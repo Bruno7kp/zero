@@ -1,11 +1,14 @@
 <?php
 namespace B7KP\Controller;
 
+use B7KP\Model\Model;
+use B7KP\Library\Route;
+
 abstract class Controller
 {
 	protected $factory;
 	
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		$this->factory = $factory;
 	}
@@ -32,14 +35,16 @@ abstract class Controller
 
 	protected function render($file, $variables = array())
 	{
+
 		unset($variables['file']);
 		extract($variables);
-		include dirname(dirname(dirname(__FILE__)))."/view/".$file;
+		include MAIN_DIR."/view/".$file;
 	}
 
 	protected function createForm($formclass, $obj = null)
 	{
-		if(get_parent_class($formclass) == "Form")
+		$formclass = "B7KP\Form\\".$formclass;
+		if(get_parent_class($formclass) == "B7KP\\Form\\Form")
 		{
 			$form = new $formclass();
 			$form->build($obj);

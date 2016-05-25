@@ -1,6 +1,9 @@
 <?php 
 namespace B7KP\Library;
 
+use B7KP\Core\Dao;
+use B7KP\Model\Model;
+
 class Template
 {
 	private static $dao;
@@ -11,7 +14,7 @@ class Template
 	private static function setFactory()
 	{
 		self::$dao = Dao::getConn();
-		self::$factory = new MainFactory(self::$dao);
+		self::$factory = new Model(self::$dao);
 	}
 
 	public static function render()

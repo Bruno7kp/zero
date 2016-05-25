@@ -1,6 +1,8 @@
 <?php
 namespace B7KP\Core;
 
+use \PDO;
+
 class Crud extends PDO {
 	private $error;
 	private $sql;

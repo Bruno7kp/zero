@@ -1,3 +1,11 @@
+<?php
+use B7KP\Library\Url;
+use B7KP\Library\Route;
+use B7KP\Core\App;
+use B7KP\Utils\UserSession;
+use B7KP\Entity\User;
+
+?>
 <header id="fh5co-header-section" role="header" class="" >
 	<div class="container">
 		

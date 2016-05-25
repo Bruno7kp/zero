@@ -1,3 +1,6 @@
+<?php
+use B7KP\Library\Route;
+?>
 <html>
 <?php
 	$head = array("title" => "Login");

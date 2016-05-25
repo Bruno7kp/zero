@@ -1,10 +1,14 @@
 <?php
-/**
-* src/Controller/RegisterController.php
-*/
+namespace B7KP\Controller;
+
+use B7KP\Model\Model;
+use B7KP\Library\Assert;
+use B7KP\Utils\Login;
+use B7KP\Library\Url;
+
 class RegisterController extends Controller
 {
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 	}

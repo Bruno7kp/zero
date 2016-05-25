@@ -1,6 +1,8 @@
 <?php 
 namespace B7KP\Model;
 
+use B7KP\Core\Dao;
+
 class Model
 {
 	protected $dao;
@@ -14,13 +16,13 @@ class Model
 	{
 		if(!class_exists($entity))
 		{
-			throw new MainException("Class ".$entity." not found");
+			throw new \Exception("Class ".$entity." not found");
 		}
 
 		$this->object = new $entity();
 		$this->object->fillData($arg);
 
-		$id = $this->dao->create(strtolower($entity), $this->object->getAllAsArray());
+		$id = $this->dao->create($entity::getTableName(), $this->object->getAllAsArray());
 
 		return $id;
 	}
@@ -29,19 +31,19 @@ class Model
 	{
 		if(!class_exists($entity))
 		{
-			throw new MainException("Class ".$entity." not found");
+			throw new \Exception("Class ".$entity." not found");
 		}
 
 		$this->object = $this->findOneBy($entity, $arg->id);
 
 		if(count($this->object) != 1)
 		{
-			throw new MainException($entity." not found");
+			throw new \Exception($entity." not found");
 		}
 
 		$this->object->fillData($arg);
 
-		$rows = $this->dao->update(strtolower($entity), $this->object->getAllAsArray(), "id = :id", array("id" => $this->object->id));
+		$rows = $this->dao->update($entity::getTableName(), $this->object->getAllAsArray(), "id = :id", array("id" => $this->object->id));
 
 		return $rows;
 	}
@@ -50,13 +52,13 @@ class Model
 	{
 		if(!class_exists($entity))
 		{
-			throw new MainException("Class ".$entity." not found");
+			throw new \Exception("Class ".$entity." not found");
 		}
 
 		$this->object = $this->findOneBy($entity, $id);
 		if(count($this->object) != 1)
 		{
-			throw new MainException("Object not found");
+			throw new \Exception("Object not found");
 		}
 
 		return $this->dao->delete($entity, "id = :id", array("id" => $id));
@@ -64,7 +66,7 @@ class Model
 
 	public function findOneBy($entity, $cond, $by = "id")
 	{
-		$results = $this->dao->findBy($entity, $cond, $by);
+		$results = $this->dao->findBy($entity::getTableName(), $cond, $by);
 		if(count($results) < 1)
 		{
 			return false;
@@ -75,20 +77,20 @@ class Model
 
 	public function find($entity, $cond, $order = false, $limit = false, $andor = "AND", $like = "=")
 	{
-		$results = $this->dao->find($entity, $cond, $order, $limit, $andor, $like);
+		$results = $this->dao->find($entity::getTableName(), $cond, $order, $limit, $andor, $like);
 		return $this->createMultipleObjects($entity, $results);
 	}
 
 	public function findMtoM($primary, $secondary, $cond = false, $bind = false, $obj = true, $inverse = false, $order = "")
 	{
-		$contable = $primary."_".$secondary;
-		$tables = $primary.", ".$secondary.", ".$contable;
+		$contable = $primary::getTableName()."_".$secondary::getTableName();
+		$tables = $primary::getTableName().", ".$secondary::getTableName().", ".$contable;
 		$bindF = array();
 		$cols = "*";
 
 		if(!$cond)
 		{
-			$cond = $primary.".id = ".$contable.".id".$primary. " AND ".$secondary.".id = ".$contable.".id".$secondary;
+			$cond = $primary::getTableName().".id = ".$contable.".id".$primary::getTableName(). " AND ".$secondary::getTableName().".id = ".$contable.".id".$secondary::getTableName();
 		}
 
 		if(is_array($bind))

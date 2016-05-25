@@ -1,11 +1,13 @@
 <?php 
 namespace B7KP\Controller;
 
+use B7KP\Model\Model;
+
 class ErrorController extends Controller
 {
 	private $message = "Page not found";
 
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 	}

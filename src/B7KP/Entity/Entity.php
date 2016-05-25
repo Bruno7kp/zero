@@ -67,5 +67,12 @@ abstract class Entity
 
 		return $value;
 	}
+
+	public static function getTableName()
+	{
+		$class = explode("\\", get_called_class());
+		$class = strtolower(end($class));
+		return strtolower($class);
+	}
 }
 ?>

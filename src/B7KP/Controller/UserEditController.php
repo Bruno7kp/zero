@@ -1,11 +1,17 @@
 <?php
 namespace B7KP\Controller;
 
+use B7KP\Model\Model;
+use B7KP\Utils\UserSession;
+use B7KP\Utils\Login;
+use B7KP\Library\Assert;
+use B7KP\Library\Route;
+
 class UserEditController extends Controller
 {
 	private $user;
 
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 		$this->user = UserSession::getUser($this->factory);

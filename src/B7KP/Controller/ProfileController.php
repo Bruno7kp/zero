@@ -1,10 +1,15 @@
 <?php
 namespace B7KP\Controller;
 
+use B7KP\Model\Model;
+use B7KP\Utils\UserSession;
+use B7KP\Entity\User;
+use LastFmApi\Main\LastFm;
+
 class ProfileController extends Controller
 {
 	
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 	}
@@ -14,7 +19,7 @@ class ProfileController extends Controller
 	*/
 	public function profileAction($login)
 	{
-		$user = $this->factory->findOneBy("User", $login, "login");
+		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
 			$lfm = new LastFm();

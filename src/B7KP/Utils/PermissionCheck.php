@@ -1,6 +1,8 @@
 <?php 
 namespace B7KP\Utils;
 
+use B7KP\Interfaces\iPermission;
+
 class PermissionCheck
 {
 

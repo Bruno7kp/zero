@@ -9,6 +9,9 @@ function __autoload($className)
 
 	$class = str_replace('\\', '/', $className);
 	$file = MAIN_DIR."src/".$class.".php";
-	require_once $file;
+	if(file_exists($file))
+	{
+		require_once $file;
+	}
 } 
 ?>

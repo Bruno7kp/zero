@@ -1,9 +1,15 @@
 <?php 
 namespace B7KP\Controller;
 
+use B7KP\Model\Model;
+use B7KP\Utils\UserSession;
+use B7KP\Utils\Login;
+use B7KP\Library\Assert;
+use B7KP\Library\Url;
+
 class LoginController extends Controller
 {
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 	}
@@ -71,7 +77,7 @@ class LoginController extends Controller
 	private function checkAssert($post)
 	{
 		$assert = new Assert();
-		$assert->check("User", $post, false);
+		$assert->check("\B7KP\Entity\User", $post, false);
 		$ignore = array("unique", "different");
 		$this->assertErrors = $assert->getErrors($ignore);
 

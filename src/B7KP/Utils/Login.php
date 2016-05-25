@@ -1,20 +1,23 @@
 <?php 
 namespace B7KP\Utils;
 
+use B7KP\Model\Model;
+use B7KP\Core\App;
+
 class Login
 {
 	private $login;
 	private $password;
 	private $factory;
 	
-	function __construct($login, $password, MainFactory $factory)
+	function __construct($login, $password, Model $factory)
 	{
 		$this->login 	= $login;
 		$this->password = $password;
 		$this->factory 	= $factory;
 	}
 
-	public function login($entity = "User")
+	public function login($entity = "B7KP\Entity\User")
 	{
 		$user = $this->factory->findOneBy($entity, $this->login, "login");
 		if($user instanceof $entity)

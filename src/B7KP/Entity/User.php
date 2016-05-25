@@ -1,6 +1,8 @@
 <?php
 namespace B7KP\Entity;
 
+use B7KP\Interfaces\iPermission;
+
 class User extends Entity implements iPermission
 {
 	/**

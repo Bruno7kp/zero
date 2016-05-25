@@ -1,6 +1,11 @@
 <?php 
 namespace B7KP\Library;
 
+use B7KP\Core\Dao;
+use B7KP\Model\Model;
+use B7KP\Utils\Functions;
+use LastFmApi\Main\LastFm;
+
 class Assert
 {
 	private $asserts;
@@ -14,7 +19,7 @@ class Assert
 		$reader = new AnnotationReader();
 		$this->asserts = $reader->find("property","Assert");
 		$dao = Dao::getConn();
-		$this->factory = new MainFactory($dao);
+		$this->factory = new Model($dao);
 	}
 
 	public function check($class, $data, $matchall = true, $returnnotset = true)
@@ -31,12 +36,12 @@ class Assert
 			}
 			else
 			{
-				throw new Exception("Assert not defined");
+				throw new \Exception("Assert not defined");
 			}
 		}
 		else
 		{
-			throw new Exception("Class not exists: ".$class." at ".__FILE__." on ".__LINE__);
+			throw new \Exception("Class not exists: ".$class." at ".__FILE__." on ".__LINE__);
 		}
 
 		return $this->error;
@@ -72,7 +77,7 @@ class Assert
 						}
 						else
 						{
-							throw new Exception("Type of assert not valid: ".$assert);
+							throw new \Exception("Type of assert not valid: ".$assert);
 						}
 					}
 				}
@@ -94,7 +99,7 @@ class Assert
 						}
 						else
 						{
-							throw new Exception("Type of assert not valid: ".$assert);
+							throw new \Exception("Type of assert not valid: ".$assert);
 						}
 					}
 				}

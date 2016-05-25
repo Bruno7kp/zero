@@ -8,14 +8,15 @@ class Cache
 
 	static function getJsonData($class, $file = "main")
 	{
-		$filejson = dirname(dirname(dirname(__FILE__)))."/cache/".$class."/".$file.".json";
+		$class = str_replace("\\", "-", $class);
+		$filejson = MAIN_DIR."/cache/".$class."/".$file.".json";
 		$content = file_get_contents($filejson);
 		return json_decode($content);
 	}
 
 	static function setJsonData($class, $data, $file = "main")
 	{
-		$dir = dirname(dirname(dirname(__FILE__)))."/cache/".$class;
+		$dir = MAIN_DIR."/cache/".$class;
 		if(!file_exists($dir))
 		{
 			mkdir($dir, 0777, true);

@@ -1,6 +1,8 @@
 <?php
 namespace B7KP\Library;
 
+use B7KP\Utils\Functions;
+
 class Route
 {
 	private static $routes;

@@ -1,6 +1,10 @@
 <?php 
 namespace B7KP\Library;
 
+use B7KP\Interfaces\iCache;
+use B7KP\Utils\Cache;
+use B7KP\Utils\Functions;
+
 class AnnotationReader implements iCache
 {
 	private $reflection;
@@ -71,7 +75,7 @@ class AnnotationReader implements iCache
 	private function scan()
 	{
 		unset($this->scan);
-		$scanned_directory = $this->findPHPFiles(dirname(dirname(__FILE__)));
+		$scanned_directory = $this->findPHPFiles();
 
 		foreach ($scanned_directory as $file) {
 			$class = str_replace(".php", "", $file);
@@ -91,7 +95,7 @@ class AnnotationReader implements iCache
 		return $this;
 	}
 
-	private function findPHPFiles($dir){
+	private function findPHPFiles($dir = MAIN_DIR.'src/', $replace = MAIN_DIR.'src/'){
 	    $ffs = scandir($dir);
 	 	$a = array();
 
@@ -99,11 +103,12 @@ class AnnotationReader implements iCache
 	    	if($ff != '.' && $ff != '..'){
 	    		$file_parts = pathinfo($ff);
 	    		if(!empty($file_parts['extension']) && "php" == $file_parts['extension']) 
-		    		$a[] = $ff;
+		    		$a[] = str_replace("/", "\\", str_replace($replace, "", $dir)."\\".$ff);
 		    		if(is_dir($dir.'/'.$ff)) 
 	      				$a = array_merge($a, $this->findPHPFiles($dir.'/'.$ff));
 	    	}
 	  	}
+
 	  	return $a;	
 	}
 

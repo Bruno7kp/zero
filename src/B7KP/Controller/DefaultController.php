@@ -1,9 +1,11 @@
 <?php
 namespace B7KP\Controller;
 
+use B7KP\Model\Model;
+
 class DefaultController extends Controller
 {
-	function __construct(MainFactory $factory)
+	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 	}
