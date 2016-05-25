@@ -1,3 +1,7 @@
+<?php
+use B7KP\Library\Url;
+use B7KP\Core\App;
+?>
 <footer id="fh5co-footer">
 	<div class="container">
 		
@@ -5,9 +9,9 @@
 			<li><a href="#"><i class="fa fa-twitter"></i></a></li>
 			<li><a href="#"><i class="fa fa-facebook"></i></a></li>
 			<li><a href="#"><i class="fa fa-lastfm"></i></a></li>
-			<li><a href="#"><i class="fa fa-instagram"></i></a></li>
+			<li><a href="#"><i class="fa fa-github"></i></a></li>
 		</ul>
-		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a>. All rights reserved. Development <em>by</em> <a href="http://freehtml5.co" target="_blank"><?php echo App::get("author");?></a> <br> Images by <a href="http://unsplash.com/" target="_blank">Unsplash</a></small></p>
+		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a>. All rights reserved. Development <em>by</em> <a href="#" target="_blank"><?php echo App::get("author");?></a> <br> Thanks to <a href="http://freehtml5.co" target="_blank">Freehtml5.co</a>, <a href="#">Last.fm</a></small></p>
 
 	</div>
 </footer>

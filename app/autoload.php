@@ -7,36 +7,11 @@ function __autoload($className)
 		define("MAIN_DIR", dirname(dirname(__FILE__))."/");
 	}
 
-	if(strpos($className, "\\") !== false)
+	$class = str_replace('\\', '/', $className);
+	$file = MAIN_DIR."src/".$class.".php";
+	if(file_exists($file))
 	{
-		if(file_exists("src/Api/".str_replace('\\', '/', $className . '.php'))) {
-			require_once "src/Api/".str_replace('\\', '/', $className . '.php');
-		}elseif(file_exists("src/".str_replace('\\', '/', $className . '.php'))) {
-			require_once "src/".str_replace('\\', '/', $className . '.php');
-		}
-	}
-	else
-	{
-		$dirs = array(
-			"src/Controller/", 
-			"src/Core/", 
-			"src/Entity/",
-			"src/Factory/", 
-			"src/Form/", 
-			"src/Interfaces/",
-			"src/Library/",
-			"src/Security/"
-		);
-
-		foreach ($dirs as $value) {
-			$file = MAIN_DIR . $value . $className . ".php";
-
-			if(file_exists($file))
-			{
-				require_once $file;
-				break;
-			}
-		}
+		require_once $file;
 	}
 } 
 ?>

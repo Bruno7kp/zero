@@ -1,5 +1,7 @@
 <?php 
+define("MAIN_DIR", __DIR__."/");
+
 require_once("app/conf.php"); 
 
-Template::render();
+B7KP\Library\Template::render();
 ?>

@@ -1,4 +1,7 @@
 <?php
+use B7KP\Library\Url;
+use B7KP\Core\App;
+
 isset($image) || $image = Url::asset("img/hero2.jpg");
 isset($subimage) || $subimage = "";
 isset($title) || $title = App::get("name");
