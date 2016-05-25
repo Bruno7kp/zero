@@ -1,0 +1,101 @@
+:root {
+  --icon-color: rgb(21, 126, 251);
+  --link-color: #333;
+  --link-color-hover: rgb(21, 126, 251);
+}
+
+[class^="icon-"], [class*=" icon-"]{
+    color: var(--icon-color);
+}
+
+/* SPACES */
+.bottomspace-xs{
+	margin-bottom: 5px;
+}
+
+.bottomspace-sm{
+	margin-bottom: 10px;
+}
+
+
+/* ICONS SIZES */
+.font-1{
+	font-size: 1em;
+}
+
+.font-1-5{
+	font-size: 1.5em;
+}
+
+.font-2{
+	font-size: 2em;
+}
+
+.font-2-5{
+	font-size: 2.5em;
+}
+
+.font-3{
+	font-size: 3em;
+}
+
+.font-4{
+	font-size: 4em;
+}
+
+.font-5{
+	font-size: 5em;
+}
+
+.font-7-5{
+	font-size: 7.5em;
+}
+
+.font-10{
+	font-size: 10em;
+}
+
+.font-15{
+	font-size: 15em;
+}
+
+.font-20{
+	font-size: 20em;
+}
+
+/* ALERT */
+.alert-minimalist {
+	background-color: rgb(255, 255, 255);
+	border-color: rgba(149, 149, 149, 0.3);
+	border-radius: 3px;
+	color: rgb(149, 149, 149);
+	padding: 10px;
+}
+.alert-minimalist > [data-notify="icon"] {
+	height: 50px;
+	margin-right: 12px;
+}
+.alert-minimalist > [data-notify="title"] {
+	color: rgb(51, 51, 51);
+	display: block;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+.alert-minimalist > [data-notify="message"] {
+	font-size: 80%;
+}
+
+/* LINK */
+a.white {
+	color: white;
+}
+ a.white-hover:hover{
+	color: white;
+ }
+
+/* DARK BG */
+#bg {
+	filter: brightness(0.5);
+	-webkit-filter: brightness(0.5);
+	-moz-filter: brightness(0.5);
+}

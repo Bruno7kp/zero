@@ -1,0 +1,13 @@
+>> ZERO
+
+/app
+> Configuration
+
+/src
+> Classes
+
+/src/Core
+> App Info :: DataBase Connection
+
+/src/Controller
+> 
