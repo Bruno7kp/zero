@@ -35,9 +35,9 @@ class Login
 		}
 	}
 
-	static function logout()
+	static function logout($entity = "B7KP\Entity\User")
 	{
-		unset($_SESSION[App::get("name")]["USER"]);
+		unset($_SESSION[App::get("name")][strtoupper($entity)]);
 	}
 }
 ?>
