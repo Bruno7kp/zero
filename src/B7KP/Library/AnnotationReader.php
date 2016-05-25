@@ -21,7 +21,10 @@ class AnnotationReader implements iCache
 	}
 
 	/**
-	* $cpm = class/property/method
+	* $cpm = Class(e)/Property(Propriedade/Atributo)/Method(Método)
+	* Se $usecache for 'true', vai ser carregado os dados do arquivo json correspondente
+	* Se $forceupdate for 'true', antes de carregar, o arquivo será atualizado
+	* Se $usecache for 'false', $forceupdate também será, já que o arquivo não será utilizado
 	*/
 	public function find($cpm, $annotation, $forceupdate = true)
 	{
