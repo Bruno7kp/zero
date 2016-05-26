@@ -653,7 +653,7 @@ textarea {
 }
 
 body.inner-page #fh5co-hero {
-  height: 400px;
+  height: 500px;
 }
 
 #bg {
@@ -678,7 +678,7 @@ body.blur #bg {
 
 body.inner-page #fh5co-hero .fh5co-hero-wrap {
   padding-top: 50px;
-  height: 400px;
+  height: 500px;
 }
 
 @media screen and (max-width: 768px) {
@@ -704,7 +704,7 @@ body.inner-page #fh5co-hero .fh5co-hero-wrap {
 }
 
 body.inner-page #fh5co-main {
-  margin-top: 400px;
+  margin-top: 500px;
 }
 
 body.inner-min #fh5co-main {

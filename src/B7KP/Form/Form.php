@@ -14,7 +14,8 @@ abstract class Form
 	const TYPE_CHECK = 5;
 	const TYPE_RADIO = 6;
 	const TYPE_FILE = 7;
-	const TYPE_SUBMIT = 8;
+	const TYPE_BIG_TEXT = 8;
+	const TYPE_SUBMIT = 9;
 
 	function __construct(){}
 
@@ -41,20 +42,23 @@ abstract class Form
 		return $this;
 	}
 
-	final protected function add($type, $name, $class = "form-control", $options = array())
+	final protected function add($type, $name, $class = "form-control", $options = array(), $placeholder = false)
 	{
 		switch ($type) {
 			case self::TYPE_TEXT:
-				$this->input("text", $name, $class);
+				$this->input("text", $name, $class, $placeholder);
+				break;
+			case self::TYPE_BIG_TEXT:
+				$this->textarea($name, $class);
 				break;
 			case self::TYPE_PASS:
-				$this->input("password", $name, $class);
+				$this->input("password", $name, $class, $placeholder);
 				break;
 			case self::TYPE_MAIL:
-				$this->input("email", $name, $class);
+				$this->input("email", $name, $class, $placeholder);
 				break;
 			case self::TYPE_HIDDEN:
-				$this->input("hidden", $name, $class);
+				$this->input("hidden", $name, $class, $placeholder);
 				break;
 			case self::TYPE_SELECT:
 				$this->select($name, $class, $options);
@@ -80,11 +84,12 @@ abstract class Form
 		return $this;
 	}
 
-	final protected function input($type, $name, $class)
+	final protected function input($type, $name, $class, $placeholder)
 	{
+		if(!$placeholder): $placeholder = ucfirst($name); endif;
 		$value = $this->checkValue($name);
 		$this->form .= "<div class='form-group'>";
-		$this->form .= "<input type='".$type."' name='".$name."' class='".$class."' value='".$value."' placeholder='".ucfirst($name)."'>";
+		$this->form .= "<input type='".$type."' name='".$name."' class='".$class."' value='".$value."' placeholder='".$placeholder."'>";
 		$this->form .= "</div>";
 	}
 
@@ -100,11 +105,11 @@ abstract class Form
 		$value = "";
 		if($this->obj)
 		{
-			if(is_object($this->obj))
+			if(is_object($this->obj) && isset($this->obj->$name))
 			{
 				$value = $this->obj->$name;
 			}
-			elseif(is_array($obj))
+			elseif(is_array($this->obj) && isset($this->obj[$name]))
 			{
 				$value = $this->obj[$name];
 			}

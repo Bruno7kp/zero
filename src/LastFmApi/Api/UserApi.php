@@ -149,6 +149,7 @@ class UserApi extends BaseApi
             $info['subscriber'] = (string) $call->user->subscriber;
             $info['playcount'] = (string) $call->user->playcount;
             $info['playlists'] = (string) $call->user->playlists;
+            $info['registered'] = (string) $call->user->registered;
 
             return $info;
         } else {

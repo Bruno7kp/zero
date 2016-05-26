@@ -13,6 +13,7 @@ class LastFm
     private $apiKey;
     private $sessionKey;
     private $secret;
+    private $token = false;
     private $artistApi;
     private $userName;
     private $artists = array();
@@ -23,14 +24,20 @@ class LastFm
 
     public function __construct()
     {
-        $this->apiKey = '1678d4b98027bed86c9db0f2f0d33ad9'; //required
-        $this->secret = 'ebf81920241cd59da9f2ff6ccb62be61'; //required
+        $this->apiKey = '68d81020be83713df69720b5acdf0a1f';
+        $this->secret = 'daf57401387415299a1778da3544ab10';
         $auth = new AuthApi('setsession', array('apiKey' => $this->apiKey, 'secret' => $this->secret));
         $this->artistApi = new ArtistApi($auth);
         $this->albumApi = new AlbumApi($auth);
         $this->trackApi = new TrackApi($auth);
         $this->libraryApi = new LibraryApi($auth);
         $this->userApi = new UserApi($auth);
+    }
+
+    public function setToken($token)
+    {
+        $auth = new AuthApi('getsession', array('apiKey' => $this->apiKey, 'secret' => $this->secret, 'token' => $token));
+        return $auth->username;
     }
 
     public function setUser($user)
@@ -67,6 +74,43 @@ class LastFm
             $vars['user'] = $this->userName;
         }
         return $this->userApi->getTopArtists($vars);
+    }
+
+    public function getUserTopAlbum($vars = array())
+    {
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        return $this->userApi->getTopAlbums($vars);
+    }
+
+    public function getUserTopMusic($vars = array())
+    {
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        return $this->userApi->getTopTracks($vars);
+    }
+
+    public function getRecentTrack($vars = array())
+    {
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        $vars['limit'] = 4;
+        return $this->userApi->getRecentTracks($vars);   
+    }
+
+    public function getWeeklyChartList($vars = array())
+    {
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        return $this->userApi->getWeeklyChartList($vars); 
     }
 
     public function getArtistInfo($str)
@@ -147,6 +191,27 @@ class LastFm
         $artistInfo = $this->artistApi->getInfo(array("artist" => $artist));
 
         return $artistInfo['bio'];
-    }   
+    }  
+
+    // Funções auxiliares
+
+    public function removeWeeksBeforeDate($array = array(), $date)
+    {
+        $date   = str_replace("/", "-", str_replace(".", "-", $date)); 
+        $array  = (array) $array;
+        $array  = array_reverse($array);
+        $date   = new \DateTime($date);
+        $date   = $date->format("U");
+        $final  = array();
+        foreach ($array as $value) {
+            if($value['to'] < $date)
+            {
+                break;
+            }
+            $final[] = $value;
+        }
+
+        return $final;
+    }
 }
 ?>

@@ -6,6 +6,7 @@ use B7KP\Utils\UserSession;
 use B7KP\Utils\Login;
 use B7KP\Library\Assert;
 use B7KP\Library\Route;
+use B7KP\Entity\User;
 
 class UserEditController extends Controller
 {
@@ -47,7 +48,7 @@ class UserEditController extends Controller
 			$post->id = $this->user->id;
 			if($this->checkAssert($post))
 			{
-				$affected = $this->factory->update("User", $post);
+				$affected = $this->factory->update("B7KP\Entity\User", $post);
 				if($affected > 0)
 				{
 					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("userprofile"));
@@ -72,7 +73,7 @@ class UserEditController extends Controller
 	private function checkAssert($post)
 	{
 		$assert = new Assert();
-		$assert->check("User", $post, false);
+		$assert->check("\B7KP\Entity\User", $post, false);
 		$this->assertErrors = $assert->getErrors();
 
 		return count($this->assertErrors)==0;

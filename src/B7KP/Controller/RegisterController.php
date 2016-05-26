@@ -3,8 +3,11 @@ namespace B7KP\Controller;
 
 use B7KP\Model\Model;
 use B7KP\Library\Assert;
-use B7KP\Utils\Login;
 use B7KP\Library\Url;
+use B7KP\Utils\Login;
+use B7KP\Entity\User;
+use B7KP\Utils\UserSession;
+use LastFmApi\Main\LastFm;
 
 class RegisterController extends Controller
 {
@@ -18,10 +21,35 @@ class RegisterController extends Controller
 	*/
 	public function indexAction()
 	{
+		$var = array();
 		$this->checkAccess();
-		$form = $this->createForm("RegisterForm");
-		$var = array("form" => $form);
-		$this->render("register.php", $var);
+		$get = (object)$_GET;
+		if(isset($get->token))
+		{
+			$lfm_user = $this->checkToken($get->token);
+			if(!is_null($lfm_user))
+			{
+				$get->login = $lfm_user;
+				$form = $this->createForm("RegisterForm", $get);
+				$var = array("form" => $form, "lfm_user" => $lfm_user);
+				$this->render("register.php", $var);
+				return;
+			}
+			else
+			{
+				$var["error"] = true;
+			}
+		}
+		$this->render("auth.php", $var);
+	}
+
+	/**
+	* return = username or null
+	*/
+	private function checkToken($token)
+	{
+		$lfm = new LastFm();
+		return $lfm->setToken($token);
 	}
 
 	protected function checkAccess()
@@ -42,7 +70,7 @@ class RegisterController extends Controller
 		{
 			if($this->checkAssert($post))
 			{
-				$id = $this->factory->add("User", $post);
+				$id = $this->factory->add("B7KP\Entity\User", $post);
 				if($id > 0)
 				{
 					$login = new Login($post->login, $post->password, $this->factory);
@@ -69,7 +97,7 @@ class RegisterController extends Controller
 	private function checkAssert($post)
 	{
 		$assert = new Assert();
-		$assert->check("User", $post, false);
+		$assert->check("\B7KP\Entity\User", $post, false);
 		$this->assertErrors = $assert->getErrors();
 
 		return count($this->assertErrors)==0;

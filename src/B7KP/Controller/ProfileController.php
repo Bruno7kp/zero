@@ -22,24 +22,33 @@ class ProfileController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			$lfm = new LastFm();
-			$last = $lfm->setUser($user->login)->getUserInfo();
-			$acts = $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+			$lfm 	= new LastFm();
+			$last 	= $lfm->setUser($user->login)->getUserInfo();
+			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
+			$acts 	= $lfm->getUserTopArtist(array("limit" => 5, "period" => "overall"));
+			$albs 	= $lfm->getUserTopAlbum(array("limit" => 5, "period" => "overall"));
+			$mus 	= $lfm->getUserTopMusic(array("limit" => 5, "period" => "overall"));
+			$weeks 	= $lfm->getWeeklyChartList();
+			$weeks 	= $lfm->removeWeeksBeforeDate($weeks, $date);
+			$recent = $lfm->getRecentTrack();
 			$topact = false; $bgimage = false;
 			if(isset($acts[0])): 
-				$topact = $acts[0];
 				$bgimage = $acts[0]["images"]["mega"]; 
 			endif;
 			$var = array
 					(
-						"user" => $user, 
-						"lfm_href" => $last["url"], 
-						"lfm_image" => str_replace("34s", "avatar170s", $last["image"]),
+						"user" 			=> $user, 
+						"lfm_href" 		=> $last["url"], 
+						"lfm_image" 	=> str_replace("34s", "avatar170s", $last["image"]),
 						"lfm_playcount" => $last["playcount"],
-						"lfm_age" => $last["age"],
-						"lfm_country" => $last["country"],
-						"lfm_bg" => $bgimage,
-						"lfm_topact" => $topact
+						"lfm_country" 	=> $last["country"],
+						"lfm_bg" 		=> $bgimage,
+						"lfm_topalbs"	=> $albs,
+						"lfm_topacts" 	=> $acts,
+						"lfm_topmus" 	=> $mus,
+						"lfm_register"	=> $date,
+						"recent"		=> $recent,
+						"weeks" 		=> $weeks
 					);
 			$this->render("profile.php", $var);
 		}

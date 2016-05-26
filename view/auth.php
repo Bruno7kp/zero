@@ -17,12 +17,18 @@ use B7KP\Core\App;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2>Register <br><small>or <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
-							<small class="text-muted">
-								Hello, <strong><?php echo $lfm_user;?></strong>. Complete the fields below and done. To access <?php echo App::get('name');?> again, use your last.fm login and the new password you will insert below. We do <strong>not</strong> recomend to use the same password of your Last.fm account.
-							</small>
+							<h2>Connect <?php echo App::get('name');?> with Last.fm <br><small>You already did that? <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
+
+							<a class="btn btn-danger" href="<?php echo "http://www.last.fm/api/auth/?api_key=68d81020be83713df69720b5acdf0a1f";?>">
+							<i class="fa fa-lastfm"></i> Click Here
+							</a>
 							<?php 
-								$form->output();
+							if(isset($error) && $error)
+							{
+							?>
+							<div class="alert alert-danger">Something went wrong when checking the token. Try again later. <i class="fa-frown-o fa-fw fa"></i></div>
+							<?php
+							}
 							?>
 						</div>
 

@@ -6,7 +6,7 @@ class Functions
 	static function correctDate($date, $format)
 	{
 		$date = str_replace("/", "-", $date);
-		$date = new DateTime($date);
+		$date = new \DateTime($date);
 		$date = $date->format($format);
 		return $date;
 	}
@@ -24,6 +24,10 @@ class Functions
 		return $final;
 	}
 
+	static function extractNumber($str)
+	{
+		return preg_replace("/[^0-9]/","",$str);
+	}
 
 	static function getStringBetween($str, $start, $end)
 	{

@@ -9,7 +9,7 @@ namespace LastFmApi\Api;
 /**
  * Allows access to the api requests relating to authentication
  */
-class AuthApi
+class AuthApi extends BaseApi
 {
 
     /**

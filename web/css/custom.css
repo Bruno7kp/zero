@@ -2,10 +2,15 @@
   --icon-color: rgb(21, 126, 251);
   --link-color: #333;
   --link-color-hover: rgb(21, 126, 251);
+  --main-site-color: #28bbf8;
 }
 
-[class^="icon-"], [class*=" icon-"]{
+[class^="icon-"], [class*=" icon-"]:not(.except){
     color: var(--icon-color);
+}
+
+.ico-color{
+	color: var(--main-site-color);
 }
 
 /* SPACES */

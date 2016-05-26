@@ -6,7 +6,7 @@ use B7KP\Interfaces\iPermission;
 class User extends Entity implements iPermission
 {
 	/**
-	* @Assert(null=false|alfanum|max=20|min=3|unique|lastfm|different=["admin", "adm", "user", "superuser"])
+	* @Assert(null=false|max=20|min=3|unique|lastfm|different=["admin", "adm", "user", "superuser"])
 	*/
 	protected $login;
 
@@ -25,11 +25,6 @@ class User extends Entity implements iPermission
 	*/
 	protected $name;
 
-	/**
-	* @Assert(null=true)
-	*/
-	protected $avatar;
-
 	function __construct()
 	{
 		parent::__construct();
@@ -37,7 +32,26 @@ class User extends Entity implements iPermission
 
 	function permissionLevel()
 	{
+		if(in_array(strtolower($this->login), $this->modUsers()))
+		{
+			return 5;
+		}
+		if(in_array(strtolower($this->login), $this->adminUsers()))
+		{
+			return 7;
+		}
 		return 1;
 	}
+
+	private function adminUsers()
+	{
+		return array('bruno7kp');
+	}
+
+	private function modUsers()
+	{
+		return array();
+	}
+
 }
 ?>

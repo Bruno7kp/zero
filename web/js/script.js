@@ -36,6 +36,8 @@ function formSubmit()
 		})
 		.fail(function() {
 			console.log("error");
+			showAlert(1, "Something went wrong. Try Again later.");
+			undisable(thisBtn);
 		})
 		.always(function() {
 			console.log("complete");
@@ -46,13 +48,15 @@ function formSubmit()
 function disable(item)
 {
 	item.attr('disabled', 'disabled');
-	item.addClass('disabled')
+	item.addClass('disabled');
+	item.text('wait...');
 }
 
 function undisable(item)
 {
 	item.removeAttr('disabled');
 	item.removeClass('disabled');
+	item.text('submit');
 }
 
 function goTo(data)
@@ -84,6 +88,7 @@ function showAlert(erro, message)
 		type: 'minimalist',
 		delay: 4000,
 		allow_dismiss: true,
+		newest_on_top: true,
 		template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
 			'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
 			'<i data-notify="icon" class="bottomspace-sm pull-left"></i>' +
