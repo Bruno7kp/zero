@@ -22,6 +22,11 @@ abstract class Entity
 		// Do nothing
 	}
 
+	function __isset($property)
+	{
+		return isset($this->$property);
+	}
+
 	final private function set($property, $value)
 	{
 		if($this->setable($property))

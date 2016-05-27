@@ -28,8 +28,9 @@ class ProfileController extends Controller
 			$acts 	= $lfm->getUserTopArtist(array("limit" => 5, "period" => "overall"));
 			$albs 	= $lfm->getUserTopAlbum(array("limit" => 5, "period" => "overall"));
 			$mus 	= $lfm->getUserTopMusic(array("limit" => 5, "period" => "overall"));
-			$weeks 	= $lfm->getWeeklyChartList();
-			$weeks 	= $lfm->removeWeeksBeforeDate($weeks, $date);
+			$wksfm 	= $lfm->getWeeklyChartList();
+			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date));
+			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
 			$recent = $lfm->getRecentTrack();
 			$topact = false; $bgimage = false;
 			if(isset($acts[0])): 
@@ -48,7 +49,8 @@ class ProfileController extends Controller
 						"lfm_topmus" 	=> $mus,
 						"lfm_register"	=> $date,
 						"recent"		=> $recent,
-						"weeks" 		=> $weeks
+						"weeks" 		=> $weeks,
+						"weekstodate"	=> $wksfm
 					);
 			$this->render("profile.php", $var);
 		}
@@ -72,7 +74,7 @@ class ProfileController extends Controller
 	{
 		if(UserSession::getUser($this->factory) == false)
 		{
-			$this->redirectToRoute("home");
+			$this->redirectToRoute("login");
 		}
 	}
 }

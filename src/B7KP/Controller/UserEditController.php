@@ -19,7 +19,7 @@ class UserEditController extends Controller
 	}
 
 	/**
-	* @Route(name=useredit|route=/edit)
+	* @Route(name=useredit|route=/edit/email)
 	*/
 	public function indexAction()
 	{

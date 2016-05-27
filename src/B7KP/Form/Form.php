@@ -4,18 +4,20 @@ namespace B7KP\Form;
 abstract class Form
 {
 	protected $form = "";
-	protected $obj = false;
+	protected $obj 	= false;
 
-	const TYPE_TEXT = 0;
-	const TYPE_PASS = 1;
-	const TYPE_MAIL = 2;
-	const TYPE_HIDDEN = 3;
-	const TYPE_SELECT = 4;
-	const TYPE_CHECK = 5;
-	const TYPE_RADIO = 6;
-	const TYPE_FILE = 7;
+	const TYPE_TEXT 	= 0;
+	const TYPE_PASS 	= 1;
+	const TYPE_MAIL 	= 2;
+	const TYPE_HIDDEN 	= 3;
+	const TYPE_SELECT 	= 4;
+	const TYPE_CHECK 	= 5;
+	const TYPE_RADIO 	= 6;
+	const TYPE_FILE 	= 7;
 	const TYPE_BIG_TEXT = 8;
-	const TYPE_SUBMIT = 9;
+	const TYPE_SUBMIT 	= 9;
+	const SEPARATOR 	= 10;
+	const COMMENT 		= 11;
 
 	function __construct(){}
 
@@ -61,7 +63,7 @@ abstract class Form
 				$this->input("hidden", $name, $class, $placeholder);
 				break;
 			case self::TYPE_SELECT:
-				$this->select($name, $class, $options);
+				$this->select($name, $class, $options, $placeholder);
 				break;
 			case self::TYPE_CHECK:
 				$this->checkbox($name, $class, $options);
@@ -74,6 +76,12 @@ abstract class Form
 				break;
 			case self::TYPE_FILE:
 				$this->file($name, $class, $options);
+				break;
+			case self::SEPARATOR:
+				$this->separator($name);
+				break;
+			case self::COMMENT:
+				$this->comment($name, $class);
 				break;
 			
 			default:
@@ -97,6 +105,43 @@ abstract class Form
 	{
 		$this->form .= "<div class='form-group'>";
 		$this->form .= "<button type='submit' class='".$class."'>".$name."</button>";
+		$this->form .= "</div>";
+	}
+
+	final protected function select($name, $class, $options, $placeholder)
+	{
+		$value = $this->checkValue($name);
+		$this->form .= "<div class='form-group'>";
+		if(!empty($placeholder)):
+			$this->form .= "<label>".$placeholder."</label>";
+		endif;
+		$this->form .= "<select class='".$class."' name='".$name."'>";
+		foreach ($options as $key => $option) {
+			if($value == $option):
+				$this->form .= "<option value='".$key."' selected>".$option."</option>";
+				continue;
+			endif;
+			$this->form .= "<option value='".$key."'>".$option."</option>";
+		}
+		$this->form .= "</select>";
+		$this->form .= "</div>";
+	}
+
+	final protected function separator($name)
+	{
+		$div = "<hr/>";
+		$accept = array("hr" => "<hr/>", "br" => "<br/>");
+		if(array_key_exists($name, $accept))
+		{
+			$div = $accept[$name];
+		}
+		$this->form .= $div;
+	}
+
+	final protected function comment($name, $class)
+	{
+		$this->form .= "<div class='".$class."'>";
+		$this->form .= $name;
 		$this->form .= "</div>";
 	}
 

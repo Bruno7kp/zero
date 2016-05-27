@@ -46,7 +46,7 @@ use B7KP\Entity\User;
 					<a href="#" class="fh5co-sub-ddown"><?php echo $user->login;?></a>
 					<ul class="fh5co-sub-menu">
 					 	<li><a href="<?php echo Route::url('userprofile');?>">Profile</a></li>
-					 	<li><a href="#">Settings</a></li>
+					 	<li><a href="<?php echo Route::url('settings');?>">Settings</a></li>
 						<li><a href="<?php echo Route::url('logout');?>">Logout</a></li>
 					</ul>
 				</li>

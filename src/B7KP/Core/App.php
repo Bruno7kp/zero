@@ -39,7 +39,7 @@ class App
 	{
 		self::$name = "ZERO";
 		self::$author = "Bruno7kp";
-		self::$version = "0.1.5"; //21009409
+		self::$version = "0.03.238"; //21009409
 
 		switch ($_SERVER['SERVER_NAME']) {
 			case 'localhost':

@@ -1,6 +1,9 @@
+<?php
+use B7KP\Library\Route;
+?>
 <html>
 <?php
-	$head = array("title" => "Edit Your Profile");
+	$head = array("title" => "Settings");
 	$this->render("ext/head.php", $head);
 ?>
 	<body class="inner-min">
@@ -13,9 +16,13 @@
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2>Edit E-Mail</h2>
-							
+							<h2>Settings</h2>
 							<?php $form->output();?>
+							<hr>
+							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline">Edit e-mail</a>
+							<br>
+							<a href="" class="btn btn-outline">Edit password</a>
+							
 						</div>
 
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
@@ -23,7 +30,7 @@
 					</div>
 					
 				</div>
-			</section>
+				</section>
 			<?php $this->render("ext/footer.php");?>
 		</div>
 	</body>

@@ -22,6 +22,54 @@
 	margin-bottom: 10px;
 }
 
+.bottomspace-md{
+	margin-bottom: 15px;
+}
+
+.bottomspace-lg{
+	margin-bottom: 20px;
+}
+
+.bottomspace-xl{
+	margin-bottom: 25px;
+}
+
+.bottomspace-big{
+	margin-bottom: 50px;
+}
+
+.bottomspace-mega{
+	margin-bottom: 100px;
+}
+
+.topspace-xs{
+	margin-top: 5px;
+}
+
+.topspace-sm{
+	margin-top: 10px;
+}
+
+.topspace-md{
+	margin-top: 15px;
+}
+
+.topspace-lg{
+	margin-top: 20px;
+}
+
+.topspace-xl{
+	margin-top: 25px;
+}
+
+.topspace-big{
+	margin-top: 50px;
+}
+
+.topspace-mega{
+	margin-top: 100px;
+}
+
 
 /* ICONS SIZES */
 .font-1{
@@ -103,4 +151,31 @@ a.white {
 	filter: brightness(0.5);
 	-webkit-filter: brightness(0.5);
 	-moz-filter: brightness(0.5);
+}
+
+/* BORDER DIVIDER */
+.divider-left {
+	border-left: #eee 1px solid;
+}
+
+.divider-right {
+	border-right: #eee 1px solid;
+}
+
+.divider-lr {
+	border-right: #eee 1px solid;
+	border-left: #eee 1px solid;
+}
+
+.divider-top {
+	border-top: #eee 1px solid;
+}
+
+.divider-bottom {
+	border-bottom: #eee 1px solid;
+}
+
+.divider-tb {
+	border-top: #eee 1px solid;
+	border-bottom: #eee 1px solid;
 }

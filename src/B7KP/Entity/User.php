@@ -2,11 +2,12 @@
 namespace B7KP\Entity;
 
 use B7KP\Interfaces\iPermission;
+use B7KP\Utils\UserSession;
 
 class User extends Entity implements iPermission
 {
 	/**
-	* @Assert(null=false|max=20|min=3|unique|lastfm|different=["admin", "adm", "user", "superuser"])
+	* @Assert(null=false|max=20|min=3|unique|lastfm)
 	*/
 	protected $login;
 
@@ -19,11 +20,6 @@ class User extends Entity implements iPermission
 	* @Assert(null=false|email|unique)
 	*/
 	protected $email;
-
-	/**
-	* @Assert(null=false)
-	*/
-	protected $name;
 
 	function __construct()
 	{
@@ -41,6 +37,17 @@ class User extends Entity implements iPermission
 			return 7;
 		}
 		return 1;
+	}
+
+	function checkSelfPermission($factory)
+	{
+		$session = UserSession::getUser($factory);
+		if($session && $session->id == $this->id)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	private function adminUsers()

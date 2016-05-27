@@ -11,7 +11,7 @@ use B7KP\Core\App;
 			<li><a href="#"><i class="fa fa-lastfm"></i></a></li>
 			<li><a href="#"><i class="fa fa-github"></i></a></li>
 		</ul>
-		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a>. All rights reserved. Development <em>by</em> <a href="#" target="_blank"><?php echo App::get("author");?></a> <br> Thanks to <a href="http://freehtml5.co" target="_blank">Freehtml5.co</a>, <a href="#">Last.fm</a></small></p>
+		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a> <?php echo App::get("version");?>. All rights reserved. Development <em>by</em> <a href="#" target="_blank"><?php echo App::get("author");?></a> <br> Thanks to <a href="http://freehtml5.co" target="_blank">Freehtml5.co</a>, <a href="#">Last.fm</a></small></p>
 
 	</div>
 </footer>
