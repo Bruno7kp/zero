@@ -1,6 +1,8 @@
 <?php 
 namespace B7KP\Utils;
 
+use B7KP\Library\Url; 
+
 class Snippets
 {
 	static function recentListRow($name, $img, $artist, $album, $url)
@@ -18,7 +20,6 @@ class Snippets
 				<small>{$artist}</small>
 			</div>
 		</div>
-		<hr>
 		";
 	}
 
@@ -42,7 +43,6 @@ class Snippets
 				</div>
 			</div>
 		</div>
-		<hr>
 		";
 	}
 
@@ -68,7 +68,6 @@ class Snippets
 				</div>
 			</div>
 		</div>
-		<hr>
 		";
 	}
 
@@ -94,7 +93,13 @@ class Snippets
 				</div>
 			</div>
 		</div>
-		<hr>
+		";
+	}
+
+	static function loader($size)
+	{
+		return "
+		<img src='".Url::asset("img/loader.gif")."' style='margin: 15px 0px; width: ".$size."px' alt='loading...'>
 		";
 	}
 }

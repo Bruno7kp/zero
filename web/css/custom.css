@@ -179,3 +179,10 @@ a.white {
 	border-top: #eee 1px solid;
 	border-bottom: #eee 1px solid;
 }
+
+.divider {
+	border-top: #eee 1px solid;
+	border-bottom: #eee 1px solid;
+	border-right: #eee 1px solid;
+	border-left: #eee 1px solid;
+}

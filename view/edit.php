@@ -1,3 +1,6 @@
+<?php
+use B7KP\Library\Route;
+?>
 <html>
 <?php
 	$head = array("title" => "Edit Your Profile");
@@ -16,8 +19,10 @@
 							<h2>Edit E-Mail</h2>
 							
 							<?php $form->output();?>
-						</div>
 
+							<hr>
+							<a href="<?php echo Route::url('settings');?>" class="btn btn-outline">Settings</a>
+						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
 
 					</div>

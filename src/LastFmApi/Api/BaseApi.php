@@ -198,44 +198,18 @@ class BaseApi
 
     private function process_response()
     {
-        $xmlstr = '';
-        $record = 0;
-        foreach ($this->response as $line) {
-            if ($record == 1) {
-                $xmlstr .= $line;
-            } elseif (substr($line, 0, 1) == '<') {
-                $record = 1;
-            } elseif (preg_match('/^HTTP\/1.[0-9]{1} ([4-9]{1}[0-9]{2}.*)/', $line, $matches)) {
-                $this->handleError(99, $this->host . ': Service not available (' . trim($matches[1]) . ')');
-                return;
+        $end = false;
+        $resp = "";
+        for ($i=11; $end == false; $i++) { 
+            if(isset($this->response[$i])){
+                $resp .= $this->response[$i];
+            }
+            else
+            {
+                $end = true;
             }
         }
-
-        try {
-            libxml_use_internal_errors(true);
-            $xml = new SimpleXMLElement($xmlstr);
-        } catch (Exception $e) {
-            // Crap! We got errors!!!
-            $errors = libxml_get_errors();
-            $errorMessage = '';
-            if (is_array($errors) && sizeof($errors)) { //array can be empty
-                $error = $errors[0];
-                $errorMessage = $error->message;
-            }
-            $this->handleError(95, 'SimpleXMLElement error: ' . $e->getMessage() . ': ' . $errorMessage);
-        }
-
-        if (!isset($e)) {
-            // All is well :)
-            return $xml;
-            /* return filter_var_array(
-              (array) $xml,
-              array(
-              'filter' => FILTER_SANITIZE_STRING,
-              'flags' => FILTER_FLAG_STRIP_HIGH
-              )
-              ); */
-        }
+        return json_decode($resp);
     }
 
     /*
@@ -264,6 +238,7 @@ class BaseApi
                     }
                     $url = substr($url, 0, -1);
                     $url = str_replace(' ', '%20', $url);
+                    $url .= "&format=json";
 
                     $out = "GET " . $url . " HTTP/1.0\r\n";
                     $out .= "Host: " . $this->host . "\r\n";

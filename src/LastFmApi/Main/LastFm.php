@@ -113,9 +113,36 @@ class LastFm
         return $this->userApi->getWeeklyChartList($vars); 
     }
 
-    public function getArtistInfo($str)
+    public function getWeeklyArtistList($vars = array())
     {
-        $vars = array("artist" => $str);
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        return $this->userApi->getWeeklyArtistChart($vars);
+    }
+
+    public function getWeeklyAlbumList($vars = array())
+    {
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        return $this->userApi->getWeeklyAlbumChart($vars); 
+    }
+
+    public function getWeeklyMusicList($vars = array())
+    {
+        if(!isset($vars['user']))
+        {
+            $vars['user'] = $this->userName;
+        }
+        return $this->userApi->getWeeklyTrackChart($vars);
+    }
+
+    public function getArtistInfo($str, $mbid = null)
+    {
+        $vars = array("artist" => $str, "mbid" => $mbid);
         return $this->artistApi->getInfo($vars);
     }
 

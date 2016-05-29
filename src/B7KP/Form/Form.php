@@ -117,7 +117,7 @@ abstract class Form
 		endif;
 		$this->form .= "<select class='".$class."' name='".$name."'>";
 		foreach ($options as $key => $option) {
-			if($value == $option):
+			if($value == $key):
 				$this->form .= "<option value='".$key."' selected>".$option."</option>";
 				continue;
 			endif;

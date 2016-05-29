@@ -48,7 +48,7 @@ class SettingsController extends Controller
 					$updated = $this->factory->update("B7KP\Entity\Settings", $post);
 					if($updated)
 					{
-						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("userprofile"));
+						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("settings"));
 					}
 					else
 					{
@@ -61,7 +61,7 @@ class SettingsController extends Controller
 					$id = $this->factory->add("B7KP\Entity\Settings", $post);
 					if($id > 0)
 					{
-						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("userprofile"));
+						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("settings"));
 					}
 					else
 					{

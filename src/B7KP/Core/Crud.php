@@ -110,6 +110,27 @@ class Crud extends PDO {
 		return $this->run($sql, $bind);
 	}
 
+	public function multi_insert($table, $fields, $data) {
+		$cols = "(?";
+		for ($i=1; $i < count(explode(",", $fields)); $i++) { 
+			$cols .= ", ?";
+		}
+		$cols .= ")";
+		$values = $cols;
+		for ($i=1; $i < count($data); $i++) { 
+			$values .= ", ".$cols;
+		}
+		$sql = "INSERT INTO " . $table . " (" . $fields . ") VALUES " . $values . ";";
+		$key = 0;
+		$bind = array();
+		foreach ($data as $key) {
+			foreach ($key as $kval) {
+				$bind[] = $kval;
+			}
+		}
+		return $this->run($sql, $bind);
+	}
+
 	public function run($sql, $bind="") {
 		$this->sql = trim($sql);
 		$this->bind = $this->cleanup($bind);

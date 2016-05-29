@@ -166,22 +166,37 @@ class ArtistApi extends BaseApi
         $vars = array_merge($vars, $methodVars);
 
         if ($call = $this->apiGetCall($vars)) {
+            $a = (array)$call->artist;
+            $image[0] = (array) $call->artist->image[0];
+            $image[1] = (array) $call->artist->image[1];
+            $image[2] = (array) $call->artist->image[2];
+            $image[3] = (array) $call->artist->image[3];
+            $image[4] = (array) $call->artist->image[4];
             $info['name'] = (string) $call->artist->name;
             $info['mbid'] = (string) $call->artist->mbid;
             $info['url'] = (string) $call->artist->url;
-            $info['image']['small'] = (string) $call->artist->image;
-            $info['image']['medium'] = (string) $call->artist->image[1];
-            $info['image']['large'] = (string) $call->artist->image[2];
+            $info['images']['small'] = (string) $image[0]["#text"];
+            $info['images']['medium'] = (string) $image[1]["#text"];
+            $info['images']['large'] = (string) $image[2]["#text"];
+            $info['images']['extralarge'] = (string) $image[3]["#text"];
+            $info['images']['mega'] = (string) $image[4]["#text"];
             $info['streamable'] = (string) $call->artist->streamable;
             $info['stats']['listeners'] = (string) $call->artist->stats->listeners;
             $info['stats']['playcount'] = (string) $call->artist->stats->playcount;
             $i = 0;
             foreach ($call->artist->similar->artist as $artist) {
+                $image[0] = (array) $artist->image[0];
+                $image[1] = (array) $artist->image[1];
+                $image[2] = (array) $artist->image[2];
+                $image[3] = (array) $artist->image[3];
+                $image[4] = (array) $artist->image[4];
                 $info['similar'][$i]['name'] = (string) $artist->name;
                 $info['similar'][$i]['url'] = (string) $artist->url;
-                $info['similar'][$i]['image']['small'] = (string) $artist->image;
-                $info['similar'][$i]['image']['medium'] = (string) $artist->image[1];
-                $info['similar'][$i]['image']['large'] = (string) $artist->image[2];
+                $info['similar'][$i]['image']['small'] = (string) $image[0]["#text"];
+                $info['similar'][$i]['image']['medium'] = (string) $image[1]["#text"];
+                $info['similar'][$i]['image']['large'] = (string) $image[2]["#text"];
+                $info['similar'][$i]['image']['extralarge'] = (string) $image[3]["#text"];
+                $info['similar'][$i]['image']['mega'] = (string) $image[4]["#text"];
                 $i++;
             }
             if (count($call->artist->tags->tag) > 0) {
@@ -197,8 +212,8 @@ class ArtistApi extends BaseApi
             $info['bio']['published'] = (string) $call->artist->bio->published;
             $info['bio']['summary'] = (string) $call->artist->bio->summary;
             $info['bio']['content'] = (string) $call->artist->bio->content;
-            $info['bio']['placeformed'] = (string) $call->artist->bio->placeformed;
-            $info['bio']['yearformed'] = (string) $call->artist->bio->yearformed;
+            //$info['bio']['placeformed'] = (string) $call->artist->bio->placeformed;
+            //$info['bio']['yearformed'] = (string) $call->artist->bio->yearformed;
 
             return $info;
         } else {

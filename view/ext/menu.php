@@ -18,8 +18,14 @@ use B7KP\Entity\User;
 				<li <?php if(Route::isCurRoute('home')): echo 'class="active"';endif;?> >
 					<a href="<?php echo Route::url('home')?>">Home</a>
 				</li>
+				<li><a href="elements.html">About</a></li>
+				<?php 
+				$user = UserSession::getUser($this->factory);
+				if($user instanceof User)
+				{
+				?>
 				<li>
-					<a href="#" class="fh5co-sub-ddown">Dropdown</a>
+					<a href="#" class="fh5co-sub-ddown">Charts</a>
 					 <ul class="fh5co-sub-menu">
 					 	<li><a href="left-sidebar.html">Left Sidebar</a></li>
 					 	<li><a href="right-sidebar.html">Right Sidebar</a></li>
@@ -36,9 +42,10 @@ use B7KP\Entity\User;
 						<li><a href="#">CSS3</a></li> 
 					</ul>
 				</li>
-				<li><a href="elements.html">Elements</a></li>
 				<?php
-				$user = UserSession::getUser($this->factory);
+				}
+				?>
+				<?php
 				if($user instanceof User)
 				{
 				?>

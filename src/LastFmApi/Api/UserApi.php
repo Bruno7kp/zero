@@ -138,18 +138,19 @@ class UserApi extends BaseApi
         $vars['api_sig'] = $apiSig;
 
         if ($call = $this->apiGetCall($vars)) {
+            $img = (array)$call->user->image[2];
+            $img = $img["#text"];
             $info['name'] = (string) $call->user->name;
             $info['realname'] = (string) $call->user->realname;
             $info['url'] = (string) $call->user->url;
-            $info['image'] = (string) $call->user->image;
-            $info['lang'] = (string) $call->user->lang;
+            $info['image'] = (string) $img;
             $info['country'] = (string) $call->user->country;
             $info['age'] = (string) $call->user->age;
             $info['gender'] = (string) $call->user->gender;
             $info['subscriber'] = (string) $call->user->subscriber;
             $info['playcount'] = (string) $call->user->playcount;
             $info['playlists'] = (string) $call->user->playlists;
-            $info['registered'] = (string) $call->user->registered;
+            $info['registered'] = (int) $call->user->registered->unixtime;
 
             return $info;
         } else {
@@ -375,21 +376,23 @@ class UserApi extends BaseApi
                 if (count($call->recenttracks->track) > 0) {
                     $i = 0;
                     foreach ($call->recenttracks->track as $track) {
+                        $artist = (array) $track->artist;
+                        $album = (array) $track->album;
+                        $image[0] = (array) $track->image[0];
+                        $image[1] = (array) $track->image[1];
+                        $image[2] = (array) $track->image[2];
                         $recentTracks[$i]['name'] = (string) $track->name;
-                        if (isset($track['nowplaying'])) {
-                            $recentTracks[$i]['nowplaying'] = true;
-                        }
                         $recentTracks[$i]['mbid'] = (string) $track->mbid;
                         $recentTracks[$i]['url'] = (string) $track->url;
-                        $recentTracks[$i]['date'] = (string) $track->date['uts'];
+                        //$recentTracks[$i]['date'] = (string) $track->date['uts'];
                         $recentTracks[$i]['streamable'] = (string) $track->streamable;
-                        $recentTracks[$i]['artist']['name'] = (string) $track->artist;
-                        $recentTracks[$i]['artist']['mbid'] = (string) $track->artist['mbid'];
-                        $recentTracks[$i]['album']['name'] = (string) $track->album;
-                        $recentTracks[$i]['album']['mbid'] = (string) $track->album['mbid'];
-                        $recentTracks[$i]['images']['small'] = (string) $track->image[0];
-                        $recentTracks[$i]['images']['medium'] = (string) $track->image[1];
-                        $recentTracks[$i]['images']['large'] = (string) $track->image[2];
+                        $recentTracks[$i]['artist']['name'] = (string) $artist["#text"];
+                        $recentTracks[$i]['artist']['mbid'] = (string) $artist['mbid'];
+                        $recentTracks[$i]['album']['name'] = (string) $album['#text'];
+                        $recentTracks[$i]['album']['mbid'] = (string) $album['mbid'];
+                        $recentTracks[$i]['images']['small'] = (string) $image[0]['#text'];
+                        $recentTracks[$i]['images']['medium'] = (string) $image[1]['#text'];
+                        $recentTracks[$i]['images']['large'] = (string) $image[2]['#text'];
                         $i++;
                     }
 
@@ -592,6 +595,9 @@ class UserApi extends BaseApi
                 if (count($call->topalbums->album) > 0) {
                     $i = 0;
                     foreach ($call->topalbums->album as $album) {
+                        $image[0] = (array) $album->image[0];
+                        $image[1] = (array) $album->image[1];
+                        $image[2] = (array) $album->image[2];
                         $topalbums[$i]['name'] = (string) $album->name;
                         $topalbums[$i]['playcount'] = (string) $album->playcount;
                         $topalbums[$i]['mbid'] = (string) $album->mbid;
@@ -599,9 +605,9 @@ class UserApi extends BaseApi
                         $topalbums[$i]['artist']['name'] = (string) $album->artist->name;
                         $topalbums[$i]['artist']['mbid'] = (string) $album->artist->mbid;
                         $topalbums[$i]['artist']['url'] = (string) $album->artist->url;
-                        $topalbums[$i]['images']['small'] = (string) $album->image[0];
-                        $topalbums[$i]['images']['medium'] = (string) $album->image[1];
-                        $topalbums[$i]['images']['large'] = (string) $album->image[2];
+                        $topalbums[$i]['images']['small'] = (string) $image[0]["#text"];
+                        $topalbums[$i]['images']['medium'] = (string) $image[1]["#text"];
+                        $topalbums[$i]['images']['large'] = (string) $image[2]["#text"];
                         $i++;
                     }
 
@@ -639,17 +645,24 @@ class UserApi extends BaseApi
                 if (count($call->topartists->artist) > 0) {
                     $i = 0;
                     foreach ($call->topartists->artist as $artist) {
+                        $a = (array)$artist;
+                        $img = (array)$a["image"];
+                        $image[0] = (array)$img[0];
+                        $image[1] = (array)$img[1];
+                        $image[2] = (array)$img[2];
+                        $image[3] = (array)$img[3];
+                        $image[4] = (array)$img[4];
                         $topartists[$i]['name'] = (string) $artist->name;
-                        $topartists[$i]['rank'] = (string) $artist['rank'];
+                        $topartists[$i]['rank'] = (string) $a["@attr"]->rank;
                         $topartists[$i]['playcount'] = (string) $artist->playcount;
                         $topartists[$i]['mbid'] = (string) $artist->mbid;
                         $topartists[$i]['url'] = (string) $artist->url;
                         $topartists[$i]['streamable'] = (string) $artist->streamable;
-                        $topartists[$i]['images']['small'] = (string) $artist->image[0];
-                        $topartists[$i]['images']['medium'] = (string) $artist->image[1];
-                        $topartists[$i]['images']['large'] = (string) $artist->image[2];
-                        $topartists[$i]['images']['extralarge'] = (string) $artist->image[3];
-                        $topartists[$i]['images']['mega'] = (string) $artist->image[4];
+                        $topartists[$i]['images']['small'] = (string) $image[0]["#text"];
+                        $topartists[$i]['images']['medium'] = (string) $image[1]["#text"];
+                        $topartists[$i]['images']['large'] = (string) $image[2]["#text"];
+                        $topartists[$i]['images']['extralarge'] = (string) $image[3]["#text"];
+                        $topartists[$i]['images']['mega'] = (string) $image[4]["#text"];
                         $i++;
                     }
 
@@ -727,19 +740,24 @@ class UserApi extends BaseApi
                 if (count($call->toptracks->track) > 0) {
                     $i = 0;
                     foreach ($call->toptracks->track as $track) {
+                        $t = (array)$track;
+                        $image[0] = (array) $track->image[0];
+                        $image[1] = (array) $track->image[1];
+                        $image[2] = (array) $track->image[2];
+
                         $toptracks[$i]['name'] = (string) $track->name;
-                        $toptracks[$i]['rank'] = (string) $track['rank'];
+                        $toptracks[$i]['rank'] = (string) $t["@attr"]->rank;
                         $toptracks[$i]['playcount'] = (string) $track->playcount;
                         $toptracks[$i]['mbid'] = (string) $track->mbid;
                         $toptracks[$i]['url'] = (string) $track->url;
-                        $toptracks[$i]['streamable'] = (string) $track->streamable;
-                        $toptracks[$i]['fulltrack'] = (string) $track->streamable['fulltrack'];
+                        //$toptracks[$i]['streamable'] = (string) $track->streamable;
+                        //$toptracks[$i]['fulltrack'] = (string) $track->streamable['fulltrack'];
                         $toptracks[$i]['artist']['name'] = (string) $track->artist->name;
                         $toptracks[$i]['artist']['mbid'] = (string) $track->artist->mbid;
                         $toptracks[$i]['artist']['url'] = (string) $track->artist->url;
-                        $toptracks[$i]['images']['small'] = (string) $track->image[0];
-                        $toptracks[$i]['images']['medium'] = (string) $track->image[1];
-                        $toptracks[$i]['images']['large'] = (string) $track->image[2];
+                        $toptracks[$i]['images']['small'] = (string) $image[0]['#text'];
+                        $toptracks[$i]['images']['medium'] = (string) $image[1]['#text'];
+                        $toptracks[$i]['images']['large'] = (string) $image[2]['#text'];
                         $i++;
                     }
 
@@ -775,11 +793,14 @@ class UserApi extends BaseApi
 
             if ($call = $this->apiGetCall($vars)) {
                 $i = 0;
+                $weeklyalbums = array();
                 foreach ($call->weeklyalbumchart->album as $album) {
+                    $a = (array)$album;
+                    $ac = (array)$a['artist'];
                     $weeklyalbums[$i]['name'] = (string) $album->name;
-                    $weeklyalbums[$i]['rank'] = (string) $album['rank'];
-                    $weeklyalbums[$i]['artist']['name'] = (string) $album->artist;
-                    $weeklyalbums[$i]['artist']['mbid'] = (string) $album->artist['mbid'];
+                    $weeklyalbums[$i]['rank'] = (string) $a["@attr"]->rank;
+                    $weeklyalbums[$i]['artist']['name'] = (string) $ac['#text'];
+                    $weeklyalbums[$i]['artist']['mbid'] = (string) $ac['mbid'];
                     $weeklyalbums[$i]['mbid'] = (string) $album->mbid;
                     $weeklyalbums[$i]['playcount'] = (string) $album->playcount;
                     $weeklyalbums[$i]['url'] = (string) $album->url;
@@ -814,9 +835,11 @@ class UserApi extends BaseApi
 
             if ($call = $this->apiGetCall($vars)) {
                 $i = 0;
+                $weeklyartists = array();
                 foreach ($call->weeklyartistchart->artist as $artist) {
+                    $a = (array)$artist;
                     $weeklyartists[$i]['name'] = (string) $artist->name;
-                    $weeklyartists[$i]['rank'] = (string) $artist['rank'];
+                    $weeklyartists[$i]['rank'] = (string) $a["@attr"]->rank;
                     $weeklyartists[$i]['mbid'] = (string) $artist->mbid;
                     $weeklyartists[$i]['playcount'] = (string) $artist->playcount;
                     $weeklyartists[$i]['url'] = (string) $artist->url;
@@ -852,8 +875,8 @@ class UserApi extends BaseApi
             if ($call = $this->apiGetCall($vars)) {
                 $i = 0;
                 foreach ($call->weeklychartlist->chart as $chart) {
-                    $weeklychartlist[$i]['from'] = (string) $chart['from'];
-                    $weeklychartlist[$i]['to'] = (string) $chart['to'];
+                    $weeklychartlist[$i]['from'] = (string) $chart->from;
+                    $weeklychartlist[$i]['to'] = (string) $chart->to;
                     $i++;
                 }
 
@@ -885,11 +908,14 @@ class UserApi extends BaseApi
 
             if ($call = $this->apiGetCall($vars)) {
                 $i = 0;
+                $weeklytracks = array();
                 foreach ($call->weeklytrackchart->track as $track) {
+                    $t = (array)$track;
+                    $a = (array)$t['artist'];
                     $weeklytracks[$i]['name'] = (string) $track->name;
-                    $weeklytracks[$i]['rank'] = (string) $track['rank'];
-                    $weeklytracks[$i]['artist']['name'] = (string) $track->artist;
-                    $weeklytracks[$i]['artist']['mbid'] = (string) $track->artist['mbid'];
+                    $weeklytracks[$i]['rank'] = (string) $t["@attr"]->rank;
+                    $weeklytracks[$i]['artist']['name'] = (string) $a["#text"];
+                    $weeklytracks[$i]['artist']['mbid'] = (string) $a['mbid'];
                     $weeklytracks[$i]['mbid'] = (string) $track->mbid;
                     $weeklytracks[$i]['playcount'] = (string) $track->playcount;
                     $weeklytracks[$i]['url'] = (string) $track->url;

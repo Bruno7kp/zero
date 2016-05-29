@@ -1,5 +1,6 @@
 <?php
 use B7KP\Library\Url;
+use B7KP\Library\Route;
 use B7KP\Core\App;
 ?>
 <footer id="fh5co-footer">
@@ -19,6 +20,7 @@ use B7KP\Core\App;
 <script>
 	baseUrl = "<?php echo Url::getBaseUrl();?>";
 	curPage = "<?php echo Url::getRequest();?>";
+	curRoute = "<?php echo Route::getName(Url::getRequest());?>";
 </script>
 <script src="<?php echo Url::asset('js/jquery.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/bootstrap.min.js');?>"></script>

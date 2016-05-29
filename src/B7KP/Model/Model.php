@@ -27,6 +27,15 @@ class Model
 		return $id;
 	}
 
+	public function multiAdd($entity, $fields, $arg)
+	{
+		if(!class_exists($entity))
+		{
+			throw new \Exception("Class ".$entity." not found");
+		}
+		return $this->dao->create_var($entity::getTableName(), $fields, $arg);
+	}
+
 	public function update($entity, $arg)
 	{
 		if(!class_exists($entity))
@@ -61,7 +70,18 @@ class Model
 			throw new \Exception("Object not found");
 		}
 
-		return $this->dao->delete($entity, "id = :id", array("id" => $id));
+		return $this->dao->delete($entity::getTableName(), "id = :id", array("id" => $id));
+	}
+
+	public function removeBy($entity, $by, $value, $ind = "=")
+	{
+		if(!class_exists($entity))
+		{
+			throw new \Exception("Class ".$entity." not found");
+		}
+		//echo "DELETE FROM ".$entity::getTableName()." WHERE ". $by." ".$ind." ".$value;
+		//die();
+		return $this->dao->run("DELETE FROM ".$entity::getTableName()." WHERE ". $by." ".$ind." ".$value);
 	}
 
 	public function findOneBy($entity, $cond, $by = "id")

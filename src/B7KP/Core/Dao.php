@@ -28,6 +28,11 @@ class Dao
     	return $this->crud->insert($entity, $data);
     }
 
+    public function create_var($entity, $fields, $data)
+    {
+    	return $this->crud->multi_insert($entity, $fields, $data);
+    }
+
     public function update($entity, $data, $where, $bind)
     {
     	return $this->crud->update($entity, $data, $where, $bind);
