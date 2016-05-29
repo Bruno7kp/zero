@@ -1,6 +1,7 @@
 <?php
 use B7KP\Library\Route;
 ?>
+<!doctype html>
 <html>
 <?php
 	$head = array("title" => "Edit Your Profile");

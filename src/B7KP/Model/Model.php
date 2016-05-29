@@ -101,6 +101,12 @@ class Model
 		return $this->createMultipleObjects($entity, $results);
 	}
 
+	public function findSql($entity, $sql)
+	{
+		$results = $this->dao->run($sql);
+		return $this->createMultipleObjects($entity, $results);
+	}
+
 	public function findMtoM($primary, $secondary, $cond = false, $bind = false, $obj = true, $inverse = false, $order = "")
 	{
 		$contable = $primary::getTableName()."_".$secondary::getTableName();

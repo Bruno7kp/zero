@@ -153,6 +153,38 @@ a.white {
 	-moz-filter: brightness(0.5);
 }
 
+.bg {
+	background: rgba(0,0,0,0.7);
+    padding: 15px;
+}
+
+.full {
+	width: 100%;
+}
+
+.white {
+	color: white;
+}
+
+.bigtxt {
+	font-size: 35px;
+	margin-top: 1em;
+}
+
+.bigtxt small {
+	font-size: 15px;
+	color: #ccc;
+    display: block;
+}
+
+.br {
+    display: block;
+}
+
+.text-muted-alt {
+	color: #ccc;
+}
+
 /* BORDER DIVIDER */
 .divider-left {
 	border-left: #eee 1px solid;

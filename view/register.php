@@ -2,6 +2,7 @@
 use B7KP\Library\Route;
 use B7KP\Core\App;
 ?>
+<!doctype html>
 <html>
 <?php
 	$head = array("title" => "Register");

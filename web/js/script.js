@@ -185,7 +185,13 @@ function loadStatus(actual, total)
 			"<span class='sr-only'>" + perc + "% of weeks loaded</span>"+
 		"</div>"+
 	"</div>";
-	divAct.html(txt)
+	divAct.html(txt);
+	if(actual == total)
+	{
+		txt = "<h2>Success</h2>" +
+		"Now you can enjoy your weekly charts :]";
+	}
+	divAct.html(txt);
 }
 
 function nothingNew()
@@ -198,15 +204,16 @@ function nothingNew()
 	undisable_alt($(".all"), "Update all");
 }
 
-function nothingNew()
+function failMsg()
 {
 	divAct = $("#updateaction");
-	txt = "<h2>Oops, something went wrong</h2> " +
-	"<small class='text-muted'>Try again.</small>";
+	txt = "<h2>Oops</h2> " +
+	"<small class='text-muted'>Something went wrong while saving some of your data. Plesa try update again later. :[</small>";
 	divAct.html(txt);
 	undisable_alt($(".new"), "Update new weeks");
 	undisable_alt($(".all"), "Update all");
 }
+
 
 function routesFns()
 {

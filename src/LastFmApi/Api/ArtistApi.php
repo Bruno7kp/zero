@@ -183,6 +183,7 @@ class ArtistApi extends BaseApi
             $info['streamable'] = (string) $call->artist->streamable;
             $info['stats']['listeners'] = (string) $call->artist->stats->listeners;
             $info['stats']['playcount'] = (string) $call->artist->stats->playcount;
+            $info['userplaycount'] = isset($call->album->userplaycount) ? (string) $call->album->userplaycount : 0;
             $i = 0;
             foreach ($call->artist->similar->artist as $artist) {
                 $image[0] = (array) $artist->image[0];

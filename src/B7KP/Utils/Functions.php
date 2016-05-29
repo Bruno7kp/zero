@@ -11,6 +11,12 @@ class Functions
 		return $date;
 	}
 
+	static function formatNum($num){
+		$num = intval($num);
+		$num = $num === 0 ? "=" : sprintf("%+d", $num);
+	    return $num;
+	}
+
 	static function removeEmpty($array)
 	{
 		$final = array();

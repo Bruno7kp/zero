@@ -7,6 +7,7 @@ use LastFmApi\Api\AlbumApi;
 use LastFmApi\Api\TrackApi;
 use LastFmApi\Api\LibraryApi;
 use LastFmApi\Api\UserApi;
+use B7KP\Core\App;
 
 class LastFm
 {
@@ -24,8 +25,8 @@ class LastFm
 
     public function __construct()
     {
-        $this->apiKey = '68d81020be83713df69720b5acdf0a1f';
-        $this->secret = 'daf57401387415299a1778da3544ab10';
+        $this->apiKey = App::get('lastfmapikey');
+        $this->secret = App::get('lastfmapisecret');
         $auth = new AuthApi('setsession', array('apiKey' => $this->apiKey, 'secret' => $this->secret));
         $this->artistApi = new ArtistApi($auth);
         $this->albumApi = new AlbumApi($auth);
@@ -143,7 +144,28 @@ class LastFm
     public function getArtistInfo($str, $mbid = null)
     {
         $vars = array("artist" => $str, "mbid" => $mbid);
+        
+        $vars['username'] = $this->userName;
+        
         return $this->artistApi->getInfo($vars);
+    }
+
+    public function getMusicInfo($str, $artist, $mbid = null)
+    {
+        $vars = array("track" => $str, "artist" => $artist,"mbid" => $mbid);
+        
+        $vars['username'] = $this->userName;
+        
+        return $this->trackApi->getInfo($vars);
+    }
+
+    public function getAlbumInfo($str, $artist, $mbid = null)
+    {
+        $vars = array("album" => $str, "artist" => $artist,"mbid" => $mbid);
+
+        $vars['username'] = $this->userName;
+        
+        return $this->albumApi->getInfo($vars);
     }
 
     public function loadLibrary()

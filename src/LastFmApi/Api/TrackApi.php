@@ -111,35 +111,55 @@ class TrackApi extends BaseApi {
 		$vars = array_merge($vars, $methodVars);
 
 		if ( $call = $this->apiGetCall($vars) ) {
-			$info['id'] = (string) $call->track->id;
+			if(isset($call->track->album))
+			{
+	            $image[0] = (array) $call->track->album->image[0];
+	            $image[1] = (array) $call->track->album->image[1];
+	            $image[2] = (array) $call->track->album->image[2];
+	            $image[3] = (array) $call->track->album->image[3];
+			}
+			else
+			{
+				$image[0]["#text"] = "";
+				$image[1]["#text"] = "";
+				$image[2]["#text"] = "";
+				$image[3]["#text"] = "";
+			}
+            //$image[4] = (array) $call->track->album->image[4];
+			//$info['id'] = (string) $call->track->id;
 			$info['name'] = (string) $call->track->name;
-			$info['mbid'] = (string) $call->track->mbid;
+			$info['mbid'] = isset($call->track->mbid) ? (string) $call->track->mbid : "";
 			$info['url'] = (string) $call->track->url;
 			$info['duration'] = (string) $call->track->duration;
-			$info['streamable'] = (string) $call->track->streamable;
-			$info['fulltrack'] = (string) $call->track->streamable['fulltrack'];
+			//$info['streamable'] = (string) $call->track->streamable;
+			//$info['fulltrack'] = (string) $call->track->streamable['fulltrack'];
 			$info['listeners'] = (string) $call->track->listeners;
 			$info['playcount'] = (string) $call->track->playcount;
 			$info['artist']['name'] = (string) $call->track->artist->name;
 			$info['artist']['mbid'] = (string) $call->track->artist->mbid;
 			$info['artist']['url'] = (string) $call->track->artist->url;
-			$info['album']['position'] = (string) $call->track->album['position'];
+			if(isset($call->track->album)){
+				
+			//$info['album']['position'] = (string) $call->track->album->position;
 			$info['album']['artist'] = (string) $call->track->album->artist;
 			$info['album']['title'] = (string) $call->track->album->title;
 			$info['album']['mbid'] = (string) $call->track->album->mbid;
 			$info['album']['url'] = (string) $call->track->album->url;
-			$info['album']['image']['small'] = (string) $call->track->album->image[0];
-			$info['album']['image']['medium'] = (string) $call->track->album->image[1];
-			$info['album']['image']['large'] = (string) $call->track->album->image[2];
+			}
+			$info['album']['image']['small'] = (string) $image[0]["#text"];
+			$info['album']['image']['medium'] = (string) $image[1]["#text"];
+			$info['album']['image']['large'] = (string) $image[2]["#text"];
+			$info['album']['image']['extralarge'] = (string) $image[3]["#text"];
+			//$info['album']['image']['mega'] = (string) $image[4]["#text"];
 			$i = 0;
 			foreach ( $call->track->toptags->tag as $tag ) {
 				$info['toptags'][$i]['name'] = (string) $tag->name;
 				$info['toptags'][$i]['url'] = (string) $tag->url;
 				$i++;
 			}
-			$info['wiki']['published'] = (string) $call->track->wiki->published;
-			$info['wiki']['summary'] = (string) $call->track->wiki->summary;
-			$info['wiki']['content'] = (string) $call->track->wiki->content;
+			//$info['wiki']['published'] = (string) $call->track->wiki->published;
+			//$info['wiki']['summary'] = (string) $call->track->wiki->summary;
+			//$info['wiki']['content'] = (string) $call->track->wiki->content;
 
 			return $info;
 		}

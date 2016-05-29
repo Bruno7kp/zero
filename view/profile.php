@@ -1,8 +1,9 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
-use B7KP\Library\RouCVte;
+use B7KP\Library\Route;
 ?>
+<!doctype html>
 <html>
 <?php
 	$head = array("title" => "{$user->login}'s Profile");
@@ -23,9 +24,9 @@ use B7KP\Library\RouCVte;
 				<div class="container">
 					<div class="row bottomspace-md">
 						<div class="col-xs-12">
-							<div class="row">
+							<div class="">
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted">Last.fm register date</small>
+									<small class="text-muted">Last.fm register</small>
 									<br/>
 									<strong>
 									<i class="fa fa-calendar fa-fw ico-color"></i>
@@ -57,7 +58,7 @@ use B7KP\Library\RouCVte;
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted">Scrobbles per week</small>
+									<small class="text-muted">Scrobbles/week</small>
 									<br/>
 									<strong>
 									<i class="ti-headphone ico-color"></i>
@@ -77,7 +78,6 @@ use B7KP\Library\RouCVte;
 					</div>
 					<div class="row">
 						<div class="col-md-8 col-sm-7 col-xs-12">
-							<h2 class="topspace-lg">LAST WEEK</h2>
 							<?php
 							$outofdateweeks = $weekstodate - count($weeks);
 							if($user->checkSelfPermission($this->factory))
@@ -98,10 +98,8 @@ use B7KP\Library\RouCVte;
 							else
 							{
 								$weeks = $weeks[0];
-								$charts = new Charts($this->factory);
-								echo "<div class='row'>";
-									echo $charts->getHomeWeeklyChartsAlt($weeks);
-								echo "</div>";
+								$charts = new Charts($this->factory, $user);
+								echo $charts->getHomeWeeklyChartsAlt($weeks);
 							}
 							?>
 						</div>

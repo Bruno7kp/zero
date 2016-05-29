@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 <?php
 	$head = array("title" => "Index");

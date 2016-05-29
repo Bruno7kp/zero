@@ -2,6 +2,7 @@
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 ?>
+<!doctype html>
 <html>
 <?php
 	$head = array("title" => "Update");

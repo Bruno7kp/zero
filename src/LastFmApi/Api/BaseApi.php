@@ -239,6 +239,7 @@ class BaseApi
                     $url = substr($url, 0, -1);
                     $url = str_replace(' ', '%20', $url);
                     $url .= "&format=json";
+                    //echo $url;
 
                     $out = "GET " . $url . " HTTP/1.0\r\n";
                     $out .= "Host: " . $this->host . "\r\n";

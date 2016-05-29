@@ -13,6 +13,8 @@ class App
 	private static $user;
 	private static $password;
 	private static $dsn;
+	private static $lastfmapikey;
+	private static $lastfmapisecret;
 	private static $loaded = false;
 	
 	private function __construct(){}
@@ -39,7 +41,7 @@ class App
 	{
 		self::$name = "ZERO";
 		self::$author = "Bruno7kp";
-		self::$version = "0.03.541";
+		self::$version = "0.03.866";
 
 		switch ($_SERVER['SERVER_NAME']) {
 			case 'localhost':
@@ -50,16 +52,20 @@ class App
 				self::$user = "root";
 				self::$password = "";
 				self::$dsn = self::setDsn();
+				self::$lastfmapikey = "68d81020be83713df69720b5acdf0a1f";
+				self::$lastfmapisecret = "daf57401387415299a1778da3544ab10";
 				break;
 			
 			default:
 				self::$environment = "PROD";
 				self::$db = "mysql";
-				self::$dbname = "mydb";
-				self::$host = "localhost";
-				self::$user = "root";
-				self::$password = "";
+				self::$dbname = "u484388465_bd";
+				self::$host = "mysql.hostinger.com.br";
+				self::$user = "u484388465_user";
+				self::$password = "b3tt3rg1v3ch4rts";
 				self::$dsn = self::setDsn();
+				self::$lastfmapikey = "2009fbfac80cacfae524cb384040403b";
+				self::$lastfmapisecret = "7a8bce33c7232ed3eb3493061267820f";
 				break;
 		}
 

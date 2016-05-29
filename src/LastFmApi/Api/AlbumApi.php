@@ -87,15 +87,26 @@ class AlbumApi extends BaseApi
         $info = array();
         $i = 0;
         if ($call = $this->apiGetCall($vars)) {
+            //var_dump($call);
+            $a = (array)$call->album;
+            $image[0] = (array) $call->album->image[0];
+            $image[1] = (array) $call->album->image[1];
+            $image[2] = (array) $call->album->image[2];
+            $image[3] = (array) $call->album->image[3];
+            $image[4] = (array) $call->album->image[4];
             $info['name'] = (string) $call->album->name;
             $info['artist'] = (string) $call->album->artist;
-            $info['lastfmid'] = (string) $call->album->id;
-            $info['mbid'] = (string) $call->album->mbid;
+            //$info['lastfmid'] = (string) $call->album->id;
+
+            $info['mbid'] = isset($call->album->mbid) ? (string) $call->album->mbid : "";
             $info['url'] = (string) $call->album->url;
-            $info['releasedate'] = strtotime(trim((string) $call->album->releasedate));
-            $info['image']['small'] = (string) $call->album->image;
-            $info['image']['medium'] = (string) $call->album->image[1];
-            $info['image']['large'] = (string) $call->album->image[2];
+            //$info['releasedate'] = strtotime(trim((string) $call->album->releasedate));
+            $info['userplaycount'] = isset($call->album->userplaycount) ? (string) $call->album->userplaycount : 0;
+            $info['images']['small'] = (string) $image[0]["#text"];
+            $info['images']['medium'] = (string) $image[1]["#text"];
+            $info['images']['large'] = (string) $image[2]["#text"];
+            $info['images']['extralarge'] = (string) $image[3]["#text"];
+            $info['images']['mega'] = (string) $image[4]["#text"];
             $info['listeners'] = (string) $call->album->listeners;
             $info['playcount'] = (string) $call->album->playcount;
             foreach ($call->album->tags->tag as $tags) {
@@ -116,10 +127,10 @@ class AlbumApi extends BaseApi
                 $info['tracks'][$i]['artist']['url'] = $track->artist->url;
                 $i++;
             }
-            $info['wiki'] = array(
-                'summary' => (string) $call->album->wiki->summary,
-                'content' => (string) $call->album->wiki->content
-            );
+            // $info['wiki'] = array(
+            //     'summary' => (string) $call->album->wiki->summary,
+            //     'content' => (string) $call->album->wiki->content
+            // );
 
             return $info;
         } else {
