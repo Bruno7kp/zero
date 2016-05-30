@@ -164,7 +164,8 @@ class AnnotationReader implements iCache
 		foreach ($annotations as $value) {
 			if(strpos($value, "(") > 0)
 			{
-				$value = substr($value, 0, -2);
+				$value = rtrim($value);
+				$value = rtrim($value, ")");
 				$value = explode("(", $value, 2);
 				$parse[$value[0]] = $this->parseParams($value[1]);
 			}

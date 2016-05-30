@@ -20,7 +20,7 @@ use B7KP\Core\App;
 						<div class="col-md-4 col-md-offset-4 text-center">
 							<h2>Connect <?php echo App::get('name');?> with Last.fm <br><small>You already did that? <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
 
-							<a class="btn btn-danger" href="<?php echo "http://www.last.fm/api/auth/?api_key=68d81020be83713df69720b5acdf0a1f";?>">
+							<a class="btn btn-danger" href="<?php echo "http://www.last.fm/api/auth/?api_key=".App::get('lastfmapikey');?>">
 							<i class="fa fa-lastfm"></i> Click Here
 							</a>
 							<?php 

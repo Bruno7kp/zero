@@ -148,7 +148,7 @@ class UpdateController extends Controller
 	{
 		$error = 0;
 		$i = 0;
-		if(count($list)>0)
+		if(is_array($list) && count($list)>0)
 		{
 			foreach ($list as $value) {
 				$data[$i] = new \stdClass();
@@ -183,7 +183,7 @@ class UpdateController extends Controller
 	{
 		$error = 0;
 		$i = 0;
-		if(count($list)>0){
+		if(is_array($list) && count($list)>0){
 			foreach ($list as $value) {
 				$data[$i] = new \stdClass();
 				$data[$i]->idweek = $idweek;
@@ -219,7 +219,7 @@ class UpdateController extends Controller
 	{
 		$error = 0;
 		$i = 0;
-		if(count($list)>0)
+		if(is_array($list) && count($list)>0)
 		{
 			foreach ($list as $value) {
 				$data[$i] = new \stdClass();

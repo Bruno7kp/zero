@@ -165,7 +165,7 @@ function updateControl(weeks)
 			updateWeek(update);
 		})
 		.fail(function() {
-			console.log("error");
+			console.log("error" + index);
 			failMsg();
 		})
 		.always(function() {
@@ -190,6 +190,8 @@ function loadStatus(actual, total)
 	{
 		txt = "<h2>Success</h2>" +
 		"Now you can enjoy your weekly charts :]";
+		undisable_alt($(".new"), "Update new weeks");
+		undisable_alt($(".all"), "Update all");
 	}
 	divAct.html(txt);
 }
@@ -232,9 +234,15 @@ function loadOverall()
 	login = curPage.split("/");
 	login = login[login.length - 1];
 	loadAct(login);
-	loadAlb(login);
-	loadMus(login);
-	loadRecent(login);
+	setTimeout(function(){ 
+		loadMus(login);
+	}, 5000);
+	setTimeout(function(){ 
+		loadAlb(login);
+	}, 7500);
+	setTimeout(function(){ 
+		loadRecent(login);
+	}, 2500);
 }
 
 function loadAct(login)

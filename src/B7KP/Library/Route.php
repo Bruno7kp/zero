@@ -87,7 +87,7 @@ class Route
 		return $realroute;
 	}
 
-	private function specialRouteFix($route, $getname = false, $getparams = false)
+	private static function specialRouteFix($route, $getname = false, $getparams = false)
 	{
 		$r = self::$routes["404"];
 		$p = array();
