@@ -18,7 +18,9 @@ use B7KP\Entity\User;
 				<li <?php if(Route::isCurRoute('home')): echo 'class="active"';endif;?> >
 					<a href="<?php echo Route::url('home')?>">Home</a>
 				</li>
-				<li><a href="elements.html">About</a></li>
+				<li <?php if(Route::isCurRoute('about')): echo 'class="active"';endif;?>>
+					<a href="<?php echo Route::url('about')?>">About</a>
+				</li>
 				<?php 
 				$user = UserSession::getUser($this->factory);
 				if($user instanceof User)

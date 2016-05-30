@@ -7,12 +7,12 @@ use B7KP\Core\App;
 	<div class="container">
 		
 		<ul class="fh5co-social-icons">
-			<li><a href="https://twitter.com/Bruno7kp"><i class="fa fa-twitter"></i></a></li>
-			<li><a href="https://www.facebook.com/bruno7kp"><i class="fa fa-facebook"></i></a></li>
-			<li><a href="http://www.last.fm/user/Bruno7kp"><i class="fa fa-lastfm"></i></a></li>
-			<li><a href="https://github.com/Bruno7kp/zero"><i class="fa fa-github"></i></a></li>
+			<li><a target="_blank" href="https://twitter.com/Bruno7kp"><i class="fa fa-twitter"></i></a></li>
+			<li><a target="_blank" href="https://www.facebook.com/bruno7kp"><i class="fa fa-facebook"></i></a></li>
+			<li><a target="_blank" href="http://www.last.fm/user/Bruno7kp"><i class="fa fa-lastfm"></i></a></li>
+			<li><a target="_blank" href="https://github.com/Bruno7kp/zero"><i class="fa fa-github"></i></a></li>
 		</ul>
-		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a> <?php echo App::get("version");?>. All rights reserved. Development <em>by</em> <a href="#" target="_blank"><?php echo App::get("author");?></a> <br> Thanks to <a href="http://freehtml5.co" target="_blank">Freehtml5.co</a>, <a href="#">Last.fm</a></small></p>
+		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a> <?php echo App::get("version");?>.</p>
 
 	</div>
 </footer>

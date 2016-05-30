@@ -247,14 +247,14 @@ function loadAct(login, callsequence)
 		art.html(data);
 		if(callsequence)
 		{
-			loadRecent(login, callsequence);
+			setTimeout(function(){ loadRecent(login, callsequence); }, 2000);
 		}
 		console.log("success");
 	})
 	.fail(function() {
 		if(callsequence)
 		{
-			loadRecent(login, callsequence);
+			setTimeout(function(){ loadRecent(login, callsequence); }, 2000);
 		}
 		console.log("error");
 	})
@@ -294,14 +294,14 @@ function loadMus(login, callsequence)
 		mus.html(data);
 		if(callsequence)
 		{
-			loadAlb(login);
+			setTimeout(function(){ loadAlb(login); }, 2000);
 		}
 		console.log("success");
 	})
 	.fail(function() {
 		if(callsequence)
 		{
-			loadAlb(login);
+			setTimeout(function(){ loadAlb(login); }, 2000);
 		}
 		console.log("error");
 	})
@@ -322,14 +322,14 @@ function loadRecent(callsequence)
 		recent.html(data);
 		if(callsequence)
 		{
-			loadMus(login, callsequence);
+			setTimeout(function(){ loadMus(login, callsequence); }, 2000);
 		}
 		console.log("success");
 	})
 	.fail(function() {
 		if(callsequence)
 		{
-			loadMus(login, callsequence);
+			setTimeout(function(){ loadMus(login, callsequence); }, 2000);
 		}
 		console.log("error");
 	})

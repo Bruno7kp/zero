@@ -2,7 +2,7 @@
 use B7KP\Library\Url;
 use B7KP\Core\App;
 
-isset($title) || $title = App::get("name");
+isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("name");
 ?>
 <head>
 	<meta charset="utf-8">
