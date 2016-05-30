@@ -10,6 +10,7 @@ use B7KP\Entity\Artist_charts;
 use B7KP\Library\Url; 
 use B7KP\Utils\Snippets; 
 use B7KP\Utils\Functions as Fn; 
+use B7KP\Utils\Constants as C;
 
 class Charts
 {
@@ -37,35 +38,72 @@ class Charts
 		return $css;
 	}
 
-	public function getHomeWeeklyCharts(Week $week, $limit)
+	private function getMainContent()
+	{
+		$js = "<script src='".Url::asset("js/chart.js")."'></script>";
+		//$js .= "<link rel='stylesheet' href='".Url::asset("css/themify-icons.css")."'>";
+		return $js;
+	}
+
+	private function getTable($list, $type, $settings, $week)
+	{
+		ob_start();
+		include MAIN_DIR.'/view/inc/chart-table.php';
+		$table = ob_get_clean();
+		return $table;
+	}
+
+	/* If $html = true: returns table with the charts, else: array of the items */
+	public function getWeeklyCharts(Week $week, $type, $limit, $html = false, $settings = false)
 	{
 		$cond = array("idweek" => $week->id);
-		$album  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 5");
-		$artist = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 5");
-		$music  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 5");
-		$html = "<div class='col-md-6 col-xs-12'> \n";
-		$html .= "<h3>TOP ARTISTS</h3>\n";
-		$html .= $this->createTable($artist, "artist", true);
-		$html .= "<div class='text-center topspace-sm'> \n";
-		$html .= "<a href='' class='btn btn-info btn-sm'>View full chart</a>";
-		$html .= "</div> \n";
-		$html .= "</div> \n";
-		$html .= "<div class='col-md-6 col-xs-12'> \n";
-		$html .= "<h3>TOP MUSICS</h3>\n";
-		$html .= $this->createTable($music, "music", true);
-		$html .= "<div class='text-center topspace-sm'> \n";
-		$html .= "<a href='' class='btn btn-info btn-sm'>View full chart</a>";
-		$html .= "</div> \n";
-		$html .= "</div> \n";
-		$html .= "<div class='col-md-6 col-xs-12'> \n";
-		$html .= "<h3>TOP ALBUMS</h3>\n";
-		$html .= $this->createTable($album, "album", true);
-		$html .= "<div class='text-center topspace-sm'> \n";
-		$html .= "<a href='' class='btn btn-info btn-sm'>View full chart</a>";
-		$html .= "</div> \n";
-		$html .= "</div> \n";
+		$limit = ($limit == C::LIMIT_MAX) ? false : "0, ".$limit;
+		$newlist = array();
+		switch ($type) {
+			case 'album':
+				$list  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", $limit);
+				$i = 0;
+				foreach ($list as $key => $value) {
+					$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
+					$ext = $this->extract($chartstats, true);
+					$newlist[$i]['stats'] = $ext;
+					$newlist[$i]['item'] = $value;
+					$i++;
+				}
+				break;
 
-		return $html;
+			case 'artist':
+				$list = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", $limit);
+				$i = 0;
+				foreach ($list as $key => $value) {
+					$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
+					$ext = $this->extract($chartstats, true);
+					$newlist[$i]['stats'] = $ext;
+					$newlist[$i]['item'] = $value;
+					$i++;
+				}
+				break;
+			
+			default:
+				$list  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", $limit);
+				$i = 0;
+				foreach ($list as $key => $value) {
+					$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
+					$ext = $this->extract($chartstats, true);
+					$newlist[$i]['stats'] = $ext;
+					$newlist[$i]['item'] = $value;
+					$i++;
+				}
+				break;
+		}
+
+
+		if($html && $settings)
+		{
+			$list = $this->getTable($newlist, $type, $settings, $week->week);
+		}
+
+		return $list;
 	}
 
 	public function getHomeWeeklyChartsAlt(Week $week)
@@ -109,6 +147,7 @@ class Charts
 			$icon = $this->aux('getMoveIcon', $move);
 			$html .= Snippets::specMusRow($value, $this->user, Fn::formatNum($move), $icon);
 		}
+		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline'>View full chart</a></div></div>";
 		return $html;
 	}
 
@@ -168,18 +207,6 @@ class Charts
 				return false;
 				break;
 		}
-	}
-
-	private function createTable($items, $type, $fluid = false)
-	{
-		ob_start();
-		include MAIN_DIR."view/inc/simple-table.php";
-		return ob_get_clean();
-	}
-
-	private function createFullTable()
-	{
-
 	}
 
 	public function extract($array, $chartrun = true, $referenceweek = false)

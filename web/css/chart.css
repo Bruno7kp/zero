@@ -20,7 +20,7 @@
 	border-bottom: solid 1px #eee;
 }
 
-.chart-table tr td:first-child,
+.chart-table tr td:nth-child(2),
 .chart-table tr td:last-child {
     text-align: center;
 	font-size: 20px;

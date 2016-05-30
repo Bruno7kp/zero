@@ -1,6 +1,8 @@
 <?php
 namespace B7KP\Entity;
 
+use B7KP\Utils\Constants as C;
+
 class Settings extends Entity
 {
 	/**
@@ -29,6 +31,59 @@ class Settings extends Entity
 	function __construct()
 	{
 		parent::__construct();
+	}
+
+	public function __get($property)
+	{
+		if(!isset($this->$property) || is_null($this->$property))
+		{
+			return self::defaultValueFor($property);
+		}
+		else
+		{
+			return $this->$property;
+		}
+	}
+
+	static function defaultValueFor($for)
+	{
+		switch ($for) {
+			case 'art_limit':
+			case 'alb_limit':
+			case 'mus_limit':
+				$for = 10;
+				break;
+
+			case 'style':
+				$for = 'chart.css';
+				break;
+
+			case 'show_images':
+				$for = false;
+				break;
+
+			case 'show_dropouts':
+				$for = false;
+				break;
+
+			case 'show_first_image':
+				$for = true;
+				break;
+
+			case 'show_move':
+				$for = C::SHOW_MOVE_DIFF;
+				break;
+
+			case 'show_points':
+				$for = true;
+				break;
+
+			default:
+				$for = "not found";
+				break;
+		}
+
+		return $for;
 	}
 }
 ?>
