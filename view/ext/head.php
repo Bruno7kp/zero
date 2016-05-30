@@ -8,6 +8,7 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title><?php echo $title;?></title>
+	<link rel="shortcut icon" href="<?php echo Url::asset('img/icon.png');?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/themify-icons.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/bootstrap.min.css');?>">

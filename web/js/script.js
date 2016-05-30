@@ -233,107 +233,26 @@ function loadOverall()
 {
 	login = curPage.split("/");
 	login = login[login.length - 1];
-	loadAct(login, true);
-}
-
-function loadAct(login, callsequence)
-{
-	art = $(".top-artists");
-	$.ajax({
-		url: baseUrl + '/art_top_list/' + login + '/' + 5,
-		dataType: 'html'
-	})
-	.done(function(data) {
-		art.html(data);
-		if(callsequence)
-		{
-			setTimeout(function(){ loadRecent(login, callsequence); }, 2000);
-		}
-		console.log("success");
-	})
-	.fail(function() {
-		if(callsequence)
-		{
-			setTimeout(function(){ loadRecent(login, callsequence); }, 2000);
-		}
-		console.log("error");
-	})
-	.always(function() {
-		console.log("complete");
-	});
-}
-
-function loadAlb(login)
-{
+	//loadAct(login, true);
 	alb = $(".top-albums");
-	$.ajax({
-		url: baseUrl + '/alb_top_list/' + login + '/' + 5,
-		dataType: 'html'
-	})
-	.done(function(data) {
-		alb.html(data);
-		console.log("success");
-	})
-	.fail(function() {
-		console.log("error");
-	})
-	.always(function() {
-		console.log("complete");
-	});
-	
-}
-
-function loadMus(login, callsequence)
-{
+	rec = $(".recent");
+	art = $(".top-artists");
 	mus = $(".top-musics");
 	$.ajax({
-		url: baseUrl + '/mus_top_list/' + login + '/' + 5,
-		dataType: 'html'
+		url: baseUrl + '/load_all/' + login + '/' + 5,
+		dataType: 'json'
 	})
 	.done(function(data) {
-		mus.html(data);
-		if(callsequence)
-		{
-			setTimeout(function(){ loadAlb(login); }, 2000);
-		}
+		art.html(data.artist);
+		alb.html(data.album);
+		mus.html(data.music);
+		rec.html(data.recent);
 		console.log("success");
 	})
 	.fail(function() {
-		if(callsequence)
-		{
-			setTimeout(function(){ loadAlb(login); }, 2000);
-		}
 		console.log("error");
 	})
 	.always(function() {
 		console.log("complete");
-	});
-	
-}
-
-function loadRecent(callsequence)
-{
-	recent = $(".recent");
-	$.ajax({
-		url: baseUrl + '/recent_list/' + login + '/' + 5,
-		dataType: 'html'
-	})
-	.done(function(data) {
-		recent.html(data);
-		if(callsequence)
-		{
-			setTimeout(function(){ loadMus(login, callsequence); }, 2000);
-		}
-		console.log("success");
-	})
-	.fail(function() {
-		if(callsequence)
-		{
-			setTimeout(function(){ loadMus(login, callsequence); }, 2000);
-		}
-		console.log("error");
-	})
-	.always(function() {
-		console.log("complete");
-	});
+	});	
 }

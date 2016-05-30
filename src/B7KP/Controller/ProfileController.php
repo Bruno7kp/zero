@@ -70,6 +70,27 @@ class ProfileController extends Controller
 	}
 
 	/**
+	* @Route(name=load_all|route=/load_all/{login}/{limit})
+	*/
+	public function loadAll($login, $limit)
+	{
+		$all = array();
+		ob_start();
+		$this->artTopList($login, $limit);
+		$all['artist'] = ob_get_clean();
+		ob_start();
+		$this->musTopList($login, $limit);
+		$all['music'] = ob_get_clean();
+		ob_start();
+		$this->albTopList($login, $limit);
+		$all['album'] = ob_get_clean();
+		ob_start();
+		$this->recentList($login, $limit);
+		$all['recent'] = ob_get_clean();
+		echo json_encode($all);
+	}	
+
+	/**
 	* @Route(name=art_top_list|route=/art_top_list/{login}/{limit})
 	*/
 	public function artTopList($login, $limit)
