@@ -233,19 +233,10 @@ function loadOverall()
 {
 	login = curPage.split("/");
 	login = login[login.length - 1];
-	loadAct(login);
-	setTimeout(function(){ 
-		loadMus(login);
-	}, 5000);
-	setTimeout(function(){ 
-		loadAlb(login);
-	}, 7500);
-	setTimeout(function(){ 
-		loadRecent(login);
-	}, 2500);
+	loadAct(login, true);
 }
 
-function loadAct(login)
+function loadAct(login, callsequence)
 {
 	art = $(".top-artists");
 	$.ajax({
@@ -254,9 +245,17 @@ function loadAct(login)
 	})
 	.done(function(data) {
 		art.html(data);
+		if(callsequence)
+		{
+			loadRecent(login, callsequence);
+		}
 		console.log("success");
 	})
 	.fail(function() {
+		if(callsequence)
+		{
+			loadRecent(login, callsequence);
+		}
 		console.log("error");
 	})
 	.always(function() {
@@ -284,7 +283,7 @@ function loadAlb(login)
 	
 }
 
-function loadMus(login)
+function loadMus(login, callsequence)
 {
 	mus = $(".top-musics");
 	$.ajax({
@@ -293,9 +292,17 @@ function loadMus(login)
 	})
 	.done(function(data) {
 		mus.html(data);
+		if(callsequence)
+		{
+			loadAlb(login);
+		}
 		console.log("success");
 	})
 	.fail(function() {
+		if(callsequence)
+		{
+			loadAlb(login);
+		}
 		console.log("error");
 	})
 	.always(function() {
@@ -304,7 +311,7 @@ function loadMus(login)
 	
 }
 
-function loadRecent()
+function loadRecent(callsequence)
 {
 	recent = $(".recent");
 	$.ajax({
@@ -313,9 +320,17 @@ function loadRecent()
 	})
 	.done(function(data) {
 		recent.html(data);
+		if(callsequence)
+		{
+			loadMus(login, callsequence);
+		}
 		console.log("success");
 	})
 	.fail(function() {
+		if(callsequence)
+		{
+			loadMus(login, callsequence);
+		}
 		console.log("error");
 	})
 	.always(function() {
