@@ -65,7 +65,7 @@ class Charts
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
-					$ext = $this->extract($chartstats, true);
+					$ext = $this->extract($chartstats, false);
 					$newlist[$i]['stats'] = $ext;
 					$newlist[$i]['item'] = $value;
 					$i++;
@@ -77,7 +77,7 @@ class Charts
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
-					$ext = $this->extract($chartstats, true);
+					$ext = $this->extract($chartstats, false);
 					$newlist[$i]['stats'] = $ext;
 					$newlist[$i]['item'] = $value;
 					$i++;
@@ -89,7 +89,7 @@ class Charts
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
-					$ext = $this->extract($chartstats, true);
+					$ext = $this->extract($chartstats, false);
 					$newlist[$i]['stats'] = $ext;
 					$newlist[$i]['item'] = $value;
 					$i++;
@@ -104,51 +104,6 @@ class Charts
 		}
 
 		return $list;
-	}
-
-	public function getHomeWeeklyChartsAlt(Week $week)
-	{
-		$html = "";
-		$from = new \DateTime($week->from_day);
-		$from = $from->format("Y.m.d");
-		$to = new \DateTime($week->to_day);
-		$to->modify('-1 day');
-		$to = $to->format("Y.m.d");
-		$cond = array("idweek" => $week->id);
-		$album  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
-		$artist = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
-		$music  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
-		$lfm = new \LastFmApi\Main\LastFm();
-		$lfm->setUser($this->user->login);
-		$html .= "<div class='text-center bottomspace-sm'>";
-		$html .= "<h2>WEEK ".$week->week."</h2>";
-		$html .= "<small><b>".$from." - ".$to."</b></small>";
-		$html .= "</div>";
-		foreach ($artist as $value) {
-			$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
-			$ext = $this->extract($chartstats);
-			//var_dump($ext);
-			$move = $ext[$week->week]['rank']['move'];
-			$icon = $this->aux('getMoveIcon', $move);
-			$html .= Snippets::specArtRow($value, $this->user, Fn::formatNum($move), $icon);
-		}
-		foreach ($album as $value) {
-			$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
-			$ext = $this->extract($chartstats);
-			$move = $ext[$week->week]['rank']['move'];
-			$icon = $this->aux('getMoveIcon', $move);
-			$html .= Snippets::specAlbRow($value, $this->user, Fn::formatNum($move), $icon);
-		}
-		foreach ($music as $value) {
-			$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
-			$ext = $this->extract($chartstats);
-			//var_dump($ext);
-			$move = $ext[$week->week]['rank']['move'];
-			$icon = $this->aux('getMoveIcon', $move);
-			$html .= Snippets::specMusRow($value, $this->user, Fn::formatNum($move), $icon);
-		}
-		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline'>View full chart</a></div></div>";
-		return $html;
 	}
 
 	private function aux($method, $value)
@@ -406,5 +361,49 @@ class Charts
 		return $weeks;
 	}
 
+	public function getHomeWeeklyChartsAlt(Week $week)
+	{
+		$html = "";
+		$from = new \DateTime($week->from_day);
+		$from = $from->format("Y.m.d");
+		$to = new \DateTime($week->to_day);
+		$to->modify('-1 day');
+		$to = $to->format("Y.m.d");
+		$cond = array("idweek" => $week->id);
+		$album  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
+		$artist = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
+		$music  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
+		$lfm = new \LastFmApi\Main\LastFm();
+		$lfm->setUser($this->user->login);
+		$html .= "<div class='text-center bottomspace-sm'>";
+		$html .= "<h2>WEEK ".$week->week."</h2>";
+		$html .= "<small><b>".$from." - ".$to."</b></small>";
+		$html .= "</div>";
+		foreach ($artist as $value) {
+			$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
+			$ext = $this->extract($chartstats);
+			//var_dump($ext);
+			$move = $ext[$week->week]['rank']['move'];
+			$icon = $this->aux('getMoveIcon', $move);
+			$html .= Snippets::specArtRow($value, $this->user, Fn::formatNum($move), $icon);
+		}
+		foreach ($album as $value) {
+			$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
+			$ext = $this->extract($chartstats);
+			$move = $ext[$week->week]['rank']['move'];
+			$icon = $this->aux('getMoveIcon', $move);
+			$html .= Snippets::specAlbRow($value, $this->user, Fn::formatNum($move), $icon);
+		}
+		foreach ($music as $value) {
+			$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
+			$ext = $this->extract($chartstats);
+			//var_dump($ext);
+			$move = $ext[$week->week]['rank']['move'];
+			$icon = $this->aux('getMoveIcon', $move);
+			$html .= Snippets::specMusRow($value, $this->user, Fn::formatNum($move), $icon);
+		}
+		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline'>View full chart</a></div></div>";
+		return $html;
+	}
 	
 }

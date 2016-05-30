@@ -70,7 +70,7 @@ class Crud {
 	}
 
 	private function filter($table, $info) {
-		$driver = $this->getAttribute(PDO::ATTR_DRIVER_NAME);
+		$driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 		if($driver == 'sqlite') {
 			$sql = "PRAGMA table_info('" . $table . "');";
 			$key = "name";
@@ -86,8 +86,9 @@ class Crud {
 
 		if(false !== ($list = $this->run($sql))) {
 			$fields = array();
+			//var_dump($list);
 			foreach($list as $record)
-				$fields[] = $record->$key;
+				$fields[] = $record->{strtolower($key)};
 			return array_values(array_intersect($fields, array_keys($info)));
 		}
 		return array();
@@ -148,7 +149,7 @@ class Crud {
 				elseif(preg_match("/^(" . implode("|", array("update")) . ") /i", $this->sql))
 					return is_numeric($pdostmt->rowCount());
 				elseif(preg_match("/^(" . implode("|", array("insert")) . ") /i", $this->sql))
-					return $this->lastInsertId();
+					return $this->pdo->lastInsertId();
 			}	
 		} catch (PDOException $e) {
 			$this->error = $e->getMessage();	

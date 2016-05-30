@@ -33,6 +33,7 @@ if($show_first_image)
 		<th>Plays</th>
 	</tr>
 	<?php 
+	var_dump($list);
 	foreach ($list as $value) {
 		$stats = $value['stats'][$week];
 		$item = $value['item'];
@@ -40,12 +41,20 @@ if($show_first_image)
 	<tr>
 		<td><i class='ti-plus'></i></td>
 		<td><?php echo $stats["rank"]["rank"];?></td>
+		<td><?php echo $stats["rank"]["move"];?></td>
 		<td><?php echo $item->$type;?></td>
 		<td><?php echo $item->artist;?></td>
 		<td><?php echo $stats["playcount"]["playcount"];?></td>
+		<td><?php echo $stats["playcount"]["move"];?></td>
+		<td><?php echo $stats["week"];?></td>
 		<?php 
 
 		?>
+	</tr>
+	<tr>
+		<td colspan=>
+		Chart-run
+		</td>
 	</tr>
 	<?php
 	}
