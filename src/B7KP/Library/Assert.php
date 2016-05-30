@@ -4,6 +4,7 @@ namespace B7KP\Library;
 use B7KP\Core\Dao;
 use B7KP\Model\Model;
 use B7KP\Utils\Functions;
+use B7KP\Utils\UserSession;
 use LastFmApi\Main\LastFm;
 
 class Assert

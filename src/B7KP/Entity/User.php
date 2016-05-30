@@ -26,17 +26,22 @@ class User extends Entity implements iPermission
 		parent::__construct();
 	}
 
-	function permissionLevel()
+	function permissionLevel($action = 'default', $field = null, $value = null)
 	{
-		if(in_array(strtolower($this->login), $this->modUsers()))
-		{
-			return 5;
+		switch ($action) {
+		
+			default:
+				if(in_array(strtolower($this->login), $this->modUsers()))
+				{
+					return 5;
+				}
+				if(in_array(strtolower($this->login), $this->adminUsers()))
+				{
+					return 7;
+				}
+				return 1;
+				break;
 		}
-		if(in_array(strtolower($this->login), $this->adminUsers()))
-		{
-			return 7;
-		}
-		return 1;
 	}
 
 	function checkSelfPermission($factory)
