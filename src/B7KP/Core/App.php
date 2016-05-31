@@ -59,9 +59,9 @@ class App
 			default:
 				self::$environment = "PROD";
 				self::$db = "mysql";
-				self::$dbname = "u484388465_bd";
+				self::$dbname = "u708424862_bd";
 				self::$host = "mysql.hostinger.com.br";
-				self::$user = "u484388465_user";
+				self::$user = "u708424862_user";
 				self::$password = "b3tt3rg1v3ch4rts";
 				self::$dsn = self::setDsn();
 				self::$lastfmapikey = "2009fbfac80cacfae524cb384040403b";
