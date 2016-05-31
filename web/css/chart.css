@@ -23,7 +23,20 @@
 .chart-table td.center {
     text-align: center;
 }
+.chart-table td.left {
+	text-align: left;
+}
 
+.chart-table th.center {
+    text-align: center;
+}
+.chart-table th.left {
+	text-align: left;
+}
+
+.chart-table td.min {
+	width: 30px;
+}
 .chart-table small {
 	font-size: 12px;
 	color: #777;

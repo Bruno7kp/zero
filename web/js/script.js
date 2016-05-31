@@ -49,6 +49,14 @@ function copyChart()
 		});
 	});
 
+	$('.showonhover').hover(function() {
+		/* Stuff to do when the mouse enters the element */
+		$(this).find('span').removeClass('hidden');
+	}, function() {
+		/* Stuff to do when the mouse leaves the element */
+		$(this).find('span').addClass('hidden');
+	});
+
 	$("body").click(function(event) {
 		copyBtn.tooltipster('hide');
 		copyBtnAlt.tooltipster('hide');

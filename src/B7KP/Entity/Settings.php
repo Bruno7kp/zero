@@ -71,7 +71,7 @@ class Settings extends Entity
 				break;
 
 			case 'show_move':
-				$for = C::SHOW_MOVE_DIFF;
+				$for = C::SHOW_MOVE_PERC;
 				break;
 
 			case 'show_points':

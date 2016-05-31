@@ -20,16 +20,23 @@ use B7KP\Library\Route;
 			<section>
 				<div class="container">
 					<div class="fh5co-spacer fh5co-spacer-sm"></div>
-					<button id="copy" data-clipboard-target="#copyme">Copy</button>
-					<button id="copy_alt" data-clipboard-target="#copyme_alt">Copy</button>
 
 					<div class="row">
 
-						<div id="copyme" class="col-md-10 col-md-offset-1 text-center">
-							<h2><?php echo $title?></h2>
-							<small><strong><?php echo $from . " - " . $to;?></strong></small>
-							<hr>
-							<?php echo $list;?>
+						<div id="copyme" class="col-md-10 col-md-offset-1">
+							<div class="text-center">
+								<h2><?php echo $title?></h2>
+								<h5><strong><?php echo $from . " - " . $to;?></strong></h5>
+								<?php echo $list;?>
+							</div>
+						</div>
+						<div class="col-md-10 col-md-offset-1 topspace-lg">
+							<button class="btn btn-custom btn-info btn-sm" id="copy" data-clipboard-target="#copyme">
+								<i class="ti-clipboard"></i> <span>Copy chart</span>
+							</button>
+							<button class="btn btn-custom btn-info btn-sm showonhover" id="copy_alt" data-clipboard-target="#copyme_alt">
+								<i class="ti-clipboard"></i> <span class="hidden">Copy without formatting</span>
+							</button>
 						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
 

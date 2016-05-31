@@ -1,6 +1,7 @@
 <?php 
 namespace B7KP\Utils;
 
+use B7KP\Utils\Constants as C;
 use B7KP\Library\Url; 
 
 class Snippets
@@ -223,6 +224,43 @@ class Snippets
 		$html .= "</div>"; // row1
 
 		return $html;
+	}
+
+	static function getMove($show_move, $move, $lw, $ispt = false)
+	{
+		switch ($show_move) {
+		case C::SHOW_MOVE_HIDDEN:
+			$move = "";
+			break;
+
+		case C::SHOW_MOVE_DIFF:
+			$move = $move;
+			break;
+
+		case C::SHOW_MOVE_LW:
+			$move = $lw;
+			break;
+
+		case C::SHOW_MOVE_PERC:
+			if($ispt)
+			{
+				if(is_numeric($lw))
+				{
+					$tw = $lw + intval($move);
+					$move = round((($tw/$lw)-1)*100, 2)."%";
+				}
+				else
+				{
+					$move = $lw;
+				}
+			}
+			else
+			{
+				$move = self::getMove(C::SHOW_MOVE_DIFF, $move, $lw);
+			}
+			break;
+		}
+		return $move;
 	}
 }
 ?>

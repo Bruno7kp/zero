@@ -19,6 +19,13 @@
     padding: 5px;
 }
 
+.btn-custom{
+    padding: 5px 15px;
+}
+.btn-custom span{
+	font-size: 9px;
+}
+
 /* SPACES */
 .bottomspace-xs{
 	margin-bottom: 5px;
