@@ -26,33 +26,47 @@ if($show_first_image)
 ?>
 <table class="chart-table table-fluid">
 	<tr>
-		<th>Chart-run</th>
+		<th class="cr-col">Chart-run</th>
 		<th>Rank</th>
 		<th>Name</th>
 		<?php if($type != "artist"): ?><th>Artist</th> <?php ; endif;?>
 		<th>Plays</th>
+		<th>Peak</th>
+		<th>Weeks</th>
 	</tr>
 	<?php 
-	var_dump($list);
 	foreach ($list as $value) {
-		$stats = $value['stats'][$week];
-		$item = $value['item'];
+		$todate 	= $value["stats"]["stats"]["todate"];
+		$stats 		= $value["stats"]["chartrun"][$week];
+		$item 		= $value["item"];
+		// vars
+		$position 	= $stats["rank"]["rank"];
+		$move 		= $stats["rank"]["move"];
+		$name 		= $item->$type;
+		$artist 	= $item->artist;
+		$plays 		= $stats["playcount"]["playcount"];
+		$playsmove 	= $stats["playcount"]["move"];
+		$totalweeks = $todate["weeks"]["total"];
+		$peak 		= $todate["overall"]["peak"];
 	?>
 	<tr>
-		<td><i class='ti-plus'></i></td>
-		<td><?php echo $stats["rank"]["rank"];?></td>
-		<td><?php echo $stats["rank"]["move"];?></td>
-		<td><?php echo $item->$type;?></td>
-		<td><?php echo $item->artist;?></td>
-		<td><?php echo $stats["playcount"]["playcount"];?></td>
-		<td><?php echo $stats["playcount"]["move"];?></td>
-		<td><?php echo $stats["week"];?></td>
+		<td class="cr-col">
+			<a class="cr-icon"><i class="ti-stats-up"></i></a>
+		</td>
+		<td><?php echo $position;?></td>
+		<td><?php echo $name;?></td>
+		<?php if($type != "artist"): ?>
+		<td><?php echo $artist;?></td> 
+		<?php ; endif;?>
+		<td><?php echo $plays;?></td>
+		<td><?php echo $peak;?></td>
+		<td><?php echo $totalweeks;?></td>
 		<?php 
 
 		?>
 	</tr>
-	<tr>
-		<td colspan=>
+	<tr style="display:none;">
+		<td colspan="7">
 		Chart-run
 		</td>
 	</tr>
@@ -60,3 +74,4 @@ if($show_first_image)
 	}
 	?>
 </table>
+<div style="display:none;"><div id="copyme_alt">dasd</div></div>

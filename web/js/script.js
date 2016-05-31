@@ -7,6 +7,52 @@ function initialize()
 	updateAction();
 	formSubmit();
 	routesFns();
+	copyChart();
+}
+
+function copyChart()
+{
+	copyBtn = $("#copy");
+	copyBtnAlt = $("#copy_alt");
+
+   	copyBtn.tooltipster({
+	    theme: 'tooltipster-blue',
+	    trigger: 'custom',
+        content: $('<span>Chart Copied!</span>')
+    });
+
+    copyBtnAlt.tooltipster({
+	    theme: 'tooltipster-blue',
+	    trigger: 'custom',
+        content: $('<span>Chart Copied!</span>')
+    });
+
+	copyBtn.click(function(event) {
+		$(".cr-col").hide(); // remove chart-run col
+		var clip = new Clipboard('#copy');
+		clip.on('success', function(e) {
+			copyBtn.tooltipster('show');
+		    e.clearSelection();
+			$(".cr-col").show();
+		});
+	});
+
+	copyBtnAlt.click(function(event) {
+		var clipb = new Clipboard('#copy_alt', {
+		    text: function() {
+		        return document.querySelector('#copyme_alt').innerHTML;
+		    }
+		});
+		clipb.on('success', function(e) {
+			copyBtnAlt.tooltipster('show');
+		    e.clearSelection();
+		});
+	});
+
+	$("body").click(function(event) {
+		copyBtn.tooltipster('hide');
+		copyBtnAlt.tooltipster('hide');
+	});
 }
 
 function formSubmit()

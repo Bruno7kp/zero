@@ -659,7 +659,7 @@ body.inner-page #fh5co-hero {
 #bg {
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center left;
+  background-position: 0% 25%;
   height: 600px;
   position: fixed;
   top: 0;

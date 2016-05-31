@@ -41,7 +41,7 @@ class Charts
 	private function getMainContent()
 	{
 		$js = "<script src='".Url::asset("js/chart.js")."'></script>";
-		//$js .= "<link rel='stylesheet' href='".Url::asset("css/themify-icons.css")."'>";
+		$js .= "<link rel='stylesheet' href='".Url::asset("css/themify-icons.css")."'>";
 		return $js;
 	}
 
@@ -65,7 +65,7 @@ class Charts
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
-					$ext = $this->extract($chartstats, false);
+					$ext = $this->extract($chartstats, false, $week->week);
 					$newlist[$i]['stats'] = $ext;
 					$newlist[$i]['item'] = $value;
 					$i++;
@@ -77,7 +77,7 @@ class Charts
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
-					$ext = $this->extract($chartstats, false);
+					$ext = $this->extract($chartstats, false, $week->week);
 					$newlist[$i]['stats'] = $ext;
 					$newlist[$i]['item'] = $value;
 					$i++;
@@ -89,7 +89,7 @@ class Charts
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
-					$ext = $this->extract($chartstats, false);
+					$ext = $this->extract($chartstats, false, $week->week);
 					$newlist[$i]['stats'] = $ext;
 					$newlist[$i]['item'] = $value;
 					$i++;
@@ -101,6 +101,10 @@ class Charts
 		if($html && $settings)
 		{
 			$list = $this->getTable($newlist, $type, $settings, $week->week);
+		}
+		else
+		{
+			$list = $newlist;
 		}
 
 		return $list;
@@ -196,7 +200,7 @@ class Charts
 					$stats[$key]['rank']['lw'] = $stats[$key-1]['rank']['rank'];
 					$stats[$key]['rank']['move'] = $stats[$key]['rank']['lw'] - $stats[$key]['rank']['rank'];
 					$stats[$key]['playcount']['lw'] = $stats[$key-1]['playcount']['playcount'];
-					$stats[$key]['playcount']['move'] = $stats[$key]['playcount']['lw'] - $stats[$key]['playcount']['playcount'];
+					$stats[$key]['playcount']['move'] = $stats[$key]['playcount']['playcount'] - $stats[$key]['playcount']['lw'];
 				}
 				else
 				{

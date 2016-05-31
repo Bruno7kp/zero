@@ -13,6 +13,12 @@
 	color: var(--main-site-color);
 }
 
+.cr-icon {
+    color: #28bbf8;
+    background-color: aliceblue;
+    padding: 5px;
+}
+
 /* SPACES */
 .bottomspace-xs{
 	margin-bottom: 5px;

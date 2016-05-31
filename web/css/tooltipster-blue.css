@@ -1,0 +1,11 @@
+.tooltipster-blue {
+	border-radius: 5px; 
+	border-bottom: 3px solid #28bbf8;
+	background: #2a2a2a;
+	color: #fff;
+}
+.tooltipster-blue .tooltipster-content {
+	font-size: 14px;
+	line-height: 16px;
+	padding: 8px 10px;
+}
