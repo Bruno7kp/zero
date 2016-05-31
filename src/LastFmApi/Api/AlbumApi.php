@@ -120,7 +120,7 @@ class AlbumApi extends BaseApi
                 $info['tracks'][$i]['url'] = (string) $track->url;
                 $info['tracks'][$i]['duration'] = (string) $track->duration;
                 //$info['tracks'][$i]['streamable'] = (string) $track->streamable;
-                $info['tracks'][$i]['rank'] = (string) $track['rank'];
+                //$info['tracks'][$i]['rank'] = (string) $track->rank;
                 $info['tracks'][$i]['artist'] = array();
                 $info['tracks'][$i]['artist']['name'] = $track->artist->name;
                 $info['tracks'][$i]['artist']['mbid'] = $track->artist->mbid;

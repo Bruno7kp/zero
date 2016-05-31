@@ -328,6 +328,8 @@ class Charts
 
 	public function getMusicStats($name, $artist, $mbid)
 	{
+		$name 	= addslashes($name);
+		$artist = addslashes($artist);
 		$cond = "music_charts.mus_mbid = '".$mbid."'";
 		if(empty($mbid))
 		{
@@ -341,7 +343,9 @@ class Charts
 
 	public function getAlbumStats($name, $artist, $mbid)
 	{
-		$cond = "album_charts.alb_mbid = '".$mbid."'";
+		$name 	= addslashes($name);
+		$artist = addslashes($artist);
+		$cond	= "album_charts.alb_mbid = '".$mbid."'";
 		if(empty($mbid))
 		{
 			$cond = "album_charts.album = '$name' AND album_charts.artist = '$artist'";
@@ -354,6 +358,7 @@ class Charts
 
 	public function getArtistStats($name, $mbid)
 	{
+		$name 	= addslashes($name);
 		$cond = "artist_charts.art_mbid = '".$mbid."'";
 		if(empty($mbid))
 		{

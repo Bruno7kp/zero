@@ -17,7 +17,7 @@ $js 				= $this->getMainContent();
 $show_images 		= $settings->show_images;
 $show_dropouts 		= $settings->show_dropouts;
 $show_first_image 	= $settings->show_first_image;
-$show_points 		= $settings->show_points;
+$show_playcounts 		= $settings->show_playcounts;
 $show_move 			= $settings->show_move;
 
 
@@ -65,7 +65,7 @@ if($show_first_image && count($list)>0)
 		<?php if($type != "artist"): ?>
 			<th>Artist</th> 
 		<?php ; endif;?>
-		<?php if($show_points): ?>
+		<?php if($show_playcounts): ?>
 			<th class="center">Plays</th>
 		<?php ; endif;?>
 		<th class="center">Peak</th>
@@ -103,7 +103,7 @@ if($show_first_image && count($list)>0)
 			<td class="left"><?php echo $artist;?></td> 
 		<?php 
 		}
-		if($show_points)
+		if($show_playcounts)
 		{ 
 		?>
 			<td class='rk-col'>

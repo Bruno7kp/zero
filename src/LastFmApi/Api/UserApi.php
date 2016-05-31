@@ -141,7 +141,7 @@ class UserApi extends BaseApi
             $img = (array)$call->user->image[2];
             $img = $img["#text"];
             $info['name'] = (string) $call->user->name;
-            $info['realname'] = (string) $call->user->realname;
+            //$info['realname'] = (string) $call->user->realname;
             $info['url'] = (string) $call->user->url;
             $info['image'] = (string) $img;
             $info['country'] = (string) $call->user->country;

@@ -5,6 +5,7 @@ use B7KP\Core\Dao;
 use B7KP\Model\Model;
 use B7KP\Utils\Functions;
 use B7KP\Utils\UserSession;
+use B7KP\Library\Options;
 use LastFmApi\Main\LastFm;
 
 class Assert
@@ -298,6 +299,25 @@ class Assert
 			if (strpos($this->data->$field, $this->data->$rule) !== false) {
 				$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field should not contain the same value of the <b>{$rule}</b> field", "fn" => __FUNCTION__);
 			}
+		}
+	}
+
+	private function option($rule, $field)
+	{
+		$options = new Options();
+		$o = $options->get($this->class, $field);
+		$ok = false;
+		foreach ($o as $key => $value) {
+			if($key == $this->data->$field)
+			{
+				$ok = true;
+				break;
+			}
+		}
+
+		if(!$ok)
+		{
+				$this->error[] = array("field" => $field, "error" => "Option of the field: <b>{$field}</b> not available, try reload the page and select an option again.", "fn" => __FUNCTION__);
 		}
 	}
 
