@@ -5,7 +5,7 @@
   --main-site-color: #28bbf8;
 }
 
-[class^="icon-"], [class*=" icon-"]:not(.except){
+[class^="icon-"]:not(.except), [class*=" icon-"]:not(.except){
     color: var(--icon-color);
 }
 
@@ -161,9 +161,9 @@ a.white {
 
 /* DARK BG */
 #bg {
-	filter: brightness(0.5);
-	-webkit-filter: brightness(0.5);
-	-moz-filter: brightness(0.5);
+	filter: brightness(0.5) blur(3px);
+	-webkit-filter: brightness(0.5) blur(3px);
+	-moz-filter: brightness(0.5) blur(3px);
 }
 
 .bg {

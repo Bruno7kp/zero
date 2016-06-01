@@ -8,6 +8,7 @@ use B7KP\Entity\Music_charts;
 use B7KP\Entity\Album_charts; 
 use B7KP\Entity\Artist_charts; 
 use B7KP\Library\Url; 
+use B7KP\Library\Route; 
 use B7KP\Utils\Snippets; 
 use B7KP\Utils\Functions as Fn; 
 use B7KP\Utils\Constants as C;
@@ -204,19 +205,27 @@ class Charts
 				}
 				else
 				{
-					if(count($stats) > 1)
-					{
-						$stats[$key]['rank']['lw'] = "RE";
-						$stats[$key]['rank']['move'] = "RE";
-						$stats[$key]['playcount']['lw'] = "RE";
-						$stats[$key]['playcount']['move'] = "RE";
+					$isdebut = true;
+					for ($i = 0; $i < $key; $i++) 
+					{ 
+						if(isset($stats[$i]))
+						{
+							$isdebut = false;
+						}
 					}
-					else
+					if($isdebut)
 					{
 						$stats[$key]['rank']['lw'] = "NEW";
 						$stats[$key]['rank']['move'] = "NEW";
 						$stats[$key]['playcount']['lw'] = "NEW";
 						$stats[$key]['playcount']['move'] = "NEW";
+					}
+					else
+					{
+						$stats[$key]['rank']['lw'] = "RE";
+						$stats[$key]['rank']['move'] = "RE";
+						$stats[$key]['playcount']['lw'] = "RE";
+						$stats[$key]['playcount']['move'] = "RE";
 					}
 				}
 			}
@@ -411,7 +420,10 @@ class Charts
 			$icon = $this->aux('getMoveIcon', $move);
 			$html .= Snippets::specMusRow($value, $this->user, Fn::formatNum($move), $icon);
 		}
-		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline'>View full chart</a></div></div>";
+		$artlink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'music', 'week' => $week->week));
+		$alblink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'album', 'week' => $week->week));
+		$muslink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'artist', 'week' => $week->week));
+		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline disabled'>View full chart:</a> <a class='btn btn-outline' href='".$artlink."'><i class='ti-user'></i></a> <a class='btn btn-outline' href='".$alblink."'><i class='icon-vynil except'></i></a> <a class='btn btn-outline' href='".$muslink."'><i class='ti-music'></i></a></div></div>";
 		return $html;
 	}
 	

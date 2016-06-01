@@ -63,7 +63,7 @@ class ChartController extends Controller
 	}
 
 	/**
-	* @Route(name=weekly_chart|route=user/{login}/charts/{type}/week/{week})
+	* @Route(name=weekly_chart|route=/user/{login}/charts/{type}/week/{week})
 	*/
 	public function weeklyChart($login, $type, $week)
 	{

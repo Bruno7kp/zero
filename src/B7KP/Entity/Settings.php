@@ -48,7 +48,7 @@ class Settings extends Entity
 
 	/**
 	* @Assert(null=false|int|option)
-	* @Options(values={"1": "Difference with last week","0": "None (hide)","2": "Show last week position", "3": "Difference with last week (percentage) (only for playcounts)"})
+	* @Options(values={"1": "Difference with last week","0": "None (hide)","2": "Show last week position/plays", "3": "Difference with last week (percentage) (only for playcounts)"})
 	*/
 	protected $show_move;
 

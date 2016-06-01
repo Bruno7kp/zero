@@ -47,7 +47,7 @@ class Route
 			foreach ($special as $value) {
 				if(!isset($array[$value]) || empty($array[$value]))
 				{
-					throw new Exception("Missing one argument to create url: ".$value);
+					throw new \Exception("Missing one argument to create url: ".$value);
 				}
 				$url = str_replace("{".$value."}", $array[$value], $url);
 			}

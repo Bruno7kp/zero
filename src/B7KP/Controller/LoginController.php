@@ -6,6 +6,7 @@ use B7KP\Utils\UserSession;
 use B7KP\Utils\Login;
 use B7KP\Library\Assert;
 use B7KP\Library\Url;
+use B7KP\Library\Route;
 
 class LoginController extends Controller
 {
@@ -38,7 +39,7 @@ class LoginController extends Controller
 				$login = new Login($post->login, $post->password, $this->factory);
 				if($login->login())
 				{
-					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Url::getBaseUrl());
+					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url('userprofile'));
 				}
 				else
 				{

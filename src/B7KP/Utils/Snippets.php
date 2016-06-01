@@ -234,7 +234,7 @@ class Snippets
 			break;
 
 		case C::SHOW_MOVE_DIFF:
-			$move = $move;
+			$move = ($move <> 0 || !is_numeric($move) ? $move : "=");
 			break;
 
 		case C::SHOW_MOVE_LW:
@@ -247,7 +247,15 @@ class Snippets
 				if(is_numeric($lw))
 				{
 					$tw = $lw + intval($move);
-					$move = round((($tw/$lw)-1)*100, 2)."%";
+					$move = round((($tw/$lw)-1)*100, 2);
+					if($move <> 0)
+					{
+						$move .= "%";
+					}
+					else
+					{
+						$move = "=";
+					}
 				}
 				else
 				{
@@ -261,6 +269,38 @@ class Snippets
 			break;
 		}
 		return $move;
+	}
+
+	static function getMoveClass($show_move, $move, $tw, $isrank)
+	{
+		$color = "";
+		if($move == "=")
+		{
+			$color = "non";
+		}
+		elseif($move == "NEW")
+		{
+			$color = "deb";
+		}
+		elseif($move == "RE")
+		{
+			$color = "ret";
+		}
+		else
+		{
+			$move = intval($move);
+			if($show_move == C::SHOW_MOVE_DIFF || $show_move == C::SHOW_MOVE_PERC)
+			{
+				$color = $move > 0 ? "up" : "down";
+			}
+			elseif($show_move == C::SHOW_MOVE_LW)
+			{
+				$cond = $isrank ? $tw < $move : $tw > $move;
+				$color = $cond ? "up" : "down";
+			}
+		}
+
+		return $color;
 	}
 }
 ?>

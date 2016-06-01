@@ -1,3 +1,7 @@
+.chart-table {
+	margin: 0px auto;
+}
+
 .chart-table th {
 	padding: 5px;
 	font-size: 16px;
@@ -18,6 +22,45 @@
 
 .chart-table tr {
 	border-bottom: solid 1px #eee;
+}
+
+.chart-table td.rk-col {
+	font-size: 20px;
+	line-height: 1;
+}
+
+.chart-table td.rk-col span:not(.black) {
+	font-size: 11px;
+	/*display: block;*/
+}
+
+.chart-table span.black {
+	font-size: 10px;
+	color: #777;
+}
+
+.chart-table span.non {
+	color: #777;
+}
+
+.chart-table span.deb {
+	color: #03A9F4;
+}
+
+.chart-table span.ret {
+	color: #FF9800;
+}
+
+.chart-table span.up {
+	color: #4CAF50;
+}
+
+.chart-table span.down {
+	color: #F44336;
+}
+
+.chart-table tr:nth-child(2) td:nth-child(2).rk-col{
+	color: #28bbf8;
 }
 
 .chart-table td.center {

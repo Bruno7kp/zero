@@ -79,10 +79,16 @@ if($show_first_image && count($list)>0)
 		// vars
 		$position 	= $stats["rank"]["rank"];
 		$move 		= S::getMove($show_move, $stats["rank"]["move"], $stats["rank"]["lw"]);
+		$moveclass  = S::getMoveClass($show_move, $move, $position, true);
 		$name 		= $item->$type;
 		$artist 	= $item->artist;
 		$plays 		= $stats["playcount"]["playcount"];
 		$playsmove 	= S::getMove($show_move, $stats["playcount"]["move"], $stats["playcount"]["lw"], true);
+		$pmclass  	= S::getMoveClass($show_move, $playsmove, $plays, false);
+		$playsmove  = C::SHOW_MOVE_LW == $show_move ? "<span class='black'>LW:</span> ".$playsmove : $playsmove; 
+		$move  		= C::SHOW_MOVE_LW == $show_move ? "<span class='black'>LW:</span> ".$move : $move;
+		if(intval($move) > 0):	$move = "+".$move; endif;
+		if(intval($playsmove) > 0):	$playsmove = "+".$playsmove; endif;
 		$totalweeks = $todate["weeks"]["total"];
 		$peak 		= $todate["overall"]["peak"];
 	?>
@@ -93,7 +99,7 @@ if($show_first_image && count($list)>0)
 		<td class='rk-col'>
 			<?php echo $position;?>
 			<br/>
-			<small><?php echo $move;?></small>
+			<span class="<?php echo $moveclass;?>"><?php echo $move;?></span>
 		</td>
 		<td class="left"><?php echo $name;?></td>
 		<?php 
@@ -109,7 +115,7 @@ if($show_first_image && count($list)>0)
 			<td class='rk-col'>
 				<?php echo $plays;?>
 				<br/>
-				<small><?php echo $playsmove;?></small>
+				<span class="<?php echo $pmclass;?>"><?php echo $playsmove;?></span>
 			</td>
 		<?php 
 		}

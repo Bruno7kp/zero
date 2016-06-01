@@ -105,8 +105,9 @@ class UpdateController extends Controller
 			if($idweek > 0)
 			{
 				$thiswk = $this->factory->findOneBy("B7KP\Entity\Week", $idweek);
-				$from_day = new \DateTime($thiswk->from_day);
-				$to_day = new \DateTime($thiswk->to_day);
+				$gmt = new \DateTimeZone("GMT");
+				$from_day = new \DateTime($thiswk->from_day, $gmt);
+				$to_day = new \DateTime($thiswk->to_day, $gmt);
 				$from_day = $from_day->format("U");
 				$to_day = $to_day->format("U");
 				$lastfm = new LastFm();
