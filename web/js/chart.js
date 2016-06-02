@@ -19,11 +19,10 @@ function loadimages()
 		td = $(this);
 		if(type == "artist")
 		{
-			except = ["The Killers", "Ellie Goulding"];
-			if($.inArray(artist, except) >= 0)
-			{
-				mbid = "";
-			}
+			//except = ["The Killers", "Ellie Goulding"];
+			
+			mbid = "";
+			
 			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
 		else if(type == "album")
@@ -103,9 +102,9 @@ function setImg(rankid, img)
 	$("#"+rankid).html("<img width='64' src='"+img+"'/>");
 }
 
-function loadArtImg(name, mbid, seton)
+function loadArtImg(name, seton)
 {
-	last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
+	last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid=&format=json';
 	last = encodeURI(last);
 	$.ajax({
 		url: last,
