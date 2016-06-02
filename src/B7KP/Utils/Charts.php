@@ -42,9 +42,8 @@ class Charts
 
 	private function getMainContent()
 	{
-		$js = "<script src='".Url::asset("js/chart.js")."'></script>";
-		$js .= "<link rel='stylesheet' href='".Url::asset("css/themify-icons.css")."'>";
-		return $js;
+		$cn = "<link rel='stylesheet' href='".Url::asset("css/themify-icons.css")."'>";
+		return $cn;
 	}
 
 	private function getTable($list, $type, $settings, $week)

@@ -46,7 +46,7 @@ class Options
 		foreach ($set as $key => $value) {
 			$arr = $this->$key($value, $arr);
 		}
-var_dump($arr);
+
 		return $arr;
 	}
 

@@ -21,6 +21,7 @@ use B7KP\Core\App;
 	baseUrl = "<?php echo Url::getBaseUrl();?>";
 	curPage = "<?php echo Url::getRequest();?>";
 	curRoute = "<?php echo Route::getName(Url::getRequest());?>";
+	apiKey = "<?php echo App::get('lastfmapikey');?>";
 </script>
 <script src="<?php echo Url::asset('js/jquery.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/bootstrap.min.js');?>"></script>
@@ -33,6 +34,7 @@ use B7KP\Core\App;
 <script src="<?php echo Url::asset('js/custom.js');?>"></script>
 <script src="<?php echo Url::asset('js/main.js');?>"></script>
 <script src="<?php echo Url::asset('js/script.js');?>"></script>
+<script src="<?php echo Url::asset('js/chart.js');?>"></script>
 <script src="<?php echo Url::asset('js/bootstrap-notify.min.js');?>"></script>
 <!-- cdn -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>

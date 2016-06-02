@@ -134,7 +134,10 @@ class TrackApi extends BaseApi {
 			//$info['streamable'] = (string) $call->track->streamable;
 			//$info['fulltrack'] = (string) $call->track->streamable['fulltrack'];
 			$info['listeners'] = (string) $call->track->listeners;
-			$info['playcount'] = (string) $call->track->playcount;
+			if(isset($call->track->playcount))
+			{
+				$info['playcount'] = (string) $call->track->playcount;
+			}
 			$info['artist']['name'] = (string) $call->track->artist->name;
 			$info['artist']['mbid'] = (string) $call->track->artist->mbid;
 			$info['artist']['url'] = (string) $call->track->artist->url;
@@ -151,12 +154,12 @@ class TrackApi extends BaseApi {
 			$info['album']['image']['large'] = (string) $image[2]["#text"];
 			$info['album']['image']['extralarge'] = (string) $image[3]["#text"];
 			//$info['album']['image']['mega'] = (string) $image[4]["#text"];
-			$i = 0;
-			foreach ( $call->track->toptags->tag as $tag ) {
-				$info['toptags'][$i]['name'] = (string) $tag->name;
-				$info['toptags'][$i]['url'] = (string) $tag->url;
-				$i++;
-			}
+			//$i = 0;
+			// foreach ( $call->track->toptags->tag as $tag ) {
+			// 	$info['toptags'][$i]['name'] = (string) $tag->name;
+			// 	$info['toptags'][$i]['url'] = (string) $tag->url;
+			// 	$i++;
+			// }
 			//$info['wiki']['published'] = (string) $call->track->wiki->published;
 			//$info['wiki']['summary'] = (string) $call->track->wiki->summary;
 			//$info['wiki']['content'] = (string) $call->track->wiki->content;

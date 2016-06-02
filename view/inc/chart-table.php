@@ -62,6 +62,9 @@ if($show_first_image && count($list)>0)
 	<tr>
 		<th class="cr-col min center">+</th>
 		<th class="center"><?php echo Lang::get('rk')?></th>
+		<?php if($show_images): ?>
+			<th class="center">Img</th>
+		<?php ; endif;?>
 		<th><?php echo Lang::get('name')?></th>
 		<?php if($type != "artist"): ?>
 			<th><?php echo Lang::get('art')?></th> 
@@ -92,6 +95,8 @@ if($show_first_image && count($list)>0)
 		if(intval($playsmove) > 0):	$playsmove = "+".$playsmove; endif;
 		$totalweeks = $todate["weeks"]["total"];
 		$peak 		= $todate["overall"]["peak"];
+		$t = substr($type, 0,3)."_mbid";
+		$mbid = $item->$t;
 	?>
 	<tr>
 		<td class="cr-col min">
@@ -102,6 +107,9 @@ if($show_first_image && count($list)>0)
 			<br/>
 			<span class="<?php echo $moveclass;?>"><?php echo $move;?></span>
 		</td>
+		<?php if($show_images): ?>
+			<td class="getimage" id="rankid<?php echo $position;?>" data-type="<?php echo $type;?>" data-name="<?php echo $name?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo $artist;?>"><?php echo S::loader(30);?></td>
+		<?php ; endif;?>
 		<td class="left"><?php echo $name;?></td>
 		<?php 
 		if($type != "artist")

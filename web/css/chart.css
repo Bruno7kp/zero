@@ -7,6 +7,11 @@
 	font-size: 16px;
 }
 
+.getimage {
+	width: 64px;
+	text-align: center;
+}
+
 .chart-table.table-fluid  {
 	width: 100%;
 }
