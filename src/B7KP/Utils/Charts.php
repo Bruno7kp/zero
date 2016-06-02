@@ -345,7 +345,7 @@ class Charts
 		{
 			$cond = "music_charts.music = '$name' AND music_charts.artist = '$artist'";
 		}
-		$sql = "SELECT music_charts.* FROM music_charts, week WHERE ".$cond." AND week.iduser = '".$this->user->id."' GROUP BY music_charts.id ORDER BY week.week DESC, music_charts.updated";
+		$sql = "SELECT music_charts.* FROM music_charts, week WHERE ".$cond." AND week.id = music_charts.idweek AND week.iduser = '".$this->user->id."' GROUP BY music_charts.id ORDER BY week.week DESC, music_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Music_charts", $sql);
 
 		return $weeks;
@@ -360,7 +360,7 @@ class Charts
 		{
 			$cond = "album_charts.album = '$name' AND album_charts.artist = '$artist'";
 		}
-		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.iduser = '".$this->user->id."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
+		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.id = album_charts.idweek AND week.iduser = '".$this->user->id."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Album_charts", $sql);
 
 		return $weeks;
@@ -374,7 +374,8 @@ class Charts
 		{
 			$cond = "artist_charts.artist = '$name'";
 		}
-		$sql = "SELECT artist_charts.* FROM artist_charts, week WHERE ".$cond." AND week.iduser = '".$this->user->id."' GROUP BY artist_charts.id ORDER BY week.week DESC, artist_charts.updated";
+		$sql = "SELECT artist_charts.* FROM artist_charts, week WHERE ".$cond." AND week.id = artist_charts.idweek AND week.iduser = '".$this->user->id."' GROUP BY artist_charts.id ORDER BY week.week DESC, artist_charts.updated";
+
 		$weeks = $this->factory->findSql("B7KP\Entity\Artist_charts", $sql);
 
 		return $weeks;

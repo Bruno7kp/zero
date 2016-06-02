@@ -18,7 +18,7 @@ $js 				= $this->getMainContent();
 $show_images 		= $settings->show_images;
 $show_dropouts 		= $settings->show_dropouts;
 $show_first_image 	= $settings->show_first_image;
-$show_playcounts 		= $settings->show_playcounts;
+$show_playcounts 	= $settings->show_playcounts;
 $show_move 			= $settings->show_move;
 
 
