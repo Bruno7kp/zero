@@ -22,22 +22,25 @@ function loadimages()
 			//except = ["The Killers", "Ellie Goulding"];
 			
 			mbid = "";
-			artist = artist.replace("&", "%26").replace("+", "%2B");
+			//artist = artist.replace("&", "%26");
 			
 			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
 		else if(type == "album")
 		{
-			artist = artist.replace("&", "%26").replace("+", "%2B");
+			//artist = artist.replace("&", "%26").replace("+", "%2B");
 			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&artist='+artist+'&album='+name+'&mbid='+mbid+'&format=json';
 
 		}
 		else
 		{
-			artist = artist.replace("&", "%26").replace("+", "%2B");;
+			//artist = artist.replace("&", "%26").replace("+", "%2B");;
 			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&artist='+artist+'&track='+name+'&mbid='+mbid+'&format=json';
 		}
 		last = encodeURI(last);
+		last = last.replace("+", "%2B");
+		last = last.replace("%20&", "%20%26");
+		last = last.replace("&%20", "%26%20");
 		//console.log(last);
 		getF(last, td, artist);
 		function getF(last, td, artistIn)
