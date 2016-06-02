@@ -7,6 +7,10 @@
 	font-size: 16px;
 }
 
+.min-col {
+	width: 30px;
+}
+
 .getimage {
 	width: 64px;
 	text-align: center;

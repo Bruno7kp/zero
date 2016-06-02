@@ -22,51 +22,45 @@ function loadimages()
 			//except = ["The Killers", "Ellie Goulding"];
 			
 			mbid = "";
+			artist = artist.replace("&", "%26").replace("+", "%2B");
 			
 			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
 		else if(type == "album")
 		{
+			artist = artist.replace("&", "%26").replace("+", "%2B");
 			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&artist='+artist+'&album='+name+'&mbid='+mbid+'&format=json';
 
 		}
 		else
 		{
+			artist = artist.replace("&", "%26").replace("+", "%2B");;
 			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&artist='+artist+'&track='+name+'&mbid='+mbid+'&format=json';
 		}
 		last = encodeURI(last);
 		//console.log(last);
-		getF(last, td);
-		function getF(last, td)
+		getF(last, td, artist);
+		function getF(last, td, artistIn)
 		{
-
+			console.log(last);
 			$.ajax({
 				url: last,
 				type: 'GET',
 				dataType: 'json'
 			})
 			.done(function(data) {
-				set = true;
+				if(artistIn == true)
+				{
+					type = "artist";
+				}
 				if(type == "music")
 				{
-					// console.log(data);
-					if(typeof data.track != 'undefined')
-					{
-						if(typeof data.track.album != 'undefined')
-						{
-							img = data.track.album.image[1]["#text"];
-							setImg(td.attr('id'), img);
-						}
-						else
-						{
-							set = false;
-							loadArtImg(data.track.artist.name, data.track.artist.mbid, td.attr('id'));
-						}
-					}
-					else
-					{
-						loadArtImg(artist, "", td.attr('id'));
-					}
+
+					nartist = artistIn.replace("&", "%26").replace("+", "%2B");
+		
+					newa = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
+					
+					getF(newa, td, true);
 				}
 				else if(type == "album")
 				{
@@ -102,9 +96,9 @@ function setImg(rankid, img)
 	$("#"+rankid).html("<img width='64' src='"+img+"'/>");
 }
 
-function loadArtImg(name, seton)
+function loadArtImg(name, mbid, seton)
 {
-	last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid=&format=json';
+	last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
 	last = encodeURI(last);
 	$.ajax({
 		url: last,
