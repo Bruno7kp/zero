@@ -5,6 +5,7 @@ use B7KP\Model\Model;
 use B7KP\Utils\UserSession;
 use B7KP\Utils\Snippets;
 use B7KP\Entity\User;
+use B7KP\Library\Lang;
 use LastFmApi\Main\LastFm;
 
 class ProfileController extends Controller
@@ -113,7 +114,7 @@ class ProfileController extends Controller
 			}
 			else
 			{
-				echo "Nothing to show here.";
+				echo Lang::get('not_show');
 			}
 
 		}
@@ -145,7 +146,7 @@ class ProfileController extends Controller
 			}
 			else
 			{
-				echo "Nothing to show here.";
+				echo Lang::get('not_show');
 			}
 		}
 		else
@@ -177,7 +178,7 @@ class ProfileController extends Controller
 			}
 			else
 			{
-				echo "Nothing to show here.";
+				echo Lang::get('not_show');
 			}
 
 		}
@@ -200,17 +201,17 @@ class ProfileController extends Controller
 			$recent = $lfm->getRecentTrack();
 			if(count($recent) > 0)
 			{
-				$html = "<div class='bottomspace-sm topspace-sm'><h2 class='h3'>RECENT TRACKS</h2></div>";
+				$html = "<div class='bottomspace-sm topspace-sm'><h2 class='h3'>".Lang::get('rec_tra')."</h2></div>";
 				foreach ($recent as $key => $value) 
 				{
 					$html .= Snippets::recentListRow($value['name'], $value['images']['medium'], $value['artist']['name'], $value['album']['name'], $value['url']);
 				}
-				$html .= "<a class='btn btn-danger btn-block topspace-sm' target='_blank' href='http://last.fm/user/{$user->login}/library'>View more <i class='fa fa-lastfm'></i></a>";
+				$html .= "<a class='btn btn-danger btn-block topspace-sm' target='_blank' href='http://last.fm/user/{$user->login}/library'>".Lang::get('view')." <i class='fa fa-lastfm'></i></a>";
 				echo $html;
 			}
 			else
 			{
-				echo "Nothing to show here.";
+				echo Lang::get('not_show');
 			}
 		}
 		else

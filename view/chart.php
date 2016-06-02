@@ -1,10 +1,12 @@
 <?php
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 ?>
 <!doctype html>
 <html>
 <?php
-	$title 	= $user->login."'s Top ".ucfirst($type)." - Week ".$week->week;
+	$lang = substr($type, 0, 3)."_x";
+	$title 	= $user->login." :: Top ".Lang::get($lang)." - ".Lang::get('wk')." ".$week->week;
 	$head 	= array("title" => $title);
 	$this->render("ext/head.php", $head);
 	$from 	= new DateTime($week->from_day);
@@ -32,10 +34,10 @@ use B7KP\Library\Route;
 						</div>
 						<div class="col-md-10 col-md-offset-1 topspace-lg">
 							<button class="btn btn-custom btn-info btn-sm" id="copy" data-clipboard-target="#copyme">
-								<i class="ti-clipboard"></i> <span>Copy chart</span>
+								<i class="ti-clipboard"></i> <span><?php echo Lang::get('copy');?> chart</span>
 							</button>
 							<button class="btn btn-custom btn-info btn-sm showonhover" id="copy_alt" data-clipboard-target="#copyme_alt">
-								<i class="ti-clipboard"></i> <span class="hidden">Copy without formatting</span>
+								<i class="ti-clipboard"></i> <span class="hidden"><?php echo Lang::get('copy_w');?></span>
 							</button>
 						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	

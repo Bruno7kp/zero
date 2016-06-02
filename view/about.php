@@ -1,10 +1,11 @@
 <?php
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 ?>
 <!doctype html>
 <html>
 <?php
-	$head = array("title" => "About");
+	$head = array("title" => Lang::get('about'));
 	$this->render("ext/head.php", $head);
 ?>
 	<body class="inner-min">
@@ -17,7 +18,7 @@ use B7KP\Library\Route;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2>About</h2>
+							<h2><?php Lang::get('about');?></h2>
 							Hey ~
 							<hr>
 							<h3>To do list</h3>

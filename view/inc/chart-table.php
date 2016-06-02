@@ -1,5 +1,6 @@
 <?php
 use B7KP\Entity\Settings;
+use B7KP\Library\Lang;
 use LastFmApi\Main\LastFm;
 use B7KP\Utils\Constants as C;
 use B7KP\Utils\Snippets as S;
@@ -60,16 +61,16 @@ if($show_first_image && count($list)>0)
 <table class="chart-table table-fluid topspace-md">
 	<tr>
 		<th class="cr-col min center">+</th>
-		<th class="center">Rank</th>
-		<th>Name</th>
+		<th class="center"><?php echo Lang::get('rk')?></th>
+		<th><?php echo Lang::get('name')?></th>
 		<?php if($type != "artist"): ?>
-			<th>Artist</th> 
+			<th><?php echo Lang::get('art')?></th> 
 		<?php ; endif;?>
 		<?php if($show_playcounts): ?>
-			<th class="center">Plays</th>
+			<th class="center"><?php echo Lang::get('play_x')?></th>
 		<?php ; endif;?>
-		<th class="center">Peak</th>
-		<th class="center">Weeks</th>
+		<th class="center"><?php echo Lang::get('pk')?></th>
+		<th class="center"><?php echo Lang::get('wk_x')?></th>
 	</tr>
 	<?php 
 	foreach ($list as $value) {

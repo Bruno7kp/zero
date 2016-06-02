@@ -3,6 +3,7 @@ namespace B7KP\Utils;
 
 use B7KP\Utils\Constants as C;
 use B7KP\Library\Url; 
+use B7KP\Library\Lang; 
 
 class Snippets
 {
@@ -43,7 +44,7 @@ class Snippets
 			<div class='col-xs-9'>
 				<a href='{$url}' target='_blank'>{$name}</a>
 				<br>
-				<small class='text-muted'>{$playcount} plays</small>
+				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
 				<div class='progress'>
 				  <div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='{$perc}' aria-valuemin='0' aria-valuemax='100' style='width: {$perc}%'>
@@ -66,9 +67,9 @@ class Snippets
 			<div class='col-xs-9'>
 				<a href='{$url}' target='_blank'>{$name}</a> 
 				<br>
-				<small class='text-muted'>by <a href='{$arturl}' target='_blank'>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href='{$arturl}' target='_blank'>{$artist}</a></small>
 				<br>
-				<small class='text-muted'>{$playcount} plays</small>
+				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
 				<div class='progress'>
 				  <div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='{$perc}' aria-valuemin='0' aria-valuemax='100' style='width: {$perc}%'>
@@ -91,9 +92,9 @@ class Snippets
 			<div class='col-xs-9'>
 				<a href='{$url}' target='_blank'>{$name}</a> 
 				<br>
-				<small class='text-muted'>by <a href='{$arturl}' target='_blank'>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href='{$arturl}' target='_blank'>{$artist}</a></small>
 				<br>
-				<small class='text-muted'>{$playcount} plays</small>
+				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
 				<div class='progress'>
 				  <div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='{$perc}' aria-valuemin='0' aria-valuemax='100' style='width: {$perc}%'>
@@ -132,10 +133,10 @@ class Snippets
 		$html .= "<h1>".$value->music."<small class='text-muted-alt br'>".$value->artist."</small><h1>";
 		$html .= "<div class='row bigtxt'>";
 		$html .= "<div class='col-xs-4'>";
-		$html .= "#".$value->rank."<small>rank</small>";
+		$html .= "#".$value->rank."<small>".Lang::get('rk')."</small>";
 		$html .= "</div>";
 		$html .= "<div class='col-xs-4'>";
-		$html .= "".$value->playcount."<small>plays</small>";
+		$html .= "".$value->playcount."<small>".(Lang::get('play_x'))."</small>";
 		$html .= "</div>"; // col-xs-4
 		$html .= "<div class='col-xs-4'>";
 		$html .= "<i class='".$icon."'></i><small>".$move."</small>";
@@ -168,10 +169,10 @@ class Snippets
 		$html .= "<h1>".$value->artist."<h1>";
 		$html .= "<div class='row bigtxt'>";
 		$html .= "<div class='col-xs-4'>";
-		$html .= "#".$value->rank."<small>rank</small>";
+		$html .= "#".$value->rank."<small>".Lang::get('rk')."</small>";
 		$html .= "</div>";
 		$html .= "<div class='col-xs-4'>";
-		$html .= "".$value->playcount."<small>plays</small>";
+		$html .= "".$value->playcount."<small>".(Lang::get('play_x'))."</small>";
 		$html .= "</div>"; // col-xs-4
 		$html .= "<div class='col-xs-4'>";
 		$html .= "<i class='".$icon."'></i><small>".$move."</small>";
@@ -204,10 +205,10 @@ class Snippets
 		$html .= "<h1>".$value->album."<small class='text-muted-alt br'>".$value->artist."</small><h1>";
 		$html .= "<div class='row bigtxt'>";
 		$html .= "<div class='col-xs-4'>";
-		$html .= "#".$value->rank."<small>rank</small>";
+		$html .= "#".$value->rank."<small>".Lang::get('rk')."</small>";
 		$html .= "</div>";
 		$html .= "<div class='col-xs-4'>";
-		$html .= "".$value->playcount."<small>plays</small>";
+		$html .= "".$value->playcount."<small>".(Lang::get('play_x'))."</small>";
 		$html .= "</div>"; // col-xs-4
 		$html .= "<div class='col-xs-4'>";
 		$html .= "<i class='".$icon."'></i><small>".$move."</small>";

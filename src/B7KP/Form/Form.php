@@ -1,6 +1,8 @@
 <?php
 namespace B7KP\Form;
 
+use B7KP\Library\Lang;
+
 abstract class Form
 {
 	protected $form = "";
@@ -94,7 +96,7 @@ abstract class Form
 
 	final protected function input($type, $name, $class, $placeholder)
 	{
-		if(!$placeholder): $placeholder = ucfirst($name); endif;
+		if(!$placeholder): $placeholder = Lang::get($name); endif;
 		$value = $this->checkValue($name);
 		$this->form .= "<div class='form-group'>";
 		$this->form .= "<input type='".$type."' name='".$name."' class='".$class."' value='".$value."' placeholder='".$placeholder."'>";
@@ -104,7 +106,7 @@ abstract class Form
 	final protected function submit($name, $class)
 	{
 		$this->form .= "<div class='form-group'>";
-		$this->form .= "<button type='submit' class='".$class."'>".$name."</button>";
+		$this->form .= "<button type='submit' class='".$class."'>".Lang::get($name)."</button>";
 		$this->form .= "</div>";
 	}
 
@@ -113,7 +115,7 @@ abstract class Form
 		$value = $this->checkValue($name);
 		$this->form .= "<div class='form-group'>";
 		if(!empty($placeholder)):
-			$this->form .= "<label>".$placeholder."</label>";
+			$this->form .= "<label>".Lang::get($placeholder)."</label>";
 		endif;
 		$this->form .= "<select class='".$class."' name='".$name."'>";
 		foreach ($options as $key => $option) {
@@ -141,7 +143,7 @@ abstract class Form
 	final protected function comment($name, $class)
 	{
 		$this->form .= "<div class='".$class."'>";
-		$this->form .= $name;
+		$this->form .= Lang::get($name);
 		$this->form .= "</div>";
 	}
 

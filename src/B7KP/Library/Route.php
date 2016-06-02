@@ -2,6 +2,7 @@
 namespace B7KP\Library;
 
 use B7KP\Utils\Functions;
+use B7KP\Entity\User;
 
 class Route
 {
@@ -168,6 +169,15 @@ class Route
 	public static function isCurRoute($route)
 	{
 		return $route == self::getName(Url::getRequest());
+	}
+
+	public static function getRoutes(User $user)
+	{
+		if($user->permissionLevel() == 7)
+		{
+			self::findRoutes();
+			return self::$routes;
+		}
 	}
 }
 ?>

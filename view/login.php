@@ -1,5 +1,6 @@
 <?php
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 ?>
 <!doctype html>
 <html>
@@ -17,7 +18,7 @@ use B7KP\Library\Route;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2>Login <br><small>or <a href="<?php echo Route::url('register');?>">Register</a></small></h2>
+							<h2>Login <br><small><?php echo Lang::get('or');?> <a href="<?php echo Route::url('register');?>"><?php echo Lang::get('reg');?></a></small></h2>
 							
 							<?php $form->output();?>
 						</div>

@@ -1,10 +1,11 @@
 <?php
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 ?>
 <!doctype html>
 <html>
 <?php
-	$head = array("title" => "Settings");
+	$head = array("title" => Lang::get('sett'));
 	$this->render("ext/head.php", $head);
 ?>
 	<body class="inner-min">
@@ -17,14 +18,14 @@ use B7KP\Library\Route;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2>Settings</h2>
+							<h2><?php echo Lang::get('sett');?></h2>
 							<?php $form->output();?>
 							<hr>
-							<a href="<?php echo Route::url('update');?>" class="btn btn-outline">Update charts</a>
+							<a href="<?php echo Route::url('update');?>" class="btn btn-outline"><?php echo Lang::get('update');?> charts</a>
 							<br>
-							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline">Edit e-mail</a>
+							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> e-mail</a>
 							<br>
-							<a href="" class="btn btn-outline">Edit password</a>
+							<a href="" class="btn btn-outline"><?php echo Lang::get('edit');?> <?php echo Lang::get('pass');?></a>
 							
 						</div>
 

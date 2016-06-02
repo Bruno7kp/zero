@@ -9,6 +9,7 @@ use B7KP\Entity\Album_charts;
 use B7KP\Entity\Artist_charts; 
 use B7KP\Library\Url; 
 use B7KP\Library\Route; 
+use B7KP\Library\Lang; 
 use B7KP\Utils\Snippets; 
 use B7KP\Utils\Functions as Fn; 
 use B7KP\Utils\Constants as C;
@@ -394,7 +395,7 @@ class Charts
 		$lfm = new \LastFmApi\Main\LastFm();
 		$lfm->setUser($this->user->login);
 		$html .= "<div class='text-center bottomspace-sm'>";
-		$html .= "<h2>WEEK ".$week->week."</h2>";
+		$html .= "<h2>".strtoupper(Lang::get('wk'))." ".$week->week."</h2>";
 		$html .= "<small><b>".$from." - ".$to."</b></small>";
 		$html .= "</div>";
 		foreach ($artist as $value) {
@@ -423,7 +424,7 @@ class Charts
 		$artlink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'music', 'week' => $week->week));
 		$alblink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'album', 'week' => $week->week));
 		$muslink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'artist', 'week' => $week->week));
-		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline disabled'>View full chart:</a> <a class='btn btn-outline' href='".$artlink."'><i class='ti-user'></i></a> <a class='btn btn-outline' href='".$alblink."'><i class='icon-vynil except'></i></a> <a class='btn btn-outline' href='".$muslink."'><i class='ti-music'></i></a></div></div>";
+		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline disabled'>".Lang::get('ch_cm').":</a> <a class='btn btn-outline' href='".$artlink."'><i class='ti-user'></i></a> <a class='btn btn-outline' href='".$alblink."'><i class='icon-vynil except'></i></a> <a class='btn btn-outline' href='".$muslink."'><i class='ti-music'></i></a></div></div>";
 		return $html;
 	}
 	

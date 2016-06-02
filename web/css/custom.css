@@ -13,6 +13,10 @@
 	color: var(--main-site-color);
 }
 
+.white-bg {
+	background-color: white;
+}
+
 .cr-icon {
     color: #28bbf8;
     background-color: aliceblue;

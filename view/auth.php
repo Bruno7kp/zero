@@ -1,5 +1,6 @@
 <?php
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 use B7KP\Core\App;
 ?>
 <!doctype html>
@@ -18,16 +19,16 @@ use B7KP\Core\App;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2>Connect <?php echo App::get('name');?> with Last.fm <br><small>You already did that? <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
+							<h2><?php echo Lang::get('conn');?> <br><small><?php echo Lang::get('alr')?> <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
 
 							<a class="btn btn-danger" href="<?php echo "http://www.last.fm/api/auth/?api_key=".App::get('lastfmapikey');?>">
-							<i class="fa fa-lastfm"></i> Click Here
+							<i class="fa fa-lastfm"></i> <?php echo Lang::get('click_h');?>
 							</a>
 							<?php 
 							if(isset($error) && $error)
 							{
 							?>
-							<div class="alert alert-danger">Something went wrong when checking the token. Try again later. <i class="fa-frown-o fa-fw fa"></i></div>
+							<div class="alert alert-danger"><?php echo Lang::get('error_token');?> <i class="fa-frown-o fa-fw fa"></i></div>
 							<?php
 							}
 							?>
