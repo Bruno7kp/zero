@@ -421,9 +421,9 @@ class Charts
 			$icon = $this->aux('getMoveIcon', $move);
 			$html .= Snippets::specMusRow($value, $this->user, Fn::formatNum($move), $icon);
 		}
-		$artlink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'music', 'week' => $week->week));
+		$artlink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'artist', 'week' => $week->week));
 		$alblink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'album', 'week' => $week->week));
-		$muslink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'artist', 'week' => $week->week));
+		$muslink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'music', 'week' => $week->week));
 		$html .= "<div class='row topspace-md text-center'><div class='col-xs-12'><a class='btn btn-outline disabled'>".Lang::get('ch_cm').":</a> <a class='btn btn-outline' href='".$artlink."'><i class='ti-user'></i></a> <a class='btn btn-outline' href='".$alblink."'><i class='icon-vynil except'></i></a> <a class='btn btn-outline' href='".$muslink."'><i class='ti-music'></i></a></div></div>";
 		return $html;
 	}
