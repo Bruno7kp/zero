@@ -54,6 +54,34 @@ class Charts
 		return $table;
 	}
 
+	private function getDropouts($actual, $past, $type)
+	{
+		$mbid = substr($type, 0, 3)."_mbid";
+		foreach ($past as $pastkey => $pastvalue) {
+			foreach ($actual as $actkey => $actvalue) {
+				if($type == "artist")
+				{
+					if($pastvalue["item"]->$mbid == $actvalue["item"]->$mbid || $pastvalue["item"]->$type == $actvalue["item"]->$type)
+					{
+						unset($past[$pastkey]);
+						break;
+					}
+				}
+				else
+				{
+					//echo $pastvalue["item"]->$mbid;
+					if($pastvalue["item"]->$mbid == $actvalue["item"]->$mbid || $pastvalue["item"]->$type == $actvalue["item"]->$type && $pastvalue["item"]->artist == $actvalue["item"]->artist)
+					{
+						unset($past[$pastkey]);
+						break;
+					}
+				}
+			}
+		}
+
+		return $past;
+	}
+
 	/* If $html = true: returns table with the charts, else: array of the items */
 	public function getWeeklyCharts(Week $week, $type, $limit, $html = false, $settings = false)
 	{

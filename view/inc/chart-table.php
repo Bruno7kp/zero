@@ -55,7 +55,25 @@ if($show_first_image && count($list)>0)
 		$fimg = $f["images"]["large"];
 	}
 	
-	echo "<div class='text-center'><img src='".$fimg."'/></div>";
+	echo "<div class='text-center bottomspace-xl'><img src='".$fimg."'/></div>";
+}
+
+if($show_dropouts && $week > 1)
+{
+	$weekbefore = $week - 1;
+	$cond = array("week" => $weekbefore, "iduser" => $this->user->id);
+	$lastweek = $this->factory->find("B7KP\Entity\Week", $cond);
+	if(count($lastweek) > 0)
+	{
+		$lastweek = $lastweek[0];
+		$subs = substr($type, 0,3)."_limit";
+		$limitlw = $settings->$subs;
+		$lastw = $this->getWeeklyCharts($lastweek, $type, $limitlw);
+	}
+	else
+	{
+		$show_dropouts = false;
+	}
 }
 ?>
 <table class="chart-table table-fluid topspace-md">
@@ -76,10 +94,42 @@ if($show_first_image && count($list)>0)
 		<th class="center"><?php echo Lang::get('wk_x')?></th>
 	</tr>
 	<?php 
+	//var_dump($lastw);
 	foreach ($list as $value) {
 		$todate 	= $value["stats"]["stats"]["todate"];
 		$stats 		= $value["stats"]["chartrun"][$week];
 		$item 		= $value["item"];
+		if($show_dropouts)
+		{
+			$thembid = substr($type, 0, 3)."_mbid";
+
+			foreach ($lastw as $k => $v) {
+				if(!empty($v["item"]->$thembid) && $v["item"]->$thembid == $item->$thembid)
+				{
+					unset($lastw[$k]);
+					break;
+				}
+				else
+				{
+					if($type == "artist")
+					{
+						if($v["item"]->artist == $item->artist)
+						{
+							unset($lastw[$k]);
+							break;
+						}
+					}
+					else
+					{
+						if($v["item"]->artist == $item->artist && $v["item"]->$type == $item->$type)
+						{
+							unset($lastw[$k]);
+							break;
+						}
+					}
+				}
+			}
+		}
 		// vars
 		$position 	= $stats["rank"]["rank"];
 		$move 		= S::getMove($show_move, $stats["rank"]["move"], $stats["rank"]["lw"]);
@@ -133,7 +183,7 @@ if($show_first_image && count($list)>0)
 		<td><?php echo $totalweeks;?></td>
 	</tr>
 	<tr style="display:none;">
-		<td colspan="7">
+		<td colspan="8">
 		Chart-run
 		</td>
 	</tr>
@@ -141,13 +191,67 @@ if($show_first_image && count($list)>0)
 	}
 	?>
 	<?php 
-	if($show_dropouts)
+	if($show_dropouts && count($lastw) > 0)
 	{
 	?>
 	<tr>
-		<th colspan="7">Dropouts</th>
+		<th colspan="8"><small class="topspace-lg"><?php echo Lang::get('dropouts');?></small></th>
 	</tr>
 	<?php
+		foreach ($lastw as $dropk => $dropv) 
+		{
+			$dropitem = $dropv["item"];
+			$name 	= $dropitem->$type;
+			$artist = $dropitem->artist;
+			$mbid 	= "";
+			$todate = $dropv["stats"]["stats"]["todate"];
+			$stats 	= $dropv["stats"]["chartrun"][$week-1];
+			$position 	= $stats["rank"]["rank"];
+			$plays 		= $stats["playcount"]["playcount"];
+			$totalweeks = $todate["weeks"]["total"];
+			$peak 		= $todate["overall"]["peak"];
+	?>
+	<tr class="drops">
+		<td class="cr-col min">
+			<a class="cr-icon"><i class="ti-stats-up"></i></a>
+		</td>
+		<td>
+			OUT
+			<br/>
+			<small>LW: <?php echo $position;?></small>
+		</td>
+		<?php if($show_images): ?>
+			<td class="getimage" id="rankout<?php echo $dropk;?>" data-type="<?php echo $type;?>" data-name="<?php echo $name?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo $artist;?>"><?php echo S::loader(30);?></td>
+		<?php ; endif;?>
+		<td class="left"><?php echo $name;?></td>
+		<?php 
+		if($type != "artist")
+		{ 
+		?>
+			<td class="left"><?php echo $artist;?></td> 
+		<?php 
+		}
+		if($show_playcounts)
+		{ 
+		?>
+			<td>
+				OUT
+				<br/>
+				<small>LW: <?php echo $plays;?></small>
+			</td>
+		<?php 
+		}
+		?>
+		<td><?php echo $peak;?></td>
+		<td><?php echo $totalweeks;?></td>
+	</tr>
+	<tr style="display:none;">
+		<td colspan="8">
+		Chart-run
+		</td>
+	</tr>
+	<?php
+		}
 	}
 	?>
 </table>

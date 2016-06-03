@@ -160,6 +160,9 @@ class Lang
 		$messages["name"][self::PT_BR] = "Nome";
 		$messages["name"][self::EN_US] = "Name";
 
+		$messages["dropouts"][self::PT_BR] = "Saídas";
+		$messages["dropouts"][self::EN_US] = "Dropouts";
+
 		$messages["copy"][self::PT_BR] = "Copiar";
 		$messages["copy"][self::EN_US] = "Copy";
 		$messages["copy_w"][self::PT_BR] = "Copiar sem formatação";

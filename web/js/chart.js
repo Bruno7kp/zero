@@ -72,7 +72,14 @@ function loadimages()
 				}
 				else
 				{
-					img = data.artist.image[1]["#text"];
+					if(typeof data.artist != "undefined")
+					{
+						img = data.artist.image[1]["#text"];
+					}
+					else
+					{
+						img = null;
+					}
 					setImg(td.attr('id'), img);
 				}
 				
