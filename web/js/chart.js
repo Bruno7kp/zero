@@ -5,6 +5,36 @@ $(document).ready(function(){
 function chartinit()
 {
 	loadimages();
+	openChartRun();
+	pop();
+}
+
+function pop()
+{
+	$('[data-toggle="popover"]').popover({html: true}); 
+
+	$('body').on('click', function (e) {
+	    $('[data-toggle="popover"]').each(function () {
+	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+	            $(this).popover('hide');
+	        }
+	    });
+	});
+}
+
+function openChartRun()
+{
+	$(".cr-icon").click(function(event) {
+		trCr = $(this).closest('tr').next();
+		if(trCr.is(':visible'))
+		{
+			trCr.hide('400');
+		}
+		else
+		{
+			trCr.show('400');
+		}
+	});
 }
 
 function loadimages()

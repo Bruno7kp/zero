@@ -33,6 +33,14 @@ class Snippets
 		";
 	}
 
+	static function getRankColor($rank, $peak)
+	{
+		if($rank == $peak)
+		{
+			return "no-one";
+		}
+	}
+
 	static function topActListRow($name, $url, $playcount, $img, $biggest)
 	{
 		$perc = $playcount/$biggest*100;

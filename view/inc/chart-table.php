@@ -98,6 +98,7 @@ if($show_dropouts && $week > 1)
 	foreach ($list as $value) {
 		$todate 	= $value["stats"]["stats"]["todate"];
 		$stats 		= $value["stats"]["chartrun"][$week];
+		$cr 		= $value["stats"]["chartrun"];
 		$item 		= $value["item"];
 		if($show_dropouts)
 		{
@@ -182,9 +183,39 @@ if($show_dropouts && $week > 1)
 		<td><?php echo $peak;?></td>
 		<td><?php echo $totalweeks;?></td>
 	</tr>
-	<tr style="display:none;">
+	<tr style="display:none;" class="cr-row">
 		<td colspan="8">
-		Chart-run
+		<h3>Chart-run</h3>
+		<div class="text-left">
+			<?php 
+
+			$cr = array_reverse($cr);
+			$wktxt = strtoupper(Lang::get('wk'));
+			$wktxtplu = strtoupper(Lang::get('wk_x'));
+			$wktxt = strlen($wktxt) > 4 ? substr($wktxt, 0, 3)."." : $wktxt;
+			foreach ($cr as $key => $value) {
+				$thisweek = $value["week"]["week"];
+				$thisfrom = $value["week"]["from"];
+				$thisto = "<a href=\"#\">".$value["week"]["to"]."</a>\n";
+				$thisto .= "<span class=\"text-muted\">".$value["playcount"]["playcount"]." ".strtolower(Lang::get('play_x'))."</span>\n";
+				echo "<a class='cr-btn divider ".S::getRankColor($value["rank"]["rank"], $peak)."' title='".$wktxt." ".$thisweek."' data-toggle='popover' data-placement='auto top' data-content='".$thisto."'>";
+				echo $value["rank"]["rank"];
+				echo "</a>";
+				if(isset($cr[$key+1]))
+				{
+
+					$diff = $cr[$key+1]["week"]["week"] - $thisweek - 1; 
+					if($diff > 0)
+					{
+						echo "<a class='cr-btn divider wksout' title='".$wktxtplu." OUT' data-toggle='popover' data-placement='auto top' data-content=''>";
+							echo $diff."x";
+							echo "</a>";
+					}
+				}
+
+			}
+			?>
+		</div>
 		</td>
 	</tr>
 	<?php

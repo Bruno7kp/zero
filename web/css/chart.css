@@ -11,6 +11,88 @@
 	width: 30px;
 }
 
+.cr-icon {
+	cursor: pointer;
+}
+
+a.cr-btn {
+	float: left;
+    cursor: pointer;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: center;
+    display: block;
+    background: #fdfdfd;
+    color: #28BBF8;
+    border: 1px solid #e2ddda;
+    height: 40px;
+    width: 40px;
+    font-weight: 300;
+    margin: 2px;
+    line-height: 40px;
+    font-size: 12px;
+}
+
+a.cr-btn:hover {
+	border: 1px solid #28BBF8;
+	background-color: #28BBF8;
+	color: white;
+}
+
+a.cr-btn.wksout:hover {
+	border: #eee 1px solid;
+	color: white;
+}
+
+a.cr-btn.no-one {
+    border: 2px solid #28BBF8;
+}
+
+a.cr-btn.wksout{
+	font-size: 12px;
+	cursor: pointer;
+	color: #666;
+	line-height: 40px;
+}
+
+.popover {
+ 	padding: 0px; 
+    border: 0px solid #ccc; 
+    border-radius: 5px;
+}
+.popover-title {
+    color: #FFFFFF;
+    background-color: #28BBF8;
+    text-align: center;
+    min-width: 85px;
+    line-height: 14px;
+    font-size: smaller;
+}
+.popover-content {
+	padding: 0px;
+    font-size: 11px;
+}
+
+.popover-content a {
+	display: block;
+    text-align: center;
+    border: none;
+    margin: 5px 0px;
+}
+
+.popover-content a:hover {
+    background: rgba(0,0,0,0.1);
+    border: none;
+}
+
+.popover-content .text-muted{
+	background-color: rgba(0,0,50,0.1);
+	margin-top: 6px;
+	padding: 3px;
+	display: block;
+}
+
 .getimage {
 	width: 64px;
 	text-align: center;

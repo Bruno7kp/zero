@@ -29,6 +29,7 @@ function copyChart()
 
 	copyBtn.click(function(event) {
 		$(".cr-col").hide(); // remove chart-run col
+		$(".cr-row").hide(); // remove chart-run row
 		var clip = new Clipboard('#copy');
 		clip.on('success', function(e) {
 			copyBtn.tooltipster('show');
