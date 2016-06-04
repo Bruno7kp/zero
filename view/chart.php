@@ -2,6 +2,7 @@
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
+use B7KP\Utils\UserSession;
 ?>
 <!doctype html>
 <html>
@@ -73,6 +74,20 @@ use B7KP\Library\Lang;
 							<button class="btn btn-custom btn-info btn-sm showonhover" id="copy_alt" data-clipboard-target="#copyme_alt">
 								<i class="ti-clipboard"></i> <span class="hidden"><?php echo Lang::get('copy_w');?></span>
 							</button>
+							<?php 
+							
+							if($user->checkSelfPermission($this->factory))
+							{
+								$from = new \DateTime($week->from_day);
+								$to = new \DateTime($week->to_day);
+							?>
+							<br>
+							<button class="btn btn-custom btn-info btn-sm upwk" data-from="<?php echo $from->format("U");?>" data-to="<?php echo $to->format("U");?>">
+								<i class="ti-reload"></i> <span> <?php echo Lang::get('update');?> chart </span>
+							</button>
+							<?php
+							}
+							?>
 						</div>
 						<div class="col-md-5 topspace-lg">
 							<div class="chart-table">

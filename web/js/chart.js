@@ -7,6 +7,45 @@ function chartinit()
 	loadimages();
 	openChartRun();
 	pop();
+	updateUniqueWeek();
+}
+
+function updateUniqueWeek()
+{
+	updateBtn = $(".upwk");
+	updateBtn.click(function(event) {
+		$(this).addClass('disabled');
+		$(this).attr('disabled','disabled');
+		from = $(this).attr('data-from');
+		to = $(this).attr('data-to');
+		updateWeek(from, to);
+	});
+	function updateWeek(from, to)
+	{
+		$.ajax({
+			url: baseUrl + '/update/week/' + from + "/" + to,
+			dataType: 'json'
+		})
+		.done(function(data) {
+			console.log(data);
+			if(data.error == 0)
+			{
+				updateBtn.text('Ok');
+			}
+			else
+			{
+				updateBtn.text('Fail');
+			}
+			console.log("success");
+		})
+		.fail(function() {
+			updateBtn.text('Fail');
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+		});
+	}
 }
 
 function pop()
