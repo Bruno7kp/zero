@@ -96,6 +96,10 @@ if($show_dropouts && $week > 1)
 	</tr>
 	<?php 
 	//var_dump($lastw);
+	if(count($list) == 0)
+	{
+		echo "<tr><td colspan='8'>".Lang::get('nodata_week')."</td></tr>";
+	}
 	foreach ($list as $value) {
 		$todate 	= $value["stats"]["stats"]["todate"];
 		$stats 		= $value["stats"]["chartrun"][$week];
@@ -249,7 +253,7 @@ if($show_dropouts && $week > 1)
 	}
 	?>
 	<?php 
-	if($show_dropouts && count($lastw) > 0)
+	if($show_dropouts && isset($lastw) && count($lastw) > 0)
 	{
 	?>
 	<tr>

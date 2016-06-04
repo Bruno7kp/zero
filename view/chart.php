@@ -1,5 +1,6 @@
 <?php
 use B7KP\Library\Route;
+use B7KP\Library\Url;
 use B7KP\Library\Lang;
 ?>
 <!doctype html>
@@ -14,6 +15,8 @@ use B7KP\Library\Lang;
 	$to 	= new DateTime($week->to_day);
 	$to->modify('-1 day');
 	$to 	= $to->format("Y.m.d");
+	$weeks = $this->factory->find("\B7KP\Entity\Week", array("iduser" => $user->id), "week ASC");
+	$last = end($weeks);
 ?>
 	<body class="inner-min">
 		<?php $this->render("ext/menu.php");?>
@@ -22,9 +25,40 @@ use B7KP\Library\Lang;
 			<section>
 				<div class="container">
 					<div class="fh5co-spacer fh5co-spacer-sm"></div>
-
 					<div class="row">
+						<div class="col-md-5 col-md-offset-1">
+							<?php if($week->week > 1): ?> 
+							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => $type, 'week' => ($week->week - 1)));?>"><i class='ti-arrow-left'></i> <?php echo Lang::get('previous');?></a>
+							<?php ; endif;?>
 
+							<div class="btn-group">
+							  	<button type="button" class="btn btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							  		<span class="ti-calendar"></span>
+  								</button>
+  								<ul class="dropdown-menu">
+								    <?php 
+								    $weeks = array_reverse($weeks);
+								    $u = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
+								    foreach ($weeks as $key => $value) {
+								    	$d = new DateTime($value->to_day);
+								    	$d->modify('-1 day');
+								    	echo "<li><a href='".$u.$value->week."'>".$value->week." | ".$d->format('Y.m.d')."</a></li>";
+								    }
+								    ?>
+  								</ul>
+							</div>
+
+							<?php if($last->week != $week->week): ?> 
+							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => $type, 'week' => $last->week));?>"><?php echo Lang::get('next');?> <i class='ti-arrow-right'></i></a>
+							<?php ; endif;?>
+						</div>
+						<div class="col-md-5 text-right">
+							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => 'artist', 'week' => $week->week));?>"><i class='ti-user'></i></a>
+							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => 'album', 'week' => $week->week));?>"><i class='icon-vynil except'></i></a>
+							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => 'music', 'week' => $week->week));?>"><i class='ti-music'></i></a>
+						</div>
+					</div>
+					<div class="row">
 						<div id="copyme" class="col-md-10 col-md-offset-1">
 							<div class="text-center">
 								<h2><?php echo $title?></h2>

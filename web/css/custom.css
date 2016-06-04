@@ -13,6 +13,11 @@
 	color: var(--main-site-color);
 }
 
+.dropdown-menu{
+    max-height: 300px;
+    overflow: auto;
+}
+
 .white-bg {
 	background-color: white;
 }

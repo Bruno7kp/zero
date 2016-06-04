@@ -125,6 +125,15 @@ class Lang
 		$messages["add"][self::PT_BR] = "Adicionar";
 		$messages["add"][self::EN_US] = "Add";
 
+		$messages["nodata_week"][self::PT_BR] = "Nenhum dado encontrado para esse semana.";
+		$messages["nodata_week"][self::EN_US] = "No data found for this week.";
+
+		$messages["previous"][self::PT_BR] = "Anterior";
+		$messages["previous"][self::EN_US] = "Previous";
+
+		$messages["next"][self::PT_BR] = "Próxima";
+		$messages["next"][self::EN_US] = "Next";
+
 		$messages["u"][self::PT_BR] = "Você";
 		$messages["u"][self::EN_US] = "You";
 
