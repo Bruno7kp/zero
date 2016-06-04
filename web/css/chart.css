@@ -16,13 +16,12 @@
 }
 
 a.cr-btn {
-	float: left;
     cursor: pointer;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     text-align: center;
-    display: block;
+    display: inline-block;
     background: #fdfdfd;
     color: #28BBF8;
     border: 1px solid #e2ddda;
