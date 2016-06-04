@@ -192,7 +192,7 @@ if($show_dropouts && $week > 1)
 		<td colspan="8">
 		<div class="row">
 			<h3>Chart-run</h3>
-			<div class="col-md-12 text-left">
+			<div class="col-md-12 text-center">
 				<?php 
 				$base = Url::getBaseUrl()."/user/".$this->user->login."/charts/".$type."/week/";
 				$cr = array_reverse($cr);
@@ -268,6 +268,10 @@ if($show_dropouts && $week > 1)
 			$position 	= $stats["rank"]["rank"];
 			$plays 		= $stats["playcount"]["playcount"];
 			$totalweeks = $todate["weeks"]["total"];
+			$wkstop1 	= $todate["weeks"]["top01"];
+			$wkstop5 	= $todate["weeks"]["top05"];
+			$wkstop10 	= $todate["weeks"]["top10"];
+			$wkstop20 	= $todate["weeks"]["top20"];
 			$peak 		= $todate["overall"]["peak"];
 	?>
 	<tr class="drops">
@@ -308,7 +312,7 @@ if($show_dropouts && $week > 1)
 		<td colspan="8">
 		<div class="row">
 			<h3>Chart-run</h3>
-			<div class="col-md-12 text-left">
+			<div class="col-md-12 text-center">
 				<?php 
 				$base = Url::getBaseUrl()."/user/".$this->user->login."/charts/".$type."/week/";
 				$cr = array_reverse($cr);
