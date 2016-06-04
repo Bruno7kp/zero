@@ -266,6 +266,16 @@ class Lang
 		$messages["new_on"][self::PT_BR] = "Olá, parece que você é novo no Last.fm, você terá esperar até a semana terminar para aproveitar os charts semanais.";
 		$messages["new_on"][self::EN_US] = "Hello, looks like you're new in last.fm, you'll have to wait till the week ends.";
 		
+		//def
+
+		$messages["new_def"][self::PT_BR] = "Nova entrada no chart";
+		$messages["new_def"][self::EN_US] = "New entry";
+
+		$messages["re_def"][self::PT_BR] = "Reentrada";
+		$messages["re_def"][self::EN_US] = "Re-entry";
+
+		$messages["lw_def"][self::PT_BR] = "Posição na semana anterior";
+		$messages["lw_def"][self::EN_US] = "Position in the previous week";
 
 		return $messages;
 	}

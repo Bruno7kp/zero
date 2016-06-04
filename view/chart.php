@@ -32,13 +32,22 @@ use B7KP\Library\Lang;
 								<?php echo $list;?>
 							</div>
 						</div>
-						<div class="col-md-10 col-md-offset-1 topspace-lg">
+						<div class="col-md-5 col-md-offset-1 topspace-lg">
 							<button class="btn btn-custom btn-info btn-sm" id="copy" data-clipboard-target="#copyme">
 								<i class="ti-clipboard"></i> <span><?php echo Lang::get('copy');?> chart</span>
 							</button>
 							<button class="btn btn-custom btn-info btn-sm showonhover" id="copy_alt" data-clipboard-target="#copyme_alt">
 								<i class="ti-clipboard"></i> <span class="hidden"><?php echo Lang::get('copy_w');?></span>
 							</button>
+						</div>
+						<div class="col-md-5 topspace-lg">
+							<div class="chart-table">
+								<small>
+									<span class="deb">NEW</span> = <?php echo Lang::get('new_def');?> | 
+									<span class="ret">RE</span> = <?php echo Lang::get('re_def');?> | 
+									<span>LW</span> = <?php echo Lang::get('lw_def');?>
+								</small>
+							</div>
 						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
 

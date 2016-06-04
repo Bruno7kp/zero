@@ -393,9 +393,9 @@ if($show_dropouts && $week > 1)
 
 			$simple .= $position." (".$move.") ";
 			$simple .= $name." ";
-			if($type != "artist"): $simple .= "- ".$artist." "; endif; 
-			if($show_playcounts): $simple .= $plays." (".$playsmove.") | "; endif;
-			$simple .= $peak." | ".$totalweeks."\n";
+			if($type != "artist"): $simple .= "- ".$artist; endif; 
+			if($show_playcounts): $simple .= " | ".$plays." (".$playsmove.")"; endif;
+			$simple .= " | ".$peak." | ".$totalweeks."\n";
 
 		}
 
