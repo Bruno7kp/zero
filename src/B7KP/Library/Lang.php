@@ -95,6 +95,12 @@ class Lang
 		$messages["click"][self::PT_BR] = "Clique";
 		$messages["click"][self::EN_US] = "Click";
 
+		$messages["outof"][self::PT_BR] = "fora do chart";
+		$messages["outof"][self::EN_US] = "out of the chart";
+
+		$messages["out"][self::PT_BR] = "SAIU";
+		$messages["out"][self::EN_US] = "OUT";
+
 		$messages["click_h"][self::PT_BR] = "Clique aqui";
 		$messages["click_h"][self::EN_US] = "Click here";
 
@@ -127,6 +133,9 @@ class Lang
 
 		$messages["or"][self::PT_BR] = "ou";
 		$messages["or"][self::EN_US] = "or";
+
+		$messages["on"][self::PT_BR] = "no";
+		$messages["on"][self::EN_US] = "on";
 
 		$messages["now"][self::PT_BR] = "agora";
 		$messages["now"][self::EN_US] = "now";

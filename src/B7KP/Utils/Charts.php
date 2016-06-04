@@ -25,6 +25,11 @@ class Charts
 	{
 		$this->factory = $factory;
 		$this->user = $user;
+		$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
+		if(!is_object($this->settings))
+		{
+			$this->settings = new \B7KP\Entity\Settings();
+		}
 	}
 
 	public function setCssFile($name)
@@ -367,12 +372,13 @@ class Charts
 	{
 		$name 	= addslashes($name);
 		$artist = addslashes($artist);
+		$limit  = $this->settings->mus_limit;
 		$cond = "music_charts.mus_mbid = '".$mbid."'";
 		if(empty($mbid))
 		{
 			$cond = "music_charts.music = '$name' AND music_charts.artist = '$artist'";
 		}
-		$sql = "SELECT music_charts.* FROM music_charts, week WHERE ".$cond." AND week.id = music_charts.idweek AND week.iduser = '".$this->user->id."' GROUP BY music_charts.id ORDER BY week.week DESC, music_charts.updated";
+		$sql = "SELECT music_charts.* FROM music_charts, week WHERE ".$cond." AND week.id = music_charts.idweek AND week.iduser = '".$this->user->id."' AND music_charts.rank <= '".$limit."' GROUP BY music_charts.id ORDER BY week.week DESC, music_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Music_charts", $sql);
 
 		return $weeks;
@@ -382,12 +388,13 @@ class Charts
 	{
 		$name 	= addslashes($name);
 		$artist = addslashes($artist);
+		$limit  = $this->settings->alb_limit;
 		$cond	= "album_charts.alb_mbid = '".$mbid."'";
 		if(empty($mbid))
 		{
 			$cond = "album_charts.album = '$name' AND album_charts.artist = '$artist'";
 		}
-		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.id = album_charts.idweek AND week.iduser = '".$this->user->id."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
+		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.id = album_charts.idweek AND week.iduser = '".$this->user->id."' AND album_charts.rank <= '".$limit."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Album_charts", $sql);
 
 		return $weeks;
@@ -397,11 +404,12 @@ class Charts
 	{
 		$name 	= addslashes($name);
 		$cond = "artist_charts.art_mbid = '".$mbid."'";
+		$limit  = $this->settings->art_limit;
 		if(empty($mbid))
 		{
 			$cond = "artist_charts.artist = '$name'";
 		}
-		$sql = "SELECT artist_charts.* FROM artist_charts, week WHERE ".$cond." AND week.id = artist_charts.idweek AND week.iduser = '".$this->user->id."' GROUP BY artist_charts.id ORDER BY week.week DESC, artist_charts.updated";
+		$sql = "SELECT artist_charts.* FROM artist_charts, week WHERE ".$cond." AND week.id = artist_charts.idweek AND week.iduser = '".$this->user->id."' AND artist_charts.rank <= '".$limit."' GROUP BY artist_charts.id ORDER BY week.week DESC, artist_charts.updated";
 
 		$weeks = $this->factory->findSql("B7KP\Entity\Artist_charts", $sql);
 

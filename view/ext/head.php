@@ -22,6 +22,7 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<link rel="stylesheet" href="<?php echo Url::asset('lib/font-awesome/css/font-awesome.min.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/custom.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/animate.css');?>">
+	<link rel="stylesheet" href="<?php echo Url::asset('css/chart.css');?>">
 	<!-- cdn -->
 	<link rel="stylesheet" href="<?php echo Url::asset('css/tooltipster-blue.css');?>">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">

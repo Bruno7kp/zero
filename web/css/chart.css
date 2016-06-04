@@ -52,10 +52,24 @@ a.cr-btn.no-one {
 a.cr-btn.wksout{
 	font-size: 12px;
 	cursor: pointer;
-	color: #666;
+	color: #ccc;
 	line-height: 40px;
 }
 
+.center {
+	margin: 0px auto;
+}
+
+.dest {
+	padding: 10px;
+	margin: 3px;
+	display: inline-block;
+    width: 20%;
+    font-size: small;
+}
+.dest hr {
+	margin: 3px;
+}
 .popover {
  	padding: 0px; 
     border: 0px solid #ccc; 
