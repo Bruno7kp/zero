@@ -8,6 +8,25 @@ function chartinit()
 	openChartRun();
 	pop();
 	updateUniqueWeek();
+	switchToSimpleCR();
+}
+
+function switchToSimpleCR()
+{
+	$(".switchto").click(function(event) {
+		main = $(this).closest('div').find(".main");
+		sub = $(this).closest('div').find(".sub");
+		if(main.hasClass('hidden'))
+		{
+			main.removeClass('hidden');
+			sub.addClass('hidden');
+		}
+		else
+		{
+			main.addClass('hidden');
+			sub.removeClass('hidden');
+		}
+	});
 }
 
 function updateUniqueWeek()
@@ -31,6 +50,9 @@ function updateUniqueWeek()
 			if(data.error == 0)
 			{
 				updateBtn.text('Ok');
+				setTimeout(function(){
+				   window.location.reload(1);
+				}, 2500);
 			}
 			else
 			{
@@ -53,11 +75,11 @@ function pop()
 	$('[data-toggle="popover"]').popover({html: true}); 
 
 	$('body').on('click', function (e) {
-	    $('[data-toggle="popover"]').each(function () {
-	        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-	            $(this).popover('hide');
-	        }
-	    });
+	    if ($(e.target).data('toggle') !== 'popover'
+	        && $(e.target).parents('.popover.in').length === 0) { 
+	        $('[data-toggle="popover"]').popover('hide');
+	    }
+
 	});
 }
 

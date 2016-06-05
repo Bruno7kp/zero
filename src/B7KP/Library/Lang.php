@@ -125,6 +125,12 @@ class Lang
 		$messages["add"][self::PT_BR] = "Adicionar";
 		$messages["add"][self::EN_US] = "Add";
 
+		$messages["switchto"][self::PT_BR] = "alternar para";
+		$messages["switchto"][self::EN_US] = "switch to";
+
+		$messages["switch"][self::PT_BR] = "alternar";
+		$messages["switch"][self::EN_US] = "switch";
+
 		$messages["nodata_week"][self::PT_BR] = "Nenhum dado encontrado para esse semana.";
 		$messages["nodata_week"][self::EN_US] = "No data found for this week.";
 

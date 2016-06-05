@@ -50,7 +50,7 @@ use B7KP\Utils\UserSession;
 							</div>
 
 							<?php if($last->week != $week->week): ?> 
-							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => $type, 'week' => $last->week));?>"><?php echo Lang::get('next');?> <i class='ti-arrow-right'></i></a>
+							<a class="btn btn-outline" href="<?php echo Route::url('weekly_chart', array('login' => $user->login, 'type' => $type, 'week' => ($week->week + 1)));?>"><?php echo Lang::get('next');?> <i class='ti-arrow-right'></i></a>
 							<?php ; endif;?>
 						</div>
 						<div class="col-md-5 text-right">

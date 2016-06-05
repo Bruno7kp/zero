@@ -195,8 +195,9 @@ if($show_dropouts && $week > 1)
 	<tr style="display:none;" class="cr-row">
 		<td colspan="8">
 		<div class="row">
-			<h3>Chart-run</h3>
-			<div class="col-md-12 text-center">
+			<h3 class="bottomspace-xs">Chart-run</h3>
+			<a href="#!" class="switchto"><small><?php echo Lang::get("switch");?> chart-run</small></a>
+			<div class="col-md-12 text-center topspace-md main">
 				<?php 
 				$base = Url::getBaseUrl()."/user/".$this->user->login."/charts/".$type."/week/";
 				$cr = array_reverse($cr);
@@ -204,28 +205,33 @@ if($show_dropouts && $week > 1)
 				$wktxtplu = strtoupper(Lang::get('wk_x'));
 				$outof = strtoupper(Lang::get('outof'));
 				$wktxt = strlen($wktxt) > 4 ? substr($wktxt, 0, 3)."." : $wktxt;
+				$simplerun = "";
 				foreach ($cr as $key => $value) {
 					$thisweek = $value["week"]["week"];
 					$thisfrom = $value["week"]["from"];
 					$url 	  = $base.$thisweek;
 					$thisto = "<a href=\"".$url."\">".$value["week"]["to"]."</a>\n";
-					$thisto .= "<span class=\"text-muted\">".$value["playcount"]["playcount"]." ".strtolower(Lang::get('play_x'))."</span>\n";
+					$thisto .= "<span class=\"text-muted\">".$value["playcount"]["playcount"]." ".mb_strtolower(Lang::get('play_x'))."</span>\n";
 					echo "<a class='cr-btn divider ".S::getRankColor($value["rank"]["rank"], $peak)."' title='".$wktxt." ".$thisweek."' data-toggle='popover' data-placement='auto top' data-content='".$thisto."'>";
 					echo $value["rank"]["rank"];
 					echo "</a>";
+					$simplerun .= $value["rank"]["rank"] . " - ";
 					if(isset($cr[$key+1]))
 					{
-
 						$diff = $cr[$key+1]["week"]["week"] - $thisweek - 1; 
 						if($diff > 0)
 						{
-							echo "<a class='cr-btn divider wksout' title='".$wktxtplu." ".$outof."' data-toggle='popover' data-placement='auto top' data-content=''>";
+							$simplerun .= "OUT (".$diff."x) - ";
+							echo "<a class='cr-btn divider wksout' title='<i class=\"ti-help\"></i>' data-toggle='popover' data-placement='auto top' data-content='<a>".$wktxtplu." ".$outof."</a>'>";
 								echo $diff."x";
 								echo "</a>";
 						}
 					}
 				}
 				?>
+			</div>
+			<div class="col-md-12 text-center topspace-md sub hidden">
+				<?php echo "<small class='simplerun'>".$simplerun."...</small>"; ?>
 			</div>
 		</div>
 		<div class="row text-center topspace-lg">
@@ -315,8 +321,9 @@ if($show_dropouts && $week > 1)
 	<tr style="display:none;" class="cr-row">
 		<td colspan="8">
 		<div class="row">
-			<h3>Chart-run</h3>
-			<div class="col-md-12 text-center">
+			<h3 class="bottomspace-xs">Chart-run</h3>
+			<a href="#!" class="switchto"><small><?php echo Lang::get("switch");?> chart-run</small></a>
+			<div class="col-md-12 text-center topspace-md main">
 				<?php 
 				$base = Url::getBaseUrl()."/user/".$this->user->login."/charts/".$type."/week/";
 				$cr = array_reverse($cr);
@@ -324,21 +331,24 @@ if($show_dropouts && $week > 1)
 				$wktxtplu = strtoupper(Lang::get('wk_x'));
 				$outof = strtoupper(Lang::get('outof'));
 				$wktxt = strlen($wktxt) > 4 ? substr($wktxt, 0, 3)."." : $wktxt;
+				$simplerun = "";
 				foreach ($cr as $key => $value) {
 					$thisweek = $value["week"]["week"];
 					$thisfrom = $value["week"]["from"];
 					$url 	  = $base.$thisweek;
 					$thisto = "<a href=\"".$url."\">".$value["week"]["to"]."</a>\n";
-					$thisto .= "<span class=\"text-muted\">".$value["playcount"]["playcount"]." ".strtolower(Lang::get('play_x'))."</span>\n";
+					$thisto .= "<span class=\"text-muted\">".$value["playcount"]["playcount"]." ".mb_strtolower(Lang::get('play_x'))."</span>\n";
 					echo "<a class='cr-btn divider ".S::getRankColor($value["rank"]["rank"], $peak)."' title='".$wktxt." ".$thisweek."' data-toggle='popover' data-placement='auto top' data-content='".$thisto."'>";
 					echo $value["rank"]["rank"];
 					echo "</a>";
+					$simplerun .= $value["rank"]["rank"] . " - ";
 					if(isset($cr[$key+1]))
 					{
 
 						$diff = $cr[$key+1]["week"]["week"] - $thisweek - 1; 
 						if($diff > 0)
 						{
+							$simplerun .= "OUT (".$diff."x) - ";
 							echo "<a class='cr-btn divider wksout' title='".$wktxtplu." ".$outof."' data-toggle='popover' data-placement='auto top' data-content=''>";
 								echo $diff."x";
 								echo "</a>";
@@ -346,6 +356,9 @@ if($show_dropouts && $week > 1)
 					}
 				}
 				?>
+			</div>
+			<div class="col-md-12 text-center topspace-md sub hidden">
+				<?php echo "<small class='simplerun'>".$simplerun."...</small>"; ?>
 			</div>
 		</div>
 		<div class="row text-center topspace-lg">
