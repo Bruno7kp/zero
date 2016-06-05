@@ -112,7 +112,7 @@ a.cr-btn.wksout{
 }
 
 .chart-table.table-fluid  {
-	width: 100%;
+	min-width: 100%;
 }
 
 .chart-table td {

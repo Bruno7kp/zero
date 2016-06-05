@@ -33,6 +33,7 @@ function copyChart()
 		var clip = new Clipboard('#copy');
 		clip.on('success', function(e) {
 			copyBtn.tooltipster('show');
+			console.log(e);
 		    e.clearSelection();
 			$(".cr-col").show();
 		});
