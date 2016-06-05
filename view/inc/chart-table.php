@@ -127,7 +127,7 @@ if($show_dropouts && $week > 1)
 					}
 					else
 					{
-						if($v["item"]->artist == $item->artist && $v["item"]->$type == $item->$type)
+						if($v["item"]->artist == $item->artist && mb_strtolower($v["item"]->$type) == mb_strtolower($item->$type))
 						{
 							unset($lastw[$k]);
 							break;
