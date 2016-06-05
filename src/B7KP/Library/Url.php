@@ -18,7 +18,7 @@ class Url
 
 	static function getRequest()
 	{	
-		$request = str_replace(strtolower(self::getBaseUrl()), "", strtolower(self::getFullUrl()));
+		$request = str_replace(mb_strtolower(self::getBaseUrl()), "", mb_strtolower(self::getFullUrl()));
 		$request = explode("?", $request);
 		$request = $request[0];
 		return $request;
