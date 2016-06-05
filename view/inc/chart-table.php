@@ -358,7 +358,7 @@ if($show_dropouts && $week > 1)
 				?>
 			</div>
 			<div class="col-md-12 text-center topspace-md sub hidden">
-				<?php echo "<small class='simplerun'>".$simplerun."...</small>"; ?>
+				<?php echo "<small class='simplerun'>".$simplerun."x</small>"; ?>
 			</div>
 		</div>
 		<div class="row text-center topspace-lg">

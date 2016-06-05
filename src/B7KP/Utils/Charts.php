@@ -75,7 +75,7 @@ class Charts
 				else
 				{
 					//echo $pastvalue["item"]->$mbid;
-					if($pastvalue["item"]->$mbid == $actvalue["item"]->$mbid || $pastvalue["item"]->$type == $actvalue["item"]->$type && $pastvalue["item"]->artist == $actvalue["item"]->artist)
+					if($pastvalue["item"]->$mbid == $actvalue["item"]->$mbid || mb_strtolower($pastvalue["item"]->$type) == mb_strtolower($actvalue["item"]->$type) && $pastvalue["item"]->artist == $actvalue["item"]->artist)
 					{
 						unset($past[$pastkey]);
 						break;
