@@ -22,6 +22,7 @@ use B7KP\Core\App;
 	curPage = "<?php echo Url::getRequest();?>";
 	curRoute = "<?php echo Route::getName(Url::getRequest());?>";
 	apiKey = "<?php echo App::get('lastfmapikey');?>";
+	lang = 0;
 </script>
 <script src="<?php echo Url::asset('js/jquery.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/bootstrap.min.js');?>"></script>

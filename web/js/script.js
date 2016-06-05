@@ -10,6 +10,50 @@ function initialize()
 	copyChart();
 }
 
+function getMsg(msgid)
+{
+	// eng
+	if (lang == 1) 
+	{
+		array = {};
+		array.att = "Updated";
+		array.success = "Success";
+		array.atting = "Updating";
+		array.fail = "Fail";
+		array.failload = "Something went wrong while saving some of your data. Please try update again later. :[";
+		array.error = "Something went wrong. Try Again later.";
+		array.copy = "Chart Copied!";
+		array.wait = "Wait";
+		array.updatenew = "Update new weeks";
+		array.updateall = "Update all";
+		array.wksloaded = "of weeks loaded";
+		array.finish = "Now you can enjoy your weekly charts :]";
+		array.uptodate = "Your charts are up to date :]";
+		array.nothingnew = "Look like there's nothing to update for now, come back later.";
+	}
+	// pt
+	else
+	{
+		array = {};
+		array.att = "Atualizado";
+		array.success = "Sucesso";
+		array.atting = "Atualizando";
+		array.fail = "Falha";
+		array.failload = "Algo deu errado ao salvar seus dados. Tente novamente. :[";
+		array.error = "Algo deu errado. Tente novamente mais tarde.";
+		array.copy = "Chart Copiado!";
+		array.wait = "Aguarde";
+		array.updatenew = "Atualizar novas semanas";
+		array.updateall = "Atualizar tudo";
+		array.wksloaded = "de semanas carregadas";
+		array.finish = "Agora você pode aproveitar seus chart semanais :]";
+		array.uptodate = "Seus charts estão atualizados :]";
+		array.nothingnew = "Parece que não há nada para atualizar por enquanto, volte mais tarde.";
+	}
+
+	return array[msgid];
+}
+
 function copyChart()
 {
 	copyBtn = $("#copy");
@@ -18,13 +62,13 @@ function copyChart()
    	copyBtn.tooltipster({
 	    theme: 'tooltipster-blue',
 	    trigger: 'custom',
-        content: $('<span>Chart Copied!</span>')
+        content: $('<span>'+getMsg('copy')+'</span>')
     });
 
     copyBtnAlt.tooltipster({
 	    theme: 'tooltipster-blue',
 	    trigger: 'custom',
-        content: $('<span>Chart Copied!</span>')
+        content: $('<span>'+getMsg('copy')+'</span>')
     });
 
 	copyBtn.click(function(event) {
@@ -94,7 +138,7 @@ function formSubmit()
 		})
 		.fail(function() {
 			console.log("error");
-			showAlert(1, "Something went wrong. Try Again later.");
+			showAlert(1, getMsg('error'));
 			undisable(thisBtn);
 		})
 		.always(function() {
@@ -107,7 +151,7 @@ function disable(item)
 {
 	item.attr('disabled', 'disabled');
 	item.addClass('disabled');
-	item.text('wait...');
+	item.text(getMsg('wait')+'...');
 }
 
 function undisable(item)
@@ -129,6 +173,14 @@ function goTo(data)
 	window.location.href = data.url;
 }
 
+function successAndGoTo(data)
+{
+	showAlert(0, '');
+	setTimeout(function(){ 
+		window.location.href = data.url;
+	}, 3000);
+}
+
 function showAlert(erro, message)
 {
 	type = "danger";
@@ -137,14 +189,17 @@ function showAlert(erro, message)
 	if(erro == 0)
 	{
 		type = "success";
-		title = "Success";
-		icon = "ti-thumb-up";
+		title = getMsg('success');
+		icon = "ti-thumb-up fa-4x";
 	}
 
 	$.notify({
 		icon: icon,
 		title: title,
 		message: message,
+		offset: {
+			y: 200
+		},
 		animate: {
 			enter: 'animated fadeInUp',
 			exit: 'animated fadeOutDown'
@@ -185,7 +240,7 @@ function updateAction()
 		.fail(function() {
 			console.log("error");
 			undisable($(".updaters"));
-			showAlert('danger', 'Something went wrong');
+			showAlert('danger', getMsg('error'));
 		})
 		.always(function() {
 			console.log("complete");
@@ -234,20 +289,20 @@ function loadStatus(actual, total)
 {
 	divAct = $("#updateaction");
 	perc = actual/total*100;
-	txt = "<h2>Updating</h2> " +
+	txt = "<h2>"+getMsg('atting')+"</h2> " +
 	"<small class='text-muted'>" + actual + " / " + total + " </small>" +
 	"<div class='progress'>"+
 		"<div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='" + perc + "' aria-valuemin='0' aria-valuemax='100' style='width: " + perc + "%'>"+
-			"<span class='sr-only'>" + perc + "% of weeks loaded</span>"+
+			"<span class='sr-only'>" + perc + "% "+getMsg('wksloaded')+"</span>"+
 		"</div>"+
 	"</div>";
 	divAct.html(txt);
 	if(actual == total)
 	{
-		txt = "<h2>Success</h2>" +
-		"Now you can enjoy your weekly charts :]";
-		undisable_alt($(".new"), "Update new weeks");
-		undisable_alt($(".all"), "Update all");
+		txt = "<h2>"+getMsg('success')+"</h2>" +
+		getMsg('finish');
+		undisable_alt($(".new"), getMsg('updatenew'));
+		undisable_alt($(".all"), getMsg('updateall'));
 	}
 	divAct.html(txt);
 }
@@ -255,21 +310,21 @@ function loadStatus(actual, total)
 function nothingNew()
 {
 	divAct = $("#updateaction");
-	txt = "<h2>Your charts are up to date :]</h2> " +
-	"<small class='text-muted'>Look like there's nothing to update for now, come back later.</small>";
+	txt = "<h2>"+getMsg('uptodate')+"</h2> " +
+	"<small class='text-muted'>"+getMsg('nothingnew')+"</small>";
 	divAct.html(txt);
-	undisable_alt($(".new"), "Update new weeks");
-	undisable_alt($(".all"), "Update all");
+	undisable_alt($(".new"), getMsg('updatenew'));
+	undisable_alt($(".all"), getMsg('updateall'));
 }
 
 function failMsg()
 {
 	divAct = $("#updateaction");
 	txt = "<h2>Oops</h2> " +
-	"<small class='text-muted'>Something went wrong while saving some of your data. Plesa try update again later. :[</small>";
+	"<small class='text-muted'>"+getMsg('failload')+"</small>";
 	divAct.html(txt);
-	undisable_alt($(".new"), "Update new weeks");
-	undisable_alt($(".all"), "Update all");
+	undisable_alt($(".new"), getMsg('updatenew'));
+	undisable_alt($(".all"), getMsg('updateall'));
 }
 
 

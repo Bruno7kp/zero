@@ -7,6 +7,7 @@ use B7KP\Utils\Login;
 use B7KP\Library\Assert;
 use B7KP\Library\Url;
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 
 class LoginController extends Controller
 {
@@ -43,7 +44,7 @@ class LoginController extends Controller
 				}
 				else
 				{
-					$response = array("erro" => 1, "message" => "Login or password invalid");
+					$response = array("erro" => 1, "message" => Lang::get("invalid_login"));
 				}
 			}
 			else

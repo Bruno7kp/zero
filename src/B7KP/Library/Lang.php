@@ -175,6 +175,15 @@ class Lang
 		$messages["password"][self::PT_BR] = "Senha";
 		$messages["password"][self::EN_US] = "Password";
 
+		$messages["old_pass"][self::PT_BR] = "Senha atual";
+		$messages["old_pass"][self::EN_US] = "Actual password";
+
+		$messages["new_pass"][self::PT_BR] = "Nova senha";
+		$messages["new_pass"][self::EN_US] = "New password";
+
+		$messages["new_pass_repeat"][self::PT_BR] = "Repetir nova senha";
+		$messages["new_pass_repeat"][self::EN_US] = "Repeat new password";
+
 		$messages["yes"][self::PT_BR] = "Sim";
 		$messages["yes"][self::EN_US] = "Yes";
 
@@ -191,6 +200,23 @@ class Lang
 		$messages["copy"][self::EN_US] = "Copy";
 		$messages["copy_w"][self::PT_BR] = "Copiar sem formatação";
 		$messages["copy_w"][self::EN_US] = "Copy without formatting";
+
+		// LOGIN
+		$messages["invalid_login"][self::PT_BR] = "A senha atual está errada";
+		$messages["invalid_login"][self::EN_US] = "The current password is wrong";
+
+		$messages["min_max_login"][self::PT_BR] = "A senha deve ter entre 4 e 20 caracteres";
+		$messages["min_max_login"][self::EN_US] = "The password must be between 4 and 20 characters";
+
+		$messages["pass_dont_match"][self::PT_BR] = "A senha e sua confirmação são diferentes";
+		$messages["pass_dont_match"][self::EN_US] = "The password and its confirm are not the same";
+
+		$messages["fail_update"][self::PT_BR] = "Ocorreu um problema ao atualizar";
+		$messages["fail_update"][self::EN_US] = "There was a problem updating";
+
+		$messages["not_contain"][self::PT_BR] = "A senha não deve conter seu login";
+		$messages["not_contain"][self::EN_US] = "The password should not contain your login";
+
 
 		// CHART
 		$messages["mov"][self::PT_BR] = "Movimento";
@@ -224,10 +250,10 @@ class Lang
 		$messages["look_at"][self::PT_BR] = "Dê uma olhada nas";
 		$messages["look_at"][self::EN_US] = "Take a look at the";
 
-		$messages["up_new_week"][self::PT_BR] = "Atualize novas semanas";
+		$messages["up_new_week"][self::PT_BR] = "Atualizar novas semanas";
 		$messages["up_new_week"][self::EN_US] = "Update new weeks";
 
-		$messages["up_all"][self::PT_BR] = "Atualize tudo";
+		$messages["up_all"][self::PT_BR] = "Atualizar tudo";
 		$messages["up_all"][self::EN_US] = "Update all";
 
 		$messages["alr"][self::PT_BR] = "Já fez isso?";

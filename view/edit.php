@@ -18,7 +18,7 @@ use B7KP\Library\Lang;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2><?php echo Lang::get('edit');?> E-Mail</h2>
+							<h2><?php echo Lang::get('edit');?> <?php echo $field;?></h2>
 							
 							<?php $form->output();?>
 

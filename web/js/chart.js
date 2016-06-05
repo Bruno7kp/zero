@@ -11,6 +11,26 @@ function chartinit()
 	switchToSimpleCR();
 }
 
+function getChartMsg(msgid)
+{
+	// eng
+	if (lang == 1) 
+	{
+		array = {};
+		array.att = "Updated";
+		array.fail = "Fail";
+	}
+	// pt
+	else
+	{
+		array = {};
+		array.att = "Atualizado";
+		array.fail = "Falha";
+	}
+
+	return array[msgid];
+}
+
 function switchToSimpleCR()
 {
 	$(".switchto").click(function(event) {
@@ -56,12 +76,12 @@ function updateUniqueWeek()
 			}
 			else
 			{
-				updateBtn.text('Fail');
+				updateBtn.text(getChartMsg('fail'));
 			}
 			console.log("success");
 		})
 		.fail(function() {
-			updateBtn.text('Fail');
+			updateBtn.text(getChartMsg('fail'));
 			console.log("error");
 		})
 		.always(function() {

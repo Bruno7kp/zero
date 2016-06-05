@@ -323,7 +323,7 @@ class Assert
 
 	private function lastfm($rule, $field)
 	{
-		if($rule)
+		if($rule && !empty($this->data->$field))
 		{
 			$lastfm = new LastFm();
 			$vars = array('user' => $this->data->$field);

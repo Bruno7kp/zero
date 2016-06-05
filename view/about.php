@@ -23,16 +23,13 @@ use B7KP\Library\Lang;
 							<hr>
 							<h3>To do list</h3>
 							<ul class="list-group">
-								<li class="list-group-item">Charts</li>
 								<li class="list-group-item">List of weeks/charts</li>
-								<li class="list-group-item">Clean homepage</li>
 								<li class="list-group-item">New main bg</li>
-								<li class="list-group-item">Default artist image</li>
 								<li class="list-group-item">Artist page</li>
 								<li class="list-group-item">Music page</li>
 								<li class="list-group-item">Album page</li>
-								<li class="list-group-item">Change user password</li>
-								<li class="list-group-item">Retrieve email password</li>
+								<li class="list-group-item"><s>Change user password</s></li>
+								<li class="list-group-item">Reset password</li>
 								<?php 
 // 								require MAIN_DIR.'src/PHPMailer-master/PHPMailerAutoload.php';
 

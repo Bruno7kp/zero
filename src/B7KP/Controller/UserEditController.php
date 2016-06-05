@@ -25,7 +25,7 @@ class UserEditController extends Controller
 	{
 		$this->checkAccess();
 		$form = $this->createForm("UserEditForm", $this->user);
-		$var = array("form" => $form);
+		$var = array("form" => $form, "field" => "E-mail");
 		$this->render("edit.php", $var);
 	}
 
@@ -49,9 +49,9 @@ class UserEditController extends Controller
 			if($this->checkAssert($post))
 			{
 				$affected = $this->factory->update("B7KP\Entity\User", $post);
-				if($affected > 0)
+				if($affected)
 				{
-					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("userprofile"));
+					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("useredit"));
 				}
 				else
 				{
