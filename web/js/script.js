@@ -342,8 +342,13 @@ function routesFns()
 
 function loadOverall()
 {
-	login = curPage.split("/");
-	login = login[login.length - 1];
+	cur = curPage.split("/");
+	login = cur[cur.length - 1];
+
+	if(login.length == 0)
+	{
+		login = cur[cur.length - 2];
+	}
 	//loadAct(login, true);
 	alb = $(".top-albums");
 	rec = $(".recent");

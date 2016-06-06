@@ -7,7 +7,7 @@ use B7KP\Utils\UserSession;
 use B7KP\Entity\User;
 
 ?>
-<header id="fh5co-header-section" role="header" class="" >
+<header id="fh5co-header-section" role="header" class="">
 	<div class="container">
 		
 		<!-- START #fh5co-logo -->
@@ -27,23 +27,8 @@ use B7KP\Entity\User;
 				if($user instanceof User)
 				{
 				?>
-				<li>
-					<a href="#" class="fh5co-sub-ddown">Charts</a>
-					 <ul class="fh5co-sub-menu">
-					 	<li><a href="left-sidebar.html">Left Sidebar</a></li>
-					 	<li><a href="right-sidebar.html">Right Sidebar</a></li>
-						<li><a href="#">HTML5</a></li>
-						<li>
-							<a href="#" class="fh5co-sub-ddown">JavaScript</a>
-							<ul class="fh5co-sub-menu">
-								<li><a href="#">jQuery</a></li>
-								<li><a href="#">Zipto</a></li>
-								<li><a href="#">Node.js</a></li>
-								<li><a href="#">AngularJS</a></li>
-							</ul>
-						</li>
-						<li><a href="#">CSS3</a></li> 
-					</ul>
+				<li <?php if(Route::isCurRoute('chart_list')): echo 'class="active"';endif;?>>
+					<a href="<?php echo Route::url('chart_list', array("login" => $user->login))?>">Charts</a>
 				</li>
 				<?php
 				}

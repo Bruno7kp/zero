@@ -9,6 +9,20 @@
     color: var(--icon-color);
 }
 
+.no-margin {
+	margin: 0px !important;
+}
+
+.min-bold {
+	font-weight: 700;
+	font-size: 11px;
+}
+
+
+.min-min {
+	font-size: x-small;
+}
+
 .ico-color{
 	color: var(--main-site-color);
 }

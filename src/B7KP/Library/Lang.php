@@ -161,6 +161,9 @@ class Lang
 		$messages["by"][self::PT_BR] = "de";
 		$messages["by"][self::EN_US] = "by";
 
+		$messages["to"][self::PT_BR] = "até";
+		$messages["to"][self::EN_US] = "to";
+
 		$messages["hello"][self::PT_BR] = "Olá";
 		$messages["hello"][self::EN_US] = "Hello";
 
@@ -169,6 +172,9 @@ class Lang
 
 		$messages["ch_cm"][self::PT_BR] = "Ver chart completo";
 		$messages["ch_cm"][self::EN_US] = "View full chart";
+
+		$messages["ch_li"][self::PT_BR] = "Ver lista completa";
+		$messages["ch_li"][self::EN_US] = "View full list";
 
 		$messages["pass"][self::PT_BR] = "Senha";
 		$messages["pass"][self::EN_US] = "Password";
@@ -268,8 +274,8 @@ class Lang
 		$messages["error_token"][self::PT_BR] = "Algo deu errado ao checar o seu token. Tente novamente mais tarde.";
 		$messages["error_token"][self::EN_US] = "Something went wrong when checking the token. Try again later.";
 
-		$messages["sett_limit"][self::PT_BR] = "<p class='text-muted'>Aqui você pode selecionar o limite de itens para seu chart semanal. Colocando um limite, os itens que ficarem abaixo do mesmo serão ignorados na geração de seus charts, prevenindo que suas tabelas fiquem poluídas, mas se quiser, pode optar por salvar todos os itens disponíveis selecionando a opção 'Max'.</p>";
-		$messages["sett_limit"][self::EN_US] = "<p class='text-muted'>Here you can select the item limit of your weekly chart. Putting a limit, items that fall below this limit are ignored when generating your data, preventing your graphics become polluted, but if you want to take advantage of all the data, you can select the 'Max' option.</p>";
+		$messages["sett_limit"][self::PT_BR] = "<p class='text-muted'>Aqui você pode selecionar o limite de itens para seu chart semanal. Colocando um limite, os itens que ficarem abaixo do mesmo serão ignorados na geração de seus charts.</p>";
+		$messages["sett_limit"][self::EN_US] = "<p class='text-muted'>Here you can select the item limit of your weekly chart. Putting a limit, items that fall below this limit are ignored when generating your data.</p>";
 
 		$messages["sett_diff_lw"][self::PT_BR] = "Diferença em relação a semana anterior";
 		$messages["sett_diff_lw"][self::EN_US] = "Difference with last week";
@@ -317,6 +323,9 @@ class Lang
 
 		$messages["lw_def"][self::PT_BR] = "Posição na semana anterior";
 		$messages["lw_def"][self::EN_US] = "Position in the previous week";
+
+		$messages["last_1_x"][self::PT_BR] = "Últimos #1s";
+		$messages["last_1_x"][self::EN_US] = "Latest #1s";
 
 		return $messages;
 	}

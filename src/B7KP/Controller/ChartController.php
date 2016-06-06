@@ -26,35 +26,30 @@ class ChartController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			$lfm 	= new LastFm();
-			$last 	= $lfm->setUser($user->login)->getUserInfo();
-			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
-			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
-			$wksfm 	= $lfm->getWeeklyChartList();
-			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date));
-			$average = $last['playcount'] / $wksfm;
-			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
-			$bgimage = false;
-			$topartist = false;
-			if(isset($acts[0])): 
-				$bgimage = $acts[0]["images"]["mega"];
-				$topartist = $acts[0];
-			endif;
+			$numberones = array();
+			$cond = array("iduser" => $user->id);
+			$weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC", "0, 5");
+			$i = 0;
+			foreach ($weeks as $week) 
+			{
+				$numberones[$i]["week"] = $week->week;
+				$from = new \DateTime($week->from_day);
+				$numberones[$i]["from"] = $from->format("Y.m.d");
+				$to = new \DateTime($week->to_day);
+				$to->modify('-1 day');
+				$numberones[$i]["to"] = $to->format("Y.m.d");
+				$cond = array("idweek" => $week->id);
+				$numberones[$i]["album"]  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberones[$i]["artist"] = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$i++;
+			}
 			$var = array
 					(
-						"user" 			=> $user, 
-						"lfm_href" 		=> $last["url"], 
-						"lfm_image" 	=> str_replace("34s", "avatar170s", $last["image"]),
-						"lfm_playcount" => $last["playcount"],
-						"lfm_country" 	=> $last["country"],
-						"lfm_bg" 		=> $bgimage,
-						"lfm_register"	=> $date,
-						"weeks" 		=> $weeks,
-						"weekstodate"	=> $wksfm,
-						"topartist"		=> $topartist,
-						"average"		=> round($average)
+						"weeks" => $numberones,
+						"user" => $user
 					);
-			$this->render("profile.php", $var);
+			$this->render("mainchart.php", $var);
 		}
 		else
 		{
