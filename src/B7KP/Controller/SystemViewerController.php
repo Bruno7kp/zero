@@ -28,6 +28,17 @@ class SystemViewerController extends Controller
 		$this->render("admin/routes.php", $vars);
 	}
 
+	/**
+	* @Route(name=users|route=/users)
+	*/
+	public function viewUsers()
+	{
+		$this->checkAccess();
+		$users = $this->factory->find("B7KP\Entity\User", array());
+		$vars = array("users" => $users);
+		$this->render("admin/users.php", $vars);
+	}
+
 	protected function checkAccess()
 	{
 		$check = $this->user instanceof User && $this->user->permissionLevel() == 7;
