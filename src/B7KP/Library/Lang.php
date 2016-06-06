@@ -280,7 +280,7 @@ class Lang
 		$messages["sett_diff_lw"][self::PT_BR] = "Diferença em relação a semana anterior";
 		$messages["sett_diff_lw"][self::EN_US] = "Difference with last week";
 
-		$messages["sett_none"][self::PT_BR] = "Nenhum (escoder)";
+		$messages["sett_none"][self::PT_BR] = "Nenhum (esconder)";
 		$messages["sett_none"][self::EN_US] = "None (hide)";
 
 		$messages["sett_lw"][self::PT_BR] = "Posição da semana anterior";
