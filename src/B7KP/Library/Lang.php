@@ -304,8 +304,8 @@ class Lang
 		$messages["not_show"][self::PT_BR] = "Nada para mostrar aqui";
 		$messages["not_show"][self::EN_US] = "Nothing to show here.";
 
-		$messages["rec_tra"][self::PT_BR] = "FAIXAS RECENTES";
-		$messages["rec_tra"][self::EN_US] = "RECENT TRACKS";
+		$messages["rec_tra"][self::PT_BR] = "Faixas recentes";
+		$messages["rec_tra"][self::EN_US] = "Recent tracks";
 
 		$messages["sett_plays"][self::PT_BR] = "Mostrar número de execuções";
 		$messages["sett_plays"][self::EN_US] = "Show playcounts";
