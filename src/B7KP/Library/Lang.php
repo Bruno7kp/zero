@@ -286,7 +286,7 @@ class Lang
 		$messages["sett_lw"][self::PT_BR] = "Posição da semana anterior";
 		$messages["sett_lw"][self::EN_US] = "Show last week position/plays";
 
-		$messages["sett_pp"][self::PT_BR] = "Diferença em relação a semana anterior (porcentagem) (apenas para execuções)";
+		$messages["sett_pp"][self::PT_BR] = "Diferença em relação a semana anterior (porcentagem) (apenas para reproduções)";
 		$messages["sett_pp"][self::EN_US] = "Difference with last week (percentage) (only for playcounts)";
 
 		$messages["sett_showimg"][self::PT_BR] = "Mostrar imagens no chart";
@@ -307,7 +307,7 @@ class Lang
 		$messages["rec_tra"][self::PT_BR] = "Faixas recentes";
 		$messages["rec_tra"][self::EN_US] = "Recent tracks";
 
-		$messages["sett_plays"][self::PT_BR] = "Mostrar número de execuções";
+		$messages["sett_plays"][self::PT_BR] = "Mostrar número de reproduções";
 		$messages["sett_plays"][self::EN_US] = "Show playcounts";
 
 		$messages["new_on"][self::PT_BR] = "Olá, parece que você é novo no Last.fm, você terá esperar até a semana terminar para aproveitar os charts semanais.";
