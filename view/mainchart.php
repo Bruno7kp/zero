@@ -191,7 +191,7 @@ use B7KP\Library\Lang;
 															?>
 															<h4 class="no-margin"><?php echo $album->album;?></h4>
 															<span class="text-muted"><?php echo Lang::get('by');?></span>
-															<?php echo $music->artist;?>
+															<?php echo $album->artist;?>
 															<?php
 															}
 															else
