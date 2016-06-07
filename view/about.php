@@ -42,7 +42,7 @@ use B7KP\Library\Lang;
 // $mail->Host = 'smtp.live.com';  // Specify main and backup SMTP servers
 // $mail->SMTPAuth = true;                               // Enable SMTP authentication
 // $mail->Username = 'bruno7kp@outlook.com';                 // SMTP username
-// $mail->Password = 'ab4m7g3p';                           // SMTP password
+// $mail->Password = '';                           // SMTP password
 // $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
 // $mail->Port = 587;                                    // TCP port to connect to
 
