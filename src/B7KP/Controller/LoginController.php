@@ -44,7 +44,7 @@ class LoginController extends Controller
 				}
 				else
 				{
-					$response = array("erro" => 1, "message" => Lang::get("invalid_login"));
+					$response = array("erro" => 1, "message" => Lang::get("invalid_user_login"));
 				}
 			}
 			else

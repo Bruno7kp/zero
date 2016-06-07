@@ -84,10 +84,10 @@ if($show_dropouts && $week > 1)
 		<?php if($show_images): ?>
 			<th class="center">Img</th>
 		<?php ; endif;?>
-		<th><?php echo Lang::get('name');?></th>
 		<?php if($type != "artist"): ?>
-			<th><?php echo Lang::get('art')?></th> 
+			<th><?php echo Lang::get('title');?></th>
 		<?php ; endif;?>
+		<th><?php echo Lang::get('art')?></th> 
 		<?php if($show_playcounts): ?>
 			<th class="center"><?php echo Lang::get('play_x')?></th>
 		<?php ; endif;?>

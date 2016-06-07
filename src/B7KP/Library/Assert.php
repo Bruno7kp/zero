@@ -6,6 +6,7 @@ use B7KP\Model\Model;
 use B7KP\Utils\Functions;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Options;
+use B7KP\Library\Lang;
 use LastFmApi\Main\LastFm;
 
 class Assert
@@ -131,7 +132,7 @@ class Assert
 		{
 			if(strlen($this->data->$field) == 0)
 			{
-				$this->error[] = array("field" => $field, "error" => "<b>{$field}</b> can not be null", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('the_field')." <b>{$field}</b> ".Lang::get('not_null'), "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -142,7 +143,7 @@ class Assert
 		{
 			if(!preg_match('/^[a-zA-Z0-9]+$/', $this->data->$field))
 			{
-				$this->error[] = array("field" => $field, "error" => "Only letter and numbers are acceptable to field: <b>{$field}</b>", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('alfanum').": <b>{$field}</b>", "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -151,7 +152,7 @@ class Assert
 	{
 		if(strlen($this->data->$field) > $rule)
 		{
-			$this->error[] = array("field" => $field, "error" => "{$rule} is the max number of characters permitted for: <b>{$field}</b>", "fn" => __FUNCTION__);	
+			$this->error[] = array("field" => $field, "error" => "{$rule} ".Lang::get('max').": <b>{$field}</b>", "fn" => __FUNCTION__);	
 		}
 	}
 
@@ -159,7 +160,7 @@ class Assert
 	{
 		if(strlen($this->data->$field) < $rule)
 		{
-			$this->error[] = array("field" => $field, "error" => "{$rule} is the min number of characters permitted for: <b>{$field}</b>", "fn" => __FUNCTION__);	
+			$this->error[] = array("field" => $field, "error" => "{$rule} ".Lang::get('min').": <b>{$field}</b>", "fn" => __FUNCTION__);	
 		}
 	}
 
@@ -169,7 +170,7 @@ class Assert
 		{
 			if(!filter_var($this->data->$field,FILTER_VALIDATE_EMAIL))
 			{
-				$this->error[] = array("field" => $field, "error" => "Email invalid", "fn" => __FUNCTION__);	
+				$this->error[] = array("field" => $field, "error" => "Email ".Lang::get('invalid'), "fn" => __FUNCTION__);	
 			}
 		}
 	}
@@ -185,12 +186,12 @@ class Assert
 				{
 					if($user->id != $this->data->id)
 					{
-						$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> is already in use", "fn" => __FUNCTION__);
+						$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('in_use'), "fn" => __FUNCTION__);
 					}
 				}
 				else
 				{
-					$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> is already in use", "fn" => __FUNCTION__);
+					$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('in_use'), "fn" => __FUNCTION__);
 				}
 			}
 		}	
@@ -203,7 +204,7 @@ class Assert
 			$this->data->$field = Functions::convertStringToNumeric($this->data->$field);
 			if(!is_int($this->data->$field))
 			{
-				$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be an integer", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get("integer"), "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -214,7 +215,7 @@ class Assert
 		{
 			if(!is_numeric($this->data->$field))
 			{
-				$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be a number", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('be_number'), "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -223,7 +224,7 @@ class Assert
 	{
 		if($this->data->$field > $rule)
 		{
-			$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be lower than {$rule}", "fn" => __FUNCTION__);
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('lower')." {$rule}", "fn" => __FUNCTION__);
 		}
 	}
 
@@ -231,7 +232,7 @@ class Assert
 	{
 		if($this->data->$field < $rule)
 		{
-			$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be bigger than {$rule}", "fn" => __FUNCTION__);
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('bigger')." {$rule}", "fn" => __FUNCTION__);
 		}
 	}
 
@@ -239,7 +240,7 @@ class Assert
 	{
 		if($rule != $this->data->$field)
 		{
-			$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be equal to {$rule}", "fn" => __FUNCTION__);
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('equal')." {$rule}", "fn" => __FUNCTION__);
 		}
 	}
 
@@ -249,7 +250,7 @@ class Assert
 		foreach ($rule as $value) {
 			if($value == $this->data->$field)
 			{
-				$this->error[] = array("field" => $field, "error" => "Invalid value in field <b>{$field}</b>: '{$value}', try another", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('inv_value')." <b>{$field}</b>: '{$value}'", "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -260,7 +261,7 @@ class Assert
 		{
 			if (strpos($this->data->$field, $rule) === false) 
 			{
-				$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must contain <b>{$rule}</b>", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('must_cn')." <b>{$rule}</b>", "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -271,7 +272,7 @@ class Assert
 		{
 			if (strpos($this->data->$field, $rule) !== false) 
 			{
-				$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must not contain <b>{$rule}</b>", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('must_n_cn')." <b>{$rule}</b>", "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -280,7 +281,7 @@ class Assert
 	{
 		if(isset($this->data->$rule) && $this->data->$rule != $this->data->$field)
 		{
-			$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be equal to the <b>{$rule}</b> field", "fn" => __FUNCTION__);
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('field')." ".Lang::get('equal_to')." <b>{$rule}</b> ", "fn" => __FUNCTION__);
 		}
 	}
 
@@ -288,7 +289,7 @@ class Assert
 	{
 		if(isset($this->data->$rule) && $this->data->$rule == $this->data->$field)
 		{
-			$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field must be different of the <b>{$rule}</b> field", "fn" => __FUNCTION__);
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('field')." ".Lang::get('diff_to')." <b>{$rule}</b> ", "fn" => __FUNCTION__);
 		}
 	}
 
@@ -297,7 +298,7 @@ class Assert
 		if(isset($this->data->$rule) && !empty($this->data->$rule) && !empty($this->data->$field))
 		{
 			if (strpos($this->data->$field, $this->data->$rule) !== false) {
-				$this->error[] = array("field" => $field, "error" => "The <b>{$field}</b> field should not contain the same value of the <b>{$rule}</b> field", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('field')." ".Lang::get('same_val')." <b>{$rule}</b>", "fn" => __FUNCTION__);
 			}
 		}
 	}
@@ -317,7 +318,7 @@ class Assert
 
 		if(!$ok)
 		{
-				$this->error[] = array("field" => $field, "error" => "Option of the field: <b>{$field}</b> not available, try reload the page and select an option again.", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('opt_field').": <b>{$field}</b> ".Lang::get('opt_not'), "fn" => __FUNCTION__);
 		}
 	}
 
@@ -329,7 +330,7 @@ class Assert
 			$vars = array('user' => $this->data->$field);
 			if($lastfm->getUserInfo($vars) === false)
 			{
-				$this->error[] = array("field" => $field, "error" => "Last.fm username not found", "fn" => __FUNCTION__);
+				$this->error[] = array("field" => $field, "error" => Lang::get('last_user'), "fn" => __FUNCTION__);
 			}
 		}
 	}

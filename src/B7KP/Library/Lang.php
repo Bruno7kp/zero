@@ -95,6 +95,9 @@ class Lang
 		$messages["click"][self::PT_BR] = "Clique";
 		$messages["click"][self::EN_US] = "Click";
 
+		$messages["title"][self::PT_BR] = "Título";
+		$messages["title"][self::EN_US] = "Title";
+
 		$messages["outof"][self::PT_BR] = "fora do chart";
 		$messages["outof"][self::EN_US] = "out of the chart";
 
@@ -121,6 +124,9 @@ class Lang
 
 		$messages["remove"][self::PT_BR] = "Remover";
 		$messages["remove"][self::EN_US] = "Remove";
+
+		$messages["stats"][self::PT_BR] = "Estatísticas";
+		$messages["stats"][self::EN_US] = "Stats";
 
 		$messages["add"][self::PT_BR] = "Adicionar";
 		$messages["add"][self::EN_US] = "Add";
@@ -176,6 +182,9 @@ class Lang
 		$messages["ch_li"][self::PT_BR] = "Ver lista completa";
 		$messages["ch_li"][self::EN_US] = "View full list";
 
+		$messages["ch_wkli"][self::PT_BR] = "Lista de semanas";
+		$messages["ch_wkli"][self::EN_US] = "Lista of weeks";
+
 		$messages["pass"][self::PT_BR] = "Senha";
 		$messages["pass"][self::EN_US] = "Password";
 		$messages["password"][self::PT_BR] = "Senha";
@@ -210,6 +219,9 @@ class Lang
 		// LOGIN
 		$messages["invalid_login"][self::PT_BR] = "A senha atual está errada";
 		$messages["invalid_login"][self::EN_US] = "The current password is wrong";
+
+		$messages["invalid_user_login"][self::PT_BR] = "Usuário ou senha inválida";
+		$messages["invalid_user_login"][self::EN_US] = "User or password invalid";
 
 		$messages["min_max_login"][self::PT_BR] = "A senha deve ter entre 4 e 20 caracteres";
 		$messages["min_max_login"][self::EN_US] = "The password must be between 4 and 20 characters";
@@ -286,6 +298,18 @@ class Lang
 		$messages["sett_lw"][self::PT_BR] = "Posição da semana anterior";
 		$messages["sett_lw"][self::EN_US] = "Show last week position/plays";
 
+		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
+		$messages["big_one"][self::EN_US] = "Largest number of plays in one week";
+
+		$messages["big_num"][self::PT_BR] = "Maior número de semanas no";
+		$messages["big_num"][self::EN_US] = "Largest number of weeks on";
+
+		$messages["big_n"][self::PT_BR] = "Maior número de";
+		$messages["big_n"][self::EN_US] = "Largest number of";
+
+		$messages["of"][self::PT_BR] = "de";
+		$messages["of"][self::EN_US] = "of";
+
 		$messages["sett_pp"][self::PT_BR] = "Diferença em relação a semana anterior (porcentagem) (apenas para reproduções)";
 		$messages["sett_pp"][self::EN_US] = "Difference with last week (percentage) (only for playcounts)";
 
@@ -326,6 +350,87 @@ class Lang
 
 		$messages["last_1_x"][self::PT_BR] = "Últimos #1s";
 		$messages["last_1_x"][self::EN_US] = "Latest #1s";
+
+		$messages["not_null"][self::PT_BR] = "não pode ser vazio";
+		$messages["not_null"][self::EN_US] = "can not be null";
+
+		$messages["the_field"][self::PT_BR] = "o campo";
+		$messages["the_field"][self::EN_US] = "the field";
+
+		$messages["alfanum"][self::PT_BR] = "Apenas letras e números são acetos no campo";
+		$messages["alfanum"][self::EN_US] = "Only letter and numbers are acceptable to field";
+
+		$messages["max"][self::PT_BR] = "é o máximo de caracteres permitidos para";
+		$messages["max"][self::EN_US] = "is the max number of characters permitted for";
+
+		$messages["min"][self::PT_BR] = "é o mínimo de caracteres permitidos para";
+		$messages["min"][self::EN_US] = "is the min. number of characters permitted for";
+		
+		$messages["invalid"][self::PT_BR] = "inválido";
+		$messages["invalid"][self::EN_US] = "invalid";
+
+		$messages["the"][self::PT_BR] = "O";
+		$messages["the"][self::EN_US] = "The";
+
+		$messages["in_use"][self::PT_BR] = "já está em uso";
+		$messages["in_use"][self::EN_US] = "is already in use";
+
+		$messages["integer"][self::PT_BR] = "deve ser um número inteiro";
+		$messages["integer"][self::EN_US] = "must be an integer";
+
+		$messages["be_number"][self::PT_BR] = "deve ser um número";
+		$messages["be_number"][self::EN_US] = "must be a number";
+
+		$messages["lower"][self::PT_BR] = "deve ser menor que";
+		$messages["lower"][self::EN_US] = "must be lower than";
+
+		$messages["bigger"][self::PT_BR] = "deve ser maior que";
+		$messages["bigger"][self::EN_US] = "must be bigger than";
+
+		$messages["bigger"][self::PT_BR] = "deve ser igual a";
+		$messages["bigger"][self::EN_US] = "must be equal to";
+
+		$messages["inv_value"][self::PT_BR] = "Valor inválido no campo";
+		$messages["inv_value"][self::EN_US] = "Invalid value in field";
+
+		$messages["must_cn"][self::PT_BR] = "deve conter";
+		$messages["must_cn"][self::EN_US] = "must contain";
+
+		$messages["must_cn"][self::PT_BR] = "não deve conter";
+		$messages["must_cn"][self::EN_US] = "must not contain";
+
+		$messages["equal_to"][self::PT_BR] = "deve ser igual a";
+		$messages["equal_to"][self::EN_US] = "must be equal to the";
+
+		$messages["diff_to"][self::PT_BR] = "deve ser diferente de";
+		$messages["diff_to"][self::EN_US] = "must be different of the";
+
+		$messages["field"][self::PT_BR] = "campo";
+		$messages["field"][self::EN_US] = "field";
+
+		$messages["same_val"][self::PT_BR] = "não pode conter o mesmo valor de";
+		$messages["same_val"][self::EN_US] = "should not contain the same value of the";
+
+		$messages["opt_field"][self::PT_BR] = "Opção do campo";
+		$messages["opt_field"][self::EN_US] = "Option of the field";
+
+		$messages["opt_not"][self::PT_BR] = "não disponível, tente recarregar a página e selecione a opção novamente.";
+		$messages["opt_not"][self::EN_US] = "not available, try reload the page and select an option again.";
+
+		$messages["last_user"][self::PT_BR] = "Usuário do Last.fm não encontrado.";
+		$messages["last_user"][self::EN_US] = "Last.fm username not found";
+
+		
+
+		
+		
+
+		
+		
+		
+		
+
+		
 
 		return $messages;
 	}

@@ -110,6 +110,7 @@ class ProfileController extends Controller
 				{
 					$html .= Snippets::topActListRow($act['name'], $act['url'], $act['playcount'], $act['images']['medium'], $lfm_topacts[0]['playcount']);
 				}
+				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;
 			}
 			else
@@ -142,6 +143,7 @@ class ProfileController extends Controller
 				{
 					$html .= Snippets::topAlbListRow($alb['name'], $alb['url'], $alb['playcount'], $alb['images']['medium'], $lfm_topalbs[0]['playcount'], $alb['artist']['name'], $alb['artist']['url']);
 				}
+				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;
 			}
 			else
@@ -173,7 +175,7 @@ class ProfileController extends Controller
 				{
 					$html .= Snippets::topAlbListRow($mus['name'], $mus['url'], $mus['playcount'], $mus['images']['medium'], $lfm_topmus[0]['playcount'], $mus['artist']['name'], $mus['artist']['url']);
 				}
-
+				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;
 			}
 			else

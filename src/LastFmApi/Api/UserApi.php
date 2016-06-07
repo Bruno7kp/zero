@@ -138,21 +138,28 @@ class UserApi extends BaseApi
         $vars['api_sig'] = $apiSig;
 
         if ($call = $this->apiGetCall($vars)) {
-            $img = (array)$call->user->image[2];
-            $img = $img["#text"];
-            $info['name'] = (string) $call->user->name;
-            //$info['realname'] = (string) $call->user->realname;
-            $info['url'] = (string) $call->user->url;
-            $info['image'] = (string) $img;
-            $info['country'] = (string) $call->user->country;
-            $info['age'] = (string) $call->user->age;
-            $info['gender'] = (string) $call->user->gender;
-            $info['subscriber'] = (string) $call->user->subscriber;
-            $info['playcount'] = (string) $call->user->playcount;
-            $info['playlists'] = (string) $call->user->playlists;
-            $info['registered'] = (int) $call->user->registered->unixtime;
+            if(isset($call->user))
+            {
+                $img = (array)$call->user->image[2];
+                $img = $img["#text"];
+                $info['name'] = (string) $call->user->name;
+                //$info['realname'] = (string) $call->user->realname;
+                $info['url'] = (string) $call->user->url;
+                $info['image'] = (string) $img;
+                $info['country'] = (string) $call->user->country;
+                $info['age'] = (string) $call->user->age;
+                $info['gender'] = (string) $call->user->gender;
+                $info['subscriber'] = (string) $call->user->subscriber;
+                $info['playcount'] = (string) $call->user->playcount;
+                $info['playlists'] = (string) $call->user->playlists;
+                $info['registered'] = (int) $call->user->registered->unixtime;
 
-            return $info;
+                return $info;
+            }
+            else
+            {
+                return false;
+            }
         } else {
             return false;
         }

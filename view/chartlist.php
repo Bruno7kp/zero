@@ -2,6 +2,7 @@
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
 use B7KP\Library\Route;
+use B7KP\Library\Url;
 use B7KP\Library\Lang;
 ?>
 <!doctype html>
@@ -19,11 +20,12 @@ use B7KP\Library\Lang;
 					<div class="row bottomspace-md text-center">
 						<div class="col-xs-12">
 							<h1 class="h3"><?php echo $user->login;?> Charts</h2>
+							<a href="<?php echo Route::url('chart_list', array('login' => $user->login));?>" class="no-margin btn btn-custom btn-success"><i class="ti-stats-up"></i></a>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6 text-center bottomspace-md">
-							<h3 class="topspace-sm"><?php echo Lang::get('last_1_x');?></h3>
+						<div class="col-md-8 col-md-offset-2 text-center bottomspace-md">
+							<h3 class="topspace-sm"><?php echo Lang::get('ch_wkli');?></h3>
 							<div id="fh5co-tab-feature" class="fh5co-tab" style="display: block; width: 100%; margin: 0px;">
 								<ul class="resp-tabs-list hor_1 hidden-xs">
 									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab" style=""><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
@@ -40,6 +42,7 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
+													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/artist/week/";
 													foreach ($weeks as $value) {
 												?>
 													<div class="row divider-tb bottomspace-sm">
@@ -56,7 +59,7 @@ use B7KP\Library\Lang;
 															{
 																$showlink = true;
 																$r = array("login" => $user->login, "type" => "artist", "week" => $value["week"]);
-																$weeklink = Route::url('weekly_chart', $r);
+																$weeklink = $mainlink.$value["week"];
 																$artist = $value["artist"][0];
 															?>
 															<h4 class="h3 no-margin"><?php echo $artist->artist;?></h4>
@@ -82,9 +85,7 @@ use B7KP\Library\Lang;
 												<?php
 													}
 												?>
-												<div class="row text-center divider-tb bottomspace-sm">
-													<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
-												</div>
+												
 												<?php
 												}
 												else
@@ -104,6 +105,7 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
+													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
 													foreach ($weeks as $value) {
 												?>
 													<div class="row divider-tb bottomspace-sm">
@@ -120,7 +122,7 @@ use B7KP\Library\Lang;
 															{
 																$showlink = true;
 																$r = array("login" => $user->login, "type" => "music", "week" => $value["week"]);
-																$weeklink = Route::url('weekly_chart', $r);
+																$weeklink = $mainlink.$value["week"];
 																$music = $value["music"][0];
 															?>
 															<h4 class="no-margin"><?php echo $music->music;?></h4>
@@ -148,9 +150,7 @@ use B7KP\Library\Lang;
 												<?php
 													}
 												?>
-												<div class="row text-center divider-tb bottomspace-sm">
-													<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
-												</div>
+												
 												<?php
 												}
 												else
@@ -170,6 +170,7 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
+													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/album/week/";
 													foreach ($weeks as $value) {
 												?>
 													<div class="row divider-tb bottomspace-sm">
@@ -186,7 +187,7 @@ use B7KP\Library\Lang;
 															{
 																$showlink = true;
 																$r = array("login" => $user->login, "type" => "album", "week" => $value["week"]);
-																$weeklink = Route::url('weekly_chart', $r);
+																$weeklink = $mainlink.$value["week"];
 																$album = $value["album"][0];
 															?>
 															<h4 class="no-margin"><?php echo $album->album;?></h4>
@@ -214,9 +215,7 @@ use B7KP\Library\Lang;
 												<?php
 													}
 												?>
-												<div class="row text-center divider-tb bottomspace-sm">
-													<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
-												</div>
+												
 												<?php
 												}
 												else
@@ -230,46 +229,6 @@ use B7KP\Library\Lang;
 								</div>
 								<br>
 							</div>	
-						</div>
-						<div class="col-md-6">
-							<h2 class="h3 text-center"><?php echo Lang::get('stats');?></h2>
-							<table class="table table-bordered middle">
-								<tr>
-									<td>
-										<?php echo Lang::get('big_one');?>
-									</td>
-									<td>
-										<div class="btn-group" role="group">
-											<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-											<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-											<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo Lang::get("big_num");?> #1 / Top 5 / etc...
-									</td>
-									<td>
-										<div class="btn-group" role="group">
-											<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'artist', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-											<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-											<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										Artistas com mais músicas/álbuns em #1
-									</td>
-									<td>
-										<div class="btn-group" role="group">
-											<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
-											<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
-										</div>
-									</td>
-								</tr>
-							</table>
 						</div>
 					</div>
 				</div>

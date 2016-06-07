@@ -8,6 +8,7 @@ use B7KP\Utils\Charts;
 use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 use B7KP\Entity\Week;
+use B7KP\Core\Dao;
 use LastFmApi\Main\LastFm;
 
 class ChartController extends Controller
@@ -58,13 +59,52 @@ class ChartController extends Controller
 	}
 
 	/**
+	* @Route(name=full_chart_list|route=/user/{login}/charts/list)
+	*/
+	public function fullCharts($login)
+	{
+		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
+		if($user instanceof User)
+		{
+			$numberones = array();
+			$cond = array("iduser" => $user->id);
+			$weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC");
+			$i = 0;
+			foreach ($weeks as $week) 
+			{
+				$numberones[$i]["week"] = $week->week;
+				$from = new \DateTime($week->from_day);
+				$numberones[$i]["from"] = $from->format("Y.m.d");
+				$to = new \DateTime($week->to_day);
+				$to->modify('-1 day');
+				$numberones[$i]["to"] = $to->format("Y.m.d");
+				$cond = array("idweek" => $week->id);
+				$numberones[$i]["album"]  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberones[$i]["artist"] = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$i++;
+			}
+			$var = array
+					(
+						"weeks" => $numberones,
+						"user" => $user
+					);
+			$this->render("chartlist.php", $var);
+		}
+		else
+		{
+			$this->redirectToRoute("registernotfound", array("entity" => "user"));
+		}
+	}
+
+	/**
 	* @Route(name=weekly_chart|route=/user/{login}/charts/{type}/week/{week})
 	*/
 	public function weeklyChart($login, $type, $week)
 	{
-		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
-		$validtype = ($type == "artist" || $type == "album" || $type == "music");
-		if($user instanceof User && $validtype && is_numeric($week))
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		if(is_numeric($week))
 		{
 			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$week = $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id, "week" => $week), "week DESC");
@@ -89,16 +129,90 @@ class ChartController extends Controller
 		}
 		else
 		{
-			$this->redirectToRoute("registernotfound", array("entity" => "User"));
+			$this->redirectToRoute("chart_list", array("login" => $user->login));
 		}
 	}
 
+	/**
+	* @Route(name=bwp|route=/user/{login}/charts/{type}/overall/bwp)
+	*/
+	public function biggestWeeklyPlaycounts($login, $type)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$entity = "B7KP\Entity\\".ucfirst($type)."_charts";
+		$table  = $type."_charts";
+		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." ORDER BY t.playcount DESC LIMIT 0, 100");
+		$vars = array("user" => $user, "list" => $biggest, "type" => $type);
+		$this->render("bwp.php", $vars);
+	}
+
+	/**
+	* @Route(name=mwa|route=/user/{login}/charts/{type}/overall/mwa/top/{rank})
+	*/
+	public function moreWeeksAt($login, $type, $rank)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$rank = intval($rank) > 1 ? intval($rank) : 1;
+		$table  = $type."_charts";
+		$dao = Dao::getConn();
+		$group = "";
+		if($type != "artist"): $group .= ", t.".$type; endif;
+		$biggest = $dao->run("SELECT t.*, count(w.week) as total FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist".$group." ORDER BY total DESC");
+		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings);
+		$this->render("mwa.php", $vars);
+	}
+
+	/**
+	* @Route(name=mia|route=/user/{login}/charts/artist/overall/more/{type}/at/{rank})
+	*/
+	public function moreItemsAt($login, $type, $rank)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		if($type == "artist")
+		{
+			$this->redirectToRoute("chart_list", array("login" => $user->login));
+		}
+		$rank = intval($rank) > 1 ? intval($rank) : 1;
+		$table  = $type."_charts";
+		$dao = Dao::getConn();
+
+		$col = "t.".$type;
+		$biggest = $dao->run("SELECT t.*, count(".$col.") as total, COUNT(DISTINCT ".$col.") AS uniques FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist ORDER BY uniques DESC, total DESC");
+		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings);
+		$this->render("mia.php", $vars);
+	}
 
 	protected function checkAccess()
 	{
 		if(UserSession::getUser($this->factory) == false)
 		{
 			$this->redirectToRoute("login");
+		}
+	}
+
+	protected function isValidType($type, $user)
+	{
+		if($type != "artist" && $type != "music" && $type != "album")
+		{
+			$this->redirectToRoute("chart_list", array("login" => $user->login));
+		}
+	}
+
+	protected function isValidUser($login)
+	{
+		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
+		if($user instanceof User)
+		{
+			return $user;
+		}
+		else
+		{
+			$this->redirectToRoute("404");
 		}
 	}
 }

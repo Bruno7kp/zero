@@ -18,6 +18,14 @@
 	font-size: 11px;
 }
 
+.middle {
+    vertical-align: middle !important;
+}
+
+.middle td {
+    vertical-align: middle !important;
+    border-color: #eee !important;
+}
 
 .min-min {
 	font-size: x-small;
