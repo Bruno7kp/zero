@@ -8,6 +8,7 @@ function initialize()
 	formSubmit();
 	routesFns();
 	copyChart();
+	sortTable();
 }
 
 function getMsg(msgid)
@@ -145,6 +146,27 @@ function formSubmit()
 			console.log("complete");
 		});
 	});
+}
+
+function sortTable()
+{
+	$.tablesorter.themes.bootstrap = {
+		table        : 'table table-bordered table-striped',
+	    caption      : 'caption',
+	    // header class names
+	    header       : 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)
+	    sortNone     : '',
+	    sortAsc      : '',
+	    sortDesc     : '',
+	    active       : '', // applied when column is sorted
+	    hover        : '', // custom css required - a defined bootstrap style may not override other classes
+	    // icon class names
+	    icons        : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+	    iconSortNone : 'ti-arrows-vertical', // class name added to icon when column is not sorted
+	    iconSortAsc  : 'ti-angle-up', // class name added to icon when column has ascending sort
+	    iconSortDesc : 'ti-angle-down',
+	};
+	$(".tablesorter").tablesorter({theme : "bootstrap", headerTemplate : '{content} {icon}',widgets : [ "uitheme"]});
 }
 
 function disable(item)

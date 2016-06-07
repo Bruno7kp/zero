@@ -28,18 +28,27 @@ use B7KP\Core\App;
 <script src="<?php echo Url::asset('js/bootstrap.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/owl.carousel.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/jquery.magnific-popup.min.js');?>"></script>
+<!-- <script src="<?php echo Url::asset('js/jquery.tablesorter.js');?>"></script> -->
 <script src="<?php echo Url::asset('js/easyResponsiveTabs.js');?>"></script>
 <script src="<?php echo Url::asset('js/fastclick.js');?>"></script>
 <script src="<?php echo Url::asset('js/hoverIntent.js');?>"></script>
 <script src="<?php echo Url::asset('js/superfish.js');?>"></script>
+<script src="<?php echo Url::asset('js/bootstrap-notify.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/custom.js');?>"></script>
 <script src="<?php echo Url::asset('js/main.js');?>"></script>
 <script src="<?php echo Url::asset('js/script.js');?>"></script>
 <script src="<?php echo Url::asset('js/chart.js');?>"></script>
-<script src="<?php echo Url::asset('js/bootstrap-notify.min.js');?>"></script>
 <!-- cdn -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/js/jquery.tooltipster.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.widgets.min.js"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/widgets/widget-uitheme.min.js"></script>
+
+
+
+
 
 <a title="Web Analytics" href="http://clicky.com/100961601"><img alt="Web Analytics" src="//static.getclicky.com/media/links/badge.gif" border="0" width="0" height="0" /></a>
 <script src="//static.getclicky.com/js" type="text/javascript"></script>

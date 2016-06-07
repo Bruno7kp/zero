@@ -58,13 +58,16 @@ use B7KP\Library\Lang;
 						if(is_array($list) && count($list) > 0)
 						{
 						?>
-							<table class="table middle divider">
+							<table class="table middle divider tablesorter">
+							<thead>
 								<tr>
 									<th class="text-center">#</th>
 									<th><?php echo Lang::get('art');?></th>
 									<th class="text-center"><?php echo Lang::get($mintype.'_x');?></th>
 									<th class="text-center"><?php echo "Total ".Lang::get('of')." ".mb_strtolower(Lang::get('wk_x'));?></th>
 								</tr>								
+							</thead>
+							<tbody>
 								<?php 
 								$weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
 								foreach ($list as $key => $value) 
@@ -81,6 +84,7 @@ use B7KP\Library\Lang;
 								<?php 
 								}
 								?>
+							</tbody>
 							</table>
 						<?php
 						}
