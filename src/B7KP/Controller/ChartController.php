@@ -142,7 +142,7 @@ class ChartController extends Controller
 		$this->isValidType($type, $user);
 		$entity = "B7KP\Entity\\".ucfirst($type)."_charts";
 		$table  = $type."_charts";
-		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." ORDER BY t.playcount DESC LIMIT 0, 100");
+		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." ORDER BY t.playcount DESC, w.week ASC LIMIT 0, 100");
 		$vars = array("user" => $user, "list" => $biggest, "type" => $type);
 		$this->render("bwp.php", $vars);
 	}
@@ -156,11 +156,16 @@ class ChartController extends Controller
 		$this->isValidType($type, $user);
 		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 		$rank = intval($rank) > 1 ? intval($rank) : 1;
+		$limit = substr($type,0,3)."_limit";
+		if($rank > $settings->$limit)
+		{
+			$rank = $settings->$limit;
+		}
 		$table  = $type."_charts";
 		$dao = Dao::getConn();
 		$group = "";
 		if($type != "artist"): $group .= ", t.".$type; endif;
-		$biggest = $dao->run("SELECT t.*, count(w.week) as total FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist".$group." ORDER BY total DESC");
+		$biggest = $dao->run("SELECT t.*, count(w.week) as total FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist".$group." ORDER BY total DESC, w.week ASC");
 		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings);
 		$this->render("mwa.php", $vars);
 	}
@@ -178,6 +183,11 @@ class ChartController extends Controller
 			$this->redirectToRoute("chart_list", array("login" => $user->login));
 		}
 		$rank = intval($rank) > 1 ? intval($rank) : 1;
+		$limit = substr($type,0,3)."_limit";
+		if($rank > $settings->$limit)
+		{
+			$rank = $settings->$limit;
+		}
 		$table  = $type."_charts";
 		$dao = Dao::getConn();
 
