@@ -51,7 +51,6 @@ use B7KP\Library\Lang;
 														</div>
 														<div class="col-md-6 topspace-md text-center">
 															<?php 
-															$showlink = false;
 															if(is_array($value["artist"]) && count($value["artist"]) > 0)
 															{
 																$showlink = true;
@@ -69,14 +68,7 @@ use B7KP\Library\Lang;
 															?>
 														</div>
 														<div class="col-md-2 topspace-md bottomspace-sm text-center">
-														<?php 
-														if($showlink)
-														{
-														?>
 															<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
-														<?php
-														}
-														?>
 														</div>
 													</div>
 												<?php
@@ -115,10 +107,10 @@ use B7KP\Library\Lang;
 														</div>
 														<div class="col-md-6 text-center">
 															<?php 
-															$showlink = false;
+
 															if(is_array($value["music"]) && count($value["music"]) > 0)
 															{
-																$showlink = true;
+
 																$r = array("login" => $user->login, "type" => "music", "week" => $value["week"]);
 																$weeklink = Route::url('weekly_chart', $r);
 																$music = $value["music"][0];
@@ -135,14 +127,7 @@ use B7KP\Library\Lang;
 															?>
 														</div>
 														<div class="col-md-2 topspace-md bottomspace-sm text-center">
-														<?php 
-														if($showlink)
-														{
-														?>
 															<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
-														<?php
-														}
-														?>
 														</div>
 													</div>
 												<?php
@@ -181,10 +166,9 @@ use B7KP\Library\Lang;
 														</div>
 														<div class="col-md-6 text-center">
 															<?php 
-															$showlink = false;
 															if(is_array($value["album"]) && count($value["album"]) > 0)
 															{
-																$showlink = true;
+
 																$r = array("login" => $user->login, "type" => "album", "week" => $value["week"]);
 																$weeklink = Route::url('weekly_chart', $r);
 																$album = $value["album"][0];
@@ -201,14 +185,9 @@ use B7KP\Library\Lang;
 															?>
 														</div>
 														<div class="col-md-2 topspace-md bottomspace-sm text-center">
-														<?php 
-														if($showlink)
-														{
-														?>
+
 															<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
-														<?php
-														}
-														?>
+
 														</div>
 													</div>
 												<?php
