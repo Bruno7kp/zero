@@ -2,6 +2,7 @@
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
 use B7KP\Library\Route;
+use B7KP\Library\Url;
 use B7KP\Library\Lang;
 ?>
 <!doctype html>
@@ -40,7 +41,9 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
+													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/artist/week/";
 													foreach ($weeks as $value) {
+														$weeklink = $wkli.$value["week"];
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -53,9 +56,6 @@ use B7KP\Library\Lang;
 															<?php 
 															if(is_array($value["artist"]) && count($value["artist"]) > 0)
 															{
-																$showlink = true;
-																$r = array("login" => $user->login, "type" => "artist", "week" => $value["week"]);
-																$weeklink = Route::url('weekly_chart', $r);
 																$artist = $value["artist"][0];
 															?>
 															<h4 class="h3 no-margin"><?php echo $artist->artist;?></h4>
@@ -96,7 +96,9 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
+													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
 													foreach ($weeks as $value) {
+														$weeklink = $wkli.$value["week"];
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -110,9 +112,6 @@ use B7KP\Library\Lang;
 
 															if(is_array($value["music"]) && count($value["music"]) > 0)
 															{
-
-																$r = array("login" => $user->login, "type" => "music", "week" => $value["week"]);
-																$weeklink = Route::url('weekly_chart', $r);
 																$music = $value["music"][0];
 															?>
 															<h4 class="no-margin"><?php echo $music->music;?></h4>
@@ -155,7 +154,9 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
+													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
 													foreach ($weeks as $value) {
+														$weeklink = $wkli.$value["week"];
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -166,11 +167,11 @@ use B7KP\Library\Lang;
 														</div>
 														<div class="col-md-6 text-center">
 															<?php 
+
 															if(is_array($value["album"]) && count($value["album"]) > 0)
 															{
 
-																$r = array("login" => $user->login, "type" => "album", "week" => $value["week"]);
-																$weeklink = Route::url('weekly_chart', $r);
+
 																$album = $value["album"][0];
 															?>
 															<h4 class="no-margin"><?php echo $album->album;?></h4>

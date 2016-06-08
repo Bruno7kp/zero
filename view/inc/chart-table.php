@@ -34,7 +34,7 @@ if($show_first_image && count($list)>0)
 	$lfm = new LastFM();
 	if($type == "artist")
 	{
-		$f = $lfm->$get($first->$type, $first->art_mbid);
+		$f = $lfm->$get($first->$type);
 	}
 	else
 	{
@@ -49,7 +49,7 @@ if($show_first_image && count($list)>0)
 		}
 		else
 		{
-			$fa = $lfm->getArtistInfo($f["artist"]["name"], $f["artist"]["mbid"]);
+			$fa = $lfm->getArtistInfo($f["artist"]["name"]);
 			$fimg = $fa["images"]["large"];
 		}
 	}

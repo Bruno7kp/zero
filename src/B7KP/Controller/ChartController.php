@@ -155,6 +155,10 @@ class ChartController extends Controller
 		$user = $this->isValidUser($login);
 		$this->isValidType($type, $user);
 		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		if(!is_object($settings))
+		{
+			$settings = new Settings();
+		}
 		$rank = intval($rank) > 1 ? intval($rank) : 1;
 		$limit = substr($type,0,3)."_limit";
 		if($rank > $settings->$limit)
@@ -182,6 +186,10 @@ class ChartController extends Controller
 		{
 			$this->redirectToRoute("chart_list", array("login" => $user->login));
 		}
+		if(!is_object($settings))
+		{
+			$settings = new Settings();
+		}
 		$rank = intval($rank) > 1 ? intval($rank) : 1;
 		$limit = substr($type,0,3)."_limit";
 		if($rank > $settings->$limit)
@@ -195,6 +203,36 @@ class ChartController extends Controller
 		$biggest = $dao->run("SELECT t.*, count(".$col.") as total, COUNT(DISTINCT ".$col.") AS uniques FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist ORDER BY uniques DESC, total DESC");
 		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings);
 		$this->render("mia.php", $vars);
+	}
+
+	/**
+	* @Route(name=editwkchart|route=/editweek/{id}/{type})
+	*/
+	public function editChart($id, $type)
+	{
+		if($this->isAjaxRequest())
+		{
+			$user = UserSession::getUser($this->factory);
+			$week = $this->factory->findOneBy("B7KP\Entity\Week", $id);
+			$types = array("artist", "music", "album");
+			if(is_object($week) && is_object($user) && $week->iduser == $user->id && in_array($type, $types))
+			{
+				$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+				if(!is_object($settings))
+				{
+					$settings = new Settings();
+				}
+				$this->render("editweek.php", array("week" => $week, "user" => $user, "settings" => $settings));
+			}
+			else
+			{
+				echo false;
+			}
+		}
+		else
+		{
+			$this->redirectToRoute("home");
+		}
 	}
 
 	protected function checkAccess()

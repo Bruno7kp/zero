@@ -23,7 +23,7 @@ use B7KP\Library\Lang;
 							<hr>
 							<h3>To do list</h3>
 							<ul class="list-group">
-								<li class="list-group-item">List of weeks/charts</li>
+								<li class="list-group-item"><s>List of weeks/charts</s></li>
 								<li class="list-group-item">New main bg</li>
 								<li class="list-group-item">Artist page</li>
 								<li class="list-group-item">Music page</li>

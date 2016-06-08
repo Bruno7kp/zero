@@ -9,6 +9,7 @@ function chartinit()
 	pop();
 	updateUniqueWeek();
 	switchToSimpleCR();
+	editWeek();
 }
 
 function getChartMsg(msgid)
@@ -87,6 +88,48 @@ function updateUniqueWeek()
 		.always(function() {
 			console.log("complete");
 		});
+	}
+}
+
+function editWeek()
+{
+	editBtn = $(".editwk");
+	editBtn.click(function(event) {
+		id = $(this).attr('data-id');
+		type = $(this).attr('data-type');
+
+		showModal(id, type);
+	});
+
+	function showModal(id, type)
+	{
+		$.ajax({
+			url: baseUrl + '/editweek/'+id+'/'+type,
+			type: 'POST',
+			dataType: 'html',
+		})
+		.done(function(data) {
+			console.log("success");
+			console.log(data);
+			$.magnificPopup.open({
+				  items: {
+				      src: $(data),
+				      type: 'inline'
+				  }
+			});
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+		});
+		
+	}
+
+	function editWeek()
+	{
+
 	}
 }
 
