@@ -36,7 +36,8 @@ class ErrorController extends Controller
 	public function registerNotFoundAction($entity)
 	{
 		$this->checkAccess();
-		if(class_exists($entity))
+		$except = array("artist", "music", "album", "user");
+		if(class_exists($entity) || in_array($entity, $except))
 		{
 			$this->render("error/404.php", array("message" => ucfirst($entity)." not found"));
 		}

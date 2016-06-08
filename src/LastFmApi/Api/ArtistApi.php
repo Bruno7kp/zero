@@ -166,6 +166,9 @@ class ArtistApi extends BaseApi
         $vars = array_merge($vars, $methodVars);
 
         if ($call = $this->apiGetCall($vars)) {
+            if(isset($call->artist))
+            {
+
             $a = (array)$call->artist;
             $image[0] = (array) $call->artist->image[0];
             $image[1] = (array) $call->artist->image[1];
@@ -183,7 +186,7 @@ class ArtistApi extends BaseApi
             $info['streamable'] = (string) $call->artist->streamable;
             $info['stats']['listeners'] = (string) $call->artist->stats->listeners;
             $info['stats']['playcount'] = (string) $call->artist->stats->playcount;
-            $info['userplaycount'] = isset($call->album->userplaycount) ? (string) $call->album->userplaycount : 0;
+            $info['userplaycount'] = isset($call->artist->stats->userplaycount) ? (string) $call->artist->stats->userplaycount : 0;
             $i = 0;
             foreach ($call->artist->similar->artist as $artist) {
                 $image[0] = (array) $artist->image[0];
@@ -216,6 +219,11 @@ class ArtistApi extends BaseApi
             //$info['bio']['placeformed'] = (string) $call->artist->bio->placeformed;
             //$info['bio']['yearformed'] = (string) $call->artist->bio->yearformed;
 
+            }
+            else
+            {
+                $info = false;
+            }
             return $info;
         } else {
             return false;
