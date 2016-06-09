@@ -2,8 +2,10 @@
 namespace B7KP\Utils;
 
 use B7KP\Utils\Constants as C;
+use B7KP\Utils\Functions as F;
 use B7KP\Library\Url; 
 use B7KP\Library\Lang; 
+use B7KP\Library\Route; 
 
 class Snippets
 {
@@ -18,6 +20,7 @@ class Snippets
 			$album = "<small class='text-muted'>".$album."</small>
 				<br>";
 		}
+		
 		return "
 		<div class='row bottomspace-xs'>
 			<div class='col-xs-3'>
@@ -44,6 +47,7 @@ class Snippets
 	static function topActListRow($name, $url, $playcount, $img, $biggest)
 	{
 		$perc = $playcount/$biggest*100;
+		$url = Route::url("artist", array("name" => F::fixLFM($name)));
 		return "
 		<div class='row'>
 			<div class='col-xs-3'>

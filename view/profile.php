@@ -14,7 +14,8 @@ use B7KP\Library\Lang;
 					<a href='http://last.fm/user/{$user->login}' class='white-hover' title='View Last.fm profile' target='_blank'>
 						<i class='fa fa-lastfm'></i>
 					</a>
-				</h3>";
+				</h3>
+				<a class='btn btn-custom btn-sm' href='".Route::url("chart_list", array('login' => $user->login))."'><i class='ti-stats-up'></i> Charts</a>";
 	$blocktitle = "<img class='img-circle' src='".$lfm_image."'>";
 ?>
 	<body class="inner-page">

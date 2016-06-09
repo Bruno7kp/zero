@@ -17,6 +17,13 @@ class Functions
 	    return $num;
 	}
 
+	public function fixLFM($name)
+	{
+		$name = str_replace("+", "%252b", $name);
+		$name = str_replace(" ", "+", $name);
+		return $name;
+	}
+
 	static function removeEmpty($array)
 	{
 		$final = array();

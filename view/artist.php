@@ -1,6 +1,8 @@
 <?php
+use B7KP\Core\App;
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions as F;
 use B7KP\Library\Route;
 use B7KP\Library\Lang;
 ?>
@@ -15,144 +17,159 @@ use B7KP\Library\Lang;
 						<i class='fa fa-lastfm'></i>
 					</a>
 				</h3>";
-	$blocktitle = "<img  height='174' class='img-circle' src='".$lfm_image."'>";
+	if(is_object($user))
+	{
+		$blockalt .= "<a href='#!' class='btn btn-sm btn-custom'>".$userplaycount." ".Lang::get("play_x")."</a>";
+	}
+	$blocktitle = "<img height='174' class='img-circle' src='".$lfm_image."'>";
 ?>
 	<body class="inner-page">
 		<?php $this->render("ext/menu.php");?>
-		<?php $this->render("ext/header.php", array("title" => $blocktitle, "subtitle" => "", "image" => $lfm_image, "alttitle" => $blockalt));?>
+		<?php $this->render("ext/header.php", array("title" => $blocktitle, "subtitle" => "", "image" => $lfm_bg, "alttitle" => $blockalt));?>
 		<div id="fh5co-main">
 			<section>
 				<div class="container">
-					<div class="row bottomspace-md">
+					<div class="row">
 						<div class="col-xs-12">
 							<div class="">
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('reg_alt');?></small>
+									<small class="text-muted"><?php echo Lang::get('listener_x');?> (Last.fm)</small>
 									<br/>
 									<strong>
-									<i class="fa fa-calendar fa-fw ico-color"></i>
-										<?php echo $lfm_register;?>
+									<i class="fa fa-lastfm fa-fw ico-color"></i>
+										<?php echo number_format($listeners);?>
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('country');?></small>
+									<small class="text-muted"><?php echo Lang::get('play_x');?> (Last.fm)</small>
 									<br/>
 									<strong>
-									<i class="fa fa-flag-o fa-fw ico-color"></i>
-									<?php echo $lfm_country;?>
+									<i class="fa fa-lastfm fa-fw ico-color"></i>
+									<?php echo number_format($playcount);?>
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('scr');?></small>
+									<small class="text-muted"><?php echo Lang::get('entries');?> <a href="#notes">¹</a></small>
 									<br/>
 									<strong>
-									<i class="ti-control-play ico-color"></i>
-									<?php echo number_format($lfm_playcount);?>
+									<i class="ti-medall-alt ico-color"></i>
+									<?php echo number_format($totalcharts);?>
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('wk_x');?></small>
+									<small class="text-muted">Charts <?php echo Lang::get('in');?> #1 <a href="#notes">²</a></small>
 									<br/>
 									<strong>
-									<i class="fa fa-calendar-check-o fa-fw ico-color"></i>
-									<?php echo count($weeks);?>
+									<i class="ti-medall-alt ico-color"></i>
+									<?php echo number_format($totalusers);?>
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('scr');?>/<?php echo Lang::get('wk');?></small>
+									<small class="text-muted"><?php echo Lang::get('wk_x');?> <?php echo Lang::get('in');?> #1 <a href="#notes">³</a></small>
 									<br/>
 									<strong>
 									<i class="ti-headphone ico-color"></i>
-									<?php echo $average;?>
+									<?php echo number_format($totaln1);?>
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted">Top <?php echo Lang::get('art');?></small>
+									<small class="text-muted">#1 <?php echo Lang::get('user');?> <a href="#notes">*</a></small>
 									<br/>
 									<strong>
-									<i class="ti-microphone ico-color"></i>
-									<?php echo $topartist["name"];?>
+									<i class="ti-headphone ico-color"></i>
+									<?php echo isset($topusers[0]["user"]) ? "<a href='".Route::url("profile", array('login' => $topusers[0]["user"]->login))."'>".$topusers[0]["user"]->login."</a>" : "N/A"; ?>
 									</strong>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-8 col-sm-7 col-xs-12">
-							<?php
-							$outofdateweeks = $weekstodate - count($weeks);
-							if($user->checkSelfPermission($this->factory))
-							{
-								if(count($weekstodate) == 0)
-								{
-									echo "<div class='alert alert-info'>".Lang::get('new_on')."</div>";
-								}
-								elseif($outofdateweeks > 0)
-								{
-									echo "<div class='alert alert-info'>".Lang::get('hello').", ".Lang::get('u')." ".Lang::get('hv')." ".$outofdateweeks." ".Lang::get('wk')."(s) ".Lang::get('desatt').", <a href='".Route::url("update")."'>".Lang::get('update')." ".Lang::get('now')."?</a></div>";
-								}
-							}
-							if(count($weeks) <= 0)
-							{
-								echo "<div class='row'><div class='col-md-12'>".Lang::get('no_data')." <i class='fa fa-frown-o'></i></div></div>";
-							}
-							else
-							{
-								$weeks = $weeks[0];
-								$charts = new Charts($this->factory, $user);
-								echo $charts->getHomeWeeklyChartsAlt($weeks);
-							}
-							?>
+						<div class="col-md-8 col-sm-8">
+							<!-- Artist -->
+							<!-- Album -->
+							<!-- Tracks -->
 						</div>
-						<div class="col-md-4 col-sm-5 col-xs-12">
-							<div id="fh5co-tab-feature" class="fh5co-tab" style="display: block; width: 100%; margin: 0px;">
-								<ul class="resp-tabs-list hor_1 hidden-xs">
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab" style=""><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab" style=""><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></li>
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab" style=""><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></span></li>
-								</ul>
-								<div class="resp-tabs-container hor_1 divider-lr divider-bottom">
-									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-0" style="">
-										<div class="row">
-											<div class="col-md-12">
-												<h2 class="h3">Top <?php echo Lang::get('art_x');?></h2>
-											</div>
-											<div class="col-md-12 top-artists">
-												<?php echo Snippets::loader(50);?>
-											</div>
-										</div>
-									</div>
-									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-1">
-										<div class="row">
-											<div class="col-md-12">
-												<h2 class="h3">Top <?php echo Lang::get('mus_x');?></h2>
-											</div>
-											<div class="col-md-12 top-musics">
-												<?php echo Snippets::loader(50);?>
-											</div>
-										</div>
-									</div>
-									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-2">
-										<div class="row">
-											<div class="col-md-12">
-												<h2 class="h3">Top <?php echo Lang::get('alb_x');?></h2>
-											</div>
-											<div class="col-md-12 top-albums">
-												<?php echo Snippets::loader(50);?>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>	
+						<div class="col-md-4 col-sm-4">
+							<!-- Users -->
 							<div class="row">
-								<div class="col-xs-12">
-									<div class="col-xs-12 recent divider topspace-md">
-										<?php echo Snippets::loader(50);?>
-									</div>
+								<div class="col-md-12 topspace-md">
+								<?php 
+								if(count($topusers) > 0)
+								{
+								?>
+								<div class="divider">
+								<h2 class='h3 text-center topspace-sm'>Top <?php echo Lang::get('user_x');?></h2>
+										<?php 
+										foreach ($topusers as $key => $value) {
+										?>
+										<div class="row bottomspace-md pd-5">
+											<div class="col-xs-4">
+												<img class="img-circle img-responsive" src="<?php echo $value["avatar"];?>">
+											</div>
+											<div class="col-xs-8 topspace-xl">
+												<h3>
+													<a href="<?php echo Route::url("profile", array("login" => $value["user"]->login));?>"><?php echo $value["user"]->login;?></a>
+													<br>
+													<small class="text-muted"><?php echo $value["weeks"]." ".Lang::get("wk_x")." ".Lang::get("at")." #1";?></small>
+												</h3>
+											</div>
+										</div>
+										<?php 
+										} 
+										?>
+								</div>
+								<?php
+								}
+								?>								
+								</div>
+							</div>
+							<!-- Similar -->
+							<div class="row">
+								<div class="col-md-12">
+									<?php 
+									if(count($similar) > 0)
+									{
+									?>	
+										<div class="divider topspace-md">
+											
+										<h2 class='h3 text-center topspace-sm'>Similar</h2>
+										<?php 
+										foreach ($similar as $key => $value) {
+										?>
+										<div class="row bottomspace-md pd-5">
+											<div class="col-xs-4">
+												<img class="img-circle img-responsive" src="<?php echo $value["image"]["large"];?>">
+											</div>
+											<div class="col-xs-8 topspace-xxl">
+												<h3>
+													<a href="<?php echo Route::url("artist", array("name" => F::fixLFM($value["name"])));?>"><?php echo $value["name"];?></a>
+												</h3>
+											</div>
+										</div>
+										<?php 
+										} 
+										?>
+										</div>
+									<?php
+									}
+									?>
 								</div>
 							</div>
 						</div>
-						<div class="fh5co-spacer fh5co-spacer-md"></div>	
+
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<small class="text-muted" id="notes">
+								¹ = <small>Número de usuários que colocaram este artista em algum de seus charts semanais</small> 
+								<br/>
+								² = <small>Números de usuário que colocaram este artista em #1 em algum de seus charts semanais</small>  
+								<br/>
+								³ = <small>Soma de semanas em #1 entre todos os charts/usuários</small>  
+								<br/>
+								* = <small>Usuário com maior número de semanas em #1 deste artista</small>
+							</small>
+						</div>
 					</div>
 				</div>
 			</section>

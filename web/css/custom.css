@@ -106,6 +106,10 @@
 	margin-top: 25px;
 }
 
+.topspace-xxl{
+	margin-top: 35px;
+}
+
 .topspace-big{
 	margin-top: 50px;
 }
@@ -114,7 +118,9 @@
 	margin-top: 100px;
 }
 
-
+.pd-5{
+	padding-left: 5px;
+}
 /* ICONS SIZES */
 .font-1{
 	font-size: 1em;

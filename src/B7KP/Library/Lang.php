@@ -254,6 +254,19 @@ class Lang
 		$messages["play_x"][self::PT_BR] = "Reproduções";
 		$messages["play_x"][self::EN_US] = "Plays";
 		$messages["scr"][self::PT_BR] = "Scrobbles";
+		$messages["listener"][self::PT_BR] = "Ouvinte";
+		$messages["listener"][self::EN_US] = "Listener";
+		$messages["listener_x"][self::PT_BR] = "Ouvintes";
+		$messages["listener_x"][self::EN_US] = "Listeners";
+
+		$messages["entries"][self::PT_BR] = "Entradas em charts";
+		$messages["entries"][self::EN_US] = "Entries in charts";
+
+		$messages["user"][self::PT_BR] = "Usuário";
+		$messages["user"][self::EN_US] = "User";
+
+		$messages["user_x"][self::PT_BR] = "Usuários";
+		$messages["user_x"][self::EN_US] = "Users";
 
 		// TEXTOS/FRASESComplete the fields below and done.
 		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu login na last.fm e a senha que colocar logo abaixo. Ñós <b>não</b> recomendamos usar a mesma senha da sua conta na Last.fm.";
@@ -371,6 +384,12 @@ class Lang
 
 		$messages["the"][self::PT_BR] = "O";
 		$messages["the"][self::EN_US] = "The";
+
+		$messages["in"][self::PT_BR] = "em";
+		$messages["in"][self::EN_US] = "in";
+
+		$messages["at"][self::PT_BR] = "no";
+		$messages["at"][self::EN_US] = "at";
 
 		$messages["in_use"][self::PT_BR] = "já está em uso";
 		$messages["in_use"][self::EN_US] = "is already in use";
