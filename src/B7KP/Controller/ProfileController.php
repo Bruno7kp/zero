@@ -173,7 +173,7 @@ class ProfileController extends Controller
 				$html = "";
 				foreach ($lfm_topmus as $mus) 
 				{
-					$html .= Snippets::topAlbListRow($mus['name'], $mus['url'], $mus['playcount'], $mus['images']['medium'], $lfm_topmus[0]['playcount'], $mus['artist']['name'], $mus['artist']['url']);
+					$html .= Snippets::topMusListRow($mus['name'], $mus['url'], $mus['playcount'], $mus['images']['medium'], $lfm_topmus[0]['playcount'], $mus['artist']['name'], $mus['artist']['url'], null, null);
 				}
 				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;

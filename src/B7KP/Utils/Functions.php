@@ -21,7 +21,8 @@ class Functions
 	{
 		$name = str_replace("+", "%252b", $name);
 		$name = str_replace(" ", "+", $name);
-		return $name;
+		//var_dump($name);
+		return ($name);
 	}
 
 	static function removeEmpty($array)

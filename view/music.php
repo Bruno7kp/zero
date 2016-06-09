@@ -9,13 +9,15 @@ use B7KP\Library\Lang;
 <!doctype html>
 <html>
 <?php
-	$head = array("title" => "{$name}");
+	$head = array("title" => "{$name} - {$artist}");
 	$this->render("ext/head.php", $head);
 	$blockalt = "<h3>
 					<a class='white' href=''>".$name."</a> 
 					<a href='{$lfmurl}' class='white-hover' title='View Last.fm page' target='_blank'>
 						<i class='fa fa-lastfm'></i>
 					</a>
+					<br>
+					<span><a href={$artisturl} class=white>{$artist}</a></span>
 				</h3>";
 	if(is_object($user))
 	{
@@ -124,50 +126,19 @@ use B7KP\Library\Lang;
 								</div>
 							</div>
 							<!-- Similar -->
-							<div class="row">
-								<div class="col-md-12">
-									<?php 
-									if(count($similar) > 0)
-									{
-									?>	
-										<div class="divider topspace-md">
-											
-										<h2 class='h3 text-center topspace-sm'>Similar</h2>
-										<?php 
-										foreach ($similar as $key => $value) {
-										?>
-										<div class="row bottomspace-md pd-5">
-											<div class="col-xs-4">
-												<img class="img-circle img-responsive" src="<?php echo $value["image"]["large"];?>">
-											</div>
-											<div class="col-xs-8 topspace-xxl">
-												<h3>
-													<a href="<?php echo Route::url("artist", array("name" => F::fixLFM($value["name"])));?>"><?php echo $value["name"];?></a>
-												</h3>
-											</div>
-										</div>
-										<?php 
-										} 
-										?>
-										</div>
-									<?php
-									}
-									?>
-								</div>
-							</div>
 						</div>
 
 					</div>
 					<div class="row">
 						<div class="col-xs-12">
 							<small class="text-muted" id="notes">
-								¹ = <small>Número de usuários que colocaram este artista em algum de seus charts semanais</small> 
+								¹ = <small>Número de usuários que colocaram esta música em algum de seus charts semanais</small> 
 								<br/>
-								² = <small>Números de usuário que colocaram este artista em #1 em algum de seus charts semanais</small>  
+								² = <small>Números de usuário que colocaram esta música em #1 em algum de seus charts semanais</small>  
 								<br/>
 								³ = <small>Soma de semanas em #1 entre todos os charts/usuários</small>  
 								<br/>
-								* = <small>Usuário com maior número de semanas em #1 deste artista</small>
+								* = <small>Usuário com maior número de semanas em #1 desta música</small>
 							</small>
 						</div>
 					</div>

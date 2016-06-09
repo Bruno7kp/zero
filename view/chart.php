@@ -21,7 +21,7 @@ use B7KP\Utils\UserSession;
 ?>
 	<body class="inner-min">
 		<?php $this->render("ext/menu.php");?>
-		<?php $this->render("ext/header.php");?>
+		<?php $this->render("ext/header.php", array("image" => $lfm_bg));?>
 		<div id="fh5co-main">
 			<section>
 				<div class="container">

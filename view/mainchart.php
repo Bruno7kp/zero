@@ -13,13 +13,55 @@ use B7KP\Library\Lang;
 ?>
 	<body class="inner-min">
 		<?php $this->render("ext/menu.php");?>
-		<?php $this->render("ext/header.php");?>
+		<?php $this->render("ext/header.php", array("image" => $lfm_bg));?>
 		<div id="fh5co-main">
 			<section>
 				<div class="container">
-					<div class="row bottomspace-md text-center">
+					<div class="row bottomspace-md">
 						<div class="col-xs-12">
-							<h1 class="h3"><?php echo $user->login;?> Charts</h2>
+							<div class="row">
+								<ul class="nav nav-pills">
+								  	<li role="presentation">
+								  		<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3">
+											<img height="40" class="img-circle" src="<?php echo $lfm_image;?>" alt="<?php echo $user->login;?>">
+								  		 	<?php echo $user->login;?>
+								  		</a>
+								  	</li>
+								  	<li role="presentation">
+										<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3">
+										<i class="ti-stats-up"></i> 
+										Charts
+										</a>
+								  	</li>
+								  	<li role="presentation">
+										<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3">
+											<i class="ti-user"></i>
+											<?php echo Lang::get('art_x');?>
+										</a>
+								  	</li>
+								</ul>
+								<div class="col-xs-12 col-md-3">
+									<a href="" class="h3"></a>
+									
+								</div>
+								<div class="col-xs-6 col-md-2">
+									
+								</div>
+								<div class="col-xs-6 col-md-2">
+									
+								</div>
+								<div class="col-xs-6 col-md-2">
+									<i class="icon-vynil"></i>
+									<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3"><?php echo Lang::get('alb_x');?></a>
+									
+								</div>
+								<div class="col-xs-6 col-md-2">
+									<i class="ti-music"></i>
+									<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3"><?php echo Lang::get('mus_x');?></a>
+									
+								</div>
+							</div>
+							<hr>
 						</div>
 					</div>
 					<div class="row">

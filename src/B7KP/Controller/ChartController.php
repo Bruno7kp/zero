@@ -27,6 +27,13 @@ class ChartController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
+			$lfm 	= new LastFm();
+			$last 	= $lfm->setUser($user->login)->getUserInfo();
+			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+			$bgimage = false;
+			if(isset($acts[0])): 
+				$bgimage = $acts[0]["images"]["mega"];
+			endif;
 			$numberones = array();
 			$cond = array("iduser" => $user->id);
 			$weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC", "0, 5");
@@ -48,7 +55,9 @@ class ChartController extends Controller
 			$var = array
 					(
 						"weeks" => $numberones,
-						"user" => $user
+						"user" => $user,
+						"lfm_bg" => $bgimage,
+						"lfm_image" => str_replace("34s", "avatar170s", $last["image"])
 					);
 			$this->render("mainchart.php", $var);
 		}
@@ -66,6 +75,7 @@ class ChartController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
+			$bgimage = $this->getUserBg($user);
 			$numberones = array();
 			$cond = array("iduser" => $user->id);
 			$weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC");
@@ -87,7 +97,8 @@ class ChartController extends Controller
 			$var = array
 					(
 						"weeks" => $numberones,
-						"user" => $user
+						"user" => $user,
+						"lfm_bg" => $bgimage
 					);
 			$this->render("chartlist.php", $var);
 		}
@@ -108,18 +119,27 @@ class ChartController extends Controller
 		{
 			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$week = $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id, "week" => $week), "week DESC");
+			$bgimage = $this->getUserBg($user);
 			if(is_array($week) && count($week) > 0)
 			{
 				$limit = 10;
 				if($settings instanceof Settings)
 				{
+
 					$prop = substr($type, 0, 3) . "_limit";
 					$limit = $settings->$prop;
 				}
 				$week = $week[0];
 				$chart = new Charts($this->factory, $user);
 				$list = $chart->getWeeklyCharts($week, $type, $limit, true, $settings);
-				$vars = array('user' => $user, 'list' => $list, 'type' => $type, 'week' => $week);
+				$vars = array
+							(
+								'user' => $user, 
+								'list' => $list, 
+								'type' => $type, 
+								'week' => $week,
+								"lfm_bg" => $bgimage
+								);
 				$this->render("chart.php", $vars);
 			}
 			else
@@ -140,10 +160,11 @@ class ChartController extends Controller
 	{
 		$user = $this->isValidUser($login);
 		$this->isValidType($type, $user);
+		$bgimage = $this->getUserBg($user);
 		$entity = "B7KP\Entity\\".ucfirst($type)."_charts";
 		$table  = $type."_charts";
 		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." ORDER BY t.playcount DESC, w.week ASC LIMIT 0, 100");
-		$vars = array("user" => $user, "list" => $biggest, "type" => $type);
+		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "lfm_bg" => $bgimage);
 		$this->render("bwp.php", $vars);
 	}
 
@@ -154,6 +175,7 @@ class ChartController extends Controller
 	{
 		$user = $this->isValidUser($login);
 		$this->isValidType($type, $user);
+		$bgimage = $this->getUserBg($user);
 		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 		if(!is_object($settings))
 		{
@@ -170,7 +192,7 @@ class ChartController extends Controller
 		$group = "";
 		if($type != "artist"): $group .= ", t.".$type; endif;
 		$biggest = $dao->run("SELECT t.*, count(w.week) as total FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist".$group." ORDER BY total DESC, w.week ASC");
-		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings);
+		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings, "lfm_bg" => $bgimage);
 		$this->render("mwa.php", $vars);
 	}
 
@@ -181,6 +203,7 @@ class ChartController extends Controller
 	{
 		$user = $this->isValidUser($login);
 		$this->isValidType($type, $user);
+		$bgimage = $this->getUserBg($user);
 		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 		if($type == "artist")
 		{
@@ -201,7 +224,7 @@ class ChartController extends Controller
 
 		$col = "t.".$type;
 		$biggest = $dao->run("SELECT t.*, count(".$col.") as total, COUNT(DISTINCT ".$col.") AS uniques FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist ORDER BY uniques DESC, total DESC");
-		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings);
+		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings, "lfm_bg" => $bgimage);
 		$this->render("mia.php", $vars);
 	}
 
@@ -249,6 +272,19 @@ class ChartController extends Controller
 		{
 			$this->redirectToRoute("chart_list", array("login" => $user->login));
 		}
+	}
+
+	protected function getUserBg($user)
+	{
+		$lfm 	= new LastFm();
+		$last 	= $lfm->setUser($user->login)->getUserInfo();
+		$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+		$bgimage = false;
+		if(isset($acts[0])): 
+			$bgimage = $acts[0]["images"]["mega"];
+		endif;
+
+		return $bgimage;
 	}
 
 	protected function isValidUser($login)

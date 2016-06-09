@@ -27,7 +27,7 @@ class Snippets
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
 			</div>
 			<div class='col-xs-9'>
-				<a href='{$url}' target='_blank'>{$name}</a>
+				<a href={$url} target='_blank'>{$name}</a>
 				<br>
 				".$album."
 				<small>{$artist}</small>
@@ -54,7 +54,7 @@ class Snippets
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
 			</div>
 			<div class='col-xs-9'>
-				<a href='{$url}' target='_blank'>{$name}</a>
+				<a href={$url} target='_blank'>{$name}</a>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
@@ -71,15 +71,16 @@ class Snippets
 	static function topAlbListRow($name, $url, $playcount, $img, $biggest, $artist, $arturl)
 	{
 		$perc = $playcount/$biggest*100;
+		$url = Route::url("album", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist)));
 		return "
 		<div class='row'>
 			<div class='col-xs-3'>
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
 			</div>
 			<div class='col-xs-9'>
-				<a href='{$url}' target='_blank'>{$name}</a> 
+				<a href={$url} target='_blank'>{$name}</a> 
 				<br>
-				<small class='text-muted'>".Lang::get('by')." <a href='{$arturl}' target='_blank'>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href={$arturl} target='_blank'>{$artist}</a></small>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
@@ -96,15 +97,17 @@ class Snippets
 	static function topMusListRow($name, $url, $playcount, $img, $biggest, $artist, $arturl, $album, $alburl)
 	{
 		$perc = $playcount/$biggest*100;
+		$url = Route::url("music", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist)));
+		$arturl = Route::url("artist", array("name" => F::fixLFM($name)));
 		return "
 		<div class='row'>
 			<div class='col-xs-3'>
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
 			</div>
 			<div class='col-xs-9'>
-				<a href='{$url}' target='_blank'>{$name}</a> 
+				<a href=".$url." target='_blank'>{$name}</a> 
 				<br>
-				<small class='text-muted'>".Lang::get('by')." <a href='{$arturl}' target='_blank'>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href={$arturl} target='_blank'>{$artist}</a></small>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>

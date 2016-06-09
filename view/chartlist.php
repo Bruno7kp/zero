@@ -13,7 +13,7 @@ use B7KP\Library\Lang;
 ?>
 	<body class="inner-min">
 		<?php $this->render("ext/menu.php");?>
-		<?php $this->render("ext/header.php");?>
+		<?php $this->render("ext/header.php", array("image" => $lfm_bg));?>
 		<div id="fh5co-main">
 			<section>
 				<div class="container">
