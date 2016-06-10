@@ -15,7 +15,7 @@ use B7KP\Library\Lang;
 						<i class='fa fa-lastfm'></i>
 					</a>
 				</h3>
-				<a class='btn btn-custom btn-sm' href='".Route::url("chart_list", array('login' => $user->login))."'><i class='ti-stats-up'></i> Charts</a>";
+				";
 	$blocktitle = "<img class='img-circle' src='".$lfm_image."'>";
 ?>
 	<body class="inner-page">
@@ -26,56 +26,46 @@ use B7KP\Library\Lang;
 				<div class="container">
 					<div class="row bottomspace-md">
 						<div class="col-xs-12">
-							<div class="">
-								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('reg_alt');?></small>
-									<br/>
-									<strong>
-									<i class="fa fa-calendar fa-fw ico-color"></i>
-										<?php echo $lfm_register;?>
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('country');?></small>
-									<br/>
-									<strong>
-									<i class="fa fa-flag-o fa-fw ico-color"></i>
-									<?php echo $lfm_country;?>
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('scr');?></small>
-									<br/>
-									<strong>
-									<i class="ti-control-play ico-color"></i>
-									<?php echo number_format($lfm_playcount);?>
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('wk_x');?></small>
-									<br/>
-									<strong>
-									<i class="fa fa-calendar-check-o fa-fw ico-color"></i>
-									<?php echo count($weeks);?>
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted"><?php echo Lang::get('scr');?>/<?php echo Lang::get('wk');?></small>
-									<br/>
-									<strong>
-									<i class="ti-headphone ico-color"></i>
-									<?php echo $average;?>
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-4 col-xs-6 text-center divider">
-									<small class="text-muted">Top <?php echo Lang::get('art');?></small>
-									<br/>
-									<strong>
-									<i class="ti-microphone ico-color"></i>
-									<?php echo $topartist["name"];?>
-									</strong>
-								</div>
-							</div>
+							<?php 
+							$this->render("inc/profile-menu.php", array('user' => $user, 'usericon' => $lfm_image));
+							?>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+							<small class="text-muted"><?php echo Lang::get('reg_alt');?></small>
+							<br/>
+							<strong>
+							<i class="fa fa-calendar fa-fw ico-color"></i>
+								<?php echo $lfm_register;?>
+							</strong>
+						</div>
+						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+							<small class="text-muted"><?php echo Lang::get('scr');?></small>
+							<br/>
+							<strong>
+							<i class="ti-control-play ico-color"></i>
+							<?php echo number_format($lfm_playcount);?>
+							</strong>
+						</div>
+						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+							<small class="text-muted"><?php echo Lang::get('wk_x');?></small>
+							<br/>
+							<strong>
+							<i class="fa fa-calendar-check-o fa-fw ico-color"></i>
+							<?php echo count($weeks);?>
+							</strong>
+						</div>
+						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+							<small class="text-muted"><?php echo Lang::get('scr');?>/<?php echo Lang::get('wk');?></small>
+							<br/>
+							<strong>
+							<i class="ti-headphone ico-color"></i>
+							<?php echo $average;?>
+							</strong>
+						</div>
+						<div class="col-xs-12 bottomspace-md">
+							<hr>
 						</div>
 					</div>
 					<div class="row">
@@ -95,7 +85,7 @@ use B7KP\Library\Lang;
 							}
 							if(count($weeks) <= 0)
 							{
-								echo "<div class='row'><div class='col-md-12'>".Lang::get('no_data')." <i class='fa fa-frown-o'></i></div></div>";
+								echo "<div class='alert alert-warning'>".Lang::get('no_data')."</div>";
 							}
 							else
 							{

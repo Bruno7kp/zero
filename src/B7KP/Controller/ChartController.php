@@ -96,9 +96,10 @@ class ChartController extends Controller
 			}
 			$var = array
 					(
-						"weeks" => $numberones,
-						"user" => $user,
-						"lfm_bg" => $bgimage
+						"weeks" 	=> $numberones,
+						"user" 		=> $user,
+						"lfm_bg" 	=> $bgimage,
+						"lfm_image" => $this->getUserBg($user, true)
 					);
 			$this->render("chartlist.php", $var);
 		}
@@ -134,11 +135,12 @@ class ChartController extends Controller
 				$list = $chart->getWeeklyCharts($week, $type, $limit, true, $settings);
 				$vars = array
 							(
-								'user' => $user, 
-								'list' => $list, 
-								'type' => $type, 
-								'week' => $week,
-								"lfm_bg" => $bgimage
+								'user' 		=> $user, 
+								'list' 		=> $list, 
+								'type' 		=> $type, 
+								'week' 		=> $week,
+								"lfm_bg" 	=> $bgimage,
+								"lfm_image" => $this->getUserBg($user, true)
 								);
 				$this->render("chart.php", $vars);
 			}
@@ -164,7 +166,14 @@ class ChartController extends Controller
 		$entity = "B7KP\Entity\\".ucfirst($type)."_charts";
 		$table  = $type."_charts";
 		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." ORDER BY t.playcount DESC, w.week ASC LIMIT 0, 100");
-		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "lfm_bg" => $bgimage);
+		$vars = array
+					(
+						"user" 		=> $user, 
+						"list" 		=> $biggest, 
+						"type" 		=> $type, 
+						"lfm_bg" 	=> $bgimage,
+						"lfm_image" => $this->getUserBg($user, true)
+					);
 		$this->render("bwp.php", $vars);
 	}
 
@@ -192,7 +201,16 @@ class ChartController extends Controller
 		$group = "";
 		if($type != "artist"): $group .= ", t.".$type; endif;
 		$biggest = $dao->run("SELECT t.*, count(w.week) as total FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist".$group." ORDER BY total DESC, w.week ASC");
-		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings, "lfm_bg" => $bgimage);
+		$vars = array
+					(
+						"user" 		=> $user, 
+						"list" 		=> $biggest, 
+						"type" 		=> $type, 
+						"rank" 		=> $rank, 
+						"settings" 	=> $settings, 
+						"lfm_bg" 	=> $bgimage,
+						"lfm_image" => $this->getUserBg($user, true)
+					);
 		$this->render("mwa.php", $vars);
 	}
 
@@ -224,7 +242,16 @@ class ChartController extends Controller
 
 		$col = "t.".$type;
 		$biggest = $dao->run("SELECT t.*, count(".$col.") as total, COUNT(DISTINCT ".$col.") AS uniques FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank <= ".$rank." GROUP BY t.artist ORDER BY uniques DESC, total DESC");
-		$vars = array("user" => $user, "list" => $biggest, "type" => $type, "rank" => $rank, "settings" => $settings, "lfm_bg" => $bgimage);
+		$vars = array
+					(
+						"user" 		=> $user, 
+						"list" 		=> $biggest, 
+						"type" 		=> $type, 
+						"rank" 		=> $rank, 
+						"settings" 	=> $settings, 
+						"lfm_bg" 	=> $bgimage,
+						"lfm_image" => $this->getUserBg($user, true)
+					);
 		$this->render("mia.php", $vars);
 	}
 
@@ -274,15 +301,22 @@ class ChartController extends Controller
 		}
 	}
 
-	protected function getUserBg($user)
+	protected function getUserBg($user, $avatar = false)
 	{
 		$lfm 	= new LastFm();
 		$last 	= $lfm->setUser($user->login)->getUserInfo();
-		$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
-		$bgimage = false;
-		if(isset($acts[0])): 
-			$bgimage = $acts[0]["images"]["mega"];
-		endif;
+		if($avatar)
+		{
+			$bgimage = str_replace("34s", "avatar170s", $last["image"]);
+		}
+		else
+		{
+			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+			$bgimage = false;
+			if(isset($acts[0])): 
+				$bgimage = $acts[0]["images"]["mega"];
+			endif;
+		}
 
 		return $bgimage;
 	}

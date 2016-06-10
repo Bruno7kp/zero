@@ -19,49 +19,9 @@ use B7KP\Library\Lang;
 				<div class="container">
 					<div class="row bottomspace-md">
 						<div class="col-xs-12">
-							<div class="row">
-								<ul class="nav nav-pills">
-								  	<li role="presentation">
-								  		<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3">
-											<img height="40" class="img-circle" src="<?php echo $lfm_image;?>" alt="<?php echo $user->login;?>">
-								  		 	<?php echo $user->login;?>
-								  		</a>
-								  	</li>
-								  	<li role="presentation">
-										<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3">
-										<i class="ti-stats-up"></i> 
-										Charts
-										</a>
-								  	</li>
-								  	<li role="presentation">
-										<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3">
-											<i class="ti-user"></i>
-											<?php echo Lang::get('art_x');?>
-										</a>
-								  	</li>
-								</ul>
-								<div class="col-xs-12 col-md-3">
-									<a href="" class="h3"></a>
-									
-								</div>
-								<div class="col-xs-6 col-md-2">
-									
-								</div>
-								<div class="col-xs-6 col-md-2">
-									
-								</div>
-								<div class="col-xs-6 col-md-2">
-									<i class="icon-vynil"></i>
-									<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3"><?php echo Lang::get('alb_x');?></a>
-									
-								</div>
-								<div class="col-xs-6 col-md-2">
-									<i class="ti-music"></i>
-									<a href="<?php echo Route::url('profile', array('login' => $user->login));?>" class="h3"><?php echo Lang::get('mus_x');?></a>
-									
-								</div>
-							</div>
-							<hr>
+							<?php 
+							$this->render("inc/profile-menu.php", array('user' => $user, 'usericon' => $lfm_image));
+							?>
 						</div>
 					</div>
 					<div class="row">
@@ -261,11 +221,9 @@ use B7KP\Library\Lang;
 										<?php echo Lang::get('big_one');?>
 									</td>
 									<td>
-										<div class="btn-group" role="group">
-											<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-											<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-											<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-										</div>
+										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
+										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
 									</td>
 								</tr>
 								<tr>
@@ -273,11 +231,10 @@ use B7KP\Library\Lang;
 										<?php echo Lang::get("big_num");?> #1 / Top 5 / etc...
 									</td>
 									<td>
-										<div class="btn-group" role="group">
-											<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'artist', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-											<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-											<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-										</div>
+										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'artist', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
+										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
+
 									</td>
 								</tr>
 								<tr>
@@ -285,10 +242,8 @@ use B7KP\Library\Lang;
 										Artistas com mais músicas/álbuns em #1
 									</td>
 									<td>
-										<div class="btn-group" role="group">
-											<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
-											<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
-										</div>
+										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
 									</td>
 								</tr>
 							</table>

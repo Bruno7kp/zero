@@ -249,6 +249,8 @@ class Lang
 		$messages["wk"][self::EN_US] = "Week";
 		$messages["wk_x"][self::PT_BR] = "Semanas";
 		$messages["wk_x"][self::EN_US] = "Weeks";
+		$messages["wk_min"][self::PT_BR] = "Sem.";
+		$messages["wk_min"][self::EN_US] = "Wks";
 		$messages["play"][self::PT_BR] = "Reprodução";
 		$messages["play"][self::EN_US] = "Play";
 		$messages["play_x"][self::PT_BR] = "Reproduções";
@@ -261,6 +263,18 @@ class Lang
 
 		$messages["entries"][self::PT_BR] = "Entradas em charts";
 		$messages["entries"][self::EN_US] = "Entries in charts";
+
+		$messages["this_act"][self::PT_BR] = "Esse artista";
+		$messages["this_act"][self::EN_US] = "This artist";
+
+		$messages["this_alb"][self::PT_BR] = "Esse álbum";
+		$messages["this_alb"][self::EN_US] = "This album";
+
+		$messages["this_mus"][self::PT_BR] = "Essa música";
+		$messages["this_mus"][self::EN_US] = "This music";
+
+		$messages["no_chart"][self::PT_BR] = "não entrou no chart";
+		$messages["no_chart"][self::EN_US] = "has not entered the chart";
 
 		$messages["user"][self::PT_BR] = "Usuário";
 		$messages["user"][self::EN_US] = "User";

@@ -650,6 +650,10 @@ class UserApi extends BaseApi
 
             if ($call = $this->apiGetCall($vars)) {
                 if (count($call->topartists->artist) > 0) {
+                    $info = (array)($call->topartists);
+                    $info = $info["@attr"];
+
+                    $topartists["info"] = $info;
                     $i = 0;
                     foreach ($call->topartists->artist as $artist) {
                         $a = (array)$artist;

@@ -105,6 +105,7 @@ class ProfileController extends Controller
 
 			if (count($lfm_topacts) > 0) 
 			{
+				unset($lfm_topacts["info"]);
 				$html = "";
 				foreach ($lfm_topacts as $act) 
 				{
@@ -138,6 +139,7 @@ class ProfileController extends Controller
 			$lfm_topalbs 	= $lfm->getUserTopAlbum(array("limit" => (int)$limit, "period" => "overall"));
 			if (count($lfm_topalbs) > 0) 
 			{
+				unset($lfm_topalbs["info"]);
 				$html = "";
 				foreach ($lfm_topalbs as $alb) 
 				{
@@ -170,6 +172,7 @@ class ProfileController extends Controller
 			$lfm_topmus 	= $lfm->getUserTopMusic(array("limit" => (int)$limit, "period" => "overall"));
 			if (count($lfm_topmus) > 0) 
 			{
+				unset($lfm_topmus["info"]);
 				$html = "";
 				foreach ($lfm_topmus as $mus) 
 				{

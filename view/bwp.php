@@ -17,16 +17,21 @@ use B7KP\Library\Lang;
 		<div id="fh5co-main">
 			<section>
 				<div class="container">
+					<div class="row bottomspace-xl text-center">
+						<div class="col-xs-12">
+							<?php 
+							$this->render("inc/profile-menu.php", array('user' => $user, 'usericon' => $lfm_image));
+							?>
+						</div>
+					</div>
 					<div class="row bottomspace-md text-center">
 						<div class="col-xs-12">
-							<h1 class="h3"><?php echo $user->login;?> Charts</h1>
 							<h3 class="h3"><?php echo Lang::get('big_one');?></h3>
 						</div>
 					</div>
 					<div class="row text-center">
 						<div class="col-xs-12">
 							<div class="btn-group" role="group">
-								<a href="<?php echo Route::url('chart_list', array('login' => $user->login));?>" class="no-margin btn btn-custom btn-success"><i class="ti-stats-up"></i></a>
 								<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
 								<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
 								<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
@@ -34,7 +39,7 @@ use B7KP\Library\Lang;
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-8 col-md-offset-2 topspace-md">
+						<div class="col-md-10 col-md-offset-1 topspace-md">
 						<?php
 						if(is_array($list) && count($list) > 0)
 						{
@@ -69,8 +74,9 @@ use B7KP\Library\Lang;
 									<td class="text-center"><?php echo $value->playcount; ?></td>
 									<td class="text-center"><?php echo $value->rank; ?></td>
 									<td class="text-center">
-										<?php echo $week->week; ?>
-										<small><a target="_blank" href="<?php echo $url;?>"><i class="ti-new-window"></i></a></small>
+										<a target="_blank" href="<?php echo $url;?>">
+											<?php echo $week->week; ?>
+										</a>
 									</td>
 								</tr>
 								<?php 

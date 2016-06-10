@@ -262,7 +262,7 @@ textarea {
 }
 
 .sf-menu a {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.8);
   padding: .75em 1em;
   text-transform: uppercase;
   letter-spacing: 1px;

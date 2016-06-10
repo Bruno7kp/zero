@@ -159,6 +159,11 @@ class Route
 		return $find;
 	}
 
+	public static function gerCurRoute()
+	{
+		return self::getName(Url::getRequest());
+	}
+
 	public static function getRouteParams($route)
 	{
 		$find = self::routeExists($route, false, true);

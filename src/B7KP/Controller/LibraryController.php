@@ -4,6 +4,7 @@ namespace B7KP\Controller;
 use B7KP\Model\Model;
 use B7KP\Core\Dao;
 use B7KP\Utils\UserSession;
+use B7KP\Utils\Charts;
 use B7KP\Utils\Snippets;
 use B7KP\Entity\User;
 use B7KP\Library\Lang;
@@ -19,75 +20,78 @@ class LibraryController extends Controller
 	}
 
 	/**
-	* @Route(name=library_art|route=/user/{login}/charts/artist)
+	* @Route(name=lib_art_list|route=/user/{login}/charts/artists)
 	*/
-	public function artistMainPage($name)
+	public function artistList($login)
 	{
-
-		$this->checkAccess();
+		$user = $this->isValidUser($login);
+		$chart = new Charts($this->factory, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 		$lastfm = new Lastfm();
+		$lastfm->setUser($user->login);
+		$page = isset($_GET["page"]) ? intval($_GET["page"]) : 1;
+		$v = array
+				(
+					"period" => "overall",
+					"limit" => 50,
+					"page" => $page
+				);
+		$top = $lastfm->getUserTopArtist($v);
+		$info = $top["info"];
+		unset($top["info"]);
+		$list = array();
+
+		if(is_array($top) && count($top) > 0)
+		{
+			foreach ($top as $key => $value) {
+				$list[$key]["artist"] = $value["name"];
+				$list[$key]["rank"] = $value["rank"];
+				$list[$key]["playcount"] = $value["playcount"];
+				$list[$key]["img"] = $value["images"]["large"];
+				$stats = $chart->getArtistStats($value["name"], "");
+				$list[$key]["stats"] = $chart->extract($stats, false);
+			}
+		}
+
 		$dao = Dao::getConn();
 
-		if($this->user instanceof User)
-		{
-			$lastfm->setUser($this->user->login);
-		}
+		$vars = array
+					(
+						"user" => $user,
+						"list" => $list,
+						"info" => $info,
+						"page" => $page,
+						"limit"		=> $settings->art_limit,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true),
+						"biggest_playcount" => $this->getBiggestPlaycount($user)
+					);
 
-		$name = str_replace("+", " ", $name);
-		$name = str_replace("%252b", "+", $name);
+		$this->render("lib_art.php", $vars);
+	}
 
-		$artist = $lastfm->getArtistInfo($name);
-		if(is_array($artist))
-		{
-			$usersdata = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM artist_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.artist = '".addslashes($artist["name"])."' AND t.rank = 1 GROUP BY u.id ORDER BY total DESC");
-			$totalcharts = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM artist_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.artist = '".addslashes($artist["name"])."' GROUP BY u.id ORDER BY total DESC");
-			$totalusers = 0;
-			$totaln1 = 0;
-			$totalcharts = count($totalcharts);
+	/**
+	* @Route(name=lib_mus_list|route=/user/{login}/charts/musics)
+	*/
+	public function musicList($login)
+	{
+		$user = $this->isValidUser($login);
+		$lastfm = new Lastfm();
+		$lastfm->setUser($user->login);
+		$dao = Dao::getConn();
 
-			$topusers = array();
-			$i = 0;
+	}
 
-			foreach ($usersdata as $value) {
-				$totalusers++;
-				$totaln1 += $value->total;
-				if($i < 5)
-				{
-					$topusers[$i]["user"] = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser);
-					$topusers[$i]["weeks"] = $value->total;
-					$topusers[$i]["avatar"] = $lastfm->getUserInfo(array('user' => $topusers[$i]["user"]->login));
-					$topusers[$i]["avatar"] = str_replace("34s", "avatar170s", $topusers[$i]["avatar"]["image"]);
-				}
-			}
-			$imgbg = $this->getBgImage($artist);
-			$img = (isset($artist["images"]["large"]) ? $artist["images"]["large"] : $imgbg);
-			$lfmurl = $artist["url"];
-			$name = $artist["name"];
-			$listeners = $artist["stats"]["listeners"];
-			$playcount = $artist["stats"]["playcount"];
-			$userplaycount = $artist["userplaycount"];
-			$similar = $artist["similar"];
-			$vars = array(
-							"lfm_bg" 		=> $imgbg, 
-							"lfm_image" 	=> $img, 
-							"lfmurl"		=> $lfmurl, 
-							"listeners" 	=> $listeners, 
-							"playcount" 	=> $playcount, 
-							"user" 			=> $this->user, 
-							"userplaycount" => $userplaycount, 
-							"name" 			=> $name, 
-							"totalusers"	=> $totalusers, 
-							"totaln1" 		=> $totaln1,
-							"totalcharts"	=> $totalcharts,
-							"topusers" 		=> $topusers,
-							"similar"  		=> $similar
-						);
-			$this->render("artist.php", $vars);
-		}
-		else
-		{
-			$this->redirectToRoute("registernotfound", array("entity" => "artist"));
-		}
+	/**
+	* @Route(name=lib_alb_list|route=/user/{login}/charts/albums)
+	*/
+	public function albumList($login)
+	{
+		$user = $this->isValidUser($login);
+		$lastfm = new Lastfm();
+		$lastfm->setUser($user->login);
+		$dao = Dao::getConn();
+
 	}
 
 	protected function getBgImage($artist)
@@ -125,9 +129,56 @@ class LibraryController extends Controller
 		return $img;
 	}
 
+	protected function isValidUser($login)
+	{
+		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
+		if($user instanceof User)
+		{
+			return $user;
+		}
+		else
+		{
+			$this->redirectToRoute("404");
+		}
+	}
+
+	protected function getUserBg($user, $avatar = false)
+	{
+		$lfm 	= new LastFm();
+		$last 	= $lfm->setUser($user->login)->getUserInfo();
+		if($avatar)
+		{
+			$bgimage = str_replace("34s", "avatar170s", $last["image"]);
+		}
+		else
+		{
+			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+			$bgimage = false;
+			if(isset($acts[0])): 
+				$bgimage = $acts[0]["images"]["mega"];
+			endif;
+		}
+
+		return $bgimage;
+	}
+
+	protected function getBiggestPlaycount($user)
+	{
+		$lfm 	= new LastFm();
+		$lfm->setUser($user->login);
+		$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+		$plays = 0;
+		if(isset($acts[0]["playcount"])): 
+			$plays = $acts[0]["playcount"];
+		endif;
+
+
+		return $plays;
+	}
+
 	protected function checkAccess()
 	{
-		$this->user = UserSession::getUser($this->factory);
+		return true;
 	}
 
 }

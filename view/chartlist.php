@@ -19,8 +19,9 @@ use B7KP\Library\Lang;
 				<div class="container">
 					<div class="row bottomspace-md text-center">
 						<div class="col-xs-12">
-							<h1 class="h3"><?php echo $user->login;?> Charts</h2>
-							<a href="<?php echo Route::url('chart_list', array('login' => $user->login));?>" class="no-margin btn btn-custom btn-success"><i class="ti-stats-up"></i></a>
+							<?php 
+							$this->render("inc/profile-menu.php", array('user' => $user, 'usericon' => $lfm_image));
+							?>
 						</div>
 					</div>
 					<div class="row">
