@@ -81,6 +81,19 @@ class Settings extends Entity
 		}
 	}
 
+	static function getAllDefaults()
+	{
+		$def = new \stdClass();
+
+		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts");
+
+		foreach ($items as $value) {
+			$def->$value = self::defaultValueFor($value);
+		}
+
+		return $def;
+	}
+
 	static function defaultValueFor($for)
 	{
 		switch ($for) {

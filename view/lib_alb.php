@@ -11,7 +11,7 @@ use B7KP\Utils\Snippets as S;
 <!doctype html>
 <html>
 <?php
-	$head = array("title" => "{$user->login} - ".Lang::get("art_x"));
+	$head = array("title" => "{$user->login} - ".Lang::get("alb_x"));
 	$this->render("ext/head.php", $head);
 ?>
 
@@ -40,6 +40,7 @@ use B7KP\Utils\Snippets as S;
 									<th class="text-center">#</th>
 									<th class="text-center"><?php echo Lang::get('art');?></th>
 									<th>&nbsp;</th>
+									<th><?php echo Lang::get('alb');?></th>
 									<th class="text-center"><?php echo Lang::get('play_x');?></th>
 									<th class="text-center"><?php echo Lang::get('wk_x');?></th>
 									<th class="text-center"><?php echo Lang::get('pk');?></th>
@@ -63,9 +64,14 @@ use B7KP\Utils\Snippets as S;
 									<td class="text-center">
 										<img class="img-circle" src="<?php echo $value["img"]; ?>" height="60">
 									</td>
-									<td class="rk-col">
+									<td>
 										<a href=<?php echo $liburl.F::fixLFM($value["artist"]);?>>
 											<?php echo $value["artist"]; ?>
+										</a>
+									</td>
+									<td>
+										<a href=<?php echo $liburl.F::fixLFM($value["artist"])."/".F::fixLFM($value["music"]);?>>
+											<?php echo $value["music"]; ?>
 										</a>
 									</td>
 									<td class="text-center rk-col"><?php echo $value["playcount"]; ?></td>
@@ -85,7 +91,7 @@ use B7KP\Utils\Snippets as S;
 									if($page > 2)
 									{
 									?>
-										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_art_list', $cond)."?page=1";?>"><i class="ti-angle-double-left"></i></a>
+										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_alb_list', $cond)."?page=1";?>"><i class="ti-angle-double-left"></i></a>
 									<?php
 									}
 									?>
@@ -94,17 +100,17 @@ use B7KP\Utils\Snippets as S;
 									if($page > 1)
 									{
 									?>
-										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_art_list', $cond)."?page=".($page-1);?>"><i class="ti-angle-left"></i></a>
+										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_alb_list', $cond)."?page=".($page-1);?>"><i class="ti-angle-left"></i></a>
 									<?php
 									}
 									?>
-									<a class="btn btn-custom btn-sm divider disabled" href="<?php echo Route::url('lib_art_list', $cond)."?page=".$page;?>"><?php echo $page;?></a>
+									<a class="btn btn-custom btn-sm divider disabled" href="<?php echo Route::url('lib_alb_list', $cond)."?page=".$page;?>"><?php echo $page;?></a>
 
 									<?php 
 									if($totalpages > $page)
 									{
 									?>
-										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_art_list', $cond)."?page=".($page+1);?>"><i class="ti-angle-right"></i></a>
+										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_alb_list', $cond)."?page=".($page+1);?>"><i class="ti-angle-right"></i></a>
 									<?php
 									}
 									?>
@@ -113,7 +119,7 @@ use B7KP\Utils\Snippets as S;
 									if($totalpages > 1 && ($totalpages - $page) >= 2)
 									{
 									?>
-										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_art_list', $cond)."?page=".$totalpages;?>"><i class="ti-angle-double-right"></i></a>
+										<a class="btn btn-custom btn-sm divider" href="<?php echo Route::url('lib_alb_list', $cond)."?page=".$totalpages;?>"><i class="ti-angle-double-right"></i></a>
 									<?php
 									}
 									?>

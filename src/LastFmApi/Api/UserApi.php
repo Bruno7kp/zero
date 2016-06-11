@@ -600,12 +600,18 @@ class UserApi extends BaseApi
 
             if ($call = $this->apiGetCall($vars)) {
                 if (count($call->topalbums->album) > 0) {
+                    $info = (array)($call->topalbums);
+                    $info = $info["@attr"];
+
+                    $topalbums["info"] = $info;
                     $i = 0;
                     foreach ($call->topalbums->album as $album) {
+                        $a = (array)$album;
                         $image[0] = (array) $album->image[0];
                         $image[1] = (array) $album->image[1];
                         $image[2] = (array) $album->image[2];
                         $topalbums[$i]['name'] = (string) $album->name;
+                        $topalbums[$i]['rank'] = (string) $a["@attr"]->rank;
                         $topalbums[$i]['playcount'] = (string) $album->playcount;
                         $topalbums[$i]['mbid'] = (string) $album->mbid;
                         $topalbums[$i]['url'] = (string) $album->url;
@@ -749,6 +755,10 @@ class UserApi extends BaseApi
 
             if ($call = $this->apiGetCall($vars)) {
                 if (count($call->toptracks->track) > 0) {
+                    $info = (array)($call->toptracks);
+                    $info = $info["@attr"];
+
+                    $toptracks["info"] = $info;
                     $i = 0;
                     foreach ($call->toptracks->track as $track) {
                         $t = (array)$track;

@@ -25,6 +25,7 @@ class Login
 			$login = Pass::check($this->password, $user->password);
 			if($login)
 			{
+				$this->checkSettings($user);
 				$_SESSION[App::get("name")][strtoupper($entity)] = $user->id;
 			}
 			return $login;
@@ -38,6 +39,19 @@ class Login
 	static function logout($entity = "B7KP\Entity\User")
 	{
 		unset($_SESSION[App::get("name")][strtoupper($entity)]);
+	}
+
+	// k
+
+	private function checkSettings($user)
+	{
+		$set = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		if($set == false)
+		{
+			$data = \B7KP\Entity\Settings::getAllDefaults();
+			$data->iduser = $user->id;
+			$this->factory->add("B7KP\Entity\Settings", $data);
+		}
 	}
 }
 ?>

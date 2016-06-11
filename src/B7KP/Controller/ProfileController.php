@@ -6,6 +6,7 @@ use B7KP\Utils\UserSession;
 use B7KP\Utils\Snippets;
 use B7KP\Entity\User;
 use B7KP\Library\Lang;
+use B7KP\Library\Route;
 use LastFmApi\Main\LastFm;
 
 class ProfileController extends Controller
@@ -109,9 +110,9 @@ class ProfileController extends Controller
 				$html = "";
 				foreach ($lfm_topacts as $act) 
 				{
-					$html .= Snippets::topActListRow($act['name'], $act['url'], $act['playcount'], $act['images']['medium'], $lfm_topacts[0]['playcount']);
+					$html .= Snippets::topActListRow($act['name'], $act['url'], $act['playcount'], $act['images']['medium'], $lfm_topacts[0]['playcount'], $user->login);
 				}
-				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
+				$html .= "<a href='".Route::url('lib_art_list', array('login' => $login))."' class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;
 			}
 			else
@@ -143,9 +144,9 @@ class ProfileController extends Controller
 				$html = "";
 				foreach ($lfm_topalbs as $alb) 
 				{
-					$html .= Snippets::topAlbListRow($alb['name'], $alb['url'], $alb['playcount'], $alb['images']['medium'], $lfm_topalbs[0]['playcount'], $alb['artist']['name'], $alb['artist']['url']);
+					$html .= Snippets::topAlbListRow($alb['name'], $alb['url'], $alb['playcount'], $alb['images']['medium'], $lfm_topalbs[0]['playcount'], $alb['artist']['name'], $alb['artist']['url'], $user->login);
 				}
-				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
+				$html .= "<a href='".Route::url('lib_alb_list', array('login' => $login))."' class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;
 			}
 			else
@@ -176,9 +177,9 @@ class ProfileController extends Controller
 				$html = "";
 				foreach ($lfm_topmus as $mus) 
 				{
-					$html .= Snippets::topMusListRow($mus['name'], $mus['url'], $mus['playcount'], $mus['images']['medium'], $lfm_topmus[0]['playcount'], $mus['artist']['name'], $mus['artist']['url'], null, null);
+					$html .= Snippets::topMusListRow($mus['name'], $mus['url'], $mus['playcount'], $mus['images']['medium'], $lfm_topmus[0]['playcount'], $mus['artist']['name'], $mus['artist']['url'], null, null, $user->login);
 				}
-				$html .= "<a class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
+				$html .= "<a href='".Route::url('lib_mus_list', array('login' => $login))."' class='btn btn-info btn-block btn-sm'>".Lang::get('view')."</a>";
 				echo $html;
 			}
 			else
@@ -209,7 +210,7 @@ class ProfileController extends Controller
 				$html = "<div class='bottomspace-sm topspace-sm'><h2 class='h3'>".Lang::get('rec_tra')."</h2></div>";
 				foreach ($recent as $key => $value) 
 				{
-					$html .= Snippets::recentListRow($value['name'], $value['images']['medium'], $value['artist']['name'], $value['album']['name'], $value['url']);
+					$html .= Snippets::recentListRow($value['name'], $value['images']['medium'], $value['artist']['name'], $value['album']['name'], $value['url'], $login);
 				}
 				$html .= "<a class='btn btn-danger btn-block topspace-sm' target='_blank' href='http://last.fm/user/{$user->login}/library'>".Lang::get('view')." <i class='fa fa-lastfm'></i></a>";
 				echo $html;

@@ -34,7 +34,7 @@ class ArtistController extends Controller
 		}
 
 		$name = str_replace("+", " ", $name);
-		$name = str_replace("%252b", "+", $name);
+		$name = str_replace("%252B", "+", $name);
 
 		$artist = $lastfm->getArtistInfo($name);
 		if(is_array($artist))

@@ -120,9 +120,16 @@ class AuthApi extends BaseApi
         $vars['api_sig'] = $sig;
 
         if ($call = $this->apiGetCall($vars)) {
-            $this->username = (string) $call->session->name;
-            $this->sessionKey = (string) $call->session->key;
-            $this->subscriber = (string) $call->session->subscriber;
+            if(isset($call->session))
+            {
+                $this->username = (string) $call->session->name;
+                $this->sessionKey = (string) $call->session->key;
+                $this->subscriber = (string) $call->session->subscriber;
+            }
+            else
+            {
+                return false;
+            }
         } else {
             return false;
         }

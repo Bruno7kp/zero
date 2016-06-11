@@ -196,17 +196,28 @@ class BaseApi
      * @return object
      */
 
+    private function isJSON($string){
+       return is_string($string) && is_array(json_decode($string, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
+    }
+
     private function process_response()
     {
         $end = false;
         $resp = "";
-        for ($i=11; $end == false; $i++) { 
-            if(isset($this->response[$i])){
-                $resp .= $this->response[$i];
-            }
-            else
-            {
-                $end = true;
+        if($this->isJSON($this->response[10]))
+        {
+            $resp = $this->response[10];
+        }
+        else
+        {
+            for ($i=11; $end == false; $i++) { 
+                if(isset($this->response[$i])){
+                    $resp .= $this->response[$i];
+                }
+                else
+                {
+                    $end = true;
+                }
             }
         }
         return json_decode($resp);

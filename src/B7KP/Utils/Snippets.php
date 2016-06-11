@@ -9,7 +9,7 @@ use B7KP\Library\Route;
 
 class Snippets
 {
-	static function recentListRow($name, $img, $artist, $album, $url)
+	static function recentListRow($name, $img, $artist, $album, $url, $login)
 	{
 		if(empty($img))
 		{
@@ -20,6 +20,8 @@ class Snippets
 			$album = "<small class='text-muted'>".$album."</small>
 				<br>";
 		}
+
+		$url = Route::url("lib_mus", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $login));
 		
 		return "
 		<div class='row bottomspace-xs'>
@@ -44,10 +46,10 @@ class Snippets
 		}
 	}
 
-	static function topActListRow($name, $url, $playcount, $img, $biggest)
+	static function topActListRow($name, $url, $playcount, $img, $biggest, $login)
 	{
 		$perc = $playcount/$biggest*100;
-		$url = Route::url("artist", array("name" => F::fixLFM($name)));
+		$url = Route::url("lib_art", array("name" => F::fixLFM($name), "login" => $login));
 		return "
 		<div class='row'>
 			<div class='col-xs-3'>
@@ -68,10 +70,11 @@ class Snippets
 		";
 	}
 
-	static function topAlbListRow($name, $url, $playcount, $img, $biggest, $artist, $arturl)
+	static function topAlbListRow($name, $url, $playcount, $img, $biggest, $artist, $arturl, $login)
 	{
 		$perc = $playcount/$biggest*100;
-		$url = Route::url("album", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist)));
+		$url = Route::url("lib_alb", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $login));
+		$arturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $login));
 		return "
 		<div class='row'>
 			<div class='col-xs-3'>
@@ -94,11 +97,11 @@ class Snippets
 		";
 	}
 
-	static function topMusListRow($name, $url, $playcount, $img, $biggest, $artist, $arturl, $album, $alburl)
+	static function topMusListRow($name, $url, $playcount, $img, $biggest, $artist, $arturl, $album, $alburl, $login)
 	{
 		$perc = $playcount/$biggest*100;
-		$url = Route::url("music", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist)));
-		$arturl = Route::url("artist", array("name" => F::fixLFM($name)));
+		$url = Route::url("lib_mus", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $login));
+		$arturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $login));
 		return "
 		<div class='row'>
 			<div class='col-xs-3'>
@@ -317,6 +320,20 @@ class Snippets
 		}
 
 		return $color;
+	}
+
+	static function chartRun($type, $cr, $user, $stats, $limit, $name, $artist = false)
+	{
+		$peak = $stats["overall"]["peak"];
+		$totalweeks = $stats["weeks"]["total"];
+		$wkstop1 	= $stats["weeks"]["top01"];
+		$wkstop5 	= $stats["weeks"]["top05"];
+		$wkstop10 	= $stats["weeks"]["top10"];
+		$wkstop20 	= $stats["weeks"]["top20"];
+		ob_start();
+		include MAIN_DIR.'/view/inc/cr.php';
+		$run = ob_get_clean();
+		return $run;
 	}
 }
 ?>

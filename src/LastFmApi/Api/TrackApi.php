@@ -155,7 +155,7 @@ class TrackApi extends BaseApi {
 					$info['userplaycount'] = 0;
 				}
 				$info['artist']['name'] = (string) $call->track->artist->name;
-				$info['artist']['mbid'] = (string) $call->track->artist->mbid;
+				$info['artist']['mbid'] = isset($call->track->artist->mbid) ? (string) $call->track->artist->mbid : "";
 				$info['artist']['url'] = (string) $call->track->artist->url;
 				if(isset($call->track->album)){
 					

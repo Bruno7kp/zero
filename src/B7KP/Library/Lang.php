@@ -283,7 +283,7 @@ class Lang
 		$messages["user_x"][self::EN_US] = "Users";
 
 		// TEXTOS/FRASESComplete the fields below and done.
-		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu login na last.fm e a senha que colocar logo abaixo. Ñós <b>não</b> recomendamos usar a mesma senha da sua conta na Last.fm.";
+		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu login na last.fm e a senha que colocar logo abaixo. Nós <b>não</b> recomendamos usar a mesma senha da sua conta na Last.fm.";
 		$messages["init"][self::EN_US] = "Complete the fields below and done. To access ".App::get('name')." again, use your last.fm login and the new password you will insert below. We do <strong>not</strong> recomend to use the same password of your Last.fm account.";
 
 		$messages["conn"][self::PT_BR] = "Conecte ".App::get('name')." com seu Last.fm";

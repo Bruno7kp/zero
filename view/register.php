@@ -22,7 +22,8 @@ use B7KP\Core\App;
 							<h2><?php echo Lang::get('reg');?> <br><small><?php echo Lang::get('or');?> <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
 							<small class="text-muted">
 								<?php echo Lang::get('hello');?>, <strong><?php echo $lfm_user;?></strong>. 
-							</small><?php echo Lang::get('init');?>
+							<?php echo Lang::get('init');?>
+							</small>
 							<?php 
 								$form->output();
 							?>

@@ -168,7 +168,6 @@ class ArtistApi extends BaseApi
         if ($call = $this->apiGetCall($vars)) {
             if(isset($call->artist))
             {
-
             $a = (array)$call->artist;
             $image[0] = (array) $call->artist->image[0];
             $image[1] = (array) $call->artist->image[1];
@@ -176,7 +175,7 @@ class ArtistApi extends BaseApi
             $image[3] = (array) $call->artist->image[3];
             $image[4] = (array) $call->artist->image[4];
             $info['name'] = (string) $call->artist->name;
-            $info['mbid'] = (string) $call->artist->mbid;
+            $info['mbid'] = isset($call->artist->mbid) ? (string) $call->artist->mbid : "";
             $info['url'] = (string) $call->artist->url;
             $info['images']['small'] = (string) $image[0]["#text"];
             $info['images']['medium'] = (string) $image[1]["#text"];

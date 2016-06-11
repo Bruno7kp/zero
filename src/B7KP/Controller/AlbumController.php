@@ -36,9 +36,9 @@ class AlbumController extends Controller
 		}
 
 		$name = str_replace("+", " ", $name);
-		$name = str_replace("%252b", "+", $name);
+		$name = str_replace("%252B", "+", $name);
 		$artist = str_replace("+", " ", $artist);
-		$artist = str_replace("%252b", "+", $artist);
+		$artist = str_replace("%252B", "+", $artist);
 
 		$album = $lastfm->getAlbumInfo($name, $artist);
 		if(is_array($album))
