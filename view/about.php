@@ -93,6 +93,15 @@ use B7KP\Library\Lang;
 							<br/>
 							Último mas não menos importante, note que caso o last.fm ou você mesmo altere o nome de uma música/álbum, seja um acento, um espaço ou qualquer coisa, o sistema tem grandes chances de entender como uma música nova. Então fique de olho, se isso ocorrer recomendo atualizar tudo, que aí a música virá escrita da mesma forma que atualmente. (Ps: mudanças de uppercase/lowercase não afetam, pois tanto o sistema quanto o last.fm são case insensitive, ou seja, não há diferença entre letras maiúsculas e minúsculas, ex: oN mY mIND, on my mind, ON MY MIND e On My Mind) 
 						</p>
+						<hr>
+						<p>
+							Tem dúvidas ou sugestões? Me chama em qualquer rede social que eu vou. Se quiserem podem enviar pro meu email: bruno7kp@outlook.com
+							<br>
+							Outra coisinha: tanto o domínio quanto a hospedagem do site são free, ou seja...
+							<br>
+							Se o site engrenar, talvez em contrate algum serviço mais rápido e seguro, mas agora não tem como, então tenham isso em mente se o site ficar lerdo/caindo, ok manas?<br/>
+							<img src="http://i.imgur.com/t8pmIKA.gif">
+						</p>
 							
 								<?php 
 // 								require MAIN_DIR.'src/PHPMailer-master/PHPMailerAutoload.php';
