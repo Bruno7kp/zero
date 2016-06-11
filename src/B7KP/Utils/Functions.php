@@ -17,7 +17,7 @@ class Functions
 	    return $num;
 	}
 
-	public function fixLFM($name)
+	static function fixLFM($name)
 	{
 		$name = str_replace("+", "%252B", $name);
 		$name = str_replace("/", "%252F", $name);
