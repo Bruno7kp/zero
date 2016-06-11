@@ -15,13 +15,15 @@ use B7KP\Core\App;
 			<h1 class="topspace-lg text-center">USERS</h1>
 			<hr>
 			<?php 
+			$i = 0;
 			foreach ($users as $user) {
 				$label = $user->permissionLevel() == 7 ? "<span class='label label-danger'>admin</span>" : "";
 				$href = "<a target='_blank' href='".Route::url("profile", array("login" => $user->login))."' class='label label-info'><i class='ti-new-window'></i></a>"; 
 			?>
-			<big><?php echo $user->login." ".$href." ".$label;?></big><br/>
+			<big><?php echo $i." ".$user->login." ".$href." ".$label;?></big><br/>
 			<hr>
 			<?php
+			$i++;
 			}
 			?>
 		</div>

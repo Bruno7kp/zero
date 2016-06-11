@@ -94,6 +94,40 @@ class RegisterController extends Controller
 		}
 	}
 
+	/**
+	* @Route(name=check_admin_register|route=/check/admin/register)
+	*/
+	public function checkAdminRegister()
+	{
+		$post = (object)$_POST;
+		if($this->isAjaxRequest())
+		{
+			if($this->checkAssert($post))
+			{
+				$id = $this->factory->add("B7KP\Entity\User", $post);
+				if($id > 0)
+				{
+					//$login = new Login($post->login, $post->password, $this->factory);
+					//$login->login();
+					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Url::getBaseUrl()."/user/".$post->login);
+				}
+				else
+				{
+					$response = array("erro" => 1, "message" => "Oops, we can't register your account, try again later");
+				}
+			}
+			else
+			{
+				$response = array("erro" => 1, "message" => $this->assertErrors[0]["error"]);
+			}
+			echo json_encode($response);
+		}
+		else
+		{
+			$this->redirectToRoute("home");
+		}
+	}
+
 	private function checkAssert($post)
 	{
 		$assert = new Assert();

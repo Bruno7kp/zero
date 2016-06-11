@@ -18,15 +18,9 @@ use B7KP\Core\App;
 					<div class="row">
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
-						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2><?php echo Lang::get('reg');?> <br><small><?php echo Lang::get('or');?> <a href="<?php echo Route::url('login');?>">Login</a></small></h2>
-							<small class="text-muted">
-								<?php echo Lang::get('hello');?>, <strong><?php echo $lfm_user;?></strong>. 
-							<?php echo Lang::get('init');?>
-							</small>
+						<div class="col-md-4 col-md-offset-4 text-center"> 
 							<?php 
-								//$form->output();
-								echo "Cadastros desabilitados no momento.";
+								$form->output();
 							?>
 						</div>
 

@@ -39,6 +39,16 @@ class SystemViewerController extends Controller
 		$this->render("admin/users.php", $vars);
 	}
 
+	/**
+	* @Route(name=setuser|route=/setuser)
+	*/
+	public function setUsers()
+	{
+		$this->checkAccess();
+		$form = $this->createForm("AdminRegisterForm");
+		$this->render("admin/setuser.php", array("form" => $form));
+	}
+
 	protected function checkAccess()
 	{
 		$check = $this->user instanceof User && $this->user->permissionLevel() == 7;

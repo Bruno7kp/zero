@@ -57,7 +57,7 @@ class User extends Entity implements iPermission
 
 	private function adminUsers()
 	{
-		return array('bruno7kp');
+		return array('bruno7kp', 'itsvictornunes');
 	}
 
 	private function modUsers()
