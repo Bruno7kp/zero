@@ -11,7 +11,7 @@ class AboutController extends Controller
 	}
 
 	/**
-	* @Route(name=about|route=/about)
+	* @Route(name=about|route=/faq)
 	*/
 	public function indexAction()
 	{

@@ -20,7 +20,7 @@ use B7KP\Entity\User;
 					<a href="<?php echo Route::url('home')?>"><?php echo Lang::get('home');?></a>
 				</li>
 				<li <?php if(Route::isCurRoute('about')): echo 'class="active"';endif;?>>
-					<a href="<?php echo Route::url('about')?>"><?php echo Lang::get('about');?></a>
+					<a href="<?php echo Route::url('about')?>">FAQ</a>
 				</li>
 				<?php 
 				$user = UserSession::getUser($this->factory);
