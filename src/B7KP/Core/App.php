@@ -41,7 +41,7 @@ class App
 	{
 		self::$name = "ZERO";
 		self::$author = "Bruno7kp";
-		self::$version = "0.09.172";
+		self::$version = "0.09.174";
 
 		switch ($_SERVER['SERVER_NAME']) {
 			case 'localhost':
@@ -59,13 +59,13 @@ class App
 			default:
 				self::$environment = "PROD";
 				self::$db = "mysql";
-				self::$dbname = "u708424862_bd";
-				self::$host = "mysql.hostinger.com.br";
-				self::$user = "u708424862_user";
-				self::$password = "b3tt3rg1v3ch4rts";
+				self::$dbname = "gifbo380_lastfm";
+				self::$host = "localhost";
+				self::$user = "gifbo380_victor";
+				self::$password = "Andrebicudo18";
 				self::$dsn = self::setDsn();
-				self::$lastfmapikey = "2009fbfac80cacfae524cb384040403b";
-				self::$lastfmapisecret = "7a8bce33c7232ed3eb3493061267820f";
+				self::$lastfmapikey = "f383ea53a3df0bb4c8c1387018ec6c58";
+				self::$lastfmapisecret = "2d32aeac2eaf2c7014d1591b01b2001f";
 				break;
 		}
 

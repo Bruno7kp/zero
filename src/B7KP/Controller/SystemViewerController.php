@@ -2,6 +2,7 @@
 namespace B7KP\Controller;
 
 use B7KP\Model\Model;
+use B7KP\Core\Dao;
 use B7KP\Entity\User;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Route;
@@ -37,6 +38,17 @@ class SystemViewerController extends Controller
 		$users = $this->factory->find("B7KP\Entity\User", array());
 		$vars = array("users" => $users);
 		$this->render("admin/users.php", $vars);
+	}
+
+	/**
+	* @Route(name=exec_query|route=/execute)
+	*/
+	public function executeQuery()
+	{
+		$this->checkAccess();
+		$dao = Dao::getConn();
+
+		//
 	}
 
 	/**

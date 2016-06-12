@@ -156,7 +156,7 @@ use B7KP\Library\Lang;
 												<?php 
 												if(is_array($weeks) && count($weeks) > 0)
 												{
-													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
+													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/album/week/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
 												?>

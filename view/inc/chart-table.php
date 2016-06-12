@@ -43,15 +43,8 @@ if($show_first_image && count($list)>0)
 	}
 	if($type == "music")
 	{
-		if(isset($f["album"]["image"]["large"]) && !empty($f["album"]["image"]["large"]))
-		{
-			$fimg = $f["album"]["image"]["large"];
-		}
-		else
-		{
-			$fa = $lfm->getArtistInfo($f["artist"]["name"]);
-			$fimg = $fa["images"]["large"];
-		}
+		$fa = $lfm->getArtistInfo($f["artist"]["name"]);
+		$fimg = $fa["images"]["large"];
 	}
 	else
 	{
@@ -96,110 +89,115 @@ if($show_dropouts && $week > 1)
 	</tr>
 	<?php 
 	//var_dump($lastw);
-	if(count($list) == 0)
+	if(!is_array($list) || count($list) == 0)
 	{
+		$list = array();
 		echo "<tr><td colspan='8'>".Lang::get('nodata_week')."</td></tr>";
 	}
-	foreach ($list as $value) {
-		$todate 	= $value["stats"]["stats"]["todate"];
-		$stats 		= $value["stats"]["chartrun"][$week];
-		$cr 		= $value["stats"]["chartrun"];
-		$item 		= $value["item"];
-		if($show_dropouts)
+	else
+	{
+		foreach ($list as $value) 
 		{
-			$thembid = substr($type, 0, 3)."_mbid";
+			$todate 	= $value["stats"]["stats"]["todate"];
+			$stats 		= $value["stats"]["chartrun"][$week];
+			$cr 		= $value["stats"]["chartrun"];
+			$item 		= $value["item"];
+			if($show_dropouts)
+			{
+				$thembid = substr($type, 0, 3)."_mbid";
 
-			foreach ($lastw as $k => $v) {
-				if(!empty($v["item"]->$thembid) && $v["item"]->$thembid == $item->$thembid)
-				{
-					unset($lastw[$k]);
-					break;
-				}
-				else
-				{
-					if($type == "artist")
+				foreach ($lastw as $k => $v) {
+					if(!empty($v["item"]->$thembid) && $v["item"]->$thembid == $item->$thembid)
 					{
-						if($v["item"]->artist == $item->artist)
-						{
-							unset($lastw[$k]);
-							break;
-						}
+						unset($lastw[$k]);
+						break;
 					}
 					else
 					{
-						if($v["item"]->artist == $item->artist && mb_strtolower($v["item"]->$type) == mb_strtolower($item->$type))
+						if($type == "artist")
 						{
-							unset($lastw[$k]);
-							break;
+							if($v["item"]->artist == $item->artist)
+							{
+								unset($lastw[$k]);
+								break;
+							}
+						}
+						else
+						{
+							if($v["item"]->artist == $item->artist && mb_strtolower($v["item"]->$type) == mb_strtolower($item->$type))
+							{
+								unset($lastw[$k]);
+								break;
+							}
 						}
 					}
 				}
 			}
-		}
-		// vars
-		$position 	= $stats["rank"]["rank"];
-		$move 		= S::getMove($show_move, $stats["rank"]["move"], $stats["rank"]["lw"]);
-		$moveclass  = S::getMoveClass($show_move, $move, $position, true);
-		$name 		= $item->$type;
-		$artist 	= $item->artist;
-		$plays 		= $stats["playcount"]["playcount"];
-		$playsmove 	= S::getMove($show_move, $stats["playcount"]["move"], $stats["playcount"]["lw"], true);
-		$pmclass  	= S::getMoveClass($show_move, $playsmove, $plays, false);
-		$playsmove  = C::SHOW_MOVE_LW == $show_move ? "<span class='black'>LW:</span> ".$playsmove : $playsmove; 
-		$move  		= C::SHOW_MOVE_LW == $show_move ? "<span class='black'>LW:</span> ".$move : $move;
-		if(intval($move) > 0):	$move = "+".$move; endif;
-		if(intval($playsmove) > 0):	$playsmove = "+".$playsmove; endif;
-		$totalweeks = $todate["weeks"]["total"];
-		$wkstop1 	= $todate["weeks"]["top01"];
-		$wkstop5 	= $todate["weeks"]["top05"];
-		$wkstop10 	= $todate["weeks"]["top10"];
-		$wkstop20 	= $todate["weeks"]["top20"];
-		$peak 		= $todate["overall"]["peak"];
-		$t = substr($type, 0,3)."_mbid";
-		$mbid = $item->$t;
-	?>
-	<tr>
-		<td class="cr-col min">
-			<a class="cr-icon"><i class="ti-stats-up"></i></a>
-		</td>
-		<td class='rk-col'>
-			<?php echo $position;?>
-			<br/>
-			<span class="<?php echo $moveclass;?>"><?php echo $move;?></span>
-		</td>
-		<?php if($show_images): ?>
-			<td class="getimage" id="rankid<?php echo $position;?>" data-type="<?php echo $type;?>" data-name="<?php echo $name?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo $artist;?>"><?php echo S::loader(30);?></td>
-		<?php ; endif;?>
-		<td class="left"><?php echo $name;?></td>
-		<?php 
-		if($type != "artist")
-		{ 
+			// vars
+			$position 	= $stats["rank"]["rank"];
+			$move 		= S::getMove($show_move, $stats["rank"]["move"], $stats["rank"]["lw"]);
+			$moveclass  = S::getMoveClass($show_move, $move, $position, true);
+			$name 		= $item->$type;
+			$artist 	= $item->artist;
+			$plays 		= $stats["playcount"]["playcount"];
+			$playsmove 	= S::getMove($show_move, $stats["playcount"]["move"], $stats["playcount"]["lw"], true);
+			$pmclass  	= S::getMoveClass($show_move, $playsmove, $plays, false);
+			$playsmove  = C::SHOW_MOVE_LW == $show_move ? "<span class='black'>LW:</span> ".$playsmove : $playsmove; 
+			$move  		= C::SHOW_MOVE_LW == $show_move ? "<span class='black'>LW:</span> ".$move : $move;
+			if(intval($move) > 0):	$move = "+".$move; endif;
+			if(intval($playsmove) > 0):	$playsmove = "+".$playsmove; endif;
+			$totalweeks = $todate["weeks"]["total"];
+			$wkstop1 	= $todate["weeks"]["top01"];
+			$wkstop5 	= $todate["weeks"]["top05"];
+			$wkstop10 	= $todate["weeks"]["top10"];
+			$wkstop20 	= $todate["weeks"]["top20"];
+			$peak 		= $todate["overall"]["peak"];
+			$t = substr($type, 0,3)."_mbid";
+			$mbid = $item->$t;
 		?>
-			<td class="left"><?php echo $artist;?></td> 
-		<?php 
-		}
-		if($show_playcounts)
-		{ 
-		?>
-			<td class='rk-col'>
-				<?php echo $plays;?>
-				<br/>
-				<span class="<?php echo $pmclass;?>"><?php echo $playsmove;?></span>
+		<tr>
+			<td class="cr-col min">
+				<a class="cr-icon"><i class="ti-stats-up"></i></a>
 			</td>
-		<?php 
-		}
-		?>
-		<td><?php echo $peak;?></td>
-		<td><?php echo $totalweeks;?></td>
-	</tr>
-	<tr style="display:none;" class="cr-row">
-		<td colspan="8">
+			<td class='rk-col'>
+				<?php echo $position;?>
+				<br/>
+				<span class="<?php echo $moveclass;?>"><?php echo $move;?></span>
+			</td>
+			<?php if($show_images): ?>
+				<td class="getimage" id="rankid<?php echo $position;?>" data-type="<?php echo $type;?>" data-name="<?php echo addslashes($name);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo addslashes($artist);?>"><?php echo S::loader(30);?></td>
+			<?php ; endif;?>
+			<td class="left"><?php echo $name;?></td>
+			<?php 
+			if($type != "artist")
+			{ 
+			?>
+				<td class="left"><?php echo $artist;?></td> 
+			<?php 
+			}
+			if($show_playcounts)
+			{ 
+			?>
+				<td class='rk-col'>
+					<?php echo $plays;?>
+					<br/>
+					<span class="<?php echo $pmclass;?>"><?php echo $playsmove;?></span>
+				</td>
+			<?php 
+			}
+			?>
+			<td><?php echo $peak;?></td>
+			<td><?php echo $totalweeks;?></td>
+		</tr>
+		<tr style="display:none;" class="cr-row">
+			<td colspan="8">
+			<?php
+				echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
+			?>
+			</td>
+		</tr>
 		<?php
-			echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
-		?>
-		</td>
-	</tr>
-	<?php
+		}
 	}
 	?>
 	<?php 
@@ -238,7 +236,7 @@ if($show_dropouts && $week > 1)
 			<small>LW: <?php echo $position;?></small>
 		</td>
 		<?php if($show_images): ?>
-			<td class="getimage" id="rankout<?php echo $dropk;?>" data-type="<?php echo $type;?>" data-name="<?php echo $name?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo $artist;?>"><?php echo S::loader(30);?></td>
+			<td class="getimage" id="rankout<?php echo $dropk;?>" data-type="<?php echo $type;?>" data-name="<?php echo addslashes($name);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo addslashes($artist);?>"><?php echo S::loader(30);?></td>
 		<?php ; endif;?>
 		<td class="left"><?php echo $name;?></td>
 		<?php 

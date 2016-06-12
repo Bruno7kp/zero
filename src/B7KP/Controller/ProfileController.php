@@ -104,7 +104,7 @@ class ProfileController extends Controller
 			$last 	= $lfm->setUser($user->login);
 			$lfm_topacts 	= $lfm->getUserTopArtist(array("limit" => (int)$limit, "period" => "overall"));
 
-			if (count($lfm_topacts) > 0) 
+			if (is_array($lfm_topacts) && count($lfm_topacts) > 1) 
 			{
 				unset($lfm_topacts["info"]);
 				$html = "";
@@ -138,7 +138,7 @@ class ProfileController extends Controller
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($user->login);
 			$lfm_topalbs 	= $lfm->getUserTopAlbum(array("limit" => (int)$limit, "period" => "overall"));
-			if (count($lfm_topalbs) > 0) 
+			if (is_array($lfm_topalbs) && count($lfm_topalbs) > 1) 
 			{
 				unset($lfm_topalbs["info"]);
 				$html = "";
@@ -171,7 +171,7 @@ class ProfileController extends Controller
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($user->login);
 			$lfm_topmus 	= $lfm->getUserTopMusic(array("limit" => (int)$limit, "period" => "overall"));
-			if (count($lfm_topmus) > 0) 
+			if (is_array($lfm_topmus) && count($lfm_topmus) > 1) 
 			{
 				unset($lfm_topmus["info"]);
 				$html = "";
@@ -205,7 +205,7 @@ class ProfileController extends Controller
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($user->login);
 			$recent = $lfm->getRecentTrack();
-			if(count($recent) > 0)
+			if(is_array($recent) && count($recent) > 0)
 			{
 				$html = "<div class='bottomspace-sm topspace-sm'><h2 class='h3'>".Lang::get('rec_tra')."</h2></div>";
 				foreach ($recent as $key => $value) 

@@ -167,8 +167,10 @@ function loadimages()
 	$.each(tds, function(index, val) {
 		type = $(this).attr('data-type');
 		name = $(this).attr('data-name');
+		name = name.replace(/\\/g, "");
 		mbid = $(this).attr('data-mbid');
 		artist = $(this).attr('data-artist');
+		artist = artist.replace(/\\/g, "");
 		rankid = $(this).attr('id');
 		td = $(this);
 		if(type == "artist")
@@ -193,6 +195,7 @@ function loadimages()
 		}
 		last = encodeURI(last);
 		last = last.replace("+", "%2B");
+		last = last.replace("#", "%23");
 		last = last.replace("%20&", "%20%26");
 		last = last.replace("&%20", "%26%20");
 		//console.log(last);
