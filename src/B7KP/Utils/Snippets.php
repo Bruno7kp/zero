@@ -50,11 +50,24 @@ class Snippets
 	{
 		$perc = $playcount/$biggest*100;
 		$url = Route::url("lib_art", array("name" => F::fixLFM($name), "login" => $login));
-		return "
-		<div class='row'>
+		if(empty($img))
+		{
+			$img = "
+			<div class='col-xs-3 getimage imgfix' id='rankid".md5($name)."' data-type='artist' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'>
+			".self::loader(60)."
+			</div>
+			";
+		}
+		else
+		{
+			$img = "
 			<div class='col-xs-3'>
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
-			</div>
+			</div>";
+		}
+		return "
+		<div class='row'>
+			".$img."
 			<div class='col-xs-9'>
 				<a href={$url} target='_blank'>{$name}</a>
 				<br>
@@ -75,11 +88,24 @@ class Snippets
 		$perc = $playcount/$biggest*100;
 		$url = Route::url("lib_alb", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $login));
 		$arturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $login));
-		return "
-		<div class='row'>
+		if(empty($img))
+		{
+			$img = "
+			<div class='col-xs-3 getimage imgfix' id='rankid".md5($name)."' data-type='album' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($artist, ENT_QUOTES)."'>
+			".self::loader(60)."
+			</div>
+			";
+		}
+		else
+		{
+			$img = "
 			<div class='col-xs-3'>
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
-			</div>
+			</div>";
+		}
+		return "
+		<div class='row'>
+			".$img."
 			<div class='col-xs-9'>
 				<a href={$url} target='_blank'>{$name}</a> 
 				<br>
@@ -102,11 +128,24 @@ class Snippets
 		$perc = $playcount/$biggest*100;
 		$url = Route::url("lib_mus", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $login));
 		$arturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $login));
-		return "
-		<div class='row'>
+		if(empty($img))
+		{
+			$img = "
+			<div class='col-xs-3 getimage imgfix' id='rankid".md5($name)."' data-type='music' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($artist, ENT_QUOTES)."'>
+			".self::loader(60)."
+			</div>
+			";
+		}
+		else
+		{
+			$img = "
 			<div class='col-xs-3'>
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
-			</div>
+			</div>";
+		}
+		return "
+		<div class='row'>
+			".$img."
 			<div class='col-xs-9'>
 				<a href=".$url." target='_blank'>{$name}</a> 
 				<br>

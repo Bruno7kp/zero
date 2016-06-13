@@ -137,6 +137,9 @@ class Lang
 		$messages["switch"][self::PT_BR] = "alternar";
 		$messages["switch"][self::EN_US] = "switch";
 
+		$messages["prev_of"][self::PT_BR] = "Chart da semana atual até o momento";
+		$messages["prev_of"][self::EN_US] = "Chart of the current week to date";
+
 		$messages["nodata_week"][self::PT_BR] = "Nenhum dado encontrado para esse semana.";
 		$messages["nodata_week"][self::EN_US] = "No data found for this week.";
 

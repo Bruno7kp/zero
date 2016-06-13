@@ -20,6 +20,69 @@ class LibraryController extends Controller
 	}
 
 	/**
+	* @Route(name=live_charts|route=/livechart/{type})
+	*/
+	public function liveChart($type)
+	{
+		$this->validTypeFor("all", $type);
+		$user 	= UserSession::getUser($this->factory);
+		$login  = isset($user->login) ? $user->login : "";
+		$user 	= $this->isValidUser($login);
+		$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
+		$lfm 	= new LastFm();
+		$last 	= $lfm->setUser($user->login)->getUserInfo();
+		$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
+		$wksfm 	= $lfm->getWeeklyChartList();
+		$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date));
+		$outofdateweeks = $wksfm - count($weeks);
+		$list = false;
+		if($outofdateweeks > 0)
+		{
+			$this->render("error/live.php", array("error" => 0, "lfm_bg" 	=> $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+		}
+		else
+		{
+			$fn = "getWeekly".ucfirst($type)."List";
+			$gmt = new \DateTimeZone("GMT");
+			$now = new \DateTime("now", $gmt);
+			$now = $now->format("U");
+			$date = new \DateTime($weeks[0]->to_day, $gmt);
+			$from_day = $date->format("U");
+			$date->modify("+7 day");
+			$to_day = $date->format("U");
+			if($now > $to_day)
+			{
+				$this->render("error/live.php", array("error" => 1, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+			}
+			else
+			{
+				$vars = array("from" => $from_day, "to" => $to_day);
+				$list = $lfm->$fn($vars);
+				$this->render("live.php", array("week" => ($weeks[0]->week + 1), "user" => $user,"list" => $list, "type" => $type, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+			}
+		}
+	}
+
+	private function validTypeFor($for, $type)
+	{
+		switch ($for) {
+			case 'artist':
+				if($type != "album" && $type != "music")
+				{
+					$this->redirectToRoute("404");
+				}
+				break;
+			
+			default:
+				if($type != "artist" && $type != "album" && $type != "music")
+				{
+					$this->redirectToRoute("404");
+				}
+				break;
+		}
+	}
+
+	/**
 	* @Route(name=lib_art_list|route=/user/{login}/charts/artists)
 	*/
 	public function artistList($login)

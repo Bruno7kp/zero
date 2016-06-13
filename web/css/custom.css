@@ -13,6 +13,10 @@
 	margin: 0px !important;
 }
 
+.imgfix img {
+	padding: 5px;
+}
+
 .nav-link {
 	font-size: 20px;
 	color: #333;

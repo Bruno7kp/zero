@@ -6,6 +6,7 @@ use B7KP\Core\Dao;
 use B7KP\Entity\User;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Route;
+use B7KP\Utils\Pass;
 
 class SystemViewerController extends Controller
 {
@@ -48,7 +49,11 @@ class SystemViewerController extends Controller
 		$this->checkAccess();
 		$dao = Dao::getConn();
 
-		//
+		// $data = new \stdClass();
+		// 				$data->password = Pass::encrypt("1234");
+		// 				$data->id = 154;
+		// 				$affected = $this->factory->update("\B7KP\Entity\User", $data);
+		// var_dump($affected);
 	}
 
 	/**

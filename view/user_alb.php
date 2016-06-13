@@ -38,7 +38,7 @@ use B7KP\Utils\Snippets as S;
 					</div>
 					<div class="row topspace-md">
 						<div class="col-xs-4 col-sm-3 col-md-2">
-							<img class="img-circle img-responsive" src="<?php echo $album['img'];?>">
+							<img class="img-responsive" src="<?php echo $album['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
 							<h2><?php echo $name;?></h2>
