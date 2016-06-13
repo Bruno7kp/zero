@@ -165,7 +165,7 @@ if($show_dropouts && $week > 1)
 				<span class="<?php echo $moveclass;?>"><?php echo $move;?></span>
 			</td>
 			<?php if($show_images): ?>
-				<td class="getimage" id="rankid<?php echo $position;?>" data-type="<?php echo $type;?>" data-name="<?php echo addslashes($name);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo addslashes($artist);?>"><?php echo S::loader(30);?></td>
+				<td class="getimage" id="rankid<?php echo $position;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"><?php echo S::loader(30);?></td>
 			<?php ; endif;?>
 			<td class="left"><?php echo $name;?></td>
 			<?php 
@@ -236,7 +236,7 @@ if($show_dropouts && $week > 1)
 			<small>LW: <?php echo $position;?></small>
 		</td>
 		<?php if($show_images): ?>
-			<td class="getimage" id="rankout<?php echo $dropk;?>" data-type="<?php echo $type;?>" data-name="<?php echo addslashes($name);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo addslashes($artist);?>"><?php echo S::loader(30);?></td>
+			<td class="getimage" id="rankout<?php echo $dropk;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"><?php echo S::loader(30);?></td>
 		<?php ; endif;?>
 		<td class="left"><?php echo $name;?></td>
 		<?php 
