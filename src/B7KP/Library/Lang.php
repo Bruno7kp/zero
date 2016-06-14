@@ -298,6 +298,12 @@ class Lang
 		$messages["look_at"][self::PT_BR] = "Dê uma olhada nas";
 		$messages["look_at"][self::EN_US] = "Take a look at the";
 
+		$messages["no_alb"][self::PT_BR] = "Nenhum álbum desse artista entrou nos charts.";
+		$messages["no_alb"][self::EN_US] = "No albums";
+
+		$messages["no_mus"][self::PT_BR] = "Nenhuma música desse artista entrou nos charts.";
+		$messages["no_mus"][self::EN_US] = "No musics";
+
 		$messages["up_new_week"][self::PT_BR] = "Atualizar novas semanas";
 		$messages["up_new_week"][self::EN_US] = "Update new weeks";
 
@@ -309,6 +315,9 @@ class Lang
 
 		$messages["no_data"][self::PT_BR] = "Nenhum dado para mostrar aqui.";
 		$messages["no_data"][self::EN_US] = "There's no data to show here.";
+
+		$messages["need_update"][self::PT_BR] = "Seus charts precisam estar atualizados";
+		$messages["need_update"][self::EN_US] = "Your charts need to be updated";
 
 		$messages["customize"][self::PT_BR] = "<p class='text-muted'>Aqui você pode customizar seus charts.</p>";
 		$messages["customize"][self::EN_US] = "<p class='text-muted'>Here you can customize your charts.</p>";

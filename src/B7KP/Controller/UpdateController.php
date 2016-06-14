@@ -41,7 +41,7 @@ class UpdateController extends Controller
 			$last 	= $lfm->setUser($this->user->login)->getUserInfo();
 			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
 			$wksfm 	= $lfm->getWeeklyChartList();
-			$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date);
+			$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date, $this->user->id);
 			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $this->user->id), "week DESC");
 			$wksfm = array_reverse($wksfm);
 			if($time == "new")
@@ -91,7 +91,7 @@ class UpdateController extends Controller
 				$last 	= $lfm->setUser($this->user->login)->getUserInfo();
 				$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
 				$wksfm 	= $lfm->getWeeklyChartList();
-				$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date);
+				$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date, $this->user->id);
 				$wksfm 	= array_reverse($wksfm);
 				$key 	= array_search($fromu, array_column($wksfm, 'from'));
 				$data->week = $key + 1;

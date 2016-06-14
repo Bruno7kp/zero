@@ -1,6 +1,7 @@
 <?php
 namespace B7KP\Utils;
 
+use B7KP\Core\Dao;
 use B7KP\Model\Model;
 use B7KP\Entity\Week; 
 use B7KP\Entity\User; 
@@ -414,6 +415,25 @@ class Charts
 		$weeks = $this->factory->findSql("B7KP\Entity\Artist_charts", $sql);
 
 		return $weeks;
+	}
+
+	public function getAlbumByArtist($artist, $limit)
+	{
+		$dao = Dao::getConn();
+		$artist = addslashes($artist);
+		$sql = "SELECT a.album, a.artist, count(id) as weeks, min(rank) as peak FROM album_charts a WHERE a.artist = '".$artist."' AND rank <= ".$limit." GROUP BY a.album ORDER BY weeks DESC";
+		$alb = $dao->run($sql);
+		return $alb;
+
+	}
+
+	public function getMusicByArtist($artist, $limit)
+	{
+		$dao = Dao::getConn();
+		$artist = addslashes($artist);
+		$sql = "SELECT a.music, a.artist, count(id) as weeks, min(rank) as peak FROM music_charts a WHERE a.artist = '".$artist."' AND rank <= ".$limit." GROUP BY a.music ORDER BY weeks DESC";
+		$mus = $dao->run($sql);
+		return $mus;
 	}
 
 	public function getHomeWeeklyChartsAlt(Week $week)

@@ -23,6 +23,7 @@ class Functions
 		$name = str_replace("/", "%252F", $name);
 		$name = str_replace("\\", "%255C", $name);
 		$name = str_replace("#", "%23", $name);
+		$name = str_replace("?", "%3F", $name);
 		$name = str_replace(" ", "+", $name);
 		//var_dump($name);
 		return ($name);

@@ -244,16 +244,23 @@ class LastFm
 
     // Funções auxiliares
 
-    public function removeWeeksBeforeDate($array = array(), $date)
+    public function removeWeeksBeforeDate($array = array(), $date, $id)
     {
         $date   = str_replace("/", "-", str_replace(".", "-", $date)); 
         $array  = (array) $array;
         $array  = array_reverse($array);
         $date   = new \DateTime($date);
+        if(isset($id))
+        {
+            if($id == 38 || $id == 258 || $id > 274)
+            {
+                $date->modify("+1 day");
+            }
+        }
         $date   = $date->format("U");
         $final  = array();
         foreach ($array as $value) {
-            if($value['to'] < $date)
+            if($value['to'] <= $date)
             {
                 break;
             }

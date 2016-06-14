@@ -75,6 +75,10 @@ use B7KP\Library\Lang;
 								
 						<?php
 						}
+						else
+						{
+							echo "<div class=text-center>".Lang::get("no_data")."</div>";
+						}
 						?>
 						</div>
 					</div>

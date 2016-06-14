@@ -48,12 +48,8 @@ class SystemViewerController extends Controller
 	{
 		$this->checkAccess();
 		$dao = Dao::getConn();
-
-		// $data = new \stdClass();
-		// 				$data->password = Pass::encrypt("1234");
-		// 				$data->id = 154;
-		// 				$affected = $this->factory->update("\B7KP\Entity\User", $data);
-		// var_dump($affected);
+		//$affected = $this->factory->removeBy("\B7KP\Entity\Week", "iduser", 38);
+		//var_dump($affected);
 	}
 
 	/**

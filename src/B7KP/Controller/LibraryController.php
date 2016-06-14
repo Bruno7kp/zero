@@ -33,12 +33,12 @@ class LibraryController extends Controller
 		$last 	= $lfm->setUser($user->login)->getUserInfo();
 		$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
 		$wksfm 	= $lfm->getWeeklyChartList();
-		$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date));
+		$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));
 		$outofdateweeks = $wksfm - count($weeks);
 		$list = false;
 		if($outofdateweeks > 0)
 		{
-			$this->render("error/live.php", array("error" => 0, "lfm_bg" 	=> $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+			$this->render("error/live.php", array("error" => 0, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
 		}
 		else
 		{
@@ -52,14 +52,17 @@ class LibraryController extends Controller
 			$to_day = $date->format("U");
 			if($now > $to_day)
 			{
-				$this->render("error/live.php", array("error" => 1, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+				//$this->render("error/live.php", array("error" => 1, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+				$date->modify("+7 day");
+				$to_to = $date->format("U");
+				$vars = array("from" => $to_day, "to" => $to_to);
 			}
 			else
 			{
 				$vars = array("from" => $from_day, "to" => $to_day);
-				$list = $lfm->$fn($vars);
-				$this->render("live.php", array("week" => ($weeks[0]->week + 1), "user" => $user,"list" => $list, "type" => $type, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
 			}
+			$list = $lfm->$fn($vars);
+			$this->render("live.php", array("week" => ($weeks[0]->week + 1), "user" => $user,"list" => $list, "type" => $type, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
 		}
 	}
 
@@ -80,6 +83,36 @@ class LibraryController extends Controller
 				}
 				break;
 		}
+	}
+
+	/**
+	* @Route(name=lib_art_music|route=/user/{login}/library/{artist}/music)
+	*/
+	public function artMusLibList($login, $artist)
+	{
+		$user = $this->isValidUser($login);
+		$chart = new Charts($this->factory, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$fixed = urldecode($artist);
+		$fixed = str_replace("+", " ", $fixed);
+		$fixed = str_replace("%2b", "+", $fixed);
+		$music = $chart->getMusicByArtist($fixed, $settings->mus_limit);
+		var_dump($music);
+	}
+
+	/**
+	* @Route(name=lib_art_album|route=/user/{login}/library/{artist}/album)
+	*/
+	public function artAlbLibList($login, $artist)
+	{
+		$user = $this->isValidUser($login);
+		$chart = new Charts($this->factory, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$fixed = urldecode($artist);
+		$fixed = str_replace("+", " ", $fixed);
+		$fixed = str_replace("%2b", "+", $fixed);
+		$album = $chart->getAlbumByArtist($fixed, $settings->alb_limit);
+		var_dump($album);
 	}
 
 	/**
@@ -261,6 +294,8 @@ class LibraryController extends Controller
 			$artist["userplaycount"] = $artist["userplaycount"];
 			$artist["img"] = $artist["images"]["large"];
 			$stats = $chart->getArtistStats($artist["name"], "");
+			$album = $chart->getAlbumByArtist($artist["name"], $settings->alb_limit);
+			$music = $chart->getMusicByArtist($artist["name"], $settings->mus_limit);
 			$artist["stats"] = $chart->extract($stats, false);
 			$dao = Dao::getConn();
 
@@ -268,6 +303,8 @@ class LibraryController extends Controller
 						(
 							"user" => $user,
 							"artist" => $artist,
+							"album" => $album,
+							"music" => $music,
 							"limit" => $settings->art_limit,
 							"lfm_bg" 	=> $this->getUserBg($user),
 							"lfm_image" => $this->getUserBg($user, true)

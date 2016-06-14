@@ -30,7 +30,11 @@ class ProfileController extends Controller
 			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
 			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
 			$wksfm 	= $lfm->getWeeklyChartList();
-			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date));
+			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));
+			if($wksfm == 0)
+			{
+				$wksfm = 1;
+			}
 			$average = $last['playcount'] / $wksfm;
 			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
 			$bgimage = false;
