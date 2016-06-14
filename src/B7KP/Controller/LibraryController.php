@@ -97,7 +97,32 @@ class LibraryController extends Controller
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
 		$music = $chart->getMusicByArtist($fixed, $settings->mus_limit);
-		var_dump($music);
+		$lfm 	= new LastFm();
+		$lfm 	= $lfm->setUser($user->login);
+		$data = $lfm->getArtistInfo($fixed);
+		if($data)
+		{
+			$act["artist"] = $data["name"];
+			$act["userplaycount"] = $data["userplaycount"];
+			$act["img"] = $data["images"]["large"];
+			$stats = $chart->getArtistStats($data["name"], "");
+			$act["stats"] = $chart->extract($stats, false);
+		}
+		else
+		{
+			$this->redirectToRoute("lib_art", array("login" => $user->login));
+		}
+
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"music" 	=> $music,
+						"artist" 	=> $act,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("user_art_mus.php", $vars);
 	}
 
 	/**
@@ -286,16 +311,16 @@ class LibraryController extends Controller
 		$fixed = urldecode($name);
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
-		$artist = $lastfm->getArtistInfo($fixed);
+		$data = $lastfm->getArtistInfo($fixed);
 
-		if($artist)
+		if($data)
 		{
-			$artist["artist"] = $artist["name"];
-			$artist["userplaycount"] = $artist["userplaycount"];
-			$artist["img"] = $artist["images"]["large"];
-			$stats = $chart->getArtistStats($artist["name"], "");
-			$album = $chart->getAlbumByArtist($artist["name"], $settings->alb_limit);
-			$music = $chart->getMusicByArtist($artist["name"], $settings->mus_limit);
+			$artist["artist"] = $data["name"];
+			$artist["userplaycount"] = $data["userplaycount"];
+			$artist["img"] = $data["images"]["large"];
+			$stats = $chart->getArtistStats($data["name"], "");
+			$album = $chart->getAlbumByArtist($data["name"], $settings->alb_limit);
+			$music = $chart->getMusicByArtist($data["name"], $settings->mus_limit);
 			$artist["stats"] = $chart->extract($stats, false);
 			$dao = Dao::getConn();
 

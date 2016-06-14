@@ -53,12 +53,9 @@ class Snippets
 		if(empty($img))
 		{
 			$img = "
-			<div class='col-xs-1 text-center'>
-			<div class=' getimage imgfix' id='rankid".md5($name)."' data-type='artist' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'>
+			<div class='col-xs-3 getimage imgfix' id='rankid".md5($name)."' data-type='artist' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'>
 			".self::loader(60)."
 			</div>
-			</div>
-			<div class='col-xs-11'>
 			";
 		}
 		else
@@ -67,11 +64,12 @@ class Snippets
 			<div class='col-xs-3'>
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
 			</div>
-			<div class='col-xs-9'>";
+			";
 		}
 		return "
 		<div class='row'>
 			".$img."
+			<div class='col-xs-9'>
 				<a href={$url} target='_blank'>{$name}</a>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>

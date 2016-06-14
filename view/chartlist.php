@@ -1,5 +1,6 @@
 <?php
 use B7KP\Utils\Snippets;
+use B7KP\Utils\Functions as F;
 use B7KP\Utils\Charts;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
@@ -44,6 +45,7 @@ use B7KP\Library\Lang;
 												if(is_array($weeks) && count($weeks) > 0)
 												{
 													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/artist/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 												?>
 													<div class="row divider-tb bottomspace-sm">
@@ -57,11 +59,12 @@ use B7KP\Library\Lang;
 															<?php 
 															if(is_array($value["artist"]) && count($value["artist"]) > 0)
 															{
+																$actlink = $muslink.F::fixLFM($value["artist"][0]->artist);
 																$r = array("login" => $user->login, "type" => "artist", "week" => $value["week"]);
 																$weeklink = $mainlink.$value["week"];
 																$artist = $value["artist"][0];
 															?>
-															<h4 class="h3 no-margin"><?php echo $artist->artist;?></h4>
+															<h4 class="h3 no-margin"><?php echo "<a href=".$actlink.">".$artist->artist."</a>";?></h4>
 															<?php
 															}
 															else
@@ -98,6 +101,7 @@ use B7KP\Library\Lang;
 												if(is_array($weeks) && count($weeks) > 0)
 												{
 													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 												?>
 													<div class="row divider-tb bottomspace-sm">
@@ -111,13 +115,15 @@ use B7KP\Library\Lang;
 															<?php 
 															if(is_array($value["music"]) && count($value["music"]) > 0)
 															{
+																$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
+																$mlink = $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music);
 																$r = array("login" => $user->login, "type" => "music", "week" => $value["week"]);
 																$weeklink = $mainlink.$value["week"];
 																$music = $value["music"][0];
 															?>
-															<h4 class="no-margin"><?php echo $music->music;?></h4>
+															<h4 class="no-margin"><?php echo "<a href=".$mlink.">".$music->music."</a>";?></h4>
 															<span class="text-muted"><?php echo Lang::get('by');?></span>
-															<?php echo $music->artist;?>
+															<?php echo "<a href=".$actlink.">".$music->artist."</a>";?>
 															<?php
 															}
 															else
@@ -154,6 +160,7 @@ use B7KP\Library\Lang;
 												if(is_array($weeks) && count($weeks) > 0)
 												{
 													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/album/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 												?>
 													<div class="row divider-tb bottomspace-sm">
@@ -167,13 +174,15 @@ use B7KP\Library\Lang;
 															<?php 
 															if(is_array($value["album"]) && count($value["album"]) > 0)
 															{
+															$actlink = $muslink.F::fixLFM($value["album"][0]->artist);
+															$alblink = $muslink.F::fixLFM($value["album"][0]->artist)."/".F::fixLFM($value["album"][0]->album);
 																$r = array("login" => $user->login, "type" => "album", "week" => $value["week"]);
 																$weeklink = $mainlink.$value["week"];
 																$album = $value["album"][0];
 															?>
-															<h4 class="no-margin"><?php echo $album->album;?></h4>
+															<h4 class="no-margin"><?php echo "<a href=".$alblink.">".$album->album."</a>";?></h4>
 															<span class="text-muted"><?php echo Lang::get('by');?></span>
-															<?php echo $album->artist;?>
+															<?php echo "<a href=".$actlink.">".$album->artist."</a>";?>
 															<?php
 															}
 															else

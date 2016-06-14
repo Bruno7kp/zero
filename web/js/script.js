@@ -219,9 +219,6 @@ function showAlert(erro, message)
 		icon: icon,
 		title: title,
 		message: message,
-		offset: {
-			y: 200
-		},
 		animate: {
 			enter: 'animated fadeInUp',
 			exit: 'animated fadeOutDown'
@@ -229,6 +226,7 @@ function showAlert(erro, message)
 	},{
 		type: 'minimalist',
 		delay: 4000,
+		z_index: 10002,
 		allow_dismiss: true,
 		newest_on_top: true,
 		template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +

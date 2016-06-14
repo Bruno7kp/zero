@@ -1,5 +1,6 @@
 <?php
 use B7KP\Utils\Snippets;
+use B7KP\Utils\Functions as F;
 use B7KP\Utils\Charts;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
@@ -44,8 +45,10 @@ use B7KP\Library\Lang;
 												if(is_array($weeks) && count($weeks) > 0)
 												{
 													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/artist/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
+														$actlink = $muslink.F::fixLFM($value["artist"][0]->artist);
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -60,7 +63,7 @@ use B7KP\Library\Lang;
 															{
 																$artist = $value["artist"][0];
 															?>
-															<h4 class="h3 no-margin"><?php echo $artist->artist;?></h4>
+															<h4 class="h3 no-margin"><?php echo "<a href=".$actlink.">".$artist->artist."</a>";?></h4>
 															<?php
 															}
 															else
@@ -99,8 +102,11 @@ use B7KP\Library\Lang;
 												if(is_array($weeks) && count($weeks) > 0)
 												{
 													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
+														$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
+														$mlink = $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music);
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -116,9 +122,9 @@ use B7KP\Library\Lang;
 															{
 																$music = $value["music"][0];
 															?>
-															<h4 class="no-margin"><?php echo $music->music;?></h4>
+															<h4 class="no-margin"><?php echo "<a href=".$mlink.">".$music->music."</a>";?></h4>
 															<span class="text-muted"><?php echo Lang::get('by');?></span>
-															<?php echo $music->artist;?>
+															<?php echo "<a href=".$actlink.">".$music->artist."</a>";?>
 															<?php
 															}
 															else
@@ -157,8 +163,11 @@ use B7KP\Library\Lang;
 												if(is_array($weeks) && count($weeks) > 0)
 												{
 													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/album/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
+														$actlink = $muslink.F::fixLFM($value["album"][0]->artist);
+														$alblink = $muslink.F::fixLFM($value["album"][0]->artist)."/".F::fixLFM($value["album"][0]->album);
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -176,9 +185,9 @@ use B7KP\Library\Lang;
 
 																$album = $value["album"][0];
 															?>
-															<h4 class="no-margin"><?php echo $album->album;?></h4>
+															<h4 class="no-margin"><?php echo "<a href=".$alblink.">".$album->album."</a>";?></h4>
 															<span class="text-muted"><?php echo Lang::get('by');?></span>
-															<?php echo $album->artist;?>
+															<?php echo "<a href=".$actlink.">".$album->artist."</a>";?>
 															<?php
 															}
 															else
@@ -247,6 +256,20 @@ use B7KP\Library\Lang;
 									</td>
 								</tr>
 							</table>
+							<?php 
+							if($user->checkSelfPermission($this->factory))
+							{
+							?>
+							<div class="row text-center">
+								<h2 class="h3">Live chart</h2>
+								<p><?php echo Lang::get("live_chart");?></p>
+								<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'artist'));?>><i class="ti-user"></i></a>
+								<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'album'));?>><i class="icon-vynil except"></i></a>
+								<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'music'));?>><i class="ti-music"></i></a>
+							</div>
+							<?php
+							}
+							?>
 						</div>
 					</div>
 				</div>

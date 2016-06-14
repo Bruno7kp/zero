@@ -465,17 +465,8 @@ class Lang
 		$messages["last_user"][self::PT_BR] = "Usuário do Last.fm não encontrado.";
 		$messages["last_user"][self::EN_US] = "Last.fm username not found";
 
-		
-
-		
-		
-
-		
-		
-		
-		
-
-		
+		$messages["live_chart"][self::PT_BR] = "Acompanhe como está o chart da semana atual até o momento.";
+		$messages["live_chart"][self::EN_US] = "";
 
 		return $messages;
 	}

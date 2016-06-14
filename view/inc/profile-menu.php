@@ -21,6 +21,8 @@ switch ($curroute) {
 
 	case 'lib_art_list':
 	case 'lib_art':
+	case 'lib_art_music':
+	case 'lib_art_album':
 		$a_arti = "active";
 		break;
 	case 'lib_mus_list':
