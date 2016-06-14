@@ -59,10 +59,10 @@ class App
 			default:
 				self::$environment = "PROD";
 				self::$db = "mysql";
-				self::$dbname = "gifbo380_lastfm";
-				self::$host = "localhost";
-				self::$user = "gifbo380_victor";
-				self::$password = "Andrebicudo18";
+				self::$dbname = "";
+				self::$host = "";
+				self::$user = "";
+				self::$password = "";
 				self::$dsn = self::setDsn();
 				self::$lastfmapikey = "f383ea53a3df0bb4c8c1387018ec6c58";
 				self::$lastfmapisecret = "2d32aeac2eaf2c7014d1591b01b2001f";
