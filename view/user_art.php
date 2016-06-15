@@ -100,7 +100,7 @@ use B7KP\Utils\Snippets as S;
 											<tr>
 												<th class=text-center><h4 class=no-margin>".Lang::get('pk')."</h4></th>
 												<th colspan=2>
-													<h3 class=no-margin>".Lang::get("alb_x")."</h3>
+													<h3 class=no-margin>".Lang::get("alb")."</h3>
 												</th>
 												<th class=text-center><h4 class=no-margin>".Lang::get('wk_x')."</h4></th>
 											</tr>
@@ -146,7 +146,7 @@ use B7KP\Utils\Snippets as S;
 											<tr>
 												<th class=text-center><h4 class=no-margin>".Lang::get('pk')."</h4></th>
 												<th>
-													<h3 class=no-margin>".Lang::get("mus_x")."</h3>
+													<h3 class=no-margin>".Lang::get("mus")."</h3>
 												</th>
 												<th class=text-center><h4 class=no-margin>".Lang::get('wk_x')."</h4></th>
 											</tr>
