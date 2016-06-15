@@ -6,6 +6,7 @@ use B7KP\Library\Url;
 use B7KP\Library\Lang;
 use B7KP\Utils\Constants as C;
 use B7KP\Utils\Snippets as S;
+use B7KP\Utils\Functions as F;
 ?>
 <!doctype html>
 <html>
@@ -41,7 +42,8 @@ use B7KP\Utils\Snippets as S;
 							<img class="img-responsive" src="<?php echo $album['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2><?php echo $name;?></h2>
+							<h2 class="no-margin"><?php echo $name;?></h2>
+							<h3><?php echo Lang::get("by");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($artist)));?>><?php echo $artist;?></a></h3>
 							<div class="row">
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 									<small class="text-muted"><?php echo Lang::get('play_x');?></small>

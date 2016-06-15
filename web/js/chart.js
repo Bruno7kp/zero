@@ -10,6 +10,7 @@ function chartinit()
 	updateUniqueWeek();
 	switchToSimpleCR();
 	editWeek();
+	loadPlaycount();
 }
 
 function getChartMsg(msgid)
@@ -250,6 +251,94 @@ function loadimages()
 			});
 		}
 		 
+	});
+}
+
+function loadPlaycount()
+{
+	tds = $(".loadplaycount");
+	loadplugin = false;
+	i = 1;
+	console.log(tds.length);
+	$.each(tds, function(index, val) {
+		type = $(this).attr('data-type');
+		name = $(this).attr('data-name');
+		user = $(this).attr('data-login');
+		name = name.replace(/\\/g, "");
+		mbid = $(this).attr('data-mbid');
+		artist = $(this).attr('data-artist');
+		artist = artist.replace(/\\/g, "");
+		rankid = $(this).attr('id');
+		td = $(this);
+		if(type == "artist")
+		{
+			//except = ["The Killers", "Ellie Goulding"];
+			
+			mbid = "";
+			//artist = artist.replace("&", "%26");
+			
+			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&mbid='+mbid+'&format=json';
+		}
+		else if(type == "album")
+		{
+			//artist = artist.replace("&", "%26").replace("+", "%2B");
+			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&album='+name+'&mbid=&format=json';
+
+		}
+		else
+		{
+			//artist = artist.replace("&", "%26").replace("+", "%2B");;
+			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json';
+		}
+		last = encodeURI(last);
+		last = last.replace("+", "%2B");
+		last = last.replace("#", "%23");
+		last = last.replace("%20&", "%20%26");
+		last = last.replace("&%20", "%26%20");
+		//console.log(last);
+		getF(last, td, type);
+		function getF(last, td, type)
+		{
+			console.log(last);
+			$.ajax({
+				url: last,
+				type: 'GET',
+				dataType: 'json'
+			})
+			.done(function(data) {
+				console.log(i);
+				if(typeof data.track != "undefined" && typeof data.track.userplaycount != "undefined")
+				{
+					td.text(data.track.userplaycount);
+				}
+				else if(typeof data.album.userplaycount != "undefined")
+				{
+					td.text(data.album.userplaycount);
+				}
+				else
+				{
+					td.text("-");
+				}
+
+				if(i == td.length)
+				{
+					setTimeout(function(){ 
+					//$(".tablesorteralt").tablesorter({theme : "bootstrap", headerTemplate : '{content} {icon}',widgets : [ "uitheme"]});
+
+					 }, 1000);
+
+				}
+				i++;
+				console.log("success");
+			})
+			.fail(function() {
+				console.log("error");
+			})
+			.always(function() {
+				console.log("complete");
+			});
+		}
+		
 	});
 }
 

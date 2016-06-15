@@ -421,7 +421,7 @@ class Charts
 	{
 		$dao = Dao::getConn();
 		$artist = addslashes($artist);
-		$sql = "SELECT a.album, a.artist, count(id) as weeks, min(rank) as peak FROM album_charts a WHERE a.artist = '".$artist."' AND rank <= ".$limit." GROUP BY a.album ORDER BY weeks DESC";
+		$sql = "SELECT a.album, a.artist, count(a.id) as weeks, min(rank) as peak FROM album_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.album ORDER BY peak ASC, weeks DESC";
 		$alb = $dao->run($sql);
 		return $alb;
 
@@ -431,7 +431,7 @@ class Charts
 	{
 		$dao = Dao::getConn();
 		$artist = addslashes($artist);
-		$sql = "SELECT a.music, a.artist, count(id) as weeks, min(rank) as peak FROM music_charts a WHERE a.artist = '".$artist."' AND rank <= ".$limit." GROUP BY a.music ORDER BY weeks DESC";
+		$sql = "SELECT a.music, a.artist, count(a.id) as weeks, min(rank) as peak FROM music_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.music ORDER BY peak ASC, weeks DESC";
 		$mus = $dao->run($sql);
 		return $mus;
 	}

@@ -204,7 +204,7 @@ class BaseApi
     {
         $end = false;
         $resp = "";
-        if($this->isJSON($this->response[10]))
+        if(isset($this->response[10]) && $this->isJSON($this->response[10]))
         {
             $resp = $this->response[10];
         }

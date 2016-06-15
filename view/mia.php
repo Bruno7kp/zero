@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions as F;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -74,15 +75,15 @@ use B7KP\Library\Lang;
 							</thead>
 							<tbody>
 								<?php 
-								$weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
+								$basurl = Url::getBaseUrl()."/user/".$user->login."/library/";
 								foreach ($list as $key => $value) 
 								{
 									$week = $this->factory->findOneBy("B7KP\Entity\Week", $value->idweek);
-									$url = $weekurl.$week->week;
+									$actlink = $basurl.F::fixLFM($value->artist)."/".$type;
 								?>
 								<tr>
 									<td class="text-center"><?php echo $key+1;?></td>
-									<td><?php echo $value->artist; ?></td>
+									<td><?php echo "<a href=".$actlink.">".$value->artist."</a>"; ?></td>
 									<td class="text-center"><?php echo $value->uniques; ?></td>
 									<td class="text-center"><?php echo $value->total; ?></td>
 								</tr>

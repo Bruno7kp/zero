@@ -75,109 +75,51 @@ use B7KP\Utils\Snippets as S;
 					</div>
 					<div class="row">
 						<div class="col-md-12">
-							<?php if(!empty($times)): ?>
-							<hr/>
-							<?php ; endif; ?>
-						</div>
-					</div>
-					<?php
-					echo S::chartRun("artist", $artist["stats"]["chartrun"], $user, $artist["stats"]["stats"]["alltime"], $limit, $name);
-					?>
-					<div class="row">
-						<div class="col-md-12">
 							<hr/>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6">
-
-							<?php 
+						<div class="col-md-8">
+							<h3><?php echo Lang::get("alb_x")." ".Lang::get("of")." <a href='".Route::url('lib_art', array("login" => $user->login, "name" => F::fixLFM($name)))."'>".$name."</a>";?></h3>
+							<?php
 							if(count($album) > 0)
 							{
-								$max = 0;
-								echo "	<table class='table middle'>";
+								echo "	<table class='table middle tablesorteralt'>";
 								echo "	<thead>
 											<tr>
-												<th class=text-center><h4 class=no-margin>".Lang::get('pk')."</h4></th>
+												<th class=text-center>".Lang::get('pk')."</th>
 												<th colspan=2>
-													<h3 class=no-margin>".Lang::get("alb_x")."</h3>
+													".Lang::get("alb")."
 												</th>
-												<th class=text-center><h4 class=no-margin>".Lang::get('wk_x')."</h4></th>
+												<th class=text-center>".Lang::get('wk_x')."</th>
+												<th class=text-center>".Lang::get('play_x')."</th>
 											</tr>
 										<thead>
 										<tbody class=large>";
 								foreach ($album as $item) 
 								{
-									if($max == 5)
-									{
-										break;
-									}
-									$max++;
 									echo "<tr>";
 										echo "<td class='text-center'>";
 											echo $item->peak;
 										echo "</td>";
-										echo "<td class='getimage' id='rankid".md5($item->album)."' data-type='album' data-name='".htmlentities($item->album, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
+										echo "<td class='getimage' id='rankid".md5($item->album)."' data-type='album' data-name='".htmlentities($item->album, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
 										echo "<td>";
-											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
+											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
 										echo "</td>";
 										echo "<td class='text-center'>";
 											echo $item->weeks;
+										echo "</td>";
+										echo "<td id='".md5($item->album)."' class='text-center loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+											//echo $item->weeks;
 										echo "</td>";
 									echo "</tr>";
 
 								}
 								echo "</tbody></table>";
-								echo "<a class='btn btn-outline topspace-md' href=".Route::url('lib_art_album', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
 							}
 							else
 							{
 								echo Lang::get("no_alb");
-							}
-							?>
-						</div>
-						<div class="col-md-6">
-							<?php
-							if(count($music) > 0)
-							{
-								$max = 0;
-								echo "	<table class='table middle'>";
-								echo "	<thead>
-											<tr>
-												<th class=text-center><h4 class=no-margin>".Lang::get('pk')."</h4></th>
-												<th>
-													<h3 class=no-margin>".Lang::get("mus_x")."</h3>
-												</th>
-												<th class=text-center><h4 class=no-margin>".Lang::get('wk_x')."</h4></th>
-											</tr>
-										<thead>
-										<tbody class=large>";
-								foreach ($music as $item) 
-								{
-									if($max == 10)
-									{
-										break;
-									}
-									$max++;
-									echo "<tr>";
-										echo "<td class='text-center'>";
-											echo $item->peak;
-										echo "</td>";
-										echo "<td>";
-											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->music))).">".$item->music."</a>";
-										echo "</td>";
-										echo "<td class='text-center'>";
-											echo $item->weeks;
-										echo "</td>";
-									echo "</tr>";
-
-								}
-								echo "</tbody></table>";
-								echo "<a class='btn btn-outline topspace-md' href=".Route::url('lib_art_music', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
-							}
-							else
-							{
-								echo Lang::get("no_mus");
 							}
 							?>
 						</div>

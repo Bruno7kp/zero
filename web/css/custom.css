@@ -145,6 +145,10 @@
 	margin: 0px auto;
 }
 
+.large {
+	font-size: large;
+}
+
 .pd-5{
 	padding-left: 5px;
 }

@@ -137,7 +137,32 @@ class LibraryController extends Controller
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
 		$album = $chart->getAlbumByArtist($fixed, $settings->alb_limit);
-		var_dump($album);
+		$lfm 	= new LastFm();
+		$lfm 	= $lfm->setUser($user->login);
+		$data = $lfm->getArtistInfo($fixed);
+		if($data)
+		{
+			$act["artist"] = $data["name"];
+			$act["userplaycount"] = $data["userplaycount"];
+			$act["img"] = $data["images"]["large"];
+			$stats = $chart->getArtistStats($data["name"], "");
+			$act["stats"] = $chart->extract($stats, false);
+		}
+		else
+		{
+			$this->redirectToRoute("lib_art", array("login" => $user->login));
+		}
+
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"album" 	=> $album,
+						"artist" 	=> $act,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("user_art_alb.php", $vars);
 	}
 
 	/**

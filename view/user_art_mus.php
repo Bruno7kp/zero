@@ -79,31 +79,42 @@ use B7KP\Utils\Snippets as S;
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-8">
 							<h3><?php echo Lang::get("mus_x")." ".Lang::get("of")." <a href='".Route::url('lib_art', array("login" => $user->login, "name" => F::fixLFM($name)))."'>".$name."</a>";?></h3>
 							<?php
 							if(count($music) > 0)
 							{
+								echo "	<table class='table middle tablesorteralt'>";
+								echo "	<thead>
+											<tr>
+												<th class=text-center>".Lang::get('pk')."</th>
+												<th>
+													".Lang::get("mus")."
+												</th>
+												<th class=text-center>".Lang::get('wk_x')."</th>
+												<th class=text-center>".Lang::get('play_x')."</th>
+											</tr>
+										<thead>
+										<tbody class=large>";
 								foreach ($music as $item) 
 								{
-									echo "<div class='pd'>";
-									echo "<div class='float' id='rankid".md5($item->music)."' data-type='music' data-name='".htmlentities($item->music, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'><img src='".$artist['img']."' height='64'></div>";
-									echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->music))).">".$item->music."</a>";
-									echo "<br/>";
-										echo "<div class='row' style='font-size: small;'>";
-											echo "<div class='col-xs-2 text-center'>";
-												echo "<small class='text-muted'>".Lang::get("pk")."</small><br>";
-												echo "<b>".$item->peak."</b>";
-											echo "</div>";
-											echo "<div class='col-xs-2 text-center'>";
-												echo "<small class='text-muted'>".Lang::get("wk_x")."</small><br>";
-												echo "<b>".$item->weeks."</b>";
-											echo "</div>";
-										echo "</div>";
-									echo "</div>";
+									echo "<tr>";
+										echo "<td class='text-center'>";
+											echo $item->peak;
+										echo "</td>";
+										echo "<td>";
+											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->music))).">".$item->music."</a>";
+										echo "</td>";
+										echo "<td class='text-center'>";
+											echo $item->weeks;
+										echo "</td>";
+										echo "<td id='".md5($item->music)."' class='text-center loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+											//echo $item->weeks;
+										echo "</td>";
+									echo "</tr>";
 
 								}
-								echo "<a class='btn btn-outline' href=".Route::url('lib_art_music', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
+								echo "</tbody></table>";
 							}
 							else
 							{
