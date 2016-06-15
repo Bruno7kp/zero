@@ -286,8 +286,8 @@ class Lang
 		$messages["user_x"][self::EN_US] = "Users";
 
 		// TEXTOS/FRASESComplete the fields below and done.
-		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu login na last.fm e a senha que colocar logo abaixo. Nós <b>não</b> recomendamos usar a mesma senha da sua conta na Last.fm.";
-		$messages["init"][self::EN_US] = "Complete the fields below and done. To access ".App::get('name')." again, use your last.fm login and the new password you will insert below. We do <strong>not</strong> recomend to use the same password of your Last.fm account.";
+		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu <b>Nome de usuário</b> do last.fm e a senha que colocar logo abaixo. Nós <b>não</b> recomendamos usar a mesma senha da sua conta no Last.fm.";
+		$messages["init"][self::EN_US] = "Complete the fields below and done. To access ".App::get('name')." again, use your last.fm <b>Username</b> and the new password you will insert below. We do <strong>not</strong> recomend to use the same password of your Last.fm account.";
 
 		$messages["conn"][self::PT_BR] = "Conecte ".App::get('name')." com seu Last.fm";
 		$messages["conn"][self::EN_US] = "Connect ".App::get('name')." with your Last.fm";
@@ -324,6 +324,18 @@ class Lang
 
 		$messages["error_token"][self::PT_BR] = "Algo deu errado ao checar o seu token. Tente novamente mais tarde.";
 		$messages["error_token"][self::EN_US] = "Something went wrong when checking the token. Try again later.";
+
+		$messages["conf_prop"][self::PT_BR] = "Confirme que você é proprietário da conta.";
+		$messages["conf_prop"][self::EN_US] = "Confirm that you're the owner of the account.";
+
+		$messages["after_new_pass"][self::PT_BR] = "Após a confirmação da senha você será redirecionado para a página de login.";
+		$messages["after_new_pass"][self::EN_US] = "After confirming the password you will be redirected to the login page.";
+
+		$messages["type_new_pass"][self::PT_BR] = "Digite sua nova senha.";
+		$messages["type_new_pass"][self::EN_US] = "Type your new password.";
+
+		$messages["note_app"][self::PT_BR] = "Para fazer login neste site novamente, deve-se usar seu nome de usuário e sua senha, note que a senha não precisa ser a mesma do Last.fm.";
+		$messages["note_app"][self::EN_US] = "To login on this site again, you must use your username and password, note that the password does not need to be the same as Last.fm.";
 
 		$messages["sett_limit"][self::PT_BR] = "<p class='text-muted'>Aqui você pode selecionar o limite de itens para seu chart semanal. Colocando um limite, os itens que ficarem abaixo do mesmo serão ignorados na geração de seus charts.</p>";
 		$messages["sett_limit"][self::EN_US] = "<p class='text-muted'>Here you can select the item limit of your weekly chart. Putting a limit, items that fall below this limit are ignored when generating your data.</p>";
@@ -419,6 +431,15 @@ class Lang
 
 		$messages["in_use"][self::PT_BR] = "já está em uso";
 		$messages["in_use"][self::EN_US] = "is already in use";
+
+		$messages["forg_pass"][self::PT_BR] = "Esqueceu sua senha?";
+		$messages["forg_pass"][self::EN_US] = "Forgot password?";
+
+		$messages["type_user"][self::PT_BR] = "Digite seu nome de usuário";
+		$messages["type_user"][self::EN_US] = "Type your username";
+
+		$messages["acc_not_exists"][self::PT_BR] = "Esta conta não está cadastrada. Para se cadastrar";
+		$messages["acc_not_exists"][self::EN_US] = "This account is not registered. To register";
 
 		$messages["integer"][self::PT_BR] = "deve ser um número inteiro";
 		$messages["integer"][self::EN_US] = "must be an integer";

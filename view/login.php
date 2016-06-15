@@ -21,6 +21,7 @@ use B7KP\Library\Lang;
 							<h2>Login <br><small><?php echo Lang::get('or');?> <a href="<?php echo Route::url('register');?>"><?php echo Lang::get('reg');?></a></small></h2>
 							
 							<?php $form->output();?>
+							<a href="<?php echo Route::url('forgotpass');?>"><?php echo Lang::get('forg_pass');?></a>
 						</div>
 
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
