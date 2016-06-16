@@ -118,6 +118,7 @@ function editWeek()
 				      type: 'inline'
 				  }
 			});
+			sortList();
 		})
 		.fail(function() {
 			console.log("error");
@@ -125,12 +126,71 @@ function editWeek()
 		.always(function() {
 			console.log("complete");
 		});
-		
+	}
+
+	function sortList()
+	{
+		list = $(".editablelist");
+		$.each(list, function(index, val) {
+			if($(this).find("li").length>1)
+			{
+				$(this).find("li").prepend("<i class='ti-arrows-vertical'></i> ")
+				var ed = document.getElementById($(this).attr("id"));
+				Sortable.create(ed);
+			}
+		});
+
+		editWeek();
 	}
 
 	function editWeek()
 	{
-
+		$('#btn-wk-edit').on('click', function(event) {
+			event.preventDefault();
+			list = $(".editablelist").find("li");
+			finallist = {};
+			finallist.week = $(this).attr('data-week');
+			finallist.type = $(this).attr('data-type');
+			i = 0;
+			finallist.items = [];
+			last = list.length;
+			$.each(list, function(index, val) {
+				eachdata = {
+					name: $(this).attr('data-name'),
+					mbid: $(this).attr('data-mbid'),
+					rank: (i+1),
+					playcount: $(this).attr('data-playcount'),
+					artist: {name: $(this).attr('data-artist'), mbid: $(this).attr('data-artist-mbid')}
+				};
+				finallist.items[i] = eachdata;
+				i++;
+				if(i == last)
+				{
+					$.ajax({
+						url: baseUrl + '/update/edited/week',
+						type: 'POST',
+						dataType: 'json',
+						data: finallist,
+					})
+					.done(function(data) {
+						if(data.error == 0)
+						{
+							location.reload();
+						}
+						console.log("success");
+					})
+					.fail(function() {
+						alert("Ops, algo deu errado, tente novamente mais tarde.");
+						console.log("error");
+					})
+					.always(function() {
+						console.log("complete");
+					});
+					
+				}
+			});
+			console.log(finallist);
+		});
 	}
 }
 

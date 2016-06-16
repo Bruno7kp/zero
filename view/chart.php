@@ -79,7 +79,7 @@ use B7KP\Utils\UserSession;
 								<?php echo $list;?>
 							</div>
 						</div>
-						<div class="col-md-5 col-md-offset-1 topspace-lg">
+						<div class="col-md-6 topspace-lg">
 							<button class="btn btn-custom btn-info btn-sm" id="copy" data-clipboard-target="#copyme">
 								<i class="ti-clipboard"></i> <span><?php echo Lang::get('copy');?> chart</span>
 							</button>
@@ -97,14 +97,14 @@ use B7KP\Utils\UserSession;
 							<button class="btn btn-custom btn-info btn-sm upwk" data-from="<?php echo $from->format("U");?>" data-to="<?php echo $to->format("U");?>">
 								<i class="ti-reload"></i> <span> <?php echo Lang::get('update');?> chart </span>
 							</button>
-							<!-- <button class="btn btn-custom btn-info btn-sm editwk" data-id="<?php echo $week->id;?>" data-type="<?php echo $type;?>">
+							<button class="btn btn-custom btn-info btn-sm editwk" data-id="<?php echo $week->id;?>" data-type="<?php echo $type;?>">
 								<i class="ti-pencil"></i> <span> <?php echo Lang::get('edit');?> chart </span>
-							</button> -->
+							</button>
 							<?php
 							}
 							?>
 						</div>
-						<div class="col-md-5 topspace-lg">
+						<div class="col-md-6 topspace-lg">
 							<div class="chart-table">
 								<small>
 									<span class="deb">NEW</span> = <?php echo Lang::get('new_def');?> | 

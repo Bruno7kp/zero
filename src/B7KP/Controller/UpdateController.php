@@ -145,6 +145,52 @@ class UpdateController extends Controller
 		}
 	}
 
+	private function isWeekOwner($id)
+	{
+		$w = $this->factory->find("B7KP\Entity\Week", array("iduser" => $this->user->id, "id" => $id));
+
+		return (is_array($w) && count($w) > 0);
+	}
+
+	/**
+	* @Route(name=update_edited_week|route=/update/edited/week)
+	*/
+	public function updateEditedWeek()
+	{
+		if($this->isAjaxRequest() && $this->user instanceof User)
+		{
+			if(isset($_POST["type"]) && isset($_POST["items"]) && isset($_POST["week"]) && $this->isWeekOwner($_POST["week"]))
+			{
+				$post = (object) $_POST;
+				$call = "set".ucfirst($post->type)."List";
+				$updated = new \DateTime();
+				$updated = $updated->format("YmdHis");
+				$list = array();
+				foreach ($post->items as $key => $value) {
+					$value = (object) $value;
+					$list[$key]["name"] = $value->name;
+					$list[$key]["mbid"] = $value->mbid;
+					$list[$key]["artist"]["name"] = $value->artist["name"];
+					$list[$key]["artist"]["mbid"] = $value->artist["mbid"];
+					$list[$key]["rank"] = $value->rank;
+					$list[$key]["playcount"] = $value->playcount;
+				}
+				$error = $this->$call($list, $post->week, $updated);
+				$resp = array("error" => $error, "msg" => "fail");
+			}
+			else
+			{
+				$resp = array("error" => 1, "msg" => "Data not found/loaded");
+			}
+
+			echo json_encode($resp);
+		}
+		else
+		{
+			$this->redirectToRoute("home");
+		}
+	}
+
 	private function setArtistList($list, $idweek, $updated)
 	{
 		$error = 0;

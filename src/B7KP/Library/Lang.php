@@ -385,6 +385,10 @@ class Lang
 		$messages["sett_plays"][self::PT_BR] = "Mostrar número de reproduções";
 		$messages["sett_plays"][self::EN_US] = "Show playcounts";
 
+		$messages["no_edit"][self::PT_BR] = "Não há nada para editar aqui.";
+		$messages["no_edit"][self::EN_US] = "There's nothing to update.";
+		
+
 		$messages["new_on"][self::PT_BR] = "Olá, parece que você é novo no Last.fm, você terá esperar até a semana terminar para aproveitar os charts semanais.";
 		$messages["new_on"][self::EN_US] = "Hello, looks like you're new in last.fm, you'll have to wait till the week ends.";
 		

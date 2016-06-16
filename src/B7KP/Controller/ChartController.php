@@ -267,12 +267,18 @@ class ChartController extends Controller
 			$types = array("artist", "music", "album");
 			if(is_object($week) && is_object($user) && $week->iduser == $user->id && in_array($type, $types))
 			{
+				$meth = "getWeekly".ucfirst($type)."List";
 				$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-				if(!is_object($settings))
-				{
-					$settings = new Settings();
-				}
-				$this->render("editweek.php", array("week" => $week, "user" => $user, "settings" => $settings));
+				$gmt = new \DateTimeZone("GMT");
+				$from_day = new \DateTime($week->from_day, $gmt);
+				$to_day = new \DateTime($week->to_day, $gmt);
+				$from_day = $from_day->format("U");
+				$to_day = $to_day->format("U");
+				$vars = array("from" => $from_day, "to" => $to_day);
+				$lfm = new LastFm();
+				$lfm->setUser($user->login);
+				$list = $lfm->$meth($vars);
+				$this->render("editweek.php", array("week" => $week, "user" => $user, "settings" => $settings, "list" => $list, "type" => $type));
 			}
 			else
 			{

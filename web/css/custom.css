@@ -13,6 +13,12 @@
 	margin: 0px !important;
 }
 
+.bg-white {
+	background: white;
+}
+.pd-list-fix {
+	padding: 5px 10px;
+}
 .imgfix img {
 	padding: 5px;
 }
