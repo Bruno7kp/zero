@@ -319,6 +319,9 @@ class Lang
 		$messages["need_update"][self::PT_BR] = "Seus charts precisam estar atualizados";
 		$messages["need_update"][self::EN_US] = "Your charts need to be updated";
 
+		$messages["tied"][self::PT_BR] = "Você pode alterar as posições dos artistas/álbuns/músicas que tiverem número de reproduções iguais, basta arrastar os itens entre si e apertar em 'editar'.";
+		$messages["tied"][self::EN_US] = "You can change the positions of artists / albums / songs that have the same number of reproductions, simply drag items between them";
+
 		$messages["customize"][self::PT_BR] = "<p class='text-muted'>Aqui você pode customizar seus charts.</p>";
 		$messages["customize"][self::EN_US] = "<p class='text-muted'>Here you can customize your charts.</p>";
 

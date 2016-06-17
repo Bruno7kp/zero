@@ -5,6 +5,7 @@ use B7KP\Library\Lang;
 
 <div class="col-md-6 col-md-offset-3 bg-white">
 	<h3><?php echo Lang::get("edit")." Chart"." :: ".Lang::get("wk")." ".$week->week;?></h3>
+	<p class="text-muted"><?php echo Lang::get("tied");?></p>
 	<?php 
 		$limit = substr($type, 0, 3)."_limit";
 		$limit = $settings->$limit;
