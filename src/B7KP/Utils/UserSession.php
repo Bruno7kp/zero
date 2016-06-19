@@ -13,8 +13,17 @@ class UserSession
 	static function getUser(Model $factory)
 	{
 		$o = false;
-		if (isset($_SESSION[App::get("name")]["B7KP\ENTITY\USER"])) {
+		if (isset($_SESSION[App::get("name")]["B7KP\ENTITY\USER"])) 
+		{
 			$user = $factory->findOneBy("B7KP\Entity\User", $_SESSION[App::get("name")]["B7KP\ENTITY\USER"]);
+			if($user instanceof User)
+			{
+				$o = $user;
+			}
+		}
+		else if(isset($_COOKIE[App::get("name")."B7KP\ENTITY\USER"]))
+		{
+			$user = $factory->findOneBy("B7KP\Entity\User", $_COOKIE[App::get("name")."B7KP\ENTITY\USER"]);
 			if($user instanceof User)
 			{
 				$o = $user;

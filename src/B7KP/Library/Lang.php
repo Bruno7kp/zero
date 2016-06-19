@@ -137,6 +137,9 @@ class Lang
 		$messages["switch"][self::PT_BR] = "alternar";
 		$messages["switch"][self::EN_US] = "switch";
 
+		$messages["stay_logged"][self::PT_BR] = "Permanecer conectado";
+		$messages["stay_logged"][self::EN_US] = "Stay connected";
+
 		$messages["prev_of"][self::PT_BR] = "Chart da semana atual até o momento";
 		$messages["prev_of"][self::EN_US] = "Chart of the current week to date";
 
@@ -309,6 +312,9 @@ class Lang
 
 		$messages["up_all"][self::PT_BR] = "Atualizar tudo";
 		$messages["up_all"][self::EN_US] = "Update all";
+
+		$messages["username"][self::PT_BR] = "Nome de usuário";
+		$messages["username"][self::EN_US] = "Username";
 
 		$messages["alr"][self::PT_BR] = "Já fez isso?";
 		$messages["alr"][self::EN_US] = "You already did that?";

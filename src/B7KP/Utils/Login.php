@@ -9,12 +9,14 @@ class Login
 	private $login;
 	private $password;
 	private $factory;
+	private $cookie;
 	
-	function __construct($login, $password, Model $factory)
+	function __construct($login, $password, Model $factory, $cookie = false)
 	{
 		$this->login 	= $login;
 		$this->password = $password;
 		$this->factory 	= $factory;
+		$this->cookie 	= $cookie;
 	}
 
 	public function login($entity = "B7KP\Entity\User")
@@ -26,7 +28,15 @@ class Login
 			if($login)
 			{
 				$this->checkSettings($user);
-				$_SESSION[App::get("name")][strtoupper($entity)] = $user->id;
+				if($this->cookie)
+				{
+
+					setcookie(App::get("name").strtoupper($entity), $user->id, time()+31556926, "/");
+				}
+				else
+				{
+					$_SESSION[App::get("name")][strtoupper($entity)] = $user->id;
+				}
 			}
 			return $login;
 		}
@@ -39,6 +49,7 @@ class Login
 	static function logout($entity = "B7KP\Entity\User")
 	{
 		unset($_SESSION[App::get("name")][strtoupper($entity)]);
+		setcookie(App::get("name").strtoupper($entity), null, time()-31556926, "/");
 	}
 
 	// k

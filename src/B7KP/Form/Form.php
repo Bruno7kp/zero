@@ -68,7 +68,7 @@ abstract class Form
 				$this->select($name, $class, $options, $placeholder);
 				break;
 			case self::TYPE_CHECK:
-				$this->checkbox($name, $class, $options);
+				$this->checkbox($name, $class, $placeholder);
 				break;
 			case self::TYPE_RADIO:
 				$this->radio($name, $class, $options);
@@ -108,6 +108,17 @@ abstract class Form
 		$this->form .= "<div class='form-group'>";
 		$this->form .= "<button type='submit' class='".$class."'>".Lang::get($name)."</button>";
 		$this->form .= "</div>";
+	}
+
+	final protected function checkbox($name, $class, $placeholder)
+	{
+		foreach ($name as $n => $v) {
+			$this->form .= "<div class='form-group'>";
+			$this->form .= "<div class=checkbox>";
+			$this->form .= "<input type='checkbox' name='".$v."' id='".$v."'> <label for='".$v."'>".Lang::get($placeholder[$n])."</label>";
+			$this->form .= "</div>";
+			$this->form .= "</div>";
+		}
 	}
 
 	final protected function select($name, $class, $options, $placeholder)

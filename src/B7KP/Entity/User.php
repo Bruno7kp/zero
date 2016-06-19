@@ -7,7 +7,7 @@ use B7KP\Utils\UserSession;
 class User extends Entity implements iPermission
 {
 	/**
-	* @Assert(null=false|max=20|min=3|unique|lastfm)
+	* @Assert(null=false|max=20|min=2|unique|lastfm)
 	*/
 	protected $login;
 
@@ -20,6 +20,11 @@ class User extends Entity implements iPermission
 	* @Assert(null=false|email|unique)
 	*/
 	protected $email;
+
+	/**
+	* @Assert(null=true)
+	*/
+	protected $cookie;
 
 	function __construct()
 	{

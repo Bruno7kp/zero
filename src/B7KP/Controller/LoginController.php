@@ -33,11 +33,12 @@ class LoginController extends Controller
 	public function checkLogin()
 	{
 		$post = (object)$_POST;
+		$post->cookie = isset($post->cookie);
 		if($this->isAjaxRequest())
 		{
 			if($this->checkAssert($post))
 			{
-				$login = new Login($post->login, $post->password, $this->factory);
+				$login = new Login($post->login, $post->password, $this->factory, $post->cookie);
 				if($login->login())
 				{
 					$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url('userprofile'));
