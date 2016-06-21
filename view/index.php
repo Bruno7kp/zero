@@ -17,7 +17,11 @@
 								<p class="text-justify larger topspace-md">
 									ZERO é um projeto feito para todos os amantes de música que adoram acompanhar seus próprios habitos músicais.
 									<br/>
-									Com ele são gerados gráficos semanais, listando os artistas, álbuns e músicas mais ouvidos durante o período, podendo acompanhar o desempenho desses semana por semana, e visualizar as mudanças e descobertas de seus artistas favoritos com o passar do tempo.</p>
+									Com ele são gerados gráficos semanais, listando os artistas, músicas e álbuns mais ouvidos durante cada semana, podendo acompanhar o desempenho desses, e visualizar as mudanças e descobertas de seus artistas favoritos com o passar do tempo.
+								</p>
+								<p class="text-justify larger topspace-md">
+									Para utilizar o ZERO, é necessário uma conta no <a target="_blank" href="http://last.fm">Last.fm</a>, uma rede social/programa (Audioscrobbler) que rastreia as músicas que você escuta. É com as informações providas por ele, os gráficos são gerados.
+								</p>
 							</div>
 						</div>
 					</div>
