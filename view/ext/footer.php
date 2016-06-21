@@ -50,11 +50,15 @@ use B7KP\Core\App;
 
 
 
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
+  ga('create', 'UA-79543567-1', 'auto');
+  ga('send', 'pageview');
 
-<a title="Web Analytics" href="http://clicky.com/100961601"><img alt="Web Analytics" src="//static.getclicky.com/media/links/badge.gif" border="0" width="0" height="0" /></a>
-<script src="//static.getclicky.com/js" type="text/javascript"></script>
-<script type="text/javascript">try{ clicky.init(100961601); }catch(e){}</script>
-<noscript><p><img alt="Clicky" width="0" height="0" src="//in.getclicky.com/100961601ns.gif" /></p></noscript>
+</script>
 
 <!-- /JS -->
