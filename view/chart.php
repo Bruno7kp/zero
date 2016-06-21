@@ -90,8 +90,9 @@ use B7KP\Utils\UserSession;
 							
 							if($user->checkSelfPermission($this->factory))
 							{
-								$from = new \DateTime($week->from_day);
-								$to = new \DateTime($week->to_day);
+								$gmt = new \DateTimeZone("GMT");
+								$from = new \DateTime($week->from_day, $gmt);
+								$to = new \DateTime($week->to_day, $gmt);
 							?>
 							<br>
 							<button class="btn btn-custom btn-info btn-sm upwk" data-from="<?php echo $from->format("U");?>" data-to="<?php echo $to->format("U");?>">

@@ -14,10 +14,16 @@ if(is_array($cr))
 	$typelib = "lib_".substr($type, 0, 3);
 	$cond = array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $user->login);
 	$liburl = Route::url($typelib, $cond);
+	$libarturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $user->login));
 ?>
 <div class="row text-center">
-<h3 class="bottomspace-xs">Chart-run <?php echo Lang::get("of");?> <a href=<?php echo $liburl;?>><?php echo $name;?></a></h3>
-<a href="#!" class="switchto"><small><?php echo Lang::get("switch");?> chart-run</small></a>
+<h3 class="bottomspace-xs">
+	<a href="#!" class="switchto" style="font-size: smaller;">
+		<i class="ti-layout-grid2"></i></a> 
+	Chart-run: <a href=<?php echo $liburl;?>><?php echo $name;?></a> 
+	<?php if ($type != "artist"): echo Lang::get("of") ?> <a href=<?php echo $libarturl;?>><?php echo $artist;?></a> <?php ; endif;?>
+</h3>
+
 <div class="col-md-12 text-center topspace-md main">
 	<?php 
 	$base = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
@@ -59,7 +65,7 @@ if(is_array($cr))
 <div class="col-md-8 col-md-offset-2">
 	<div class="center">
 	<?php 
-	echo "<h4>".Lang::get('wk_x')." ".Lang::get('on')."...</h4>";
+	echo "<h5 class='no-margin'>".Lang::get('wk_x')." ".Lang::get('on')."...</h5>";
 
 	echo "<div class='dest divider'><b>Top 1</b><hr/>".$wkstop1."</div>";
 	echo "<div class='dest divider'><b>Top 5</b><hr/>".$wkstop5."</div>";

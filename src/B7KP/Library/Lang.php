@@ -355,7 +355,7 @@ class Lang
 		$messages["sett_none"][self::PT_BR] = "Nenhum (esconder)";
 		$messages["sett_none"][self::EN_US] = "None (hide)";
 
-		$messages["sett_lw"][self::PT_BR] = "Posição da semana anterior";
+		$messages["sett_lw"][self::PT_BR] = "Posição/pontos da semana anterior";
 		$messages["sett_lw"][self::EN_US] = "Show last week position/plays";
 
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";

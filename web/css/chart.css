@@ -63,8 +63,14 @@ a.cr-btn.wksout{
 	padding: 10px;
 	margin: 3px;
 	display: inline-block;
-    width: 20%;
-    font-size: small;
+    min-width: 13%;
+    font-size: smaller;
+}
+.bold {
+	font-weight: bold;
+}
+.dest b{
+	color: #28BBF8;
 }
 .dest hr {
 	margin: 3px;

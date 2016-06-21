@@ -12,7 +12,7 @@ use B7KP\Core\App;
 	<div class="row">
 		
 		<div class="white-bg divider col-md-8 col-md-offset-2 topspace-lg">
-			<h1 class="topspace-lg text-center">USERS</h1>
+			<h1 class="topspace-lg text-center">USERS (<?php echo count($users);?>)</h1>
 			<hr>
 			<?php 
 			$i = 1;
