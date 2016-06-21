@@ -186,8 +186,15 @@ if($show_dropouts && $week > 1)
 			<?php 
 			}
 			?>
-			<td><?php echo $peak;?></td>
-			<td><?php echo $totalweeks;?></td>
+			<?php
+			$sp = "";
+			if($peak == 1):
+				$sp = "rk-sp";
+			endif;
+			$timespk = $todate["rank"][$peak]
+			?>
+			<td class='rk-col <?php echo $sp;?>'><?php echo $peak;?><br><span class='black'><?php echo $timespk."x"?></span></td>
+			<td class='rk-col'><?php echo $totalweeks;?></td>
 		</tr>
 		<tr style="display:none;" class="cr-row">
 			<td colspan="8">

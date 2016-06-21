@@ -13,6 +13,15 @@
 	margin: 0px !important;
 }
 
+.v-center {
+	vertical-align: center;
+	margin: auto;
+}
+
+.larger{
+	font-size: larger;
+}
+
 .bg-white {
 	background: white;
 }

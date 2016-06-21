@@ -14,7 +14,14 @@ if(is_array($cr))
 	$typelib = "lib_".substr($type, 0, 3);
 	$cond = array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $user->login);
 	$liburl = Route::url($typelib, $cond);
-	$libarturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $user->login));
+	if($type != "artist")
+	{
+		$libarturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $user->login));
+	}
+	else
+	{
+		$libarturl = "";
+	}
 ?>
 <div class="row text-center">
 <h3 class="bottomspace-xs">

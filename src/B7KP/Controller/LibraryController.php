@@ -107,6 +107,10 @@ class LibraryController extends Controller
 			$act["img"] = $data["images"]["large"];
 			$stats = $chart->getArtistStats($data["name"], "");
 			$act["stats"] = $chart->extract($stats, false);
+			foreach ($music as $key => $value) {
+				$albstats = $chart->getMusicStats($value->music, $value->artist, "");
+				$music[$key]->stats = $chart->extract($albstats, false);
+			}
 		}
 		else
 		{
@@ -118,6 +122,7 @@ class LibraryController extends Controller
 						"user" 		=> $user,
 						"music" 	=> $music,
 						"artist" 	=> $act,
+						"mlimit"	=> $settings->mus_limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
@@ -130,6 +135,7 @@ class LibraryController extends Controller
 	*/
 	public function artAlbLibList($login, $artist)
 	{
+		$this->redirectToRoute("lib_art", array("login" => $login, "name" => $artist));
 		$user = $this->isValidUser($login);
 		$chart = new Charts($this->factory, $user);
 		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
@@ -347,7 +353,15 @@ class LibraryController extends Controller
 			$album = $chart->getAlbumByArtist($data["name"], $settings->alb_limit);
 			$music = $chart->getMusicByArtist($data["name"], $settings->mus_limit);
 			$artist["stats"] = $chart->extract($stats, false);
-			$dao = Dao::getConn();
+			foreach ($album as $key => $value) {
+				$albstats = $chart->getAlbumStats($value->album, $value->artist, "");
+				$album[$key]->stats = $chart->extract($albstats, false);
+			}
+
+			foreach ($music as $key => $value) {
+				$albstats = $chart->getMusicStats($value->music, $value->artist, "");
+				$music[$key]->stats = $chart->extract($albstats, false);
+			}
 
 			$vars = array
 						(
@@ -356,6 +370,8 @@ class LibraryController extends Controller
 							"album" => $album,
 							"music" => $music,
 							"limit" => $settings->art_limit,
+							"alimit" => $settings->alb_limit,
+							"mlimit" => $settings->mus_limit,
 							"lfm_bg" 	=> $this->getUserBg($user),
 							"lfm_image" => $this->getUserBg($user, true)
 						);

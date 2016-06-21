@@ -79,42 +79,58 @@ use B7KP\Utils\Snippets as S;
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-8">
-							<h3><?php echo Lang::get("mus_x")." ".Lang::get("of")." <a href='".Route::url('lib_art', array("login" => $user->login, "name" => F::fixLFM($name)))."'>".$name."</a>";?></h3>
+						<div class="col-md-12">
 							<?php
 							if(count($music) > 0)
 							{
-								echo "	<table class='table middle tablesorteralt'>";
-								echo "	<thead>
-											<tr>
-												<th class=text-center>".Lang::get('pk')."</th>
-												<th>
-													".Lang::get("mus")."
-												</th>
-												<th class=text-center>".Lang::get('wk_x')."</th>
-												<th class=text-center>".Lang::get('play_x')."</th>
-											</tr>
-										<thead>
-										<tbody class=large>";
+							?>
+							<h2 class="text-center topspace-md"><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
+							<table class="chart-table table-fluid topspace-md">
+								<tr>
+									<th class="cr-col min center">+</th>
+									<th class="center"><?php echo Lang::get('pk');?></th>
+									<th><?php echo Lang::get('title');?></th>
+									<th class="center"><?php echo Lang::get('wk_x')?></th>
+									<th class="center"><?php echo Lang::get('play_x')?></th>
+								</tr>
+							<?php
 								foreach ($music as $item) 
 								{
+									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
+									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
+									$todate = $item->stats["stats"]["alltime"];
+									$cr = $item->stats["chartrun"];
+									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$sp = "";
+									if($peak == 1):
+										$sp = "rk-sp";
+									endif;
 									echo "<tr>";
-										echo "<td class='text-center'>";
-											echo $item->peak;
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+										echo "</td>";
+										echo "<td class='rk-col text-center ".$sp."'>";
+											echo $peak;
+											echo "<br><span class='black'>".$times."x</span>";
 										echo "</td>";
 										echo "<td>";
 											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->music))).">".$item->music."</a>";
 										echo "</td>";
-										echo "<td class='text-center'>";
-											echo $item->weeks;
+										echo "<td class='text-center rk-col'>";
+											echo $weeks;
 										echo "</td>";
-										echo "<td id='".md5($item->music)."' class='text-center loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+										echo "<td id='".md5($item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
 											//echo $item->weeks;
+										echo "</td>";
+									echo "</tr>";
+									echo "<tr style='display:none;' class='cr-row'>";
+										echo "<td colspan='8'>";
+											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
 
 								}
-								echo "</tbody></table>";
+								echo "</table>";
 							}
 							else
 							{

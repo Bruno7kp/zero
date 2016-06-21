@@ -1,5 +1,6 @@
 <?php
 use B7KP\Library\Url;
+use B7KP\Library\Lang;
 use B7KP\Core\App;
 
 isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("name");
@@ -8,8 +9,9 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title><?php echo $title;?></title>
-	<link rel="shortcut icon" href="<?php echo Url::asset('img/icon.png');?>">
+	<link rel="shortcut icon" href="http://i.imgur.com/yr9iecI.png">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="<?php echo Lang::get('app_desc');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/themify-icons.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/bootstrap.min.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/owl.carousel.min.css');?>">

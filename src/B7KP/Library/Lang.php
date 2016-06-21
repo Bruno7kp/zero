@@ -355,7 +355,7 @@ class Lang
 		$messages["sett_none"][self::PT_BR] = "Nenhum (esconder)";
 		$messages["sett_none"][self::EN_US] = "None (hide)";
 
-		$messages["sett_lw"][self::PT_BR] = "Posição/pontos da semana anterior";
+		$messages["sett_lw"][self::PT_BR] = "Posição/reproduções da semana anterior";
 		$messages["sett_lw"][self::EN_US] = "Show last week position/plays";
 
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
@@ -366,6 +366,9 @@ class Lang
 
 		$messages["big_n"][self::PT_BR] = "Maior número de";
 		$messages["big_n"][self::EN_US] = "Largest number of";
+
+		$messages["app_desc"][self::PT_BR] = "Maior número de";
+		$messages["app_desc"][self::EN_US] = "Largest number of";
 
 		$messages["of"][self::PT_BR] = "de";
 		$messages["of"][self::EN_US] = "of";
@@ -409,8 +412,8 @@ class Lang
 		$messages["re_def"][self::PT_BR] = "Reentrada";
 		$messages["re_def"][self::EN_US] = "Re-entry";
 
-		$messages["lw_def"][self::PT_BR] = "Posição na semana anterior";
-		$messages["lw_def"][self::EN_US] = "Position in the previous week";
+		$messages["lw_def"][self::PT_BR] = "Posição/reproduções na semana anterior";
+		$messages["lw_def"][self::EN_US] = "Position/plays in the previous week";
 
 		$messages["last_1_x"][self::PT_BR] = "Últimos #1s";
 		$messages["last_1_x"][self::EN_US] = "Latest #1s";

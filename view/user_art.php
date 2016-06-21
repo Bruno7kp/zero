@@ -89,46 +89,59 @@ use B7KP\Utils\Snippets as S;
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-12">
 
 							<?php 
 							if(count($album) > 0)
 							{
-								$max = 0;
-								echo "	<table class='table middle'>";
-								echo "	<thead>
-											<tr>
-												<th class=text-center><h4 class=no-margin>".Lang::get('pk')."</h4></th>
-												<th colspan=2>
-													<h3 class=no-margin>".Lang::get("alb")."</h3>
-												</th>
-												<th class=text-center><h4 class=no-margin>".Lang::get('wk_x')."</h4></th>
-											</tr>
-										<thead>
-										<tbody class=large>";
+							?>
+							<h2 class="text-center topspace-xxl"><?php echo Lang::get("alb_x");?></h2>
+							<table class="chart-table table-fluid topspace-md">
+								<tr>
+									<th class="cr-col min center">+</th>
+									<th class="center"><?php echo Lang::get('pk');?></th>
+									<th class="center">Img</th>
+									<th><?php echo Lang::get('title');?></th>
+									<th class="center"><?php echo Lang::get('wk_x')?></th>
+									<th class="center"><?php echo Lang::get('play_x')?></th>
+								</tr>
+							<?php
 								foreach ($album as $item) 
 								{
-									if($max == 5)
-									{
-										break;
-									}
-									$max++;
+									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
+									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
+									$todate = $item->stats["stats"]["alltime"];
+									$cr = $item->stats["chartrun"];
+									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$sp = "";
+									if($peak == 1):
+										$sp = "rk-sp";
+									endif;
 									echo "<tr>";
-										echo "<td class='text-center'>";
-											echo $item->peak;
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+										echo "</td>";
+										echo "<td class='rk-col text-center ".$sp."'>";
+											echo $peak;
+											echo "<br><span class='black'>".$times."x</span>";
 										echo "</td>";
 										echo "<td class='getimage' id='rankid".md5($item->album)."' data-type='album' data-name='".htmlentities($item->album, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
 										echo "<td>";
 											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
 										echo "</td>";
-										echo "<td class='text-center'>";
-											echo $item->weeks;
+										echo "<td class='text-center rk-col'>";
+											echo $weeks;
+										echo "</td>";
+										echo "<td id='".md5($item->album)."' class='text-center rk-col loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
 										echo "</td>";
 									echo "</tr>";
-
+									echo "<tr style='display:none;' class='cr-row'>";
+										echo "<td colspan='8'>";
+											echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
+										echo "</td>";
+									echo "</tr>";
 								}
-								echo "</tbody></table>";
-								echo "<a class='btn btn-outline topspace-md' href=".Route::url('lib_art_album', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
+								echo "</table>";
 							}
 							else
 							{
@@ -136,22 +149,21 @@ use B7KP\Utils\Snippets as S;
 							}
 							?>
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-12">
 							<?php
 							if(count($music) > 0)
 							{
+							?>
+							<h2 class="text-center topspace-xxl"><?php echo Lang::get("mus_x");?></h2>
+							<table class="chart-table table-fluid topspace-md">
+								<tr>
+									<th class="cr-col min center">+</th>
+									<th class="center"><?php echo Lang::get('pk');?></th>
+									<th><?php echo Lang::get('title');?></th>
+									<th class="center"><?php echo Lang::get('wk_x')?></th>
+								</tr>
+							<?php
 								$max = 0;
-								echo "	<table class='table middle'>";
-								echo "	<thead>
-											<tr>
-												<th class=text-center><h4 class=no-margin>".Lang::get('pk')."</h4></th>
-												<th>
-													<h3 class=no-margin>".Lang::get("mus")."</h3>
-												</th>
-												<th class=text-center><h4 class=no-margin>".Lang::get('wk_x')."</h4></th>
-											</tr>
-										<thead>
-										<tbody class=large>";
 								foreach ($music as $item) 
 								{
 									if($max == 10)
@@ -159,20 +171,38 @@ use B7KP\Utils\Snippets as S;
 										break;
 									}
 									$max++;
+									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
+									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
+									$todate = $item->stats["stats"]["alltime"];
+									$cr = $item->stats["chartrun"];
+									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$sp = "";
+									if($peak == 1):
+										$sp = "rk-sp";
+									endif;
 									echo "<tr>";
-										echo "<td class='text-center'>";
-											echo $item->peak;
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+										echo "</td>";
+										echo "<td class='rk-col text-center ".$sp."'>";
+											echo $peak;
+											echo "<br><span class='black'>".$times."x</span>";
 										echo "</td>";
 										echo "<td>";
 											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->music))).">".$item->music."</a>";
 										echo "</td>";
-										echo "<td class='text-center'>";
-											echo $item->weeks;
+										echo "<td class='text-center rk-col'>";
+											echo $weeks;
+										echo "</td>";
+									echo "</tr>";
+									echo "<tr style='display:none;' class='cr-row'>";
+										echo "<td colspan='8'>";
+											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
 
 								}
-								echo "</tbody></table>";
+								echo "</table>";
 								echo "<a class='btn btn-outline topspace-md' href=".Route::url('lib_art_music', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
 							}
 							else

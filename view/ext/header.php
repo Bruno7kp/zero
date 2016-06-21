@@ -3,14 +3,19 @@ use B7KP\Library\Url;
 use B7KP\Library\Lang;
 use B7KP\Core\App;
 
-isset($image) || $image = Url::asset("img/hero2.jpg");
+$bgstyle = "";
+if(!isset($image))
+{
+	$bgstyle = "filter: blur(0px); -webkit-filter: blur(0px); -moz-filter: blur(0px);";
+}
+isset($image) || $image = "http://i.imgur.com/R60fsP4.png";
 isset($subimage) || $subimage = "";
-isset($title) || $title = App::get("name");
+isset($title) || $title = "<img src=http://i.imgur.com/SB5Hr6U.png height=75 />";
 isset($subtitle) || $subtitle = Lang::get('wel_to');
 isset($alttitle) || $alttitle = false;
 ?>
 <aside id="fh5co-hero" >
-	<div id="bg" style="background-image: url(<?php echo $image;?>);"></div>
+	<div id="bg" style="background-image: url(<?php echo $image;?>); <?php echo $bgstyle;?>"></div>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8 col-md-offset-2">
