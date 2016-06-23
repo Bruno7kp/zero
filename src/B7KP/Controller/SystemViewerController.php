@@ -48,6 +48,7 @@ class SystemViewerController extends Controller
 	{
 		$this->checkAccess();
 		$dao = Dao::getConn();
+		$affected = $dao->run("ALTER TABLE settings ADD lang INT NOT NULL, ADD alb_cert_gold INT NOT NULL, ADD alb_cert_platinum INT NOT NULL, ADD alb_cert_diamond INT NOT NULL, ADD mus_cert_gold INT NOT NULL, ADD mus_cert_platinum INT NOT NULL, ADD mus_cert_diamond INT NOT NULL, ADD show_cert INT NOT NULL, ADD show_chart_cert INT NOT NULL, ADD show_plaque INT NOT NULL");
 		//$affected = $dao->run("UPDATE week SET week = 198 WHERE iduser = 124 AND week = 1 AND to_day > '2015-01-01'");
 		//$affected = $this->factory->removeBy("\B7KP\Entity\Week", "iduser", 38);
 		//var_dump($affected);

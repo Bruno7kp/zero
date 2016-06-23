@@ -293,6 +293,14 @@ class Assert
 		}
 	}
 
+	private function biggerThan($rule, $field)
+	{
+		if(isset($this->data->$rule) && $this->data->$field <= $this->data->$rule)
+		{
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('field')." ".Lang::get('bigger_to')." <b>{$rule}</b> ", "fn" => __FUNCTION__);
+		}
+	}
+
 	private function notContainFields($rule, $field)
 	{
 		if(isset($this->data->$rule) && !empty($this->data->$rule) && !empty($this->data->$field))
