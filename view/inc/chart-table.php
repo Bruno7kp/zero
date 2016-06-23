@@ -53,7 +53,7 @@ if($show_first_image && count($list)>0)
 	
 	echo "<div class='text-center bottomspace-xl'><img src='".$fimg."'/></div>";
 }
-
+$lastw = array();
 if($show_dropouts && $week > 1)
 {
 	$weekbefore = $week - 1;

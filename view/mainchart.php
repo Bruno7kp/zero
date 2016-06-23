@@ -248,7 +248,7 @@ use B7KP\Library\Lang;
 								</tr>
 								<tr>
 									<td>
-										Artistas com mais músicas/álbuns em #1
+										<?php echo Lang::get('art_alb_mus');?>
 									</td>
 									<td>
 										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>

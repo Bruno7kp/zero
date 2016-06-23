@@ -22,6 +22,7 @@ class SettingsForm extends Form
 		$fir = $options->get("\B7KP\Entity\Settings", "show_first_image");
 		$mov = $options->get("\B7KP\Entity\Settings", "show_move");
 		$pts = $options->get("\B7KP\Entity\Settings", "show_playcounts");
+		$lan = $options->get("\B7KP\Entity\Settings", "lang");
 		$form = $this
 				->init(Route::url("change_settings"))
 				->add(self::COMMENT, "sett_limit", "form-group text-justify")
@@ -34,6 +35,7 @@ class SettingsForm extends Form
 				->add(self::TYPE_SELECT, "show_first_image", "form-control", $fir,"sett_showf_img")
 				->add(self::TYPE_SELECT, "show_move", "form-control", $mov,"sett_move")
 				->add(self::TYPE_SELECT, "show_playcounts", "form-control", $pts,"sett_plays")
+				->add(self::TYPE_SELECT, "lang", "form-control", $lan,"language")
 				->add(self::TYPE_SUBMIT, "save", "send btn btn-success")
 				->end();
 	}

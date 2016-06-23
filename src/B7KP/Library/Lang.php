@@ -103,6 +103,9 @@ class Lang
 	{
 		$messages = array();
 		// GERAL
+		$messages["language"][self::PT_BR] = "Idioma do site";
+		$messages["language"][self::EN_US] = "Site language";
+
 		$messages["mus"][self::PT_BR] = "Música";
 		$messages["mus"][self::EN_US] = "Music";
 		$messages["mus_x"][self::PT_BR] = "Músicas";
@@ -356,6 +359,9 @@ class Lang
 
 		$messages["no_mus"][self::PT_BR] = "Nenhuma música desse artista entrou nos charts.";
 		$messages["no_mus"][self::EN_US] = "No musics";
+
+		$messages["art_alb_mus"][self::PT_BR] = "Artistas com mais músicas/álbuns em #1";
+		$messages["art_alb_mus"][self::EN_US] = "Artists with more musics/albums at #1";
 
 		$messages["up_new_week"][self::PT_BR] = "Atualizar novas semanas";
 		$messages["up_new_week"][self::EN_US] = "Update new weeks";
