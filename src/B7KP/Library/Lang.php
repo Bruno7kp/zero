@@ -15,9 +15,46 @@ class Lang
 
 	private function __construct(){}
 
-	static function get($msg_id)
+	static function getLangs()
 	{
-		$lang = Settings::defaultValueFor('lang');
+		$ref = new \ReflectionClass(__CLASS__);
+        return $ref->getConstants();
+	}
+
+	static function detectLang()
+	{
+		$mainlang = "en";
+		$acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		$langs = array();
+		foreach( explode(',', $acceptLanguage) as $lang) 
+		{
+		    $lang = explode(';q=', $lang);
+		    $langs[$lang[0]] = count($lang)>1?floatval($lang[1]):1;
+		}
+		arsort($langs);
+		foreach ($langs as $key => $value) 
+		{
+			$mainlang = $key;
+			break;
+		}
+		$mainlang = substr($mainlang, 0, 2);
+
+		switch ($mainlang) {
+			case 'pt':
+				$detected = self::PT_BR;
+				break;
+
+			default:
+				$detected = self::EN_US;
+				break;
+
+		}
+
+		return $detected;
+	}
+
+	static function getUserLang()
+	{
 		$dao = Dao::getConn();
 		$factory = new Model($dao);
 		$user = UserSession::getUser($factory);
@@ -29,6 +66,19 @@ class Lang
 				$lang = $settings->lang;
 			}
 		}
+		else
+		{
+			$lang = self::detectLang();
+		}
+
+		return $lang;
+	}
+
+	static function get($msg_id)
+	{
+		$lang = self::getUserLang();
+		//$lang = Settings::defaultValueFor('lang');
+		
 		$orig = $msg_id;
 		$msg_id = strtolower($msg_id);
 		$msg = self::messages();
@@ -486,6 +536,9 @@ class Lang
 
 		$messages["diff_to"][self::PT_BR] = "deve ser diferente de";
 		$messages["diff_to"][self::EN_US] = "must be different of the";
+
+		$messages["bigger_to"][self::PT_BR] = "deve ser maior que";
+		$messages["bigger_to"][self::EN_US] = "must be bigger than";
 
 		$messages["field"][self::PT_BR] = "campo";
 		$messages["field"][self::EN_US] = "field";

@@ -2,6 +2,7 @@
 namespace B7KP\Entity;
 
 use B7KP\Utils\Constants as C;
+use B7KP\Library\Lang;
 
 class Settings extends Entity
 {
@@ -64,6 +65,54 @@ class Settings extends Entity
 	*/
 	protected $lang;
 
+	/**
+	* @Assert(null=false|minNum=1)
+	*/
+	protected $alb_cert_gold;
+
+	/**
+	* @Assert(null=false|biggerThan=alb_cert_gold)
+	*/
+	protected $alb_cert_platinum;
+
+	/**
+	* @Assert(null=false|biggerThan=alb_cert_platinum)
+	*/
+	protected $alb_cert_diamond;
+
+	/**
+	* @Assert(null=false|minNum=1)
+	*/
+	protected $mus_cert_gold;
+
+	/**
+	* @Assert(null=false|biggerThan=mus_cert_gold)
+	*/
+	protected $mus_cert_platinum;
+
+	/**
+	* @Assert(null=false|biggerThan=mus_cert_platinum)
+	*/
+	protected $mus_cert_diamond;
+
+	/**
+	* @Assert(null=false|int|option)
+	* @Options(values={"1": "Yes","0": "No"}|settings={"translate": "1"})
+	*/
+	protected $show_cert;
+
+	/**
+	* @Assert(null=false|int|option)
+	* @Options(values={"1": "Yes","0": "No"}|settings={"translate": "1"})
+	*/
+	protected $show_chart_cert;
+
+	/**
+	* @Assert(null=false|int|option)
+	* @Options(values={"1": "Yes","0": "No"}|settings={"translate": "1"})
+	*/
+	protected $show_plaque;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -85,7 +134,7 @@ class Settings extends Entity
 	{
 		$def = new \stdClass();
 
-		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts");
+		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque");
 
 		foreach ($items as $value) {
 			$def->$value = self::defaultValueFor($value);
@@ -97,6 +146,17 @@ class Settings extends Entity
 	static function defaultValueFor($for)
 	{
 		switch ($for) {
+			case 'alb_cert_gold':
+			case 'alb_cert_platinum':
+			case 'alb_cert_diamond':
+			case 'mus_cert_gold':
+			case 'mus_cert_platinum':
+			case 'mus_cert_diamond':
+			case 'show_cert':
+			case 'show_chart_cert':
+			case 'show_plaque':
+				$for = 0;
+				break;
 			case 'art_limit':
 			case 'alb_limit':
 			case 'mus_limit':
@@ -128,7 +188,7 @@ class Settings extends Entity
 				break;
 
 			case 'lang':
-				$for = 0;
+				$for = Lang::detectLang();
 				break;
 
 			default:
