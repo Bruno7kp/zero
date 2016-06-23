@@ -95,46 +95,8 @@ use B7KP\Library\Lang;
 						</p>
 						<hr>
 						<p>
-							Tem dúvidas ou sugestões? Me chama em qualquer rede social que eu vou. Se quiserem podem enviar pro meu email: bruno7kp@outlook.com
-							<br>
-							Outra coisinha: tanto o domínio quanto a hospedagem do site são free, ou seja...
-							<br>
-							Se o site engrenar, talvez em contrate algum serviço mais rápido e seguro, mas agora não tem como, então tenham isso em mente se o site ficar lerdo/caindo, ok manas?<br/>
-							<img src="http://i.imgur.com/t8pmIKA.gif">
+							Tem dúvidas ou sugestões? Me chama em qualquer rede social que eu vou.
 						</p>
-							
-								<?php 
-// 								require MAIN_DIR.'src/PHPMailer-master/PHPMailerAutoload.php';
-
-// $mail = new PHPMailer;
-
-// //$mail->SMTPDebug = 3;                               // Enable verbose debug output
-
-// $mail->isSMTP();  
-// $mail->CharSet = 'UTF-8';                                    // Set mailer to use SMTP
-// $mail->Host = 'smtp.live.com';  // Specify main and backup SMTP servers
-// $mail->SMTPAuth = true;                               // Enable SMTP authentication
-// $mail->Username = 'bruno7kp@outlook.com';                 // SMTP username
-// $mail->Password = '';                           // SMTP password
-// $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-// $mail->Port = 587;                                    // TCP port to connect to
-
-// $mail->SetFrom('bruno@b7kp.tk', 'First Last', FALSE);
-// $mail->addAddress('bruno@b7kp.tk', 'asd');     // Add a recipient
-
-// $mail->isHTML(true);                                  // Set email format to HTML
-
-// $mail->Subject = 'Here is the subject';
-// $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-// $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-// if(!$mail->send()) {
-//     echo 'Message could not be sent.';
-//     echo 'Mailer Error: ' . $mail->ErrorInfo;
-// } else {
-//     echo 'Message has been sent';
-// }
-								?>
 
 						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
