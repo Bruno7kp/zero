@@ -26,6 +26,8 @@ use B7KP\Library\Lang;
 							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> e-mail</a>
 							<br>
 							<a href="<?php echo Route::url('usereditpass');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> <?php echo Lang::get('pass');?></a>
+							<br>
+							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('cert');?></a>
 							
 						</div>
 

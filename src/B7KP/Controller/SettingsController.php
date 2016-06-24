@@ -5,6 +5,7 @@ use B7KP\Model\Model;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Assert;
 use B7KP\Library\Route;
+use B7KP\Library\Lang;
 use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 
@@ -29,6 +30,17 @@ class SettingsController extends Controller
 		$form = $this->createForm("SettingsForm", $this->settings);
 		$vars = array("form" => $form);
 		$this->render("settings.php", $vars);
+	}
+
+	/**
+	* @Route(name=cert_settings|route=/certification)
+	*/
+	public function certAction()
+	{
+		$this->checkAccess();
+		$form = $this->createForm("CertForm", $this->settings);
+		$vars = array("form" => $form, "field" => Lang::get("cert"));
+		$this->render("edit.php", $vars);
 	}
 
 	/**

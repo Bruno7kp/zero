@@ -66,32 +66,32 @@ class Settings extends Entity
 	protected $lang;
 
 	/**
-	* @Assert(null=false|minNum=1)
+	* @Assert(null=false|minNum=0|int)
 	*/
 	protected $alb_cert_gold;
 
 	/**
-	* @Assert(null=false|biggerThan=alb_cert_gold)
+	* @Assert(null=false|int|biggerThan=alb_cert_gold)
 	*/
 	protected $alb_cert_platinum;
 
 	/**
-	* @Assert(null=false|biggerThan=alb_cert_platinum)
+	* @Assert(null=false|int|biggerThan=alb_cert_platinum)
 	*/
 	protected $alb_cert_diamond;
 
 	/**
-	* @Assert(null=false|minNum=1)
+	* @Assert(null=false|minNum=0|int)
 	*/
 	protected $mus_cert_gold;
 
 	/**
-	* @Assert(null=false|biggerThan=mus_cert_gold)
+	* @Assert(null=false|int|biggerThan=mus_cert_gold)
 	*/
 	protected $mus_cert_platinum;
 
 	/**
-	* @Assert(null=false|biggerThan=mus_cert_platinum)
+	* @Assert(null=false|int|biggerThan=mus_cert_platinum)
 	*/
 	protected $mus_cert_diamond;
 

@@ -297,7 +297,7 @@ class Assert
 	{
 		if(isset($this->data->$rule) && $this->data->$field <= $this->data->$rule)
 		{
-			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>{$field}</b> ".Lang::get('field')." ".Lang::get('bigger_to')." <b>{$rule}</b> ", "fn" => __FUNCTION__);
+			$this->error[] = array("field" => $field, "error" => Lang::get('the')." <b>".Lang::get($field)."</b> ".Lang::get('bigger_to')." <b>".Lang::get($rule)."</b> ", "fn" => __FUNCTION__);
 		}
 	}
 

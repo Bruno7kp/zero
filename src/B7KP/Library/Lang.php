@@ -372,6 +372,51 @@ class Lang
 		$messages["username"][self::PT_BR] = "Nome de usuário";
 		$messages["username"][self::EN_US] = "Username";
 
+		$messages["cert"][self::PT_BR] = "Certificações";
+		$messages["cert"][self::EN_US] = "Certifications";
+
+		$messages["use_cert"][self::PT_BR] = "Usar certificações";
+		$messages["use_cert"][self::EN_US] = "Use certifications";
+
+		$messages["use_cert_cha"][self::PT_BR] = "Mostrar certificações nos charts";
+		$messages["use_cert_cha"][self::EN_US] = "Show certifications on charts";
+
+		$messages["use_plaque"][self::PT_BR] = "Mostrar placas de certificações (se disponíveis)";
+		$messages["use_plaque"][self::EN_US] = "Show certifications plaques (if available)";
+
+		$messages["alb_cert"][self::PT_BR] = "Valores para certificados de álbuns";
+		$messages["alb_cert"][self::EN_US] = "Values ​​for albums certificates";
+
+		$messages["mus_cert"][self::PT_BR] = "Valores para certificados de músicas";
+		$messages["mus_cert"][self::EN_US] = "Values ​​for musics certificates";
+
+		$messages["gold"][self::PT_BR] = "Ouro";
+		$messages["gold"][self::EN_US] = "Gold";
+
+		$messages["plat"][self::PT_BR] = "Platina";
+		$messages["plat"][self::EN_US] = "Platinum";
+
+		$messages["diam"][self::PT_BR] = "Diamante";
+		$messages["diam"][self::EN_US] = "Diamond";
+
+		$messages["alb_cert_gold"][self::PT_BR] = "valor do certificado de ouro";
+		$messages["alb_cert_gold"][self::EN_US] = "value of gold certificate";
+
+		$messages["alb_cert_platinum"][self::PT_BR] = "valor do certificado de platina";
+		$messages["alb_cert_platinum"][self::EN_US] = "value of platinum certificate";
+
+		$messages["alb_cert_diamond"][self::PT_BR] = "valor do certificado de diamante";
+		$messages["alb_cert_diamond"][self::EN_US] = "value of diamond certificate";
+
+		$messages["mus_cert_gold"][self::PT_BR] = "valor do certificado de ouro";
+		$messages["mus_cert_gold"][self::EN_US] = "value of gold certificate";
+
+		$messages["mus_cert_platinum"][self::PT_BR] = "valor do certificado de platina";
+		$messages["mus_cert_platinum"][self::EN_US] = "value of platinum certificate";
+
+		$messages["mus_cert_diamond"][self::PT_BR] = "valor do certificado de diamante";
+		$messages["mus_cert_diamond"][self::EN_US] = "value of diamond certificate";
+
 		$messages["alr"][self::PT_BR] = "Já fez isso?";
 		$messages["alr"][self::EN_US] = "You already did that?";
 
