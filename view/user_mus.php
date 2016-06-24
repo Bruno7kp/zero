@@ -4,6 +4,7 @@ use B7KP\Utils\Charts;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
+use B7KP\Utils\Certified;
 use B7KP\Utils\Constants as C;
 use B7KP\Utils\Functions as F;
 use B7KP\Utils\Snippets as S;
@@ -13,6 +14,8 @@ use B7KP\Utils\Snippets as S;
 <?php
 	$head = array("title" => "{$user->login} - ".$music["music"]);
 	$this->render("ext/head.php", $head);
+
+	$c = new Certified($user, $this->factory);
 
 	$name = $music["music"];
 	$artist = $music["artist"];
@@ -72,6 +75,21 @@ use B7KP\Utils\Snippets as S;
 										</small>			
 									</strong>
 								</div>
+								<?php
+								if($settings->show_cert > 0)
+								{
+								?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="text-muted"><?php echo Lang::get('cert_s');?></small>
+									<br>
+									<strong>
+										<i class="icon-vynil ico-color"></i>
+										<?php echo $c->getCertification("music",$plays, "text"); ?>
+									</strong>
+								</div>
+								<?php
+								}
+								?>
 							</div>
 						</div>
 					</div>

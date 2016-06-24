@@ -372,6 +372,7 @@ class LibraryController extends Controller
 							"limit" => $settings->art_limit,
 							"alimit" => $settings->alb_limit,
 							"mlimit" => $settings->mus_limit,
+							"settings" => $settings,
 							"lfm_bg" 	=> $this->getUserBg($user),
 							"lfm_image" => $this->getUserBg($user, true)
 						);
@@ -420,6 +421,7 @@ class LibraryController extends Controller
 						(
 							"user" => $user,
 							"music" => $music,
+							"settings" => $settings,
 							"limit" => $settings->mus_limit,
 							"lfm_bg" 	=> $this->getUserBg($user),
 							"lfm_image" => $this->getUserBg($user, true)
@@ -471,6 +473,7 @@ class LibraryController extends Controller
 			$vars = array
 						(
 							"user" => $user,
+							"settings" => $settings,
 							"album" => $album,
 							"limit" => $settings->alb_limit,
 							"lfm_bg" 	=> $this->getUserBg($user),

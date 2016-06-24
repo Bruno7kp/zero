@@ -29,7 +29,7 @@
 					id : 'fh5co-logo-mobile',
 					class : ''
 				});
-				cloneLogo.find("a").html("<img src='http://i.imgur.com/Dmc5NjH.png' width=100>");
+				cloneLogo.find("a").html("<img src='http://i.imgur.com/NvbfhEa.png' width=100>");
 
 				$('<div id="fh5co-logo-mobile-wrap">').append(cloneLogo).insertBefore('#fh5co-header-section');
 				$('#fh5co-logo-mobile-wrap').append('<a href="#" id="fh5co-mobile-menu-btn"><i class="ti-menu"></i></a>')
@@ -136,10 +136,10 @@
 
 			if ( $(window).scrollTop() > 70 ) {
 				$('#fh5co-header-section').addClass('fh5co-scrolled');
-				$('#fh5co-logo').find("a").html("<img src='http://i.imgur.com/Dmc5NjH.png' width=125>");
+				$('#fh5co-logo').find("a").html("<img src='http://i.imgur.com/NvbfhEa.png' width=125>");
 			} else {
 				$('#fh5co-header-section').removeClass('fh5co-scrolled');
-				$('#fh5co-logo').find("a").html("<img width=125 src='http://i.imgur.com/SB5Hr6U.png'>");
+				$('#fh5co-logo').find("a").html("<img width=125 src='http://i.imgur.com/N1c2b3t.png'>");
 			}
 
 

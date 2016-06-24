@@ -13,7 +13,7 @@
 					<div class="col-md-8 col-md-offset-2 text-center fh5co-lead-wrap">
 						<div class="row">
 							<div class="col-md-12 text-center">
-								<img src="http://i.imgur.com/yr9iecI.png" alt="ZERO" height="70">
+								<img src="http://i.imgur.com/OOKNwlp.png" alt="ZERO" height="70">
 								<p class="text-justify larger topspace-md">
 									ZERO é um projeto feito para todos os amantes de música que adoram acompanhar seus próprios habitos músicais.
 									<br/>

@@ -375,6 +375,9 @@ class Lang
 		$messages["cert"][self::PT_BR] = "Certificações";
 		$messages["cert"][self::EN_US] = "Certifications";
 
+		$messages["cert_s"][self::PT_BR] = "Certificação";
+		$messages["cert_s"][self::EN_US] = "Certification";
+
 		$messages["use_cert"][self::PT_BR] = "Usar certificações";
 		$messages["use_cert"][self::EN_US] = "Use certifications";
 
@@ -455,6 +458,9 @@ class Lang
 
 		$messages["sett_none"][self::PT_BR] = "Nenhum (esconder)";
 		$messages["sett_none"][self::EN_US] = "None (hide)";
+
+		$messages["none"][self::PT_BR] = "Nenhum";
+		$messages["none"][self::EN_US] = "None";
 
 		$messages["sett_lw"][self::PT_BR] = "Posição/reproduções da semana anterior";
 		$messages["sett_lw"][self::EN_US] = "Show last week position/plays";
