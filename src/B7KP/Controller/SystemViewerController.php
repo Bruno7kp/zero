@@ -3,6 +3,7 @@ namespace B7KP\Controller;
 
 use B7KP\Model\Model;
 use B7KP\Core\Dao;
+use B7KP\Core\App;
 use B7KP\Entity\User;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Route;
@@ -48,11 +49,37 @@ class SystemViewerController extends Controller
 	{
 		$this->checkAccess();
 		$dao = Dao::getConn();
-		$affected = $dao->run("ALTER TABLE settings ADD show_times INT NOT NULL");
+		$affected = $dao->run("ALTER TABLE settings ADD show_times INT NOT NULL, ADD show_points INT NOT NULL");
 		//$affected = $dao->run("UPDATE week SET week = 198 WHERE iduser = 124 AND week = 1 AND to_day > '2015-01-01'");
 		//$affected = $this->factory->removeBy("\B7KP\Entity\Week", "iduser", 38);
 		//var_dump($affected);
 	}
+
+	/**
+	* @Route(name=dbinfo|route=/dbinfo)
+	*/
+	public function dbInfo()
+	{
+		$this->checkAccess();
+		$dao = Dao::getConn();
+		$tables = $dao->run("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='".App::get("dbname")."'");
+			echo "<h3>".$tables[0]->table_schema."<h3>";
+			echo "<table>";
+				echo "<tr>";
+			foreach ($tables[0] as $kt => $vt) {
+					echo "<td>".$kt."</td>";
+			}
+				echo "</tr>";
+		foreach ($tables as $key => $value) {
+			echo "<tr>";
+			foreach ($value as $k => $v) {
+				echo "<td>".$v."</td>";
+			}
+			echo "</tr>";
+		}
+			echo "</table>";
+	}
+
 
 	/**
 	* @Route(name=php|route=/phpinfo)

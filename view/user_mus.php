@@ -82,13 +82,13 @@ use B7KP\Utils\Snippets as S;
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 									<small class="text-muted"><?php echo Lang::get('cert_s');?></small>
 									<br>
-									<strong>
-										<i class="icon-vynil ico-color"></i>
-										<?php 
-										$pts = $c->getPoints("music", $name, $artist);
-										echo $c->getCertification("music", $pts, "text"); 
-										?>
-									</strong>
+									<?php 
+									$pts = $c->getPoints("music", $name, $artist);
+									$txt = $c->getCertification("music", $pts, "text+icon");
+									//echo $c->getCertification("music", $pts, "icon"); 
+									//echo ($txt != Lang::get('none')) ? "<br/>" : "";
+									echo " <strong>".$txt."</strong>"; 
+									?>
 								</div>
 								<?php
 								}
@@ -118,7 +118,7 @@ use B7KP\Utils\Snippets as S;
 								{
 
 							?>
-							<button class="btn btn-custom btn-info btn-sm" id="gen_plaque" data-type="music" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image=<?php echo $music['img'];?> data-points=<?php echo $pts;?>><?php echo Lang::get("gen_plaque");?></button>
+							<button class="btn btn-custom btn-info btn-sm" id="gen_plaque" data-type="music" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="<?php echo $music['img'];?>" data-points=<?php echo $pts;?>><?php echo Lang::get("gen_plaque");?></button>
 							<?php
 								}
 								$plaques = $c->getPlaque("music", $name, $artist);

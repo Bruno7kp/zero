@@ -6,6 +6,7 @@ use B7KP\Core\Dao;
 use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 use B7KP\Library\Lang;
+use B7KP\Library\Url;
 use LastFmApi\Main\LastFm;
 
 class Certified
@@ -129,8 +130,65 @@ class Certified
 				$certification = empty($text) ? Lang::get('none') : $text;
 				break;
 
-			case 'class':
-				# code...
+			case 'text+icon':
+				$text = "";
+				if($certification['g'] > 0)
+				{
+					$file = "/web/img/gold-icon.png";
+					$text = "<img class='img-disc' src='".Url::getBaseUrl().$file."' alt='".Lang::get("gold")."' title='".Lang::get("gold")."'/>";
+				}
+				else
+				{
+					if($certification['d'] > 0)
+					{
+						$file = "/web/img/diamond-icon.png";
+						$text = $certification['d']."x "."<img class='img-disc' src='".Url::getBaseUrl().$file."' alt='".Lang::get("diam")."' title='".Lang::get("diam")."'/>";
+					}
+					if($certification['p'] > 0)
+					{
+						$file = "/web/img/platinum-icon.png";
+						if($certification['d'] > 0)
+						{
+							$text .= " + ";
+						}
+						$text .= $certification['p']."x "."<img class='img-disc' src='".Url::getBaseUrl().$file."' alt='".Lang::get("plat")."' title='".Lang::get("plat")."'/>";
+					}
+				}
+				$certification = empty($text) ? Lang::get('none') : $text;
+				break;
+
+			case 'icon':
+				$file = "";
+				if($certification['g'] > 0)
+				{
+					$file = "/web/img/gold-icon.png";
+				}
+				else
+				{
+					if($certification['d'] > 0)
+					{
+						$num = $certification['d'];
+						if($certification['d'] > 5): $num = 5; endif;
+						if($certification['d'] == 1): $num = ""; endif;
+						$file = "/web/img/diamond-icon".$num.".png";
+						if($certification['d'] == 1 && $certification['p'] == 1)
+						{
+							$file = "/web/img/diamond-platinum.png";
+						}
+						if($certification['d'] == 1 && $certification['p'] > 1)
+						{
+							$file = "/web/img/diamond-platinum2.png";
+						}
+					}
+					else if($certification['p'] > 0)
+					{
+						$num = $certification['p'];
+						if($certification['p'] > 5): $num = 5; endif;
+						if($certification['p'] == 1): $num = ""; endif;
+						$file .= "/web/img/platinum-icon".$num.".png";
+					}
+				}
+				$certification = empty($file) ? "<i class='icon-vynil ico-color'></i>" : "<img class='img-disc' src='".Url::getBaseUrl().$file."' alt='Certification'/>";
 				break;
 
 			case 'image':

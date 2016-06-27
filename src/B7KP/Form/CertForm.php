@@ -18,6 +18,7 @@ class CertForm extends Form
 		$certch = $options->get("\B7KP\Entity\Settings", "show_chart_cert");
 		$plaq = $options->get("\B7KP\Entity\Settings", "show_plaque");
 		$type = $options->get("\B7KP\Entity\Settings", "cert_type");
+		$pts = $options->get("\B7KP\Entity\Settings", "show_points");
 		$form = $this
 				->init(Route::url("change_settings"))
 				->add(self::TYPE_SELECT, "show_cert", "form-control", $cert, "use_cert")
@@ -39,7 +40,8 @@ class CertForm extends Form
 				->add(self::TYPE_TEXT, "mus_cert_diamond", "form-control")
 				->add(self::TYPE_SELECT, "show_chart_cert", "form-control", $certch, "use_cert_cha")
 				->add(self::TYPE_SELECT, "show_plaque", "form-control", $plaq, "use_plaque")
-				->add(self::TYPE_SUBMIT, "submit", "send btn btn-primary btn-lg")
+				->add(self::TYPE_SELECT, "show_points", "form-control", $pts,"sett_points")
+				->add(self::TYPE_SUBMIT, "save", "send btn btn-success")
 				->end();
 	}
 

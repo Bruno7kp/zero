@@ -54,13 +54,15 @@ class SettingsController extends Controller
 			$post->id = $this->user->id;
 			if($this->checkAssert($post))
 			{
+				$post = $this->correctValues($post);
+				$url = isset($post->show_cert) ? Route::url("cert_settings") : Route::url("settings");
 				if($this->settings)
 				{
 					$post->id = $this->settings->id;
 					$updated = $this->factory->update("B7KP\Entity\Settings", $post);
 					if($updated)
 					{
-						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("settings"));
+						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => $url);
 					}
 					else
 					{
@@ -73,7 +75,7 @@ class SettingsController extends Controller
 					$id = $this->factory->add("B7KP\Entity\Settings", $post);
 					if($id > 0)
 					{
-						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => Route::url("settings"));
+						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => $url);
 					}
 					else
 					{
@@ -100,6 +102,17 @@ class SettingsController extends Controller
 		$this->assertErrors = $assert->getErrors();
 
 		return count($this->assertErrors)==0;
+	}
+
+	private function correctValues($post)
+	{
+		if(isset($post->show_cert) && $post->show_cert == 0)
+		{
+			$post->show_chart_cert = 0;
+			$post->show_plaque = 0;
+		}
+
+		return $post;
 	}
 
 	protected function checkAccess()

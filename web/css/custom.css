@@ -288,6 +288,10 @@ a.white {
 	color: #ccc;
 }
 
+.img-disc {
+	height: 24px;
+}
+
 /* BORDER DIVIDER */
 .divider-left {
 	border-left: #eee 1px solid;

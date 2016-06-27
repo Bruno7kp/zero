@@ -388,14 +388,14 @@ class Lang
 		$messages["cert_s"][self::PT_BR] = "Certificação";
 		$messages["cert_s"][self::EN_US] = "Certification";
 
-		$messages["use_cert"][self::PT_BR] = "Usar certificações";
-		$messages["use_cert"][self::EN_US] = "Use certifications";
+		$messages["use_cert"][self::PT_BR] = "Habilitar certificações";
+		$messages["use_cert"][self::EN_US] = "Enable certifications";
 
-		$messages["use_cert_cha"][self::PT_BR] = "Mostrar certificações nos charts";
-		$messages["use_cert_cha"][self::EN_US] = "Show certifications on charts";
+		$messages["use_cert_cha"][self::PT_BR] = "Mostrar certificações no chart-run";
+		$messages["use_cert_cha"][self::EN_US] = "Show certifications on chart-run";
 
-		$messages["use_plaque"][self::PT_BR] = "Mostrar placas de certificados";
-		$messages["use_plaque"][self::EN_US] = "Show certifications plaques";
+		$messages["use_plaque"][self::PT_BR] = "Habilitar placas de certificados";
+		$messages["use_plaque"][self::EN_US] = "Enable certifications plaques";
 
 		$messages["gen_plaque"][self::PT_BR] = "Gerar placa de certificado";
 		$messages["gen_plaque"][self::EN_US] = "Create certification plaque";
@@ -480,6 +480,10 @@ class Lang
 
 		$messages["sett_lw"][self::PT_BR] = "Posição/reproduções da semana anterior";
 		$messages["sett_lw"][self::EN_US] = "Show last week position/plays";
+
+		$messages["sett_points"][self::PT_BR] = "Mostrar pontos";
+		$messages["sett_points"][self::EN_US] = "Show points";
+
 
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
 		$messages["big_one"][self::EN_US] = "Largest number of plays in one week";
