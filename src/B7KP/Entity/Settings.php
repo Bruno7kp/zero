@@ -113,6 +113,18 @@ class Settings extends Entity
 	*/
 	protected $show_plaque;
 
+	/**
+	* @Assert(null=false|int|option)
+	* @Options(values={"1": "pt_x","0": "play_x"}|settings={"translate": "1"})
+	*/
+	protected $cert_type;
+
+	/**
+	* @Assert(null=false|int|option)
+	* @Options(values={"1": "Yes","0": "No"}|settings={"translate": "1"})
+	*/
+	protected $show_times;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -134,7 +146,7 @@ class Settings extends Entity
 	{
 		$def = new \stdClass();
 
-		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque");
+		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times");
 
 		foreach ($items as $value) {
 			$def->$value = self::defaultValueFor($value);
@@ -155,6 +167,8 @@ class Settings extends Entity
 			case 'show_cert':
 			case 'show_chart_cert':
 			case 'show_plaque':
+			case 'cert_type':
+			case 'show_times':
 				$for = 0;
 				break;
 			case 'art_limit':

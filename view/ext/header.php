@@ -10,7 +10,7 @@ if(!isset($image))
 }
 isset($image) || $image = "http://i.imgur.com/R60fsP4.png";
 isset($subimage) || $subimage = "";
-isset($title) || $title = "<img src=http://i.imgur.com/N1c2b3t.png height=100 />";
+isset($title) || $title = "<img src=http://i.imgur.com/imcNtzL.png height=100 />";
 isset($subtitle) || $subtitle = Lang::get('wel_to');
 isset($alttitle) || $alttitle = false;
 ?>

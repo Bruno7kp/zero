@@ -25,8 +25,8 @@ use B7KP\Core\App;
 							<?php echo Lang::get('init');?>
 							</small>
 							<?php 
-								//$form->output();
-								echo "Cadastros desabilitados no momento.";
+								$form->output();
+								//echo "Cadastros desabilitados no momento.";
 							?>
 						</div>
 

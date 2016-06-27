@@ -314,6 +314,10 @@ class Lang
 		$messages["play"][self::EN_US] = "Play";
 		$messages["play_x"][self::PT_BR] = "Reproduções";
 		$messages["play_x"][self::EN_US] = "Plays";
+		$messages["pt"][self::PT_BR] = "Ponto";
+		$messages["pt"][self::EN_US] = "Point";
+		$messages["pt_x"][self::PT_BR] = "Pontos";
+		$messages["pt_x"][self::EN_US] = "Points";
 		$messages["scr"][self::PT_BR] = "Scrobbles";
 		$messages["listener"][self::PT_BR] = "Ouvinte";
 		$messages["listener"][self::EN_US] = "Listener";
@@ -341,7 +345,7 @@ class Lang
 		$messages["user_x"][self::PT_BR] = "Usuários";
 		$messages["user_x"][self::EN_US] = "Users";
 
-		// TEXTOS/FRASESComplete the fields below and done.
+		// TEXTOS/FRASES
 		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu <b>Nome de usuário</b> do last.fm e a senha que colocar logo abaixo. Nós <b>não</b> recomendamos usar a mesma senha da sua conta no Last.fm.";
 		$messages["init"][self::EN_US] = "Complete the fields below and done. To access ".App::get('name')." again, use your last.fm <b>Username</b> and the new password you will insert below. We do <strong>not</strong> recomend to use the same password of your Last.fm account.";
 
@@ -350,6 +354,12 @@ class Lang
 
 		$messages["wel_to"][self::PT_BR] = "Bem vindo ao";
 		$messages["wel_to"][self::EN_US] = "Welcome to";
+
+		$messages["cert_type"][self::PT_BR] = "Os certificados serão baseados em número de reproduções ou pontos?";
+		$messages["cert_type"][self::EN_US] = "";
+
+		$messages["cert_exp"][self::PT_BR] = "Os certificados podem ser baseados em número de reproduções ou pontos. Os pontos são feitos atribuindo um valor para cada posição que o álbum/música alcançou. Ex: uma música que tem três semanas no chart, com as posições #1, #2 e #3, receberá 100, 98 e 96 pontos respectivamente, totalizando 294 pontos.";
+		$messages["cert_exp"][self::EN_US] = "";
 
 		$messages["look_at"][self::PT_BR] = "Dê uma olhada nas";
 		$messages["look_at"][self::EN_US] = "Take a look at the";
@@ -384,8 +394,11 @@ class Lang
 		$messages["use_cert_cha"][self::PT_BR] = "Mostrar certificações nos charts";
 		$messages["use_cert_cha"][self::EN_US] = "Show certifications on charts";
 
-		$messages["use_plaque"][self::PT_BR] = "Mostrar placas de certificações (se disponíveis)";
-		$messages["use_plaque"][self::EN_US] = "Show certifications plaques (if available)";
+		$messages["use_plaque"][self::PT_BR] = "Mostrar placas de certificados";
+		$messages["use_plaque"][self::EN_US] = "Show certifications plaques";
+
+		$messages["gen_plaque"][self::PT_BR] = "Gerar placa de certificado";
+		$messages["gen_plaque"][self::EN_US] = "Create certification plaque";
 
 		$messages["alb_cert"][self::PT_BR] = "Valores para certificados de álbuns";
 		$messages["alb_cert"][self::EN_US] = "Values ​​for albums certificates";
@@ -458,6 +471,9 @@ class Lang
 
 		$messages["sett_none"][self::PT_BR] = "Nenhum (esconder)";
 		$messages["sett_none"][self::EN_US] = "None (hide)";
+
+		$messages["sett_times"][self::PT_BR] = "Mostrar número de semanas no pico";
+		$messages["sett_times"][self::EN_US] = "Show number of weeks at peak";
 
 		$messages["none"][self::PT_BR] = "Nenhum";
 		$messages["none"][self::EN_US] = "None";

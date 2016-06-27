@@ -32,6 +32,7 @@ class Login
 				{
 
 					setcookie(App::get("name").strtoupper($entity), $user->id, time()+31556926, "/");
+					$_COOKIE[App::get("name")."B7KP\ENTITY\USER"] = $user->id;
 				}
 				else
 				{
@@ -49,7 +50,7 @@ class Login
 	static function logout($entity = "B7KP\Entity\User")
 	{
 		unset($_SESSION[App::get("name")][strtoupper($entity)]);
-		setcookie(App::get("name").strtoupper($entity), null, time()-31556926, "/");
+		setcookie(App::get("name").strtoupper($entity), false, time()-31556926, "/");
 	}
 
 	// k

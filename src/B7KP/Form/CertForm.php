@@ -17,9 +17,12 @@ class CertForm extends Form
 		$cert = $options->get("\B7KP\Entity\Settings", "show_cert");
 		$certch = $options->get("\B7KP\Entity\Settings", "show_chart_cert");
 		$plaq = $options->get("\B7KP\Entity\Settings", "show_plaque");
+		$type = $options->get("\B7KP\Entity\Settings", "cert_type");
 		$form = $this
 				->init(Route::url("change_settings"))
 				->add(self::TYPE_SELECT, "show_cert", "form-control", $cert, "use_cert")
+				->add(self::COMMENT, "cert_exp", "form-group text-justify text-muted")
+				->add(self::TYPE_SELECT, "cert_type", "form-control", $type, "cert_type")
 				->add(self::COMMENT, "alb_cert", "form-group text-center")
 				->add(self::COMMENT, "gold", "form-group text-center no-margin")
 				->add(self::TYPE_TEXT, "alb_cert_gold", "form-control")

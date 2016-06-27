@@ -22,6 +22,7 @@ $show_dropouts 		= $settings->show_dropouts;
 $show_first_image 	= $settings->show_first_image;
 $show_playcounts 	= $settings->show_playcounts;
 $show_move 			= $settings->show_move;
+$show_times 		= $settings->show_times;
 $subs 				= substr($type, 0,3)."_limit";
 $limit 				= $settings->$subs;
 
@@ -193,7 +194,16 @@ if($show_dropouts && $week > 1)
 			endif;
 			$timespk = $todate["rank"][$peak]
 			?>
-			<td class='rk-col <?php echo $sp;?>'><?php echo $peak;?><br><span class='black'><?php echo $timespk."x"?></span></td>
+			<td class='rk-col <?php echo $sp;?>'><?php echo $peak;?>
+				<?php 
+				if($show_times)
+				{
+				?>
+				<br><span class='black'><?php echo $timespk."x"?></span>
+				<?php 
+				}	
+				?>
+			</td>
 			<td class='rk-col'><?php echo $totalweeks;?></td>
 		</tr>
 		<tr style="display:none;" class="cr-row">

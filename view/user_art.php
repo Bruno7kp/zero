@@ -14,6 +14,8 @@ use B7KP\Utils\Snippets as S;
 	$head = array("title" => "{$user->login} - ".$artist["artist"]);
 	$this->render("ext/head.php", $head);
 
+	$show_times = $settings->show_times;
+
 	$name = $artist["artist"];
 	$plays =  $artist["userplaycount"];
 	$totalwks = $artist["stats"]["stats"]["alltime"]["weeks"]["total"];
@@ -123,7 +125,10 @@ use B7KP\Utils\Snippets as S;
 										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
+										if($show_times)
+										{
 											echo "<br><span class='black'>".$times."x</span>";
+										}
 										echo "</td>";
 										echo "<td class='getimage' id='rankid".md5($item->album)."' data-type='album' data-name='".htmlentities($item->album, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
 										echo "<td>";
@@ -186,7 +191,10 @@ use B7KP\Utils\Snippets as S;
 										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
+										if($show_times)
+										{
 											echo "<br><span class='black'>".$times."x</span>";
+										}
 										echo "</td>";
 										echo "<td>";
 											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->music))).">".$item->music."</a>";

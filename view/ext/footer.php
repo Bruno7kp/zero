@@ -49,8 +49,10 @@ use B7KP\Core\App;
 <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
 
 
-
-
+<?php
+if(App::get('environment') != "DEV")
+{
+?>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -62,4 +64,7 @@ use B7KP\Core\App;
 
 </script>
 
+<?php
+}
+?>
 <!-- /JS -->

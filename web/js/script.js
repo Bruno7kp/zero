@@ -9,6 +9,8 @@ function initialize()
 	routesFns();
 	copyChart();
 	sortTable();
+	generatePlaque();
+	removePlaque();
 }
 
 function getMsg(msgid)
@@ -31,6 +33,9 @@ function getMsg(msgid)
 		array.finish = "Now you can enjoy your weekly charts :]";
 		array.uptodate = "Your charts are up to date :]";
 		array.nothingnew = "Look like there's nothing to update for now, come back later.";
+		array.sure = "Are you sure?";
+		array.newplaque = "Create certification plaque";
+		array.limitplaque = "You can only generate one certificate per day for each album/music";
 	}
 	// pt
 	else
@@ -50,9 +55,100 @@ function getMsg(msgid)
 		array.finish = "Agora você pode aproveitar seus chart semanais :]";
 		array.uptodate = "Seus charts estão atualizados :]";
 		array.nothingnew = "Parece que não há nada para atualizar por enquanto, volte mais tarde.";
+		array.sure = "Tem certeza?";
+		array.newplaque = "Gerar placa de certificado";
+		array.limitplaque = "Só é possível gerar um certificado por dia para cada álbum/música";
 	}
 
 	return array[msgid];
+}
+
+function generatePlaque()
+{
+	genBtn = $("#gen_plaque");
+	genBtn.on('click', function(event) {
+		event.preventDefault();
+		btn = $(this);
+		data = {};
+		data.type = $(this).attr('data-type');
+		data.points = $(this).attr('data-points');
+		data.name = $(this).attr('data-name');
+		data.artist = $(this).attr('data-artist');
+		data.image = $(this).attr('data-image');
+		disable(btn);
+		$.ajax({
+			url: baseUrl + '/new/plaque',
+			type: 'POST',
+			dataType: 'json',
+			data: data,
+		})
+		.done(function(data) {
+			console.log(data);
+			if(typeof data.url != "undefined" && data.url.length > 1){
+				$.magnificPopup.open({
+				  items: {
+				    src: data.url
+				  },
+				  type: 'image'
+				});
+			}
+			else
+			{
+				if(typeof data.error != "undefined" && data.error == 1)
+				{
+					showAlert(1, getMsg("limitplaque"));
+				}
+				else
+				{
+					showAlert(1, getMsg("error"));
+				}
+			}
+			undisable_alt(btn, getMsg("newplaque"));
+		})
+		.fail(function() {
+			console.log("error");
+			showAlert(1, getMsg("error"));
+			undisable_alt(btn, getMsg("newplaque"));
+		})
+		.always(function() {
+			console.log("complete");
+		});
+		
+	});
+}
+
+function removePlaque()
+{
+	$(".remove-plaque").on('click', function(event) {
+		event.preventDefault();
+		if(confirm(getMsg("sure")))
+		{
+			id = $(this).attr('data-id');
+			div = $(this);
+			$.ajax({
+				url: baseUrl + '/delete/plaque/'+id,
+				dataType: 'json'
+			})
+			.done(function(data) {
+				console.log("success");
+				if(data.error == 0)
+				{
+					div.closest('.col-plaque').hide('slow');
+				}
+				else
+				{
+					showAlert(1, getMsg("error"));
+				}
+			})
+			.fail(function() {
+				console.log("error");
+				showAlert(1, getMsg("error"));
+			})
+			.always(function() {
+				console.log("complete");
+			});
+		}
+	});
 }
 
 function copyChart()

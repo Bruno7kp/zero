@@ -4,6 +4,7 @@ namespace B7KP\Controller;
 use B7KP\Model\Model;
 use B7KP\Core\Dao;
 use B7KP\Utils\UserSession;
+use B7KP\Utils\Certified;
 use B7KP\Utils\Charts;
 use B7KP\Utils\Snippets;
 use B7KP\Entity\User;
@@ -86,6 +87,86 @@ class LibraryController extends Controller
 	}
 
 	/**
+	* @Route(name=gen_cert|route=/new/plaque)
+	*/
+	public function newPlaque()
+	{
+		$user = UserSession::getUser($this->factory);
+		if($this->isAjaxRequest())
+		{
+			$post = (object) $_POST;
+			$c = new Certified($user, $this->factory);
+			if($this->checkDate($post->type, $post->name, $post->artist, $c))
+			{
+				if($this->checkCert($post->type, $post->points, $c))
+				{
+					$url = $c->createPlaque($post->type, $post->points, $post->image, $post->name, $post->artist);
+					echo json_encode(array("url" => $url));
+				}
+				else
+				{
+					echo json_encode(array("error" => 2));
+				}
+			}
+			else
+			{
+				echo json_encode(array("error" => 1));
+			}	
+		}
+		else
+		{
+			$this->redirectToRoute("home");
+		}
+	}
+
+	private function checkDate($type, $name, $artist, Certified $c)
+	{
+		$p = $c->getPlaque($type, $name, $artist);
+		$date = new \DateTime();
+		if(count($p) > 0 && $p[0]->date == $date->format("Y-m-d"))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private function checkCert($type, $points, Certified $c)
+	{
+		$p = $c->getCertification($type, $points);
+		$v = $p["g"] + $p["p"] + $p["d"];
+		if($v > 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	* @Route(name=remove_cert|route=/delete/plaque/{id})
+	*/
+	public function removePlaque($id)
+	{
+		$user = UserSession::getUser($this->factory);
+		if($this->isAjaxRequest())
+		{
+			$cert = $this->factory->findOneBy("B7KP\Entity\Plaque", $id);
+			if(is_object($cert) && isset($cert->iduser) && $cert->iduser == $user->id)
+			{
+				$this->factory->remove("\B7KP\Entity\Plaque", $id);
+				echo json_encode(array("error" => 0));
+			}
+			else
+			{
+				echo json_encode(array("error" => 1));
+			}
+		}
+		else
+		{
+			$this->redirectToRoute("home");
+		}
+	}
+
+	/**
 	* @Route(name=lib_art_music|route=/user/{login}/library/{artist}/music)
 	*/
 	public function artMusLibList($login, $artist)
@@ -122,6 +203,7 @@ class LibraryController extends Controller
 						"user" 		=> $user,
 						"music" 	=> $music,
 						"artist" 	=> $act,
+						"settings"	=> $settings,
 						"mlimit"	=> $settings->mus_limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)

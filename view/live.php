@@ -47,6 +47,7 @@ use B7KP\Library\Lang;
 							
 							<?php 
 							$mainurl = Url::getBaseUrl()."/user/".$user->login."/music/";
+							$i = 50;
 							foreach ($list as $item) 
 							{
 								switch ($type) {
@@ -69,6 +70,11 @@ use B7KP\Library\Lang;
 										$item["images"]["medium"] = ""; 
 										echo Snippets::topActListRow($item['name'], $item['url'], $item['playcount'], $item['images']['medium'], $list[0]['playcount'], $user->login); 
 										break;
+								}
+								$i--;
+								if($i == 0)
+								{
+									break;
 								}
 							}
 							?>

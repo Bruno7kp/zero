@@ -84,7 +84,10 @@ use B7KP\Utils\Snippets as S;
 									<br>
 									<strong>
 										<i class="icon-vynil ico-color"></i>
-										<?php echo $c->getCertification("music",$plays, "text"); ?>
+										<?php 
+										$pts = $c->getPoints("music", $name, $artist);
+										echo $c->getCertification("music", $pts, "text"); 
+										?>
 									</strong>
 								</div>
 								<?php
@@ -104,6 +107,48 @@ use B7KP\Utils\Snippets as S;
 					<div class="row">
 						<div class="col-md-12">
 							<hr/>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<?php 
+							if($settings->show_cert > 0 && $settings->show_plaque)
+							{
+								if($user->checkSelfPermission($this->factory) && $c->getCertification("music", $pts, "text") != Lang::get('none'))
+								{
+
+							?>
+							<button class="btn btn-custom btn-info btn-sm" id="gen_plaque" data-type="music" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image=<?php echo $music['img'];?> data-points=<?php echo $pts;?>><?php echo Lang::get("gen_plaque");?></button>
+							<?php
+								}
+								$plaques = $c->getPlaque("music", $name, $artist);
+								if(count($plaques) > 0)
+								{
+							?>
+								<button class="btn btn-custom btn-info btn-sm" type="button" data-toggle="collapse" data-target="#collapsecertified" aria-expanded="false" aria-controls="collapsecertified">
+								  	<?php echo Lang::get("use_plaque");?>
+								</button>
+								<div class="collapse" id="collapsecertified">
+								  	<div class="well">
+								  		<div class="row">
+							<?php
+									foreach ($plaques as $key => $value) {
+										echo "<div class='col-md-4 col-sm-6 col-xs-12 bottomspace-md col-plaque'>
+										<img class='img-responsive bottomspace-xs' src='".$value->url."'>";
+										if($user->checkSelfPermission($this->factory))
+										{
+											echo "<button class='btn btn-custom btn-sm btn-danger remove-plaque' data-id='".$value->id."'><i class='fa fa-times'></i></button>";
+										}
+										echo "</div>";
+									}
+							?>
+								  		</div>
+								  	</div>
+								</div>
+							<?php
+								}
+							}
+							?>
 						</div>
 					</div>
 				</div>
