@@ -487,7 +487,7 @@ class Charts
 	public function getAllKill()
 	{
 		$dao = Dao::getConn();
-		$sql = "SELECT w.id as idweek, w.week as week, a.artist as artist, b.album as album, m.music as music FROM artist_charts a, album_charts b, music_charts m, week w, user u WHERE a.idweek = b.idweek AND a.idweek = m.idweek AND a.rank = 1 AND b.rank=1 AND m.rank=1 AND a.artist = b.artist AND a.artist=m.artist AND a.idweek = w.id AND b.idweek = w.id AND m.idweek = w.id AND w.iduser = u.id AND u.id = ".$this->user->id;
+		$sql = "SELECT w.id as idweek, w.week as week, a.artist as artist, b.album as album, m.music as music FROM artist_charts a, album_charts b, music_charts m, week w, user u WHERE a.idweek = b.idweek AND a.idweek = m.idweek AND a.rank = 1 AND b.rank=1 AND m.rank=1 AND a.artist = b.artist AND a.artist=m.artist AND a.idweek = w.id AND b.idweek = w.id AND m.idweek = w.id AND w.iduser = u.id AND u.id = ".$this->user->id." ORDER BY week";
 		$allkill = $dao->run($sql);
 		return $allkill;
 	}

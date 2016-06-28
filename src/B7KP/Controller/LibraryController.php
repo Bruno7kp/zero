@@ -87,6 +87,25 @@ class LibraryController extends Controller
 	}
 
 	/**
+	* @Route(name=allkill|route=/user/{login}/charts/allkill)
+	*/
+	public function allKill($login)
+	{
+		$user = $this->isValidUser($login);
+		$chart = new Charts($this->factory, $user);
+		$allkill = $chart->getAllKill();
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"allkill" 	=> $allkill,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("allkill.php", $vars);
+	}
+
+	/**
 	* @Route(name=gen_cert|route=/new/plaque)
 	*/
 	public function newPlaque()

@@ -397,6 +397,9 @@ class Lang
 		$messages["use_plaque"][self::PT_BR] = "Habilitar placas de certificados";
 		$messages["use_plaque"][self::EN_US] = "Enable certifications plaques";
 
+		$messages["plaque"][self::PT_BR] = "Placas de certificados";
+		$messages["plaque"][self::EN_US] = "Certifications plaques";
+
 		$messages["gen_plaque"][self::PT_BR] = "Gerar placa de certificado";
 		$messages["gen_plaque"][self::EN_US] = "Create certification plaque";
 
@@ -484,9 +487,14 @@ class Lang
 		$messages["sett_points"][self::PT_BR] = "Mostrar pontos";
 		$messages["sett_points"][self::EN_US] = "Show points";
 
-
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
 		$messages["big_one"][self::EN_US] = "Largest number of plays in one week";
+
+		$messages["big_debut"][self::PT_BR] = "Maiores estréias (debuts)";
+		$messages["big_debut"][self::EN_US] = "Biggest debuts";
+
+		$messages["allkill"][self::PT_BR] = "Artistas que ficaram em #1 em todos os charts na mesma semana";
+		$messages["allkill"][self::EN_US] = "All-kill";
 
 		$messages["big_num"][self::PT_BR] = "Maior número de semanas no";
 		$messages["big_num"][self::EN_US] = "Largest number of weeks on";

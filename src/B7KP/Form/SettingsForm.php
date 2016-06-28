@@ -26,6 +26,8 @@ class SettingsForm extends Form
 		$tim = $options->get("\B7KP\Entity\Settings", "show_times");
 		$form = $this
 				->init(Route::url("change_settings"))
+				->add(self::TYPE_SELECT, "lang", "form-control", $lan,"language")
+				->add(self::TYPE_SELECT, "show_points", "form-control", $pts,"sett_points")
 				->add(self::COMMENT, "sett_limit", "form-group text-justify")
 				->add(self::TYPE_SELECT, "art_limit", "form-control", $art,"Top x ".Lang::get('art_x'))
 				->add(self::TYPE_SELECT, "alb_limit", "form-control", $alb,"Top x ".Lang::get('alb_x'))
@@ -37,7 +39,6 @@ class SettingsForm extends Form
 				->add(self::TYPE_SELECT, "show_move", "form-control", $mov,"sett_move")
 				->add(self::TYPE_SELECT, "show_playcounts", "form-control", $pts,"sett_plays")
 				->add(self::TYPE_SELECT, "show_times", "form-control", $pts,"sett_times")
-				->add(self::TYPE_SELECT, "lang", "form-control", $lan,"language")
 				->add(self::TYPE_SUBMIT, "save", "send btn btn-success")
 				->end();
 	}

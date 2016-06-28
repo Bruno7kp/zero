@@ -16,6 +16,7 @@ switch ($curroute) {
 	case 'bwp';
 	case 'mwa';
 	case 'mia';
+	case 'allkill';
 		$a_char = "active";
 		break;
 

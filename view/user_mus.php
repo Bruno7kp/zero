@@ -75,6 +75,21 @@ use B7KP\Utils\Snippets as S;
 										</small>			
 									</strong>
 								</div>
+								<?php 
+								if($settings->show_points > 0)
+								{
+								?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="text-muted"><?php echo Lang::get('pt_x');?></small>
+									<br>
+									<strong>
+										<i class="ti-bar-chart-alt ico-color"></i>
+										<?php echo $c->getChartPoints("music", $name, $artist);;?>			
+									</strong>
+								</div>
+								<?php
+								}
+								?>
 								<?php
 								if($settings->show_cert > 0)
 								{
@@ -126,7 +141,7 @@ use B7KP\Utils\Snippets as S;
 								{
 							?>
 								<button class="btn btn-custom btn-info btn-sm" type="button" data-toggle="collapse" data-target="#collapsecertified" aria-expanded="false" aria-controls="collapsecertified">
-								  	<?php echo Lang::get("use_plaque");?>
+								  	<?php echo Lang::get("plaque");?>
 								</button>
 								<div class="collapse" id="collapsecertified">
 								  	<div class="well">

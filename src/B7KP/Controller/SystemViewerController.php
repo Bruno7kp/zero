@@ -62,8 +62,7 @@ class SystemViewerController extends Controller
 	{
 		$this->checkAccess();
 		$dao = Dao::getConn();
-		$tables = $dao->run("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='".App::get("dbname")."'");
-			echo "<h3>".$tables[0]->table_schema."<h3>";
+		$tables = $dao->run("SELECT table_name, column_name, is_nullable, data_type, character_maximum_length, character_set_name, collation_name, column_type, column_key, extra FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='".App::get("dbname")."'");
 			echo "<table>";
 				echo "<tr>";
 			foreach ($tables[0] as $kt => $vt) {
