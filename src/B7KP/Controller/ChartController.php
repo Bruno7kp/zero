@@ -291,6 +291,88 @@ class ChartController extends Controller
 		}
 	}
 
+	/**
+	* @Route(name=allkill|route=/user/{login}/charts/allkill)
+	*/
+	public function allKill($login)
+	{
+		$user = $this->isValidUser($login);
+		$chart = new Charts($this->factory, $user);
+		$allkill = $chart->getAllKill();
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"allkill" 	=> $allkill,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("allkill.php", $vars);
+	}
+
+	/**
+	* @Route(name=b_debuts|route=/user/{login}/charts/{type}/overall/debuts)
+	*/
+	public function biggestDebuts($login, $type)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$chart = new Charts($this->factory, $user);
+		$debuts = $chart->getBiggestDebuts($type, "", "playcount DESC");
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"list" 	=> $debuts,
+						"type"		=> $type,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("debuts.php", $vars);
+	}
+
+	/**
+	* @Route(name=debuts_at|route=/user/{login}/charts/{type}/overall/debuts/at/{top})
+	*/
+	public function biggestDebutsAt($login, $type, $top)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$chart = new Charts($this->factory, $user);
+		$debuts = $chart->getBiggestDebuts($type);
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"debuts" 	=> $debuts,
+						"type"		=> $type,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("debuts.php", $vars);
+	}
+
+	/**
+	* @Route(name=debuts_at|route=/user/{login}/charts/{type}/overall/awm/debuts/at/{top})
+	*/
+	public function biggestDebutsAtByArtist($login, $type, $top)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$chart = new Charts($this->factory, $user);
+		$debuts = $chart->getBiggestDebuts($type);
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"debuts" 	=> $debuts,
+						"type"		=> $type,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("debuts.php", $vars);
+	}
+
 	protected function checkAccess()
 	{
 		if(UserSession::getUser($this->factory) == false)

@@ -240,9 +240,9 @@ use B7KP\Library\Lang;
 										<?php echo Lang::get('big_debut');?>
 									</td>
 									<td>
-										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
+										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
+										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
 									</td>
 								</tr>
 								<tr>
@@ -254,6 +254,15 @@ use B7KP\Library\Lang;
 										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
 										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
 
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<?php echo Lang::get('art_alb_mus');?>
+									</td>
+									<td>
+										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
 									</td>
 								</tr>
 								<tr>

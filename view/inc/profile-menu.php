@@ -11,12 +11,13 @@ switch ($curroute) {
 
 	case 'chart_list':
 	case 'full_chart_list':
-	case 'weekly_chart';
-	case 'live_charts';
-	case 'bwp';
-	case 'mwa';
-	case 'mia';
-	case 'allkill';
+	case 'weekly_chart':
+	case 'live_charts':
+	case 'bwp':
+	case 'mwa':
+	case 'mia':
+	case 'allkill':
+	case 'b_debuts':
 		$a_char = "active";
 		break;
 
