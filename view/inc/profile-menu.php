@@ -18,6 +18,8 @@ switch ($curroute) {
 	case 'mia':
 	case 'allkill':
 	case 'b_debuts':
+	case 'debuts_at':
+	case 'debuts_by':
 		$a_char = "active";
 		break;
 

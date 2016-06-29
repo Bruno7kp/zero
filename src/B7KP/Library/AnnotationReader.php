@@ -9,7 +9,7 @@ class AnnotationReader implements iCache
 {
 	private $reflection;
 	private $scan;
-	private $usecache = false;
+	private $usecache = true;
 	private static $updated = 0;
 	
 	function __construct()

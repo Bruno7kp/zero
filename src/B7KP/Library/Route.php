@@ -12,7 +12,7 @@ class Route
 	private static function findRoutes()
 	{
 		$reader = new AnnotationReader();
-		$controllers = $reader->find("method","Route");
+		$controllers = $reader->find("method","Route", false);
 		self::mapRoutes($controllers);
 	}
 

@@ -11,6 +11,19 @@ function initialize()
 	sortTable();
 	generatePlaque();
 	removePlaque();
+	urlSelector();
+}
+
+function urlSelector()
+{
+	$(".urlselector").on('change', function(event) {
+		event.preventDefault();
+		var url = $(this).val();
+	    if (url) { 
+	        window.location = url;
+	    }
+	    return false;
+	});
 }
 
 function getMsg(msgid)

@@ -370,6 +370,12 @@ class Lang
 		$messages["no_mus"][self::PT_BR] = "Nenhuma música desse artista entrou nos charts.";
 		$messages["no_mus"][self::EN_US] = "No musics";
 
+		$messages["filter_rank"][self::PT_BR] = "Filtre por posição";
+		$messages["filter_rank"][self::EN_US] = "Filter by position";
+
+		$messages["filter"][self::PT_BR] = "Filtro";
+		$messages["filter"][self::EN_US] = "Filter";
+
 		$messages["art_alb_mus"][self::PT_BR] = "Artistas com mais músicas/álbuns em #1";
 		$messages["art_alb_mus"][self::EN_US] = "Artists with more musics/albums at #1";
 

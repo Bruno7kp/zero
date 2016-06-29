@@ -319,11 +319,13 @@ class ChartController extends Controller
 		$this->isValidType($type, $user);
 		$chart = new Charts($this->factory, $user);
 		$debuts = $chart->getBiggestDebuts($type, "", "playcount DESC");
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 		$vars = array 
 					(
 						"user" 		=> $user,
-						"list" 	=> $debuts,
+						"list" 		=> $debuts,
 						"type"		=> $type,
+						"limit"		=> $settings->$type."_limit",
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
@@ -332,19 +334,26 @@ class ChartController extends Controller
 	}
 
 	/**
-	* @Route(name=debuts_at|route=/user/{login}/charts/{type}/overall/debuts/at/{top})
+	* @Route(name=debuts_at|route=/user/{login}/charts/{type}/overall/debuts/{signal}/{top})
 	*/
-	public function biggestDebutsAt($login, $type, $top)
+	public function biggestDebutsAt($login, $type, $signal, $top)
 	{
 		$user = $this->isValidUser($login);
+		$signal = $this->isValidSignal($signal);
 		$this->isValidType($type, $user);
+		$top = intval($top) > 0 ? intval($top) : 1;
 		$chart = new Charts($this->factory, $user);
-		$debuts = $chart->getBiggestDebuts($type);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$debuts = $chart->getBiggestDebuts($type, "rank ".$signal." ".$top, "playcount DESC");
+		$limit = substr($type,0,3)."_limit";
 		$vars = array 
 					(
 						"user" 		=> $user,
-						"debuts" 	=> $debuts,
+						"list" 		=> $debuts,
 						"type"		=> $type,
+						"top"		=> $top,
+						"signal"	=> $signal,
+						"limit"		=> $settings->$limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
@@ -353,7 +362,7 @@ class ChartController extends Controller
 	}
 
 	/**
-	* @Route(name=debuts_at|route=/user/{login}/charts/{type}/overall/awm/debuts/at/{top})
+	* @Route(name=debuts_by|route=/user/{login}/charts/{type}/overall/awm/debuts/at/{top})
 	*/
 	public function biggestDebutsAtByArtist($login, $type, $top)
 	{
@@ -387,6 +396,17 @@ class ChartController extends Controller
 		{
 			$this->redirectToRoute("chart_list", array("login" => $user->login));
 		}
+	}
+
+	protected function isValidSignal($signal)
+	{
+		$return = "=";
+		$valid = array("=", ">", "<", ">=", "<=");
+		if(in_array($signal, $valid))
+		{
+			$return = $signal;
+		}
+		return $return;
 	}
 
 	protected function getUserBg($user, $avatar = false)
