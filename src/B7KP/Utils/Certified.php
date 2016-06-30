@@ -67,10 +67,36 @@ class Certified
 	{
 		$valid = array("album", "music");
 		if(!in_array($type, $valid)): return null; endif;
+		$limit = substr($type, 0, 3)."_limit";
 		$table = $type."_charts";
-		$pts = $this->dao->run("SELECT count(idweek) * 100 - (sum(rank) - count(idweek))*2 as pts FROM ".$table." WHERE ".$type." = '".addslashes($name)."' and artist = '".addslashes($artist)."'");
+		$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts FROM ".$table." t, week w, user u WHERE t.".$type." = '".addslashes($name)."' and t.artist = '".addslashes($artist)."' AND w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit."");
 
 		return $pts[0]->pts;
+	}
+
+	public function getArtistChartPoints($name)
+	{
+		$limit = "art_limit";
+		$pts = $this->dao->run("SELECT count(idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts FROM artist_charts t, week w, user u WHERE t.artist = '".addslashes($name)."' AND w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit."");
+
+		return $pts[0]->pts;
+	}
+
+	public function getChartPointsList($type)
+	{
+		$valid = array("album", "music", "artist");
+		if(!in_array($type, $valid)): return null; endif;
+		$limit = substr($type, 0, 3)."_limit";
+		if($type != "artist")
+		{
+			$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts, t.".$type.", t.artist FROM ".$table." t, week w, user u WHERE w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit." GROUP BY t.artist, t.".$type." ORDER BY pts DESC");
+		}
+		else
+		{
+			$pts = $this->dao->run("SELECT count(idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts, t.artist FROM artist_charts t, week w, user u WHERE w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit." GROUP BY t.artist ORDER BY pts DESC");
+		}
+
+		return $pts;
 	}
 
 	public function getWeights($type)

@@ -267,11 +267,11 @@ use B7KP\Library\Lang;
 								</tr>
 								<tr>
 									<td>
-										<?php echo Lang::get('art_alb_mus');?>
+										<?php echo Lang::get('big_debut_art');?>
 									</td>
 									<td>
-										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
+										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
 									</td>
 								</tr>
 								<tr>

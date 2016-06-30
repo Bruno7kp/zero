@@ -1,12 +1,13 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
-use B7KP\Library\Route;
-use B7KP\Library\Url;
-use B7KP\Library\Lang;
+use B7KP\Utils\Certified;
 use B7KP\Utils\Constants as C;
 use B7KP\Utils\Functions as F;
 use B7KP\Utils\Snippets as S;
+use B7KP\Library\Route;
+use B7KP\Library\Url;
+use B7KP\Library\Lang;
 ?>
 <!doctype html>
 <html>
@@ -15,6 +16,7 @@ use B7KP\Utils\Snippets as S;
 	$this->render("ext/head.php", $head);
 
 	$show_times = $settings->show_times;
+	$c = new Certified($user, $this->factory);
 
 	$name = $artist["artist"];
 	$plays =  $artist["userplaycount"];
@@ -72,6 +74,21 @@ use B7KP\Utils\Snippets as S;
 										</small>			
 									</strong>
 								</div>
+								<?php 
+								if($settings->show_points > 0)
+								{
+								?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="text-muted"><?php echo Lang::get('pt_x');?></small>
+									<br>
+									<strong>
+										<i class="ti-bar-chart-alt ico-color"></i>
+										<?php echo $c->getArtistChartPoints($name);?>			
+									</strong>
+								</div>
+								<?php
+								}
+								?>
 							</div>
 						</div>
 					</div>

@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions as F;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -11,7 +12,7 @@ use B7KP\Library\Lang;
 	$head = array("title" => "{$user->login} Charts");
 	$this->render("ext/head.php", $head);
 	$top = isset($top) ? $top : "1";
-	$signal = isset($signal) ? $signal : "=";
+	$signal = isset($signal) ? $signal : ">=";
 	$curRoute = Route::getName(Url::getRequest());
 ?>
 	<body class="inner-min">
@@ -29,7 +30,38 @@ use B7KP\Library\Lang;
 					</div>
 					<div class="row bottomspace-md text-center">
 						<div class="col-xs-12">
-							<h3 class="h3"><?php echo Lang::get('big_debut');?></h3>
+							<h3 class="h3">
+								<?php
+								switch ($signal) {
+									case '=':
+										$rest = " ".Lang::get("in")." #".$top;
+										break;
+									
+									case '>':
+										$rest = " ".Lang::get("out_of_top")." ".$top;
+										break;
+
+									case '<':
+										if($top > 1){
+											$rest = " ".Lang::get("inside_of_top")." ".($top-1);
+										}else{
+											$rest = "";
+										}
+										break;
+									case '>=':
+										if($top > 1){
+											$rest = " ".Lang::get("out_of_top")." ".($top-1);
+										}else{
+											$rest = "";
+										}
+										break;
+									case '<=':
+										$rest = " ".Lang::get("inside_of_top")." ".$top;
+										break;
+								} 
+								echo Lang::get('big_debut').$rest;
+								?>	
+							</h3>
 						</div>
 					</div>
 					<div class="row text-center">
@@ -45,12 +77,28 @@ use B7KP\Library\Lang;
 						<div class="col-xs-12">
 							<small><?php echo Lang::get("filter_rank");?></small>
 							<br/>
-							<div class="col-xs-6 col-xs-offset-3 col-sm-4 col-sm-offset-4 col-md-2 col-md-offset-5 text-center">
+							<div class="col-xs-3 col-xs-offset-3 col-sm-2 col-sm-offset-4 col-md-1 col-md-offset-5 text-center">
 								<select class="form-control urlselector">
 								<?php 
-								for ($i=0; $i < $limit; $i++) { 
+								$signs = array(">=", "<=", "=", ">", "<");
+								foreach ($signs as $value) 
+								{
 								?>
-								<option <?php echo ($top == $i+1 ? "selected='selected'" : "");?>value="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => $type, 'top' => ($i+1), 'signal' => $signal));?>">
+								<option <?php echo ($signal == $value ? "selected='selected'" : "");?>value="<?php echo Route::url("debuts_at", array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $value));?>">
+								<?php echo $value;?>
+								</option>
+								<?php
+								}
+								?>
+								</select>
+							</div>
+							<div class="col-xs-3 col-sm-2 col-md-1">
+								<select class="form-control urlselector">
+								<?php 
+								for ($i=0; $i < $limit; $i++) 
+								{ 
+								?>
+								<option <?php echo ($top == $i+1 ? "selected='selected'" : "");?>value="<?php echo Route::url("debuts_at", array('login' => $user->login, 'type' => $type, 'top' => ($i+1), 'signal' => $signal));?>">
 								<?php echo $i+1;?>
 								</option>
 								<?php
@@ -82,16 +130,26 @@ use B7KP\Library\Lang;
 								<tbody>
 								<?php 
 								$weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
+								$itemurl = Url::getBaseUrl()."/user/".$user->login."/music/";
 								foreach ($list as $key => $value) 
 								{
 									$week = $this->factory->findOneBy("B7KP\Entity\Week", $value->idweek);
 									$url = $weekurl.$week->week;
+									$rest = $type != "artist" ? $type == "album" ? "/".F::fixLFM($value->$type) : "/_/".F::fixLFM($value->$type) : "" ;
 								?>
 								<tr>
 									<td class="text-center"><?php echo $key+1;?></td>
-									<td><?php echo $value->$type; ?></td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist).$rest;?>>
+										<?php echo $value->$type; ?>
+										</a>
+									</td>
 									<?php if($type != "artist") { ?>
-									<td><?php echo $value->artist; ?></td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist);?>>
+										<?php echo $value->artist; ?>
+										</a>
+									</td>
 									<?php } ?>
 									<td class="text-center"><?php echo $value->playcount; ?></td>
 									<td class="text-center"><?php echo $value->rank; ?></td>

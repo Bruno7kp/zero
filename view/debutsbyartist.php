@@ -1,7 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
-use B7KP\Utils\Charts;
 use B7KP\Utils\Functions as F;
+use B7KP\Utils\Charts;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -31,46 +31,44 @@ use B7KP\Library\Lang;
 					<div class="row bottomspace-md text-center">
 						<div class="col-xs-12">
 							<h3 class="h3">
-								<?php 
+							<?php 
 								switch ($signal) {
 									case '=':
-										$rest = " (".Lang::get("in")." #".$top.")";
+										$rest = " ".Lang::get("in")." #".$top;
 										break;
 									
 									case '>':
-										$rest = " (".Lang::get("out_of_top")." ".$top.")";
+										$rest = " ".Lang::get("out_of_top")." ".$top;
 										break;
 
 									case '<':
 										if($top > 1){
-											$rest = " (".Lang::get("inside_of_top")." ".($top-1).")";
+											$rest = " ".Lang::get("inside_of_top")." ".($top-1);
 										}else{
 											$rest = "";
 										}
 										break;
 									case '>=':
 										if($top > 1){
-											$rest = " (".Lang::get("out_of_top")." ".($top-1).")";
+											$rest = " ".Lang::get("out_of_top")." ".($top-1);
 										}else{
 											$rest = "";
 										}
 										break;
 									case '<=':
-										$rest = " (".Lang::get("inside_of_top")." ".$top.")";
+										$rest = " ".Lang::get("inside_of_top")." ".$top;
 										break;
 								}
-								echo Lang::get('big_one').$rest;
-								?>
-								
+								echo Lang::get('big_debut_one').$rest;
+							?>	
 							</h3>
 						</div>
 					</div>
 					<div class="row text-center">
 						<div class="col-xs-12">
 							<div class="btn-group" role="group">
-								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'artist', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'album', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'music', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
+								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'album', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i> <i class="icon-vynil except"></i></a>
+								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'music', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i> <i class="ti-music"></i></a>
 							</div>
 						</div>
 					</div>
@@ -85,7 +83,7 @@ use B7KP\Library\Lang;
 								foreach ($signs as $value) 
 								{
 								?>
-								<option <?php echo ($signal == $value ? "selected='selected'" : "");?>value="<?php echo Route::url("bwp_at", array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $value));?>">
+								<option <?php echo ($signal == $value ? "selected='selected'" : "");?>value="<?php echo Route::url("debuts_by", array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $value));?>">
 								<?php echo $value;?>
 								</option>
 								<?php
@@ -99,7 +97,7 @@ use B7KP\Library\Lang;
 								for ($i=0; $i < $limit; $i++) 
 								{ 
 								?>
-								<option <?php echo ($top == $i+1 ? "selected='selected'" : "");?>value="<?php echo Route::url("bwp_at", array('login' => $user->login, 'type' => $type, 'top' => ($i+1), 'signal' => $signal));?>">
+								<option <?php echo ($top == $i+1 ? "selected='selected'" : "");?>value="<?php echo Route::url("debuts_by", array('login' => $user->login, 'type' => $type, 'top' => ($i+1), 'signal' => $signal));?>">
 								<?php echo $i+1;?>
 								</option>
 								<?php
@@ -119,46 +117,27 @@ use B7KP\Library\Lang;
 								<thead>
 								<tr>
 									<th class="text-center">#</th>
-									<?php if($type != "artist")  { ?>
-									<th><?php echo Lang::get('title');?></th>
-									<?php } ?>
 									<th><?php echo Lang::get('art');?></th>
-									<th class="text-center"><?php echo Lang::get('play_x');?></th>
-									<th class="text-center"><?php echo Lang::get('rk');?></th>
-									<th class="text-center"><?php echo Lang::get('wk');?></th>
+									<th class="text-center">Total</th>
 								</tr>								
 								</thead>
 								<tbody>
 								<?php 
 								$weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
-								$itemurl = Url::getBaseUrl()."/user/".$user->login."/music/";
 								foreach ($list as $key => $value) 
 								{
 									$week = $this->factory->findOneBy("B7KP\Entity\Week", $value->idweek);
 									$url = $weekurl.$week->week;
-									$rest = $type != "artist" ? $type == "album" ? "/".F::fixLFM($value->$type) : "/_/".F::fixLFM($value->$type) : "" ;
 								?>
 								<tr>
 									<td class="text-center"><?php echo $key+1;?></td>
 									<td>
-										<a href=<?php echo $itemurl.F::fixLFM($value->artist).$rest;?>>
-										<?php echo $value->$type; ?>
-										</a>
-									</td>
-									<?php if($type != "artist") { ?>
-									<td>
-										<a href=<?php echo $itemurl.F::fixLFM($value->artist);?>>
+										<a href="<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($value->artist)));?>">
 										<?php echo $value->artist; ?>
 										</a>
+											
 									</td>
-									<?php } ?>
-									<td class="text-center"><?php echo $value->playcount; ?></td>
-									<td class="text-center"><?php echo $value->rank; ?></td>
-									<td class="text-center">
-										<a target="_blank" href="<?php echo $url;?>">
-											<?php echo $week->week; ?>
-										</a>
-									</td>
+									<td class="text-center"><?php echo $value->total; ?></td>
 								</tr>
 								<?php 
 								}

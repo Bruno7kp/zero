@@ -492,14 +492,14 @@ class Charts
 		return $allkill;
 	}
 
-	public function getBiggestDebuts($type, $and = "", $order = "")
+	public function getBiggestDebuts($type, $and = "", $order = "", $select = "")
 	{
 		$dao = Dao::getConn();
 		$and = (empty($and) ? "" : " AND ".$type."_charts.".$and);
 		$order = (empty($order) ? "" : " ORDER BY ".$type."_charts.".$order);
 		switch ($type) {
 			case 'music':
-				$sql = "SELECT music_charts.*, week.week from week, music_charts INNER JOIN 
+				$sql = "SELECT ".$select." music_charts.*, week.week from week, music_charts INNER JOIN 
 						(
 						   SELECT m.music, m.artist, min(w.week) as debut FROM music_charts m, week w, user u WHERE w.iduser = u.id AND m.idweek = w.id AND u.id = ".$this->user->id." GROUP BY m.music, m.artist
 						) table2
@@ -511,7 +511,7 @@ class Charts
 				break;
 
 			case 'album':
-				$sql = "SELECT album_charts.*, week.week from week, album_charts INNER JOIN 
+				$sql = "SELECT ".$select." album_charts.*, week.week from week, album_charts INNER JOIN 
 						(
 						   SELECT m.album, m.artist, min(w.week) as debut FROM album_charts m, week w, user u WHERE w.iduser = u.id AND m.idweek = w.id AND u.id = ".$this->user->id." GROUP BY m.album, m.artist
 						) table2

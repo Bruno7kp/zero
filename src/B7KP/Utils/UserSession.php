@@ -31,5 +31,37 @@ class UserSession
 		}
 		return $o;
 	}
+
+	static function controlUserAccess($currentlyaccessiblefor, Model $factory)
+	{
+		$u = self::getUser($factory);
+		switch ($currentlyaccessiblefor) {
+			case 'user':
+				if($u == false)
+				{
+					die("O site está sendo atualizado. Aguarde alguns minutos.");
+				}
+				break;
+			case 'mod':
+				if($u == false || $u->permissionLevel() < 5)
+				{
+					die("O site está sendo atualizado. Aguarde alguns minutos.");
+				}
+				break;
+			case 'admin':
+				if($u == false || $u->permissionLevel() < 7)
+				{
+					die("O site está sendo atualizado. Aguarde alguns minutos.");
+				}
+				break;
+			case 'master':
+				if($u == false || $u->login != "Bruno7kp")
+				{
+					die("O site está sendo atualizado. Aguarde alguns minutos.");
+				}
+				break;
+			
+		}
+	}
 }
 ?>

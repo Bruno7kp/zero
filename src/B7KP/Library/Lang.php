@@ -496,8 +496,14 @@ class Lang
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
 		$messages["big_one"][self::EN_US] = "Largest number of plays in one week";
 
-		$messages["big_debut"][self::PT_BR] = "Maiores estréias (debuts)";
+		$messages["big_debut"][self::PT_BR] = "Maiores estreias (debuts)";
 		$messages["big_debut"][self::EN_US] = "Biggest debuts";
+
+		$messages["big_debut_one"][self::PT_BR] = "Maior número de estreias";
+		$messages["big_debut_one"][self::EN_US] = "Largest number of debuts";
+
+		$messages["big_debut_art"][self::PT_BR] = "Artistas com mais músicas/álbuns que estrearam em #1";
+		$messages["big_debut_art"][self::EN_US] = "Artists with more musics/albums which debuted at #1";
 
 		$messages["allkill"][self::PT_BR] = "Artistas que ficaram em #1 em todos os charts na mesma semana";
 		$messages["allkill"][self::EN_US] = "All-kill";
@@ -585,6 +591,12 @@ class Lang
 
 		$messages["at"][self::PT_BR] = "no";
 		$messages["at"][self::EN_US] = "at";
+
+		$messages["out_of_top"][self::PT_BR] = "fora do top";
+		$messages["out_of_top"][self::EN_US] = "out of the top";
+
+		$messages["inside_of_top"][self::PT_BR] = "dentro do top";
+		$messages["inside_of_top"][self::EN_US] = "inside of the top";
 
 		$messages["in_use"][self::PT_BR] = "já está em uso";
 		$messages["in_use"][self::EN_US] = "is already in use";

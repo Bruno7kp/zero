@@ -5,6 +5,7 @@ use B7KP\Model\Model;
 use B7KP\Utils\UserSession;
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Certified;
 use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 use B7KP\Entity\Week;
@@ -165,12 +166,44 @@ class ChartController extends Controller
 		$bgimage = $this->getUserBg($user);
 		$entity = "B7KP\Entity\\".ucfirst($type)."_charts";
 		$table  = $type."_charts";
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$limit = substr($type,0,3)."_limit";
 		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." ORDER BY t.playcount DESC, w.week ASC LIMIT 0, 100");
 		$vars = array
 					(
 						"user" 		=> $user, 
 						"list" 		=> $biggest, 
 						"type" 		=> $type, 
+						"limit"		=> $settings->$limit,
+						"lfm_bg" 	=> $bgimage,
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+		$this->render("bwp.php", $vars);
+	}
+
+	/**
+	* @Route(name=bwp_at|route=/user/{login}/charts/{type}/overall/bwp/{signal}/{top})
+	*/
+	public function biggestWeeklyPlaycountsAt($login, $type, $signal, $top)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$signal = $this->isValidSignal($signal);
+		$bgimage = $this->getUserBg($user);
+		$entity = "B7KP\Entity\\".ucfirst($type)."_charts";
+		$table  = $type."_charts";
+		$top = intval($top) > 1 ? intval($top) : 1;
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$limit = substr($type,0,3)."_limit";
+		$biggest = $this->factory->findSql($entity, "SELECT t.* FROM ".$table." t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = ".$user->id." AND t.rank ".$signal." ".$top." ORDER BY t.playcount DESC, w.week ASC");
+		$vars = array
+					(
+						"user" 		=> $user, 
+						"list" 		=> $biggest, 
+						"type" 		=> $type,
+						"top"		=> $top,
+						"signal"	=> $signal,
+						"limit"		=> $settings->$limit,
 						"lfm_bg" 	=> $bgimage,
 						"lfm_image" => $this->getUserBg($user, true)
 					);
@@ -320,12 +353,13 @@ class ChartController extends Controller
 		$chart = new Charts($this->factory, $user);
 		$debuts = $chart->getBiggestDebuts($type, "", "playcount DESC");
 		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$limit = substr($type,0,3)."_limit";
 		$vars = array 
 					(
 						"user" 		=> $user,
 						"list" 		=> $debuts,
 						"type"		=> $type,
-						"limit"		=> $settings->$type."_limit",
+						"limit"		=> $settings->$limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
@@ -362,25 +396,111 @@ class ChartController extends Controller
 	}
 
 	/**
-	* @Route(name=debuts_by|route=/user/{login}/charts/{type}/overall/awm/debuts/at/{top})
+	* @Route(name=debuts_by_main|route=/user/{login}/charts/{type}/overall/awm/debuts)
 	*/
-	public function biggestDebutsAtByArtist($login, $type, $top)
+	public function biggestDebutsAtByArtist($login, $type)
 	{
 		$user = $this->isValidUser($login);
+		$signal = "=";
+		$type = $type == "artist" ? null : $type;
+		$this->isValidType($type, $user);
+		$top = 1;
 		$this->isValidType($type, $user);
 		$chart = new Charts($this->factory, $user);
-		$debuts = $chart->getBiggestDebuts($type);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$debuts = $chart->getBiggestDebuts($type, "rank ".$signal." ".$top." GROUP BY ".$type."_charts.artist ORDER BY total DESC", "", "COUNT(".$type."_charts.".$type.") as total,");
+		$limit = substr($type,0,3)."_limit";
 		$vars = array 
 					(
 						"user" 		=> $user,
-						"debuts" 	=> $debuts,
+						"list" 		=> $debuts,
 						"type"		=> $type,
+						"top"		=> $top,
+						"signal"	=> $signal,
+						"limit"		=> $settings->$limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
 
-		$this->render("debuts.php", $vars);
+		$this->render("debutsbyartist.php", $vars);
 	}
+
+	/**
+	* @Route(name=debuts_by|route=/user/{login}/charts/{type}/overall/awm/debuts/{signal}/{top})
+	*/
+	public function biggestDebutsAtByArtistAtTop($login, $type, $signal, $top)
+	{
+		$user = $this->isValidUser($login);
+		$signal = $this->isValidSignal($signal);
+		$type = $type == "artist" ? null : $type;
+		$this->isValidType($type, $user);
+		$top = intval($top) > 0 ? intval($top) : 1;
+		$chart = new Charts($this->factory, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$debuts = $chart->getBiggestDebuts($type, "rank ".$signal." ".$top." GROUP BY ".$type."_charts.artist ORDER BY total DESC", "", "COUNT(".$type."_charts.".$type.") as total,");
+		$limit = substr($type,0,3)."_limit";
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"list" 		=> $debuts,
+						"type"		=> $type,
+						"top"		=> $top,
+						"signal"	=> $signal,
+						"limit"		=> $settings->$limit,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("debutsbyartist.php", $vars);
+	}
+
+	/**
+	* @Route(name=user_cert_art|route=/user/{login}/charts/certified/{type})
+	*/
+	public function certifiedByArtist($login, $type)
+	{
+		$user = $this->isValidUser($login);
+		$type = $type == "artist" ? null : $type;
+		$this->isValidType($type, $user);
+		$chart = new Charts($this->factory, $user);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$debuts = $chart->getBiggestDebuts($type, "rank ".$signal." ".$top." GROUP BY ".$type."_charts.artist ORDER BY total DESC", "", "COUNT(".$type."_charts.".$type.") as total,");
+		$limit = substr($type,0,3)."_limit";
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"list" 		=> $cert,
+						"type"		=> $type,
+						"limit"		=> $settings->$limit,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+
+		$this->render("debutsbyartist.php", $vars);
+	}
+
+	/**
+	* @Route(name=pts_list|route=/user/{login}/charts/points/{type}/)
+	*/
+	public function pointsList($login, $type)
+	{
+		$user = $this->isValidUser($login);
+		$this->isValidType($type, $user);
+		$chart = new Certified($user, $this->factory);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$list = $chart->getChartPointsList($type);
+		$vars = array 
+					(
+						"user" 		=> $user,
+						"list" 		=> $list,
+						"type"		=> $type,
+						"lfm_bg" 	=> $this->getUserBg($user),
+						"lfm_image" => $this->getUserBg($user, true)
+					);
+		var_dump($list);
+		//$this->render("debutsbyartist.php", $vars);
+	}
+	
 
 	protected function checkAccess()
 	{
@@ -402,9 +522,9 @@ class ChartController extends Controller
 	{
 		$return = "=";
 		$valid = array("=", ">", "<", ">=", "<=");
-		if(in_array($signal, $valid))
+		if(in_array(urldecode($signal), $valid))
 		{
-			$return = $signal;
+			$return = urldecode($signal);
 		}
 		return $return;
 	}

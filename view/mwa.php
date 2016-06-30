@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions as F;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -77,17 +78,27 @@ use B7KP\Library\Lang;
 								</thead>
 								<tbody>
 								<?php 
+								$itemurl = Url::getBaseUrl()."/user/".$user->login."/music/";
 								$weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
 								foreach ($list as $key => $value) 
 								{
 									$week = $this->factory->findOneBy("B7KP\Entity\Week", $value->idweek);
 									$url = $weekurl.$week->week;
+									$rest = $type != "artist" ? $type == "album" ? "/".F::fixLFM($value->$type) : "/_/".F::fixLFM($value->$type) : "" ;
 								?>
 								<tr>
 									<td class="text-center"><?php echo $key+1;?></td>
-									<td><?php echo $value->$type; ?></td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist).$rest;?>>
+										<?php echo $value->$type; ?>
+										</a>
+									</td>
 									<?php if($type != "artist") { ?>
-									<td><?php echo $value->artist; ?></td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist);?>>
+										<?php echo $value->artist; ?>
+										</a>
+									</td>
 									<?php } ?>
 									<td class="text-center"><?php echo $value->total; ?></td>
 								</tr>

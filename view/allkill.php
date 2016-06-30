@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions as F;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -36,7 +37,7 @@ use B7KP\Library\Lang;
 						if(is_array($allkill) && count($allkill) > 0)
 						{
 						?>
-							<table class="table middle divider">
+							<table class="table middle divider tablesorter">
 								<thead>
 									
 								<tr>
@@ -50,15 +51,28 @@ use B7KP\Library\Lang;
 								<tbody>
 								<?php 
 								$weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/artist/week/";
+								$itemurl = Url::getBaseUrl()."/user/".$user->login."/music/";
 								foreach ($allkill as $key => $value) 
 								{
 									$url = $weekurl.$value->week;
 								?>
 								<tr>
 									<td class="text-center"><?php echo $key+1;?></td>
-									<td><?php echo $value->artist; ?></td>
-									<td><?php echo $value->album; ?></td>
-									<td><?php echo $value->music; ?></td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist);?>>
+										<?php echo $value->artist; ?>
+										</a>
+									</td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist)."/".F::fixLFM($value->album);?>>
+										<?php echo $value->album; ?>
+										</a>
+									</td>
+									<td>
+										<a href=<?php echo $itemurl.F::fixLFM($value->artist)."/_/".F::fixLFM($value->music);?>>
+										<?php echo $value->music; ?>
+										</a>
+									</td>
 									<td class="text-center"><?php echo "<a href='".$url."'>".$value->week."</a>"; ?></td>
 								</tr>
 								<?php 
