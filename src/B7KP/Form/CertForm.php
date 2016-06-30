@@ -38,7 +38,7 @@ class CertForm extends Form
 				->add(self::TYPE_TEXT, "mus_cert_platinum", "form-control")
 				->add(self::COMMENT, "diam", "form-group text-center no-margin")
 				->add(self::TYPE_TEXT, "mus_cert_diamond", "form-control")
-				//->add(self::TYPE_SELECT, "show_chart_cert", "form-control", $certch, "use_cert_cha")
+				->add(self::TYPE_SELECT, "show_chart_cert", "form-control", $certch, "use_cert_cha")
 				->add(self::TYPE_SELECT, "show_plaque", "form-control", $plaq, "use_plaque")
 				->add(self::TYPE_SUBMIT, "save", "send btn btn-success")
 				->end();

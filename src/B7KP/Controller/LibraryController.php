@@ -296,6 +296,7 @@ class LibraryController extends Controller
 						"info" => $info,
 						"page" => $page,
 						"limit"		=> $settings->art_limit,
+						"settings"	=> $settings,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true),
 						"biggest_playcount" => $this->getBiggestPlaycount($user)
@@ -347,6 +348,7 @@ class LibraryController extends Controller
 						"list" => $list,
 						"info" => $info,
 						"page" => $page,
+						"settings"	=> $settings,
 						"limit"		=> $settings->art_limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true),
@@ -400,6 +402,7 @@ class LibraryController extends Controller
 						"list" => $list,
 						"info" => $info,
 						"page" => $page,
+						"settings"	=> $settings,
 						"limit"		=> $settings->art_limit,
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true),

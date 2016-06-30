@@ -87,13 +87,14 @@ class Certified
 		$valid = array("album", "music", "artist");
 		if(!in_array($type, $valid)): return null; endif;
 		$limit = substr($type, 0, 3)."_limit";
+		$table = $type."_charts";
 		if($type != "artist")
 		{
-			$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts, t.".$type.", t.artist FROM ".$table." t, week w, user u WHERE w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit." GROUP BY t.artist, t.".$type." ORDER BY pts DESC");
+			$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts, t.".$type.", t.artist, min(t.rank) as peak, count(t.idweek) as weeks FROM ".$table." t, week w, user u WHERE w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit." GROUP BY t.artist, t.".$type." ORDER BY pts DESC");
 		}
 		else
 		{
-			$pts = $this->dao->run("SELECT count(idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts, t.artist FROM artist_charts t, week w, user u WHERE w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit." GROUP BY t.artist ORDER BY pts DESC");
+			$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts, t.artist, min(t.rank) as peak, count(t.idweek) as weeks FROM artist_charts t, week w, user u WHERE w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit." GROUP BY t.artist ORDER BY pts DESC");
 		}
 
 		return $pts;

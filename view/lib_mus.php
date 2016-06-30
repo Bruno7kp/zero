@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Certified;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -44,6 +45,20 @@ use B7KP\Utils\Functions as F;
 									<th class="text-center"><?php echo Lang::get('play_x');?></th>
 									<th class="text-center"><?php echo Lang::get('wk_x');?></th>
 									<th class="text-center"><?php echo Lang::get('pk');?></th>
+									<?php 
+									if($settings->show_points){
+									?>
+									<th class="text-center"><?php echo Lang::get('pt_x');?></th>
+									<?php
+									}
+									?>
+									<?php 
+									if($settings->show_chart_cert){
+									?>
+									<th class="text-center"><?php echo Lang::get('cert_s');?></th>
+									<?php
+									}
+									?>
 								</tr>								
 
 
@@ -53,6 +68,7 @@ use B7KP\Utils\Functions as F;
 								{
 									$totalweeks = $value["stats"]["stats"]["alltime"]["weeks"]["total"];
 									$peak = $value["stats"]["stats"]["alltime"]["overall"]["peak"];
+									$pts = intval($value["stats"]["stats"]["alltime"]["overall"]["chartpoints"]);
 									if(empty($totalweeks) && empty($peak))
 									{
 										$totalweeks = "N/C";
@@ -77,6 +93,22 @@ use B7KP\Utils\Functions as F;
 									<td class="text-center rk-col"><?php echo $value["playcount"]; ?></td>
 									<td class="text-center rk-col"><?php echo $totalweeks;?></td>
 									<td class="text-center rk-col"><?php echo $peak;?></td>
+									<?php 
+									if($settings->show_points){
+									?>
+									<td class="text-center rk-col"><?php echo $pts;?></td>
+									<?php
+									}
+									?>
+									<?php 
+									if($settings->show_chart_cert){
+										$c = new Certified($user, $this->factory);
+										$cert = $c->getCertification("music", ($settings->cert_type ? $pts : $value["playcount"]), "text+icon");
+									?>
+									<td class="text-center rk-col"><?php echo $cert;?></td>
+									<?php
+									}
+									?>
 								</tr>
 								<?php 
 								}

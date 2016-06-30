@@ -9,7 +9,6 @@ use B7KP\Core\App;
 		
 		<ul class="fh5co-social-icons">
 			<li><a target="_blank" href="https://twitter.com/Bruno7kp"><i class="fa fa-twitter"></i></a></li>
-			<li><a target="_blank" href="https://www.facebook.com/bruno7kp"><i class="fa fa-facebook"></i></a></li>
 			<li><a target="_blank" href="http://www.last.fm/user/Bruno7kp"><i class="fa fa-lastfm"></i></a></li>
 			<li><a target="_blank" href="https://github.com/Bruno7kp/zero"><i class="fa fa-github"></i></a></li>
 		</ul>
@@ -22,6 +21,7 @@ use B7KP\Core\App;
 	baseUrl = "<?php echo Url::getBaseUrl();?>";
 	curPage = "<?php echo Url::getRequest();?>";
 	curRoute = "<?php echo Route::getName(Url::getRequest());?>";
+	curController = "<?php echo Route::getClass(Url::getRequest());?>";
 	apiKey = "<?php echo App::get('lastfmapikey');?>";
 	lang = <?php echo Lang::getUserLang();?>;
 </script>

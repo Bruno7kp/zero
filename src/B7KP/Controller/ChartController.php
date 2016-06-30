@@ -497,8 +497,7 @@ class ChartController extends Controller
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
-		var_dump($list);
-		//$this->render("debutsbyartist.php", $vars);
+		$this->render("points.php", $vars);
 	}
 	
 

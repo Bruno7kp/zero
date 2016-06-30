@@ -22,6 +22,7 @@ switch ($curroute) {
 	case 'debuts_at':
 	case 'debuts_by':
 	case 'debuts_by_main':
+	case 'pts_list':
 		$a_char = "active";
 		break;
 

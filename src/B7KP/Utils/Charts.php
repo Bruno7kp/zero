@@ -302,7 +302,7 @@ class Charts
 		foreach ($stats as $key => $value) {
 			$p = $value["rank"]["rank"];
 			$pc = $value["playcount"]["playcount"];
-			$extract["overall"]["chartpoints"] += (101 - $p);
+			$extract["overall"]["chartpoints"] += (100 - (($p-1)*2));
 			$extract["overall"]["chartplays"] += $pc;
 			if(!isset($extract["overall"]["peak"]) || $extract["overall"]["peak"] > $p)
 			{

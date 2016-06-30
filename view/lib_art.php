@@ -43,6 +43,13 @@ use B7KP\Utils\Snippets as S;
 									<th class="text-center"><?php echo Lang::get('play_x');?></th>
 									<th class="text-center"><?php echo Lang::get('wk_x');?></th>
 									<th class="text-center"><?php echo Lang::get('pk');?></th>
+									<?php 
+									if($settings->show_points){
+									?>
+									<th class="text-center"><?php echo Lang::get('pt_x');?></th>
+									<?php
+									}
+									?>
 								</tr>								
 
 
@@ -52,6 +59,7 @@ use B7KP\Utils\Snippets as S;
 								{
 									$totalweeks = $value["stats"]["stats"]["alltime"]["weeks"]["total"];
 									$peak = $value["stats"]["stats"]["alltime"]["overall"]["peak"];
+									$pts = intval($value["stats"]["stats"]["alltime"]["overall"]["chartpoints"]);
 									if(empty($totalweeks) && empty($peak))
 									{
 										$totalweeks = "N/C";
@@ -71,6 +79,13 @@ use B7KP\Utils\Snippets as S;
 									<td class="text-center rk-col"><?php echo $value["playcount"]; ?></td>
 									<td class="text-center rk-col"><?php echo $totalweeks;?></td>
 									<td class="text-center rk-col"><?php echo $peak;?></td>
+									<?php 
+									if($settings->show_points){
+									?>
+									<td class="text-center rk-col"><?php echo $pts;?></td>
+									<?php
+									}
+									?>
 								</tr>
 								<?php 
 								}

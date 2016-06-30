@@ -397,8 +397,8 @@ class Lang
 		$messages["use_cert"][self::PT_BR] = "Habilitar certificações";
 		$messages["use_cert"][self::EN_US] = "Enable certifications";
 
-		$messages["use_cert_cha"][self::PT_BR] = "Mostrar certificações no chart-run";
-		$messages["use_cert_cha"][self::EN_US] = "Show certifications on chart-run";
+		$messages["use_cert_cha"][self::PT_BR] = "Mostrar certificações nas listas de álbuns e músicas (geral e dentro da página de artista)";
+		$messages["use_cert_cha"][self::EN_US] = "Show certifications in the lists of albums and songs (general and inside the artist page)";
 
 		$messages["use_plaque"][self::PT_BR] = "Habilitar placas de certificados";
 		$messages["use_plaque"][self::EN_US] = "Enable certifications plaques";
@@ -540,6 +540,9 @@ class Lang
 
 		$messages["rec_tra"][self::PT_BR] = "Faixas recentes";
 		$messages["rec_tra"][self::EN_US] = "Recent tracks";
+
+		$messages["chart_points"][self::PT_BR] = "Veja a pontuação de cada artista/álbum/música conquistou pelo seu desempenhos nos charts";
+		$messages["chart_points"][self::EN_US] = "See the points of each artist / album / song won for their performances in the charts";
 
 		$messages["sett_plays"][self::PT_BR] = "Mostrar número de reproduções";
 		$messages["sett_plays"][self::EN_US] = "Show playcounts";

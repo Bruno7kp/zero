@@ -288,12 +288,34 @@ use B7KP\Library\Lang;
 							if($user->checkSelfPermission($this->factory))
 							{
 							?>
-							<div class="row text-center">
-								<h2 class="h3">Live chart</h2>
-								<p><?php echo Lang::get("live_chart");?></p>
-								<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'artist'));?>><i class="ti-user"></i></a>
-								<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'album'));?>><i class="icon-vynil except"></i></a>
-								<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'music'));?>><i class="ti-music"></i></a>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-12 ">
+									<div class="divider">
+										<h2 class="h3 topspace-md">Live chart</h2>
+										<p class="pd"><?php echo Lang::get("live_chart");?></p>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'artist'));?>><i class="ti-user"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'album'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+							</div>
+							<?php
+							}
+							?>
+							<?php 
+							if($user->checkSelfPermission($this->factory))
+							{
+							?>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md">Chart points</h2>
+										<p class="pd"><?php echo Lang::get("chart_points");?></p>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
 							</div>
 							<?php
 							}
