@@ -42,11 +42,6 @@ use B7KP\Library\Lang;
 							</div>
 						</div>
 					</div>
-					<div class="row text-center topspace-sm">
-						<div class="col-xs-12">
-							<small><?php echo Lang::get("filter_rank");?></small>
-						</div>
-					</div>
 					<div class="row">
 						<div class="col-md-10 col-md-offset-1 topspace-md">
 						<?php

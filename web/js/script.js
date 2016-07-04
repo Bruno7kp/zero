@@ -12,6 +12,31 @@ function initialize()
 	generatePlaque();
 	removePlaque();
 	urlSelector();
+	btnCertShow();
+}
+
+function btnCertShow()
+{
+	$("#nid").on('click', function(event) {
+		event.preventDefault();
+		$('.nclass').show();
+		$('.uclass').hide();
+		$('.wclass').hide();
+	});
+
+	$("#uid").on('click', function(event) {
+		event.preventDefault();
+		$('.nclass').hide();
+		$('.uclass').show();
+		$('.wclass').hide();
+	});
+
+	$("#wid").on('click', function(event) {
+		event.preventDefault();
+		$('.nclass').hide();
+		$('.uclass').hide();
+		$('.wclass').show();
+	});
 }
 
 function urlSelector()

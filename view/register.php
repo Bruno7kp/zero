@@ -26,7 +26,7 @@ use B7KP\Core\App;
 							</small>
 							<?php 
 								$form->output();
-								//echo "Cadastros desabilitados no momento.";
+								//echo "<br/>".Lang::get("not_available");
 							?>
 						</div>
 

@@ -329,6 +329,7 @@ function loadPlaycount()
 		artist = $(this).attr('data-artist');
 		artist = artist.replace(/\\/g, "");
 		rankid = $(this).attr('id');
+		cert = $(this).attr('data-cert');
 		td = $(this);
 		if(type == "artist")
 		{
@@ -356,8 +357,8 @@ function loadPlaycount()
 		last = last.replace("%20&", "%20%26");
 		last = last.replace("&%20", "%26%20");
 		//console.log(last);
-		getF(last, td, type);
-		function getF(last, td, type)
+		getF(last, td, type, cert, user);
+		function getF(last, td, type, cert, user)
 		{
 			console.log(last);
 			$.ajax({
@@ -369,11 +370,25 @@ function loadPlaycount()
 				console.log(i);
 				if(typeof data.track != "undefined" && typeof data.track.userplaycount != "undefined")
 				{
-					td.text(data.track.userplaycount);
+					if(typeof cert != "undefined")
+					{
+						getCert(user, type, data.track.userplaycount, td);
+					}
+					else
+					{
+						td.text(data.track.userplaycount);
+					}
 				}
 				else if(typeof data.album.userplaycount != "undefined")
 				{
-					td.text(data.album.userplaycount);
+					if(typeof cert != "undefined")
+					{
+						getCert(user, type, data.album.userplaycount, td);
+					}
+					else
+					{
+						td.text(data.album.userplaycount);
+					}
 				}
 				else
 				{
@@ -397,6 +412,25 @@ function loadPlaycount()
 			.always(function() {
 				console.log("complete");
 			});
+		}
+
+		function getCert(user, type, plays, where)
+		{
+			$.ajax({
+				url: baseUrl + '/ajax/cert/'+user+'/'+type+'/'+plays,
+				dataType: 'html',
+			})
+			.done(function(data) {
+				console.log("success");
+				where.html(data);
+			})
+			.fail(function() {
+				console.log("error");
+			})
+			.always(function() {
+				console.log("complete");
+			});
+			
 		}
 		
 	});

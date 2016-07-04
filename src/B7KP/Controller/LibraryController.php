@@ -427,6 +427,8 @@ class LibraryController extends Controller
 		$fixed = urldecode($name);
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
+		$fixed = str_replace("%2f", "/", $fixed);
+		$fixed = str_replace("%5c", "\\", $fixed);
 		$data = $lastfm->getArtistInfo($fixed);
 
 		if($data)
@@ -484,9 +486,13 @@ class LibraryController extends Controller
 		$fixed = urldecode($name);
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
+		$fixed = str_replace("%2f", "/", $fixed);
+		$fixed = str_replace("%5c", "\\", $fixed);
 		$fixedart = urldecode($artist);
 		$fixedart = str_replace("+", " ", $fixedart);
 		$fixedart = str_replace("%2b", "+", $fixedart);
+		$fixedart = str_replace("%2f", "/", $fixedart);
+		$fixedart = str_replace("%5c", "\\", $fixedart);
 		$data = $lastfm->getMusicInfo($fixed, $fixedart);
 
 

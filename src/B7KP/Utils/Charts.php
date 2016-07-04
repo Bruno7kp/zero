@@ -499,37 +499,37 @@ class Charts
 		$order = (empty($order) ? "" : " ORDER BY ".$type."_charts.".$order);
 		switch ($type) {
 			case 'music':
-				$sql = "SELECT ".$select." music_charts.*, week.week from week, music_charts INNER JOIN 
+				$sql = "SELECT ".$select." music_charts.*, week.week from week, user, music_charts INNER JOIN 
 						(
 						   SELECT m.music, m.artist, min(w.week) as debut FROM music_charts m, week w, user u WHERE w.iduser = u.id AND m.idweek = w.id AND u.id = ".$this->user->id." GROUP BY m.music, m.artist
 						) table2
 						ON 
 						   music_charts.music=table2.music
 						   AND music_charts.artist=table2.artist
-						WHERE week.id = music_charts.idweek AND week.week = table2.debut  
+						WHERE week.id = music_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id." 
 						";
 				break;
 
 			case 'album':
-				$sql = "SELECT ".$select." album_charts.*, week.week from week, album_charts INNER JOIN 
+				$sql = "SELECT ".$select." album_charts.*, week.week from week, user, album_charts INNER JOIN 
 						(
 						   SELECT m.album, m.artist, min(w.week) as debut FROM album_charts m, week w, user u WHERE w.iduser = u.id AND m.idweek = w.id AND u.id = ".$this->user->id." GROUP BY m.album, m.artist
 						) table2
 						ON 
 						   album_charts.album=table2.album
 						   AND album_charts.artist=table2.artist
-						WHERE week.id = album_charts.idweek AND week.week = table2.debut  
+						WHERE week.id = album_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id."   
 						";
 				break;
 			
 			case 'artist':
-				$sql = "SELECT artist_charts.*, week.week from week, artist_charts INNER JOIN 
+				$sql = "SELECT artist_charts.*, week.week from week, user, artist_charts INNER JOIN 
 						(
 						   SELECT m.artist, min(w.week) as debut FROM artist_charts m, week w, user u WHERE w.iduser = u.id AND m.idweek = w.id AND u.id = ".$this->user->id." GROUP BY m.artist
 						) table2
 						ON 
 						   artist_charts.artist=table2.artist
-						WHERE week.id = artist_charts.idweek AND week.week = table2.debut  
+						WHERE week.id = artist_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id."   
 						";
 				break;
 		}

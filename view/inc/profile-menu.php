@@ -23,6 +23,7 @@ switch ($curroute) {
 	case 'debuts_by':
 	case 'debuts_by_main':
 	case 'pts_list':
+	case 'user_cert_art':
 		$a_char = "active";
 		break;
 
@@ -45,7 +46,7 @@ switch ($curroute) {
 <ul class="nav nav-tabs">
   	<li role="presentation" class="<?php echo $a_prof;?>">
   		<a class="nav-link" href="<?php echo Route::url('profile', array('login' => $user->login));?>">
-			<img height="30" class="img-circle" src="<?php echo $usericon;?>" alt="<?php echo $user->login;?>">
+			<img height="30" width="30" class="img-circle" src="<?php echo $usericon;?>" alt="<?php echo $user->login;?>">
   		 	<span class="hidden-xs"><?php echo $user->login;?></span>
   		</a>
   	</li>

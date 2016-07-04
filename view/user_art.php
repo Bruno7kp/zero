@@ -123,11 +123,28 @@ use B7KP\Library\Lang;
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
 									<th class="center"><?php echo Lang::get('play_x')?></th>
+									<?php 
+									if($settings->show_points)
+									{
+									?>
+									<th class="center"><?php echo Lang::get('pt_x')?></th>
+									<?php
+									}
+									?>
+									<?php 
+									if($settings->show_chart_cert)
+									{
+									?>
+									<th class="center"><?php echo Lang::get('cert_s')?></th>
+									<?php
+									}
+									?>
 								</tr>
 							<?php
 								foreach ($album as $item) 
 								{
 									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
+									$pts = intval($item->stats["stats"]["alltime"]["overall"]["chartpoints"]);
 									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
 									$todate = $item->stats["stats"]["alltime"];
 									$cr = $item->stats["chartrun"];
@@ -154,8 +171,27 @@ use B7KP\Library\Lang;
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
 										echo "</td>";
-										echo "<td id='".md5($item->album)."' class='text-center rk-col loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+										echo "<td class='text-center rk-col'>";
+											$c = new Certified($user, $this->factory);
+											$lfmplays = $c->getPlaycount("album", $item->album, $name);
+											echo $lfmplays;
 										echo "</td>";
+										if($settings->show_points)
+										{
+											echo "<td class='text-center rk-col'>".$pts."</td>";
+										}
+										if($settings->show_chart_cert)
+										{
+											if($settings->cert_type)
+											{
+												$cert = $c->getCertification("album", $pts, "text+icon");
+											}
+											else
+											{
+												$cert = $c->getCertification("album", $lfmplays, "text+icon");
+											}
+									 		echo '<td class="text-center rk-col"> '.$cert.'</td>';
+										}
 									echo "</tr>";
 									echo "<tr style='display:none;' class='cr-row'>";
 										echo "<td colspan='8'>";

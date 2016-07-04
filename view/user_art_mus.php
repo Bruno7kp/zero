@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Certified;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -93,6 +94,22 @@ use B7KP\Utils\Snippets as S;
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
 									<th class="center"><?php echo Lang::get('play_x')?></th>
+									<?php 
+									if($settings->show_points)
+									{
+									?>
+									<th class="center"><?php echo Lang::get('pt_x')?></th>
+									<?php
+									}
+									?>
+									<?php 
+									if($settings->show_chart_cert)
+									{
+									?>
+									<th class="center"><?php echo Lang::get('cert_s')?></th>
+									<?php
+									}
+									?>
 								</tr>
 							<?php
 								foreach ($music as $item) 
@@ -100,6 +117,7 @@ use B7KP\Utils\Snippets as S;
 									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
 									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
 									$todate = $item->stats["stats"]["alltime"];
+									$pts = intval($item->stats["stats"]["alltime"]["overall"]["chartpoints"]);
 									$cr = $item->stats["chartrun"];
 									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
 									$sp = "";
@@ -124,8 +142,25 @@ use B7KP\Utils\Snippets as S;
 											echo $weeks;
 										echo "</td>";
 										echo "<td id='".md5($item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
-											//echo $item->weeks;
 										echo "</td>";
+										if($settings->show_points)
+										{
+											echo "<td class='text-center rk-col'>".$pts."</td>";
+										}
+										if($settings->show_chart_cert)
+										{
+											$c = new Certified($user, $this->factory);
+											if($settings->cert_type)
+											{
+												$cert = $c->getCertification("music", $pts, "text+icon");
+										 		echo '<td class="text-center rk-col"> '.$cert.'</td>';
+											}
+											else
+											{
+												echo "<td id='c".md5($item->music)."' data-cert=true class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+												echo "</td>";
+											}
+										}
 									echo "</tr>";
 									echo "<tr style='display:none;' class='cr-row'>";
 										echo "<td colspan='8'>";

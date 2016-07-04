@@ -24,6 +24,7 @@ use B7KP\Utils\Snippets as S;
 	$totalwks = empty($totalwks) ? "N/C" : $totalwks;
 	$peak = $music["stats"]["stats"]["alltime"]["overall"]["peak"];
 	$peak = empty($peak) ? "N/C" : $peak;
+	$points = $music["stats"]["stats"]["alltime"]["overall"]["chartpoints"];
 	$times = $peak > 0 ? "(".$music["stats"]["stats"]["alltime"]["rank"][$peak]."x)" : "";
 ?>
 
@@ -84,7 +85,7 @@ use B7KP\Utils\Snippets as S;
 									<br>
 									<strong>
 										<i class="ti-bar-chart-alt ico-color"></i>
-										<?php echo $c->getChartPoints("music", $name, $artist);;?>			
+										<?php echo $points;?>			
 									</strong>
 								</div>
 								<?php
@@ -98,7 +99,8 @@ use B7KP\Utils\Snippets as S;
 									<small class="text-muted"><?php echo Lang::get('cert_s');?></small>
 									<br>
 									<?php 
-									$pts = $c->getPoints("music", $name, $artist);
+									//$pts = $c->getPoints("music", $name, $artist);
+									$pts = ($settings->cert_type ? $points : $plays);
 									$txt = $c->getCertification("music", $pts, "text+icon");
 									//echo $c->getCertification("music", $pts, "icon"); 
 									//echo ($txt != Lang::get('none')) ? "<br/>" : "";

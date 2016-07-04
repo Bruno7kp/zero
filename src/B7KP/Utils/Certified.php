@@ -100,6 +100,79 @@ class Certified
 		return $pts;
 	}
 
+	public function getCertifiedByArtist($type, $artist = false)
+	{
+		$valid = array("album", "music");
+		if(!in_array($type, $valid)): return null; endif;
+		$list = array();
+		if($this->type)
+		{
+			// Pts
+			$certs = $this->getChartPointsList($type);
+			$w = $this->getWeights($type);
+			foreach ($certs as $key => $value) 
+			{
+				$vcert = $this->getDefaultCert($type, $value->pts);
+				if($vcert["p"] + $vcert["g"] + $vcert["d"] == 0)
+				{
+					continue;
+				}
+				if(isset($list[$value->artist]))
+				{
+					$list[$value->artist]["total"] += $vcert["g"] + $vcert["p"] + $vcert["d"];
+					$list[$value->artist]["utotal"]++;
+					$list[$value->artist]["wtotal"] += ($vcert["g"] * $w["g"]) + ($vcert["p"] * $w["p"]) + ($vcert["d"] * $w["d"]);
+					$list[$value->artist]["g"] += $vcert["g"];
+					$list[$value->artist]["p"] += $vcert["p"];
+					$list[$value->artist]["d"] += $vcert["d"];
+					$list[$value->artist]["ug"] += $vcert["g"];
+					$list[$value->artist]["up"] += ($vcert["p"] > 0 && $vcert["d"] == 0 ? 1 : 0);
+					$list[$value->artist]["ud"] += $vcert["d"] > 0 ? 1 : 0;
+					$list[$value->artist]["wg"] += $vcert["g"] * $w["g"];
+					$list[$value->artist]["wp"] += $vcert["p"] * $w["p"];
+					$list[$value->artist]["wd"] += $vcert["d"] * $w["d"];
+					$list[$value->artist]["list"][] = array("name" => $value->$type, "c" => $vcert);
+				}
+				else
+				{
+					$list[$value->artist] = array
+											(
+												"total" => $vcert["g"] + $vcert["p"] + $vcert["d"], 
+												"utotal" => 1,
+												"wtotal" => ($vcert["g"] * $w["g"]) + ($vcert["p"] * $w["p"]) + ($vcert["d"] * $w["d"]),
+												"g" => $vcert["g"], 
+												"p" => $vcert["p"], 
+												"d" => $vcert["d"],
+												"ug" => $vcert["g"],
+												"up" => ($vcert["p"] > 0 && $vcert["d"] == 0 ? 1 : 0),
+												"ud" => $vcert["d"] > 0 ? 1 : 0,
+												"wg" => $vcert["g"] * $w["g"],
+												"wp" => $vcert["p"] * $w["p"],
+												"wd" => $vcert["d"] * $w["d"],
+												"list" => array(array("name" => $value->$type, "c" => $vcert))
+											);
+				}
+			}
+
+			if($artist)
+			{
+				return isset($list[$artist]) ? $list[$artist] : null;
+			}
+			else
+			{
+				uasort($list, function($a, $b) {
+				    return $b['total'] > $a['total'];
+				});
+				return $list;
+			}
+		}
+		else
+		{
+			// Rep
+			return false;
+		}
+	}
+
 	public function getWeights($type)
 	{
 		$valid = array("album", "music");
@@ -181,7 +254,7 @@ class Certified
 						$text .= $certification['p']."x "."<img class='img-disc' src='".Url::getBaseUrl().$file."' alt='".Lang::get("plat")."' title='".Lang::get("plat")."'/>";
 					}
 				}
-				$certification = empty($text) ? Lang::get('none') : $text;
+				$certification = empty($text) ? "-" : $text;
 				break;
 
 			case 'icon':

@@ -37,6 +37,7 @@ class ChartController extends Controller
 			endif;
 			$numberones = array();
 			$cond = array("iduser" => $user->id);
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC", "0, 5");
 			$i = 0;
 			foreach ($weeks as $week) 
@@ -56,6 +57,7 @@ class ChartController extends Controller
 			$var = array
 					(
 						"weeks" => $numberones,
+						"settings"	=> $settings,
 						"user" => $user,
 						"lfm_bg" => $bgimage,
 						"lfm_image" => str_replace("34s", "avatar170s", $last["image"])
@@ -325,6 +327,23 @@ class ChartController extends Controller
 	}
 
 	/**
+	* @Route(name=cert_ajax|route=/ajax/cert/{login}/{type}/{plays})
+	*/
+	public function certAjax($login, $type, $plays)
+	{
+		if($this->isAjaxRequest())
+		{
+			$user = $this->isValidUser($login);
+			$c = new Certified($user, $this->factory);
+			echo $c->getCertification($type, $plays, "text+icon");
+		}
+		else
+		{
+			$this->redirectToRoute("home");
+		}
+	}
+
+	/**
 	* @Route(name=allkill|route=/user/{login}/charts/allkill)
 	*/
 	public function allKill($login)
@@ -462,21 +481,21 @@ class ChartController extends Controller
 		$user = $this->isValidUser($login);
 		$type = $type == "artist" ? null : $type;
 		$this->isValidType($type, $user);
+		$artist = array();
 		$chart = new Charts($this->factory, $user);
-		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-		$debuts = $chart->getBiggestDebuts($type, "rank ".$signal." ".$top." GROUP BY ".$type."_charts.artist ORDER BY total DESC", "", "COUNT(".$type."_charts.".$type.") as total,");
-		$limit = substr($type,0,3)."_limit";
+		$c = new Certified($user, $this->factory);
+		$list = $c->getCertifiedByArtist($type);
 		$vars = array 
 					(
 						"user" 		=> $user,
-						"list" 		=> $cert,
+						"list" 		=> $list,
 						"type"		=> $type,
-						"limit"		=> $settings->$limit,
+						"weight"	=> $c->getWeights($type),
 						"lfm_bg" 	=> $this->getUserBg($user),
 						"lfm_image" => $this->getUserBg($user, true)
 					);
 
-		$this->render("debutsbyartist.php", $vars);
+		$this->render("cert.php", $vars);
 	}
 
 	/**

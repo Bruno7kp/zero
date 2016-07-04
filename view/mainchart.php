@@ -302,10 +302,7 @@ use B7KP\Library\Lang;
 							<?php
 							}
 							?>
-							<?php 
-							if($user->checkSelfPermission($this->factory))
-							{
-							?>
+							
 							<div class="row text-center bottomspace-md">
 								<div class="col-md-12">
 									<div class="divider">
@@ -314,6 +311,20 @@ use B7KP\Library\Lang;
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+							</div>
+
+							<?php 
+							if($settings->show_cert && $settings->cert_type)
+							{
+							?>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("big_one_cert");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('user_cert_art', array('login'=> $user->login,'type' => 'album'));?>><i class="ti-user"></i> <i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('user_cert_art', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-user"></i> <i class="ti-music"></i></a>
 									</div>
 								</div>
 							</div>

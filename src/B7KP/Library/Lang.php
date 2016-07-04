@@ -294,6 +294,9 @@ class Lang
 		$messages["not_contain"][self::PT_BR] = "A senha não deve conter seu login";
 		$messages["not_contain"][self::EN_US] = "The password should not contain your login";
 
+		$messages["not_available"][self::PT_BR] = "Cadastros desabilitados no momento. Volte em algumas horas.";
+		$messages["not_available"][self::EN_US] = "User registration is disabled at the time. Come back in a few hours.";
+
 
 		// CHART
 		$messages["mov"][self::PT_BR] = "Movimento";
@@ -424,6 +427,30 @@ class Lang
 		$messages["diam"][self::PT_BR] = "Diamante";
 		$messages["diam"][self::EN_US] = "Diamond";
 
+		$messages["total"][self::PT_BR] = "Total";
+		$messages["total"][self::EN_US] = "Total";
+
+		$messages["sum"][self::PT_BR] = "Soma";
+		$messages["sum"][self::EN_US] = "Sum";
+
+		$messages["unique"][self::PT_BR] = "Único";
+		$messages["unique"][self::EN_US] = "Unique";
+
+		$messages["weighted"][self::PT_BR] = "Ponderado";
+		$messages["weighted"][self::EN_US] = "Weighted";
+
+		$messages["weight"][self::PT_BR] = "Peso";
+		$messages["weight"][self::EN_US] = "Weight";
+
+		$messages["sum_exp"][self::PT_BR] = "Soma simples de certificados do artista.<br/> Ex: Artista X tem quatro músicas:<br/> Música 1: 2x platina, Música 2: 5x platina, Música 3: Ouro, Música 4: 1x Diamante + 2x platina; <br/>Total de: ouros: 1, platinas: 9, diamantes: 1, soma: 12.";
+		$messages["sum_exp"][self::EN_US] = "Simple sum of the artist certificates";
+
+		$messages["unique_exp"][self::PT_BR] = "Cada música/álbum conta apenas uma vez.<br/> Ex: Artista X tem quatro músicas: <br/> Música 1: 2x platina, Música 2: 5x platina, Música 3: Ouro, Música 4: 1x Diamante + 2x platina; <br/> Total de: ouros: 1, platinas: 2, diamantes: 1, soma: 4.";
+		$messages["unique_exp"][self::EN_US] = "Each song / album features only once";
+
+		$messages["weighted_exp"][self::PT_BR] = "Cada certificado ganha um peso diferente, o valor da platina sempre será 1, o valor do ouro e do diamante será relativo ao valor da platina.<br/> Ex: Valores: Ouro = 60, Platina = 100, Diamante = 600<br/> Ex: Pesos: Ouro = 0.6, Platina = 1, Diamante = 6<br/> Ex: Artista X tem quatro músicas: <br/> Música 1: 2x platina, Música 2: 5x platina, Música 3: Ouro, Música 4: 1x Diamante + 2x platina; <br/> Total de: ouros: 0.6, platinas: 9, diamantes: 6, soma: 15.6.";
+		$messages["weighted_exp"][self::EN_US] = "Each certificate gets a different weight, platinum will always have a value of 1, the value of gold and diamond is relative to platinum value";
+
 		$messages["alb_cert_gold"][self::PT_BR] = "valor do certificado de ouro";
 		$messages["alb_cert_gold"][self::EN_US] = "value of gold certificate";
 
@@ -495,6 +522,9 @@ class Lang
 
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
 		$messages["big_one"][self::EN_US] = "Largest number of plays in one week";
+
+		$messages["big_one_cert"][self::PT_BR] = "Artistas com maior número de certificados";
+		$messages["big_one_cert"][self::EN_US] = "Artists with the most certificates";
 
 		$messages["big_debut"][self::PT_BR] = "Maiores estreias (debuts)";
 		$messages["big_debut"][self::EN_US] = "Biggest debuts";

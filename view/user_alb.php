@@ -21,6 +21,7 @@ use B7KP\Utils\Functions as F;
 	$artist = $album["artist"];
 	$plays =  $album["userplaycount"];
 	$totalwks = $album["stats"]["stats"]["alltime"]["weeks"]["total"];
+	$points = $album["stats"]["stats"]["alltime"]["overall"]["chartpoints"];
 	$totalwks = empty($totalwks) ? "N/C" : $totalwks;
 	$peak = $album["stats"]["stats"]["alltime"]["overall"]["peak"];
 	$peak = empty($peak) ? "N/C" : $peak;
@@ -84,7 +85,7 @@ use B7KP\Utils\Functions as F;
 									<br>
 									<strong>
 										<i class="ti-bar-chart-alt ico-color"></i>
-										<?php echo $c->getChartPoints("album", $name, $artist);;?>			
+										<?php echo $points;?>			
 									</strong>
 								</div>
 								<?php
@@ -98,7 +99,7 @@ use B7KP\Utils\Functions as F;
 									<small class="text-muted"><?php echo Lang::get('cert_s');?></small>
 									<br>
 									<?php 
-									$pts = $c->getPoints("album", $name, $artist);
+									$pts = ($settings->cert_type ? $points : $plays);
 									$txt = $c->getCertification("album", $pts, "text+icon");
 									//echo $c->getCertification("album", $pts, "icon"); 
 									//echo ($txt != Lang::get('none')) ? "<br/>" : "";
