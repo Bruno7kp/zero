@@ -7,6 +7,7 @@ use B7KP\Core\App;
 use B7KP\Entity\User;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Route;
+use B7KP\Library\Options;
 use B7KP\Utils\Pass;
 
 class StatsController extends Controller
@@ -46,9 +47,21 @@ class StatsController extends Controller
 		foreach ($weeks as $key => $value) {
 			$totalweeks += $value->t;
 		}
-		$artist = $dao->run("SELECT COUNT(id) AS t, artist FROM artist_charts GROUP BY artist ORDER BY t");
-		$album = $dao->run("SELECT COUNT(id) AS t, album, artist FROM album_charts GROUP BY artist, album ORDER BY t");
-		$music = $dao->run("SELECT COUNT(id) AS t, music, artist FROM music_charts GROUP BY artist, music ORDER BY t");
+		// art/alb/mus
+		$artist = $dao->run("SELECT COUNT(id) AS t, artist FROM artist_charts GROUP BY artist ORDER BY t LIMIT 0, 1");
+		$album = $dao->run("SELECT COUNT(id) AS t, album, artist FROM album_charts GROUP BY artist, album ORDER BY t LIMIT 0, 1");
+		$music = $dao->run("SELECT COUNT(id) AS t, music, artist FROM music_charts GROUP BY artist, music ORDER BY t LIMIT 0, 1");
+		$artist_one = $dao->run("SELECT COUNT(id) AS t, artist FROM artist_charts WHERE rank = 1 GROUP BY artist ORDER BY t LIMIT 0, 1");
+		$album_one = $dao->run("SELECT COUNT(id) AS t, album, artist FROM album_charts WHERE rank = 1 GROUP BY artist, album ORDER BY t LIMIT 0, 1");
+		$music_one = $dao->run("SELECT COUNT(id) AS t, music, artist FROM music_charts WHERE rank = 1 GROUP BY artist, music ORDER BY t LIMIT 0, 1");
+
+		// SETTINGS
+		$options = new Options();
+		$limits["art"] = $dao->run("SELECT count(id) AS t, art_limit FROM settings GROUP BY art_limit");
+		$limits["alb"] = $dao->run("SELECT count(id) AS t, alb_limit FROM settings GROUP BY alb_limit");
+		$limits["mus"] = $dao->run("SELECT count(id) AS t, mus_limit FROM settings GROUP BY mus_limit");
+
+		//$limit = $options->get("B7KP\Entity\Settings", "");
 		$vars = array
 				(
 					"plaque_last_day" 	 => $last->t,
@@ -60,7 +73,13 @@ class StatsController extends Controller
 					"user_plaque"		 => $userplaque[0],
 					"user_weeks"		 => $biggestuser,
 					"weeks_total" 		 => $totalweeks,
-					"weeks_total"
+					"top_artist"		 => $artist[0],
+					"top_album"			 => $album[0],
+					"top_music"			 => $music[0],
+					"top_artist_one"	 => $artist_one[0],
+					"top_album_one"		 => $album_one[0],
+					"top_music_one"		 => $music_one[0],
+					"limits"			 => $limits
 				);
 		$this->render("zero.php", $vars);
 	}

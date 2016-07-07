@@ -81,17 +81,17 @@ use B7KP\Library\Lang;
 								<tr>
 									<th class="text-center">#</th>
 									<th><?php echo Lang::get('art');?></th>
-									<th class="text-center nclass"><?php echo Lang::get('gold');?></th>
-									<th class="text-center nclass"><?php echo Lang::get('plat');?></th>
 									<th class="text-center nclass"><?php echo Lang::get('diam');?></th>
+									<th class="text-center nclass"><?php echo Lang::get('plat');?></th>
+									<th class="text-center nclass"><?php echo Lang::get('gold');?></th>
 									<th class="text-center nclass"><?php echo Lang::get('total');?></th>
-									<th class="text-center uclass" style="display: none;"><?php echo Lang::get('gold');?></th>
-									<th class="text-center uclass" style="display: none;"><?php echo Lang::get('plat');?></th>
 									<th class="text-center uclass" style="display: none;"><?php echo Lang::get('diam');?></th>
+									<th class="text-center uclass" style="display: none;"><?php echo Lang::get('plat');?></th>
+									<th class="text-center uclass" style="display: none;"><?php echo Lang::get('gold');?></th>
 									<th class="text-center uclass" style="display: none;"><?php echo Lang::get('total');?></th>
-									<th class="text-center wclass" style="display: none;"><?php echo Lang::get('gold');?></th>
-									<th class="text-center wclass" style="display: none;"><?php echo Lang::get('plat');?></th>
 									<th class="text-center wclass" style="display: none;"><?php echo Lang::get('diam');?></th>
+									<th class="text-center wclass" style="display: none;"><?php echo Lang::get('plat');?></th>
+									<th class="text-center wclass" style="display: none;"><?php echo Lang::get('gold');?></th>
 									<th class="text-center wclass" style="display: none;"><?php echo Lang::get('total');?></th>
 								</tr>								
 								</thead>
@@ -109,17 +109,17 @@ use B7KP\Library\Lang;
 										<?php echo $key; ?>
 										</a>
 									</td>
-									<td class="text-center nclass"><?php echo $value["g"]; ?></td>
-									<td class="text-center nclass"><?php echo $value["p"]; ?></td>
 									<td class="text-center nclass"><?php echo $value["d"]; ?></td>
+									<td class="text-center nclass"><?php echo $value["p"]; ?></td>
+									<td class="text-center nclass"><?php echo $value["g"]; ?></td>
 									<td class="text-center nclass"><?php echo $value["total"]; ?></td>
-									<td class="text-center uclass" style="display: none;"><?php echo $value["ug"]; ?></td>
-									<td class="text-center uclass" style="display: none;"><?php echo $value["up"]; ?></td>
 									<td class="text-center uclass" style="display: none;"><?php echo $value["ud"]; ?></td>
+									<td class="text-center uclass" style="display: none;"><?php echo $value["up"]; ?></td>
+									<td class="text-center uclass" style="display: none;"><?php echo $value["ug"]; ?></td>
 									<td class="text-center uclass" style="display: none;"><?php echo $value["utotal"]; ?></td>
-									<td class="text-center wclass" style="display: none;"><?php echo $value["wg"]; ?></td>
-									<td class="text-center wclass" style="display: none;"><?php echo $value["wp"]; ?></td>
 									<td class="text-center wclass" style="display: none;"><?php echo $value["wd"]; ?></td>
+									<td class="text-center wclass" style="display: none;"><?php echo $value["wp"]; ?></td>
+									<td class="text-center wclass" style="display: none;"><?php echo $value["wg"]; ?></td>
 									<td class="text-center wclass" style="display: none;"><?php echo $value["wtotal"]; ?></td>
 								</tr>
 								<?php 
