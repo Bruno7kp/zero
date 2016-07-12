@@ -12,7 +12,7 @@ use B7KP\Core\App;
 			<li><a target="_blank" href="http://www.last.fm/user/Bruno7kp"><i class="fa fa-lastfm"></i></a></li>
 			<li><a target="_blank" href="https://github.com/Bruno7kp/zero"><i class="fa fa-github"></i></a></li>
 		</ul>
-		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a> <?php echo App::get("version");?>.</p>
+		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a> <?php echo App::get("version");?>.</small><span id="time"></span></p>
 
 	</div>
 </footer>
@@ -24,6 +24,7 @@ use B7KP\Core\App;
 	curController = "<?php echo Route::getClass(Url::getRequest());?>";
 	apiKey = "<?php echo App::get('lastfmapikey');?>";
 	lang = <?php echo Lang::getUserLang();?>;
+	langCode = "<?php echo Lang::getLangCode(Lang::getUserLang());?>";
 </script>
 <script src="<?php echo Url::asset('js/jquery.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/bootstrap.min.js');?>"></script>
@@ -47,7 +48,18 @@ use B7KP\Core\App;
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/widgets/widget-uitheme.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/locale/pt-br.js"></script>
+<script>
+	moment.locale(langCode);
+	local = moment();
+	utc = moment().utc();
+	nextUpdate = moment(moment().format("DD-MM-YYYY")).utc();
+	nextUpdate.day(7);
 
+	test = nextUpdate.format();
+	$("#time").html(test);
+</script>
 
 <?php
 if(App::get('environment') != "DEV")

@@ -21,6 +21,16 @@ class Lang
         return $ref->getConstants();
 	}
 
+	static function getLangCode($id)
+	{
+		$code = 'en-US';
+		if($id == self::PT_BR){
+			$code = 'pt-BR';
+		}
+
+		return $code;
+	}
+
 	static function detectLang()
 	{
 		$mainlang = "en";
