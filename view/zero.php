@@ -1,6 +1,7 @@
 <?php
 use B7KP\Library\Route;
 use B7KP\Library\Lang;
+use B7KP\Library\Url;
 ?>
 <!doctype html>
 <html>
@@ -84,30 +85,86 @@ use B7KP\Library\Lang;
 												<p>Média dos valores colocados para cada certificado</p>
 												<div class="row">
 													<div class="col-xs-6">
-														PONTOS
-														<br>
 														<?php 
 														if(isset($typec[1])){
-															echo intval($typec[1]->ag);
-															echo intval($typec[1]->ap);
-															echo intval($typec[1]->ad);
-															echo intval($typec[1]->mg);
-															echo intval($typec[1]->mp);
-															echo intval($typec[1]->md);
+														?>
+														<ul class="list-group">
+															<li class="list-group-item list-group-item-info">
+																<span class="text-info">PONTOS - ÁLBUM</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typec[1]->ag);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typec[1]->ap);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typec[1]->ad);?>
+														    </li>
+														</ul>
+														<ul class="list-group">
+														    <li class="list-group-item list-group-item-info">
+																<span class="text-info">PONTOS - MÚSICA</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typec[1]->mg);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typec[1]->mp);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typec[1]->md);?>
+													  		</li>
+													  	</ul>
+														<?php
 														}
 														?>
 													</div>
 													<div class="col-xs-6">
-														REPRODUÇÕES
-														<br>
 														<?php 
 														if(isset($typec[0])){
-															echo intval($typec[0]->ag);
-															echo intval($typec[0]->ap);
-															echo intval($typec[0]->ad);
-															echo intval($typec[0]->mg);
-															echo intval($typec[0]->mp);
-															echo intval($typec[0]->md);
+														?>
+														<ul class="list-group">
+															<li class="list-group-item list-group-item-warning">
+																<span class="text-warning">REPRODUÇÕES - ÁLBUM</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typec[0]->ag);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typec[0]->ap);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typec[0]->ad);?>
+														    </li>
+														</ul>
+														<ul class="list-group">
+														    <li class="list-group-item list-group-item-warning">
+																<span class="text-warning">REPRODUÇÕES - MÚSICA</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typec[0]->mg);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typec[0]->mp);?>
+														    </li>
+														    <li class="list-group-item">
+																<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typec[0]->md);?>
+													  		</li>
+													  	</ul>
+														<?php
 														}
 														?>
 													</div>
@@ -115,30 +172,86 @@ use B7KP\Library\Lang;
 												<p>Valor mais utilizado para cada certificado</p>
 												<div class="row">
 													<div class="col-xs-6">
-														PONTOS
-														<br>
 														<?php 
 														if(isset($typemc[1])){
-															echo intval($typemc[1]["ag"]);
-															echo intval($typemc[1]["ap"]);
-															echo intval($typemc[1]["ad"]);
-															echo intval($typemc[1]["mg"]);
-															echo intval($typemc[1]["mp"]);
-															echo intval($typemc[1]["md"]);
+														?>
+														<ul class="list-group">
+															<li class="list-group-item list-group-item-info">
+																<span class="text-info">PONTOS - ÁLBUM</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typemc[1]["ag"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typemc[1]["ap"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typemc[1]["ad"]);?>
+														    </li>
+														</ul>
+														<ul class="list-group">
+														    <li class="list-group-item list-group-item-info">
+																<span class="text-info">PONTOS - MÚSICA</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typemc[1]["mg"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typemc[1]["mp"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typemc[1]["md"]);?>
+													  		</li>
+													  	</ul>
+														<?php
 														}
 														?>
 													</div>
 													<div class="col-xs-6">
-														REPRODUÇÕES
-														<br>
 														<?php 
 														if(isset($typemc[0])){
-															echo intval($typemc[0]["ag"]);
-															echo intval($typemc[0]["ap"]);
-															echo intval($typemc[0]["ad"]);
-															echo intval($typemc[0]["mg"]);
-															echo intval($typemc[0]["mp"]);
-															echo intval($typemc[0]["md"]);
+														?>
+														<ul class="list-group">
+															<li class="list-group-item list-group-item-warning">
+																<span class="text-warning">REPRODUÇÕES - ÁLBUM</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typemc[0]["ag"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typemc[0]["ap"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typemc[0]["ad"]);?>
+														    </li>
+														</ul>
+														<ul class="list-group">
+														    <li class="list-group-item list-group-item-warning">
+																<span class="text-warning">REPRODUÇÕES - MÚSICA</span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typemc[0]["mg"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typemc[0]["mp"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typemc[0]["md"]);?>
+													  		</li>
+													  	</ul>
+														<?php
 														}
 														?>
 													</div>
@@ -185,31 +298,97 @@ use B7KP\Library\Lang;
 										<span class="fh5co-feature-icon"><i class="ti-stats-up"></i></span>
 										<h3><?php echo "CHART";?></h3>
 										<div class="row">
-											<div class="col-xs-6 bottomspace-md">
-												<h3 class="no-margin"><?php echo $top_artist->artist." (".$top_artist->u,")";?></h3>
-												<small class="text-muted">ARTISTA PRESENTE EM MAIS CHARTS/USUÁRIOS</small>
+											<div class="col-xs-12 col-md-4 bottomspace-md">
+												<?php 
+												foreach ($top_artist as $key => $act) {
+													$one = isset($one) ? $one : $act->u;
+													$perc = $act->u/$one*100;
+												?>
+										    	<h4 class="h3 no-margin text-left"><?php echo $act->artist." (".$act->u.")";?></h4>
+												<div class="progress">
+												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $perc;?>%"></div>
+												</div>
+												<?php
+												}
+												unset($one);
+												?>
 											</div>
-											<div class="col-xs-6 bottomspace-md">
-												<h3 class="no-margin"><?php echo $top_album->album." (".$top_album->u,")";?></h3>
-												<small class="text-muted">ÁLBUM PRESENTE EM MAIS CHARTS/USUÁRIOS</small>
+											<div class="col-xs-12 col-md-4 bottomspace-md">
+												<?php 
+												foreach ($top_album as $key => $alb) {
+													$one = isset($one) ? $one : $alb->u;
+													$perc = $alb->u/$one*100;
+												?>
+										    	<h4 class="h3 no-margin text-left"><?php echo $alb->album." (".$alb->u.")";?></h4>
+												<div class="progress">
+												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $perc;?>%"></div>
+												</div>
+												<?php
+												}
+												unset($one);
+												?>
 											</div>
-											<div class="col-xs-12 bottomspace-md">
-												<h3 class="no-margin"><?php echo $top_music->music." (".$top_music->u,")";?></h3>
-												<small class="text-muted">MÚSICA PRESENTE EM MAIS CHARTS/USUÁRIOS</small>
+											<div class="col-xs-12 col-md-4 bottomspace-md">
+												<?php 
+												foreach ($top_music as $key => $mus) {
+													$one = isset($one) ? $one : $mus->u;
+													$perc = $mus->u/$one*100;
+												?>
+										    	<h4 class="h3 no-margin text-left"><?php echo $mus->music." (".$mus->u.")";?></h4>
+												<div class="progress">
+												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $perc;?>%"></div>
+												</div>
+												<?php
+												}
+												unset($one);
+												?>
 											</div>
 										</div>
 										<div class="row">
-											<div class="col-xs-6 bottomspace-md">
-												<h3 class="no-margin"><?php echo $top_artist_one->artist." (".$top_artist_one->u,")";?></h3>
-												<small class="text-muted">ARTISTA COM MAIS #1s EM DIFERENTES CHARTS/USUÁRIOS</small>
+											<div class="col-xs-12 col-md-4 bottomspace-md">
+												<?php 
+												foreach ($top_artist_one as $key => $act) {
+													$one = isset($one) ? $one : $act->u;
+													$perc = $act->u/$one*100;
+												?>
+										    	<h4 class="h3 no-margin text-left"><?php echo $act->artist." (".$act->u.")";?></h4>
+												<div class="progress">
+												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $perc;?>%"></div>
+												</div>
+												<?php
+												}
+												unset($one);
+												?>
 											</div>
-											<div class="col-xs-6 bottomspace-md">
-												<h3 class="no-margin"><?php echo $top_album_one->album." (".$top_album_one->u,")";?></h3>
-												<small class="text-muted">ÁLBUM COM MAIS #1s EM DIFERENTES CHARTS/USUÁRIOS</small>
+											<div class="col-xs-12 col-md-4 bottomspace-md">
+												<?php 
+												foreach ($top_album_one as $key => $alb) {
+													$one = isset($one) ? $one : $alb->u;
+													$perc = $alb->u/$one*100;
+												?>
+										    	<h4 class="h3 no-margin text-left"><?php echo $alb->album." (".$alb->u.")";?></h4>
+												<div class="progress">
+												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $perc;?>%"></div>
+												</div>
+												<?php
+												}
+												unset($one);
+												?>
 											</div>
-											<div class="col-xs-12 bottomspace-md">
-												<h3 class="no-margin"><?php echo $top_music_one->music." (".$top_music_one->u,")";?></h3>
-												<small class="text-muted">MÚSICA COM MAIS #1s EM DIFERENTES CHARTS/USUÁRIOS</small>
+											<div class="col-xs-12 col-md-4 bottomspace-md">
+												<?php 
+												foreach ($top_music_one as $key => $mus) {
+													$one = isset($one) ? $one : $mus->u;
+													$perc = $mus->u/$one*100;
+												?>
+										    	<h4 class="h3 no-margin text-left"><?php echo $mus->music." (".$mus->u.")";?></h4>
+												<div class="progress">
+												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $perc;?>%"></div>
+												</div>
+												<?php
+												}
+												unset($one);
+												?>
 											</div>
 										</div>
 									</div>
