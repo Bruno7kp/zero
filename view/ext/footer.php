@@ -12,7 +12,7 @@ use B7KP\Core\App;
 			<li><a target="_blank" href="http://www.last.fm/user/Bruno7kp"><i class="fa fa-lastfm"></i></a></li>
 			<li><a target="_blank" href="https://github.com/Bruno7kp/zero"><i class="fa fa-github"></i></a></li>
 		</ul>
-		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="#"><?php echo App::get("name");?></a> <?php echo App::get("version");?>.</small><span id="time"></span></p>
+		<p class="text-muted fh5co-no-margin-bottom text-center"><small>&copy; 2016 <a href="<?php echo Route::url('zero_stats');?>"><?php echo App::get("name");?></a> <a href="<?php echo Route::url('zero_versions');?>"><?php echo App::get("version");?></a>.</small></p>
 
 	</div>
 </footer>
@@ -51,14 +51,52 @@ use B7KP\Core\App;
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/locale/pt-br.js"></script>
 <script>
-	moment.locale(langCode);
-	local = moment();
-	utc = moment().utc();
-	nextUpdate = moment(moment().format("DD-MM-YYYY")).utc();
-	nextUpdate.day(7);
+autoUpdateTime();
+function autoUpdateTime(){
 
-	test = nextUpdate.format();
-	$("#time").html(test);
+	// Idioma utilizado para mostrar as datas
+	moment.locale(langCode);
+
+	// Data/hora atual
+	localTime = moment();
+	utcTime = moment.utc();
+
+	// Data do fim da semana (utc)
+	utcTimeWeekEnd = moment.utc(0, "HH");
+	utcTimeWeekEnd.day(7);
+
+	// Converte data utc para local
+	localTimeWeekEnd = utcTimeWeekEnd.clone();
+	localTimeWeekEnd.local();
+
+	// Data de atualização dos charts
+	utcTimeNextUpdate = utcTimeWeekEnd.clone();
+	utcTimeNextUpdate.add(12, 'h');
+
+	// Converte para data local
+	localTimeNextUpdate = utcTimeNextUpdate.clone();
+	localTimeNextUpdate.local();
+
+	// Tempo restante para o fim da semana
+	wems = localTimeWeekEnd.diff(localTime);
+	we = moment.duration(wems);
+	wedifference = Math.floor(we.asHours()) + moment.utc(wems).format(":mm:ss");
+
+	// Tempo restante para a atualização
+	nums = localTimeNextUpdate.diff(localTime);
+	nu = moment.duration(nums);
+	nudifference = Math.floor(nu.asHours()) + moment.utc(nums).format(":mm:ss");
+
+	$("#timeLocal").html(localTime);
+	$("#timeUtc").html(utcTime);
+	$("#timeToNU").html(nudifference);
+	$("#timeToWE").html(wedifference);
+	$("#timeNuLocal").html(localTimeNextUpdate);
+	$("#timeWeLocal").html(localTimeWeekEnd);
+	$("#timeNuUtc").html(utcTimeNextUpdate);
+	$("#timeWeUtc").html(utcTimeWeekEnd);
+	setTimeout(function(){ autoUpdateTime();}, 1000);
+}
 </script>
 
 <?php

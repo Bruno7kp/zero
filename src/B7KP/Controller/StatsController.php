@@ -48,25 +48,25 @@ class StatsController extends Controller
 			$totalweeks += $value->t;
 		}
 		// art/alb/mus
-		$artist = $dao->run("SELECT COUNT(id) AS t, artist FROM artist_charts GROUP BY artist ORDER BY t DESC LIMIT 0, 1");
-		$album = $dao->run("SELECT COUNT(id) AS t, album, artist FROM album_charts GROUP BY artist, album ORDER BY t DESC LIMIT 0, 1");
-		$music = $dao->run("SELECT COUNT(id) AS t, music, artist FROM music_charts GROUP BY artist, music ORDER BY t DESC LIMIT 0, 1");
-		$artist_one = $dao->run("SELECT COUNT(id) AS t, artist FROM artist_charts WHERE rank = 1 GROUP BY artist ORDER BY t LIMIT 0, 1");
-		$album_one = $dao->run("SELECT COUNT(id) AS t, album, artist FROM album_charts WHERE rank = 1 GROUP BY artist, album ORDER BY t LIMIT 0, 1");
-		$music_one = $dao->run("SELECT COUNT(id) AS t, music, artist FROM music_charts WHERE rank = 1 GROUP BY artist, music ORDER BY t LIMIT 0, 1");
+		$artist = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.artist FROM week w, artist_charts t WHERE w.id = t.idweek GROUP BY t.artist ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$album = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.album, t.artist FROM week w, album_charts t WHERE w.id = t.idweek GROUP BY t.artist, t.album ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$music = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.music, t.artist FROM week w, music_charts t WHERE w.id = t.idweek GROUP BY t.artist, t.music ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$artist_one = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.artist FROM week w, artist_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$album_one = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.album, t.artist FROM week w, album_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist, t.album ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$music_one = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.music, t.artist FROM week w, music_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist, t.music ORDER BY u DESC, t DESC LIMIT 0, 5");
 
 		// SETTINGS
 		$options = new Options();
 		$limits["art"] = $dao->run("SELECT count(id) AS t, art_limit FROM settings GROUP BY art_limit");
 		$limits["alb"] = $dao->run("SELECT count(id) AS t, alb_limit FROM settings GROUP BY alb_limit");
 		$limits["mus"] = $dao->run("SELECT count(id) AS t, mus_limit FROM settings GROUP BY mus_limit");
-		$cert = $dao->run("SELECT count(id) AS t, avg(alb_cert_gold) as ag, avg(alb_cert_platinum) as ap, avg(alb_cert_diamond) as ad, avg(mus_cert_gold) as mg, avg(mus_cert_platinum) as mp, avg(mus_cert_diamond) as md FROM settings WHERE show_cert = 1 GROUP BY cert_type");
-		$cert_c["ag"] = $dao->run("SELECT count(id) AS t FROM settings WHERE show_cert = 1 GROUP BY alb_cert_gold ORDER BY t DESC");
-		$cert_c["ap"] = $dao->run("SELECT count(id) AS t FROM settings WHERE show_cert = 1 GROUP BY alb_cert_platinum ORDER BY t DESC");
-		$cert_c["ad"] = $dao->run("SELECT count(id) AS t FROM settings WHERE show_cert = 1 GROUP BY alb_cert_diamond ORDER BY t DESC");
-		$cert_c["mg"] = $dao->run("SELECT count(id) AS t FROM settings WHERE show_cert = 1 GROUP BY mus_cert_gold ORDER BY t DESC");
-		$cert_c["mp"] = $dao->run("SELECT count(id) AS t FROM settings WHERE show_cert = 1 GROUP BY mus_cert_platinum ORDER BY t DESC");
-		$cert_c["md"] = $dao->run("SELECT count(id) AS t FROM settings WHERE show_cert = 1 GROUP BY mus_cert_diamond ORDER BY t DESC");
+		$cert = $dao->run("SELECT cert_type, count(id) AS t, avg(alb_cert_gold) as ag, avg(alb_cert_platinum) as ap, avg(alb_cert_diamond) as ad, avg(mus_cert_gold) as mg, avg(mus_cert_platinum) as mp, avg(mus_cert_diamond) as md FROM settings WHERE show_cert = 1 GROUP BY cert_type");
+		$cert_c["ag"] = $dao->run("SELECT count(id) AS t, cert_type, alb_cert_gold AS v  FROM settings WHERE show_cert = 1 GROUP BY cert_type, alb_cert_gold ORDER BY t DESC");
+		$cert_c["ap"] = $dao->run("SELECT count(id) AS t, cert_type, alb_cert_platinum AS v  FROM settings WHERE show_cert = 1 GROUP BY cert_type, alb_cert_platinum ORDER BY t DESC");
+		$cert_c["ad"] = $dao->run("SELECT count(id) AS t, cert_type, alb_cert_diamond AS v  FROM settings WHERE show_cert = 1 GROUP BY cert_type, alb_cert_diamond ORDER BY t DESC");
+		$cert_c["mg"] = $dao->run("SELECT count(id) AS t, cert_type, mus_cert_gold AS v  FROM settings WHERE show_cert = 1 GROUP BY cert_type, mus_cert_gold ORDER BY t DESC");
+		$cert_c["mp"] = $dao->run("SELECT count(id) AS t, cert_type, mus_cert_platinum AS v  FROM settings WHERE show_cert = 1 GROUP BY cert_type, mus_cert_platinum ORDER BY t DESC");
+		$cert_c["md"] = $dao->run("SELECT count(id) AS t, cert_type, mus_cert_diamond AS v  FROM settings WHERE show_cert = 1 GROUP BY cert_type, mus_cert_diamond ORDER BY t DESC");
 
 		//$limit = $options->get("B7KP\Entity\Settings", "");
 		$vars = array
@@ -80,12 +80,12 @@ class StatsController extends Controller
 					"user_plaque"		 => $userplaque[0],
 					"user_weeks"		 => $biggestuser,
 					"weeks_total" 		 => $totalweeks,
-					"top_artist"		 => $artist[0],
-					"top_album"			 => $album[0],
-					"top_music"			 => $music[0],
-					"top_artist_one"	 => $artist_one[0],
-					"top_album_one"		 => $album_one[0],
-					"top_music_one"		 => $music_one[0],
+					"top_artist"		 => $artist,
+					"top_album"			 => $album,
+					"top_music"			 => $music,
+					"top_artist_one"	 => $artist_one,
+					"top_album_one"		 => $album_one,
+					"top_music_one"		 => $music_one,
 					"limits"			 => $limits,
 					"cert_type"			 => $cert,
 					"cert_c"			 => $cert_c

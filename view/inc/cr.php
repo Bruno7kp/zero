@@ -46,7 +46,7 @@ if(is_array($cr))
 		$url 	  = $base.$thisweek;
 		$thisto = "<a href=\"".$url."\">".$value["week"]["to"]."</a>\n";
 		$thisto .= "<span class=\"text-muted\">".$value["playcount"]["playcount"]." ".mb_strtolower(Lang::get('play_x'))."</span>\n";
-		echo "<a class='cr-btn divider ".S::getRankColor($value["rank"]["rank"], $peak)."' title='".$wktxt." ".$thisweek."' data-toggle='popover' data-placement='auto top' data-content='".$thisto."'>";
+		echo "<a class='cr-btn ".S::getRankColor($value["rank"]["rank"], $peak)."' title='".$wktxt." ".$thisweek."' data-toggle='popover' data-placement='auto top' data-content='".$thisto."'>";
 		echo $value["rank"]["rank"];
 		echo "</a>";
 		$simplerun .= $value["rank"]["rank"] . " - ";
@@ -56,7 +56,7 @@ if(is_array($cr))
 			if($diff > 0)
 			{
 				$simplerun .= "OUT (".$diff."x) - ";
-				echo "<a class='cr-btn divider wksout' title='<i class=\"ti-help\"></i>' data-toggle='popover' data-placement='auto top' data-content='<a>".$wktxtplu." ".$outof."</a>'>";
+				echo "<a class='cr-btn wksout' title='<i class=\"ti-help\"></i>' data-toggle='popover' data-placement='auto top' data-content='<a>".$wktxtplu." ".$outof."</a>'>";
 					echo $diff."x";
 					echo "</a>";
 			}
