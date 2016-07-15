@@ -325,9 +325,6 @@ class Lang
 		$messages["alfanum"][self::PT_BR] = "Apenas letras e números são acetos no campo";
 		$messages["alfanum"][self::EN_US] = "Only letter and numbers are acceptable to field";
 
-		$messages["app_desc"][self::PT_BR] = "Maior número de";
-		$messages["app_desc"][self::EN_US] = "Largest number of";
-
 		$messages["be_number"][self::PT_BR] = "deve ser um número";
 		$messages["be_number"][self::EN_US] = "must be a number";
 

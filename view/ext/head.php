@@ -20,9 +20,9 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<title><?php echo $title;?></title>
 	<link rel="shortcut icon" href="http://i.imgur.com/OOKNwlp.png">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="<?php echo Lang::get('app_desc');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/themify-icons.css');?>">
-	<link rel="stylesheet" href="<?php echo Url::asset('css/bootstrap.min.css');?>">
+	<!-- <link rel="stylesheet" href="<?php echo Url::asset('css/bootstrap.min.css');?>"> -->
+	<link rel="stylesheet" href="https://bootswatch.com/cyborg/bootstrap.min.css">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/owl.carousel.min.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/owl.theme.default.min.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/magnific-popup.css');?>">
@@ -39,5 +39,9 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<link rel="stylesheet" href="<?php echo Url::asset('css/tooltipster-blue.css');?>">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/css/theme.bootstrap.min.css">
-	
+	<style>
+	#fh5co-main{
+	    background: #131313;
+	}
+	</style>
 </head>

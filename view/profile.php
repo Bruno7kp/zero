@@ -74,7 +74,7 @@ use B7KP\Library\Lang;
 							$outofdateweeks = $weekstodate - count($weeks);
 							if($user->checkSelfPermission($this->factory))
 							{
-								if(count($weekstodate) == 0)
+								if(($weekstodate) == 0)
 								{
 									echo "<div class='alert alert-info'>".Lang::get('new_on')."</div>";
 								}
