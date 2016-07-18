@@ -329,3 +329,31 @@ a.white {
 	border-right: #eee 1px solid;
 	border-left: #eee 1px solid;
 }
+
+.jumbotron {
+	background-color: #FAFAFA;
+	box-shadow: #ccc 1px 1px 10px
+}
+
+.max-w-150{
+	max-width: 150px;
+	padding: 5px;
+}
+
+.max-w-100{
+	max-width: 100px;
+	padding: 5px;
+}
+
+.col-5-div {
+	-moz-column-count: 5;
+	-webkit-column-count: 5;
+	column-count: 5;
+}
+@media screen and (max-width: 768px) {
+  	.col-5-div {
+		-moz-column-count: 3;
+		-webkit-column-count: 3;
+		column-count: 3;
+	}
+}

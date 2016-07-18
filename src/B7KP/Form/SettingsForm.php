@@ -24,10 +24,12 @@ class SettingsForm extends Form
 		$pts = $options->get("\B7KP\Entity\Settings", "show_playcounts");
 		$lan = $options->get("\B7KP\Entity\Settings", "lang");
 		$tim = $options->get("\B7KP\Entity\Settings", "show_times");
+		$liv = $options->get("\B7KP\Entity\Settings", "hide_livechart");
 		$form = $this
 				->init(Route::url("change_settings"))
 				->add(self::TYPE_SELECT, "lang", "form-control", $lan,"language")
 				->add(self::TYPE_SELECT, "show_points", "form-control", $pts,"sett_points")
+				->add(self::TYPE_SELECT, "hide_livechart", "form-control", $liv,"hide_livechart")
 				->add(self::COMMENT, "sett_limit", "form-group text-justify")
 				->add(self::TYPE_SELECT, "art_limit", "form-control", $art,"Top x ".Lang::get('art_x'))
 				->add(self::TYPE_SELECT, "alb_limit", "form-control", $alb,"Top x ".Lang::get('alb_x'))

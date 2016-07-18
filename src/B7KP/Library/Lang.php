@@ -595,6 +595,9 @@ class Lang
 
 		$messages["gen_plaque"][self::PT_BR] = "Gerar placa de certificado";
 		$messages["gen_plaque"][self::EN_US] = "Create certification plaque";
+
+		$messages["hide_livechart"][self::PT_BR] = "Esconder 'Live Chart'";
+		$messages["hide_livechart"][self::EN_US] = "Hide 'Live Chart'";
 		
 		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu <b>Nome de usuário</b> do last.fm e a senha que colocar logo abaixo. Nós <b>não</b> recomendamos usar a mesma senha da sua conta no Last.fm.";
 		$messages["init"][self::EN_US] = "Complete the fields below and done. To access ".App::get('name')." again, use your last.fm <b>Username</b> and the new password you will insert below. We do <b>not</b> recomend to use the same password of your Last.fm account.";

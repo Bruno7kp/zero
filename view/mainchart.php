@@ -79,9 +79,6 @@ use B7KP\Library\Lang;
 												<?php
 													}
 												?>
-												<div class="row text-center divider-tb bottomspace-sm">
-													<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
-												</div>
 												<?php
 												}
 												else
@@ -140,9 +137,6 @@ use B7KP\Library\Lang;
 												<?php
 													}
 												?>
-												<div class="row text-center divider-tb bottomspace-sm">
-													<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
-												</div>
 												<?php
 												}
 												else
@@ -205,9 +199,6 @@ use B7KP\Library\Lang;
 												<?php
 													}
 												?>
-												<div class="row text-center divider-tb bottomspace-sm">
-													<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
-												</div>
 												<?php
 												}
 												else
@@ -219,8 +210,10 @@ use B7KP\Library\Lang;
 										</div>
 									</div>
 								</div>
-								<br>
 							</div>	
+							<div class="row text-center bottomspace-sm">
+								<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
+							</div>
 						</div>
 						<div class="col-md-6">
 							<h2 class="h3 text-center"><?php echo Lang::get('stats');?></h2>
@@ -285,7 +278,7 @@ use B7KP\Library\Lang;
 
 							</table>
 							<?php 
-							if($user->checkSelfPermission($this->factory))
+							if($user->checkSelfPermission($this->factory) && !$settings->hide_livechart)
 							{
 							?>
 							<div class="row text-center bottomspace-md">

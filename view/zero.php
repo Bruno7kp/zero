@@ -9,19 +9,19 @@ use B7KP\Library\Url;
 	$head = array("title" => Lang::get("stats"));
 	$this->render("ext/head.php", $head);
 ?>
-	<body class="inner-min">
+	<body class="inner-page">
 		<?php $this->render("ext/menu.php");?>
-		<?php $this->render("ext/header.php");?>
+		<?php $this->render("ext/header.php", array("subtitle" => false));?>
 		<div id="fh5co-main">
 			<section>
 				<div class="container">
 					<div class="row">
 						<div class="col-md-10 col-md-offset-1 text-center">
-							<div class="">
-								<img src="http://i.imgur.com/m0l8YGA.png" alt="ZERO" height="100">
-								<hr>
+							<div class="jumbotron">
 								<div class="row fh5co-feature-2">
 									<div class="col-md-12 bottomspace-lg fh5co-feature-item">
+										<h2><?php echo Lang::get("stats");?></h2>
+										<hr>
 										<span class="fh5co-feature-icon"><i class="ti-headphone"></i></span>
 										<h3 class="h3"><?php echo mb_strtoupper(Lang::get("user_x"));?></h3>
 										<div class="row">
@@ -294,7 +294,7 @@ use B7KP\Library\Url;
 										</div>
 										<hr>
 									</div>
-									<div class="col-md-12 bottomspace-lg">
+									<div class="col-md-12 bottomspace-lg hidden">
 										<span class="fh5co-feature-icon"><i class="ti-stats-up"></i></span>
 										<h3><?php echo "CHART";?></h3>
 										<div class="row">

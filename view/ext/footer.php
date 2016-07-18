@@ -50,11 +50,13 @@ use B7KP\Core\App;
 <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/locale/pt-br.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.4/moment-timezone-with-data.min.js"></script>
 <script>
 autoUpdateTime();
 function autoUpdateTime(){
 
 	// Idioma utilizado para mostrar as datas
+
 	moment.locale(langCode);
 
 	// Data/hora atual
@@ -87,14 +89,15 @@ function autoUpdateTime(){
 	nu = moment.duration(nums);
 	nudifference = Math.floor(nu.asHours()) + moment.utc(nums).format(":mm:ss");
 
-	$("#timeLocal").html(localTime);
-	$("#timeUtc").html(utcTime);
-	$("#timeToNU").html(nudifference);
-	$("#timeToWE").html(wedifference);
-	$("#timeNuLocal").html(localTimeNextUpdate);
-	$("#timeWeLocal").html(localTimeWeekEnd);
-	$("#timeNuUtc").html(utcTimeNextUpdate);
-	$("#timeWeUtc").html(utcTimeWeekEnd);
+	$("#timeLocal").text(localTime);
+	$("#timeUtc").text(utcTime);
+	$("#timeToNU").text(nudifference);
+	$("#timeToWE").text(wedifference);
+	$("#timeNuLocal").text(localTimeNextUpdate.format("dddd HH:mm"));
+	$("#timeWeLocal").text(localTimeWeekEnd.format("dddd HH:mm"));
+	$("#timeNuUtc").text(utcTimeNextUpdate.format("dddd HH:mm"));
+	$("#timeWeUtc").text(utcTimeWeekEnd.format("dddd HH:mm"));
+	$(".timeZone").text(moment.tz.guess());
 	setTimeout(function(){ autoUpdateTime();}, 1000);
 }
 </script>

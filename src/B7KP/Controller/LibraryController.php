@@ -29,7 +29,12 @@ class LibraryController extends Controller
 		$user 	= UserSession::getUser($this->factory);
 		$login  = isset($user->login) ? $user->login : "";
 		$user 	= $this->isValidUser($login);
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		if($settings->hide_livechart){
+			$this->redirectToRoute("chart_list", array("login" => $login));
+		}
 		$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
+
 		$lfm 	= new LastFm();
 		$last 	= $lfm->setUser($user->login)->getUserInfo();
 		$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
