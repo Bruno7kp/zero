@@ -27,19 +27,19 @@ use B7KP\Library\Url;
 										<div class="row">
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $user_total;?></h3>
-												<small class="text-muted">TOTAL DE USUÁRIOS</small>
+												<small class="text-muted"><?php echo Lang::get("c_tt_users");?></small>
 											</div>
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo "<a target='_blank' href=".Route::url("profile", array("login" => $user_last->login)).">".$user_last->login."</a>";?></h3>
-												<small class="text-muted">ÚLTIMO CADASTRO</small>
+												<small class="text-muted"><?php echo Lang::get("c_last_user");?></small>
 											</div>
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $weeks_total;?></h3>
-												<small class="text-muted">CHARTS SEMANAIS</small>
+												<small class="text-muted"><?php echo Lang::get("c_wk_ch");?></small>
 											</div>
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo "<a target='_blank' href=".Route::url("profile", array("login" => $user_weeks->login)).">".$user_weeks->login."</a> (".$user_weeks->t.")";?></h3>
-												<small class="text-muted">USUÁRIO COM MAIS CHARTS</small>
+												<small class="text-muted"><?php echo Lang::get("c_us+ch");?></small>
 											</div>
 										</div>
 										<hr>
@@ -47,9 +47,9 @@ use B7KP\Library\Url;
 									<div class="col-md-12 bottomspace-lg">
 										<span class="fh5co-feature-icon"><i class="icon-vynil"></i></span>
 										<div class="row">
-											<h3 class="h3 topspace-md">CERTIFICADOS</h3>
+											<h3 class="h3 topspace-md"><?php echo mb_strtoupper(Lang::get("cert_o")) ;?></h3>
 											<h3 class="h3 no-margin"><?php echo mb_strtoupper(Lang::get("pt_x"))." vs ".mb_strtoupper(Lang::get("play_x")) ;?></h3>
-											<p>Porcentagem de usuários que utilizam pontos/reproduções</p>
+											<p><?php echo Lang::get("c_us_perc");?></p>
 											<?php 
 											$totalcert = 0;
 											$typec = array();
@@ -61,9 +61,12 @@ use B7KP\Library\Url;
 											$pt_perc = isset($typec[1]) ? $typec[1]->t/$totalcert*100 : 0;
 
 											$typemc = array();
+
 											foreach ($cert_c as $ck => $ct) {
 												foreach ($ct as $cv) {
-													$typemc[$cv->cert_type][$ck] = $cv->v;
+													if(!isset($typemc[$cv->cert_type][$ck])){
+														$typemc[$cv->cert_type][$ck] = $cv->v;
+													}
 												}
 											}
 											?>
@@ -82,7 +85,7 @@ use B7KP\Library\Url;
 												</div>
 											</div>
 											<div class="col-xs-12">
-												<p>Média dos valores colocados para cada certificado</p>
+												<p><?php echo Lang::get("c_val_cert");?></p>
 												<div class="row">
 													<div class="col-xs-6">
 														<?php 
@@ -90,7 +93,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-info">
-																<span class="text-info">PONTOS - ÁLBUM</span>
+																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -107,7 +110,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-info">
-																<span class="text-info">PONTOS - MÚSICA</span>
+																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -132,7 +135,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-warning">
-																<span class="text-warning">REPRODUÇÕES - ÁLBUM</span>
+																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -149,7 +152,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-warning">
-																<span class="text-warning">REPRODUÇÕES - MÚSICA</span>
+																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -169,7 +172,7 @@ use B7KP\Library\Url;
 														?>
 													</div>
 												</div>
-												<p>Valor mais utilizado para cada certificado</p>
+												<p><?php echo Lang::get("c_val_cert_b");?></p>
 												<div class="row">
 													<div class="col-xs-6">
 														<?php 
@@ -177,7 +180,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-info">
-																<span class="text-info">PONTOS - ÁLBUM</span>
+																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -194,7 +197,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-info">
-																<span class="text-info">PONTOS - MÚSICA</span>
+																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -219,7 +222,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-warning">
-																<span class="text-warning">REPRODUÇÕES - ÁLBUM</span>
+																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -236,7 +239,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-warning">
-																<span class="text-warning">REPRODUÇÕES - MÚSICA</span>
+																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -263,23 +266,23 @@ use B7KP\Library\Url;
 										<div class="row">
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $plaque_total;?></h3>
-												<small class="text-muted">TOTAL DE PLACAS</small>
+												<small class="text-muted"><?php echo Lang::get("c_tt_plaques");?></small>
 											</div>
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $plaque_last_day;?></h3>
-												<small class="text-muted">PLACAS GERADAS HOJE</small>
+												<small class="text-muted"><?php echo Lang::get("c_plaques_today");?></small>
 											</div>
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $plaque_biggest_day->date." (".$plaque_biggest_day->t,")";?></h3>
-												<small class="text-muted">DIA COM MAIS PLACAS GERADAS</small>
+												<small class="text-muted"><?php echo Lang::get("c_plaques_day");?></small>
 											</div>
 											<div class="col-md-3 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo "<a href='".Route::url("profile", array("login" => $user_plaque->login))."'>".$user_plaque->login."</a> (".$user_plaque->t.")";?></h3>
-												<small class="text-muted">USUÁRIO COM MAIS PLACAS</small>
+												<small class="text-muted"><?php echo Lang::get("c_us+pl");?></small>
 											</div>
 										</div>
 										<div class="row">
-											<h3 class="no-margin">ÚLTIMAS PLACAS</h3>
+											<h3 class="no-margin"><?php echo Lang::get("c_last_p");?></h3>
 											<?php 
 											foreach ($plaque_last as $key => $value) {
 											?>
@@ -296,7 +299,7 @@ use B7KP\Library\Url;
 									</div>
 									<div class="col-md-12 bottomspace-lg hidden">
 										<span class="fh5co-feature-icon"><i class="ti-stats-up"></i></span>
-										<h3><?php echo "CHART";?></h3>
+										<h3>CHART</h3>
 										<div class="row">
 											<div class="col-xs-12 col-md-4 bottomspace-md">
 												<?php 

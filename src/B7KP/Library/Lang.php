@@ -213,6 +213,9 @@ class Lang
 		$messages["cert_s"][self::PT_BR] = "Certificação";
 		$messages["cert_s"][self::EN_US] = "Certification";
 
+		$messages["cert_o"][self::PT_BR] = "Certificados";
+		$messages["cert_o"][self::EN_US] = "Certifications";
+
 		$messages["copy"][self::PT_BR] = "Copiar";
 		$messages["copy"][self::EN_US] = "Copy";
 
@@ -246,12 +249,6 @@ class Lang
 		$messages["hello"][self::PT_BR] = "Olá";
 		$messages["hello"][self::EN_US] = "Hello";
 
-		$messages["nodata_week"][self::PT_BR] = "Nenhum dado encontrado para esse semana.";
-		$messages["nodata_week"][self::EN_US] = "No data found for this week.";
-
-		$messages["none"][self::PT_BR] = "Nenhum";
-		$messages["none"][self::EN_US] = "None";
-
 		$messages["name"][self::PT_BR] = "Nome";
 		$messages["name"][self::EN_US] = "Name";
 
@@ -260,9 +257,18 @@ class Lang
 		
 		$messages["new_pass_repeat"][self::PT_BR] = "Repetir nova senha";
 		$messages["new_pass_repeat"][self::EN_US] = "Repeat new password";
-		
+				
+		$messages["next_upd"][self::PT_BR] = "Próxima atualização";
+		$messages["next_upd"][self::EN_US] = "Next update";
+
 		$messages["no"][self::PT_BR] = "Não";
 		$messages["no"][self::EN_US] = "No";
+
+		$messages["nodata_week"][self::PT_BR] = "Nenhum dado encontrado para esse semana.";
+		$messages["nodata_week"][self::EN_US] = "No data found for this week.";
+
+		$messages["none"][self::PT_BR] = "Nenhum";
+		$messages["none"][self::EN_US] = "None";
 		
 		$messages["old_pass"][self::PT_BR] = "Senha atual";
 		$messages["old_pass"][self::EN_US] = "Actual password";
@@ -307,6 +313,9 @@ class Lang
 
 		$messages["username"][self::PT_BR] = "Nome de usuário";
 		$messages["username"][self::EN_US] = "Username";
+
+		$messages["version"][self::PT_BR] = "Versão";
+		$messages["version"][self::EN_US] = "Version";
 
 		$messages["yes"][self::PT_BR] = "Sim";
 		$messages["yes"][self::EN_US] = "Yes";
@@ -458,6 +467,9 @@ class Lang
 
 		// MENOS IMPORTANTE
 
+		$messages["complete"][self::PT_BR] = "completo";
+		$messages["complete"][self::EN_US] = "complete";
+
 		$messages["switch"][self::PT_BR] = "alternar";
 		$messages["switch"][self::EN_US] = "switch";
 
@@ -570,10 +582,10 @@ class Lang
 		$messages["big_debut_art"][self::EN_US] = "Artists with more musics/albums which debuted at #1";
 		
 		$messages["cert_exp"][self::PT_BR] = "Os certificados podem ser baseados em número de reproduções ou pontos. Os pontos são feitos atribuindo um valor para cada posição que o álbum/música alcançou. Ex: uma música que tem três semanas no chart, com as posições #1, #2 e #3, receberá 100, 98 e 96 pontos respectivamente, totalizando 294 pontos.";
-		$messages["cert_exp"][self::EN_US] = "";
+		$messages["cert_exp"][self::EN_US] = "Certifications can be based on number of plays or points. The points are made by assigning a value to each position that the album / song reached. Ex: a song that has three weeks in the chart, with positions #1, #2 and #3, will receive 100, 98 and 96 points respectively, totaling 294 points.";
 
 		$messages["cert_type"][self::PT_BR] = "Os certificados serão baseados em número de reproduções ou pontos?";
-		$messages["cert_type"][self::EN_US] = "";
+		$messages["cert_type"][self::EN_US] = "The certifications will be based on number of plays or points?";
 
 		$messages["chart_points"][self::PT_BR] = "Veja a pontuação de cada artista/álbum/música conquistou pelo seu desempenhos nos charts";
 		$messages["chart_points"][self::EN_US] = "See the points of each artist / album / song won for their performances in the charts";
@@ -609,7 +621,7 @@ class Lang
 		$messages["last_user"][self::EN_US] = "Last.fm username not found";
 
 		$messages["live_chart"][self::PT_BR] = "Acompanhe como está o chart da semana atual até o momento.";
-		$messages["live_chart"][self::EN_US] = "";
+		$messages["live_chart"][self::EN_US] = "See a preview of the chart of this week";
 
 		$messages["lw_def"][self::PT_BR] = "Posição/reproduções na semana anterior";
 		$messages["lw_def"][self::EN_US] = "Position/plays in the previous week";
@@ -726,6 +738,68 @@ class Lang
 
 		$messages["mus_cert_diamond"][self::PT_BR] = "valor do certificado de diamante";
 		$messages["mus_cert_diamond"][self::EN_US] = "value of diamond certificate";
+
+		// CURIOSITIES
+
+		$messages["c_tt_users"][self::PT_BR] = "TOTAL DE USUÁRIOS";
+		$messages["c_tt_users"][self::EN_US] = "USERS";
+
+		$messages["c_last_user"][self::PT_BR] = "ÚLTIMO CADASTRO";
+		$messages["c_last_user"][self::EN_US] = "LASTEST USER";
+
+		$messages["c_wk_ch"][self::PT_BR] = "CHARTS SEMANAIS";
+		$messages["c_wk_ch"][self::EN_US] = "WEEKLY CHARTS";
+
+		$messages["c_us+ch"][self::PT_BR] = "USUÁRIO COM MAIS CHARTS";
+		$messages["c_us+ch"][self::EN_US] = "USER WITH MORE CHARTS";
+
+		$messages["c_us_perc"][self::PT_BR] = "Porcentagem de usuários que utilizam pontos/reproduções";
+		$messages["c_us_perc"][self::EN_US] = "Percentage of users that use points/plays";
+
+		$messages["c_val_cert"][self::PT_BR] = "Média dos valores colocados para cada certificado";
+		$messages["c_val_cert"][self::EN_US] = "Average values for certifications";
+
+		$messages["c_val_cert_b"][self::PT_BR] = "Valor mais utilizado para cada certificado";
+		$messages["c_val_cert_b"][self::EN_US] = "Most common values";
+
+		$messages["c_tt_plaques"][self::PT_BR] = "TOTAL DE PLACAS";
+		$messages["c_tt_plaques"][self::EN_US] = "PLAQUES";
+
+		$messages["c_plaques_today"][self::PT_BR] = "PLACAS GERADAS HOJE";
+		$messages["c_plaques_today"][self::EN_US] = "PLAQUES GENERATED TODAY";
+
+		$messages["c_plaques_day"][self::PT_BR] = "DIA COM MAIS PLACAS GERADAS";
+		$messages["c_plaques_day"][self::EN_US] = "DAY WITH MORE PLAQUES";
+
+		$messages["c_us+pl"][self::PT_BR] = "USUÁRIO COM MAIS PLACAS";
+		$messages["c_us+pl"][self::EN_US] = "USER WITH MORE PLAQUES";
+
+		$messages["c_last_p"][self::PT_BR] = "ÚLTIMAS PLACAS";
+		$messages["c_last_p"][self::EN_US] = "LASTEST PLAQUES";
+
+		// CHANGELOG
+
+		// 0.11.000
+		$messages["v_new_faq"][self::PT_BR] = "Novo FAQ";
+		$messages["v_new_faq"][self::EN_US] = "New FAQ";
+
+		$messages["v_new_cur_page"][self::PT_BR] = "Página de curiosidades do ZERO";
+		$messages["v_new_cur_page"][self::EN_US] = "ZERO's curiosities page";
+
+		$messages["v_new_cl_page"][self::PT_BR] = "Página de changelog";
+		$messages["v_new_cl_page"][self::EN_US] = "Changelog page";
+
+		$messages["v_hide_livechart"][self::PT_BR] = "Opção para esconder o 'Live Chart'";
+		$messages["v_hide_livechart"][self::EN_US] = "Option to hide the 'Live Chart'";
+
+		$messages["v_plaque_page"][self::PT_BR] = "Página para mostrar todas as placas já geradas";
+		$messages["v_plaque_page"][self::EN_US] = "Page to show all the plaques";
+
+		$messages["v_theme"][self::PT_BR] = "Temas: Além do atual, haverá também uma versão 'dark' do site";
+		$messages["v_theme"][self::EN_US] = "Themes: There will be also a 'dark' version of the site";
+
+		$messages["v_translate"][self::PT_BR] = "Tradução (para inglês) do FAQ e revisão do que já foi traduzido";
+		$messages["v_translate"][self::EN_US] = "FAQ translation";
 
 		return $messages;
 	}

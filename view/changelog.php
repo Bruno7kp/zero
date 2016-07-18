@@ -19,7 +19,7 @@ use B7KP\Library\Lang;
 							<div class="col-md-2" id="fh5co-sidebar">
 
 								<div class="fh5co-side-section fh5co-nav-links">
-									<h2 class="fh5co-uppercase-heading-sm">Versões</h2>
+									<h2 class="fh5co-uppercase-heading-sm"><?php echo Lang::get("version");?></h2>
 									<ul>
 										<?php
 										$ids = array();
@@ -50,10 +50,10 @@ use B7KP\Library\Lang;
 								}
 								?>
 								<div class="fh5co-spacer fh5co-spacer-sm"></div>
-								<h2>Próxima atualização</h2>
+								<h2><?php echo Lang::get("next_upd");?></h2>
 								<div class="row">
 									<div class="col-md-12">
-										<span><?php echo $next["complete"];?>% completo</span>
+										<span><?php echo $next["complete"];?>% <?php echo Lang::get("complete");?></span>
 										<div class="progress">
 										  	<div class="progress-bar progress-bar-info" style="width: <?php echo $next["complete"];?>%"></div>
 										</div>
