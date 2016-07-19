@@ -49,15 +49,15 @@ class SystemViewerController extends Controller
 	{
 		$this->checkAccess();
 		$dao = Dao::getConn();
-		$tables = $dao->run("SELECT COUNT(*) AS t, date FROM plaque GROUP BY date");
-		foreach ($tables as $key => $value) {
-			echo $value->date." - ".$value->t."<br/>";
-		}
-		//$affected = $dao->run("ALTER TABLE settings ADD show_times INT NOT NULL, ADD show_points INT NOT NULL");
+		// $tables = $dao->run("SELECT COUNT(*) AS t, date FROM plaque GROUP BY date");
+		// foreach ($tables as $key => $value) {
+		// 	echo $value->date." - ".$value->t."<br/>";
+		// }
+		$affected = $dao->run("ALTER TABLE settings ADD theme INT NOT NULL");
 		//$affected = $dao->run("UPDATE week SET week = 198 WHERE iduser = 124 AND week = 1 AND to_day > '2015-01-01'");
 		//$affected = $this->factory->removeBy("\B7KP\Entity\Week", "iduser", 38);
-		$affected = $dao->run("SELECT * FROM music_charts t, week w, user u WHERE t.idweek = w.id AND u.id = w.iduser AND w.iduser = 472");
-		var_dump($affected);
+		// $affected = $dao->run("SELECT * FROM music_charts t, week w, user u WHERE t.idweek = w.id AND u.id = w.iduser AND w.iduser = 472");
+		// var_dump($affected);
 
 	}
 

@@ -4,6 +4,7 @@ namespace B7KP\Utils;
 use B7KP\Model\Model;
 use B7KP\Core\App;
 use B7KP\Entity\User;
+use B7KP\Library\Route;
 
 class UserSession
 {
@@ -36,7 +37,17 @@ class UserSession
 	{
 		$u = self::getUser($factory);
 		switch ($currentlyaccessiblefor) {
-			case 'user':
+			case 'registered':
+				if($u == false)
+				{
+					$route = Route::gerCurRoute();
+					if(!in_array($route, array("login", "logout", "check_login")))
+					{
+						die("O site só está disponível para usuários já cadastrados. Caso já esteja, faça <a href='".Route::url("login")."'>login</a>");
+					}
+				}
+				break;
+			case 'logged':
 				if($u == false)
 				{
 					die("O site está sendo atualizado. Aguarde alguns minutos.");
