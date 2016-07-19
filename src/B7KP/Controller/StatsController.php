@@ -47,12 +47,12 @@ class StatsController extends Controller
 			$totalweeks += $value->t;
 		}
 		// art/alb/mus
-		$artist = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.artist FROM week w, artist_charts t WHERE w.id = t.idweek GROUP BY t.artist ORDER BY u DESC, t DESC LIMIT 0, 5");
-		$album = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.album, t.artist FROM week w, album_charts t WHERE w.id = t.idweek GROUP BY t.artist, t.album ORDER BY u DESC, t DESC LIMIT 0, 5");
-		$music = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.music, t.artist FROM week w, music_charts t WHERE w.id = t.idweek GROUP BY t.artist, t.music ORDER BY u DESC, t DESC LIMIT 0, 5");
-		$artist_one = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.artist FROM week w, artist_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist ORDER BY u DESC, t DESC LIMIT 0, 5");
-		$album_one = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.album, t.artist FROM week w, album_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist, t.album ORDER BY u DESC, t DESC LIMIT 0, 5");
-		$music_one = $dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.music, t.artist FROM week w, music_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist, t.music ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$artist = array(); //$dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.artist FROM week w, artist_charts t WHERE w.id = t.idweek GROUP BY t.artist ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$album = array(); //$dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.album, t.artist FROM week w, album_charts t WHERE w.id = t.idweek GROUP BY t.artist, t.album ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$music = array(); //$dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.music, t.artist FROM week w, music_charts t WHERE w.id = t.idweek GROUP BY t.artist, t.music ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$artist_one = array(); //$dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.artist FROM week w, artist_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$album_one = array(); //$dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.album, t.artist FROM week w, album_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist, t.album ORDER BY u DESC, t DESC LIMIT 0, 5");
+		$music_one = array(); //$dao->run("SELECT COUNT(t.id) AS t, COUNT(DISTINCT w.iduser) AS u, t.music, t.artist FROM week w, music_charts t WHERE t.rank = 1 AND w.id = t.idweek GROUP BY t.artist, t.music ORDER BY u DESC, t DESC LIMIT 0, 5");
 
 		// SETTINGS
 		$options = new Options();
