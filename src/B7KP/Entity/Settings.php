@@ -137,6 +137,12 @@ class Settings extends Entity
 	*/
 	protected $hide_livechart;
 
+	/**
+	* @Assert(null=false|int|option)
+	* @Options(values={"1": "Dark","0": "Light"}|settings={"translate": "1"})
+	*/
+	protected $theme;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -158,7 +164,7 @@ class Settings extends Entity
 	{
 		$def = new \stdClass();
 
-		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "hide_livechart");
+		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "theme");
 
 		foreach ($items as $value) {
 			$def->$value = self::defaultValueFor($value);
@@ -182,6 +188,7 @@ class Settings extends Entity
 			case 'cert_type':
 			case 'show_times':
 			case 'hide_livechart':
+			case 'theme':
 				$for = 0;
 				break;
 			case 'show_points':

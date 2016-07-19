@@ -1,0 +1,61 @@
+/*fixes*/
+#fh5co-main{
+    background: #232323;
+}
+body{
+	color: #D1D1D1;
+}
+.jumbotron {
+    background-color: #333;
+    box-shadow: #131313 1px 1px 10px;
+}
+a:hover, a:focus, a:active{
+	color: #fff;
+}
+
+table a:not(.btn), .table a:not(.btn) {
+    color: #fff;
+    text-decoration: none;
+}
+
+code {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #c7254e;
+    background-color: #403638;
+    border-radius: 4px;
+}
+
+.cr-icon{
+	background-color: #0d2f63;
+}
+
+table {
+    background-color: #232323;
+}
+
+.chart-table tr {
+    border-bottom: solid 1px #333;
+}
+
+.chart-table tr:first-child {
+    border-bottom: solid 2px #999;
+}
+
+a.cr-btn{
+	background: #212121;
+	border: 1px solid #666;
+}
+
+.nav>li>a:hover, .nav>li>a:focus{
+	background-color: #1b1b1b;
+}
+
+.active .nav-link {
+    color: #ffffff !important;
+    cursor: pointer !important;
+}
+
+.btn-outline{
+	color: #ffffff;
+}
