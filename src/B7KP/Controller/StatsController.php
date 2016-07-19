@@ -41,8 +41,7 @@ class StatsController extends Controller
 		$user = $dao->run("SELECT * FROM user ORDER BY id DESC LIMIT 0,1"); 
 
 		// CHART
-		$weeks = $dao->run("SELECT COUNT(w.id) AS t, u.login FROM week w, user u WHERE u.id = w.iduser GROUP BY u.id ORDER BY t");
-		$biggestuser = $weeks[0];
+		$weeks = $dao->run("SELECT COUNT(w.id) AS t FROM week w");
 		$totalweeks = 0;
 		foreach ($weeks as $key => $value) {
 			$totalweeks += $value->t;
@@ -78,7 +77,6 @@ class StatsController extends Controller
 					"user_total"		 => $users[0]->t,
 					"user_last"			 => $user[0],
 					"user_plaque"		 => $userplaque[0],
-					"user_weeks"		 => $biggestuser,
 					"weeks_total" 		 => $totalweeks,
 					"top_artist"		 => $artist,
 					"top_album"			 => $album,

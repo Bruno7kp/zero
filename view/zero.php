@@ -25,21 +25,17 @@ use B7KP\Library\Url;
 										<span class="fh5co-feature-icon"><i class="ti-headphone"></i></span>
 										<h3 class="h3"><?php echo mb_strtoupper(Lang::get("user_x"));?></h3>
 										<div class="row">
-											<div class="col-md-3 col-xs-6 bottomspace-md">
+											<div class="col-md-4 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $user_total;?></h3>
 												<small class="text-muted"><?php echo Lang::get("c_tt_users");?></small>
 											</div>
-											<div class="col-md-3 col-xs-6 bottomspace-md">
+											<div class="col-md-4 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo "<a target='_blank' href=".Route::url("profile", array("login" => $user_last->login)).">".$user_last->login."</a>";?></h3>
 												<small class="text-muted"><?php echo Lang::get("c_last_user");?></small>
 											</div>
-											<div class="col-md-3 col-xs-6 bottomspace-md">
+											<div class="col-md-4 col-xs-6 bottomspace-md">
 												<h3 class="no-margin"><?php echo $weeks_total;?></h3>
 												<small class="text-muted"><?php echo Lang::get("c_wk_ch");?></small>
-											</div>
-											<div class="col-md-3 col-xs-6 bottomspace-md">
-												<h3 class="no-margin"><?php echo "<a target='_blank' href=".Route::url("profile", array("login" => $user_weeks->login)).">".$user_weeks->login."</a> (".$user_weeks->t.")";?></h3>
-												<small class="text-muted"><?php echo Lang::get("c_us+ch");?></small>
 											</div>
 										</div>
 										<hr>
@@ -93,7 +89,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-info">
-																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
+																<span class="text-info"><?php echo mb_strtoupper(Lang::get("pt_x"));?> - <?php echo mb_strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -110,7 +106,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-info">
-																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
+																<span class="text-info"><?php echo mb_strtoupper(Lang::get("pt_x"));?> - <?php echo mb_strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -135,7 +131,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-warning">
-																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
+																<span class="text-warning"><?php echo mb_strtoupper(Lang::get("play_x"));?> - <?php echo mb_strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -152,7 +148,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-warning">
-																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
+																<span class="text-warning"><?php echo mb_strtoupper(Lang::get("play_x"));?> - <?php echo mb_strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -180,7 +176,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-info">
-																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
+																<span class="text-info"><?php echo mb_strtoupper(Lang::get("pt_x"));?> - <?php echo mb_strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -197,7 +193,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-info">
-																<span class="text-info"><?php echo strtoupper(Lang::get("pt_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
+																<span class="text-info"><?php echo mb_strtoupper(Lang::get("pt_x"));?> - <?php echo mb_strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -222,7 +218,7 @@ use B7KP\Library\Url;
 														?>
 														<ul class="list-group">
 															<li class="list-group-item list-group-item-warning">
-																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("alb_x"));?></span>
+																<span class="text-warning"><?php echo mb_strtoupper(Lang::get("play_x"));?> - <?php echo mb_strtoupper(Lang::get("alb_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
@@ -239,7 +235,7 @@ use B7KP\Library\Url;
 														</ul>
 														<ul class="list-group">
 														    <li class="list-group-item list-group-item-warning">
-																<span class="text-warning"><?php echo strtoupper(Lang::get("play_x"));?> - <?php echo strtoupper(Lang::get("mus_x"));?></span>
+																<span class="text-warning"><?php echo mb_strtoupper(Lang::get("play_x"));?> - <?php echo mb_strtoupper(Lang::get("mus_x"));?></span>
 														    </li>
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
