@@ -38,7 +38,7 @@ class Theme
 				if($mainbs){
 					$html = "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/cyborg/bootstrap.min.css\" class=\"themedark\">";
 				}else{
-					$html = "<link rel=\"stylesheet\" href=\"".Url::asset('css/custom-dark.css')."\" class=\"themedark\">";
+					$html = "<link rel=\"stylesheet\" href=\"".Url::asset('css/custom-dark.css')."\" class=\"themedark\"><script>theme = 1;</script>";
 				}
 
 				
@@ -48,7 +48,7 @@ class Theme
 				if($mainbs){
 					$html = "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css\" class=\"themelight\">";
 				}else{
-					$html = "";
+					$html = "<script>theme = 0;</script>";
 				}
 				break;
 		}

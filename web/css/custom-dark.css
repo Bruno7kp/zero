@@ -59,3 +59,138 @@ a.cr-btn{
 .btn-outline{
 	color: #ffffff;
 }
+
+.resp-tabs-container{
+    background-color: #232323;
+}
+
+/* BORDER DIVIDER */
+.divider-left {
+    border-left: #333 1px solid;
+}
+
+.divider-right {
+    border-right: #333 1px solid;
+}
+
+.divider-lr {
+    border-right: #333 1px solid;
+    border-left: #333 1px solid;
+}
+
+.divider-top {
+    border-top: #333 1px solid;
+}
+
+.divider-bottom {
+    border-bottom: #333 1px solid;
+}
+
+.divider-tb {
+    border-top: #333 1px solid;
+    border-bottom: #333 1px solid;
+}
+
+.divider {
+    border-top: #333 1px solid;
+    border-bottom: #333 1px solid !important;
+    border-right: #333 1px solid;
+    border-left: #333 1px solid;
+}
+
+.resp-tab-active{
+    background-color: #232323 !important;
+}
+
+.resp-tab-active {
+    border: 1px solid #333 !important;
+    border-bottom: none;
+    margin-bottom: -1px !important;
+    padding: 17px 14px 19px 14px !important;
+    border-top: 1px solid #333 !important;
+    border-bottom: 0px #333 solid !important;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.middle td{
+    border-color: #333 !important;
+}
+
+.form-control {
+    background-color: #333;
+    color: #fff;
+    border-color: #fff;
+}
+
+.text-muted {
+    color: #ccc;
+}
+
+.text-info, .text-info:hover {
+    color: #6aaaca;
+}
+
+.list-group-item-info {
+    color: #6aaaca;
+    background-color: #0b3950;
+}
+
+.list-group-item-warning {
+    color: #8a6d3b;
+    background-color: #4c4313;
+}
+
+.label-info {
+    background-color: #5bc0de;
+}
+
+.chart-table small {
+    font-size: 12px;
+    color: #ccc;
+}
+
+.chart-table span.non {
+    color: #ccc;
+}
+.chart-table span.black {
+    font-size: 10px;
+    color: #aaa;
+}
+
+.drops {
+    background-color: #2f2f2f;
+    font-size: 12px !important;
+}
+
+a.cr-btn.wksout {
+    background-color: #2f2f2f;
+}
+
+#fh5co-header-section.fh5co-scrolled, #fh5co-logo-mobile-wrap{
+    background: #232323;
+}
+
+#fh5co-mobile-menu-btn i{
+    color: #333;
+}
+
+#fh5co-header-section.fh5co-scrolled #fh5co-menu-wrap .sf-menu a{
+    color: #ffffff;
+}
+
+.tablesorter-bootstrap tfoot td, .tablesorter-bootstrap tfoot th, .tablesorter-bootstrap thead td, .tablesorter-bootstrap thead th {
+    font: 14px/20px Arial,Sans-serif;
+    font-weight: 700;
+    padding: 4px;
+    margin: 0 0 18px;
+    background-color: #444;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: #313131;
+}
+
+.white-bg {
+    background-color: transparent;
+}
