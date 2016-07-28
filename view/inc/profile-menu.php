@@ -24,6 +24,7 @@ switch ($curroute) {
 	case 'debuts_by_main':
 	case 'pts_list':
 	case 'user_cert_art':
+	case 'plaque_gallery':
 		$a_char = "active";
 		break;
 
