@@ -4,6 +4,7 @@ namespace B7KP\Controller;
 use B7KP\Model\Model;
 use B7KP\Utils\UserSession;
 use B7KP\Utils\Login;
+use B7KP\Utils\Certified;
 use B7KP\Entity\User;
 use B7KP\Library\Assert;
 use B7KP\Library\Url;
@@ -42,13 +43,13 @@ class PlaqueController extends Controller
 		$this->isValidBy($by, $user->login);
 
 		$vars = array("by" => $by, "type" => $type, "user" => $user,"lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true));
-		$this->plaques = $this->factory->find("B7KP\Entity\Plaque", array("iduser" => $user->id), "date DESC");
-		$this->orgPlaques($by);
+		$this->plaques = $this->factory->find("B7KP\Entity\Plaque", array("iduser" => $user->id, "type" => $type), "date DESC");
+		$this->orgPlaques($by,$user,$type);
 		$vars["plaques"] = $this->plaques;
 		$this->render("plaques_gallery.php", $vars);
 	}
 
-	private function orgPlaques($by)
+	private function orgPlaques($by,$user,$type)
 	{
 		if(count($this->plaques) == 0){ return array(); }
 
@@ -66,7 +67,7 @@ class PlaqueController extends Controller
 				$array[$wknd][] = $pv;
 			}
 		}
-		else
+		else if($by == "artist")
 		{
 			foreach ($this->plaques as $pk => $pv) 
 			{
@@ -78,6 +79,21 @@ class PlaqueController extends Controller
 				}
 				$array[$artist][] = $pv;
 			}
+			ksort($array);
+		}
+		else
+		{
+			$c = new Certified($user, $this->factory);
+			//$array[]
+			foreach ($this->plaques as $key => $value) {
+				$ce = "<span class='hidden'>".str_pad($c->getValueByArray($type, json_decode($value->certified)), 11, 0,STR_PAD_LEFT)."</span>".$c->getCertification($type, $c->getValueByArray($type, json_decode($value->certified)), "text+icon");
+				if(!isset($array[$ce]))
+				{
+					$array[$ce] = array();
+				}
+				$array[$ce][] = $value;
+			}
+			krsort($array);
 		}
 
 		$this->plaques = $array;
@@ -104,7 +120,7 @@ class PlaqueController extends Controller
 
 	protected function isValidBy($by, $login)
 	{
-		if($by != "artist" && $by != "week")
+		if($by != "artist" && $by != "week" && $by != "certified")
 		{
 			$this->redirectToRoute("plaque_redirect", array('login' => $login));
 		}

@@ -361,6 +361,16 @@ class Certified
 		return ($array["g"] * $g) + ($array["p"] * $p) + ($array["d"] * $d);
 	}
 
+	public function getValueByArray($type, $array)
+	{
+		$array = (array) $array;
+		$g = $this->$type->gold;
+		$p = $this->$type->platinum;
+		$d = $this->$type->diamond;
+
+		return ($array["g"] * $g) + ($array["p"] * $p) + ($array["d"] * $d);
+	}
+
 	public function getPlaque($type, $name, $artist)
 	{
 		$plaques = $this->factory->findSql("\B7KP\Entity\Plaque", "SELECT * from plaque WHERE type = '".$type."' AND iduser = '".$this->user->id."' AND name = '".addslashes($name)."' AND artist = '".addslashes($artist)."' ORDER BY id DESC");
@@ -378,7 +388,7 @@ class Certified
 		// Imagine
 		$imagine = new \Imagine\Gd\Imagine();
 		// Capa do álbum/foto do artista
-		$image = empty($image) ? "web/img/default-alb.png" : $image;
+		$image = empty($image) ? "web/img/default-alb.png" : str_replace("https", "http", $image);
 		$photo = $imagine->open($image);
 		$bg = $imagine->open($image);
 		$minphoto  = new \Imagine\Image\Box(100, 100);

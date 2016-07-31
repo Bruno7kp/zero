@@ -324,6 +324,22 @@ use B7KP\Library\Lang;
 							<?php
 							}
 							?>
+							<?php 
+							if($settings->show_cert && $settings->show_plaque)
+							{
+							?>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("plaque");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('plaque_gallery', array('login' => $user->login, 'type' => 'album', 'by' => 'artist'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('plaque_gallery', array('login' => $user->login, 'type' => 'music', 'by' => 'artist'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+							</div>
+							<?php
+							}
+							?>
 						</div>
 					</div>
 				</div>

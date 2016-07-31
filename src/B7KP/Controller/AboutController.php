@@ -19,6 +19,14 @@ class AboutController extends Controller
 		$this->render("about.php");
 	}
 
+	/**
+	* @Route(name=forum|route=/qa)
+	*/
+	public function forum()
+	{
+
+	}
+
 	protected function checkAccess()
 	{
 		return true;

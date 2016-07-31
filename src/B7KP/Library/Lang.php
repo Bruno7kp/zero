@@ -412,6 +412,9 @@ class Lang
 		$messages["the_field"][self::PT_BR] = "o campo";
 		$messages["the_field"][self::EN_US] = "the field";
 
+		$messages["theme"][self::PT_BR] = "Tema";
+		$messages["theme"][self::EN_US] = "Theme";
+
 		$messages["this_act"][self::PT_BR] = "Esse artista";
 		$messages["this_act"][self::EN_US] = "This artist";
 
@@ -580,6 +583,15 @@ class Lang
 
 		$messages["big_debut_art"][self::PT_BR] = "Artistas com mais músicas/álbuns que estrearam em #1";
 		$messages["big_debut_art"][self::EN_US] = "Artists with more musics/albums which debuted at #1";
+
+		$messages["by_art"][self::PT_BR] = "Por artista";
+		$messages["by_art"][self::EN_US] = "By artist";
+
+		$messages["by_wk"][self::PT_BR] = "Por semana";
+		$messages["by_wk"][self::EN_US] = "By week";
+
+		$messages["by_cert"][self::PT_BR] = "Por certificado";
+		$messages["by_cert"][self::EN_US] = "By certified";
 		
 		$messages["cert_exp"][self::PT_BR] = "Os certificados podem ser baseados em número de reproduções ou pontos. Os pontos são feitos atribuindo um valor para cada posição que o álbum/música alcançou. Ex: uma música que tem três semanas no chart, com as posições #1, #2 e #3, receberá 100, 98 e 96 pontos respectivamente, totalizando 294 pontos.";
 		$messages["cert_exp"][self::EN_US] = "Certifications can be based on number of plays or points. The points are made by assigning a value to each position that the album / song reached. Ex: a song that has three weeks in the chart, with positions #1, #2 and #3, will receive 100, 98 and 96 points respectively, totaling 294 points.";
@@ -788,6 +800,9 @@ class Lang
 
 		$messages["v_new_cl_page"][self::PT_BR] = "Página de changelog";
 		$messages["v_new_cl_page"][self::EN_US] = "Changelog page";
+
+		$messages["v_new_forum"][self::PT_BR] = "Um 'fórum' (q&a) para sugestões, dúvidas, etc.";
+		$messages["v_new_forum"][self::EN_US] = "Forum";
 
 		$messages["v_hide_livechart"][self::PT_BR] = "Opção para esconder o 'Live Chart'";
 		$messages["v_hide_livechart"][self::EN_US] = "Option to hide the 'Live Chart'";
