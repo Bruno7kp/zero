@@ -2693,6 +2693,7 @@ input[type="submit"], button {
 	position: absolute;
 	right: 10px;
 	top: 10px;
+	display: none;
 }
 
 .qa-c-item-meta {

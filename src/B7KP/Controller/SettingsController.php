@@ -72,6 +72,14 @@ class SettingsController extends Controller
 				else
 				{
 					$post->iduser = $this->user->id;
+					$rest = Settings::getAllDefaults();
+					foreach ($rest as $key => $value) 
+					{
+						if(!isset($post->$key))
+						{
+							$post->$key = $value;
+						}
+					}
 					$id = $this->factory->add("B7KP\Entity\Settings", $post);
 					if($id > 0)
 					{
@@ -79,7 +87,7 @@ class SettingsController extends Controller
 					}
 					else
 					{
-						$response = array("erro" => 1, "message" => "Oops, something went wrong");
+						$response = array("erro" => 1, "message" => "Oops, something went wrong.");
 					}
 				}
 			}

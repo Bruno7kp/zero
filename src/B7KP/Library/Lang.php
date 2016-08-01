@@ -75,6 +75,10 @@ class Lang
 			{
 				$lang = $settings->lang;
 			}
+			else
+			{
+				$lang = self::detectLang();
+			}
 		}
 		else
 		{

@@ -164,7 +164,7 @@ class Settings extends Entity
 	{
 		$def = new \stdClass();
 
-		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "theme");
+		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "hide_livechart","theme");
 
 		foreach ($items as $value) {
 			$def->$value = self::defaultValueFor($value);

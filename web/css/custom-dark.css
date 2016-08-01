@@ -194,3 +194,11 @@ a.cr-btn.wksout {
 .white-bg {
     background-color: transparent;
 }
+
+.fh5co-accordion .panel-heading{
+    background: #333;
+}
+
+.fh5co-accordion .panel-heading.collapsed .accordion-toggle{
+    color: white !important;
+}

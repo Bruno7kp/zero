@@ -23,7 +23,7 @@ use B7KP\Core\App;
 	curRoute = "<?php echo Route::getName(Url::getRequest());?>";
 	curController = "<?php echo Route::getClass(Url::getRequest());?>";
 	apiKey = "<?php echo App::get('lastfmapikey');?>";
-	lang = <?php echo Lang::getUserLang();?>;
+	lang = <?php echo intval(Lang::getUserLang());?>;
 	langCode = "<?php echo Lang::getLangCode(Lang::getUserLang());?>";
 </script>
 <script src="<?php echo Url::asset('js/jquery.min.js');?>"></script>
