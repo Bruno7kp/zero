@@ -107,11 +107,18 @@ class LastFm
 
     public function getWeeklyChartList($vars = array())
     {
-        if(!isset($vars['user']))
-        {
-            $vars['user'] = $this->userName;
+        $unixdate = 1108296000;
+        $nowdate = new \DateTime("now", new \DateTimeZone('GMT'));
+        $nowunix = $nowdate->format("U");
+        $unixdates = array();
+        $i = 0;
+        while ($unixdate + 604800 < $nowunix) {
+            $unixdates[$i]["from"] = $unixdate;
+            $unixdate += 604800;
+            $unixdates[$i]["to"] = $unixdate;
+            $i++;
         }
-        return $this->userApi->getWeeklyChartList($vars); 
+        return $unixdates; 
     }
 
     public function getWeeklyArtistList($vars = array())

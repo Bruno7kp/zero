@@ -1869,13 +1869,15 @@ class qa_html_theme_base
 	public function post_meta_who($post, $class)
 	{
 		if (isset($post['who'])) {
+			$post['level'] = strpos($post['who']['data'], "Bruno7kp") > 0 ? "red" : "";
+			$this->output('<style>.red a.qa-user-link {color: #f70404 !important;}</style>');
 			$this->output('<span class="'.$class.'-who">');
 
 			if (strlen(@$post['who']['prefix']))
 				$this->output('<span class="'.$class.'-who-pad">'.$post['who']['prefix'].'</span>');
 
 			if (isset($post['who']['data']))
-				$this->output('<span class="'.$class.'-who-data">'.$post['who']['data'].'</span>');
+				$this->output('<span class="'.$class.'-who-data '.$post['level'].'">'.$post['who']['data'].'</span>');
 
 			if (isset($post['who']['title']))
 				$this->output('<span class="'.$class.'-who-title">'.$post['who']['title'].'</span>');
