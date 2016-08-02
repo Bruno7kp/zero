@@ -33,10 +33,11 @@ class LibraryController extends Controller
 		if($settings->hide_livechart){
 			$this->redirectToRoute("chart_list", array("login" => $login));
 		}
+		$startday = $settings->start_day ? "friday" : "sunday";
 		$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
 
 		$lfm 	= new LastFm();
-		$last 	= $lfm->setUser($user->login)->getUserInfo();
+		$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
 		$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
 		$wksfm 	= $lfm->getWeeklyChartList();
 		$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));

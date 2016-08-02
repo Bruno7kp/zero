@@ -25,8 +25,10 @@ class ProfileController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+			$startday = $settings->start_day ? "friday" : "sunday";
 			$lfm 	= new LastFm();
-			$last 	= $lfm->setUser($user->login)->getUserInfo();
+			$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
 			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
 			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
 			$wksfm 	= $lfm->getWeeklyChartList();

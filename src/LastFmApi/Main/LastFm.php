@@ -22,6 +22,7 @@ class LastFm
     private $musics = array();
     private $limit = 50;
     private $page = 1;
+    private $startunix = 1108296000;
 
     public function __construct()
     {
@@ -105,14 +106,25 @@ class LastFm
         return $this->userApi->getRecentTracks($vars);   
     }
 
+    public function setStartDate($var)
+    {
+        if($var == "friday"){
+             $this->startunix = 1108123200;
+        }else{
+            $this->startunix = 1108296000;
+        }
+
+        return $this;
+    }
+
     public function getWeeklyChartList($vars = array())
     {
-        $unixdate = 1108296000;
+        $unixdate = $this->startunix;
         $nowdate = new \DateTime("now", new \DateTimeZone('GMT'));
         $nowunix = $nowdate->format("U");
         $unixdates = array();
         $i = 0;
-        while ($unixdate + 604800 < $nowunix) {
+        while ($unixdate + 604800 - (60*60*12) < $nowunix) {
             $unixdates[$i]["from"] = $unixdate;
             $unixdate += 604800;
             $unixdates[$i]["to"] = $unixdate;

@@ -37,8 +37,10 @@ class UpdateController extends Controller
 	{
 		if($this->isAjaxRequest() && $this->user instanceof User)
 		{
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
+			$startday = $settings->start_day ? "friday" : "sunday";
 			$lfm 	= new LastFm();
-			$last 	= $lfm->setUser($this->user->login)->getUserInfo();
+			$last 	= $lfm->setUser($this->user->login)->setStartDate($startday)->getUserInfo();
 			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
 			$wksfm 	= $lfm->getWeeklyChartList();
 			$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date, $this->user->id);
@@ -83,18 +85,22 @@ class UpdateController extends Controller
 
 			if(count($week) == 0)
 			{
+				$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
+				$startday = $settings->start_day ? "friday" : "sunday";
 				$data = new \stdClass();
 				$data->iduser = $this->user->id;
 				$data->from_day = $from;
 				$data->to_day = $to;
 				$lfm 	= new LastFm();
-				$last 	= $lfm->setUser($this->user->login)->getUserInfo();
+				$last 	= $lfm->setUser($this->user->login)->setStartDate($startday)->getUserInfo();
 				$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
 				$wksfm 	= $lfm->getWeeklyChartList();
 				$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date, $this->user->id);
 				$wksfm 	= array_reverse($wksfm);
-				$key 	= array_search($fromu, array_column($wksfm, 'from'));
-				$data->week = $key + 1;
+				//$key 	= array_search($fromu, array_column($wksfm, 'from'));
+				$cond = array("iduser" => $this->user->id);
+				$key = $this->factory->find("B7KP\Entity\Week", $cond);
+				$data->week = count($key) + 1;
 				$idweek = $this->factory->add("B7KP\Entity\Week", $data);
 			}
 			else

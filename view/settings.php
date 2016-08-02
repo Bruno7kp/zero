@@ -23,12 +23,16 @@ use B7KP\Library\Lang;
 							<hr>
 							<a href="<?php echo Route::url('update');?>" class="btn btn-outline"><?php echo Lang::get('update');?> charts</a>
 							<br>
-							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> e-mail</a>
+							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('cert');?></a>
 							<br>
 							<a href="<?php echo Route::url('usereditpass');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> <?php echo Lang::get('pass');?></a>
 							<br>
-							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('cert');?></a>
-							
+							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> e-mail</a>
+							<br>
+							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('change_start_date');?></a>
+							<br>
+							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('reset_account');?></a>
+
 						</div>
 
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
