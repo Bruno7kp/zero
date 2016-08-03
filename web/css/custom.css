@@ -350,3 +350,8 @@ a.white {
 		column-count: 3;
 	}
 }
+
+.badge{
+	padding: 2px 5px;
+    text-align: center;
+}

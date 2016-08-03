@@ -2,6 +2,7 @@
 use B7KP\Library\Url;
 use B7KP\Library\Route;
 use B7KP\Library\Lang;
+use B7KP\Library\Notify;
 use B7KP\Core\App;
 use B7KP\Utils\UserSession;
 use B7KP\Entity\User;
@@ -23,7 +24,7 @@ use B7KP\Entity\User;
 					<a href="<?php echo Route::url('about')?>">FAQ</a>
 				</li>
 				<li>
-					<a href="<?php echo Route::url('forum')?>">FORUM <span class="label label-info">&nbsp;new&nbsp;</span></a>
+					<a href="<?php echo Route::url('forum')?>">FORUM <!-- <span class="label label-info">&nbsp;new&nbsp;</span> --></a>
 				</li>
 				<?php 
 				$user = UserSession::getUser($this->factory);
@@ -39,12 +40,14 @@ use B7KP\Entity\User;
 				<?php
 				if($user instanceof User)
 				{
+					$notify = new Notify($user);
 				?>
 				<li>
-					<a href="#" class="fh5co-sub-ddown"><?php echo $user->login;?></a>
+					<a href="#" class="fh5co-sub-ddown"><?php echo $user->login;?> <?php $notify->outputNumber();?></a>
 					<ul class="fh5co-sub-menu">
 					 	<li><a href="<?php echo Route::url('userprofile');?>"><?php echo Lang::get('prof');?></a></li>
 					 	<li><a href="<?php echo Route::url('settings');?>"><?php echo Lang::get('sett');?></a></li>
+					 	<?php $notify->outputLine();?>
 						<li><a href="<?php echo Route::url('logout');?>"><?php echo Lang::get('logout');?></a></li>
 					</ul>
 				</li>
