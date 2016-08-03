@@ -559,7 +559,12 @@ function qa_get_users_html($userids, $should_include_link, $relative_url_prefix)
 	$usershtml = array();
 
 	foreach ($userids as $userid) {
-		$publicusername = $useridtopublic[$userid];
+		if(!isset($useridtopublic[$userid])){
+			$publicusername = "Deleted user";
+			$should_include_link = false;
+		}else{
+			$publicusername = $useridtopublic[$userid];
+		}
 
 		$usershtml[$userid] = htmlspecialchars($publicusername);
 

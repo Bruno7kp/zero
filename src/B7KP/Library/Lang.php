@@ -838,6 +838,21 @@ class Lang
 		// CHANGELOG
 
 		// 0.11.000
+		$messages["v_day"][self::PT_BR] = "Agora os charts podem iniciar no Domingo ou na Sexta";
+		$messages["v_day"][self::EN_US] = "Now the charts can start on Sunday or on Friday";
+
+		$messages["v_update"][self::PT_BR] = "Agora os charts estarão disponíveis para atualização logo após o encerramento do mesmo, e não apenas 12 horas depois como era até agora";
+		$messages["v_update"][self::EN_US] = "Now the charts will be available for update after the closing of the same, not just 12 hours later as it was so far";
+
+		$messages["v_reset"][self::PT_BR] = "Resetar conta: apaga todos os charts";
+		$messages["v_reset"][self::EN_US] = "Reset account: delete all charts";
+
+		$messages["v_delete"][self::PT_BR] = "Deletar conta: apaga todos os dados";
+		$messages["v_delete"][self::EN_US] = "Delete account: delete all data";
+
+		$messages["v_search"][self::PT_BR] = "Buscar artistas/álbuns/músicas";
+		$messages["v_search"][self::EN_US] = "Search artists/albums/musics";
+
 		$messages["v_new_faq"][self::PT_BR] = "Novo FAQ";
 		$messages["v_new_faq"][self::EN_US] = "New FAQ";
 

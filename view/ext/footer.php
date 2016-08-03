@@ -72,8 +72,8 @@ function autoUpdateTime(){
 	localTimeWeekEnd.local();
 
 	// Data de atualização dos charts
-	utcTimeNextUpdate = utcTimeWeekEnd.clone();
-	utcTimeNextUpdate.add(12, 'h');
+	utcTimeNextUpdate = moment.utc(0, "HH");
+	utcTimeNextUpdate.day(5);
 
 	// Converte para data local
 	localTimeNextUpdate = utcTimeNextUpdate.clone();

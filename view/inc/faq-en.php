@@ -26,6 +26,7 @@ use B7KP\Library\Lang;
 											<li class="no-margin">&nbsp;&nbsp;<a href="#charts"><small>Gerando os charts</small></a></li>
 											<li class="no-margin">&nbsp;&nbsp;<a href="#chartconfig"><small>Configuração</small></a></li>
 											<li class="no-margin">&nbsp;&nbsp;<a href="#chartupdate"><small>Datas/horários do charts</small></a></li>
+											<li class="no-margin">&nbsp;&nbsp;<a href="#chartedit"><small>Edição de charts</small></a></li>
 										</ul>
 									</li>
 									<li>
@@ -83,14 +84,17 @@ use B7KP\Library\Lang;
 							<p>Você poderá ver uma lista de todas os chart semanais geradas, acessando no menu "Charts" e depois indo em "ver lista completa" logo abaixo da lista de últimos #1s.</p>
 
 							<h3 id="chartupdate">Datas/horários dos charts</h3>
-							<p>Os charts semanais começam (e terminam) todo <span id="timeWeUtc" class="bold"></span> no horário GMT (ou <span id="timeWeLocal"  class="bold"></span> no fuso horário local [<span class="timeZone"></span>]). A atualização das novas semanas é feita da mesma forma que a primeira atualização, ao entrar na sua página de perfil haverá um aviso de que existe uma nova semana para atualizar, basta ir na página de atualização e apertar o botão "atualizar novas semanas" e a nova semana será gerada. A atualização ficará disponível todo <span id="timeNuUtc"></span> no horário GMT (ou <span id="timeNuLocal"></span> no fuso horário local [<span class="timeZone"></span>]).</p>
-							<p>Faltam <span class="bold" id="timeToWE"></span> horas para a semana atual encerrar e <span id="timeToNU"  class="bold"></span> horas para a próxima atualização ficar disponível.</p>
+							<p>Os charts semanais começam (e terminam) todo <span id="timeWeUtc" class="bold"></span> no horário GMT (ou <span id="timeWeLocal"  class="bold"></span> no seu fuso horário local [<span class="timeZone"></span>]) <b>ou</b> toda  <span id="timeNuUtc" class="bold"></span> no horário GMT (ou <span id="timeNuLocal"  class="bold"></span> no seu fuso horário local [<span class="timeZone"></span>]). A atualização das novas semanas é feita da mesma forma que a primeira atualização, ao entrar na sua página de perfil haverá um aviso de que existe uma nova semana para atualizar, basta ir na página de atualização e apertar o botão "atualizar novas semanas" e a nova semana será gerada. A atualização ficará disponível logo após o encerramento da semana.</p>
+							<p>Faltam <span class="bold" id="timeToWE"></span> horas para a atualização de quem usa Domingo como início da contagem chegar e <span id="timeToNU"  class="bold"></span> horas para a próxima atualização de quem prefere a Sexta ficar disponível.</p>
+
+							<h3 id="chartedit">Edição de charts</h3>
+							<p>Em casos de empates no número de reproduções, é possível editar as posições da forma que você achar mais justa, para isso, abra a página do chart semanal onde o empate ocorre e aperte em 'editar chart', depois arraste o itens na ordem que desejar e salve.</p>
 
 							<h2 id="curiosities">Curiosidades</h2>
 							<h3>Estatísticas</h3>
 							<p>A página principal de charts, acessada pelo menu, mostra os últimos #1s de seus charts e algumas estatísticas baseadas nos seus charts semanais como: maior número de reproduções em uma semana, maiores estreias, etc, algumas dessas página possuem um filtro de posições, onde você pode, por exemplo, ver o maior número de reproduções em uma semana para uma música fora do top 10 (selecionando ">" e "10") ou em uma posição específica, como #2 (selecionando "=" e "2").</p>
 							<h3 id="livechart">Live Chart</h3>
-							<p>O Live Chart é uma prévia de como está o chart da semana atual, ele só fica disponível se você já ter ao menos uma semana gerada e se seus charts estiverem atualizados. Como a utilização do Live Chart pode levar os usuários a "manipularem" o chart, é possível, caso queira, esconder o mesmo, indo nas suas <a href="<?php echo Route::url('settings');?>">configurações</a>.</p>
+							<p>O Live Chart é uma prévia de como está o chart da semana atual, ele só fica disponível se você já tiver ao menos uma semana gerada e se seus charts estiverem atualizados. Como a utilização do Live Chart pode levar os usuários a "manipularem" o chart, é possível, caso queira, esconder o mesmo, indo nas suas <a href="<?php echo Route::url('settings');?>">configurações</a>.</p>
 							<h3 id="chartpoints">Pontos</h3>
 							<p>Os pontos (ou "chart points") são feitos baseados na estabilidade dos artistas/álbuns/músicas durante as semanas, o cálculo é feito da seguinte forma: é pego o chart-run (posições semana por semana que o artista/álbum/música passou), depois é atribuido um valor para cada posição, e por fim esses valores são somados, os pontos para cada posição podem serem vistos a seguir: </p>
 							<p class="col-5-div jumbotron">

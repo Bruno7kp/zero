@@ -25,9 +25,10 @@ class ChangelogController extends Controller
 	public function showVersions()
 	{
 		$changes = array();
+		$changes["0.11.610"] = array("03.08.2016", Lang::get("v_day"), Lang::get("v_update"), Lang::get("v_reset"), Lang::get("v_delete"));
 		$changes["0.11.500"] = array("31.07.2016", Lang::get("v_plaque_page"), Lang::get("theme").": Dark", Lang::get("v_new_forum"));
 		$changes["0.11.000"] = array("18.07.2016", Lang::get("v_new_faq"), Lang::get("v_new_cl_page"), Lang::get("v_new_cur_page"), Lang::get("v_hide_livechart"));
-		$next = array("complete" => 0, "text" => array(Lang::get("v_translate")));
+		$next = array("complete" => 15, "text" => array(Lang::get("v_search")));
 		$vars = array("changes" => $changes, "next" => $next);
 		$this->render("changelog.php", $vars);
 	}
