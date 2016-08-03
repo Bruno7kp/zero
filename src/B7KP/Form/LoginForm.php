@@ -17,7 +17,7 @@ class LoginForm extends Form
 				->add(self::TYPE_TEXT, "login", "input-lg form-control", array(), Lang::get("username"))
 				->add(self::TYPE_PASS, "password", "input-lg form-control", array())
 				->add(self::TYPE_CHECK, array("cookie"), "checkbox", array(), array("stay_logged"))
-				->add(self::TYPE_SUBMIT, "submit", "send btn btn-primary btn-lg")
+				->add(self::TYPE_SUBMIT, "submit", "send btn btn-success")
 				->end();
 	}
 

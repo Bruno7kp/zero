@@ -17,7 +17,7 @@ class UserEditFormPass extends Form
 				->add(self::TYPE_PASS, "old_pass", "input-lg form-control")
 				->add(self::TYPE_PASS, "new_pass", "input-lg form-control")
 				->add(self::TYPE_PASS, "new_pass_repeat", "input-lg form-control")
-				->add(self::TYPE_SUBMIT, "submit", "send btn btn-primary btn-lg")
+				->add(self::TYPE_SUBMIT, "submit", "send btn btn-success")
 				->end();
 	}
 

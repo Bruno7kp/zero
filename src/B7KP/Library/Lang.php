@@ -211,6 +211,12 @@ class Lang
 
 		// IMPORTANTE
 
+		$messages["acc_success"][self::PT_BR] = "Conta resetada com sucesso";
+		$messages["acc_success"][self::EN_US] = "Success";
+
+		$messages["acc_success_rem"][self::PT_BR] = "Conta removida com sucesso";
+		$messages["acc_success_rem"][self::EN_US] = "Success";
+
 		$messages["cert"][self::PT_BR] = "Certificações";
 		$messages["cert"][self::EN_US] = "Certifications";
 
@@ -225,6 +231,9 @@ class Lang
 
 		$messages["copy_w"][self::PT_BR] = "Copiar sem formatação";
 		$messages["copy_w"][self::EN_US] = "Copy without formatting";
+
+		$messages["change_start_date"][self::PT_BR] = "Alterar dia de início do chart";
+		$messages["change_start_date"][self::EN_US] = "Change start day of the chart";
 		
 		$messages["ch_cm"][self::PT_BR] = "Ver chart completo";
 		$messages["ch_cm"][self::EN_US] = "View full chart";
@@ -247,11 +256,20 @@ class Lang
 		$messages["filter"][self::PT_BR] = "Filtro";
 		$messages["filter"][self::EN_US] = "Filter";
 
+		$messages["friday"][self::PT_BR] = "Sexta-feira";
+		$messages["friday"][self::EN_US] = "Friday";
+
+		$messages["fri_or_sun"][self::PT_BR] = "Agora você pode escolher o dia de início do seu chart, Sexta ou Domingo?";
+		$messages["fri_or_sun"][self::EN_US] = "Now you can choose the starting day of your chart, Friday or Sunday?";
+
 		$messages["gold"][self::PT_BR] = "Ouro";
 		$messages["gold"][self::EN_US] = "Gold";
 
 		$messages["hello"][self::PT_BR] = "Olá";
 		$messages["hello"][self::EN_US] = "Hello";
+
+		$messages["here"][self::PT_BR] = "aqui";
+		$messages["here"][self::EN_US] = "here";
 
 		$messages["name"][self::PT_BR] = "Nome";
 		$messages["name"][self::EN_US] = "Name";
@@ -297,8 +315,32 @@ class Lang
 		$messages["prev_of"][self::PT_BR] = "Chart da semana atual até o momento";
 		$messages["prev_of"][self::EN_US] = "Chart of the current week to date";
 
+		$messages["reset_acc"][self::PT_BR] = "Resetar conta";
+		$messages["reset_acc"][self::EN_US] = "Reset account";
+
+		$messages["reset_acc_txt"][self::PT_BR] = "Ao resetar sua conta, todos os seus charts semanais serão apagados, as configurações e placas continuarão iguais.";
+		$messages["reset_acc_txt"][self::EN_US] = "All your weekly charts will be deleted, settings and plaques will remain in place.";
+
+		$messages["reset_account"][self::PT_BR] = "Resetar/deletar conta";
+		$messages["reset_account"][self::EN_US] = "Reset/delete account";
+
+		$messages["reset_weeks"][self::PT_BR] = "Para alterar o dia de início dos charts, é preciso resetar sua conta (excluir os charts já gerados). Resete sua conta";
+		$messages["reset_weeks"][self::EN_US] = "To change the starting day of the charts, you need to reset your account (excluding the charts already generated). Reset your account";
+
+		$messages["remove_acc"][self::PT_BR] = "Remover conta";
+		$messages["remove_acc"][self::EN_US] = "Remove account";
+
+		$messages["remove_acc_txt"][self::PT_BR] = "Ao remover sua conta, todos os seus dados serão apagados, você poderá se cadastrar novamente com a mesma conta a qualquer momento.";
+		$messages["remove_acc_txt"][self::EN_US] = "When removing your account, all your data will be deleted, you can register again with the same account at any time.";
+
 		$messages["sum"][self::PT_BR] = "Soma";
 		$messages["sum"][self::EN_US] = "Sum";
+
+		$messages["sunday"][self::PT_BR] = "Domingo";
+		$messages["sunday"][self::EN_US] = "Sunday";
+
+		$messages["start_day"][self::PT_BR] = "Dia de início do chart semanal";
+		$messages["start_day"][self::EN_US] = "Weekly beginning chart day";
 
 		$messages["stay_logged"][self::PT_BR] = "Permanecer conectado";
 		$messages["stay_logged"][self::EN_US] = "Stay connected";

@@ -14,7 +14,7 @@ class UserEditForm extends Form
 		$form = $this
 				->init(Route::url("edit_profile"))
 				->add(self::TYPE_MAIL, "email", "input-lg form-control")
-				->add(self::TYPE_SUBMIT, "submit", "send btn btn-primary btn-lg")
+				->add(self::TYPE_SUBMIT, "submit", "send btn btn-success")
 				->end();
 	}
 

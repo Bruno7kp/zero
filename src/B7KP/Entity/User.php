@@ -22,6 +22,11 @@ class User extends Entity implements iPermission
 	protected $email;
 
 	/**
+	* @Assert(null=false)
+	*/
+	protected $lfm_register;
+
+	/**
 	* @Assert(null=true)
 	*/
 	protected $cookie;

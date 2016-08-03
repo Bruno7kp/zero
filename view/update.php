@@ -20,7 +20,7 @@ use B7KP\Library\Url;
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
 							<h2><?php echo Lang::get('update')." ".Lang::get('ur');?> chart</h2>
-							<p class="text-muted"><?php echo Lang::get('look_at');?> <a href="<?php echo Route::url('settings');?>"><?php echo Lang::get('sett');?></a></p>
+							<p class="text-muted"><?php echo Lang::get('fri_or_sun')." <br/>".Lang::get('look_at');?> <a href="<?php echo Route::url('settings');?>#more"><?php echo Lang::get('sett');?></a></p>
 							<button data-url="<?php echo Route::url('check_update', array('time'=>'new'));?>" class="updaters new btn btn-outline"><?php echo Lang::get('up_new_week');?></button>
 							<br>
 							<button data-url="<?php echo Route::url('check_update', array('time'=>'all'));?>" class="updaters all btn btn-outline"><?php echo Lang::get('up_all');?></button>

@@ -20,7 +20,7 @@ use B7KP\Library\Lang;
 						<div class="col-md-4 col-md-offset-4 text-center">
 							<h2><?php echo Lang::get('sett');?></h2>
 							<?php $form->output();?>
-							<hr>
+							<hr id="more">
 							<a href="<?php echo Route::url('update');?>" class="btn btn-outline"><?php echo Lang::get('update');?> charts</a>
 							<br>
 							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('cert');?></a>
@@ -29,9 +29,9 @@ use B7KP\Library\Lang;
 							<br>
 							<a href="<?php echo Route::url('useredit');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> e-mail</a>
 							<br>
-							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('change_start_date');?></a>
+							<a href="<?php echo Route::url('usereditday');?>" class="btn btn-outline"><?php echo Lang::get('change_start_date');?></a>
 							<br>
-							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('reset_account');?></a>
+							<a href="<?php echo Route::url('reset_acc');?>" class="btn btn-outline"><?php echo Lang::get('reset_account');?></a>
 
 						</div>
 

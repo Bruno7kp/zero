@@ -29,7 +29,17 @@ class ProfileController extends Controller
 			$startday = $settings->start_day ? "friday" : "sunday";
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
-			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
+			if($user->lfm_register){
+				$date = new \DateTime($user->lfm_register);
+				$date = $date->format("Y.m.d");
+			}else{
+				$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
+				$dateuser 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
+				$data = new \stdClass();
+				$data->lfm_register = $dateuser;
+				$data->id = $user->id;
+				$this->factory->update("\B7KP\Entity\User", $data);
+			}
 			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
 			$wksfm 	= $lfm->getWeeklyChartList();
 			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));

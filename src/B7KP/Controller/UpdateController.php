@@ -92,8 +92,13 @@ class UpdateController extends Controller
 				$data->from_day = $from;
 				$data->to_day = $to;
 				$lfm 	= new LastFm();
-				$last 	= $lfm->setUser($this->user->login)->setStartDate($startday)->getUserInfo();
-				$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
+				$last 	= $lfm->setUser($this->user->login)->setStartDate($startday);
+				if($this->user->lfm_register){
+					$date = $this->user->lfm_register;
+				}else{
+					$last = $lfm->getUserInfo();
+					$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
+				}
 				$wksfm 	= $lfm->getWeeklyChartList();
 				$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date, $this->user->id);
 				$wksfm 	= array_reverse($wksfm);

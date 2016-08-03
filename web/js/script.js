@@ -13,6 +13,58 @@ function initialize()
 	removePlaque();
 	urlSelector();
 	btnCertShow();
+	resetAcc();
+}
+
+function resetAcc()
+{
+	$("#reset_acc").click(function(event) {
+		if(confirm(getMsg("sure"))){
+			$.ajax({
+				url: baseUrl + '/check/reset',
+				dataType: 'json'
+			})
+			.done(function(data) {
+				showAlert(data.error, data.msg);
+				setTimeout(function(){ 
+					window.location.reload();
+				}, 3000);
+				console.log("success");
+			})
+			.fail(function() {
+				console.log("error");
+				showAlert(1, getMsg("error"));
+			})
+			.always(function() {
+				console.log("complete");
+			});
+			
+		}
+	});
+
+	$("#delete_acc").click(function(event) {
+		if(confirm(getMsg("sure"))){
+			$.ajax({
+				url: baseUrl + '/check/delete',
+				dataType: 'json'
+			})
+			.done(function(data) {
+				showAlert(data.error, data.msg);
+				setTimeout(function(){ 
+					window.location.reload();
+				}, 3000);
+				console.log("success");
+			})
+			.fail(function() {
+				console.log("error");
+				showAlert(1, getMsg("error"));
+			})
+			.always(function() {
+				console.log("complete");
+			});
+			
+		}
+	});
 }
 
 function btnCertShow()

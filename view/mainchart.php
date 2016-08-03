@@ -48,7 +48,7 @@ use B7KP\Library\Lang;
 													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
-														$actlink = $muslink.F::fixLFM($value["artist"][0]->artist);
+														$actlink = isset($value["artist"][0]) ? $muslink.F::fixLFM($value["artist"][0]->artist) : "#!";
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">

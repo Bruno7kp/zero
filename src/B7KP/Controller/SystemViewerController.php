@@ -54,6 +54,8 @@ class SystemViewerController extends Controller
 		// 	echo $value->date." - ".$value->t."<br/>";
 		// }
 		$affected = $dao->run("ALTER TABLE settings ADD theme INT NOT NULL");
+		$affected = $dao->run("ALTER TABLE `user` ADD `lfm_register` DATE NULL AFTER `password`");
+
 		//$affected = $dao->run("UPDATE week SET week = 198 WHERE iduser = 124 AND week = 1 AND to_day > '2015-01-01'");
 		//$affected = $this->factory->removeBy("\B7KP\Entity\Settings", "iduser", 1227);
 		// $affected = $dao->run("SELECT * FROM music_charts t, week w, user u WHERE t.idweek = w.id AND u.id = w.iduser AND w.iduser = 472");

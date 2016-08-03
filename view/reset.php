@@ -18,18 +18,13 @@ use B7KP\Library\Lang;
 
 						<div class="fh5co-spacer fh5co-spacer-sm"></div>	
 						<div class="col-md-4 col-md-offset-4 text-center">
-							<h2><?php echo Lang::get('edit');?></h2>
+							<h2><?php echo Lang::get('reset_account');?></h2>
 							
-							<?php 
-							if(!is_array($weeks) || count($weeks) > 0)
-							{
-								echo "<p>".Lang::get("reset_weeks")." <a href=\"".Route::url("reset_acc")."\">".Lang::get("here")."</a>.</p>";
-							}
-							else
-							{
-								$form->output(); 
-							}
-							?>
+							<p class="text-muted text-justify"><?php echo Lang::get("reset_acc_txt");?></p>
+							<a href="#!" id="reset_acc" class="btn btn-danger"><?php echo Lang::get('reset_acc');?></a>
+							<p class="text-muted text-justify"><?php echo Lang::get("remove_acc_txt");?></p>
+							<a href="#!" id="delete_acc" class="btn btn-danger"><?php echo Lang::get('remove_acc');?></a>
+							
 
 							<hr>
 							<a href="<?php echo Route::url('settings');?>" class="btn btn-outline"><?php echo Lang::get('sett');?></a>

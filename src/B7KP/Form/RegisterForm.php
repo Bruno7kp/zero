@@ -16,7 +16,7 @@ class RegisterForm extends Form
 				->add(self::TYPE_HIDDEN, "login", "input-lg form-control", array(), "Last.fm Username")
 				->add(self::TYPE_MAIL, "email", "input-lg form-control")
 				->add(self::TYPE_PASS, "password", "input-lg form-control")
-				->add(self::TYPE_SUBMIT, "submit", "send btn btn-primary btn-lg")
+				->add(self::TYPE_SUBMIT, "submit", "send btn btn-success")
 				->end();
 	}
 

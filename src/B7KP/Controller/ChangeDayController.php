@@ -24,9 +24,10 @@ class ChangeDayController extends Controller
 	public function indexAction()
 	{
 		$this->checkAccess();
-		$form = $this->createForm("UserEditDayForm", $this->user);
-		$weeks = $this->factory->findOneBy("B7KP\Entity\Week", $this->user->id, "iduser");
-		$var = array("form" => $form, "weeks" => count($weeks));
+		$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
+		$form = $this->createForm("UserEditDayForm", $this->settings);
+		$weeks = $this->factory->find("B7KP\Entity\Week", array("iduser" => $this->user->id));
+		$var = array("form" => $form, "weeks" => $weeks);
 		$this->render("editday.php", $var);
 	}
 
@@ -36,15 +37,15 @@ class ChangeDayController extends Controller
 		{
 			$this->redirectToRoute("login");
 		}
-		$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
 	}
 
 	/**
-	* @Route(name=edit_profile|route=/check/profile/edit)
+	* @Route(name=edit_profile_day|route=/check/profile_edit_day)
 	*/
 	public function checkEdit()
 	{
 		$post = (object)$_POST;
+		$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
 		if($this->isAjaxRequest())
 		{
 			$post->id = $this->settings->id;
