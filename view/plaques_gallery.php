@@ -49,9 +49,13 @@ use B7KP\Library\Route;
 							      		<div class="panel-body">
 							      			<?php 
 							      			foreach ($value as $ky => $ve) {
-							      			?>
-							        		<img src="<?php echo $ve->url;?>" class="col-md-4 col-sm-6 col-xs-12 bottomspace-md">
-							      			<?php
+							      			echo "<div class='col-md-4 col-sm-6 col-xs-12 bottomspace-md col-plaque'>
+											<img class='img-responsive bottomspace-xs' src='".$ve->url."'>";
+											if($user->checkSelfPermission($this->factory))
+											{
+												echo "<button class='btn btn-custom btn-sm btn-danger remove-plaque' data-id='".$ve->id."'><i class='fa fa-times'></i></button>";
+											}
+											echo "</div>";
 							      			}
 							      			?>
 							      		</div>

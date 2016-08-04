@@ -2,6 +2,11 @@
     color: rgb(21, 126, 251);
 }
 
+body{
+	overflow-x: hidden;
+	background-color: white;
+}
+
 .no-margin {
 	margin: 0px !important;
 }
@@ -354,4 +359,9 @@ a.white {
 .badge{
 	padding: 2px 5px;
     text-align: center;
+    background-color: #2a9fd6;
+}
+
+.notification>.media>.media-left{
+	vertical-align: middle;
 }

@@ -49,6 +49,30 @@ class PlaqueController extends Controller
 		$this->render("plaques_gallery.php", $vars);
 	}
 
+	private function orderPlaques($user, $type)
+	{
+		$this->user = $user;
+		$this->type = $type;
+		usort($this->plaques, 'self::compare');
+	}
+
+	private function compare($a, $b)
+	{
+		$c = new Certified($this->user, $this->factory);
+		$ac = json_decode($a->certified);
+		$bc = json_decode($b->certified);
+		$ac = $c->getValueByArray($this->type, $ac);
+		$bc = $c->getValueByArray($this->type, $bc);
+		if($ac == $bc)
+		{
+			return 0;
+		}
+		else
+		{
+			 return ($ac > $bc) ? -1 : 1;
+		}
+	}
+
 	private function orgPlaques($by,$user,$type)
 	{
 		if(count($this->plaques) == 0){ return array(); }
@@ -56,6 +80,7 @@ class PlaqueController extends Controller
 		$array = array();
 		if ($by == "week") 
 		{
+			$this->orderPlaques($user, $type);
 			foreach ($this->plaques as $pk => $pv) 
 			{
 
@@ -69,6 +94,7 @@ class PlaqueController extends Controller
 		}
 		else if($by == "artist")
 		{
+			$this->orderPlaques($user, $type);
 			foreach ($this->plaques as $pk => $pv) 
 			{
 

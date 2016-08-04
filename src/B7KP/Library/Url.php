@@ -4,6 +4,15 @@ namespace B7KP\Library;
 class Url
 {
 
+	static function fix()
+	{
+		if(strpos($_SERVER['SERVER_NAME'], ".") > 0 && strpos($_SERVER['SERVER_NAME'], "www") === false)
+		{
+			header("Location: http://www.".$_SERVER['SERVER_NAME'].self::checkPort().$_SERVER['REQUEST_URI']);
+			die();
+		}
+	}
+
 	static function getFullUrl()
 	{
 		return "http://".$_SERVER['SERVER_NAME'].self::checkPort().$_SERVER['REQUEST_URI'];

@@ -4,6 +4,7 @@
 }
 body{
 	color: #D1D1D1;
+    background-color: 232323;
 }
 .jumbotron {
     background-color: #333;
@@ -201,4 +202,20 @@ a.cr-btn.wksout {
 
 .fh5co-accordion .panel-heading.collapsed .accordion-toggle{
     color: white !important;
+}
+
+.notification{
+    background-color: #2d2d2d;
+}
+
+.notification:hover{
+    background-color: #222;
+}
+
+.notification-title{
+    color: white;
+}
+
+.notification-desc{
+    color: #ccc;
 }

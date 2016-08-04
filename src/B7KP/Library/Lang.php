@@ -164,6 +164,9 @@ class Lang
 		$messages["next"][self::PT_BR] = "Próxima";
 		$messages["next"][self::EN_US] = "Next";
 
+		$messages["notifications"][self::PT_BR] = "Notificações";
+		$messages["notifications"][self::EN_US] = "Notifications";
+
 		$messages["previous"][self::PT_BR] = "Anterior";
 		$messages["previous"][self::EN_US] = "Previous";
 		
@@ -877,7 +880,32 @@ class Lang
 		$messages["v_translate"][self::PT_BR] = "Tradução (para inglês) do FAQ e revisão do que já foi traduzido";
 		$messages["v_translate"][self::EN_US] = "FAQ translation";
 
+		// noty
+
+		$messages["no_noty"][self::PT_BR] = "Nenhuma notificação encontrada";
+		$messages["no_noty"][self::EN_US] = "No notification found";
+
+		$messages["noty_weeks_to_update"][self::PT_BR] = "Seus charts estão desatualizados";
+		$messages["noty_weeks_to_update"][self::EN_US] = "FAQ translation";
+
+		$messages["noty_you_weeks_to_update"][self::PT_BR] = "Você tem {0} semana(s) desatualizada(s).";
+		$messages["noty_you_weeks_to_update"][self::EN_US] = "You have {0} semanas(s) out of date.";
+
+
 		return $messages;
+	}
+
+	static function sub($text, $array)
+	{
+		$array = (array) $array;
+		foreach ($array as $key => $value) {
+			if(strpos($text, "{".$key."}"))
+			{
+				$text = str_replace("{".$key."}", $value, $text);
+			}
+		}
+
+		return $text;
 	}
 
 }

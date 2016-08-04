@@ -85,7 +85,7 @@ class Notify
 	public function outputLine($showonzero = false)
 	{
 		$n = $this->getNotificationsNumber();
-		echo "<li><a href=>".Lang::get("notifications");
+		echo "<li><a href=".Route::url("notification").">".Lang::get("notifications");
 		if($n > 0 || $showonzero)
 		{
 			echo " <span class=\"badge\">".$n."</span>";
@@ -99,35 +99,22 @@ class Notify
 		{
 			$n = $this->notifications[$from][$index];
 			$vals = $this->mergeDefault($n);
-			echo "<div class=\"row ".$vals["class"]."\">\n";
-				echo "<div class=\"col-md-2 col-xs-3\">";
-				if($vals["url"])
-				{
-					echo "<a href=".$vals["url"].">\n";
-				}
+			echo "<li class=\"notification ".$vals["class"]."\"><div class=\"media\">\n";
+				echo "<div class=\"media-left\">";
+				echo "<div class=\"media-object\">";
 					echo "<i class=\"".$vals["icon"]."\"></i>\n";
-				if($vals["url"])
-				{
-					echo "</a>\n";
-				}
 				echo "</div>";
-				echo "<div class=\"col-md-10 col-xs-9\">";
-				if($vals["url"])
-				{
-					echo "<a href=".$vals["url"].">\n";
-				}
-					echo "<i class=\"".$vals["text"]."\"></i>\n";
-				if($vals["url"])
-				{
-					echo "</a>\n";
-				}
+				echo "</div>";
+				echo "<div class=\"media-body\">";
+				echo "<strong class=\"notification-title\">".Lang::get($from)."</strong>";
+				echo "<p class=\"notification-desc\">".$vals["text"]."</p>";
 				if($vals["render"]["file"] && file_exists(MAIN_DIR."view/".$vals["render"]["file"]))
 				{
 					$render_id = $vals["render"]["id"];
 					include MAIN_DIR."view/".$vals["render"]["file"];
 				}
 				echo "</div>\n";
-			echo "</div>\n";
+			echo "</div></li>\n";
 		}
 	}
 
@@ -136,8 +123,7 @@ class Notify
 		$default = array
 					(
 						"text" => false,
-						"url" => false,
-						"icon" => "fa fa-bell fa-fw",
+						"icon" => "fa fa-bell fa-fw fa-2x text-center",
 						"class" => "",
 						"render" => array
 									(
@@ -181,15 +167,25 @@ class Notify
 			$nots = $this->getNotifications();
 		}
 
-		foreach ($nots as $key => $value) {
-			echo "<div class=row>\n";
-			echo "<div class=col-xs-12>\n";
-			echo "<h2>".Lang::get($key)."</h2>";
-			foreach ($value as $k => $v) {
-				$this->outputNotification($key, $k);
+		if(count($nots) > 0)
+		{
+			foreach ($nots as $key => $value) 
+			{
+				echo "<div class=row>\n";
+				echo "<div class=col-xs-12>\n";
+				echo "<ul class=notifications>";
+				foreach ($value as $k => $v) {
+					$this->outputNotification($key, $k);
+				}
+				echo "</ul>\n";
+				echo "</div>\n";
+				echo "</div>\n";
 			}
-			echo "</div>\n";
-			echo "</div>\n";
+		}
+		else
+		{
+			$this->setNotification("Oops", array(array("text" => Lang::get("no_noty"), "icon" => "fa fa-meh-o fa-2x fa-fw text-primary")));
+			$this->outputNotification("Oops", 0);
 		}
 	}
 
@@ -220,7 +216,7 @@ class Notify
 		$toupdate = $wksfm - (is_array($weeks) ? count($weeks) : 0);
 		if($toupdate > 0)
 		{
-			$array[0] = array("text" => Lang::get("noty_you_weeks_to_update"), "url" => Route::url("update"), "icon" => "fa fa-calendar fa-fw");
+			$array[0] = array("text" => Lang::sub(Lang::get("noty_you_weeks_to_update"), array($toupdate))." <br/><a href=\"".Route::url("update")."\">".Lang::get('update')." ".Lang::get('now')."?</a>", "icon" => "fa fa-calendar-times-o fa-fw fa-2x text-center text-primary");
 			$this->setNotification("noty_weeks_to_update", $array);
 		}
 	}
