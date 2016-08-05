@@ -354,6 +354,11 @@ a.white {
 		-webkit-column-count: 3;
 		column-count: 3;
 	}
+
+	.nav-center-sm > li{
+		float: none;
+	    display: inline-block;
+	}
 }
 
 .badge{
@@ -364,4 +369,19 @@ a.white {
 
 .notification>.media>.media-left{
 	vertical-align: middle;
+}
+
+.no-border{
+	border: 0px;
+	background-color: rgba(0,0,0,0.1);
+	border-bottom: 1px solid white;
+}
+
+.input-group-btn .btn{
+	margin-right: 0px;
+}
+
+.nav-center > li{
+	float: none;
+    display: inline-block;
 }

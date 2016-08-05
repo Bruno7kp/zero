@@ -3,7 +3,7 @@ use B7KP\Library\Route;
 use B7KP\Library\Lang;
 
 $curroute = Route::gerCurRoute();
-$a_prof = $a_char = $a_arti = $a_albu = $a_musi = "";
+$a_prof = $a_char = $a_arti = $a_albu = $a_musi = $a_libr = $a_frie = "";
 switch ($curroute) {
 	case 'profile':
 		$a_prof = "active";
@@ -33,18 +33,24 @@ switch ($curroute) {
 	case 'lib_art_music':
 	case 'lib_art_album':
 		$a_arti = "active";
+		$a_libr = "active";
+		$t_value = "artist";
 		break;
 	case 'lib_mus_list':
 	case 'lib_mus':
 		$a_musi = "active";
+		$a_libr = "active";
+		$t_value = "music";
 		break;
 	case 'lib_alb_list':
 	case 'lib_alb':
 		$a_albu = "active";
+		$a_libr = "active";
+		$t_value = "album";
 		break;
 }
 ?>
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs nav-center-sm">
   	<li role="presentation" class="<?php echo $a_prof;?>">
   		<a class="nav-link" href="<?php echo Route::url('profile', array('login' => $user->login));?>">
 			<img height="30" width="30" class="img-circle" src="<?php echo $usericon;?>" alt="<?php echo $user->login;?>">
@@ -57,7 +63,25 @@ switch ($curroute) {
 			<span class="hidden-xs">Charts</span>
 		</a>
   	</li>
-  	<li role="presentation" class="<?php echo $a_arti;?>">
+  	<li role="presentation" class="<?php echo $a_libr;?>">
+		<a class="nav-link" href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>">
+			<i class="ti-user"></i>
+			<span class="hidden-xs"><?php echo Lang::get('library');?></span>
+		</a>
+  	</li>
+  	<li role="presentation" class="<?php echo $a_frie;?>">
+		<a class="nav-link" href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>">
+			<i class="ti-user"></i>
+			<span class="hidden-xs"><?php echo Lang::get('friends');?></span>
+		</a>
+  	</li>
+</ul>
+<?php 
+if(strpos($curroute, "_list") > 0)
+{
+?>
+<ul class="nav nav-tabs nav-center text-center topspace-lg">
+	<li role="presentation" class="<?php echo $a_arti;?>">
 		<a class="nav-link" href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>">
 			<i class="ti-user"></i>
 			<span class="hidden-xs"><?php echo Lang::get('art_x');?></span>
@@ -76,3 +100,14 @@ switch ($curroute) {
 		</a>
   	</li>
 </ul>
+<form method="get">
+	<div class="input-group">
+		<input type="text" class="form-control no-border" name="q">
+		<div class="input-group-btn">
+		    <button type="submit" class="btn btn-default btn-info"><span class="fa fa-search fa-fw"></span></button>
+		</div>
+	</div>
+</form>
+<?php
+}
+?>

@@ -2,9 +2,9 @@
 #fh5co-main{
     background: #232323;
 }
-body{
+html, body{
 	color: #D1D1D1;
-    background-color: 232323;
+    background-color: #232323;
 }
 .jumbotron {
     background-color: #333;
@@ -218,4 +218,8 @@ a.cr-btn.wksout {
 
 .notification-desc{
     color: #ccc;
+}
+
+.no-border{
+    border-bottom: 0px solid white;
 }

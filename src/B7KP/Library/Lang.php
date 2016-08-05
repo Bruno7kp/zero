@@ -262,6 +262,12 @@ class Lang
 		$messages["friday"][self::PT_BR] = "Sexta-feira";
 		$messages["friday"][self::EN_US] = "Friday";
 
+		$messages["friend"][self::PT_BR] = "amigo";
+		$messages["friend"][self::EN_US] = "friend";
+
+		$messages["friends"][self::PT_BR] = "Amigos";
+		$messages["friends"][self::EN_US] = "Friends";
+
 		$messages["fri_or_sun"][self::PT_BR] = "Agora você pode escolher o dia de início do seu chart, Sexta ou Domingo?";
 		$messages["fri_or_sun"][self::EN_US] = "Now you can choose the starting day of your chart, Friday or Sunday?";
 
@@ -273,6 +279,9 @@ class Lang
 
 		$messages["here"][self::PT_BR] = "aqui";
 		$messages["here"][self::EN_US] = "here";
+
+		$messages["library"][self::PT_BR] = "Biblioteca";
+		$messages["library"][self::EN_US] = "Library";
 
 		$messages["name"][self::PT_BR] = "Nome";
 		$messages["name"][self::EN_US] = "Name";

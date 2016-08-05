@@ -104,9 +104,9 @@ function qa_get_login_links($relative_url_prefix, $redirect_back_to_url)
 	//	Until you edit this function, don't show login, register or logout links
 
 	return array(
-		'login' => "http://localhost/zero/login",
-		'register' => "http://localhost/zero/register",
-		'logout' => "http://localhost/zero/logout"
+		'login' => "http://www.gifboard.com.br/lastfm/login",
+		'register' => "http://www.gifboard.com.br/lastfm/register",
+		'logout' => "http://www.gifboard.com.br/lastfm/logout"
 	);
 
 	/*

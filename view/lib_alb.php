@@ -22,7 +22,7 @@ use B7KP\Utils\Snippets as S;
 		<div id="fh5co-main">
 			<section>
 				<div class="container">
-					<div class="row bottomspace-xl text-center">
+					<div class="row text-center">
 						<div class="col-xs-12">
 							<?php 
 							$this->render("inc/profile-menu.php", array('user' => $user, 'usericon' => $lfm_image));
