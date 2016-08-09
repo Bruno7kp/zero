@@ -584,6 +584,7 @@ class ArtistApi extends BaseApi
             $vars = array_merge($vars, $methodVars);
 
             if ($call = $this->apiGetCall($vars)) {
+                var_dump($call);
                 $callNamespaces = $call->getDocNamespaces(true);
                 // fix missing namespace (sic)
                 if (!isset($callNamespaces['opensearch'])) {

@@ -41,6 +41,7 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<link rel="stylesheet" href="<?php echo Url::asset('css/chart.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/progress.bar.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/bootstrap-notifications.min.css');?>">
+	<link rel="stylesheet" href="<?php echo Url::asset('fonts/flaticon/flaticon.css');?>">
 	<!-- cdn -->
 	<link rel="stylesheet" href="<?php echo Url::asset('css/tooltipster-blue.css');?>">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">

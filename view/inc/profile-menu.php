@@ -65,19 +65,19 @@ switch ($curroute) {
   	</li>
   	<li role="presentation" class="<?php echo $a_libr;?>">
 		<a class="nav-link" href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>">
-			<i class="ti-user"></i>
+			<i class="flaticon-music-folder"></i>
 			<span class="hidden-xs"><?php echo Lang::get('library');?></span>
 		</a>
   	</li>
   	<li role="presentation" class="<?php echo $a_frie;?>">
 		<a class="nav-link" href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>">
-			<i class="ti-user"></i>
+			<i class="flaticon-social"></i>
 			<span class="hidden-xs"><?php echo Lang::get('friends');?></span>
 		</a>
   	</li>
 </ul>
 <?php 
-if(strpos($curroute, "_list") > 0)
+if(strpos($curroute, "_list") > 0 && strpos($curroute, "lib") !== false)
 {
 ?>
 <ul class="nav nav-tabs nav-center text-center topspace-lg">
@@ -100,7 +100,7 @@ if(strpos($curroute, "_list") > 0)
 		</a>
   	</li>
 </ul>
-<form method="get">
+<form method="get" action="<?php echo Route::url('search', array('login' => $user->login, 'type' => $t_value));?>">
 	<div class="input-group">
 		<input type="text" class="form-control no-border" name="q">
 		<div class="input-group-btn">

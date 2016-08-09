@@ -288,5 +288,25 @@ class LastFm
 
         return $final;
     }
+
+    public function search($type, $str)
+    {
+        switch ($type) {
+            case 'artist':
+                $array = array("artist" => $str);
+                return $this->artistApi->search($array);
+                break;
+
+            case 'album':
+                $array = array("album" => $str);
+                return $this->albumApi->search($array);
+                break;
+            
+            default:
+                $array = array("track" => $str);
+                return $this->trackApi->search($array);
+                break;
+        }
+    }
 }
 ?>
