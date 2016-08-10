@@ -251,42 +251,25 @@ class AlbumApi extends BaseApi
         if (!empty($methodVars['album'])) {
             $vars = array(
                 'method' => 'album.search',
-                'api_key' => $this->getAuth()->apiKey
+                'api_key' => $this->auth->apiKey
             );
             $vars = array_merge($vars, $methodVars);
 
             $searchresults = array();
             if ($call = $this->apiGetCall($vars)) {
-                $callNamespaces = $call->getDocNamespaces(true);
-                // fix missing namespace (sic)
-                if (!isset($callNamespaces['opensearch'])) {
-                    $call->results->addAttribute('xmlns:xmlns:opensearch', 'http://a9.com/-/spec/opensearch/1.1/');
-                    $call = new SimpleXMLElement($call->asXML());
-                }
-                $opensearch = $call->results->children('http://a9.com/-/spec/opensearch/1.1/');
-                if ($opensearch->totalResults > 0) {
-                    $searchresults['totalResults'] = (string) $opensearch->totalResults;
-                    $searchresults['startIndex'] = (string) $opensearch->startIndex;
-                    $searchresults['itemsPerPage'] = (string) $opensearch->itemsPerPage;
                     $i = 0;
                     foreach ($call->results->albummatches->album as $album) {
-                        $searchresults['results'][$i]['name'] = (string) $album->name;
-                        $searchresults['results'][$i]['artist'] = (string) $album->artist;
-                        $searchresults['results'][$i]['id'] = (string) $album->id;
-                        $searchresults['results'][$i]['url'] = (string) $album->url;
-                        $searchresults['results'][$i]['streamable'] = (string) $album->streamable;
-                        $searchresults['results'][$i]['image']['small'] = (string) $album->image[0];
-                        $searchresults['results'][$i]['image']['medium'] = (string) $album->image[1];
-                        $searchresults['results'][$i]['image']['large'] = (string) $album->image[2];
+                        $searchresults[$i]['name'] = (string) $album->name;
+                        $searchresults[$i]['artist'] = (string) $album->artist;
+                        //$searchresults[$i]['id'] = (string) $album->id;
+                        $searchresults[$i]['url'] = (string) $album->url;
+                        //$searchresults[$i]['streamable'] = (string) $album->streamable;
+                        $img = (array) $album->image[1];
+                        $searchResults[$i]['image'] = (string) $img["#text"];
                         $i++;
                     }
 
                     return $searchresults;
-                } else {
-                    // No tagsare found
-                    $this->handleError(90, 'No results');
-                    return false;
-                }
             } else {
                 return false;
             }

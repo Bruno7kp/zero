@@ -584,35 +584,19 @@ class ArtistApi extends BaseApi
             $vars = array_merge($vars, $methodVars);
 
             if ($call = $this->apiGetCall($vars)) {
-                var_dump($call);
-                $callNamespaces = $call->getDocNamespaces(true);
-                // fix missing namespace (sic)
-                if (!isset($callNamespaces['opensearch'])) {
-                    $call->results->addAttribute('xmlns:xmlns:opensearch', 'http://a9.com/-/spec/opensearch/1.1/');
-                    $call = new SimpleXMLElement($call->asXML());
-                }
-                $opensearch = $call->results->children('http://a9.com/-/spec/opensearch/1.1/');
-                if ($opensearch->totalResults > 0) {
-                    $searchResults['totalResults'] = (string) $opensearch->totalResults;
-                    $searchResults['startIndex'] = (string) $opensearch->startIndex;
-                    $searchResults['itemsPerPage'] = (string) $opensearch->itemsPerPage;
                     $i = 0;
                     foreach ($call->results->artistmatches->artist as $artist) {
-                        $searchResults['results'][$i]['name'] = (string) $artist->name;
-                        $searchResults['results'][$i]['mbid'] = (string) $artist->mbid;
-                        $searchResults['results'][$i]['url'] = (string) $artist->url;
-                        $searchResults['results'][$i]['streamable'] = (string) $artist->streamable;
-                        $searchResults['results'][$i]['image']['small'] = (string) $artist->image_small;
-                        $searchResults['results'][$i]['image']['large'] = (string) $artist->image;
+                        $searchResults[$i]['name'] = (string) $artist->name;
+                        $searchResults[$i]['mbid'] = (string) $artist->mbid;
+                        $searchResults[$i]['url'] = (string) $artist->url;
+                        $searchResults[$i]['streamable'] = (string) $artist->streamable;
+                        //$searchResults[$i]['image']['small'] = (string) $artist->image_small;
+                        $img = (array) $artist->image[1];
+                        $searchResults[$i]['image'] = (string) $img["#text"];
                         $i++;
                     }
 
                     return $searchResults;
-                } else {
-                    // No tagsare found
-                    $this->handleError(90, 'No results');
-                    return false;
-                }
             } else {
                 return false;
             }

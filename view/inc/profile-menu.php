@@ -47,6 +47,24 @@ switch ($curroute) {
 		$a_albu = "active";
 		$a_libr = "active";
 		$t_value = "album";
+	case 'search':
+		$a_libr = "active";
+		switch ($this->type) {
+			case 'artist':
+				$a_arti = "active";
+				$t_value = "artist";
+				break;
+
+			case 'album':
+				$a_albu = "active";
+				$t_value = "album";
+				break;
+			
+			default:
+				$a_musi = "active";
+				$t_value = "music";
+				break;
+		}
 		break;
 }
 ?>
@@ -77,7 +95,7 @@ switch ($curroute) {
   	</li>
 </ul>
 <?php 
-if(strpos($curroute, "_list") > 0 && strpos($curroute, "lib") !== false)
+if(strpos($curroute, "_list") > 0 && strpos($curroute, "lib") !== false || $curroute == "search")
 {
 ?>
 <ul class="nav nav-tabs nav-center text-center topspace-lg">
@@ -102,7 +120,7 @@ if(strpos($curroute, "_list") > 0 && strpos($curroute, "lib") !== false)
 </ul>
 <form method="get" action="<?php echo Route::url('search', array('login' => $user->login, 'type' => $t_value));?>">
 	<div class="input-group">
-		<input type="text" class="form-control no-border" name="q">
+		<input type="text" class="form-control no-border" name="q" value="<?php echo isset($this->q) ? $this->q : '';?>">
 		<div class="input-group-btn">
 		    <button type="submit" class="btn btn-default btn-info"><span class="fa fa-search fa-fw"></span></button>
 		</div>

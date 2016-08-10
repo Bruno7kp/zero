@@ -479,37 +479,19 @@ class TrackApi extends BaseApi {
 			$vars = array_merge($vars, $methodVars);
 
 			if ( $call = $this->apiGetCall($vars) ) {
-                $callNamespaces = $call->getDocNamespaces(true);
-                // fix missing namespace (sic)
-                if (!isset($callNamespaces['opensearch'])) {
-                    $call->results->addAttribute('xmlns:xmlns:opensearch', 'http://a9.com/-/spec/opensearch/1.1/');
-                    $call = new SimpleXMLElement($call->asXML());                    
-                }                
-				$opensearch = $call->results->children('http://a9.com/-/spec/opensearch/1.1/');
-				if ( $opensearch->totalResults > 0 ) {
-					$searchResults['totalResults'] = (string) $opensearch->totalResults;
-					$searchResults['startIndex'] = (string) $opensearch->startIndex;
-					$searchResults['itemsPerPage'] = (string) $opensearch->itemsPerPage;
 					$i = 0;
 					foreach ( $call->results->trackmatches->track as $track ) {
-						$searchResults['results'][$i]['name'] = (string) $track->name;
-						$searchResults['results'][$i]['artist'] = (string) $track->artist;
-						$searchResults['results'][$i]['url'] = (string) $track->url;
-						$searchResults['results'][$i]['streamable'] = (string) $track->streamable;
-						$searchResults['results'][$i]['fulltrack'] = (string) $track->streamable['fulltrack'];
-						$searchResults['results'][$i]['listeners'] = (string) $track->listeners;
-						$searchResults['results'][$i]['image']['small'] = (string) $track->image[0];
-						$searchResults['results'][$i]['image']['medium'] = (string) $track->image[1];
-						$searchResults['results'][$i]['image']['large'] = (string) $track->image[2];
+						$searchResults[$i]['name'] = (string) $track->name;
+						$searchResults[$i]['artist'] = (string) $track->artist;
+						$searchResults[$i]['url'] = (string) $track->url;
+						//$searchResults[$i]['streamable'] = (string) $track->streamable;
+						//$searchResults[$i]['fulltrack'] = (string) $track->streamable['fulltrack'];
+						$searchResults[$i]['listeners'] = (string) $track->listeners;
+						$img = (array) $track->image[1];
+                        $searchResults[$i]['image'] = (string) $img["#text"];
 						$i++;
 					}
 					return $searchResults;
-				}
-				else {
-					// No tagsare found
-					$this->handleError(90, 'No results');
-					return false;
-				}
 			}
 			else {
 				return false;
