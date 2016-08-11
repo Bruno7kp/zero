@@ -28,7 +28,7 @@ class SearchController extends Controller
 		$this->type = $type;
 		$this->user_lib = $this->isValidUser($login);
 		$this->isValidSearch();
-		$this->render("search.php", array("lfm_image" => $this->getUserBg($this->user, true)));
+		$this->render("search.php", array("lfm_image" => $this->getUserBg($this->user_lib, true)));
 	}
 
 	private function isValidSearch()
@@ -99,7 +99,7 @@ class SearchController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			if($user == $this->user)
+			if($user->id == $this->user->id)
 			{
 				$user = false;
 			}
@@ -108,6 +108,22 @@ class SearchController extends Controller
 		else
 		{
 			$this->redirectToRoute("404");
+		}
+	}
+
+	protected function guessUser()
+	{
+		if($this->user_lib)
+		{
+			return $this->user_lib->login;
+		}
+		elseif($this->user)
+		{
+			return $this->user->login;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

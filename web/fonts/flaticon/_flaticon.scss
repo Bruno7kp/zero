@@ -1,6 +1,6 @@
     /*
     Flaticon icon font: Flaticon
-    Creation date: 09/08/2016 21:33
+    Creation date: 11/08/2016 19:43
     */
 
     @font-face {
@@ -36,36 +36,40 @@
   font-smoothing: antialiased;
     }
 
-    .flaticon-book:before { content: "\f100"; }
-.flaticon-favorite:before { content: "\f101"; }
-.flaticon-favorite-1:before { content: "\f102"; }
-.flaticon-folder:before { content: "\f103"; }
-.flaticon-grammy:before { content: "\f104"; }
-.flaticon-man:before { content: "\f105"; }
-.flaticon-multimedia:before { content: "\f106"; }
-.flaticon-music:before { content: "\f107"; }
-.flaticon-music-1:before { content: "\f108"; }
-.flaticon-music-2:before { content: "\f109"; }
-.flaticon-music-folder:before { content: "\f10a"; }
-.flaticon-social:before { content: "\f10b"; }
-.flaticon-technology:before { content: "\f10c"; }
-.flaticon-trophy:before { content: "\f10d"; }
-.flaticon-trophy-1:before { content: "\f10e"; }
-.flaticon-user-with-music-note:before { content: "\f10f"; }
+    .flaticon-badge:before { content: "\f100"; }
+.flaticon-badge-2:before { content: "\f101"; }
+.flaticon-book:before { content: "\f102"; }
+.flaticon-favorite:before { content: "\f103"; }
+.flaticon-favorite-1:before { content: "\f104"; }
+.flaticon-folder:before { content: "\f105"; }
+.flaticon-grammy:before { content: "\f106"; }
+.flaticon-man:before { content: "\f107"; }
+.flaticon-multimedia:before { content: "\f108"; }
+.flaticon-music:before { content: "\f109"; }
+.flaticon-music-1:before { content: "\f10a"; }
+.flaticon-music-2:before { content: "\f10b"; }
+.flaticon-music-folder:before { content: "\f10c"; }
+.flaticon-radio:before { content: "\f10d"; }
+.flaticon-social:before { content: "\f10e"; }
+.flaticon-trophy:before { content: "\f10f"; }
+.flaticon-trophy-1:before { content: "\f110"; }
+.flaticon-user-with-music-note:before { content: "\f111"; }
     
-    $font-Flaticon-book: "\f100";
-    $font-Flaticon-favorite: "\f101";
-    $font-Flaticon-favorite-1: "\f102";
-    $font-Flaticon-folder: "\f103";
-    $font-Flaticon-grammy: "\f104";
-    $font-Flaticon-man: "\f105";
-    $font-Flaticon-multimedia: "\f106";
-    $font-Flaticon-music: "\f107";
-    $font-Flaticon-music-1: "\f108";
-    $font-Flaticon-music-2: "\f109";
-    $font-Flaticon-music-folder: "\f10a";
-    $font-Flaticon-social: "\f10b";
-    $font-Flaticon-technology: "\f10c";
-    $font-Flaticon-trophy: "\f10d";
-    $font-Flaticon-trophy-1: "\f10e";
-    $font-Flaticon-user-with-music-note: "\f10f";
+    $font-Flaticon-badge: "\f100";
+    $font-Flaticon-badge-2: "\f101";
+    $font-Flaticon-book: "\f102";
+    $font-Flaticon-favorite: "\f103";
+    $font-Flaticon-favorite-1: "\f104";
+    $font-Flaticon-folder: "\f105";
+    $font-Flaticon-grammy: "\f106";
+    $font-Flaticon-man: "\f107";
+    $font-Flaticon-multimedia: "\f108";
+    $font-Flaticon-music: "\f109";
+    $font-Flaticon-music-1: "\f10a";
+    $font-Flaticon-music-2: "\f10b";
+    $font-Flaticon-music-folder: "\f10c";
+    $font-Flaticon-radio: "\f10d";
+    $font-Flaticon-social: "\f10e";
+    $font-Flaticon-trophy: "\f10f";
+    $font-Flaticon-trophy-1: "\f110";
+    $font-Flaticon-user-with-music-note: "\f111";

@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -32,13 +33,45 @@ use B7KP\Library\Lang;
 							echo "<div class\"row\">";
 							foreach ($this->search as $key => $value) {
 						?>
-							<div class="col-md-3 col-sm-6 col-xs-12">
+							<div class="col-md-4 col-sm-6 col-xs-12 bottomspace-lg">
 								<div class="row">
 									<div class="col-xs-3">
-										<img src="<?php echo $value["image"];?>" class="img-responsive">
+										<img src="<?php echo $value["image"];?>" class="img-responsive img-circle">
 									</div>
 									<div class="col-xs-9">
-										<?php echo $value["name"];?>	
+										<?php
+											switch ($this->type) {
+											 	case 'artist':
+											 		$vars = array("name" => Functions::fixLFM($value["name"]), "login" => $this->guessUser());
+													echo "<a href=".Route::url("lib_art", $vars).">".$value["name"]."</a>";
+											 		break;
+
+											 	case 'album':
+													$vars = array("name" => Functions::fixLFM($value["name"]), "artist" => Functions::fixLFM($value["artist"]), "login" => $this->guessUser());
+													echo "<a href=".Route::url("lib_alb", $vars).">".$value["name"]."</a>";
+											 		break;
+											 	
+											 	default:
+													$vars = array("name" => Functions::fixLFM($value["name"]), "artist" => Functions::fixLFM($value["artist"]), "login" => $this->guessUser());
+													echo "<a href=".Route::url("lib_mus", $vars).">".$value["name"]."</a>";
+											 		break;
+											 } 
+										?>
+										<br>
+										<?php 
+										if($value["logged_lib"])
+										{
+										?>
+										<span class="tipup" title="<?php echo Lang::get('in_your_lib');?>"><i class="text-main flaticon-badge-2"></i></span>
+										<?php
+										}
+										if($value["this_lib"])
+										{
+										?>
+										<span class="tipup" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></span>
+										<?php
+										}
+										?>
 									</div>
 								</div>
 							</div>

@@ -183,6 +183,8 @@ class LibraryController extends Controller
 		$fixed = urldecode($artist);
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
+		$fixed = str_replace("%2f", "/", $fixed);
+		$fixed = str_replace("%5c", "\\", $fixed);
 		$music = $chart->getMusicByArtist($fixed, $settings->mus_limit);
 		$lfm 	= new LastFm();
 		$lfm 	= $lfm->setUser($user->login);
@@ -230,6 +232,8 @@ class LibraryController extends Controller
 		$fixed = urldecode($artist);
 		$fixed = str_replace("+", " ", $fixed);
 		$fixed = str_replace("%2b", "+", $fixed);
+		$fixed = str_replace("%2f", "/", $fixed);
+		$fixed = str_replace("%5c", "\\", $fixed);
 		$album = $chart->getAlbumByArtist($fixed, $settings->alb_limit);
 		$lfm 	= new LastFm();
 		$lfm 	= $lfm->setUser($user->login);

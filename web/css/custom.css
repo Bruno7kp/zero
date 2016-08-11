@@ -2,6 +2,11 @@
     color: rgb(21, 126, 251);
 }
 
+[class^="flaticon-"]:before, [class*=" flaticon-"]:before,
+[class^="flaticon-"]:after, [class*=" flaticon-"]:after {   
+margin-left: 0px !important;
+}
+
 body{
 	overflow-x: hidden;
 	background-color: white;
@@ -384,4 +389,12 @@ a.white {
 .nav-center > li{
 	float: none;
     display: inline-block;
+}
+
+.text-main{
+	color: rgb(21, 126, 251);
+}
+
+.text-sec{
+	color: rgb(251, 97, 21);
 }

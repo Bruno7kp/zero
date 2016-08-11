@@ -14,6 +14,14 @@ function initialize()
 	urlSelector();
 	btnCertShow();
 	resetAcc();
+	tipUp();
+}
+
+function tipUp()
+{
+	$('.tipup').tooltipster({
+	    theme: 'tooltipster-blue'
+    });
 }
 
 function resetAcc()

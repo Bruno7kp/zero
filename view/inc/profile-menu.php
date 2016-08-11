@@ -49,6 +49,7 @@ switch ($curroute) {
 		$t_value = "album";
 	case 'search':
 		$a_libr = "active";
+		$user = $this->user_lib;
 		switch ($this->type) {
 			case 'artist':
 				$a_arti = "active";
