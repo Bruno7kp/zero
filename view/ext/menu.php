@@ -24,7 +24,7 @@ use B7KP\Entity\User;
 					<a href="<?php echo Route::url('about')?>">FAQ</a>
 				</li>
 				<li>
-					<a href="<?php echo Route::url('forum')?>">FORUM <!-- <span class="label label-info">&nbsp;new&nbsp;</span> --></a>
+					<a href="<?php echo Route::url('forum')?>">Forum <!-- <span class="label label-info">&nbsp;new&nbsp;</span> --></a>
 				</li>
 				<?php 
 				$user = UserSession::getUser($this->factory);
@@ -32,7 +32,7 @@ use B7KP\Entity\User;
 				{
 				?>
 				<li <?php if(Route::isCurRoute('chart_list')): echo 'class="active"';endif;?>>
-					<a href="<?php echo Route::url('chart_list', array("login" => $user->login))?>">Charts</a>
+					<a href="<?php echo Route::url('chart_list', array("login" => $user->login));?>">Charts</a>
 				</li>
 				<?php
 				}
@@ -46,6 +46,9 @@ use B7KP\Entity\User;
 					<a href="#" class="fh5co-sub-ddown"><?php echo $user->login;?> <?php $notify->outputNumber();?></a>
 					<ul class="fh5co-sub-menu">
 					 	<li><a href="<?php echo Route::url('userprofile');?>"><?php echo Lang::get('prof');?></a></li>
+						<li>
+							<a href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>"><?php echo Lang::get('library');?></a>
+						</li>
 					 	<li><a href="<?php echo Route::url('settings');?>"><?php echo Lang::get('sett');?></a></li>
 					 	<?php $notify->outputLine();?>
 						<li><a href="<?php echo Route::url('logout');?>"><?php echo Lang::get('logout');?></a></li>

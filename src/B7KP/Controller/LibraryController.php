@@ -37,8 +37,15 @@ class LibraryController extends Controller
 		$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
 
 		$lfm 	= new LastFm();
-		$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
-		$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
+		$lfm->setUser($user->login)->setStartDate($startday);
+		if($user->lfm_register){
+			$lastdate = $user->lfm_register;
+			$date = new \DateTime($lastdate);
+			$date = $date->format("Y.m.d");
+		}else{
+			$last 	= $lfm->getUserInfo();
+			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
+		}
 		$wksfm 	= $lfm->getWeeklyChartList();
 		$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));
 		$outofdateweeks = $wksfm - count($weeks);

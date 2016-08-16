@@ -47,9 +47,10 @@ switch ($curroute) {
 		$a_albu = "active";
 		$a_libr = "active";
 		$t_value = "album";
+		break;
 	case 'search':
 		$a_libr = "active";
-		$user = $this->user_lib;
+		$user = $this->user_lib ? $this->user_lib : $this->user;
 		switch ($this->type) {
 			case 'artist':
 				$a_arti = "active";
@@ -106,16 +107,16 @@ if(strpos($curroute, "_list") > 0 && strpos($curroute, "lib") !== false || $curr
 			<span class="hidden-xs"><?php echo Lang::get('art_x');?></span>
 		</a>
   	</li>
-  	<li role="presentation" class="<?php echo $a_musi;?>">
-		<a class="nav-link" href="<?php echo Route::url('lib_mus_list', array('login' => $user->login));?>">
-			<i class="ti-music"></i>
-			<span class="hidden-xs"><?php echo Lang::get('mus_x');?></span>
-		</a>
-  	</li>
   	<li role="presentation" class="<?php echo $a_albu;?>">
 		<a class="nav-link" href="<?php echo Route::url('lib_alb_list', array('login' => $user->login));?>">
 			<i class="icon-vynil except"></i>
 			<span class="hidden-xs"><?php echo Lang::get('alb_x');?></span>
+		</a>
+  	</li>
+  	<li role="presentation" class="<?php echo $a_musi;?>">
+		<a class="nav-link" href="<?php echo Route::url('lib_mus_list', array('login' => $user->login));?>">
+			<i class="ti-music"></i>
+			<span class="hidden-xs"><?php echo Lang::get('mus_x');?></span>
 		</a>
   	</li>
 </ul>

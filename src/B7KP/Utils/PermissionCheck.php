@@ -2,6 +2,9 @@
 namespace B7KP\Utils;
 
 use B7KP\Interfaces\iPermission;
+use B7KP\Entity\User;
+use B7KP\Utils\Friends;
+use B7KP\Model\Model;
 
 class PermissionCheck
 {
@@ -54,6 +57,28 @@ class PermissionCheck
 		$actions["ACCESS"] 	= 1;
 
 		return $actions;
+	}
+
+	public function viewPermission(User $user, Model $factory, $permission)
+	{
+		$user_session = UserSession::getUser($factory);
+		$friend = new Friends($factory);
+		switch ($permission) {
+			case 1:
+				# friend
+				return $friend->isFriend($user);
+				break;
+
+			case 2:
+				# private
+				return $user->id == $user_session->id;
+				break;
+			
+			default:
+				# public
+				return true;
+				break;
+		}
 	}
 }
 ?>

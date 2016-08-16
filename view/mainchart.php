@@ -31,8 +31,8 @@ use B7KP\Library\Lang;
 							<div id="fh5co-tab-feature" class="fh5co-tab" style="display: block; width: 100%; margin: 0px;">
 								<ul class="resp-tabs-list hor_1 hidden-xs">
 									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab" style=""><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab" style=""><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></li>
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab" style=""><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></span></li>
+									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab" style=""><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></li>
+									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab" style=""><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></span></li>
 								</ul>
 								<div class="resp-tabs-container hor_1 divider-lr divider-bottom">
 									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-0" style="">
@@ -90,64 +90,6 @@ use B7KP\Library\Lang;
 										</div>
 									</div>
 									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-1">
-										<div class="row">
-											<div class="col-md-12 text-center">
-												<h2 class="h3">Top <?php echo Lang::get('mus_x');?></h2>
-											</div>
-											<div class="col-md-12 top-musics">
-												<?php 
-												if(is_array($weeks) && count($weeks) > 0)
-												{
-													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
-													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
-													foreach ($weeks as $value) {
-														$weeklink = $wkli.$value["week"];
-														$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
-														$mlink = $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music);
-												?>
-													<div class="row divider-tb bottomspace-sm">
-														<div class="col-md-4 text-center">
-															<h4 class="h3 no-margin"><?php echo $value["week"]?></h4>
-															<small class="min-bold"><?php echo $value["from"];?></small>
-															<small class="min-min"><?php echo Lang::get("to");?></small>
-															<small class="min-bold"><?php echo $value["to"];?></small>
-														</div>
-														<div class="col-md-6 text-center">
-															<?php 
-
-															if(is_array($value["music"]) && count($value["music"]) > 0)
-															{
-																$music = $value["music"][0];
-															?>
-															<h4 class="no-margin"><?php echo "<a href=".$mlink.">".$music->music."</a>";?></h4>
-															<span class="text-muted"><?php echo Lang::get('by');?></span>
-															<?php echo "<a href=".$actlink.">".$music->artist."</a>";?>
-															<?php
-															}
-															else
-															{
-																echo Lang::get('no_data');
-															}
-															?>
-														</div>
-														<div class="col-md-2 topspace-md bottomspace-sm text-center">
-															<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
-														</div>
-													</div>
-												<?php
-													}
-												?>
-												<?php
-												}
-												else
-												{
-													echo Lang::get('no_data');
-												}
-												?>
-											</div>
-										</div>
-									</div>
-									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-2">
 										<div class="row">
 											<div class="col-md-12 text-center">
 												<h2 class="h3">Top <?php echo Lang::get('alb_x');?></h2>
@@ -209,6 +151,65 @@ use B7KP\Library\Lang;
 											</div>
 										</div>
 									</div>
+									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-2">
+										<div class="row">
+											<div class="col-md-12 text-center">
+												<h2 class="h3">Top <?php echo Lang::get('mus_x');?></h2>
+											</div>
+											<div class="col-md-12 top-musics">
+												<?php 
+												if(is_array($weeks) && count($weeks) > 0)
+												{
+													$wkli = Url::getBaseUrl()."/user/".$user->login."/charts/music/week/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
+													foreach ($weeks as $value) {
+														$weeklink = $wkli.$value["week"];
+														$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
+														$mlink = $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music);
+												?>
+													<div class="row divider-tb bottomspace-sm">
+														<div class="col-md-4 text-center">
+															<h4 class="h3 no-margin"><?php echo $value["week"]?></h4>
+															<small class="min-bold"><?php echo $value["from"];?></small>
+															<small class="min-min"><?php echo Lang::get("to");?></small>
+															<small class="min-bold"><?php echo $value["to"];?></small>
+														</div>
+														<div class="col-md-6 text-center">
+															<?php 
+
+															if(is_array($value["music"]) && count($value["music"]) > 0)
+															{
+																$music = $value["music"][0];
+															?>
+															<h4 class="no-margin"><?php echo "<a href=".$mlink.">".$music->music."</a>";?></h4>
+															<span class="text-muted"><?php echo Lang::get('by');?></span>
+															<?php echo "<a href=".$actlink.">".$music->artist."</a>";?>
+															<?php
+															}
+															else
+															{
+																echo Lang::get('no_data');
+															}
+															?>
+														</div>
+														<div class="col-md-2 topspace-md bottomspace-sm text-center">
+															<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
+														</div>
+													</div>
+												<?php
+													}
+												?>
+												<?php
+												}
+												else
+												{
+													echo Lang::get('no_data');
+												}
+												?>
+											</div>
+										</div>
+									</div>
+									
 								</div>
 							</div>	
 							<div class="row text-center bottomspace-sm">

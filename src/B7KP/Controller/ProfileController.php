@@ -4,6 +4,7 @@ namespace B7KP\Controller;
 use B7KP\Model\Model;
 use B7KP\Utils\UserSession;
 use B7KP\Utils\Snippets;
+use B7KP\Utils\Friends;
 use B7KP\Entity\User;
 use B7KP\Library\Lang;
 use B7KP\Library\Route;
@@ -56,6 +57,34 @@ class ProfileController extends Controller
 				$bgimage = $acts[0]["images"]["mega"];
 				$topartist = $acts[0];
 			endif;
+
+			$user_session = UserSession::getUser($this->factory);
+			$add_friend = "";
+			# Se está logado, e na página de outro usuário
+			if($user_session && $user->id != $user_session->id)
+			{
+				$friend = new Friends($this->factory);
+				$add_friend = "<a id='add_friend' data-id='".$user->id."' class='no-decoration text-success tipup' title='".Lang::get("add_friend")."' href='#!'><i class='fa fa-plus-circle'></i></a>";
+				# Se já é amigo, pode remover
+				if($friend->isFriend($user))
+				{
+					$add_friend = "<a id='remove_friend' data-id='".$user->id."' class='no-decoration text-info tipup' title='".Lang::get("remove_friend")."' href='#!'><i class='fa fa-check-circle'></i></a>";
+				}
+				else
+				{
+					# Se ainda não é, verifica se o pedido já foi feito
+					$resp = $friend->hasRequest($user);
+					if($resp["response"])
+					{
+						# Se o usuário já pediu
+						if($resp["button"] == "wait")
+						{
+							$add_friend = "<a class='no-decoration text-muted tipup' title='".Lang::get("wait_friend")."' href='#!'><i class='fa fa-clock-o'></i></a>";
+						}
+					}
+					# Se ainda não pediu, ou o outro usuário já pediu, mostra o botão para adicionar
+				}
+			}
 			$var = array
 					(
 						"user" 			=> $user, 
@@ -68,7 +97,8 @@ class ProfileController extends Controller
 						"weeks" 		=> $weeks,
 						"weekstodate"	=> $wksfm,
 						"topartist"		=> $topartist,
-						"average"		=> round($average)
+						"average"		=> round($average),
+						"add_friend"	=> $add_friend
 					);
 			$this->render("profile.php", $var);
 		}

@@ -5,6 +5,7 @@ use B7KP\Utils\Certified;
 use B7KP\Utils\Constants as C;
 use B7KP\Utils\Functions as F;
 use B7KP\Utils\Snippets as S;
+use B7KP\Utils\UserSession;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -46,6 +47,15 @@ use B7KP\Library\Lang;
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
 							<h2><?php echo $name;?></h2>
+							<?php 
+							$session = UserSession::getUser($this->factory);
+							if($session && $session->id != $user->id)
+							{
+							?>
+							<a href="<?php echo Route::url('lib_art', array("login" => $session->login, "name" => F::fixLFM($name)));?>"><?php echo Lang::get("view_in_your");?></a>
+							<?php
+							}
+							?>
 							<div class="row">
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 									<small class="text-muted"><?php echo Lang::get('play_x');?></small>

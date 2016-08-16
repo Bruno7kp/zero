@@ -398,3 +398,8 @@ a.white {
 .text-sec{
 	color: rgb(251, 97, 21);
 }
+
+.no-decoration, .no-decoration:hover, .no-decoration:focus, .no-decoration:active{
+    text-decoration: none !important;
+    border-bottom: 0px !important;
+}

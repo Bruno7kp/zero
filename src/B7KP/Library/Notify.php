@@ -8,6 +8,7 @@ use B7KP\Entity\Settings;
 use B7KP\Utils\UserSession;
 use B7KP\Library\Lang;
 use B7KP\Library\Route;
+use B7KP\Utils\Friends;
 use LastFmApi\Main\LastFm;
 
 class Notify
@@ -36,6 +37,7 @@ class Notify
 		{
 			$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
 			$this->getWeeksToUpdate();
+			$this->getFriendRequests();
 		}
 	}
 
@@ -218,6 +220,26 @@ class Notify
 		{
 			$array[0] = array("text" => Lang::sub(Lang::get("noty_you_weeks_to_update"), array($toupdate))." <br/><a href=\"".Route::url("update")."\">".Lang::get('update')." ".Lang::get('now')."?</a>", "icon" => "fa fa-calendar-times-o fa-fw fa-2x text-center text-primary");
 			$this->setNotification("noty_weeks_to_update", $array);
+		}
+	}
+
+	private function getFriendRequests()
+	{
+		$friend = new Friends($this->factory);
+		$request = $friend->getRequests();
+		if($request && count($request) > 0)
+		{
+			$array = array();
+			foreach ($request as $key => $value) 
+			{
+				$user_find = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_one);
+				if($user_find)
+				{
+					$noty = "<a target='_blank' href=".Route::url("profile", array("login" => $user_find->login)).">".$user_find->login."</a>";
+					$array[] = array("text" => Lang::sub(Lang::get("noty_add_friend"), array($noty)), "icon" => "fa fa-user-plus fa-fw fa-2x text-center text-primary");
+				}
+			}
+			$this->setNotification("noty_friends_requests", $array);
 		}
 	}
 }

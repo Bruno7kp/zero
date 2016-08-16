@@ -53,8 +53,9 @@ class SystemViewerController extends Controller
 		// foreach ($tables as $key => $value) {
 		// 	echo $value->date." - ".$value->t."<br/>";
 		// }
-		$affected = $dao->run("ALTER TABLE settings ADD theme INT NOT NULL");
-		$affected = $dao->run("ALTER TABLE `user` ADD `lfm_register` DATE NULL AFTER `password`");
+		//$affected = $dao->run("ALTER TABLE settings ADD theme INT NOT NULL");
+		//$affected = $dao->run("ALTER TABLE `user` ADD `lfm_register` DATE NULL AFTER `password`");
+		$dao->run("CREATE TABLE `friend` ( `id` INT NOT NULL AUTO_INCREMENT , `iduser_one` INT NOT NULL , `iduser_two` INT NOT NULL , `accepted` INT NOT NULL , PRIMARY KEY (`id`))");
 
 		//$affected = $dao->run("UPDATE week SET week = 198 WHERE iduser = 124 AND week = 1 AND to_day > '2015-01-01'");
 		//$affected = $this->factory->removeBy("\B7KP\Entity\Settings", "iduser", 1227);

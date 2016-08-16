@@ -900,6 +900,12 @@ class Lang
 		$messages["noty_you_weeks_to_update"][self::PT_BR] = "Você tem {0} semana(s) desatualizada(s).";
 		$messages["noty_you_weeks_to_update"][self::EN_US] = "You have {0} semanas(s) out of date.";
 
+		$messages["noty_friends_requests"][self::PT_BR] = "Pedido de amizade";
+		$messages["noty_friends_requests"][self::EN_US] = "Friend request";
+
+		$messages["noty_add_friend"][self::PT_BR] = "{0} deseja ser seu amigo.";
+		$messages["noty_add_friend"][self::EN_US] = "{0} want to be your friend.";
+
 
 		return $messages;
 	}
@@ -908,7 +914,7 @@ class Lang
 	{
 		$array = (array) $array;
 		foreach ($array as $key => $value) {
-			if(strpos($text, "{".$key."}"))
+			if(strpos($text, "{".$key."}") !== false)
 			{
 				$text = str_replace("{".$key."}", $value, $text);
 			}

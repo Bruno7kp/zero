@@ -28,7 +28,7 @@ class SearchController extends Controller
 		$this->type = $type;
 		$this->user_lib = $this->isValidUser($login);
 		$this->isValidSearch();
-		$this->render("search.php", array("lfm_image" => $this->getUserBg($this->user_lib, true)));
+		$this->render("search.php", array("lfm_image" => $this->getUserBg($this->guessUser(), true)));
 	}
 
 	private function isValidSearch()
@@ -99,7 +99,7 @@ class SearchController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			if($user->id == $this->user->id)
+			if($this->user instanceof User && $user->id == $this->user->id)
 			{
 				$user = false;
 			}
@@ -130,7 +130,7 @@ class SearchController extends Controller
 	protected function getUserBg($user, $avatar = false)
 	{
 		$lfm 	= new LastFm();
-		$last 	= $lfm->setUser($user->login)->getUserInfo();
+		$last 	= $lfm->setUser($user)->getUserInfo();
 		if($avatar)
 		{
 			$bgimage = str_replace("34s", "avatar170s", $last["image"]);

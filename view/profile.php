@@ -9,11 +9,11 @@ use B7KP\Library\Lang;
 <?php
 	$head = array("title" => "{$user->login}");
 	$this->render("ext/head.php", $head);
+
+	
 	$blockalt = "<h3>
-					<a class='white' href=''>".$user->login."</a> 
-					<a href='http://last.fm/user/{$user->login}' class='white-hover' title='View Last.fm profile' target='_blank'>
-						<i class='fa fa-lastfm'></i>
-					</a>
+					<a class='white tipup' title='View Last.fm profile' href='http://last.fm/user/{$user->login}' target='_blank'>".$user->login."</a>
+				".$add_friend."
 				</h3>
 				";
 	$blocktitle = "<img class='img-circle' src='".$lfm_image."'>";

@@ -30,10 +30,12 @@ use B7KP\Library\Lang;
 						<?php 
 						if($this->search)
 						{
-							echo "<div class\"row\">";
-							foreach ($this->search as $key => $value) {
+							echo "<div class=\"row\">";
+							echo "<div class=\"grid\">";
+							foreach ($this->search as $key => $value) 
+							{
 						?>
-							<div class="col-md-4 col-sm-6 col-xs-12 bottomspace-lg">
+							<div class="col-md-4 col-sm-6 col-xs-12 bottomspace-lg grid-item <?php if(!isset($this->search[$key-1])){ echo 'grid-sizer';} ?>">
 								<div class="row">
 									<div class="col-xs-3">
 										<img src="<?php echo $value["image"];?>" class="img-responsive img-circle">
@@ -42,18 +44,25 @@ use B7KP\Library\Lang;
 										<?php
 											switch ($this->type) {
 											 	case 'artist':
+												 	$route = "lib_art";
 											 		$vars = array("name" => Functions::fixLFM($value["name"]), "login" => $this->guessUser());
-													echo "<a href=".Route::url("lib_art", $vars).">".$value["name"]."</a>";
+													echo "<a href=".Route::url($route, $vars).">".$value["name"]."</a>";
 											 		break;
 
 											 	case 'album':
+												 	$route = "lib_alb";
 													$vars = array("name" => Functions::fixLFM($value["name"]), "artist" => Functions::fixLFM($value["artist"]), "login" => $this->guessUser());
-													echo "<a href=".Route::url("lib_alb", $vars).">".$value["name"]."</a>";
+													echo "<a href=".Route::url($route, $vars).">".$value["name"]."</a>";
+													$varsact = array("name" => Functions::fixLFM($value["artist"]), "login" => $this->guessUser());
+													echo "<br><small><a href=".Route::url("lib_art", $varsact).">".$value["artist"]."</a></small>";
 											 		break;
 											 	
 											 	default:
+												 	$route = "lib_mus";
 													$vars = array("name" => Functions::fixLFM($value["name"]), "artist" => Functions::fixLFM($value["artist"]), "login" => $this->guessUser());
-													echo "<a href=".Route::url("lib_mus", $vars).">".$value["name"]."</a>";
+													echo "<a href=".Route::url($route, $vars).">".$value["name"]."</a>";
+													$varsact = array("name" => Functions::fixLFM($value["artist"]), "login" => $this->guessUser());
+													echo "<br><small><a href=".Route::url("lib_art", $varsact).">".$value["artist"]."</a></small>";
 											 		break;
 											 } 
 										?>
@@ -61,14 +70,17 @@ use B7KP\Library\Lang;
 										<?php 
 										if($value["logged_lib"])
 										{
+											$showloglegend = true;
+											$vars["login"] = $this->user->login;
 										?>
-										<span class="tipup" title="<?php echo Lang::get('in_your_lib');?>"><i class="text-main flaticon-badge-2"></i></span>
+										<a href="<?php echo Route::url($route, $vars);?>" class="tipup no-decoration" title="<?php echo Lang::get('in_your_lib');?>"><i class="text-main flaticon-badge-2"></i></a>
 										<?php
 										}
 										if($value["this_lib"])
 										{
+											$showliblegend = true;
 										?>
-										<span class="tipup" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></span>
+										<a href="<?php echo Route::url($route, $vars);?>" class="tipup no-decoration" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></a>
 										<?php
 										}
 										?>
@@ -78,6 +90,29 @@ use B7KP\Library\Lang;
 						<?php
 							}
 							echo "</div>";
+							echo "</div>";
+						?>
+							<div class="row">
+								<div class="col-xs-12">
+									<?php 
+									if(isset($showloglegend))
+									{
+									?>
+										<a href="#!" class="tipup no-decoration" title="<?php echo Lang::get('in_your_lib');?>"><i class="text-main flaticon-badge-2"></i></a> = <?php echo Lang::get('in_your_lib_long');?> &nbsp;
+									<?php
+									}
+									?>
+									<?php 
+									if(isset($showliblegend))
+									{
+									?>
+										<a href="#!" class="tipup no-decoration" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></a> = <?php echo Lang::get('in_this_lib_long');?>
+									<?php
+									}
+									?>
+								</div>
+							</div>
+						<?php
 						}
 						else
 						{
