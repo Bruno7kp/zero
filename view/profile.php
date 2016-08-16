@@ -13,7 +13,7 @@ use B7KP\Library\Lang;
 	
 	$blockalt = "<h3>
 					<a class='white tipup' title='View Last.fm profile' href='http://last.fm/user/{$user->login}' target='_blank'>".$user->login."</a>
-				".$add_friend."
+					<span class='friend'>".$add_friend."</span>
 				</h3>
 				";
 	$blocktitle = "<img class='img-circle' src='".$lfm_image."'>";
@@ -31,6 +31,9 @@ use B7KP\Library\Lang;
 							?>
 						</div>
 					</div>
+					<?php 
+					if($visibility){
+					?>
 					<div class="row">
 						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 							<small class="text-muted"><?php echo Lang::get('reg_alt');?></small>
@@ -145,6 +148,21 @@ use B7KP\Library\Lang;
 						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>	
 					</div>
+					<?php
+					}
+					else
+					{
+					?>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="alert alert-warning">
+								<?php echo Lang::get("not_visible");?>
+							</div>
+						</div>
+					</div>
+					<?php
+					}
+					?>
 				</div>
 			</section>
 			<?php $this->render("ext/footer.php");?>

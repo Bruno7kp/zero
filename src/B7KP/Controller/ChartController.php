@@ -28,6 +28,13 @@ class ChartController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+			$perm = new \B7KP\Utils\PermissionCheck("User");
+			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
+			if(!$visibility)
+			{
+				$this->redirectToRoute("profile", array("login" => $user->login));
+			}
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($user->login)->getUserInfo();
 			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
@@ -37,7 +44,6 @@ class ChartController extends Controller
 			endif;
 			$numberones = array();
 			$cond = array("iduser" => $user->id);
-			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC", "0, 5");
 			$i = 0;
 			foreach ($weeks as $week) 
@@ -78,6 +84,13 @@ class ChartController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
+			$perm = new \B7KP\Utils\PermissionCheck("User");
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
+			if(!$visibility)
+			{
+				$this->redirectToRoute("profile", array("login" => $user->login));
+			}
 			$bgimage = $this->getUserBg($user);
 			$numberones = array();
 			$cond = array("iduser" => $user->id);
@@ -572,7 +585,17 @@ class ChartController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			return $user;
+			$perm = new \B7KP\Utils\PermissionCheck("User");
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
+			if($visibility)
+			{
+				return $user;
+			}
+			else
+			{
+				$this->redirectToRoute("profile", array("login" => $user->login));
+			}
 		}
 		else
 		{

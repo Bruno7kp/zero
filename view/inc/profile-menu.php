@@ -48,6 +48,9 @@ switch ($curroute) {
 		$a_libr = "active";
 		$t_value = "album";
 		break;
+	case 'friends_list':
+		$a_frie = "active";
+		break;
 	case 'search':
 		$a_libr = "active";
 		$user = $this->user_lib ? $this->user_lib : $this->user;
@@ -90,7 +93,7 @@ switch ($curroute) {
 		</a>
   	</li>
   	<li role="presentation" class="<?php echo $a_frie;?>">
-		<a class="nav-link" href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>">
+		<a class="nav-link" href="<?php echo Route::url('friends_list', array('login' => $user->login));?>">
 			<i class="flaticon-social"></i>
 			<span class="hidden-xs"><?php echo Lang::get('friends');?></span>
 		</a>

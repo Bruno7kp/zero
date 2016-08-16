@@ -26,18 +26,35 @@ class Friends
 			$r = $this->hasRequest($user);
 			if($r["response"])
 			{
-				$this->acceptFriend($r["id"]);
+				if($r["to"] == $this->user_session->id)
+				{
+					if($this->acceptFriend($r["id"]))
+					{
+						return 2;
+					}
+				}
+			}
+			else
+			{
+				$data = new \stdClass();
+				$data->iduser_one = $this->user_session->id;
+				$data->iduser_two = $user->id;
+				$data->accepted = 0;
+				if($this->factory->add("B7KP\Entity\Friend", $data))
+				{
+					return 1;
+				}
 			}
 		}
-		return false;
+		return 0;
 	}
 
 	public function removeFriend(User $user)
 	{
 		if($this->user_session)
 		{
-			$vars_one = array("iduser_one" => $this->user_session->id, "iduser_two" => $user->id, "accepted" => 1);
-			$vars_two = array("iduser_two" => $this->user_session->id, "iduser_one" => $user->id, "accepted" => 1);
+			$vars_one = array("iduser_one" => $this->user_session->id, "iduser_two" => $user->id);
+			$vars_two = array("iduser_two" => $this->user_session->id, "iduser_one" => $user->id);
 			$by_one = $this->factory->find("B7KP\Entity\Friend", $vars_one);
 			$by_two = $this->factory->find("B7KP\Entity\Friend", $vars_two);
 			if(isset($by_one[0]))
@@ -119,11 +136,11 @@ class Friends
 			$by_two = $this->factory->find("B7KP\Entity\Friend", $vars_two);
 			if(isset($by_one[0]))
 			{
-				return array("response" => true, "id" => $by_one[0]->id, "button" => "wait");
+				return array("response" => true, "id" => $by_one[0]->id, "button" => "wait", "by" => $this->user_session->id, "to" => $user->id);
 			}
 			if(isset($by_two[0]))
 			{
-				return array("response" => true, "id" => $by_two[0]->id, "button" => "accept");
+				return array("response" => true, "id" => $by_two[0]->id, "button" => "accept", "to" => $this->user_session->id, "by" => $user->id);
 			}
 		}
 		return array("response" => false);

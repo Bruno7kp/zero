@@ -9,6 +9,7 @@ use B7KP\Utils\UserSession;
 use B7KP\Library\Lang;
 use B7KP\Library\Route;
 use B7KP\Utils\Friends;
+use B7KP\Utils\Snippets;
 use LastFmApi\Main\LastFm;
 
 class Notify
@@ -236,7 +237,7 @@ class Notify
 				if($user_find)
 				{
 					$noty = "<a target='_blank' href=".Route::url("profile", array("login" => $user_find->login)).">".$user_find->login."</a>";
-					$array[] = array("text" => Lang::sub(Lang::get("noty_add_friend"), array($noty)), "icon" => "fa fa-user-plus fa-fw fa-2x text-center text-primary");
+					$array[] = array("text" => Lang::sub(Lang::get("noty_add_friend"), array($noty))."<br/><span class='friend'>".Snippets::friendsButton("add", $value->iduser_one, Lang::get("noty_acc_friend"))." ".Lang::get("noty_add_ask")." | ".Snippets::friendsButton("cancel", $value->iduser_one, Lang::get("not_acc_friend"))." ".Lang::get("noty_reject")."</span>", "icon" => "fa fa-user-plus fa-fw fa-2x text-center text-primary");
 				}
 			}
 			$this->setNotification("noty_friends_requests", $array);

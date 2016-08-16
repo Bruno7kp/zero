@@ -375,5 +375,32 @@ class Snippets
 		$run = ob_get_clean();
 		return $run;
 	}
+
+	static function friendsButton($type, $id, $title)
+	{
+		switch ($type) {
+			case 'add':
+				$btn = "<a data-id='".$id."' class='no-decoration text-success tipup add_friend' title='".$title."' href='#!'><i class='fa fa-plus-circle'></i></a>";
+				break;
+
+			case 'remove':
+				$btn = "<a data-id='".$id."' class='no-decoration text-info tipup remove_friend' title='".$title."' href='#!'><i class='fa fa-check-circle'></i></a>";
+				break;
+
+			case 'wait':
+				$btn = "<a class='no-decoration text-muted tipup' title='".$title."' href='#!'><i class='fa fa-clock-o'></i></a>";
+				break;
+
+			case 'cancel':
+				$btn = "<a data-id='".$id."' class='no-decoration text-danger tipup remove_friend' title='".$title."' href='#!'><i class='fa fa-times-circle'></i></a>";
+				break;
+			
+			default:
+				$btn = "";
+				break;
+		}
+
+		return $btn;
+	}
 }
 ?>

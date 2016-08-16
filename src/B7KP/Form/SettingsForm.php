@@ -26,11 +26,13 @@ class SettingsForm extends Form
 		$tim = $options->get("\B7KP\Entity\Settings", "show_times");
 		$liv = $options->get("\B7KP\Entity\Settings", "hide_livechart");
 		$the = $options->get("\B7KP\Entity\Settings", "theme");
+		$vis = $options->get("\B7KP\Entity\Settings", "visibility");
 		$form = $this
 				->init(Route::url("change_settings"))
 				->add(self::TYPE_SELECT, "lang", "form-control", $lan,"language")
-				->add(self::TYPE_SELECT, "show_points", "form-control", $pts,"sett_points")
 				->add(self::TYPE_SELECT, "theme", "form-control", $the,"theme")
+				->add(self::TYPE_SELECT, "visibility", "form-control", $vis,"visibility")
+				->add(self::TYPE_SELECT, "show_points", "form-control", $pts,"sett_points")
 				->add(self::TYPE_SELECT, "hide_livechart", "form-control", $liv,"hide_livechart")
 				->add(self::COMMENT, "sett_limit", "form-group text-justify")
 				->add(self::TYPE_SELECT, "art_limit", "form-control", $art,"Top x ".Lang::get('art_x'))

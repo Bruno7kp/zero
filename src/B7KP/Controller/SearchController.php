@@ -99,11 +99,21 @@ class SearchController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			if($this->user instanceof User && $user->id == $this->user->id)
+			$perm = new \B7KP\Utils\PermissionCheck("User");
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
+			if($visibility)
 			{
-				$user = false;
+				if($this->user instanceof User && $user->id == $this->user->id)
+				{
+					$user = false;
+				}
+				return $user;
 			}
-			return $user;
+			else
+			{
+				$this->redirectToRoute("profile", array("login" => $user->login));
+			}
 		}
 		else
 		{

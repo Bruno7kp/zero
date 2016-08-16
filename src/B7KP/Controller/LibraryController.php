@@ -596,6 +596,35 @@ class LibraryController extends Controller
 		}
 	}
 
+
+	/**
+	* @Route(name=friends_list|route=/user/{login}/friends)
+	*/
+	public function friendsList($login)
+	{
+		$user = $this->isValidUser($login);
+		$perm = new \B7KP\Utils\PermissionCheck("User");
+		$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+		$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
+		if($visibility)
+		{
+			$friends = new \B7KP\Utils\Friends($this->factory);
+			$vars = array
+						(
+							"user" => $user,
+							"lfm_bg" 	=> $this->getUserBg($user),
+							"lfm_image" => $this->getUserBg($user, true),
+							"friends"=> $friends->getFriends($user)
+						);
+			$this->render("friends.php", $vars);
+		}
+		else
+		{
+			$this->redirectToRoute("profile", array("login" => $user->login));
+		}
+
+	}
+
 	protected function getBgImage($artist)
 	{
 		$img = null;
@@ -636,7 +665,17 @@ class LibraryController extends Controller
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
-			return $user;
+			$perm = new \B7KP\Utils\PermissionCheck("User");
+			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
+			if($visibility)
+			{
+				return $user;
+			}
+			else
+			{
+				$this->redirectToRoute("profile", array("login" => $user->login));
+			}
 		}
 		else
 		{

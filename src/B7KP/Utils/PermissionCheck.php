@@ -66,14 +66,9 @@ class PermissionCheck
 		switch ($permission) {
 			case 1:
 				# friend
-				return $friend->isFriend($user);
+				return $friend->isFriend($user) || $user_session && $user_session->id == $user->id;
 				break;
 
-			case 2:
-				# private
-				return $user->id == $user_session->id;
-				break;
-			
 			default:
 				# public
 				return true;

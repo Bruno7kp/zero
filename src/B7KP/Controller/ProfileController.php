@@ -64,11 +64,11 @@ class ProfileController extends Controller
 			if($user_session && $user->id != $user_session->id)
 			{
 				$friend = new Friends($this->factory);
-				$add_friend = "<a id='add_friend' data-id='".$user->id."' class='no-decoration text-success tipup' title='".Lang::get("add_friend")."' href='#!'><i class='fa fa-plus-circle'></i></a>";
+				$add_friend = Snippets::friendsButton("add", $user->id, Lang::get("add_friend"));
 				# Se já é amigo, pode remover
 				if($friend->isFriend($user))
 				{
-					$add_friend = "<a id='remove_friend' data-id='".$user->id."' class='no-decoration text-info tipup' title='".Lang::get("remove_friend")."' href='#!'><i class='fa fa-check-circle'></i></a>";
+					$add_friend = Snippets::friendsButton("remove", $user->id, Lang::get("remove_friend"));
 				}
 				else
 				{
@@ -79,12 +79,14 @@ class ProfileController extends Controller
 						# Se o usuário já pediu
 						if($resp["button"] == "wait")
 						{
-							$add_friend = "<a class='no-decoration text-muted tipup' title='".Lang::get("wait_friend")."' href='#!'><i class='fa fa-clock-o'></i></a>";
+							$add_friend = Snippets::friendsButton("wait", $user->id, Lang::get("wait_friend"));
 						}
 					}
 					# Se ainda não pediu, ou o outro usuário já pediu, mostra o botão para adicionar
 				}
 			}
+			$perm = new \B7KP\Utils\PermissionCheck("User");
+			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
 			$var = array
 					(
 						"user" 			=> $user, 
@@ -98,8 +100,13 @@ class ProfileController extends Controller
 						"weekstodate"	=> $wksfm,
 						"topartist"		=> $topartist,
 						"average"		=> round($average),
-						"add_friend"	=> $add_friend
+						"add_friend"	=> $add_friend,
+						"visibility"	=> $visibility
 					);
+			if($visibility === false)
+			{
+				unset($var["lfm_bg"]);
+			}
 			$this->render("profile.php", $var);
 		}
 		else

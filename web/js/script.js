@@ -15,10 +15,66 @@ function initialize()
 	btnCertShow();
 	resetAcc();
 	tipUp();
-	$('.grid').masonry({
-	  itemSelector: '.grid-item', // use a separate class for itemSelector, other than .col-
-	  columnWidth: '.grid-sizer',
-	  percentPosition: true
+	grid();
+	friendControl();
+}
+
+function friendControl()
+{
+	$(".add_friend").click(function(event) {
+		event.stopImmediatePropagation();
+		idfriend = $(this).attr('data-id');
+		this_btn = $(this);
+		this_div = $(this).parent();
+		$.ajax({
+			url: baseUrl + '/check/add_friend/' + idfriend,
+			dataType: 'json'
+		})
+		.done(function(data) {
+			showAlert(data.error, data.msg);
+			if(data.btn){
+				this_div.html(data.btn);
+				tipUp();
+				friendControl();
+			}
+			console.log("success");
+		})
+		.fail(function() {
+			console.log("error");
+			showAlert(1, getMsg("error"));
+		})
+		.always(function() {
+			console.log("complete");
+		});
+	});
+
+	$(".remove_friend").click(function(event) {
+		event.stopImmediatePropagation();
+		if(confirm(getMsg("sure"))){
+			idfriend = $(this).attr('data-id');
+			this_btn = $(this);
+			this_div = $(this).parent();
+			$.ajax({
+				url: baseUrl + '/check/remove_friend/' + idfriend,
+				dataType: 'json'
+			})
+			.done(function(data) {
+				showAlert(data.error, data.msg);
+				if(data.btn){
+					this_div.html(data.btn);
+					tipUp();
+					friendControl();
+				}
+				console.log("success");
+			})
+			.fail(function() {
+				console.log("error");
+				showAlert(1, getMsg("error"));
+			})
+			.always(function() {
+				console.log("complete");
+			});
+		}
 	});
 }
 
@@ -27,6 +83,15 @@ function tipUp()
 	$('.tipup').tooltipster({
 	    theme: 'tooltipster-blue'
     });
+}
+
+function grid()
+{
+	$('.grid').masonry({
+	  	itemSelector: '.grid-item', // use a separate class for itemSelector, other than .col-
+	  	columnWidth: '.grid-sizer',
+	  	percentPosition: true
+	});
 }
 
 function resetAcc()
