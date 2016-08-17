@@ -17,6 +17,7 @@ use B7KP\Library\Lang;
 				</h3>
 				";
 	$blocktitle = "<img class='img-circle' src='".$lfm_image."'>";
+	$lfm_bg = isset($lfm_bg) ? $lfm_bg : false;
 ?>
 	<body class="inner-page">
 		<?php $this->render("ext/menu.php");?>
@@ -32,7 +33,8 @@ use B7KP\Library\Lang;
 						</div>
 					</div>
 					<?php 
-					if($visibility){
+					if($visibility)
+					{
 					?>
 					<div class="row">
 						<div class="col-md-2 col-sm-3 col-xs-6 text-center">

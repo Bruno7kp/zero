@@ -319,7 +319,6 @@ function loadPlaycount()
 	tds = $(".loadplaycount");
 	loadplugin = false;
 	i = 1;
-	console.log(tds.length);
 	$.each(tds, function(index, val) {
 		type = $(this).attr('data-type');
 		name = $(this).attr('data-name');

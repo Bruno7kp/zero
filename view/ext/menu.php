@@ -42,6 +42,7 @@ use B7KP\Entity\User;
 				{
 					$notify = new Notify($user);
 				?>
+				<script><?php echo "noty = '"; $notify->outputNumber(); echo "';";?></script>
 				<li>
 					<a href="#" class="fh5co-sub-ddown"><?php echo $user->login;?> <?php $notify->outputNumber();?></a>
 					<ul class="fh5co-sub-menu">
@@ -49,6 +50,7 @@ use B7KP\Entity\User;
 						<li>
 							<a href="<?php echo Route::url('lib_art_list', array('login' => $user->login));?>"><?php echo Lang::get('library');?></a>
 						</li>
+					 	<li><a href="<?php echo Route::url('friends_list', array('login' => $user->login));?>"><?php echo Lang::get('friends');?></a></li>
 					 	<li><a href="<?php echo Route::url('settings');?>"><?php echo Lang::get('sett');?></a></li>
 					 	<?php $notify->outputLine();?>
 						<li><a href="<?php echo Route::url('logout');?>"><?php echo Lang::get('logout');?></a></li>

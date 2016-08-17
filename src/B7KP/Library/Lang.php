@@ -906,6 +906,15 @@ class Lang
 		$messages["noty_add_friend"][self::PT_BR] = "{0} deseja ser seu amigo.";
 		$messages["noty_add_friend"][self::EN_US] = "{0} want to be your friend.";
 
+		$messages["noty_new_friend"][self::PT_BR] = "{0} aceitou seu pedido de amizade.";
+		$messages["noty_new_friend"][self::EN_US] = "{0} accepted your friend request.";
+
+		$messages["noty_new_friends"][self::PT_BR] = "Nova confirmação de amizade!";
+		$messages["noty_new_friends"][self::EN_US] = "Friend request accepted!";
+
+		$messages["noty_remove"][self::PT_BR] = "Remover";
+		$messages["noty_remove"][self::EN_US] = "Remove";
+
 
 		return $messages;
 	}

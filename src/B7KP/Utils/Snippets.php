@@ -380,19 +380,19 @@ class Snippets
 	{
 		switch ($type) {
 			case 'add':
-				$btn = "<a data-id='".$id."' class='no-decoration text-success tipup add_friend' title='".$title."' href='#!'><i class='fa fa-plus-circle'></i></a>";
+				$btn = "<a data-id='".$id."' class='no-decoration no-margin tipup btn btn-custom-alt btn-success add_friend' title='".$title."' href='#!'><i class='fa fa-fw fa-plus'></i></a>";
 				break;
 
 			case 'remove':
-				$btn = "<a data-id='".$id."' class='no-decoration text-info tipup remove_friend' title='".$title."' href='#!'><i class='fa fa-check-circle'></i></a>";
+				$btn = "<a data-id='".$id."' class='no-decoration no-margin tipup btn btn-custom-alt btn-info remove_friend' title='".$title."' href='#!'><i class='fa fa-fw fa-check'></i></a>";
 				break;
 
 			case 'wait':
-				$btn = "<a class='no-decoration text-muted tipup' title='".$title."' href='#!'><i class='fa fa-clock-o'></i></a>";
+				$btn = "<a class='no-decoration no-margin tipup btn btn-custom-alt btn-info' title='".$title."' href='#!'><i class='fa fa-fw fa-clock-o'></i></a>";
 				break;
 
 			case 'cancel':
-				$btn = "<a data-id='".$id."' class='no-decoration text-danger tipup remove_friend' title='".$title."' href='#!'><i class='fa fa-times-circle'></i></a>";
+				$btn = "<a data-id='".$id."' class='no-decoration no-margin tipup btn btn-custom-alt btn-danger remove_friend' title='".$title."' href='#!'><i class='fa fa-fw fa-times'></i></a>";
 				break;
 			
 			default:

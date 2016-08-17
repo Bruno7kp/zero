@@ -98,6 +98,15 @@ body{
 	font-size: 9px;
 }
 
+.btn-custom-alt{
+   	padding: 1px 2px;
+   	margin: 3px;
+}
+
+.radius-2{
+   	border-radius: 2px;	
+}
+
 /* SPACES */
 .bottomspace-xs{
 	margin-bottom: 5px;
@@ -402,4 +411,19 @@ a.white {
 .no-decoration, .no-decoration:hover, .no-decoration:focus, .no-decoration:active{
     text-decoration: none !important;
     border-bottom: 0px !important;
+}
+#fh5co-mobile-menu-btn > .badge{
+	position: absolute;
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+@media screen and (min-width: 768px){
+
+	.container .jumbotron, .container-fluid .jumbotron {
+	    padding-right: 15px;
+	    padding-left: 15px; 
+        padding-top: 15px;
+	    padding-bottom: 15px;
+	}
 }

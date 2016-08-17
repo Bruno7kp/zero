@@ -36,7 +36,13 @@
 				}
 
 				$('<div id="fh5co-logo-mobile-wrap">').append(cloneLogo).insertBefore('#fh5co-header-section');
-				$('#fh5co-logo-mobile-wrap').append('<a href="#" id="fh5co-mobile-menu-btn"><i class="ti-menu"></i></a>')
+				if(typeof noty != "undefined" && noty != ""){
+					$('#fh5co-logo-mobile-wrap').append('<a href="#" id="fh5co-mobile-menu-btn">'+noty+'<i class="ti-menu"></i></a>')
+				}
+				else
+				{
+					$('#fh5co-logo-mobile-wrap').append('<a href="#" id="fh5co-mobile-menu-btn"><i class="ti-menu"></i></a>')
+				}
 				$('<div id="fh5co-mobile-menu">').append(clone).insertBefore('#fh5co-header-section');
 
 				$('#fh5co-header-section').hide();

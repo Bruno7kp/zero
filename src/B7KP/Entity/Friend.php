@@ -18,6 +18,11 @@ class Friend extends Entity
 	*/
 	protected $accepted;
 
+	/**
+	* @Assert(null=false|int)
+	*/
+	protected $notified;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -26,6 +31,11 @@ class Friend extends Entity
 	public function accept()
 	{
 		$this->accepted = 1;
+	}
+
+	public function notified()
+	{
+		$this->notified = 1;
 	}
 }
 ?>

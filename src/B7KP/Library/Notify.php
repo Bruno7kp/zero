@@ -39,6 +39,7 @@ class Notify
 			$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
 			$this->getWeeksToUpdate();
 			$this->getFriendRequests();
+			$this->getNewFriends();
 		}
 	}
 
@@ -118,7 +119,13 @@ class Notify
 				}
 				echo "</div>\n";
 			echo "</div></li>\n";
+			$this->executeBeforeRead();
 		}
+	}
+
+	private function executeBeforeRead()
+	{
+		$this->getNewFriends(true);
 	}
 
 	private function mergeDefault($val)
@@ -241,6 +248,26 @@ class Notify
 				}
 			}
 			$this->setNotification("noty_friends_requests", $array);
+		}
+	}
+
+	private function getNewFriends($mark = false)
+	{
+		$friend = new Friends($this->factory);
+		$request = $friend->getNewFriends($mark);
+		if($request && count($request) > 0)
+		{
+			$array = array();
+			foreach ($request as $key => $value) 
+			{
+				$user_find = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_two);
+				if($user_find)
+				{
+					$noty = "<a target='_blank' href=".Route::url("profile", array("login" => $user_find->login)).">".$user_find->login."</a>";
+					$array[] = array("text" => Lang::sub(Lang::get("noty_new_friend"), array($noty)), "icon" => "fa fa-user-plus fa-fw fa-2x text-center text-primary");
+				}
+			}
+			$this->setNotification("noty_new_friends", $array);
 		}
 	}
 }

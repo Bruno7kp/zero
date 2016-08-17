@@ -40,6 +40,7 @@ class Friends
 				$data->iduser_one = $this->user_session->id;
 				$data->iduser_two = $user->id;
 				$data->accepted = 0;
+				$data->notified = 0;
 				if($this->factory->add("B7KP\Entity\Friend", $data))
 				{
 					return 1;
@@ -76,6 +77,15 @@ class Friends
 		return $this->factory->update("B7KP\Entity\Friend", $acc);
 	}
 
+	private function read($acc)
+	{
+		if(!$acc->notified)
+		{
+			$acc->notified();
+			$this->factory->update("B7KP\Entity\Friend", $acc);
+		}
+	}
+
 	public function getFriends(User $user)
 	{
 		$vars_one = array("iduser_one" => $user->id, "accepted" => 1);
@@ -85,18 +95,38 @@ class Friends
 		$friends = array();
 		if(isset($by_one[0]))
 		{
-			foreach ($by_one as $key => $value) {
+			foreach ($by_one as $key => $value) 
+			{
 				$friends[] = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_two);
 			}
 		}
 		if(isset($by_two[0]))
 		{
-			foreach ($by_two as $key => $value) {
+			foreach ($by_two as $key => $value) 
+			{
 				$friends[] = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_one);
 			}
 		}
 
 		return $friends;
+	}
+
+	public function getNewFriends($markAsRead = false)
+	{
+		if($this->user_session)
+		{
+			$vars_one = array("iduser_one" => $this->user_session->id, "accepted" => 1, "notified" => 0);
+			$by_one = $this->factory->find("B7KP\Entity\Friend", $vars_one);
+			if($markAsRead)
+			{
+				foreach ($by_one as $key => $value) 
+				{
+					$this->read($value);
+				}
+			}
+			return $by_one;
+		}
+		return false;
 	}
 
 	public function isFriend(User $user)

@@ -96,6 +96,14 @@ switch ($curroute) {
 		<a class="nav-link" href="<?php echo Route::url('friends_list', array('login' => $user->login));?>">
 			<i class="flaticon-social"></i>
 			<span class="hidden-xs"><?php echo Lang::get('friends');?></span>
+			<?php 
+			if($curroute == "friends_list")
+			{
+				$friends = new \B7KP\Utils\Friends($this->factory);
+				$total_friends = count($friends->getFriends($user));
+				echo $total_friends > 0 ? "(".$total_friends.")" : "";
+			}
+			?>
 		</a>
   	</li>
 </ul>
