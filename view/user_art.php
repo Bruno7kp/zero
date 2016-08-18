@@ -125,7 +125,7 @@ use B7KP\Library\Lang;
 							{
 							?>
 							<h2 class="text-center topspace-xxl"><?php echo Lang::get("alb_x");?></h2>
-							<table class="chart-table table-fluid topspace-md">
+							<table class="chart-table no-no1 table-fluid topspace-md">
 								<tr>
 									<th class="cr-col min center">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
@@ -223,7 +223,7 @@ use B7KP\Library\Lang;
 							{
 							?>
 							<h2 class="text-center topspace-xxl"><?php echo Lang::get("mus_x");?></h2>
-							<table class="chart-table table-fluid topspace-md">
+							<table class="chart-table no-no1 table-fluid topspace-md">
 								<tr>
 									<th class="cr-col min center">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>

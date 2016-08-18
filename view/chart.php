@@ -45,7 +45,7 @@ use B7KP\Utils\UserSession;
 							  	<button type="button" class="btn btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							  		<span class="ti-calendar"></span>
   								</button>
-  								<ul class="dropdown-menu">
+  								<ul class="dropdown-menu min-165">
 								    <?php 
 								    $weeks = array_reverse($weeks);
 								    $u = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";

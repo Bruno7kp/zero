@@ -148,6 +148,23 @@ a.cr-btn.wksout{
 	width: 32px !important;
 }
 
+.new-certs {
+	background-color: #d7edff;
+	font-size: 12px !important;
+}
+
+.new-certs img:not(.img-disc) {
+	width: 32px !important;
+}
+
+.p-row {
+	background-color: #cae1f5;
+}
+.g-row {
+	background-color: #eee;
+}
+
+
 .chart-table td.rk-col span:not(.black) {
 	font-size: 11px;
 	/*display: block;*/
@@ -178,7 +195,7 @@ a.cr-btn.wksout{
 	color: #F44336;
 }
 
-.chart-table tr:nth-child(2) td:nth-child(2).rk-col{
+.chart-table:not(.no-no1) tr:nth-child(2) td:nth-child(2).rk-col{
 	color: #28bbf8;
 }
 

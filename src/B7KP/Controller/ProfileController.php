@@ -64,11 +64,11 @@ class ProfileController extends Controller
 			if($user_session && $user->id != $user_session->id)
 			{
 				$friend = new Friends($this->factory);
-				$add_friend = Snippets::friendsButton("add", $user->id, Lang::get("add_friend"));
+				$add_friend = Snippets::friendsButton("add", $user->id, Lang::get("friend_add"));
 				# Se já é amigo, pode remover
 				if($friend->isFriend($user))
 				{
-					$add_friend = Snippets::friendsButton("remove", $user->id, Lang::get("remove_friend"));
+					$add_friend = Snippets::friendsButton("remove", $user->id, Lang::get("friend_remove"));
 				}
 				else
 				{
@@ -79,7 +79,7 @@ class ProfileController extends Controller
 						# Se o usuário já pediu
 						if($resp["button"] == "wait")
 						{
-							$add_friend = Snippets::friendsButton("wait", $user->id, Lang::get("wait_friend"));
+							$add_friend = Snippets::friendsButton("wait", $user->id, Lang::get("friend_wait"));
 						}
 					}
 					# Se ainda não pediu, ou o outro usuário já pediu, mostra o botão para adicionar

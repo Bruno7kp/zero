@@ -317,6 +317,25 @@ class Certified
 				}
 				$certification = empty($file) ? "web/img/default-alb.png" : $file;
 				break;
+
+			case 'class':
+				if($certification['d'] > 0)
+				{
+					$certification = "d-row";
+				}
+				elseif($certification['p'] > 0)
+				{
+					$certification = "p-row";
+				}
+				elseif($certification['g'] > 0)
+				{
+					$certification = "g-row";
+				}
+				else
+				{
+					$certification = "";
+				}
+				break;
 		}
 
 		return $certification;

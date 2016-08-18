@@ -143,6 +143,30 @@ function resetAcc()
 			
 		}
 	});
+
+	$("img[get-user-image]").each(function(index, el) {
+		user_img_tag = $(this);
+		user_name = user_img_tag.attr('get-user-image');
+		get_img_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getinfo&api_key='+apiKey+'&user='+user_name+'&format=json';
+		$.ajax({
+			url: get_img_url,
+			dataType: 'json',
+			async: false,
+		})
+		.done(function(data) {
+			if(typeof data.user.image[2] != "undefined" && data.user.image[2]["#text"] != ""){
+				user_img_tag.attr('src', data.user.image[2]["#text"]);
+			}
+			console.log("success");
+		})
+		.fail(function() {
+			console.log("error");
+		})
+		.always(function() {
+			console.log("complete");
+		});
+		
+	});
 }
 
 function btnCertShow()
@@ -233,7 +257,7 @@ function getMsg(msgid)
 
 function generatePlaque()
 {
-	genBtn = $("#gen_plaque");
+	genBtn = $("#gen_plaque, .gen_plaque");
 	genBtn.on('click', function(event) {
 		event.preventDefault();
 		btn = $(this);

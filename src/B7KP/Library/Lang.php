@@ -568,6 +568,9 @@ class Lang
 		$messages["listener_x"][self::PT_BR] = "Ouvintes";
 		$messages["listener_x"][self::EN_US] = "Listeners";
 
+		$messages["new_certs"][self::PT_BR] = "Certificados da semana";
+		$messages["new_certs"][self::EN_US] = "New certifications";
+
 		$messages["new_def"][self::PT_BR] = "Nova entrada no chart";
 		$messages["new_def"][self::EN_US] = "New entry";
 
@@ -672,6 +675,27 @@ class Lang
 		$messages["error_token"][self::PT_BR] = "Algo deu errado ao checar o seu token. Tente novamente mais tarde.";
 		$messages["error_token"][self::EN_US] = "Something went wrong when checking the token. Try again later.";
 
+		$messages["fail_action"][self::PT_BR] = "Ocorreu um problema ao realizar a ação";
+		$messages["fail_action"][self::EN_US] = "Something went wrong";
+
+		$messages["friend_add"][self::PT_BR] = "Adicionar amigo";
+		$messages["friend_add"][self::EN_US] = "Add friend";
+
+		$messages["friend_accept"][self::PT_BR] = "Pedido de amizade aceito";
+		$messages["friend_accept"][self::EN_US] = "Friend request was accepted";
+
+		$messages["friend_request"][self::PT_BR] = "O pedido de amizade foi enviado";
+		$messages["friend_request"][self::EN_US] = "The friend request was sent";
+		
+		$messages["friend_remove"][self::PT_BR] = "Remover amigo";
+		$messages["friend_remove"][self::EN_US] = "Remove friend";
+
+		$messages["friend_removed"][self::PT_BR] = "Amigo removido";
+		$messages["friend_removed"][self::EN_US] = "Remove friend";
+
+		$messages["friend_wait"][self::PT_BR] = "Aguardando resposta";
+		$messages["friend_wait"][self::EN_US] = "Awaiting response";
+
 		$messages["forg_pass"][self::PT_BR] = "Esqueceu sua senha?";
 		$messages["forg_pass"][self::EN_US] = "Forgot password?";
 
@@ -699,6 +723,9 @@ class Lang
 		$messages["mus_cert"][self::PT_BR] = "Valores para certificados de músicas";
 		$messages["mus_cert"][self::EN_US] = "Values ​​for musics certificates";
 
+		$messages["need_login"][self::PT_BR] = "É preciso estar logado para realizar esta ação";
+		$messages["need_login"][self::EN_US] = "You must be logged in to perform this action";
+
 		$messages["need_update"][self::PT_BR] = "Seus charts precisam estar atualizados";
 		$messages["need_update"][self::EN_US] = "Your charts need to be updated";
 
@@ -707,6 +734,9 @@ class Lang
 
 		$messages["no_edit"][self::PT_BR] = "Não há nada para editar aqui.";
 		$messages["no_edit"][self::EN_US] = "There's nothing to update.";
+
+		$messages["no_results"][self::PT_BR] = "Nenhum amigo adicionado até agora.";
+		$messages["no_results"][self::EN_US] = "No friends added so far.";
 
 		$messages["note_app"][self::PT_BR] = "Para fazer login neste site novamente, deve-se usar seu nome de usuário e sua senha, note que a senha não precisa ser a mesma do Last.fm.";
 		$messages["note_app"][self::EN_US] = "To login on this site again, you must use your username and password, note that the password does not need to be the same as Last.fm.";
@@ -720,8 +750,14 @@ class Lang
 		$messages["no_mus"][self::PT_BR] = "Nenhuma música desse artista entrou nos charts.";
 		$messages["no_mus"][self::EN_US] = "No musics";
 
+		$messages["not_possible"][self::PT_BR] = "Não foi possível realizar a ação";
+		$messages["not_possible"][self::EN_US] = "Something went wrong";
+
 		$messages["not_show"][self::PT_BR] = "Nada para mostrar aqui";
 		$messages["not_show"][self::EN_US] = "Nothing to show here.";
+
+		$messages["not_visible"][self::PT_BR] = "Este perfil é privado.";
+		$messages["not_visible"][self::EN_US] = "This profile is private.";
 
 		$messages["rec_tra"][self::PT_BR] = "Faixas recentes";
 		$messages["rec_tra"][self::EN_US] = "Recent tracks";
@@ -914,6 +950,18 @@ class Lang
 
 		$messages["noty_remove"][self::PT_BR] = "Remover";
 		$messages["noty_remove"][self::EN_US] = "Remove";
+
+		$messages["noty_acc_friend"][self::PT_BR] = "Aceitar";
+		$messages["noty_acc_friend"][self::EN_US] = "Accept";
+
+		$messages["not_acc_friend"][self::PT_BR] = "Rejeitar";
+		$messages["not_acc_friend"][self::EN_US] = "Reject";
+
+		$messages["noty_reject"][self::PT_BR] = "Rejeitar o pedido";
+		$messages["noty_reject"][self::EN_US] = "Reject the request";
+
+		$messages["noty_add_ask"][self::PT_BR] = "Aceitar pedido";
+		$messages["noty_add_ask"][self::EN_US] = "Accept the request";
 
 
 		return $messages;

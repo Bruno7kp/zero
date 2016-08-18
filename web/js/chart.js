@@ -267,6 +267,7 @@ function loadimages()
 			$.ajax({
 				url: last,
 				type: 'GET',
+				async: false,
 				dataType: 'json'
 			})
 			.done(function(data) {
@@ -443,6 +444,10 @@ function setImg(rankid, img)
 		img = baseUrl + '/web/img/default-alb.png';
 	}
 	$("#"+rankid).html("<img width='64' src='"+img+"'/>");
+	if(rankid.indexOf("newcert") >= 0)
+	{
+		$("#n"+rankid).attr('data-image', img);
+	}
 }
 
 function loadArtImg(name, mbid, seton)

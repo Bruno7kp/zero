@@ -5,6 +5,7 @@ use B7KP\Library\Route;
 use B7KP\Library\Url;
 use LastFmApi\Main\LastFm;
 use B7KP\Utils\Constants as C;
+use B7KP\Utils\Certified;
 use B7KP\Utils\Snippets as S;
 
 if($settings instanceof Settings)
@@ -25,6 +26,7 @@ $show_move 			= $settings->show_move;
 $show_times 		= $settings->show_times;
 $subs 				= substr($type, 0,3)."_limit";
 $limit 				= $settings->$subs;
+$new_certs = array();
 
 //echo $style;
 echo $js;
@@ -103,6 +105,8 @@ if($show_dropouts && $week > 1)
 			$stats 		= $value["stats"]["chartrun"][$week];
 			$cr 		= $value["stats"]["chartrun"];
 			$item 		= $value["item"];
+			$cp_todate 	= $todate["overall"]["chartpoints"];
+
 			if($show_dropouts)
 			{
 				$thembid = substr($type, 0, 3)."_mbid";
@@ -155,6 +159,23 @@ if($show_dropouts && $week > 1)
 			$peak 		= $todate["overall"]["peak"];
 			$t = substr($type, 0,3)."_mbid";
 			$mbid = $item->$t;
+
+			# new certs
+			
+			if(true && $type != "artist")
+			{
+				$certified = new Certified($this->user, $this->factory);
+				$cert_todate = $certified->getCertification($type, $cp_todate);
+				$cert_tolw = $certified->getCertification($type, ($cp_todate - (100-(($position-1)*2))));
+				$comp_tw = $certified->getValueByArray($type, $cert_todate);
+				$comp_lw = $certified->getValueByArray($type, $cert_tolw);
+				if($comp_lw != $comp_tw)
+				{
+					$cert_new = $certified->getCertification($type, $cp_todate, "text+icon");
+					$class_new = $certified->getCertification($type, $cp_todate, "class");
+					$new_certs[] = array("name" => $name, "artist" => $artist, "points" => $cp_todate, "certified" => $cert_new, "class" => $class_new);
+				}	
+			}
 		?>
 		<tr>
 			<td class="cr-col min">
@@ -283,6 +304,42 @@ if($show_dropouts && $week > 1)
 			echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
 		?>
 		</td>
+	</tr>
+	<?php
+		}
+	}
+	?>
+	<?php 
+	if(true && count($new_certs) > 0)
+	{
+	?>
+	<tr>
+		<th colspan="8"><small class="topspace-lg"><?php echo Lang::get('new_certs');?></small></th>
+	</tr>
+
+	<?php
+		foreach ($new_certs as $key => $value) {
+			$name = $value["name"];
+			$artist = $value["artist"];
+			$points = $value["points"];
+			$certified = $value["certified"];
+			$class = $value["class"];
+			$mbid = "";
+
+	?>
+	<tr class="new-certs <?php echo $class;?>">
+		<td class="cr-col">
+			<?php echo $certified;?>
+			
+		</td>
+		<td><?php echo $points." ".Lang::get("pt_x");?></td>
+		<td class="getimage" id="newcert<?php echo $key;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"></td>
+		</td>
+		<td class="left">
+			<?php echo $name;?>
+		</td>
+		<td class="left"><?php echo $artist;?></td> 
+		<td colspan="3"><button class="btn no-margin btn-custom btn-info btn-sm gen_plaque" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="" data-points=<?php echo $points;?> id="nnewcert<?php echo $key;?>"><?php echo Lang::get("gen_plaque");?></button></td>
 	</tr>
 	<?php
 		}

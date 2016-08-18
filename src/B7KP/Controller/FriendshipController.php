@@ -36,13 +36,13 @@ class FriendshipController extends Controller
 				case 1:
 					$e = 0;
 					$m = Lang::get("friend_request");
-					$b = Snippets::friendsButton("wait", $user->id, Lang::get("wait_friend"));
+					$b = Snippets::friendsButton("wait", $user->id, Lang::get("friend_wait"));
 					break;
 
 				case 2:
 					$e = 0;
 					$m = Lang::get("friend_accept");
-					$b = Snippets::friendsButton("remove", $user->id, Lang::get("remove_friend"));
+					$b = Snippets::friendsButton("remove", $user->id, Lang::get("friend_remove"));
 					break;
 				
 				default:
@@ -72,7 +72,7 @@ class FriendshipController extends Controller
 			{
 				$e = 0;
 				$m = Lang::get("friend_removed");
-				$b = Snippets::friendsButton("add", $user->id, Lang::get("add_friend"));
+				$b = Snippets::friendsButton("add", $user->id, Lang::get("friend_add"));
 			}
 			else
 			{

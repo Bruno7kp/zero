@@ -81,6 +81,10 @@ body{
     overflow: auto;
 }
 
+.min-165{
+    min-width: 165px;
+}
+
 .white-bg {
 	background-color: white;
 }
