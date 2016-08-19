@@ -78,6 +78,7 @@ use B7KP\Library\Lang;
 										}
 										if($value["this_lib"])
 										{
+											$vars["login"] = $this->guessUser();
 											$showliblegend = true;
 										?>
 										<a href="<?php echo Route::url($route, $vars);?>" class="tipup no-decoration" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></a>
@@ -106,7 +107,7 @@ use B7KP\Library\Lang;
 									if(isset($showliblegend))
 									{
 									?>
-										<a href="#!" class="tipup no-decoration" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></a> = <?php echo Lang::get('in_this_lib_long');?>
+										<a href="#!" class="tipup no-decoration" title="<?php echo Lang::get('in_this_lib');?>"><i class="text-sec flaticon-badge-2"></i></a> = <?php echo Lang::sub(Lang::get('in_this_lib_long'), array($this->guessUser()));?>
 									<?php
 									}
 									?>

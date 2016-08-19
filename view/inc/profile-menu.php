@@ -133,7 +133,7 @@ if(strpos($curroute, "_list") > 0 && strpos($curroute, "lib") !== false || $curr
 </ul>
 <form method="get" action="<?php echo Route::url('search', array('login' => $user->login, 'type' => $t_value));?>">
 	<div class="input-group">
-		<input type="text" class="form-control no-border" name="q" value="<?php echo isset($this->q) ? $this->q : '';?>">
+		<input type="text" placeholder="<?php echo Lang::get('search');?>" class="form-control no-border" name="q" value="<?php echo isset($this->q) ? $this->q : '';?>">
 		<div class="input-group-btn">
 		    <button type="submit" class="btn btn-default btn-info"><span class="fa fa-search fa-fw"></span></button>
 		</div>

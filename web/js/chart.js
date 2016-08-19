@@ -446,6 +446,7 @@ function setImg(rankid, img)
 	$("#"+rankid).html("<img width='64' src='"+img+"'/>");
 	if(rankid.indexOf("newcert") >= 0)
 	{
+		img = img.replace("/64s/", "/174s/");
 		$("#n"+rankid).attr('data-image', img);
 	}
 }
@@ -478,9 +479,11 @@ function loadArtImg(name, mbid, seton)
 }
 
 function offsetAnchor() {
-    if(location.hash.length !== 0) {
-        window.scrollTo(window.scrollX, window.scrollY - 100);
-    }
+	if(curRoute == "about"){
+	    if(location.hash.length !== 0) {
+	        window.scrollTo(window.scrollX, window.scrollY - 100);
+	    }
+	}
 }
 
 // This will capture hash changes while on the page

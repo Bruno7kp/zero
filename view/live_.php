@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets as S;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Functions;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -75,12 +76,12 @@ use B7KP\Library\Lang;
 											<?php echo $value["rank"];?>
 										</td>
 										<td class="getimage" id="rankid<?php echo $value["rank"];?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"><?php echo S::loader(30);?></td>
-										<td class="left"><?php echo $name;?></td>
+										<td class="left"><a href="<?php echo Route::url("lib_".substr($type, 0, 3), array("name" => Functions::fixLFM($name), "artist" => Functions::fixLFM($artist), "login" => $user->login));?>"><?php echo $name;?></a></td>
 										<?php 
 										if($type != "artist")
 										{ 
 										?>
-											<td class="left"><?php echo $artist;?></td> 
+											<td class="left"><a href="<?php echo Route::url("lib_art", array("name" => Functions::fixLFM($artist), "login" => $user->login));?>"><?php echo $artist;?></a></td> 
 										<?php 
 										}
 										?>

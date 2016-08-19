@@ -227,6 +227,7 @@ function getMsg(msgid)
 		array.nothingnew = "Look like there's nothing to update for now, come back later.";
 		array.sure = "Are you sure?";
 		array.newplaque = "Create certification plaque";
+		array.newplaque_alt = "Create plaque";
 		array.limitplaque = "You can only generate one certificate per day for each album/music";
 	}
 	// pt
@@ -249,6 +250,7 @@ function getMsg(msgid)
 		array.nothingnew = "Parece que não há nada para atualizar por enquanto, volte mais tarde.";
 		array.sure = "Tem certeza?";
 		array.newplaque = "Gerar placa de certificado";
+		array.newplaque_alt = "Gerar placa";
 		array.limitplaque = "Só é possível gerar um certificado por dia para cada álbum/música";
 	}
 
@@ -295,7 +297,14 @@ function generatePlaque()
 					showAlert(1, getMsg("error"));
 				}
 			}
-			undisable_alt(btn, getMsg("newplaque"));
+			if(curRoute == "weekly_chart")
+			{
+				undisable_alt(btn, getMsg("newplaque_alt"));
+			}
+			else
+			{
+				undisable_alt(btn, getMsg("newplaque"));
+			}
 		})
 		.fail(function() {
 			console.log("error");
@@ -363,12 +372,15 @@ function copyChart()
 	copyBtn.click(function(event) {
 		$(".cr-col").hide(); // remove chart-run col
 		$(".cr-row").hide(); // remove chart-run row
+		$(".gen_plaque").hide(); // remove plaque generator button
+
 		var clip = new Clipboard('#copy');
 		clip.on('success', function(e) {
 			copyBtn.tooltipster('show');
 			console.log(e);
 		    e.clearSelection();
 			$(".cr-col").show();
+			$(".gen_plaque").show();
 		});
 	});
 

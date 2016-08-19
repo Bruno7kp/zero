@@ -141,7 +141,7 @@ a.cr-btn.wksout{
 
 .drops {
 	background-color: rgb(250, 250, 250);
-	font-size: 12px !important;
+	font-size: 14px !important;
 }
 
 .drops img {
@@ -150,18 +150,21 @@ a.cr-btn.wksout{
 
 .new-certs {
 	background-color: #d7edff;
-	font-size: 12px !important;
+	font-size: 14px !important;
 }
 
 .new-certs img:not(.img-disc) {
 	width: 32px !important;
 }
 
+.d-row {
+	background-color: #dcf0ff;
+}
 .p-row {
-	background-color: #cae1f5;
+	background-color: #fafafa;
 }
 .g-row {
-	background-color: #eee;
+	background-color: #fff2e5;
 }
 
 

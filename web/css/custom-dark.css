@@ -223,3 +223,21 @@ a.cr-btn.wksout {
 .no-border{
     border-bottom: 0px solid white;
 }
+
+.d-row {
+    background-color: #34414a;
+}
+.p-row {
+    background-color: #3e3e3e;
+}
+.g-row {
+    background-color: #40372e;
+}
+
+.bg-white {
+    background: #333;
+}
+
+.mfp-close-btn-in .mfp-close {
+    color: #fff !important;
+}

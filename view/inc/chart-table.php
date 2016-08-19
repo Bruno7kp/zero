@@ -6,6 +6,7 @@ use B7KP\Library\Url;
 use LastFmApi\Main\LastFm;
 use B7KP\Utils\Constants as C;
 use B7KP\Utils\Certified;
+use B7KP\Utils\Functions;
 use B7KP\Utils\Snippets as S;
 
 if($settings instanceof Settings)
@@ -24,6 +25,9 @@ $show_first_image 	= $settings->show_first_image;
 $show_playcounts 	= $settings->show_playcounts;
 $show_move 			= $settings->show_move;
 $show_times 		= $settings->show_times;
+$show_plaque		= $settings->show_plaque;
+$show_wkl_cert		= $settings->show_wkl_cert;
+$show_cert			= $settings->show_cert;
 $subs 				= substr($type, 0,3)."_limit";
 $limit 				= $settings->$subs;
 $new_certs = array();
@@ -162,7 +166,7 @@ if($show_dropouts && $week > 1)
 
 			# new certs
 			
-			if(true && $type != "artist")
+			if($show_cert && $show_wkl_cert && $type != "artist")
 			{
 				$certified = new Certified($this->user, $this->factory);
 				$cert_todate = $certified->getCertification($type, $cp_todate);
@@ -310,7 +314,7 @@ if($show_dropouts && $week > 1)
 	}
 	?>
 	<?php 
-	if(true && count($new_certs) > 0)
+	if($show_wkl_cert && count($new_certs) > 0)
 	{
 	?>
 	<tr>
@@ -318,6 +322,9 @@ if($show_dropouts && $week > 1)
 	</tr>
 
 	<?php
+		usort($new_certs, function($a, $b) {
+		    return $b['points'] - $a['points'];
+		});
 		foreach ($new_certs as $key => $value) {
 			$name = $value["name"];
 			$artist = $value["artist"];
@@ -328,18 +335,27 @@ if($show_dropouts && $week > 1)
 
 	?>
 	<tr class="new-certs <?php echo $class;?>">
-		<td class="cr-col">
+		<td><a target="_blank" href="<?php echo Route::url("lib_".substr($type, 0, 3), array("name" => Functions::fixLFM($name), "artist" => Functions::fixLFM($artist), "login" => $this->user->login));?>"><i class="ti-new-window"></i></a></td> 
+		<td>
 			<?php echo $certified;?>
-			
 		</td>
-		<td><?php echo $points." ".Lang::get("pt_x");?></td>
 		<td class="getimage" id="newcert<?php echo $key;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"></td>
 		</td>
 		<td class="left">
 			<?php echo $name;?>
 		</td>
 		<td class="left"><?php echo $artist;?></td> 
-		<td colspan="3"><button class="btn no-margin btn-custom btn-info btn-sm gen_plaque" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="" data-points=<?php echo $points;?> id="nnewcert<?php echo $key;?>"><?php echo Lang::get("gen_plaque");?></button></td>
+		<td><?php echo $points." ".Lang::get("pt_x");?></td>
+		<td colspan="2">
+			<?php 
+			if($show_plaque)
+			{
+			?>
+			<button class="btn no-margin btn-custom btn-info btn-sm gen_plaque" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="" data-points=<?php echo $points;?> id="nnewcert<?php echo $key;?>"><?php echo Lang::get("gen_plaque_alt");?></button>
+			<?php
+			}
+			?>
+		</td>
 	</tr>
 	<?php
 		}

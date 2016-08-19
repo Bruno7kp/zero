@@ -184,7 +184,10 @@ class Lang
 
 		$messages["save"][self::PT_BR] = "Salvar";
 		$messages["save"][self::EN_US] = "Save";
-		
+			
+		$messages["search"][self::PT_BR] = "Busca";
+		$messages["search"][self::EN_US] = "Search";
+
 		$messages["sett"][self::PT_BR] = "Configurações";
 		$messages["sett"][self::EN_US] = "Settings";
 
@@ -268,6 +271,9 @@ class Lang
 		$messages["friends"][self::PT_BR] = "Amigos";
 		$messages["friends"][self::EN_US] = "Friends";
 
+		$messages["friends_only"][self::PT_BR] = "Apenas para amigos";
+		$messages["friends_only"][self::EN_US] = "Friends only";
+
 		$messages["fri_or_sun"][self::PT_BR] = "Agora você pode escolher o dia de início do seu chart, Sexta ou Domingo?";
 		$messages["fri_or_sun"][self::EN_US] = "Now you can choose the starting day of your chart, Friday or Sunday?";
 
@@ -327,6 +333,9 @@ class Lang
 		$messages["prev_of"][self::PT_BR] = "Chart da semana atual até o momento";
 		$messages["prev_of"][self::EN_US] = "Chart of the current week to date";
 
+		$messages["public"][self::PT_BR] = "Público";
+		$messages["public"][self::EN_US] = "Public";
+
 		$messages["reset_acc"][self::PT_BR] = "Resetar conta";
 		$messages["reset_acc"][self::EN_US] = "Reset account";
 
@@ -374,6 +383,9 @@ class Lang
 
 		$messages["version"][self::PT_BR] = "Versão";
 		$messages["version"][self::EN_US] = "Version";
+
+		$messages["visibility"][self::PT_BR] = "Visibilidade do seu perfil";
+		$messages["visibility"][self::EN_US] = "Visibility";
 
 		$messages["yes"][self::PT_BR] = "Sim";
 		$messages["yes"][self::EN_US] = "Yes";
@@ -702,8 +714,23 @@ class Lang
 		$messages["gen_plaque"][self::PT_BR] = "Gerar placa de certificado";
 		$messages["gen_plaque"][self::EN_US] = "Create certification plaque";
 
+		$messages["gen_plaque_alt"][self::PT_BR] = "Gerar placa";
+		$messages["gen_plaque_alt"][self::EN_US] = "Create plaque";
+
 		$messages["hide_livechart"][self::PT_BR] = "Esconder 'Live Chart'";
 		$messages["hide_livechart"][self::EN_US] = "Hide 'Live Chart'";
+
+		$messages["in_this_lib"][self::PT_BR] = "Está nesta biblioteca";
+		$messages["in_this_lib"][self::EN_US] = "It's in this library";
+
+		$messages["in_this_lib_long"][self::PT_BR] = "Este artista/álbum/música já entrou no chart de {0}";
+		$messages["in_this_lib_long"][self::EN_US] = "This artist/album/music already debuted in {0}'s charts";
+
+		$messages["in_your_lib"][self::PT_BR] = "Está na sua biblioteca";
+		$messages["in_your_lib"][self::EN_US] = "It's in your library";
+
+		$messages["in_your_lib_long"][self::PT_BR] = "Este artista/álbum/música já entrou no seu chart";
+		$messages["in_your_lib_long"][self::EN_US] = "This artist/album/music already debuted in your charts";
 		
 		$messages["init"][self::PT_BR] = "Complete os campos abaixo e pronto. Para acessar ".App::get('name')." novamente, use seu <b>Nome de usuário</b> do last.fm e a senha que colocar logo abaixo. Nós <b>não</b> recomendamos usar a mesma senha da sua conta no Last.fm.";
 		$messages["init"][self::EN_US] = "Complete the fields below and done. To access ".App::get('name')." again, use your last.fm <b>Username</b> and the new password you will insert below. We do <b>not</b> recomend to use the same password of your Last.fm account.";
@@ -798,6 +825,9 @@ class Lang
 		$messages["sett_times"][self::PT_BR] = "Mostrar número de semanas no pico";
 		$messages["sett_times"][self::EN_US] = "Show number of weeks at peak";
 
+		$messages["show_wkl_cert"][self::PT_BR] = "Mostrar certificados da semana (abaixo das tabelas/charts semanais)";
+		$messages["show_wkl_cert"][self::EN_US] = "Show certifications of the week";
+
 		$messages["sum_exp"][self::PT_BR] = "Soma simples de certificados do artista.<br/> Ex: Artista X tem quatro músicas:<br/> Música 1: 2x platina, Música 2: 5x platina, Música 3: Ouro, Música 4: 1x Diamante + 2x platina; <br/>Total de: ouros: 1, platinas: 9, diamantes: 1, soma: 12.";
 		$messages["sum_exp"][self::EN_US] = "Simple sum of the artist certificates";
 
@@ -806,6 +836,9 @@ class Lang
 
 		$messages["tied"][self::PT_BR] = "Você pode alterar as posições dos artistas/álbuns/músicas que tiverem número de reproduções iguais, basta arrastar os itens entre si e apertar em 'editar'.";
 		$messages["tied"][self::EN_US] = "You can change the positions of artists / albums / songs that have the same number of reproductions, simply drag items between them";
+
+		$messages["tip_something"][self::PT_BR] = "Digite alguma coisa";
+		$messages["tip_something"][self::EN_US] = "Tip something";
 
 		$messages["type_user"][self::PT_BR] = "Digite seu nome de usuário";
 		$messages["type_user"][self::EN_US] = "Type your username";
@@ -924,6 +957,9 @@ class Lang
 
 		$messages["v_translate"][self::PT_BR] = "Tradução (para inglês) do FAQ e revisão do que já foi traduzido";
 		$messages["v_translate"][self::EN_US] = "FAQ translation";
+
+		$messages["v_break"][self::PT_BR] = "Nada por enquanto, vou tirar uma folga.";
+		$messages["v_break"][self::EN_US] = "Nothing for now, I'll take a break.";
 
 		// noty
 
