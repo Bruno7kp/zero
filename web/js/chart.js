@@ -267,7 +267,6 @@ function loadimages()
 			$.ajax({
 				url: last,
 				type: 'GET',
-				async: false,
 				dataType: 'json'
 			})
 			.done(function(data) {

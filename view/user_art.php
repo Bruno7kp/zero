@@ -46,16 +46,18 @@ use B7KP\Library\Lang;
 							<img class="img-circle img-responsive" src="<?php echo $artist['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2><?php echo $name;?></h2>
+							<h2><?php echo $name;?>
 							<?php 
 							$session = UserSession::getUser($this->factory);
 							if($session && $session->id != $user->id)
 							{
 							?>
-							<a href="<?php echo Route::url('lib_art', array("login" => $session->login, "name" => F::fixLFM($name)));?>"><?php echo Lang::get("view_in_your");?></a>
+							<small> • <a href="<?php echo Route::url('lib_art', array("login" => $session->login, "name" => F::fixLFM($name)));?>"><?php echo Lang::get("view_in_your");?></a></small>
 							<?php
 							}
 							?>
+							</h2>
+							
 							<div class="row">
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 									<small class="text-muted"><?php echo Lang::get('play_x');?></small>
@@ -100,6 +102,7 @@ use B7KP\Library\Lang;
 								}
 								?>
 							</div>
+
 						</div>
 					</div>
 					<div class="row">

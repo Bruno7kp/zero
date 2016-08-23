@@ -215,6 +215,9 @@ class Lang
 		$messages["view"][self::PT_BR] = "Veja mais";
 		$messages["view"][self::EN_US] = "View more";
 
+		$messages["view_in_your"][self::PT_BR] = "Ver no seu perfil";
+		$messages["view_in_your"][self::EN_US] = "View in your profile";
+
 		// IMPORTANTE
 
 		$messages["acc_success"][self::PT_BR] = "Conta resetada com sucesso";
@@ -960,6 +963,18 @@ class Lang
 
 		$messages["v_break"][self::PT_BR] = "Nada por enquanto, vou tirar uma folga.";
 		$messages["v_break"][self::EN_US] = "Nothing for now, I'll take a break.";
+
+		$messages["v_search"][self::PT_BR] = "Adicionado as buscas.";
+		$messages["v_search"][self::EN_US] = "Search!";
+
+		$messages["v_friends"][self::PT_BR] = "Agora você pode adicionar amigos, e tornar o seu perfil visível apenas para eles.";
+		$messages["v_friends"][self::EN_US] = "Friends!";
+		
+		$messages["v_plaque_chart"][self::PT_BR] = "Agora os certificados da semana podem aparecer no seu chart (apenas para quem usa pontos para as certificações).";
+		$messages["v_plaque_chart"][self::EN_US] = "Certfications on weekly charts!";
+
+		$messages["v_others"][self::PT_BR] = "Outras melhorias e correções de bugs.";
+		$messages["v_others"][self::EN_US] = "Bug fixes.";
 
 		// noty
 

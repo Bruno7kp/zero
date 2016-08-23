@@ -89,6 +89,10 @@ use B7KP\Library\Lang;
 								</div>
 							</div>
 						<?php
+								if($this->type == "artist" && $key > 12)
+								{
+									break;
+								}
 							}
 							echo "</div>";
 							echo "</div>";
