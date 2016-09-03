@@ -466,7 +466,7 @@ class Certified
 
 	private function imgurSender($filename)
 	{
-		$apis = array("22de39ba618b7e2", "818ee7e54b3dcf6", "3366c677fd95c95");
+		$apis = array("22de39ba618b7e2", "818ee7e54b3dcf6", "3366c677fd95c95", "fcd9ca28ca485f1");
 		$client_id = $apis[mt_rand(0, count($apis) - 1)];
 		$image = file_get_contents($filename);
 		$ch = curl_init();

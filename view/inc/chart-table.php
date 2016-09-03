@@ -339,8 +339,18 @@ if($show_dropouts && $week > 1)
 		<td>
 			<?php echo $certified;?>
 		</td>
+	<?php 
+	if($show_images){
+	?>
 		<td class="getimage" id="newcert<?php echo $key;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"></td>
 		</td>
+	<?php
+	}else{
+	?>
+		<span style="display:none;" class="getimage" id="newcert<?php echo $key;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"></span>
+	<?php
+	}
+	?>
 		<td class="left">
 			<?php echo $name;?>
 		</td>
