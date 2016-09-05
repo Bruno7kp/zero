@@ -210,7 +210,7 @@ class LibraryController extends Controller
 		}
 		else
 		{
-			$this->redirectToRoute("lib_art", array("login" => $user->login));
+			$this->redirectToRoute("lib_art", array("login" => $user->login, "name" => $artist));
 		}
 
 		$vars = array 
@@ -255,7 +255,7 @@ class LibraryController extends Controller
 		}
 		else
 		{
-			$this->redirectToRoute("lib_art", array("login" => $user->login));
+			$this->redirectToRoute("lib_art", array("login" => $user->login, "name" => $artist));
 		}
 
 		$vars = array 
