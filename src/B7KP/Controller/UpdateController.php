@@ -42,6 +42,10 @@ class UpdateController extends Controller
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($this->user->login)->setStartDate($startday)->getUserInfo();
 			$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
+			if($last["registered"] < 1 && $this->user->lfm_register)
+			{
+				$date = $this->user->lfm_register;
+			}
 			$wksfm 	= $lfm->getWeeklyChartList();
 			$wksfm 	= $lfm->removeWeeksBeforeDate($wksfm, $date, $this->user->id);
 			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $this->user->id), "week DESC");
