@@ -97,14 +97,22 @@ class Friends
 		{
 			foreach ($by_one as $key => $value) 
 			{
-				$friends[] = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_two);
+				$get = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_two);
+				if($get)
+				{
+					$friends[] = $get;
+				}
 			}
 		}
 		if(isset($by_two[0]))
 		{
 			foreach ($by_two as $key => $value) 
 			{
-				$friends[] = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_one);
+				$get = $this->factory->findOneBy("B7KP\Entity\User", $value->iduser_one);
+				if($get)
+				{
+					$friends[] = $get;
+				}
 			}
 		}
 
