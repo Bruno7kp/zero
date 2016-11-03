@@ -226,6 +226,9 @@ class Lang
 		$messages["acc_success_rem"][self::PT_BR] = "Conta removida com sucesso";
 		$messages["acc_success_rem"][self::EN_US] = "Success";
 
+		$messages["acc_success_pla"][self::PT_BR] = "Placas removidas com sucesso";
+		$messages["acc_success_pla"][self::EN_US] = "Success";
+
 		$messages["cert"][self::PT_BR] = "Certificações";
 		$messages["cert"][self::EN_US] = "Certifications";
 
@@ -347,6 +350,12 @@ class Lang
 
 		$messages["reset_account"][self::PT_BR] = "Resetar/deletar conta";
 		$messages["reset_account"][self::EN_US] = "Reset/delete account";
+
+		$messages["reset_plaques"][self::PT_BR] = "Apagar as placas";
+		$messages["reset_plaques"][self::EN_US] = "Remove plaques";
+
+		$messages["reset_plaques_txt"][self::PT_BR] = "Caso queira, você pode excluir todas as placas geradas por aqui.";
+		$messages["reset_plaques_txt"][self::EN_US] = "";
 
 		$messages["reset_weeks"][self::PT_BR] = "Para alterar o dia de início dos charts, é preciso resetar sua conta (excluir os charts já gerados). Resete sua conta";
 		$messages["reset_weeks"][self::EN_US] = "To change the starting day of the charts, you need to reset your account (excluding the charts already generated). Reset your account";

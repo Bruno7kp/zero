@@ -22,6 +22,8 @@ use B7KP\Library\Lang;
 							
 							<p class="text-muted text-justify"><?php echo Lang::get("reset_acc_txt");?></p>
 							<a href="#!" id="reset_acc" class="btn btn-danger"><?php echo Lang::get('reset_acc');?></a>
+							<p class="text-muted text-justify"><?php echo Lang::get("reset_plaques_txt");?></p>
+							<a href="#!" id="reset_plaques" class="btn btn-danger"><?php echo Lang::get('reset_plaques');?></a>
 							<p class="text-muted text-justify"><?php echo Lang::get("remove_acc_txt");?></p>
 							<a href="#!" id="delete_acc" class="btn btn-danger"><?php echo Lang::get('remove_acc');?></a>
 							

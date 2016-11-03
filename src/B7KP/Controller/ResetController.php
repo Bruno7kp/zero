@@ -59,6 +59,16 @@ class ResetController extends Controller
 		echo json_encode(array("error" => 0, "msg" => Lang::get("acc_success_rem")));
 	}
 
+	/**
+	* @Route(name=delete_plaques|route=/check/delete_plaques)
+	*/
+	public function deletePlaques()
+	{
+		$this->factory->removeBy("\B7KP\Entity\Plaque", "iduser", $this->user->id);
+		
+		echo json_encode(array("error" => 0, "msg" => Lang::get("acc_success_pla")));
+	}
+
 	private function removeWeeklyCharts()
 	{
 		$dao = Dao::getConn();

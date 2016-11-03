@@ -1,9 +1,8 @@
-$(document).ready(function(){
+$(document).ready(function () {
 	initialize();
 });
 
-function initialize()
-{
+function initialize() {
 	updateAction();
 	formSubmit();
 	routesFns();
@@ -19,9 +18,8 @@ function initialize()
 	friendControl();
 }
 
-function friendControl()
-{
-	$(".add_friend").click(function(event) {
+function friendControl() {
+	$(".add_friend").click(function (event) {
 		event.stopImmediatePropagation();
 		idfriend = $(this).attr('data-id');
 		this_btn = $(this);
@@ -30,27 +28,27 @@ function friendControl()
 			url: baseUrl + '/check/add_friend/' + idfriend,
 			dataType: 'json'
 		})
-		.done(function(data) {
-			showAlert(data.error, data.msg);
-			if(data.btn){
-				this_div.html(data.btn);
-				tipUp();
-				friendControl();
-			}
-			console.log("success");
-		})
-		.fail(function() {
-			console.log("error");
-			showAlert(1, getMsg("error"));
-		})
-		.always(function() {
-			console.log("complete");
-		});
+			.done(function (data) {
+				showAlert(data.error, data.msg);
+				if (data.btn) {
+					this_div.html(data.btn);
+					tipUp();
+					friendControl();
+				}
+				console.log("success");
+			})
+			.fail(function () {
+				console.log("error");
+				showAlert(1, getMsg("error"));
+			})
+			.always(function () {
+				console.log("complete");
+			});
 	});
 
-	$(".remove_friend").click(function(event) {
+	$(".remove_friend").click(function (event) {
 		event.stopImmediatePropagation();
-		if(confirm(getMsg("sure"))){
+		if (confirm(getMsg("sure"))) {
 			idfriend = $(this).attr('data-id');
 			this_btn = $(this);
 			this_div = $(this).parent();
@@ -58,134 +56,153 @@ function friendControl()
 				url: baseUrl + '/check/remove_friend/' + idfriend,
 				dataType: 'json'
 			})
-			.done(function(data) {
-				showAlert(data.error, data.msg);
-				if(data.btn){
-					this_div.html(data.btn);
-					tipUp();
-					friendControl();
-				}
-				console.log("success");
-			})
-			.fail(function() {
-				console.log("error");
-				showAlert(1, getMsg("error"));
-			})
-			.always(function() {
-				console.log("complete");
-			});
+				.done(function (data) {
+					showAlert(data.error, data.msg);
+					if (data.btn) {
+						this_div.html(data.btn);
+						tipUp();
+						friendControl();
+					}
+					console.log("success");
+				})
+				.fail(function () {
+					console.log("error");
+					showAlert(1, getMsg("error"));
+				})
+				.always(function () {
+					console.log("complete");
+				});
 		}
 	});
 }
 
-function tipUp()
-{
+function tipUp() {
 	$('.tipup').tooltipster({
-	    theme: 'tooltipster-blue'
-    });
-}
-
-function grid()
-{
-	$('.grid').masonry({
-	  	itemSelector: '.grid-item', // use a separate class for itemSelector, other than .col-
-	  	columnWidth: '.grid-sizer',
-	  	percentPosition: true
+		theme: 'tooltipster-blue'
 	});
 }
 
-function resetAcc()
-{
-	$("#reset_acc").click(function(event) {
-		if(confirm(getMsg("sure"))){
+function grid() {
+	$('.grid').masonry({
+		itemSelector: '.grid-item', // use a separate class for itemSelector, other than .col-
+		columnWidth: '.grid-sizer',
+		percentPosition: true
+	});
+}
+
+function resetAcc() {
+	$("#reset_acc").click(function (event) {
+		if (confirm(getMsg("sure"))) {
 			$.ajax({
 				url: baseUrl + '/check/reset',
 				dataType: 'json'
 			})
-			.done(function(data) {
-				showAlert(data.error, data.msg);
-				setTimeout(function(){ 
-					window.location.reload();
-				}, 3000);
-				console.log("success");
-			})
-			.fail(function() {
-				console.log("error");
-				showAlert(1, getMsg("error"));
-			})
-			.always(function() {
-				console.log("complete");
-			});
-			
+				.done(function (data) {
+					showAlert(data.error, data.msg);
+					setTimeout(function () {
+						window.location.reload();
+					}, 3000);
+					console.log("success");
+				})
+				.fail(function () {
+					console.log("error");
+					showAlert(1, getMsg("error"));
+				})
+				.always(function () {
+					console.log("complete");
+				});
+
 		}
 	});
 
-	$("#delete_acc").click(function(event) {
-		if(confirm(getMsg("sure"))){
+	$("#delete_acc").click(function (event) {
+		if (confirm(getMsg("sure"))) {
 			$.ajax({
 				url: baseUrl + '/check/delete',
 				dataType: 'json'
 			})
-			.done(function(data) {
-				showAlert(data.error, data.msg);
-				setTimeout(function(){ 
-					window.location.reload();
-				}, 3000);
-				console.log("success");
-			})
-			.fail(function() {
-				console.log("error");
-				showAlert(1, getMsg("error"));
-			})
-			.always(function() {
-				console.log("complete");
-			});
-			
+				.done(function (data) {
+					showAlert(data.error, data.msg);
+					setTimeout(function () {
+						window.location.reload();
+					}, 3000);
+					console.log("success");
+				})
+				.fail(function () {
+					console.log("error");
+					showAlert(1, getMsg("error"));
+				})
+				.always(function () {
+					console.log("complete");
+				});
+
 		}
 	});
 
-	$("img[get-user-image]").each(function(index, el) {
+	$("#reset_plaques").click(function (event) {
+		if (confirm(getMsg("sure"))) {
+			$.ajax({
+				url: baseUrl + '/check/delete_plaques',
+				dataType: 'json'
+			})
+				.done(function (data) {
+					showAlert(data.error, data.msg);
+					setTimeout(function () {
+						window.location.reload();
+					}, 3000);
+					console.log("success");
+				})
+				.fail(function () {
+					console.log("error");
+					showAlert(1, getMsg("error"));
+				})
+				.always(function () {
+					console.log("complete");
+				});
+		}
+	});
+
+	$("img[get-user-image]").each(function (index, el) {
 		user_img_tag = $(this);
 		user_name = user_img_tag.attr('get-user-image');
-		get_img_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getinfo&api_key='+apiKey+'&user='+user_name+'&format=json';
+		get_img_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getinfo&api_key=' + apiKey + '&user=' + user_name + '&format=json';
 		$.ajax({
 			url: get_img_url,
 			dataType: 'json',
 			async: false,
 		})
-		.done(function(data) {
-			if(typeof data.user.image[2] != "undefined" && data.user.image[2]["#text"] != ""){
-				user_img_tag.attr('src', data.user.image[2]["#text"]);
-			}
-			console.log("success");
-		})
-		.fail(function() {
-			console.log("error");
-		})
-		.always(function() {
-			console.log("complete");
-		});
-		
+			.done(function (data) {
+				if (typeof data.user.image[2] != "undefined" && data.user.image[2]["#text"] != "") {
+					user_img_tag.attr('src', data.user.image[2]["#text"]);
+				}
+				console.log("success");
+			})
+			.fail(function () {
+				console.log("error");
+			})
+			.always(function () {
+				console.log("complete");
+			});
+
 	});
 }
 
-function btnCertShow()
-{
-	$("#nid").on('click', function(event) {
+function btnCertShow() {
+	$("#nid").on('click', function (event) {
 		event.preventDefault();
 		$('.nclass').show();
 		$('.uclass').hide();
 		$('.wclass').hide();
 	});
 
-	$("#uid").on('click', function(event) {
+	$("#uid").on('click', function (event) {
 		event.preventDefault();
 		$('.nclass').hide();
 		$('.uclass').show();
 		$('.wclass').hide();
 	});
 
-	$("#wid").on('click', function(event) {
+	$("#wid").on('click', function (event) {
 		event.preventDefault();
 		$('.nclass').hide();
 		$('.uclass').hide();
@@ -193,23 +210,20 @@ function btnCertShow()
 	});
 }
 
-function urlSelector()
-{
-	$(".urlselector").on('change', function(event) {
+function urlSelector() {
+	$(".urlselector").on('change', function (event) {
 		event.preventDefault();
 		var url = $(this).val();
-	    if (url) { 
-	        window.location = url;
-	    }
-	    return false;
+		if (url) {
+			window.location = url;
+		}
+		return false;
 	});
 }
 
-function getMsg(msgid)
-{
+function getMsg(msgid) {
 	// eng
-	if (lang == 1) 
-	{
+	if (lang == 1) {
 		array = {};
 		array.att = "Updated";
 		array.success = "Success";
@@ -231,8 +245,7 @@ function getMsg(msgid)
 		array.limitplaque = "You can only generate one certificate per day for each album/music";
 	}
 	// pt
-	else
-	{
+	else {
 		array = {};
 		array.att = "Atualizado";
 		array.success = "Sucesso";
@@ -257,10 +270,9 @@ function getMsg(msgid)
 	return array[msgid];
 }
 
-function generatePlaque()
-{
+function generatePlaque() {
 	genBtn = $("#gen_plaque, .gen_plaque");
-	genBtn.on('click', function(event) {
+	genBtn.on('click', function (event) {
 		event.preventDefault();
 		btn = $(this);
 		data = {};
@@ -276,144 +288,133 @@ function generatePlaque()
 			dataType: 'json',
 			data: data,
 		})
-		.done(function(data) {
-			console.log(data);
-			if(typeof data.url != "undefined" && data.url.length > 1){
-				$.magnificPopup.open({
-				  items: {
-				    src: data.url
-				  },
-				  type: 'image'
-				});
-			}
-			else
-			{
-				if(typeof data.error != "undefined" && data.error == 1)
-				{
-					showAlert(1, getMsg("limitplaque"));
+			.done(function (data) {
+				console.log(data);
+				if (typeof data.url != "undefined" && data.url.length > 1) {
+					$.magnificPopup.open({
+						items: {
+							src: data.url
+						},
+						type: 'image'
+					});
 				}
-				else
-				{
-					showAlert(1, getMsg("error"));
+				else {
+					if (typeof data.error != "undefined" && data.error == 1) {
+						showAlert(1, getMsg("limitplaque"));
+					}
+					else {
+						showAlert(1, getMsg("error"));
+					}
 				}
-			}
-			if(curRoute == "weekly_chart")
-			{
-				undisable_alt(btn, getMsg("newplaque_alt"));
-			}
-			else
-			{
+				if (curRoute == "weekly_chart") {
+					undisable_alt(btn, getMsg("newplaque_alt"));
+				}
+				else {
+					undisable_alt(btn, getMsg("newplaque"));
+				}
+			})
+			.fail(function () {
+				console.log("error");
+				showAlert(1, getMsg("error"));
 				undisable_alt(btn, getMsg("newplaque"));
-			}
-		})
-		.fail(function() {
-			console.log("error");
-			showAlert(1, getMsg("error"));
-			undisable_alt(btn, getMsg("newplaque"));
-		})
-		.always(function() {
-			console.log("complete");
-		});
-		
+			})
+			.always(function () {
+				console.log("complete");
+			});
+
 	});
 }
 
-function removePlaque()
-{
-	$(".remove-plaque").on('click', function(event) {
+function removePlaque() {
+	$(".remove-plaque").on('click', function (event) {
 		event.preventDefault();
-		if(confirm(getMsg("sure")))
-		{
+		if (confirm(getMsg("sure"))) {
 			id = $(this).attr('data-id');
 			div = $(this);
 			$.ajax({
-				url: baseUrl + '/delete/plaque/'+id,
+				url: baseUrl + '/delete/plaque/' + id,
 				dataType: 'json'
 			})
-			.done(function(data) {
-				console.log("success");
-				if(data.error == 0)
-				{
-					div.closest('.col-plaque').hide('slow');
-				}
-				else
-				{
+				.done(function (data) {
+					console.log("success");
+					if (data.error == 0) {
+						div.closest('.col-plaque').hide('slow');
+					}
+					else {
+						showAlert(1, getMsg("error"));
+					}
+				})
+				.fail(function () {
+					console.log("error");
 					showAlert(1, getMsg("error"));
-				}
-			})
-			.fail(function() {
-				console.log("error");
-				showAlert(1, getMsg("error"));
-			})
-			.always(function() {
-				console.log("complete");
-			});
+				})
+				.always(function () {
+					console.log("complete");
+				});
 		}
 	});
 }
 
-function copyChart()
-{
+function copyChart() {
 	copyBtn = $("#copy");
 	copyBtnAlt = $("#copy_alt");
 
-   	copyBtn.tooltipster({
-	    theme: 'tooltipster-blue',
-	    trigger: 'custom',
-        content: $('<span>'+getMsg('copy')+'</span>')
-    });
+	copyBtn.tooltipster({
+		theme: 'tooltipster-blue',
+		trigger: 'custom',
+		content: $('<span>' + getMsg('copy') + '</span>')
+	});
 
-    copyBtnAlt.tooltipster({
-	    theme: 'tooltipster-blue',
-	    trigger: 'custom',
-        content: $('<span>'+getMsg('copy')+'</span>')
-    });
+	copyBtnAlt.tooltipster({
+		theme: 'tooltipster-blue',
+		trigger: 'custom',
+		content: $('<span>' + getMsg('copy') + '</span>')
+	});
 
-	copyBtn.click(function(event) {
+	copyBtn.click(function (event) {
 		$(".cr-col").hide(); // remove chart-run col
 		$(".cr-row").hide(); // remove chart-run row
 		$(".gen_plaque").hide(); // remove plaque generator button
 
 		var clip = new Clipboard('#copy');
-		clip.on('success', function(e) {
+		clip.on('success', function (e) {
 			copyBtn.tooltipster('show');
 			console.log(e);
-		    e.clearSelection();
+			e.clearSelection();
 			$(".cr-col").show();
 			$(".gen_plaque").show();
 		});
 	});
 
-	copyBtnAlt.click(function(event) {
+	copyBtnAlt.click(function (event) {
 		var clipb = new Clipboard('#copy_alt', {
-		    text: function() {
-		        return document.querySelector('#copyme_alt').innerHTML;
-		    }
+			text: function () {
+				return document.querySelector('#copyme_alt').innerHTML;
+			}
 		});
-		clipb.on('success', function(e) {
+		clipb.on('success', function (e) {
 			copyBtnAlt.tooltipster('show');
-		    e.clearSelection();
+			e.clearSelection();
 		});
 	});
 
-	$('.showonhover').hover(function() {
+	$('.showonhover').hover(function () {
 		/* Stuff to do when the mouse enters the element */
 		$(this).find('span').removeClass('hidden');
-	}, function() {
+	}, function () {
 		/* Stuff to do when the mouse leaves the element */
 		$(this).find('span').addClass('hidden');
 	});
 
-	$("body").click(function(event) {
+	$("body").click(function (event) {
 		copyBtn.tooltipster('hide');
 		copyBtnAlt.tooltipster('hide');
 	});
 }
 
-function formSubmit()
-{
+function formSubmit() {
 	submitBtn = $(".send");
-	submitBtn.on('click', function(event) {
+	submitBtn.on('click', function (event) {
 		event.preventDefault();
 		thisBtn = $(this);
 		disable(thisBtn);
@@ -425,91 +426,81 @@ function formSubmit()
 			type: method,
 			data: form,
 		})
-		.done(function(data) {
-			data = JSON.parse(data);
-			if(data.erro == 0)
-			{
- 				window[data.call](data);
-			}
-			else
-			{
-				showAlert(data.erro, data.message);
+			.done(function (data) {
+				data = JSON.parse(data);
+				if (data.erro == 0) {
+					window[data.call](data);
+				}
+				else {
+					showAlert(data.erro, data.message);
+					undisable(thisBtn);
+				}
+			})
+			.fail(function () {
+				console.log("error");
+				showAlert(1, getMsg('error'));
 				undisable(thisBtn);
-			}
-		})
-		.fail(function() {
-			console.log("error");
-			showAlert(1, getMsg('error'));
-			undisable(thisBtn);
-		})
-		.always(function() {
-			console.log("complete");
-		});
+			})
+			.always(function () {
+				console.log("complete");
+			});
 	});
 }
 
-function sortTable()
-{
+function sortTable() {
 	$.tablesorter.themes.bootstrap = {
-		table        : 'table table-bordered table-striped',
-	    caption      : 'caption',
-	    // header class names
-	    header       : 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)
-	    sortNone     : '',
-	    sortAsc      : '',
-	    sortDesc     : '',
-	    active       : '', // applied when column is sorted
-	    hover        : '', // custom css required - a defined bootstrap style may not override other classes
-	    // icon class names
-	    icons        : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
-	    iconSortNone : 'ti-arrows-vertical', // class name added to icon when column is not sorted
-	    iconSortAsc  : 'ti-angle-up', // class name added to icon when column has ascending sort
-	    iconSortDesc : 'ti-angle-down',
+		table: 'table table-bordered table-striped',
+		caption: 'caption',
+		// header class names
+		header: 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)
+		sortNone: '',
+		sortAsc: '',
+		sortDesc: '',
+		active: '', // applied when column is sorted
+		hover: '', // custom css required - a defined bootstrap style may not override other classes
+		// icon class names
+		icons: '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+		iconSortNone: 'ti-arrows-vertical', // class name added to icon when column is not sorted
+		iconSortAsc: 'ti-angle-up', // class name added to icon when column has ascending sort
+		iconSortDesc: 'ti-angle-down',
 	};
-	$(".tablesorter").tablesorter({theme : "bootstrap", headerTemplate : '{content} {icon}',widgets : [ "uitheme"]});
+	$(".tablesorter").tablesorter({ theme: "bootstrap", headerTemplate: '{content} {icon}', widgets: ["uitheme"] });
 }
 
-function disable(item)
-{
+function disable(item) {
 	item.attr('disabled', 'disabled');
 	item.addClass('disabled');
-	item.text(getMsg('wait')+'...');
+	item.text(getMsg('wait') + '...');
 }
 
-function undisable(item)
-{
+function undisable(item) {
 	item.removeAttr('disabled');
 	item.removeClass('disabled');
 	item.text('submit');
 }
 
-function undisable_alt(item, txt)
-{
+function undisable_alt(item, txt) {
 	item.removeAttr('disabled');
 	item.removeClass('disabled');
 	item.text(txt);
 }
 
-function goTo(data)
-{
+function goTo(data) {
 	window.location.href = data.url;
 }
 
-function successAndGoTo(data)
-{
+function successAndGoTo(data) {
 	showAlert(0, '');
-	setTimeout(function(){ 
+	setTimeout(function () {
 		window.location.href = data.url;
 	}, 3000);
 }
 
-function showAlert(erro, message)
-{
+function showAlert(erro, message) {
 	type = "danger";
 	title = "Oops";
 	icon = "icon-sad-face fa-4x";
-	if(erro == 0)
-	{
+	if (erro == 0) {
 		type = "success";
 		title = getMsg('success');
 		icon = "ti-thumb-up fa-4x";
@@ -523,28 +514,27 @@ function showAlert(erro, message)
 			enter: 'animated fadeInUp',
 			exit: 'animated fadeOutDown'
 		}
-	},{
-		type: 'minimalist',
-		delay: 4000,
-		z_index: 10002,
-		allow_dismiss: true,
-		newest_on_top: true,
-		template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+	}, {
+			type: 'minimalist',
+			delay: 4000,
+			z_index: 10002,
+			allow_dismiss: true,
+			newest_on_top: true,
+			template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
 			'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
 			'<i data-notify="icon" class="bottomspace-sm pull-left"></i>' +
 			'<span data-notify="title">{1}</span>' +
 			'<span data-notify="message">{2}</span>' +
-		'</div>',
-		placement: {
-			from: "top",
-			align: "center"
-		}
-	});
+			'</div>',
+			placement: {
+				from: "top",
+				align: "center"
+			}
+		});
 }
 
-function updateAction()
-{
-	$(".updaters").click(function(event) {
+function updateAction() {
+	$(".updaters").click(function (event) {
 		/* Act on the event */
 		disable($(".updaters"));
 		url = $(this).attr('data-url');
@@ -553,120 +543,109 @@ function updateAction()
 			type: 'POST',
 			dataType: 'json'
 		})
-		.done(function(data) {
-			updateControl(data);
-			console.log("success");
-		})
-		.fail(function() {
-			console.log("error");
-			undisable($(".updaters"));
-			showAlert('danger', getMsg('error'));
-		})
-		.always(function() {
-			console.log("complete");
-		});
-		
+			.done(function (data) {
+				updateControl(data);
+				console.log("success");
+			})
+			.fail(function () {
+				console.log("error");
+				undisable($(".updaters"));
+				showAlert('danger', getMsg('error'));
+			})
+			.always(function () {
+				console.log("complete");
+			});
+
 	});
 }
 
-function updateControl(weeks)
-{
+function updateControl(weeks) {
 	total = weeks.length;
-	if(total > 0)
-	{
+	if (total > 0) {
 		loadStatus(0, total);
 		updateWeek(0);
 	}
-	else
-	{
+	else {
 		nothingNew();
 	}
 
-	function updateWeek(index)
-	{
+	function updateWeek(index) {
 		val = weeks[index];
 		$.ajax({
 			url: baseUrl + '/update/week/' + val.from + "/" + val.to,
 			dataType: 'json'
 		})
-		.done(function(data) {
-			console.log("success");
-			update = index + 1;
-			loadStatus(update, total);
-			updateWeek(update);
-		})
-		.fail(function() {
-			console.log("error" + index);
-			failMsg();
-		})
-		.always(function() {
-			console.log("complete");
-		});
+			.done(function (data) {
+				console.log("success");
+				update = index + 1;
+				loadStatus(update, total);
+				updateWeek(update);
+			})
+			.fail(function () {
+				console.log("error" + index);
+				failMsg();
+			})
+			.always(function () {
+				console.log("complete");
+			});
 	}
 }
 
-function loadStatus(actual, total)
-{
+function loadStatus(actual, total) {
 	divAct = $("#updateaction");
-	perc = actual/total*100;
-	txt = "<h2>"+getMsg('atting')+"</h2> " +
-	"<small class='text-muted'>" + actual + " / " + total + " </small>" +
-	"<div class='progress'>"+
-		"<div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='" + perc + "' aria-valuemin='0' aria-valuemax='100' style='width: " + perc + "%'>"+
-			"<span class='sr-only'>" + perc + "% "+getMsg('wksloaded')+"</span>"+
-		"</div>"+
-	"</div>";
+	perc = actual / total * 100;
+	txt = "<h2>" + getMsg('atting') + "</h2> " +
+		"<small class='text-muted'>" + actual + " / " + total + " </small>" +
+		"<div class='progress'>" +
+		"<div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='" + perc + "' aria-valuemin='0' aria-valuemax='100' style='width: " + perc + "%'>" +
+		"<span class='sr-only'>" + perc + "% " + getMsg('wksloaded') + "</span>" +
+		"</div>" +
+		"</div>";
 	divAct.html(txt);
-	if(actual == total)
-	{
-		txt = "<h2>"+getMsg('success')+"</h2>" +
-		getMsg('finish');
+	if (actual == total) {
+		txt = "<h2>" + getMsg('success') + "</h2>" +
+			getMsg('finish');
 		undisable_alt($(".new"), getMsg('updatenew'));
 		undisable_alt($(".all"), getMsg('updateall'));
 	}
 	divAct.html(txt);
 }
 
-function nothingNew()
-{
+function nothingNew() {
 	divAct = $("#updateaction");
-	txt = "<h2>"+getMsg('uptodate')+"</h2> " +
-	"<small class='text-muted'>"+getMsg('nothingnew')+"</small>";
+	txt = "<h2>" + getMsg('uptodate') + "</h2> " +
+		"<small class='text-muted'>" + getMsg('nothingnew') + "</small>";
 	divAct.html(txt);
 	undisable_alt($(".new"), getMsg('updatenew'));
 	undisable_alt($(".all"), getMsg('updateall'));
 }
 
-function failMsg()
-{
+function failMsg() {
 	divAct = $("#updateaction");
 	txt = "<h2>Oops</h2> " +
-	"<small class='text-muted'>"+getMsg('failload')+"</small>";
+		"<small class='text-muted'>" + getMsg('failload') + "</small>";
 	divAct.html(txt);
 	undisable_alt($(".new"), getMsg('updatenew'));
 	undisable_alt($(".all"), getMsg('updateall'));
 }
 
 
-function routesFns()
-{
-	switch(curRoute) {
-	    case "profile":
-	        loadOverall();
-	        break;
+function routesFns() {
+	switch (curRoute) {
+		case "profile":
+			loadOverall();
+			break;
 
-	    default:
-	        break;
+		default:
+			break;
 	}
 }
 
-function loadOverall()
-{
+function loadOverall() {
 	cur = curPage.split("/");
 	login = cur[cur.length - 1];
 
-	if(login.length == 0)
-	{
+	if (login.length == 0) {
 		login = cur[cur.length - 2];
 	}
 	//loadAct(login, true);
@@ -678,17 +657,17 @@ function loadOverall()
 		url: baseUrl + '/load_all/' + login + '/' + 5,
 		dataType: 'json'
 	})
-	.done(function(data) {
-		art.html(data.artist);
-		alb.html(data.album);
-		mus.html(data.music);
-		rec.html(data.recent);
-		console.log("success");
-	})
-	.fail(function() {
-		console.log("error");
-	})
-	.always(function() {
-		console.log("complete");
-	});	
+		.done(function (data) {
+			art.html(data.artist);
+			alb.html(data.album);
+			mus.html(data.music);
+			rec.html(data.recent);
+			console.log("success");
+		})
+		.fail(function () {
+			console.log("error");
+		})
+		.always(function () {
+			console.log("complete");
+		});
 }
