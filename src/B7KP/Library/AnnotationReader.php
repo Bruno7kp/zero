@@ -11,6 +11,7 @@ class AnnotationReader implements iCache
 	private $scan;
 	private $usecache = true;
 	private static $updated = 0;
+	private static $real_cache = false;
 	
 	function __construct()
 	{
@@ -198,7 +199,10 @@ class AnnotationReader implements iCache
 
 	public function loadCache()
 	{
-		$this->scan = Cache::getJsonData(__CLASS__);
+		if(self::$real_cache === false){
+			self::$real_cache = Cache::getJsonData(__CLASS__);
+		}
+		$this->scan = self::$real_cache;
 		return $this;
 	}
 
