@@ -3,6 +3,28 @@ namespace B7KP\Utils;
 
 class Functions
 {
+
+	// Why? For the glory of satan of course!
+	static function getFirstDayOfFirstWeekOfYear($year)
+	{
+		$date = new \DateTime();
+		$date->setISODate($year, 1, 0);
+		return $date->format("d-m-Y");
+	}
+
+	static function getLastDayOfLastWeekOfYear($year)
+	{
+		$date = new \DateTime();
+		$date->setISODate($year, self::weeksInYear($year), 6);
+		return $date->format("d-m-Y");
+	}
+
+	static function weeksInYear($year) {
+	    $date = new \DateTime();
+	    $date->setISODate($year, 53);
+	    return ($date->format("W") === "53" ? 53 : 52);
+	}
+
 	static function correctDate($date, $format)
 	{
 		$date = str_replace("/", "-", $date);
