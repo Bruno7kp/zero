@@ -22,7 +22,8 @@ use B7KP\Library\Url;
 							<h2><?php echo Lang::get('update_yec');?></h2>
 							<p><?php echo Lang::get('update_yec_notice');?></p>
 							<hr>
-							<button data-url="<?php echo Route::url('update_yec_time', array('time'=>'all'));?>" data-time="all" class="yecupdaters all btn btn-outline"><?php echo Lang::get('up_all');?></button>
+							<button data-url="<?php echo Route::url('update_yec_time', array('time'=>'all'));?>" data-time="all" class="yecupdateall all btn btn-outline"><?php echo Lang::get('up_all');?></button>
+							<hr>
 							<?php 
 							$year = isset($year) && $year >= 2005 ? $year : 2005;
 							$now = new DateTime();

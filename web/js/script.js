@@ -535,6 +535,7 @@ function showAlert(erro, message) {
 }
 
 function updateYecAction() {
+	allon = 0;
 	$(".yecupdaters").click(function (event) {
 		/* Act on the event */
 		that = $(this);
@@ -549,6 +550,9 @@ function updateYecAction() {
 				//updateControl(data);
 				showAlert(data.error, data.msg);
 				undisable_alt($(that), "YEC " + $(that).attr('data-time'));
+				if(allon){
+					$(".yecupdateall").click();
+				}
 				console.log("success");
 			})
 			.fail(function () {
@@ -560,6 +564,19 @@ function updateYecAction() {
 				console.log("complete");
 			});
 
+	});
+
+	$(".yecupdateall").click(function(event) {
+		disable($(this));
+		yecs = $(".yecupdaters");
+		console.log(allon);
+		if(typeof yecs[allon] != "undefined"){
+			yecs[allon].click();
+			allon++;
+		}else if(allon == yecs.length){
+			undisable_alt($(this), getMsg('updateall'));
+			allon = 0;
+		}
 	});
 }
 
