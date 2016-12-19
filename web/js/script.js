@@ -4,6 +4,7 @@ $(document).ready(function () {
 
 function initialize() {
 	updateAction();
+	updateYecAction();
 	formSubmit();
 	routesFns();
 	copyChart();
@@ -532,6 +533,36 @@ function showAlert(erro, message) {
 			}
 		});
 }
+
+function updateYecAction() {
+	$(".yecupdaters").click(function (event) {
+		/* Act on the event */
+		that = $(this);
+		disable(that);
+		url = $(this).attr('data-url');
+		$.ajax({
+			url: url,
+			type: 'POST',
+			dataType: 'json'
+		})
+			.done(function (data) {
+				//updateControl(data);
+				showAlert(data.error, data.msg);
+				undisable_alt($(that), "YEC " + $(that).attr('data-time'));
+				console.log("success");
+			})
+			.fail(function () {
+				console.log("error");
+				undisable_alt($(that), "YEC " + $(that).attr('data-time'));
+				showAlert('danger', getMsg('error'));
+			})
+			.always(function () {
+				console.log("complete");
+			});
+
+	});
+}
+
 
 function updateAction() {
 	$(".updaters").click(function (event) {

@@ -1023,6 +1023,19 @@ class Lang
 		$messages["noty_add_ask"][self::PT_BR] = "Aceitar pedido";
 		$messages["noty_add_ask"][self::EN_US] = "Accept the request";
 
+		// YEC
+		$messages["update_yec"][self::PT_BR] = "Atualizar YEC";
+		$messages["update_yec"][self::EN_US] = "Update YEC";
+
+		$messages["update_yec_notice"][self::PT_BR] = "Aperte nos botões abaixo para atualizar os respectivos YECs";
+		$messages["update_yec_notice"][self::EN_US] = "";
+
+		$messages["yec_update_error"][self::PT_BR] = "Ocorreu algum problema ao atualizar o YEC. Tente novamente mais tarde.";
+		$messages["yec_update_error"][self::EN_US] = "Oops something went wrong.";
+
+		$messages["yec_update_success"][self::PT_BR] = "YEC atualizado com sucesso.";
+		$messages["yec_update_success"][self::EN_US] = "YEC updated.";
+
 
 		return $messages;
 	}

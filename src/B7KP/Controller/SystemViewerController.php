@@ -59,7 +59,7 @@ class SystemViewerController extends Controller
 		$dao->run("CREATE TABLE `yec` ( `id` INT NOT NULL AUTO_INCREMENT , `iduser` INT NOT NULL , `year` INT NOT NULL , PRIMARY KEY (`id`))");
 		$dao->run("
 		CREATE TABLE `album_yec` (
-		  `id` int(11) NOT NULL,
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `idyec` int(11) NOT NULL,
 		  `album` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
 		  `alb_mbid` varchar(255) NOT NULL,
@@ -67,21 +67,21 @@ class SystemViewerController extends Controller
 		  `art_mbid` varchar(255) NOT NULL,
 		  `playcount` int(11) NOT NULL,
 		  `rank` int(6) NOT NULL,
-		  `updated` bigint(16) NOT NULL
+		  `updated` bigint(16) NOT NULL, PRIMARY KEY (`id`)
 		)");
 		$dao->run("
 		CREATE TABLE `artist_yec` (
-		  `id` int(11) NOT NULL,
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `idyec` int(11) NOT NULL,
 		  `artist` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
 		  `art_mbid` varchar(255) NOT NULL,
 		  `playcount` int(11) NOT NULL,
 		  `rank` int(5) NOT NULL,
-		  `updated` bigint(16) NOT NULL
+		  `updated` bigint(16) NOT NULL, PRIMARY KEY (`id`)
 		)");
 		$dao->run("
 		CREATE TABLE `music_yec` (
-		  `id` int(11) NOT NULL,
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `idyec` int(11) NOT NULL,
 		  `music` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
 		  `mus_mbid` varchar(255) DEFAULT NULL,
@@ -89,7 +89,7 @@ class SystemViewerController extends Controller
 		  `art_mbid` varchar(255) NOT NULL,
 		  `playcount` int(11) NOT NULL,
 		  `rank` int(7) NOT NULL,
-		  `updated` bigint(16) NOT NULL
+		  `updated` bigint(16) NOT NULL, PRIMARY KEY (`id`)
 		)");
 	}
 
