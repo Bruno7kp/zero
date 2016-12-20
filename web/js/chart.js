@@ -304,6 +304,8 @@ function loadimages()
 				console.log("success");
 			})
 			.fail(function() {
+				img = null;
+				setImg(td.attr('id'), img);
 				console.log("error");
 			})
 			.always(function() {

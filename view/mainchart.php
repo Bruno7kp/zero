@@ -209,9 +209,19 @@ use B7KP\Library\Lang;
 											</div>
 										</div>
 									</div>
-									
 								</div>
 							</div>	
+							<div class="row text-center bottomspace-sm">
+								<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
+							</div>
+							<div class="row text-center topspace-sm">
+								<div class="col-md-12 ">
+									<div class="divider">
+										<h2 class="h3 topspace-md">YEC</h2>
+										<!-- cards with no. 1s --last 5 yrs -->
+									</div>
+								</div>
+							</div>
 							<div class="row text-center bottomspace-sm">
 								<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
 							</div>

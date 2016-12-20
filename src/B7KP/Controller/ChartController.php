@@ -60,6 +60,7 @@ class ChartController extends Controller
 				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
 				$i++;
 			}
+			// get yecs no. 1s
 			$var = array
 					(
 						"weeks" => $numberones,
@@ -77,13 +78,22 @@ class ChartController extends Controller
 	}
 
 	/**
-	* @Route(name=full_chart_list|route=/user/{login}/charts/list)
+	* @Route(name=full_chart_list|route=/user/{login}/charts/list/)
 	*/
-	public function fullCharts($login)
+	public function fullChartsRedirect($login)
+	{
+		$this->redirectToRoute("full_charts_list", array("login" => $login, "type"=> "artist"));
+	}
+
+	/**
+	* @Route(name=full_charts_list|route=/user/{login}/charts/list/{type})
+	*/
+	public function fullCharts($login, $type)
 	{
 		$user = $this->factory->findOneBy("B7KP\Entity\User", $login, "login");
 		if($user instanceof User)
 		{
+			$this->isValidType($type, $user);
 			$perm = new \B7KP\Utils\PermissionCheck("User");
 			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
@@ -105,9 +115,10 @@ class ChartController extends Controller
 				$to->modify('-1 day');
 				$numberones[$i]["to"] = $to->format("Y.m.d");
 				$cond = array("idweek" => $week->id);
-				$numberones[$i]["album"]  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
-				$numberones[$i]["artist"] = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
-				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberones[$i]["album"]  = array();
+				$numberones[$i]["artist"] = array();
+				$numberones[$i]["music"]  = array();
+				$numberones[$i][$type]  = $this->factory->find("B7KP\Entity\\".ucfirst($type)."_charts", $cond, "updated DESC, rank ASC", "0, 1");
 				$i++;
 			}
 			$var = array
@@ -115,7 +126,8 @@ class ChartController extends Controller
 						"weeks" 	=> $numberones,
 						"user" 		=> $user,
 						"lfm_bg" 	=> $bgimage,
-						"lfm_image" => $this->getUserBg($user, true)
+						"lfm_image" => $this->getUserBg($user, true),
+						"type"		=> $type
 					);
 			$this->render("chartlist.php", $var);
 		}

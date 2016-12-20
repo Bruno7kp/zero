@@ -75,7 +75,7 @@ use B7KP\Library\Lang;
 										<td class='rk-col text-center'>
 											<?php echo $value["rank"];?>
 										</td>
-										<td class="getimage" id="rankid<?php echo $value["rank"];?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"><?php echo S::loader(30);?></td>
+										<td class="getimage" id="rankid<?php echo $value["rank"];?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"><?php echo S::loader(33);?></td>
 										<td class="left"><a href=<?php echo Route::url("lib_".substr($type, 0, 3), array("name" => Functions::fixLFM($name), "artist" => Functions::fixLFM($artist), "login" => $user->login));?>><?php echo $name;?></a></td>
 										<?php 
 										if($type != "artist")
