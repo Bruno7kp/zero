@@ -214,17 +214,138 @@ use B7KP\Library\Lang;
 							<div class="row text-center bottomspace-sm">
 								<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
 							</div>
+							<?php 
+							if(count($years)){
+							?>
 							<div class="row text-center topspace-sm">
 								<div class="col-md-12 ">
-									<div class="divider">
-										<h2 class="h3 topspace-md">YEC</h2>
-										<!-- cards with no. 1s --last 5 yrs -->
+									<div class="divider bottomspace-sm">
+										<hr>
+										<?php
+											foreach ($years as $key => $value) 
+											{
+										?>
+										<h2 class="h3 topspace-md">YEC <?php echo $value["year"]; ?></h2>
+										<div class="row bottomspace-sm">
+											<div class="col-md-12">
+											<div class="col-md-12">
+												<div class="row divider-tb bottomspace-sm">
+										<?php
+												if(isset($value["artist"][0]))
+												{
+													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/artist/year/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
+													$actlink = $muslink.F::fixLFM($value["artist"][0]->artist);
+													$weeklink = $mainlink.$value["year"];
+													$year = $mainlink.$value["year"];
+													$artist = $value["artist"][0];															
+										?>
+													<div class="col-md-4 text-center">
+														<h4 class="h3 no-margin"><i class="ti-user"></i></h4>
+														<small class="min-bold"><?php echo $value["artist"][0]->playcount;?></small>
+														<small class="min-min"><?php echo Lang::get("play_x");?></small>
+													</div>
+													<div class="col-md-6 topspace-md text-center">
+														<h4 class="h3 no-margin"><?php echo "<a href=".$actlink.">".$artist->artist."</a>";?></h4>
+													</div>
+													<div class="col-md-2 topspace-md bottomspace-sm text-center">
+														<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
+													</div>
+										<?php
+												}
+												else
+												{
+													echo Lang::get('no_data');
+												}
+										?>
+												</div>
+											</div>
+											</div>
+											<div class="col-md-12">
+											<div class="col-md-12">
+												<div class="row divider-tb bottomspace-sm">
+										<?php
+												if(isset($value["album"][0]))
+												{
+													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/album/year/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
+													$actlink = $muslink.F::fixLFM($value["album"][0]->artist);
+													$alblink = $muslink.F::fixLFM($value["album"][0]->artist)."/".F::fixLFM($value["album"][0]->album);
+													$weeklink = $mainlink.$value["year"];
+													$year = $mainlink.$value["year"];
+													$album = $value["album"][0];															
+										?>
+													<div class="col-md-4 text-center">
+														<h4 class="h3 no-margin"><i class="icon-vynil except"></i></h4>
+														<small class="min-bold"><?php echo $value["album"][0]->playcount;?></small>
+														<small class="min-min"><?php echo Lang::get("play_x");?></small>
+													</div>
+													<div class="col-md-6 topspace-md text-center">
+														<h4 class="no-margin"><?php echo "<a href=".$alblink.">".$album->album."</a>";?></h4>
+															<span class="text-muted"><?php echo Lang::get('by');?></span>
+														<?php echo "<a href=".$actlink.">".$album->artist."</a>";?>
+													</div>
+													<div class="col-md-2 topspace-md bottomspace-sm text-center">
+														<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
+													</div>
+										<?php
+												}
+												else
+												{
+													echo Lang::get('no_data');
+												}
+										?>
+												</div>
+											</div>
+											</div>
+											<div class="col-md-12">
+											<div class="col-md-12">
+												<div class="row divider-tb bottomspace-sm">
+										<?php
+												if(isset($value["music"][0]))
+												{
+													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/music/year/";
+													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
+													$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
+													$alblink = $muslink.F::fixLFM($value["music"][0]->artist)."/".F::fixLFM($value["music"][0]->music);
+													$weeklink = $mainlink.$value["year"];
+													$year = $mainlink.$value["year"];
+													$music = $value["music"][0];															
+										?>
+													<div class="col-md-4 text-center">
+														<h4 class="h3 no-margin"><i class="ti-music"></i></h4>
+														<small class="min-bold"><?php echo $value["music"][0]->playcount;?></small>
+														<small class="min-min"><?php echo Lang::get("play_x");?></small>
+													</div>
+													<div class="col-md-6 topspace-md text-center">
+														<h4 class="no-margin"><?php echo "<a href=".$alblink.">".$music->music."</a>";?></h4>
+															<span class="text-muted"><?php echo Lang::get('by');?></span>
+														<?php echo "<a href=".$actlink.">".$music->artist."</a>";?>
+													</div>
+													<div class="col-md-2 topspace-md bottomspace-sm text-center">
+														<a href="<?php echo $weeklink;?>" class="btn no-margin btn-custom btn-info btn-sm"><i class="ti-stats-up"></i></a>
+													</div>
+										<?php
+												}
+												else
+												{
+													echo Lang::get('no_data');
+												}
+										?>
+										<?php
+											}
+										?> 
+												</div>
+											</div>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
 							<div class="row text-center bottomspace-sm">
-								<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
+								<a href="<?php echo Route::url('full_yec_list', array('login' => $user->login, 'by' => 'plays'));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
 							</div>
+							<?php } ?>
 						</div>
 						<div class="col-md-6">
 							<h2 class="h3 text-center"><?php echo Lang::get('stats');?></h2>

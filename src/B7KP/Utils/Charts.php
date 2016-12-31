@@ -8,6 +8,10 @@ use B7KP\Entity\User;
 use B7KP\Entity\Music_charts; 
 use B7KP\Entity\Album_charts; 
 use B7KP\Entity\Artist_charts; 
+use B7KP\Entity\Yec;
+use B7KP\Entity\Music_yec; 
+use B7KP\Entity\Album_yec; 
+use B7KP\Entity\Artist_yec; 
 use B7KP\Library\Url; 
 use B7KP\Library\Route; 
 use B7KP\Library\Lang; 
@@ -21,6 +25,7 @@ class Charts
 	private $user;
 	private $css_file = "chart.css";
 	static $referenceweek;
+	static $initialweek;
 	
 	function __construct(Model $factory, User $user)
 	{
@@ -56,6 +61,14 @@ class Charts
 	{
 		ob_start();
 		include MAIN_DIR.'/view/inc/chart-table.php';
+		$table = ob_get_clean();
+		return $table;
+	}
+
+	private function getTableYec($list, $type, $settings, $year, $lw)
+	{
+		ob_start();
+		include MAIN_DIR.'/view/inc/chart-table-yec.php';
 		$table = ob_get_clean();
 		return $table;
 	}
@@ -145,6 +158,82 @@ class Charts
 		return $list;
 	}
 
+	/* If $html = true: returns table with the charts, else: array of the items */
+	public function getYecCharts(Yec $year, $type, $limit, $html = false, $settings = false)
+	{
+		$cond = array("idyec" => $year->id);
+		$limit = ($limit == C::LIMIT_MAX) ? false : "0, ".$limit;
+		$newlist = array();
+		$fyec = $this->getWeekNumber(Fn::getFirstDayOfFirstWeekOfYear($year->year));
+		$lyec = $this->getWeekNumber(Fn::getLastDayOfLastWeekOfYear($year->year), false);
+		switch ($type) {
+			case 'album':
+				$list  = $this->factory->find("B7KP\Entity\Album_yec", $cond, "updated DESC, rank ASC", $limit);
+				$i = 0;
+				foreach ($list as $key => $value) {
+					$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
+					$ext = $this->extract($chartstats, false, $lyec, $fyec);
+					$newlist[$i]['stats'] = $ext;
+					$newlist[$i]['item'] = $value;
+					$i++;
+				}
+				break;
+
+			case 'artist':
+				$list = $this->factory->find("B7KP\Entity\Artist_yec", $cond, "updated DESC, rank ASC", $limit);
+				$i = 0;
+				foreach ($list as $key => $value) {
+					$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
+					$ext = $this->extract($chartstats, false, $lyec, $fyec);
+					$newlist[$i]['stats'] = $ext;
+					$newlist[$i]['item'] = $value;
+					$i++;
+				}
+				break;
+			
+			default:
+				$list  = $this->factory->find("B7KP\Entity\Music_yec", $cond, "updated DESC, rank ASC", $limit);
+				$i = 0;
+				foreach ($list as $key => $value) {
+					$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
+					$ext = $this->extract($chartstats, false, $lyec, $fyec);
+					$newlist[$i]['stats'] = $ext;
+					$newlist[$i]['item'] = $value;
+					$i++;
+				}
+				break;
+		}
+
+
+		if($html && $settings)
+		{
+			$list = $this->getTableYec($newlist, $type, $settings, $year->year, $lyec);
+		}
+		else
+		{
+			$list = $newlist;
+		}
+
+		return $list;
+	}
+
+	public function getWeekNumber($date, $first = true)
+	{
+		$wknb = 1;
+		$fromorto = 'to_day';
+		$major = '>';
+		$desc = 'ASC';
+		$weeks = $this->factory->findSql("B7KP\Entity\Week", "SELECT * FROM week WHERE iduser = '{$this->user->id}' AND {$fromorto} {$major} '{$date}' ORDER BY week {$desc} LIMIT 0,1");
+	
+		if(isset($weeks[0]))
+		{
+			$wknb = $weeks[0]->week;
+			return $wknb;
+		}
+
+		return false;
+	}
+
 	private function aux($method, $value)
 	{
 		switch ($method) {
@@ -203,7 +292,7 @@ class Charts
 		}
 	}
 
-	public function extract($array, $chartrun = true, $referenceweek = false)
+	public function extract($array, $chartrun = true, $referenceweek = false, $initialweek = false)
 	{
 		if(!is_array($array) || count($array) == 0)
 		{
@@ -282,6 +371,15 @@ class Charts
 					$data["todate"] = $data["alltime"]; 
 				}
 
+				if($initialweek && is_numeric($initialweek))
+				{
+					self::$initialweek = $initialweek;
+					$stats = array_filter($stats, function($k) {
+												    return $k >= \B7KP\Utils\Charts::$initialweek;
+													}, ARRAY_FILTER_USE_KEY);
+					$data['todate'] = $this->extractFromCR($stats);
+				}
+				
 				$stats = array("chartrun" => $stats, "stats" => $data);
 			}
 		}

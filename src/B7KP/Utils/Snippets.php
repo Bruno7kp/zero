@@ -364,7 +364,7 @@ class Snippets
 
 	static function chartRun($type, $cr, $user, $stats, $limit, $name, $artist = false)
 	{
-		$peak = $stats["overall"]["peak"];
+		$peak = isset($stats["overall"]["peak"]) ? $stats["overall"]["peak"] : 0;
 		$totalweeks = $stats["weeks"]["total"];
 		$wkstop1 	= $stats["weeks"]["top01"];
 		$wkstop5 	= $stats["weeks"]["top05"];

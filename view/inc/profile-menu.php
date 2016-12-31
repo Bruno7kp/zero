@@ -11,7 +11,10 @@ switch ($curroute) {
 
 	case 'chart_list':
 	case 'full_chart_list':
+	case 'full_charts_list':
+	case 'full_yec_list':
 	case 'weekly_chart':
+	case 'yec_chart':
 	case 'live_charts':
 	case 'bwp':
 	case 'bwp_at':

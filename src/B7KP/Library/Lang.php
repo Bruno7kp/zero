@@ -985,6 +985,9 @@ class Lang
 		$messages["v_others"][self::PT_BR] = "Outras melhorias e correções de bugs.";
 		$messages["v_others"][self::EN_US] = "Bug fixes.";
 
+		$messages["v_yec"][self::PT_BR] = "Charts de fim de ano (YEC).";
+		$messages["v_yec"][self::EN_US] = "YEC.";
+
 		// noty
 
 		$messages["no_noty"][self::PT_BR] = "Nenhuma notificação encontrada";
@@ -1035,6 +1038,9 @@ class Lang
 
 		$messages["yec_update_success"][self::PT_BR] = "YEC atualizado com sucesso.";
 		$messages["yec_update_success"][self::EN_US] = "YEC updated.";
+
+		$messages["ch_yecli"][self::PT_BR] = "YECs";
+		$messages["ch_yecli"][self::EN_US] = "YECs";
 
 
 		return $messages;

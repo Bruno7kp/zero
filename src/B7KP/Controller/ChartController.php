@@ -60,10 +60,24 @@ class ChartController extends Controller
 				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
 				$i++;
 			}
+			$numberonesy = array();
+			$cond = array("iduser" => $user->id);
+			$years = $this->factory->find("B7KP\Entity\Yec", $cond, "year DESC LIMIT 0,1");
+			$i = 0;
+			foreach ($years as $year) 
+			{
+				$numberonesy[$i]["year"] = $year->year;
+				$cond = array("idyec" => $year->id);
+				$numberonesy[$i]["album"]  = $this->factory->find("B7KP\Entity\\Album_yec", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberonesy[$i]["artist"]  = $this->factory->find("B7KP\Entity\\Artist_yec", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberonesy[$i]["music"]  = $this->factory->find("B7KP\Entity\\Music_yec", $cond, "updated DESC, rank ASC", "0, 1");
+				$i++;
+			}
 			// get yecs no. 1s
 			$var = array
 					(
 						"weeks" => $numberones,
+						"years" => $numberonesy,
 						"settings"	=> $settings,
 						"user" => $user,
 						"lfm_bg" => $bgimage,

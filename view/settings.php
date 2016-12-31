@@ -23,6 +23,8 @@ use B7KP\Library\Lang;
 							<hr id="more">
 							<a href="<?php echo Route::url('update');?>" class="btn btn-outline"><?php echo Lang::get('update');?> charts</a>
 							<br>
+							<a href="<?php echo Route::url('update_yec');?>" class="btn btn-outline"><?php echo Lang::get('update');?> YEC</a>
+							<br>
 							<a href="<?php echo Route::url('cert_settings');?>" class="btn btn-outline"><?php echo Lang::get('cert');?></a>
 							<br>
 							<a href="<?php echo Route::url('usereditpass');?>" class="btn btn-outline"><?php echo Lang::get('edit');?> <?php echo Lang::get('pass');?></a>

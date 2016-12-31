@@ -5,18 +5,18 @@ class Functions
 {
 
 	// Why? For the glory of satan of course!
-	static function getFirstDayOfFirstWeekOfYear($year)
+	static function getFirstDayOfFirstWeekOfYear($year, $format = "Y-m-d")
 	{
 		$date = new \DateTime();
 		$date->setISODate($year, 1, 0);
-		return $date->format("d-m-Y");
+		return $date->format($format);
 	}
 
-	static function getLastDayOfLastWeekOfYear($year)
+	static function getLastDayOfLastWeekOfYear($year, $format = "Y-m-d")
 	{
 		$date = new \DateTime();
 		$date->setISODate($year, self::weeksInYear($year), 6);
-		return $date->format("d-m-Y");
+		return $date->format($format);
 	}
 
 	static function weeksInYear($year) {
