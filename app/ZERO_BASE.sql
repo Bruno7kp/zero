@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.1
--- http://www.phpmyadmin.net
+-- version 4.7.9
+-- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 31-Out-2016 às 02:08
--- Versão do servidor: 10.1.16-MariaDB
--- PHP Version: 5.6.24
+-- Generation Time: 08-Abr-2018 às 23:45
+-- Versão do servidor: 10.1.31-MariaDB
+-- PHP Version: 5.6.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -41,6 +43,24 @@ CREATE TABLE `album_charts` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura da tabela `album_yec`
+--
+
+CREATE TABLE `album_yec` (
+  `id` int(11) NOT NULL,
+  `idyec` int(11) NOT NULL,
+  `album` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `alb_mbid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `artist` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `art_mbid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `playcount` int(11) NOT NULL,
+  `rank` int(6) NOT NULL,
+  `updated` bigint(16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura da tabela `artist_charts`
 --
 
@@ -49,6 +69,22 @@ CREATE TABLE `artist_charts` (
   `idweek` int(11) NOT NULL,
   `artist` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `art_mbid` varchar(255) NOT NULL,
+  `playcount` int(11) NOT NULL,
+  `rank` int(5) NOT NULL,
+  `updated` bigint(16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `artist_yec`
+--
+
+CREATE TABLE `artist_yec` (
+  `id` int(11) NOT NULL,
+  `idyec` int(11) NOT NULL,
+  `artist` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `art_mbid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `playcount` int(11) NOT NULL,
   `rank` int(5) NOT NULL,
   `updated` bigint(16) NOT NULL
@@ -81,6 +117,24 @@ CREATE TABLE `music_charts` (
   `mus_mbid` varchar(255) DEFAULT NULL,
   `artist` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `art_mbid` varchar(255) NOT NULL,
+  `playcount` int(11) NOT NULL,
+  `rank` int(7) NOT NULL,
+  `updated` bigint(16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `music_yec`
+--
+
+CREATE TABLE `music_yec` (
+  `id` int(11) NOT NULL,
+  `idyec` int(11) NOT NULL,
+  `music` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `mus_mbid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `artist` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `art_mbid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `playcount` int(11) NOT NULL,
   `rank` int(7) NOT NULL,
   `updated` bigint(16) NOT NULL
@@ -168,6 +222,18 @@ CREATE TABLE `week` (
   `to_day` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `yec`
+--
+
+CREATE TABLE `yec` (
+  `id` int(11) NOT NULL,
+  `iduser` int(11) NOT NULL,
+  `year` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 -- Indexes for dumped tables
 --
@@ -180,11 +246,23 @@ ALTER TABLE `album_charts`
   ADD KEY `FK_alb_week_1` (`idweek`);
 
 --
+-- Indexes for table `album_yec`
+--
+ALTER TABLE `album_yec`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `artist_charts`
 --
 ALTER TABLE `artist_charts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `FK_art_week_1` (`idweek`);
+
+--
+-- Indexes for table `artist_yec`
+--
+ALTER TABLE `artist_yec`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `friend`
@@ -198,6 +276,12 @@ ALTER TABLE `friend`
 ALTER TABLE `music_charts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `FK_mus_week_1` (`idweek`);
+
+--
+-- Indexes for table `music_yec`
+--
+ALTER TABLE `music_yec`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `plaque`
@@ -228,6 +312,12 @@ ALTER TABLE `week`
   ADD KEY `FK_user_week_1` (`iduser`);
 
 --
+-- Indexes for table `yec`
+--
+ALTER TABLE `yec`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -235,42 +325,75 @@ ALTER TABLE `week`
 -- AUTO_INCREMENT for table `album_charts`
 --
 ALTER TABLE `album_charts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2881;
+
+--
+-- AUTO_INCREMENT for table `album_yec`
+--
+ALTER TABLE `album_yec`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `artist_charts`
 --
 ALTER TABLE `artist_charts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2889;
+
+--
+-- AUTO_INCREMENT for table `artist_yec`
+--
+ALTER TABLE `artist_yec`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `friend`
 --
 ALTER TABLE `friend`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `music_charts`
 --
 ALTER TABLE `music_charts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2891;
+
+--
+-- AUTO_INCREMENT for table `music_yec`
+--
+ALTER TABLE `music_yec`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `plaque`
 --
 ALTER TABLE `plaque`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `week`
 --
 ALTER TABLE `week`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=404;
+
+--
+-- AUTO_INCREMENT for table `yec`
+--
+ALTER TABLE `yec`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
