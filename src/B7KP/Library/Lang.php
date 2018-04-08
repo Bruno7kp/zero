@@ -34,7 +34,11 @@ class Lang
 	static function detectLang()
 	{
 		$mainlang = "en";
-		$acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		$acceptLanguage = "pt";
+		if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+		{
+			$acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		}
 		$langs = array();
 		foreach( explode(',', $acceptLanguage) as $lang) 
 		{

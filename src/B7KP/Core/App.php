@@ -59,13 +59,13 @@ class App
 			default:
 				self::$environment = "PROD";
 				self::$db = "mysql";
-				self::$dbname = "";
-				self::$host = "";
-				self::$user = "";
+				self::$dbname = "mydb";
+				self::$host = "127.0.0.1";
+				self::$user = "root";
 				self::$password = "";
 				self::$dsn = self::setDsn();
-				self::$lastfmapikey = "f383ea53a3df0bb4c8c1387018ec6c58";
-				self::$lastfmapisecret = "2d32aeac2eaf2c7014d1591b01b2001f";
+				self::$lastfmapikey = "edaae45363abd9e14958641aa4addc32";
+				self::$lastfmapisecret = "5f43a1406ae7a87a261368dfadbdd0dd";
 				break;
 		}
 

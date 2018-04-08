@@ -211,7 +211,7 @@ function qa_get_logged_in_user()
 	));
 
 	$super = array("bruno7kp");
-	$mod = array("felipeesilva", "itvictornunes");
+	$mod = array("felipeesilva", "itvictornunes", "lucholerma", "pedromedeiros2", "katyanitta", "diogobalk7");
 	$level = QA_USER_LEVEL_BASIC;
 	if(in_array(mb_strtolower($result['login']), $mod))
 	{

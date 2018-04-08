@@ -358,7 +358,7 @@ if($show_dropouts && $week > 1)
 		<td><?php echo $points." ".Lang::get("pt_x");?></td>
 		<td colspan="2">
 			<?php 
-			if($show_plaque)
+			if($show_plaque && $this->user->checkSelfPermission($this->factory))
 			{
 			?>
 			<button class="btn no-margin btn-custom btn-info btn-sm gen_plaque" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="" data-points=<?php echo $points;?> id="nnewcert<?php echo $key;?>"><?php echo Lang::get("gen_plaque_alt");?></button>
