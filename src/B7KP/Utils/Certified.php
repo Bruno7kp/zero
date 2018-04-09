@@ -7,6 +7,11 @@ use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 use B7KP\Library\Lang;
 use B7KP\Library\Url;
+use Imagine\Gd\Font;
+use Imagine\Gd\Imagine;
+use Imagine\Image\Box;
+use Imagine\Image\Palette\InvalidArgumentException;
+use Imagine\Image\Point;
 use LastFmApi\Main\LastFm;
 
 class Certified
@@ -16,6 +21,7 @@ class Certified
 	private $settings;
 	private $album;
 	private $music;
+	private $type;
 	
 	function __construct(User $user, Model $factory)
 	{
@@ -43,15 +49,24 @@ class Certified
 
 	public function getPoints($type, $name, $artist)
 	{
-		if($this->type == 0)
+		if($this->type == 1)
 		{
-			return $this->getPlaycount($type, $name, $artist);
+            return $this->getChartPoints($type, $name, $artist);
+		}
+		else if($this->type == 2)
+		{
+			return $this->getPlaycountPlusPoints($type, $name, $artist);
 		}
 		else
-		{
-			return $this->getChartPoints($type, $name, $artist);
-		}
+        {
+            return $this->getPlaycount($type, $name, $artist);
+        }
 	}
+
+	public function getPlaycountPlusPoints($type, $name, $artist)
+    {
+        return $this->getPlaycount($type, $name, $artist) + $this->getChartPoints($type, $name, $artist);
+    }
 
 	public function getPlaycount($type, $name, $artist)
 	{
@@ -69,7 +84,7 @@ class Certified
 		if(!in_array($type, $valid)): return null; endif;
 		$limit = substr($type, 0, 3)."_limit";
 		$table = $type."_charts";
-		$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts FROM ".$table." t, week w, user u WHERE t.".$type." = '".addslashes($name)."' and t.artist = '".addslashes($artist)."' AND w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit."");
+		$pts = $this->dao->run("SELECT count(t.idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts FROM ".$table." t, week w, user u WHERE t.".$type." = '".addslashes($name)."' and t.artist = '".addslashes($artist)."' AND w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit);
 
 		return $pts[0]->pts;
 	}
@@ -77,7 +92,7 @@ class Certified
 	public function getArtistChartPoints($name)
 	{
 		$limit = "art_limit";
-		$pts = $this->dao->run("SELECT count(idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts FROM artist_charts t, week w, user u WHERE t.artist = '".addslashes($name)."' AND w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit."");
+		$pts = $this->dao->run("SELECT count(idweek) * 100 - (sum(t.rank) - count(t.idweek))*2 as pts FROM artist_charts t, week w, user u WHERE t.artist = '".addslashes($name)."' AND w.id = t.idweek AND w.iduser = u.id AND u.id = ".$this->user->id." AND t.rank <= ".$this->settings->$limit);
 
 		return $pts[0]->pts;
 	}
@@ -396,7 +411,17 @@ class Certified
 		return $plaques;
 	}
 
-	public function createPlaque($type, $points, $image, $name, $artist)
+    /**
+     * @param $type
+     * @param $points
+     * @param $image
+     * @param $name
+     * @param $artist
+     * @return bool
+     * @throws \Exception
+     * @throws InvalidArgumentException
+     */
+    public function createPlaque($type, $points, $image, $name, $artist)
 	{
 		$valid = array("album", "music");
 		if(!in_array($type, $valid)): return null; endif;
@@ -405,17 +430,17 @@ class Certified
 		$textname = mb_substr($name, 0, 20).$dots;
 		$filename = "web/img/temp/".md5($textname).md5($this->user->login);
 		// Imagine
-		$imagine = new \Imagine\Gd\Imagine();
+		$imagine = new Imagine();
 		// Capa do álbum/foto do artista
 		$image = empty($image) ? "web/img/default-alb.png" : str_replace("https", "http", $image);
 		$photo = $imagine->open($image);
 		$bg = $imagine->open($image);
-		$minphoto  = new \Imagine\Image\Box(100, 100);
-		$maxphoto  = new \Imagine\Image\Box(500, 500);
-		$discphoto  = new \Imagine\Image\Box(250, 250);
-		$size  = new \Imagine\Image\Box(400, 500);
+		$minphoto  = new Box(100, 100);
+		$maxphoto  = new Box(500, 500);
+		$discphoto  = new Box(250, 250);
+		$size  = new Box(400, 500);
 		$photo->resize($minphoto); // Foto
-		$bg->resize($maxphoto)->crop(new \Imagine\Image\Point(50, 0), new \Imagine\Image\Box(400, 500)); // Fundo
+		$bg->resize($maxphoto)->crop(new Point(50, 0), new Box(400, 500)); // Fundo
 		$bg->effects()
 		    ->blur(25);
 		// Base
@@ -427,21 +452,21 @@ class Certified
 		// texto do certificado
 		$text = $this->getCertification($type, $points, "text");
 		$value = $this->getValueByCert($type, $points);
-		$typecert = $this->type == 0 ? Lang::get("play_x") : Lang::get("pt_x");
+		$typecert = $this->type == 0 ? Lang::get("play_x") : $this->type == 1 ? Lang::get("pt_x") : Lang::get("both_x");
 		$value .= "+ ".mb_strtolower($typecert);
 		// Cria imagem
 		$image = $imagine->create($size);
-		$image->paste($bg, new \Imagine\Image\Point(0, 0));
-		$image->paste($base, new \Imagine\Image\Point(0, 0));
-		$image->paste($disc, new \Imagine\Image\Point(75, 100));
+		$image->paste($bg, new Point(0, 0));
+		$image->paste($base, new Point(0, 0));
+		$image->paste($disc, new Point(75, 100));
 		$image->draw()
-          	->text($this->user->login, new \Imagine\Gd\Font('web/fonts/Roboto-Regular.ttf', 25, $image->palette()->color('#fff')), new \Imagine\Image\Point(100, 40))
-          	->text($textname, new \Imagine\Gd\Font('web/fonts/ARIALUNI.TTF', 14, $image->palette()->color('#fff')), new \Imagine\Image\Point(150, 370))
-          	->text($artist, new \Imagine\Gd\Font('web/fonts/ARIALUNI.TTF', 12, $image->palette()->color('#fff')), new \Imagine\Image\Point(150, 390))
-          	->text($text, new \Imagine\Gd\Font('web/fonts/Roboto-Regular.ttf', 12, $image->palette()->color('#fff')), new \Imagine\Image\Point(150, 415))
-          	->text($value, new \Imagine\Gd\Font('web/fonts/Roboto-Regular.ttf', 11, $image->palette()->color('#fff')), new \Imagine\Image\Point(150, 435))
-          	->text($date->format("Y.m.d"), new \Imagine\Gd\Font('web/fonts/Roboto-Regular.ttf', 9, $image->palette()->color('#fff')), new \Imagine\Image\Point(150, 460));
-        $image->paste($photo, new \Imagine\Image\Point(37, 370));
+          	->text($this->user->login, new Font('web/fonts/Roboto-Regular.ttf', 25, $image->palette()->color('#fff')), new Point(100, 40))
+          	->text($textname, new Font('web/fonts/ARIALUNI.TTF', 14, $image->palette()->color('#fff')), new Point(150, 370))
+          	->text($artist, new Font('web/fonts/ARIALUNI.TTF', 12, $image->palette()->color('#fff')), new Point(150, 390))
+          	->text($text, new Font('web/fonts/Roboto-Regular.ttf', 12, $image->palette()->color('#fff')), new Point(150, 415))
+          	->text($value, new Font('web/fonts/Roboto-Regular.ttf', 11, $image->palette()->color('#fff')), new Point(150, 435))
+          	->text($date->format("Y.m.d"), new Font('web/fonts/Roboto-Regular.ttf', 9, $image->palette()->color('#fff')), new Point(150, 460));
+        $image->paste($photo, new Point(37, 370));
 		$image->save($filename.'.png', array('png_compression_level' => 9));
 
 		$url = $this->imgurSender($filename.'.png');
@@ -492,4 +517,3 @@ class Certified
 		return $link;
 	}
 }
-?>

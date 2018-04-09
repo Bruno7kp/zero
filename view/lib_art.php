@@ -47,6 +47,7 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_points){
 									?>
 									<th class="text-center"><?php echo Lang::get('pt_x');?></th>
+									<th class="text-center"><?php echo Lang::get('both_x');?></th>
 									<?php
 									}
 									?>
@@ -83,6 +84,7 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_points){
 									?>
 									<td class="text-center rk-col"><?php echo $pts;?></td>
+									<td class="text-center rk-col"><?php echo $pts + $value["playcount"];?></td>
 									<?php
 									}
 									?>

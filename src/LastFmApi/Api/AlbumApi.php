@@ -125,7 +125,7 @@ class AlbumApi extends BaseApi
                     //$info['tracks'][$i]['rank'] = (string) $track->rank;
                     $info['tracks'][$i]['artist'] = array();
                     $info['tracks'][$i]['artist']['name'] = $track->artist->name;
-                    $info['tracks'][$i]['artist']['mbid'] = $track->artist->mbid;
+                    $info['tracks'][$i]['artist']['mbid'] = isset($track->artist->mbid) ? $track->artist->mbid : "";
                     $info['tracks'][$i]['artist']['url'] = $track->artist->url;
                     $i++;
                 }

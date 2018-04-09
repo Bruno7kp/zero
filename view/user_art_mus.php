@@ -150,16 +150,20 @@ use B7KP\Utils\Snippets as S;
 										if($settings->show_chart_cert)
 										{
 											$c = new Certified($user, $this->factory);
-											if($settings->cert_type)
-											{
-												$cert = $c->getCertification("music", $pts, "text+icon");
-										 		echo '<td class="text-center rk-col"> '.$cert.'</td>';
-											}
-											else
-											{
-												echo "<td id='c".md5($item->music)."' data-cert=true class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
-												echo "</td>";
-											}
+											switch ($settings->cert_type){
+                                                case "2":
+                                                    echo "<td data-current='".$pts."' id='c".md5($item->music)."' data-cert='true' class='text-center rk-col loadplaycount' data-type='music' data-login='".$user->login."' data-name='".htmlentities($item->music, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+                                                    echo "</td>";
+                                                    break;
+                                                case "1":
+                                                    $cert = $c->getCertification("music", $pts, "text+icon");
+                                                    echo '<td class="text-center rk-col"> '.$cert.'</td>';
+                                                    break;
+                                                default:
+                                                    echo "<td id=\"c".md5($item->music)."\" data-cert=\"true\" class=\"text-center rk-col loadplaycount\" data-type=\"music\" data-login=\"".$user->login."\" data-name=\"".htmlentities($item->music, ENT_QUOTES)."\" data-artist=\"".htmlentities($name, ENT_QUOTES)."\">";
+                                                    echo "</td>";
+                                                    break;
+                                            }
 										}
 									echo "</tr>";
 									echo "<tr style='display:none;' class='cr-row'>";

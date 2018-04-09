@@ -10,7 +10,11 @@ class CertForm extends Form
 
 	function __construct(){}
 
-	public function build($obj = false)
+    /**
+     * @param bool $obj
+     * @throws \Exception
+     */
+    public function build($obj = false)
 	{
 		$this->obj = $obj;
 		$options = new Options();
@@ -45,6 +49,4 @@ class CertForm extends Form
 				->add(self::TYPE_SUBMIT, "save", "send btn btn-success")
 				->end();
 	}
-
 }
-?>

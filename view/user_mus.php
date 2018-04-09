@@ -99,6 +99,14 @@ use B7KP\Utils\Snippets as S;
 										<?php echo $points;?>			
 									</strong>
 								</div>
+                                <div class="col-md-2 col-sm-3 col-xs-6 text-center">
+                                    <small class="text-muted"><?php echo Lang::get('both_x');?></small>
+                                    <br>
+                                    <strong>
+                                        <i class="ti-bar-chart-alt ico-color"></i>
+                                        <?php echo $points + $plays;?>
+                                    </strong>
+                                </div>
 								<?php
 								}
 								?>
@@ -111,7 +119,16 @@ use B7KP\Utils\Snippets as S;
 									<br>
 									<?php 
 									//$pts = $c->getPoints("music", $name, $artist);
-									$pts = ($settings->cert_type ? $points : $plays);
+                                    switch ($settings->cert_type){
+                                        case "2":
+                                            $pts = $points + $plays;
+                                            break;
+                                        case "1":
+                                            $pts = $points;
+                                            break;
+                                        default:
+                                            $pts = $plays;
+                                    }
 									$txt = $c->getCertification("music", $pts, "text+icon");
 									//echo $c->getCertification("music", $pts, "icon"); 
 									//echo ($txt != Lang::get('none')) ? "<br/>" : "";

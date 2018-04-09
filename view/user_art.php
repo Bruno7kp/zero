@@ -98,6 +98,14 @@ use B7KP\Library\Lang;
 										<?php echo $c->getArtistChartPoints($name);?>			
 									</strong>
 								</div>
+                                <div class="col-md-2 col-sm-3 col-xs-6 text-center">
+                                    <small class="text-muted"><?php echo Lang::get('both_x');?></small>
+                                    <br>
+                                    <strong>
+                                        <i class="ti-bar-chart-alt ico-color"></i>
+                                        <?php echo $c->getArtistChartPoints($name) + $plays;?>
+                                    </strong>
+                                </div>
 								<?php
 								}
 								?>
@@ -141,6 +149,7 @@ use B7KP\Library\Lang;
 									{
 									?>
 									<th class="center"><?php echo Lang::get('pt_x')?></th>
+									<th class="center"><?php echo Lang::get('both_x')?></th>
 									<?php
 									}
 									?>
@@ -192,17 +201,21 @@ use B7KP\Library\Lang;
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
+											echo "<td class='text-center rk-col'>".($pts + $lfmplays)."</td>";
 										}
 										if($settings->show_chart_cert)
 										{
-											if($settings->cert_type)
-											{
-												$cert = $c->getCertification("album", $pts, "text+icon");
-											}
-											else
-											{
-												$cert = $c->getCertification("album", $lfmplays, "text+icon");
-											}
+										    switch ($settings->cert_type){
+                                                case "2":
+                                                    $cert = $c->getCertification("album", $pts + $lfmplays, "text+icon");
+                                                    break;
+                                                case "1":
+                                                    $cert = $c->getCertification("album", $pts, "text+icon");
+                                                    break;
+                                                default:
+                                                    $cert = $c->getCertification("album", $lfmplays, "text+icon");
+                                                    break;
+                                            }
 									 		echo '<td class="text-center rk-col"> '.$cert.'</td>';
 										}
 									echo "</tr>";

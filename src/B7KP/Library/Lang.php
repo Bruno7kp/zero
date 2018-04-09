@@ -623,6 +623,9 @@ class Lang
 		$messages["pt_x"][self::PT_BR] = "Pontos";
 		$messages["pt_x"][self::EN_US] = "Points";
 
+        $messages["both_x"][self::PT_BR] = "Plays + Points";
+        $messages["both_x"][self::EN_US] = "Plays + Points";
+
 		$messages["re_def"][self::PT_BR] = "Reentrada";
 		$messages["re_def"][self::EN_US] = "Re-entry";
 
@@ -991,6 +994,9 @@ class Lang
 
 		$messages["v_yec"][self::PT_BR] = "Charts de fim de ano (YEC).";
 		$messages["v_yec"][self::EN_US] = "YEC.";
+
+        $messages["v_new_cert_type"][self::PT_BR] = "Certificados com pontos + reproduções.";
+        $messages["v_new_cert_type"][self::EN_US] = "New certification (plays + points).";
 
 		// noty
 

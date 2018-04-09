@@ -49,6 +49,7 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_points){
 									?>
 									<th class="text-center"><?php echo Lang::get('pt_x');?></th>
+									<th class="text-center"><?php echo Lang::get('both_x');?></th>
 									<?php
 									}
 									?>
@@ -97,13 +98,24 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_points){
 									?>
 									<td class="text-center rk-col"><?php echo $pts;?></td>
+									<td class="text-center rk-col"><?php echo $pts + $value["playcount"];?></td>
 									<?php
 									}
 									?>
 									<?php 
 									if($settings->show_chart_cert){
 										$c = new Certified($user, $this->factory);
-										$cert = $c->getCertification("album", ($settings->cert_type ? $pts : $value["playcount"]), "text+icon");
+										switch ($settings->cert_type){
+                                            case "2":
+                                                $cert = $c->getCertification("album", $pts + $value["playcount"], "text+icon");
+                                                break;
+                                            case "1":
+                                                $cert = $c->getCertification("album", $pts, "text+icon");
+                                                break;
+                                            default:
+                                                $cert = $c->getCertification("album", $value["playcount"], "text+icon");
+                                                break;
+                                        }
 									?>
 									<td class="text-center rk-col"><?php echo $cert;?></td>
 									<?php

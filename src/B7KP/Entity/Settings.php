@@ -115,7 +115,7 @@ class Settings extends Entity
 
 	/**
 	* @Assert(null=false|int|option)
-	* @Options(values={"1": "pt_x","0": "play_x"}|settings={"translate": "1"})
+	* @Options(values={"1": "pt_x","0": "play_x","2": "both_x"}|settings={"translate": "1"})
 	*/
 	protected $cert_type;
 

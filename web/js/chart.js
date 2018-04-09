@@ -68,7 +68,7 @@ function updateUniqueWeek()
 			dataType: 'json'
 		})
 		.done(function(data) {
-			console.log(data);
+			//console.log(data);
 			if(data.error == 0)
 			{
 				updateBtn.text('Ok');
@@ -111,7 +111,7 @@ function editWeek()
 		})
 		.done(function(data) {
 			console.log("success");
-			console.log(data);
+			//console.log(data);
 			$.magnificPopup.open({
 				  items: {
 				      src: $(data),
@@ -189,7 +189,7 @@ function editWeek()
 					
 				}
 			});
-			console.log(finallist);
+			//console.log(finallist);
 		});
 	}
 }
@@ -263,7 +263,7 @@ function loadimages()
 		getF(last, td, artist);
 		function getF(last, td, artistIn)
 		{
-			console.log(last);
+			//console.log(last);
 			$.ajax({
 				url: last,
 				type: 'GET',
@@ -331,6 +331,8 @@ function loadPlaycount()
 		artist = artist.replace(/\\/g, "");
 		rankid = $(this).attr('id');
 		cert = $(this).attr('data-cert');
+		curr = $(this).attr('data-current');
+		//console.log(curr);
 		td = $(this);
 		if(type == "artist")
 		{
@@ -358,22 +360,23 @@ function loadPlaycount()
 		last = last.replace("%20&", "%20%26");
 		last = last.replace("&%20", "%26%20");
 		//console.log(last);
-		getF(last, td, type, cert, user);
-		function getF(last, td, type, cert, user)
+		getF(last, td, type, cert, user, curr);
+		function getF(last, td, type, cert, user, curr)
 		{
-			console.log(last);
+			//console.log(last);
 			$.ajax({
 				url: last,
 				type: 'GET',
 				dataType: 'json'
 			})
 			.done(function(data) {
-				console.log(i);
+				//console.log(i);
+				curr = isNaN(curr) ? 0 : parseInt(curr);
 				if(typeof data.track != "undefined" && typeof data.track.userplaycount != "undefined")
 				{
 					if(typeof cert != "undefined")
 					{
-						getCert(user, type, data.track.userplaycount, td);
+						getCert(user, type, parseInt(data.track.userplaycount) + curr, td);
 					}
 					else
 					{
@@ -384,7 +387,7 @@ function loadPlaycount()
 				{
 					if(typeof cert != "undefined")
 					{
-						getCert(user, type, data.album.userplaycount, td);
+						getCert(user, type, parseInt(data.album.userplaycount) + curr, td);
 					}
 					else
 					{

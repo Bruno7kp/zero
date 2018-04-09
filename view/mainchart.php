@@ -441,7 +441,7 @@ use B7KP\Library\Lang;
 							</div>
 
 							<?php 
-							if($settings->show_cert && $settings->cert_type)
+							if($settings->show_cert && $settings->cert_type == "1")
 							{
 							?>
 							<div class="row text-center bottomspace-md">

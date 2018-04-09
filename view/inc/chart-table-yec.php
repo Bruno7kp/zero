@@ -118,7 +118,7 @@ $lastw = array();
 
 			# new certs
 			
-			if($show_cert && $show_wkl_cert && $type != "artist" && $settings->cert_type)
+			if($show_cert && $show_wkl_cert && $type != "artist" && $settings->cert_type == "1")
 			{
 				$certified = new Certified($this->user, $this->factory);
 				$cert_todate = $certified->getCertification($type, $cp_todate);

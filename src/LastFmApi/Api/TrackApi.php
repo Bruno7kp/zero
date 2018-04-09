@@ -162,7 +162,7 @@ class TrackApi extends BaseApi {
 				//$info['album']['position'] = (string) $call->track->album->position;
 				$info['album']['artist'] = (string) $call->track->album->artist;
 				$info['album']['title'] = (string) $call->track->album->title;
-				$info['album']['mbid'] = (string) $call->track->album->mbid;
+				$info['album']['mbid'] = isset($call->track->album->mbid) ? (string) $call->track->album->mbid : "";
 				$info['album']['url'] = (string) $call->track->album->url;
 				}
 				$info['album']['image']['small'] = (string) $image[0]["#text"];
