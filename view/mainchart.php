@@ -102,8 +102,8 @@ use B7KP\Library\Lang;
 													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
-														$actlink = $muslink.F::fixLFM($value["album"][0]->artist);
-														$alblink = $muslink.F::fixLFM($value["album"][0]->artist)."/".F::fixLFM($value["album"][0]->album);
+														$actlink = isset($value["album"][0]) ? $muslink.F::fixLFM($value["album"][0]->artist) : "#!";
+														$alblink = isset($value["album"][0]) ? $muslink.F::fixLFM($value["album"][0]->artist)."/".F::fixLFM($value["album"][0]->album) : "#!";
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
@@ -164,8 +164,8 @@ use B7KP\Library\Lang;
 													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													foreach ($weeks as $value) {
 														$weeklink = $wkli.$value["week"];
-														$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
-														$mlink = $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music);
+														$actlink = isset($value["music"][0]) ? $muslink.F::fixLFM($value["music"][0]->artist) : "#!";
+														$mlink = isset($value["music"][0]) ? $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music) : "#!";
 												?>
 													<div class="row divider-tb bottomspace-sm">
 														<div class="col-md-4 text-center">
