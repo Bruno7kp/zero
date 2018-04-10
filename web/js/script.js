@@ -271,47 +271,82 @@ function getMsg(msgid) {
 	return array[msgid];
 }
 
+function sendToImgur(url, certData, btn) {
+    certData.image = url;
+    url = baseUrl + "/" + url;
+    //url = 'http://www.skyscrapercity.com/images/headers/9.jpg';
+    var ids = ["22de39ba618b7e2", "818ee7e54b3dcf6", "3366c677fd95c95", "fcd9ca28ca485f1"];
+    var formData = new FormData();
+    formData.append('image', url);
+    var xhttp = new XMLHttpRequest();
+    xhttp.open('POST', 'https://api.imgur.com/3/image');
+    xhttp.setRequestHeader('Authorization', 'Client-ID ' + ids[(Math.floor(Math.random() * (4)))]);
+    xhttp.onreadystatechange = function () {
+        if (xhttp.status === 200 && xhttp.readyState === 4) {
+            var res = JSON.parse(xhttp.responseText);
+            certData.url = res.data.link;
+            var newXhttp = new XMLHttpRequest();
+            newXhttp.open('POST', baseUrl + "/new/plaque/save");
+            newXhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            newXhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            newXhttp.onreadystatechange = function(){
+                if (newXhttp.status === 200 && newXhttp.readyState === 4) {
+                    var res = JSON.parse(xhttp.responseText);
+                    $.magnificPopup.open({
+                        items: {
+                            src: certData.url
+                        },
+                        type: 'image'
+                    });
+                }
+                if (curRoute === "weekly_chart") {
+                    undisable_alt(btn, getMsg("newplaque_alt"));
+                }
+                else {
+                    undisable_alt(btn, getMsg("newplaque"));
+                }
+            };
+            newXhttp.send(JSON.stringify(certData));
+        }
+    };
+    xhttp.send(formData);
+}
+
 function generatePlaque() {
-	genBtn = $("#gen_plaque, .gen_plaque");
+	var genBtn = $("#gen_plaque, .gen_plaque");
 	genBtn.on('click', function (event) {
 		event.preventDefault();
-		btn = $(this);
-		data = {};
-		data.type = $(this).attr('data-type');
-		data.points = $(this).attr('data-points');
-		data.name = $(this).attr('data-name');
-		data.artist = $(this).attr('data-artist');
-		data.image = $(this).attr('data-image');
+		var btn = $(this);
+		var certData = {};
+        certData.type = $(this).attr('data-type');
+        certData.points = $(this).attr('data-points');
+        certData.name = $(this).attr('data-name');
+        certData.artist = $(this).attr('data-artist');
+        certData.image = $(this).attr('data-image');
 		disable(btn);
 		$.ajax({
 			url: baseUrl + '/new/plaque',
 			type: 'POST',
 			dataType: 'json',
-			data: data,
+			data: certData
 		})
 			.done(function (data) {
-				console.log(data);
-				if (typeof data.url != "undefined" && data.url.length > 1) {
-					$.magnificPopup.open({
-						items: {
-							src: data.url
-						},
-						type: 'image'
-					});
+				if (typeof data.url !== "undefined" && data.url.length > 1) {
+					sendToImgur(data.url, certData, btn);
 				}
 				else {
-					if (typeof data.error != "undefined" && data.error == 1) {
+					if (typeof data.error !== "undefined" && data.error == 1) {
 						showAlert(1, getMsg("limitplaque"));
 					}
 					else {
 						showAlert(1, getMsg("error"));
 					}
-				}
-				if (curRoute == "weekly_chart") {
-					undisable_alt(btn, getMsg("newplaque_alt"));
-				}
-				else {
-					undisable_alt(btn, getMsg("newplaque"));
+                    if (curRoute === "weekly_chart") {
+                        undisable_alt(btn, getMsg("newplaque_alt"));
+                    }
+                    else {
+                        undisable_alt(btn, getMsg("newplaque"));
+                    }
 				}
 			})
 			.fail(function () {

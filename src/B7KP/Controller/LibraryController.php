@@ -132,6 +132,27 @@ class LibraryController extends Controller
 		}
 	}
 
+    /**
+     * @Route(name=gen_cert_save|route=/new/plaque/save)
+     * @throws \Exception
+     */
+    public function savePlaque()
+	{
+        $user = UserSession::getUser($this->factory);
+        if($this->isAjaxRequest()){
+            $post = json_decode(stripslashes(file_get_contents("php://input")));
+            $c = new Certified($user, $this->factory);
+            $id = $c->savePlaque($post->url, $post->type, $post->points, $post->image, $post->name, $post->artist);
+            if($id > 0){
+                echo json_encode(array("error" => 0));
+            }else{
+                echo json_encode(array("error" => 1));
+            }
+        }else{
+            $this->redirectToRoute("home");
+        }
+	}
+
 	private function checkDate($type, $name, $artist, Certified $c)
 	{
 		$p = $c->getPlaque($type, $name, $artist);

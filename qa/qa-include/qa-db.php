@@ -676,7 +676,7 @@
 	 * Return the first row from the $result resource as an array of [column name] => [column value].
 	 * If there's no first row, throw a fatal error unless $allowempty is true.
 	 */
-	function qa_db_read_one_assoc($result, $allowempty=false)
+	function qa_db_read_one_assoc($result, $allowempty=true)
 	{
 		if (!($result instanceof mysqli_result))
 			qa_fatal_error('Reading one assoc from invalid result');
@@ -714,7 +714,7 @@
 	 * Return the first column of the first row (and presumably only cell) from the $result resource.
 	 * If there's no first row, throw a fatal error unless $allowempty is true.
 	 */
-	function qa_db_read_one_value($result, $allowempty=false)
+	function qa_db_read_one_value($result, $allowempty=true)
 	{
 		if (!($result instanceof mysqli_result))
 			qa_fatal_error('Reading one value from invalid result');

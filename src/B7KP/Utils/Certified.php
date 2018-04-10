@@ -468,52 +468,35 @@ class Certified
           	->text($date->format("Y.m.d"), new Font('web/fonts/Roboto-Regular.ttf', 9, $image->palette()->color('#fff')), new Point(150, 460));
         $image->paste($photo, new Point(37, 370));
 		$image->save($filename.'.png', array('png_compression_level' => 9));
-
-		$url = $this->imgurSender($filename.'.png');
-
-		if($url && !empty($url))
-		{
-			$data = new \stdClass();
-			$data->iduser = $this->user->id;
-			$data->url = $url;
-			$data->type = $type;
-			$data->name = $name;
-			$data->artist = $artist;
-			$data->date = $date->format("Y-m-d");
-			$data->certified = json_encode($this->getCertification($type, $points));
-			$this->factory->add("\B7KP\Entity\Plaque", $data);
-		}
-
-		unlink($filename.'.png');
-
-		return $url;
+		return $filename.".png";
 	}
 
-	private function imgurSender($filename)
-	{
-		$apis = array("22de39ba618b7e2", "818ee7e54b3dcf6", "3366c677fd95c95", "fcd9ca28ca485f1");
-		$client_id = $apis[mt_rand(0, count($apis) - 1)];
-		$image = file_get_contents($filename);
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'https://api.imgur.com/3/image.json');
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array( "Authorization: Client-ID $client_id" ));
-		curl_setopt($ch, CURLOPT_POSTFIELDS, array( 'image' => base64_encode($image) ));
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    /**
+     * @param $url
+     * @param $type
+     * @param $points
+     * @param $image
+     * @param $name
+     * @param $artist
+     * @return mixed
+     * @throws \Exception
+     */
+    public function savePlaque($url, $type, $points, $image, $name, $artist)
+    {
+        $date = new \DateTime();
 
-		$reply = curl_exec($ch);
+        $data = new \stdClass();
+        $data->iduser = $this->user->id;
+        $data->url = $url;
+        $data->type = $type;
+        $data->name = $name;
+        $data->artist = $artist;
+        $data->date = $date->format("Y-m-d");
+        $data->certified = json_encode($this->getCertification($type, $points));
+        $id = $this->factory->add("\B7KP\Entity\Plaque", $data);
 
-		curl_close($ch);
-
-		$reply = json_decode($reply);
-
-		$link = false;
-		if(isset($reply->data->link) && !empty($reply->data->link))
-		{
-			$link = $reply->data->link;
-		}
-		
-		return $link;
-	}
+        if(file_exists($image))
+            unlink($image);
+        return $id;
+    }
 }
