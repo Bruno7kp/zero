@@ -186,37 +186,35 @@ use B7KP\Library\Lang;
 											echo "<br><span class='black'>".$times."x</span>";
 										}
 										echo "</td>";
-										echo "<td class='getimage' id='rankid".md5($item->album)."' data-type='album' data-name='".htmlentities($item->album, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
+										echo "<td class=\"text-center\" data-i='".md5($item->album)."'><img width='64' src='".Url::getBaseUrl()."/web/img/default-alb.png'/></td>";
 										echo "<td>";
 											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
 										echo "</td>";
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
 										echo "</td>";
-										echo "<td class='text-center rk-col'>";
-											$c = new Certified($user, $this->factory);
-											$lfmplays = $c->getPlaycount("album", $item->album, $name);
-											echo $lfmplays;
+										echo "<td id='".md5($item->album)."' class='text-center rk-col loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
 										echo "</td>";
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
-											echo "<td class='text-center rk-col'>".($pts + $lfmplays)."</td>";
+											echo "<td class='text-center rk-col' data-p='".$pts."' data-pp='".md5($item->album)."'></td>";
 										}
 										if($settings->show_chart_cert)
 										{
-										    switch ($settings->cert_type){
+                                            $c = new Certified($user, $this->factory);
+                                            switch ($settings->cert_type){
                                                 case "2":
-                                                    $cert = $c->getCertification("album", $pts + $lfmplays, "text+icon");
+                                                    echo "<td class='text-center rk-col' data-p='".$pts."' data-c='".md5($item->album)."'></td>";
                                                     break;
                                                 case "1":
                                                     $cert = $c->getCertification("album", $pts, "text+icon");
+                                                    echo '<td class="text-center rk-col"> '.$cert.'</td>';
                                                     break;
                                                 default:
-                                                    $cert = $c->getCertification("album", $lfmplays, "text+icon");
+                                                    echo "<td class='text-center rk-col' data-p='0' data-c='".md5($item->album)."'></td>";
                                                     break;
                                             }
-									 		echo '<td class="text-center rk-col"> '.$cert.'</td>';
 										}
 									echo "</tr>";
 									echo "<tr style='display:none;' class='cr-row'>";

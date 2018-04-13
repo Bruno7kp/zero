@@ -15,17 +15,14 @@ function chartinit()
 
 function getChartMsg(msgid)
 {
-	// eng
-	if (lang == 1) 
+	var array = {};
+	if (lang === 1)
 	{
-		array = {};
 		array.att = "Updated";
 		array.fail = "Fail";
 	}
-	// pt
 	else
 	{
-		array = {};
 		array.att = "Atualizado";
 		array.fail = "Falha";
 	}
@@ -36,8 +33,8 @@ function getChartMsg(msgid)
 function switchToSimpleCR()
 {
 	$(".switchto").click(function(event) {
-		main = $(this).closest('div').find(".main");
-		sub = $(this).closest('div').find(".sub");
+		var main = $(this).closest('div').find(".main");
+		var sub = $(this).closest('div').find(".sub");
 		if(main.hasClass('hidden'))
 		{
 			main.removeClass('hidden');
@@ -53,12 +50,12 @@ function switchToSimpleCR()
 
 function updateUniqueWeek()
 {
-	updateBtn = $(".upwk");
+	var updateBtn = $(".upwk");
 	updateBtn.click(function(event) {
 		$(this).addClass('disabled');
 		$(this).attr('disabled','disabled');
-		from = $(this).attr('data-from');
-		to = $(this).attr('data-to');
+		var from = $(this).attr('data-from');
+		var to = $(this).attr('data-to');
 		updateWeek(from, to);
 	});
 	function updateWeek(from, to)
@@ -68,8 +65,7 @@ function updateUniqueWeek()
 			dataType: 'json'
 		})
 		.done(function(data) {
-			//console.log(data);
-			if(data.error == 0)
+			if(data.error === 0)
 			{
 				updateBtn.text('Ok');
 				setTimeout(function(){
@@ -94,10 +90,10 @@ function updateUniqueWeek()
 
 function editWeek()
 {
-	editBtn = $(".editwk");
+	var editBtn = $(".editwk");
 	editBtn.click(function(event) {
-		id = $(this).attr('data-id');
-		type = $(this).attr('data-type');
+		var id = $(this).attr('data-id');
+		var type = $(this).attr('data-type');
 
 		showModal(id, type);
 	});
@@ -110,8 +106,6 @@ function editWeek()
 			dataType: 'html',
 		})
 		.done(function(data) {
-			console.log("success");
-			//console.log(data);
 			$.magnificPopup.open({
 				  items: {
 				      src: $(data),
@@ -130,7 +124,7 @@ function editWeek()
 
 	function sortList()
 	{
-		list = $(".editablelist");
+		var list = $(".editablelist");
 		$.each(list, function(index, val) {
 			if($(this).find("li").length>1)
 			{
@@ -147,15 +141,15 @@ function editWeek()
 	{
 		$('#btn-wk-edit').on('click', function(event) {
 			event.preventDefault();
-			list = $(".editablelist").find("li");
-			finallist = {};
+			var list = $(".editablelist").find("li");
+			var finallist = {};
 			finallist.week = $(this).attr('data-week');
 			finallist.type = $(this).attr('data-type');
-			i = 0;
+			var i = 0;
 			finallist.items = [];
-			last = list.length;
+			var last = list.length;
 			$.each(list, function(index, val) {
-				eachdata = {
+				var eachdata = {
 					name: $(this).attr('data-name'),
 					mbid: $(this).attr('data-mbid'),
 					rank: (i+1),
@@ -164,16 +158,16 @@ function editWeek()
 				};
 				finallist.items[i] = eachdata;
 				i++;
-				if(i == last)
+				if(i === last)
 				{
 					$.ajax({
 						url: baseUrl + '/update/edited/week',
 						type: 'POST',
 						dataType: 'json',
-						data: finallist,
+						data: finallist
 					})
 					.done(function(data) {
-						if(data.error == 0)
+						if(data.error === 0)
 						{
 							location.reload();
 						}
@@ -189,7 +183,6 @@ function editWeek()
 					
 				}
 			});
-			//console.log(finallist);
 		});
 	}
 }
@@ -210,7 +203,7 @@ function pop()
 function openChartRun()
 {
 	$(".cr-icon").click(function(event) {
-		trCr = $(this).closest('tr').next();
+		var trCr = $(this).closest('tr').next();
 		if(trCr.is(':visible'))
 		{
 			trCr.hide('400');
@@ -224,34 +217,28 @@ function openChartRun()
 
 function loadimages()
 {
-	tds = $(".getimage");
+	var tds = $(".getimage");
 	$.each(tds, function(index, val) {
-		type = $(this).attr('data-type');
-		name = $(this).attr('data-name');
+		var type = $(this).attr('data-type');
+		var name = $(this).attr('data-name');
 		name = name.replace(/\\/g, "");
-		mbid = $(this).attr('data-mbid');
-		artist = $(this).attr('data-artist');
+		var mbid = $(this).attr('data-mbid');
+		var artist = $(this).attr('data-artist');
 		artist = artist.replace(/\\/g, "");
-		rankid = $(this).attr('id');
-		td = $(this);
-		if(type == "artist")
+		var rankid = $(this).attr('id');
+		var td = $(this);
+		var last = "";
+		if(type === "artist")
 		{
-			//except = ["The Killers", "Ellie Goulding"];
-			
 			mbid = "";
-			//artist = artist.replace("&", "%26");
-			
 			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
-		else if(type == "album")
+		else if(type === "album")
 		{
-			//artist = artist.replace("&", "%26").replace("+", "%2B");
 			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&artist='+artist+'&album='+name+'&mbid='+mbid+'&format=json';
-
 		}
 		else
 		{
-			//artist = artist.replace("&", "%26").replace("+", "%2B");;
 			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&artist='+artist+'&track='+name+'&mbid='+mbid+'&format=json';
 		}
 		last = encodeURI(last);
@@ -259,38 +246,36 @@ function loadimages()
 		last = last.replace("#", "%23");
 		last = last.replace("%20&", "%20%26");
 		last = last.replace("&%20", "%26%20");
-		//console.log(last);
 		getF(last, td, artist);
 		function getF(last, td, artistIn)
 		{
-			//console.log(last);
 			$.ajax({
 				url: last,
 				type: 'GET',
 				dataType: 'json'
 			})
 			.done(function(data) {
-				if(artistIn == true)
+				if(artistIn === true)
 				{
 					type = "artist";
 				}
-				if(type == "music")
+				if(type === "music")
 				{
 
-					nartist = artistIn.replace("&", "%26").replace("+", "%2B");
+					var nartist = artistIn.replace("&", "%26").replace("+", "%2B");
 		
-					newa = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
+					var newa = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
 					
 					getF(newa, td, true);
 				}
-				else if(type == "album")
+				else if(type === "album")
 				{
-					img = data.album.image[1]["#text"];
+					var img = data.album.image[1]["#text"];
 					setImg(td.attr('id'), img);
 				}
 				else
 				{
-					if(typeof data.artist != "undefined")
+					if(typeof data.artist !== "undefined")
 					{
 						img = data.artist.image[1]["#text"];
 					}
@@ -304,7 +289,7 @@ function loadimages()
 				console.log("success");
 			})
 			.fail(function() {
-				img = null;
+				var img = null;
 				setImg(td.attr('id'), img);
 				console.log("error");
 			})
@@ -318,40 +303,31 @@ function loadimages()
 
 function loadPlaycount()
 {
-	tds = $(".loadplaycount");
-	loadplugin = false;
-	i = 1;
+	var tds = $(".loadplaycount");
+	var loadplugin = false;
+	var i = 1;
 	$.each(tds, function(index, val) {
-		type = $(this).attr('data-type');
-		name = $(this).attr('data-name');
-		user = $(this).attr('data-login');
+		var type = $(this).attr('data-type');
+		var name = $(this).attr('data-name');
+		var user = $(this).attr('data-login');
 		name = name.replace(/\\/g, "");
-		mbid = $(this).attr('data-mbid');
-		artist = $(this).attr('data-artist');
+		var mbid = $(this).attr('data-mbid');
+		var artist = $(this).attr('data-artist');
 		artist = artist.replace(/\\/g, "");
-		rankid = $(this).attr('id');
-		cert = $(this).attr('data-cert');
-		curr = $(this).attr('data-current');
-		//console.log(curr);
-		td = $(this);
-		if(type == "artist")
+		var rankid = $(this).attr('id');
+		var td = $(this);
+		var last = "";
+		if(type === "artist")
 		{
-			//except = ["The Killers", "Ellie Goulding"];
-			
 			mbid = "";
-			//artist = artist.replace("&", "%26");
-			
 			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
-		else if(type == "album")
+		else if(type === "album")
 		{
-			//artist = artist.replace("&", "%26").replace("+", "%2B");
 			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&album='+name+'&mbid=&format=json';
-
 		}
 		else
 		{
-			//artist = artist.replace("&", "%26").replace("+", "%2B");;
 			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json';
 		}
 		last = encodeURI(last);
@@ -360,38 +336,41 @@ function loadPlaycount()
 		last = last.replace("%20&", "%20%26");
 		last = last.replace("&%20", "%26%20");
 		//console.log(last);
-		getF(last, td, type, cert, user, curr);
-		function getF(last, td, type, cert, user, curr)
+		getF(last, td, type, user);
+		function getF(last, td, type, user)
 		{
-			//console.log(last);
 			$.ajax({
 				url: last,
 				type: 'GET',
 				dataType: 'json'
 			})
 			.done(function(data) {
-				//console.log(i);
-				curr = isNaN(curr) ? 0 : parseInt(curr);
-				if(typeof data.track != "undefined" && typeof data.track.userplaycount != "undefined")
+				if(typeof data.track !== "undefined" || typeof data.album !== "undefined")
 				{
-					if(typeof cert != "undefined")
+				    var plays = 0;
+				    if(typeof data.track !== "undefined"){
+                        plays = parseInt(data.track.userplaycount);
+                    }else if(typeof data.album !== "undefined"){
+                        plays = parseInt(data.album.userplaycount);
+                        var image = $("td[data-i=\"" + td.attr('id') + "\"]");
+                        if(image.length > 0) {
+                            if(typeof data.album.image !== "undefined" && data.album.image[1]["#text"] !== ""){
+                                $(image).find("img").attr("src", data.album.image[1]["#text"]);
+                            }
+                        }
+                    }
+                    td.text(plays);
+                    var pp = $("td[data-pp=\"" + td.attr('id') + "\"]");
+                    if(pp.length > 0)
+                    {
+                        var points = parseInt($(pp).attr('data-p'));
+                        pp.text(plays + points);
+                    }
+                    var cert = $("td[data-c=\"" + td.attr('id') + "\"]");
+					if(cert.length > 0)
 					{
-						getCert(user, type, parseInt(data.track.userplaycount) + curr, td);
-					}
-					else
-					{
-						td.text(data.track.userplaycount);
-					}
-				}
-				else if(typeof data.album.userplaycount != "undefined")
-				{
-					if(typeof cert != "undefined")
-					{
-						getCert(user, type, parseInt(data.album.userplaycount) + curr, td);
-					}
-					else
-					{
-						td.text(data.album.userplaycount);
+					    var curr = parseInt($(cert).attr('data-p'));
+						getCert(user, type, plays + curr, cert);
 					}
 				}
 				else
@@ -399,13 +378,11 @@ function loadPlaycount()
 					td.text("-");
 				}
 
-				if(i == td.length)
+				if(i === td.length)
 				{
 					setTimeout(function(){ 
 					//$(".tablesorteralt").tablesorter({theme : "bootstrap", headerTemplate : '{content} {icon}',widgets : [ "uitheme"]});
-
 					 }, 1000);
-
 				}
 				i++;
 				console.log("success");

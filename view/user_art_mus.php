@@ -99,6 +99,7 @@ use B7KP\Utils\Snippets as S;
 									{
 									?>
 									<th class="center"><?php echo Lang::get('pt_x')?></th>
+									<th class="center"><?php echo Lang::get('both_x')?></th>
 									<?php
 									}
 									?>
@@ -141,27 +142,25 @@ use B7KP\Utils\Snippets as S;
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
 										echo "</td>";
-										echo "<td id='".md5($item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
-										echo "</td>";
+										echo "<td id='".md5($item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
+											echo "<td class='text-center rk-col' data-p='".$pts."' data-pp='".md5($item->music)."'></td>";
 										}
 										if($settings->show_chart_cert)
 										{
 											$c = new Certified($user, $this->factory);
 											switch ($settings->cert_type){
                                                 case "2":
-                                                    echo "<td data-current='".$pts."' id='c".md5($item->music)."' data-cert='true' class='text-center rk-col loadplaycount' data-type='music' data-login='".$user->login."' data-name='".htmlentities($item->music, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
-                                                    echo "</td>";
+                                                    echo "<td class='text-center rk-col' data-p='".$pts."' data-c='".md5($item->music)."'></td>";
                                                     break;
                                                 case "1":
                                                     $cert = $c->getCertification("music", $pts, "text+icon");
                                                     echo '<td class="text-center rk-col"> '.$cert.'</td>';
                                                     break;
                                                 default:
-                                                    echo "<td id=\"c".md5($item->music)."\" data-cert=\"true\" class=\"text-center rk-col loadplaycount\" data-type=\"music\" data-login=\"".$user->login."\" data-name=\"".htmlentities($item->music, ENT_QUOTES)."\" data-artist=\"".htmlentities($name, ENT_QUOTES)."\">";
-                                                    echo "</td>";
+                                                    echo "<td class='text-center rk-col' data-p='0' data-c='".md5($item->music)."'></td>";
                                                     break;
                                             }
 										}
