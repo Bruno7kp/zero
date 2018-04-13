@@ -44,7 +44,7 @@ use B7KP\Library\Url;
 										<span class="fh5co-feature-icon"><i class="icon-vynil"></i></span>
 										<div class="row">
 											<h3 class="h3 topspace-md"><?php echo mb_strtoupper(Lang::get("cert_o")) ;?></h3>
-											<h3 class="h3 no-margin"><?php echo mb_strtoupper(Lang::get("pt_x"))." vs ".mb_strtoupper(Lang::get("play_x")) ;?></h3>
+											<h3 class="h3 no-margin"><?php echo mb_strtoupper(Lang::get("pt_x"))." vs ".mb_strtoupper(Lang::get("play_x"))." vs ".mb_strtoupper(Lang::get("both_x"));?></h3>
 											<p><?php echo Lang::get("c_us_perc");?></p>
 											<?php 
 											$totalcert = 0;
@@ -55,6 +55,7 @@ use B7KP\Library\Url;
 											}
 											$pl_perc = isset($typec[0]) ? $typec[0]->t/$totalcert*100 : 0;
 											$pt_perc = isset($typec[1]) ? $typec[1]->t/$totalcert*100 : 0;
+											$bt_perc = isset($typec[2]) ? $typec[2]->t/$totalcert*100 : 0;
 
 											$typemc = array();
 
@@ -68,22 +69,26 @@ use B7KP\Library\Url;
 											?>
 											<div class="col-xs-12">
 												<div class="row">
-													<div class="col-xs-6">
-														<h4 class="no-margin text-right"><span class="text-info"><?php echo mb_strtoupper(Lang::get("pt_x"))." (".round($pt_perc,2)."%)";?></span></h4>
+													<div class="col-xs-4">
+														<h4 class="no-margin text-left"><span class="text-info"><?php echo mb_strtoupper(Lang::get("pt_x"))." (".round($pt_perc,2)."%)";?></span></h4>
 													</div>
-													<div class="col-xs-6">
-														<h4 class="no-margin text-left"><span class="text-warning"><?php echo mb_strtoupper(Lang::get("play_x"))." (".round($pl_perc,2)."%)";?></span></h4>
+													<div class="col-xs-4">
+														<h4 class="no-margin text-center"><span class="text-warning"><?php echo mb_strtoupper(Lang::get("play_x"))." (".round($pl_perc,2)."%)";?></span></h4>
+													</div>
+													<div class="col-xs-4">
+														<h4 class="no-margin text-right"><span class="text-danger"><?php echo mb_strtoupper(Lang::get("both_x"))." (".round($bt_perc,2)."%)";?></span></h4>
 													</div>
 												</div>
 												<div class="progress">
 												  	<div class="progress-bar progress-bar-info" style="width: <?php echo $pt_perc;?>%"></div>
 												  	<div class="progress-bar progress-bar-warning" style="width: <?php echo $pl_perc;?>%"></div>
+												  	<div class="progress-bar progress-bar-danger" style="width: <?php echo $bt_perc;?>%"></div>
 												</div>
 											</div>
 											<div class="col-xs-12">
 												<p><?php echo Lang::get("c_val_cert");?></p>
 												<div class="row">
-													<div class="col-xs-6">
+													<div class="col-xs-12 col-sm-4">
 														<?php 
 														if(isset($typec[1])){
 														?>
@@ -125,7 +130,7 @@ use B7KP\Library\Url;
 														}
 														?>
 													</div>
-													<div class="col-xs-6">
+													<div class="col-xs-12 col-sm-4">
 														<?php 
 														if(isset($typec[0])){
 														?>
@@ -167,10 +172,52 @@ use B7KP\Library\Url;
 														}
 														?>
 													</div>
+													<div class="col-xs-12 col-sm-4">
+														<?php 
+														if(isset($typec[2])){
+														?>
+														<ul class="list-group">
+															<li class="list-group-item list-group-item-danger">
+																<span class="text-danger"><?php echo mb_strtoupper(Lang::get("both_x"));?> - <?php echo mb_strtoupper(Lang::get("alb_x"));?></span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typec[2]->ag);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typec[2]->ap);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typec[2]->ad);?>
+														    </li>
+														</ul>
+														<ul class="list-group">
+														    <li class="list-group-item list-group-item-danger">
+																<span class="text-danger"><?php echo mb_strtoupper(Lang::get("both_x"));?> - <?php echo mb_strtoupper(Lang::get("mus_x"));?></span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typec[2]->mg);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typec[2]->mp);?>
+														    </li>
+														    <li class="list-group-item">
+																<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typec[2]->md);?>
+													  		</li>
+													  	</ul>
+														<?php
+														}
+														?>
+													</div>
 												</div>
 												<p><?php echo Lang::get("c_val_cert_b");?></p>
 												<div class="row">
-													<div class="col-xs-6">
+													<div class="col-xs-12 col-sm-4">
 														<?php 
 														if(isset($typemc[1])){
 														?>
@@ -212,7 +259,7 @@ use B7KP\Library\Url;
 														}
 														?>
 													</div>
-													<div class="col-xs-6">
+													<div class="col-xs-12 col-sm-4">
 														<?php 
 														if(isset($typemc[0])){
 														?>
@@ -248,6 +295,48 @@ use B7KP\Library\Url;
 														    <li class="list-group-item">
 														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
 																<?php echo intval($typemc[0]["md"]);?>
+													  		</li>
+													  	</ul>
+														<?php
+														}
+														?>
+													</div>
+													<div class="col-xs-12 col-sm-4">
+														<?php 
+														if(isset($typemc[2])){
+														?>
+														<ul class="list-group">
+															<li class="list-group-item list-group-item-danger">
+																<span class="text-danger"><?php echo mb_strtoupper(Lang::get("both_x"));?> - <?php echo mb_strtoupper(Lang::get("alb_x"));?></span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typemc[2]["ag"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typemc[2]["ap"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typemc[2]["ad"]);?>
+														    </li>
+														</ul>
+														<ul class="list-group">
+														    <li class="list-group-item list-group-item-danger">
+																<span class="text-danger"><?php echo mb_strtoupper(Lang::get("both_x"));?> - <?php echo mb_strtoupper(Lang::get("mus_x"));?></span>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/gold-icon.png");?>">
+																<?php echo intval($typemc[2]["mg"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/platinum-icon.png");?>">
+																<?php echo intval($typemc[2]["mp"]);?>
+														    </li>
+														    <li class="list-group-item">
+														    	<img src="<?php echo Url::asset("img/diamond-icon.png");?>">
+																<?php echo intval($typemc[2]["md"]);?>
 													  		</li>
 													  	</ul>
 														<?php

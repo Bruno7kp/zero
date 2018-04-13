@@ -452,7 +452,7 @@ class Certified
 		// texto do certificado
 		$text = $this->getCertification($type, $points, "text");
 		$value = $this->getValueByCert($type, $points);
-		$typecert = $this->type == 0 ? Lang::get("play_x") : $this->type == 1 ? Lang::get("pt_x") : Lang::get("both_x");
+		$typecert = ($this->type == 0) ? Lang::get("play_x") : (($this->type == 1) ? Lang::get("pt_x") : Lang::get("both_x"));
 		$value .= "+ ".mb_strtolower($typecert);
 		// Cria imagem
 		$image = $imagine->create($size);
