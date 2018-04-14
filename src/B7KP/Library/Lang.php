@@ -987,7 +987,7 @@ class Lang
 		$messages["v_friends"][self::EN_US] = "Friends!";
 		
 		$messages["v_plaque_chart"][self::PT_BR] = "Agora os certificados da semana podem aparecer no seu chart (apenas para quem usa pontos para as certificações).";
-		$messages["v_plaque_chart"][self::EN_US] = "Certfications on weekly charts!";
+		$messages["v_plaque_chart"][self::EN_US] = "Certifications on weekly charts!";
 
 		$messages["v_others"][self::PT_BR] = "Outras melhorias e correções de bugs.";
 		$messages["v_others"][self::EN_US] = "Bug fixes.";
@@ -997,6 +997,9 @@ class Lang
 
         $messages["v_new_cert_type"][self::PT_BR] = "Certificados com pontos + reproduções.";
         $messages["v_new_cert_type"][self::EN_US] = "New certification (plays + points).";
+
+        $messages["v_weekly_cert"][self::PT_BR] = "Certificados (por reproduções e plays+points) nos charts semanais.";
+        $messages["v_weekly_cert"][self::EN_US] = "Certification (plays & plays + points) on weekly charts!.";
 
 		// noty
 

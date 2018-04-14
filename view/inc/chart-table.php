@@ -301,7 +301,7 @@ if ($show_dropouts && $week > 1) {
             foreach ($list as $certItem) {
                 $plaque = $certified->getPlaque($type, $certItem["item"]->$type, $certItem["item"]->artist);
                 $plaque = isset($plaque[0]) ? $plaque[0] : false;
-                $plaque = false;
+                //$plaque = false;
                 $certItemPoints = $cert_type == "0" ? 0 : $certItem["stats"]["stats"]["alltime"]["overall"]["chartpoints"];
                 $new_certs[] = array(
                     "name" => $certItem["item"]->$type,

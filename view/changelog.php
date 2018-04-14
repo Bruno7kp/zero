@@ -50,19 +50,6 @@ use B7KP\Library\Lang;
 								}
 								?>
 								<div class="fh5co-spacer fh5co-spacer-sm"></div>
-								<h2><?php echo Lang::get("next_upd");?></h2>
-								<div class="row">
-									<div class="col-md-12">
-										<span><?php echo $next["complete"];?>% <?php echo Lang::get("complete");?></span>
-										<div class="progress">
-										  	<div class="progress-bar progress-bar-info" style="width: <?php echo $next["complete"];?>%"></div>
-										</div>
-										<p>
-											<?php echo "<ul><li>" . implode("</li><li>", $next["text"]) . "</li></ul>";?>
-										</p>
-									</div>
-								</div>
-
 							</div>
 						</div>
 						<div class="fh5co-spacer fh5co-spacer-md"></div>
