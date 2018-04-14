@@ -10,12 +10,12 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 
 	<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="description" content="ZERO é um projeto baseado no last.fm, feito para todos os amantes de música que adoram acompanhar seus próprios habitos músicais. Com ele são gerados gráficos semanais, listando os artistas, músicas e álbuns mais ouvidos durante cada semana, podendo acompanhar o desempenho desses, e visualizar as mudanças e descobertas de seus artistas favoritos com o passar do tempo."/>
-	<meta name="keywords" content="ZERO,lastfm,chart,weekly,stats,tool,scrobble,music,música,semana,gráficos"/>
+	<meta name="description" content="ZERO CHARTS - Personal / Last.fm Weekly Charts - Charts Semanais"/>
+	<meta name="keywords" content="ZERO,lastfm,chart,charts,weekly,stats,tool,scrobble,music,música,semana,gráficos"/>
 	<meta property="og:locale" content="pt-br"/>
 	<meta property="og:title" content="<?php echo $title;?>">
 	<meta property="og:image" content="http://i.imgur.com/OOKNwlp.png">
-	<meta property="og:description" content="ZERO é um projeto baseado no last.fm, feito para todos os amantes de música que adoram acompanhar seus próprios habitos músicais. Com ele são gerados gráficos semanais, listando os artistas, músicas e álbuns mais ouvidos durante cada semana, podendo acompanhar o desempenho desses, e visualizar as mudanças e descobertas de seus artistas favoritos com o passar do tempo.">
+	<meta property="og:description" content="ZERO CHARTS - Personal / Last.fm Weekly Charts - Charts Semanais">
 	<meta property="og:site_name" content="<?php echo App::get('name');?>">
 	<meta property="og:type" content="website">
 	<title><?php echo $title;?></title>
