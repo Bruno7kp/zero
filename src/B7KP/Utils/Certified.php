@@ -351,6 +351,14 @@ class Certified
 					$certification = "";
 				}
 				break;
+            case "json":
+                $data = array(
+                    "text+icon" => $this->getCertification($type, $plays, "text+icon"),
+                    "class" => $this->getCertification($type, $plays, "class"),
+                    "cert" => $certification
+                );
+                return json_encode($data);
+                break;
 		}
 
 		return $certification;

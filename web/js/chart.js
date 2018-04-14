@@ -76,14 +76,13 @@ function updateUniqueWeek()
 			{
 				updateBtn.text(getChartMsg('fail'));
 			}
-			console.log("success");
 		})
 		.fail(function() {
 			updateBtn.text(getChartMsg('fail'));
-			console.log("error");
+			//console.log("error");
 		})
 		.always(function() {
-			console.log("complete");
+			//console.log("complete");
 		});
 	}
 }
@@ -115,10 +114,10 @@ function editWeek()
 			sortList();
 		})
 		.fail(function() {
-			console.log("error");
+			//console.log("error");
 		})
 		.always(function() {
-			console.log("complete");
+			//console.log("complete");
 		});
 	}
 
@@ -171,14 +170,14 @@ function editWeek()
 						{
 							location.reload();
 						}
-						console.log("success");
+						//console.log("success");
 					})
 					.fail(function() {
 						alert("Ops, algo deu errado, tente novamente mais tarde.");
-						console.log("error");
+						//console.log("error");
 					})
 					.always(function() {
-						console.log("complete");
+						//console.log("complete");
 					});
 					
 				}
@@ -286,15 +285,15 @@ function loadimages()
 					setImg(td.attr('id'), img);
 				}
 				
-				console.log("success");
+				//console.log("success");
 			})
 			.fail(function() {
 				var img = null;
 				setImg(td.attr('id'), img);
-				console.log("error");
+				//console.log("error");
 			})
 			.always(function() {
-				console.log("complete");
+				//console.log("complete");
 			});
 		}
 		 
@@ -345,33 +344,58 @@ function loadPlaycount()
 				dataType: 'json'
 			})
 			.done(function(data) {
-				if(typeof data.track !== "undefined" || typeof data.album !== "undefined")
+				if(typeof data.track !== "undefined" || typeof data.album !== "undefined" || typeof data.artist !== "undefined")
 				{
 				    var plays = 0;
+				    var image = $("[data-i=\"" + td.attr('id') + "\"]");;
+					var genPlaque = $("[data-gen=\"" + td.attr('id') + "\"]");;
 				    if(typeof data.track !== "undefined"){
                         plays = parseInt(data.track.userplaycount);
-                    }else if(typeof data.album !== "undefined"){
-                        plays = parseInt(data.album.userplaycount);
-                        var image = $("td[data-i=\"" + td.attr('id') + "\"]");
-                        if(image.length > 0) {
-                            if(typeof data.album.image !== "undefined" && data.album.image[1]["#text"] !== ""){
-                                $(image).find("img").attr("src", data.album.image[1]["#text"]);
+                        if(image.length > 0 || genPlaque.length > 0){
+                            if(typeof data.track.album !== "undefined" && data.track.album.image[3]["#text"] !== ""){
+                                $(image).find("img").attr("src", data.track.album.image[3]["#text"]);
+                                $(genPlaque).attr("data-image", data.track.album.image[3]["#text"]);
+                            }else{
+                                loadArtImg(data.track.artist.name, "", $(image).find("img"), genPlaque);
                             }
                         }
-                    }
+                    }else if(typeof data.album !== "undefined"){
+                        plays = parseInt(data.album.userplaycount);
+                        if(image.length > 0 || genPlaque.length > 0) {
+                            //console.log(data.album.image);
+                            if(typeof data.album.image !== "undefined" && data.album.image[3]["#text"] !== ""){
+                                $(image).find("img").attr("src", data.album.image[3]["#text"]);
+                                $(genPlaque).attr("data-image", data.album.image[3]["#text"]);
+                            }
+                        }
+                    }else if(typeof data.artist !== "undefined"){
+                        plays = parseInt(data.artist.userplaycount);
+                        if(image.length > 0) {
+
+                            if(typeof data.artist.image !== "undefined" && data.artist.image[3]["#text"] !== ""){
+                                $(image).find("img").attr("src", data.artist.image[3]["#text"]);
+                            }
+                        }
+					}
                     td.text(plays);
-                    var pp = $("td[data-pp=\"" + td.attr('id') + "\"]");
+                    var pp = $("[data-pp=\"" + td.attr('id') + "\"]");
                     if(pp.length > 0)
                     {
                         var points = parseInt($(pp).attr('data-p'));
                         pp.text(plays + points);
                     }
-                    var cert = $("td[data-c=\"" + td.attr('id') + "\"]");
+                    var cert = $("[data-c=\"" + td.attr('id') + "\"]");
 					if(cert.length > 0)
 					{
 					    var curr = parseInt($(cert).attr('data-p'));
-						getCert(user, type, plays + curr, cert);
+					    var rowClass = $("[data-class=\"" + td.attr('id') + "\"]");
+						getCert(user, type, plays + curr, cert, rowClass);
 					}
+					var gen = $("[data-gen=\"" + td.attr('id') + "\"]");
+					if(gen.length > 0)
+                    {
+                        $(gen).attr("data-points", plays + curr);
+                    }
 				}
 				else
 				{
@@ -385,31 +409,45 @@ function loadPlaycount()
 					 }, 1000);
 				}
 				i++;
-				console.log("success");
+				//console.log("success");
 			})
 			.fail(function() {
-				console.log("error");
+				//console.log("error");
 			})
 			.always(function() {
-				console.log("complete");
+				//console.log("complete");
 			});
 		}
 
-		function getCert(user, type, plays, where)
+		function getCert(user, type, plays, whereCert, whereClass)
 		{
 			$.ajax({
 				url: baseUrl + '/ajax/cert/'+user+'/'+type+'/'+plays,
-				dataType: 'html',
+				dataType: 'json'
 			})
 			.done(function(data) {
-				console.log("success");
-				where.html(data);
+                whereCert.html(data["text+icon"]);
+                if(whereClass && whereClass.length > 0){
+                    if((data["cert"].g + data["cert"].p + data["cert"].d) > 0){
+                        var currentPlaque = $(whereClass).attr("data-plaque");
+                        try{
+                            currentPlaque = JSON.parse(currentPlaque);
+                        }catch(e){
+                            currentPlaque = 0;
+                        }
+                        if(currentPlaque === 0 || currentPlaque.g !== data["cert"].g || currentPlaque.p !== data["cert"].p || currentPlaque.d !== data["cert"].d){
+                            $(whereClass).removeClass('hide');
+                            $(whereClass).addClass(data['class']);
+                            $("[data-cert-header]").removeClass('hide');
+                        }
+                    }
+                }
 			})
 			.fail(function() {
-				console.log("error");
+				//console.log("error");
 			})
 			.always(function() {
-				console.log("complete");
+				//console.log("complete");
 			});
 			
 		}
@@ -420,7 +458,7 @@ function loadPlaycount()
 function setImg(rankid, img)
 {
 	//console.log(img.length);
-	if(typeof img == 'undefined' || img == null || img.length < 2)
+	if(typeof img === 'undefined' || img == null || img.length < 2)
 	{
 		img = baseUrl + '/web/img/default-alb.png';
 	}
@@ -432,35 +470,35 @@ function setImg(rankid, img)
 	}
 }
 
-function loadArtImg(name, mbid, seton)
+function loadArtImg(name, mbid, seton,altseton)
 {
-	last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
+	var last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
 	last = encodeURI(last);
 	$.ajax({
 		url: last,
 		type: 'GET',
-		dataType: 'json',
+		dataType: 'json'
 	})
 	.done(function(data) {
-		img = baseUrl + '/web/img/default-alb.png';
-		if(typeof data.artist != 'undefined')
+		var img = baseUrl + '/web/img/default-alb.png';
+		if(typeof data.artist !== 'undefined')
 		{
-			img = data.artist.image[1]["#text"];
+			img = data.artist.image[3]["#text"];
 		}
-		setImg(seton, img);
-		console.log("success");
+		$(seton).attr("src", img);
+		$(altseton).attr("data-image", img);
 	})
 	.fail(function() {
-		console.log("error");
+        //
 	})
 	.always(function() {
-		console.log("complete");
+        //
 	});
 	
 }
 
 function offsetAnchor() {
-	if(curRoute == "about"){
+	if(curRoute === "about"){
 	    if(location.hash.length !== 0) {
 	        window.scrollTo(window.scrollX, window.scrollY - 100);
 	    }

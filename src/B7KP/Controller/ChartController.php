@@ -374,7 +374,7 @@ class ChartController extends Controller
 		{
 			$user = $this->isValidUser($login);
 			$c = new Certified($user, $this->factory);
-			echo $c->getCertification($type, $plays, "text+icon");
+			echo $c->getCertification($type, $plays, "json");
 		}
 		else
 		{
