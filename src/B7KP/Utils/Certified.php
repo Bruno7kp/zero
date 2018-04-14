@@ -433,51 +433,61 @@ class Certified
 	{
 		$valid = array("album", "music");
 		if(!in_array($type, $valid)): return null; endif;
-		$date = new \DateTime();
-		$dots = mb_strlen($name) > 20 ? "..." : "";
-		$textname = mb_substr($name, 0, 20).$dots;
-		$filename = "web/img/temp/".md5($textname).md5($this->user->login);
-		// Imagine
-		$imagine = new Imagine();
-		// Capa do álbum/foto do artista
-		$image = empty($image) ? "web/img/default-alb.png" : str_replace("https", "http", $image);
-		$photo = $imagine->open($image);
-		$bg = $imagine->open($image);
-		$minphoto  = new Box(100, 100);
-		$maxphoto  = new Box(500, 500);
-		$discphoto  = new Box(250, 250);
-		$size  = new Box(400, 500);
-		$photo->resize($minphoto); // Foto
-		$bg->resize($maxphoto)->crop(new Point(50, 0), new Box(400, 500)); // Fundo
-		$bg->effects()
-		    ->blur(25);
-		// Base
-		$base = $imagine->open('web/img/base2.png');
-		// Imagem certificado
-		$disc = $this->getCertification($type, $points, "image");
-		$disc = $imagine->open($disc);
-		$disc->resize($discphoto);
-		// texto do certificado
-		$text = $this->getCertification($type, $points, "text");
-		$value = $this->getValueByCert($type, $points);
-		$typecert = ($this->type == 0) ? Lang::get("play_x") : (($this->type == 1) ? Lang::get("pt_x") : Lang::get("both_x"));
-		$value .= "+ ".mb_strtolower($typecert);
-		// Cria imagem
-		$image = $imagine->create($size);
-		$image->paste($bg, new Point(0, 0));
-		$image->paste($base, new Point(0, 0));
-		$image->paste($disc, new Point(75, 100));
-		$image->draw()
-          	->text($this->user->login, new Font('web/fonts/Roboto-Regular.ttf', 25, $image->palette()->color('#fff')), new Point(100, 40))
-          	->text($textname, new Font('web/fonts/ARIALUNI.TTF', 14, $image->palette()->color('#fff')), new Point(150, 370))
-          	->text($artist, new Font('web/fonts/ARIALUNI.TTF', 12, $image->palette()->color('#fff')), new Point(150, 390))
-          	->text($text, new Font('web/fonts/Roboto-Regular.ttf', 12, $image->palette()->color('#fff')), new Point(150, 415))
-          	->text($value, new Font('web/fonts/Roboto-Regular.ttf', 11, $image->palette()->color('#fff')), new Point(150, 435))
-          	->text($date->format("Y.m.d"), new Font('web/fonts/Roboto-Regular.ttf', 9, $image->palette()->color('#fff')), new Point(150, 460));
-        $image->paste($photo, new Point(37, 370));
-		$image->save($filename.'.png', array('png_compression_level' => 9));
-		return $filename.".png";
+		switch (intval($this->settings->show_plaque)){
+            default:
+                $url = $this->defaultPlaque($type, $points, $image, $name, $artist);
+                break;
+        }
+        return $url;
 	}
+
+	private function defaultPlaque($type, $points, $image, $name, $artist)
+    {
+        $date = new \DateTime();
+        $dots = mb_strlen($name) > 20 ? "..." : "";
+        $textname = mb_substr($name, 0, 20).$dots;
+        $filename = "web/img/temp/".md5($textname).md5($this->user->login);
+        // Imagine
+        $imagine = new Imagine();
+        // Capa do álbum/foto do artista
+        $image = empty($image) ? "web/img/default-alb.png" : str_replace("https", "http", $image);
+        $photo = $imagine->open($image);
+        $bg = $imagine->open($image);
+        $minphoto  = new Box(100, 100);
+        $maxphoto  = new Box(500, 500);
+        $discphoto  = new Box(250, 250);
+        $size  = new Box(400, 500);
+        $photo->resize($minphoto); // Foto
+        $bg->resize($maxphoto)->crop(new Point(50, 0), new Box(400, 500)); // Fundo
+        $bg->effects()
+            ->blur(25);
+        // Base
+        $base = $imagine->open('web/img/base2.png');
+        // Imagem certificado
+        $disc = $this->getCertification($type, $points, "image");
+        $disc = $imagine->open($disc);
+        $disc->resize($discphoto);
+        // texto do certificado
+        $text = $this->getCertification($type, $points, "text");
+        $value = $this->getValueByCert($type, $points);
+        $typecert = ($this->type == 0) ? Lang::get("play_x") : (($this->type == 1) ? Lang::get("pt_x") : Lang::get("both_x"));
+        $value .= "+ ".mb_strtolower($typecert);
+        // Cria imagem
+        $image = $imagine->create($size);
+        $image->paste($bg, new Point(0, 0));
+        $image->paste($base, new Point(0, 0));
+        $image->paste($disc, new Point(75, 100));
+        $image->draw()
+            ->text($this->user->login, new Font('web/fonts/Roboto-Regular.ttf', 25, $image->palette()->color('#fff')), new Point(100, 40))
+            ->text($textname, new Font('web/fonts/ARIALUNI.TTF', 14, $image->palette()->color('#fff')), new Point(150, 370))
+            ->text($artist, new Font('web/fonts/ARIALUNI.TTF', 12, $image->palette()->color('#fff')), new Point(150, 390))
+            ->text($text, new Font('web/fonts/Roboto-Regular.ttf', 12, $image->palette()->color('#fff')), new Point(150, 415))
+            ->text($value, new Font('web/fonts/Roboto-Regular.ttf', 11, $image->palette()->color('#fff')), new Point(150, 435))
+            ->text($date->format("Y.m.d"), new Font('web/fonts/Roboto-Regular.ttf', 9, $image->palette()->color('#fff')), new Point(150, 460));
+        $image->paste($photo, new Point(37, 370));
+        $image->save($filename.'.png', array('png_compression_level' => 9));
+        return $filename.".png";
+    }
 
     /**
      * @param $url
