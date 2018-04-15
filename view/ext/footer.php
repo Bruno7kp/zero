@@ -13,7 +13,6 @@ use B7KP\Core\App;
             <li><a target="_blank" href="https://github.com/Bruno7kp/zero"><i class="fa fa-github"></i></a></li>
         </ul>
         <p class="text-muted fh5co-no-margin-bottom text-center"><small><a href="<?php echo Route::url('zero_stats');?>"><?php echo App::get("name");?></a> - <a href="<?php echo Route::url('zero_versions');?>"><?php echo App::get("version");?></a> (<?php echo App::get("updatedate")?>)</small></p>
-
     </div>
 </footer>
 <!-- JS -->
@@ -38,7 +37,7 @@ use B7KP\Core\App;
 <script src="<?php echo Url::asset('js/bootstrap-notify.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/custom.js');?>"></script>
 <script src="<?php echo Url::asset('js/main.js');?>"></script>
-<script src="<?php echo Url::asset('js/script.js?v=0');?>"></script>
+<script src="<?php echo Url::asset('js/script.js?v=2');?>"></script>
 <script src="<?php echo Url::asset('js/chart.js?v=2');?>"></script>
 <!-- cdn -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
@@ -52,6 +51,7 @@ use B7KP\Core\App;
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/locale/pt-br.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.4/moment-timezone-with-data.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.2.3/fabric.min.js" integrity="sha256-6jJ7FwCnUVTIphpgWnyaIvI6BmzIIdqRnPwoRPiNkeQ=" crossorigin="anonymous"></script>
 <script>
     autoUpdateTime();
     function autoUpdateTime(){

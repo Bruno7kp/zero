@@ -44,7 +44,7 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<link rel="stylesheet" href="<?php echo Url::asset('fonts/flaticon/flaticon.css');?>">
 	<!-- cdn -->
 	<link rel="stylesheet" href="<?php echo Url::asset('css/tooltipster-blue.css');?>">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/css/theme.bootstrap.min.css">
 <?php
 	echo Theme::getThemeFiles($theme, false);

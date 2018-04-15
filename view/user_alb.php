@@ -44,7 +44,7 @@ use B7KP\Utils\Functions as F;
 					</div>
 					<div class="row topspace-md">
 						<div class="col-xs-4 col-sm-3 col-md-2">
-							<img class="img-responsive" src="<?php echo $album['img'];?>">
+							<img data-fabric="<?php echo md5($name . $artist);?>" class="img-responsive" src="<?php echo $album['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
 							<h2 class="no-margin"><?php echo $name;?></h2>
@@ -111,6 +111,21 @@ use B7KP\Utils\Functions as F;
 								}
 								?>
 								<?php
+                                $cert_type = "";
+                                switch ($settings->cert_type){
+                                    case "2":
+                                        $pts = $points + $plays;
+                                        $cert_type = Lang::get("both_x");
+                                        break;
+                                    case "1":
+                                        $pts = $points;
+                                        $cert_type = Lang::get("pt_x");
+                                        break;
+                                    default:
+                                        $pts = $plays;
+                                        $cert_type = Lang::get("play_x");
+                                        break;
+                                }
 								if($settings->show_cert > 0)
 								{
 								?>
@@ -118,19 +133,7 @@ use B7KP\Utils\Functions as F;
 									<small class="text-muted"><?php echo Lang::get('cert_s');?></small>
 									<br>
 									<?php
-                                    switch ($settings->cert_type){
-                                        case "2":
-                                            $pts = $points + $plays;
-                                            break;
-                                        case "1":
-                                            $pts = $points;
-                                            break;
-                                        default:
-                                            $pts = $plays;
-                                    }
 									$txt = $c->getCertification("album", $pts, "text+icon");
-									//echo $c->getCertification("album", $pts, "icon"); 
-									//echo ($txt != Lang::get('none')) ? "<br/>" : "";
 									echo " <strong>".$txt."</strong>"; 
 									?>
 								</div>
@@ -162,7 +165,19 @@ use B7KP\Utils\Functions as F;
 								{
 
 							?>
-							<button class="btn btn-custom btn-info btn-sm" id="gen_plaque" data-type="album" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="<?php echo $album['img'];?>" data-points=<?php echo $pts;?>><?php echo Lang::get("gen_plaque");?></button>
+							<button class="btn btn-custom btn-info btn-sm"
+                                    data-plaque="default"
+                                    data-type="album"
+                                    data-name="<?php echo htmlentities($name, ENT_QUOTES);?>"
+                                    data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"
+                                    data-image="<?php echo $album['img'];?>" data-login="<?php echo $user->login;?>"
+                                    data-points="<?php echo $pts;?>"
+                                    data-text="<?php echo $c->getCertification("album", $pts, "text");?>"
+                                    data-disc="<?php echo $c->getCertification("album", $pts, "image");?>"
+                                    data-value="<?php echo $c->getValueByCert("album", $pts)."+ ".mb_strtolower($cert_type);?>"
+                            >
+                                <?php echo Lang::get("gen_plaque");?>
+                            </button>
 							<?php
 								}
 								$plaques = $c->getPlaque("album", $name, $artist);

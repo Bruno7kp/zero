@@ -393,7 +393,7 @@ class Certified
 		return $cert;
 	}
 
-	private function getValueByCert($type, $points)
+	public function getValueByCert($type, $points)
 	{
 		$array = $this->getDefaultCert($type, $points);
 		$g = $this->$type->gold;
