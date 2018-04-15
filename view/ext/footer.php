@@ -37,7 +37,7 @@ use B7KP\Core\App;
 <script src="<?php echo Url::asset('js/bootstrap-notify.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/custom.js');?>"></script>
 <script src="<?php echo Url::asset('js/main.js');?>"></script>
-<script src="<?php echo Url::asset('js/script.js?v=2');?>"></script>
+<script src="<?php echo Url::asset('js/script.js?v=3');?>"></script>
 <script src="<?php echo Url::asset('js/chart.js?v=2');?>"></script>
 <!-- cdn -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>

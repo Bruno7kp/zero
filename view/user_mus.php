@@ -111,27 +111,29 @@ use B7KP\Utils\Snippets as S;
 								}
 								?>
 								<?php
+                                $cert_type = "";
+                                switch ($settings->cert_type){
+                                    case "2":
+                                        $pts = $points + $plays;
+                                        $cert_type = Lang::get("both_x");
+                                        break;
+                                    case "1":
+                                        $pts = $points;
+                                        $cert_type = Lang::get("pt_x");
+                                        break;
+                                    default:
+                                        $pts = $plays;
+                                        $cert_type = Lang::get("play_x");
+                                        break;
+                                }
 								if($settings->show_cert > 0)
 								{
 								?>
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 									<small class="text-muted"><?php echo Lang::get('cert_s');?></small>
 									<br>
-									<?php 
-									//$pts = $c->getPoints("music", $name, $artist);
-                                    switch ($settings->cert_type){
-                                        case "2":
-                                            $pts = $points + $plays;
-                                            break;
-                                        case "1":
-                                            $pts = $points;
-                                            break;
-                                        default:
-                                            $pts = $plays;
-                                    }
+									<?php
 									$txt = $c->getCertification("music", $pts, "text+icon");
-									//echo $c->getCertification("music", $pts, "icon"); 
-									//echo ($txt != Lang::get('none')) ? "<br/>" : "";
 									echo " <strong>".$txt."</strong>"; 
 									?>
 								</div>
@@ -163,7 +165,19 @@ use B7KP\Utils\Snippets as S;
 								{
 
 							?>
-							<button class="btn btn-custom btn-info btn-sm" id="gen_plaque" data-type="music" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>" data-image="<?php echo $music['img'];?>" data-points=<?php echo $pts;?>><?php echo Lang::get("gen_plaque");?></button>
+                                    <button class="btn btn-custom btn-info btn-sm"
+                                            data-plaque="default"
+                                            data-type="music"
+                                            data-name="<?php echo htmlentities($name, ENT_QUOTES);?>"
+                                            data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"
+                                            data-image="<?php echo $music['img'];?>" data-login="<?php echo $user->login;?>"
+                                            data-points="<?php echo $pts;?>"
+                                            data-text="<?php echo $c->getCertification("music", $pts, "text");?>"
+                                            data-disc="<?php echo $c->getCertification("music", $pts, "image");?>"
+                                            data-value="<?php echo $c->getValueByCert("music", $pts)."+ ".mb_strtolower($cert_type);?>"
+                                    >
+                                        <?php echo Lang::get("gen_plaque");?>
+                                    </button>
 							<?php
 								}
 								$plaques = $c->getPlaque("music", $name, $artist);

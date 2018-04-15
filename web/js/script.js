@@ -332,8 +332,8 @@ function generateDefaultPlaque() {
         certData.text = $(this).attr('data-text');
         certData.value = $(this).attr('data-value');
         certData.disc = $(this).attr('data-disc');
-        if (certData.login.length > 20)
-            certData.login = certData.login.substr(0, 20) + "...";
+        if (certData.name.length > 20)
+            certData.name = certData.name.substr(0, 20) + "...";
 
         if (certData.image) {
             var can = document.createElement("canvas");
