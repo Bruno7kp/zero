@@ -150,7 +150,16 @@ if ($show_dropouts && $week > 1) {
                 if ($comp_lw != $comp_tw) {
                     $cert_new = $certified->getCertification($type, $cp_todate, "text+icon");
                     $class_new = $certified->getCertification($type, $cp_todate, "class");
-                    $new_certs[] = array("name" => $name, "artist" => $artist, "points" => $cp_todate, "certified" => $cert_new, "class" => $class_new);
+                    $new_certs[] = array(
+                        "name" => $name,
+                        "artist" => $artist,
+                        "points" => $cp_todate,
+                        "certified" => $cert_new,
+                        "class" => $class_new,
+                        "cert_text" => $certified->getCertification($type, $cp_todate, "text"),
+                        "cert_value" => $certified->getValueByCert($type, $cp_todate),
+                        "disc" => $certified->getCertification($type, $cp_todate, "image"),
+                    );
                 }
             }
             ?>
@@ -309,16 +318,22 @@ if ($show_dropouts && $week > 1) {
                     "points" => $certItemPoints,
                     "certified" => "",
                     "class" => "hide",
-                    "last_plaque" => $plaque
+                    "last_plaque" => $plaque,
+                    "cert_text" => "",
+                    "cert_value" => 0,
+                    "disc" => ""
                 );
             }
         }
         if (count($new_certs) > 0) {
             $new_cert_title = Lang::get('new_certs');
+            $cert_type_text = Lang::get("pt_x");
             if ($cert_type == "0") {
-                $new_cert_title = Lang::get('cert_o') . " (" . Lang::get("play_x") . ")";
+                $new_cert_title = Lang::get('cert_o') . " (" . Lang::get("play_x") . ") " . Lang::get("cert_note");
+                $cert_type_text = Lang::get("pt_x");
             } else if ($cert_type == "2") {
-                $new_cert_title = Lang::get('cert_o') . " (" . Lang::get("both_x") . ")";
+                $new_cert_title = Lang::get('cert_o') . " (" . Lang::get("both_x") . ") " . Lang::get("cert_note");
+                $cert_type_text = Lang::get("pt_x");
             }
             ?>
             <tr data-cert-header <?php if($cert_type != "1"){ ?>class="hide"<?php } ?>>
@@ -337,6 +352,9 @@ if ($show_dropouts && $week > 1) {
                 $points = $value["points"];
                 $certified = $value["certified"];
                 $class = $value["class"];
+                $disc = $value["disc"];
+                $cert_value = $value["cert_value"];
+                $cert_text = $value["cert_text"];
                 $mbid = "";
                 $lastPlaque = 0;
                 if (isset($value["last_plaque"]) && $value["last_plaque"] instanceof \B7KP\Entity\Plaque) {
@@ -373,13 +391,18 @@ if ($show_dropouts && $week > 1) {
                         <?php
                         if ($show_plaque && $this->user->checkSelfPermission($this->factory)) {
                             ?>
-                            <button class="btn no-margin btn-custom btn-info btn-sm gen_plaque"
+                            <button class="btn no-margin btn-custom btn-info btn-sm"
                                     data-gen="<?php echo md5($name . $artist); ?>"
+                                    data-plaque="default"
+                                    data-login="<?php echo $this->user->login;?>"
                                     data-type="<?php echo $type; ?>"
                                     data-name="<?php echo htmlentities($name, ENT_QUOTES); ?>"
                                     data-artist="<?php echo htmlentities($artist, ENT_QUOTES); ?>"
                                     data-image=""
                                     data-points="<?php echo $points; ?>"
+                                    data-text="<?php echo $cert_text; ?>"
+                                    data-disc="<?php echo $disc; ?>"
+                                    data-value="<?php echo $cert_value."+ ".mb_strtolower($cert_type_text); ?>"
                                     id="nnewcert<?php echo $key; ?>"><?php echo Lang::get("gen_plaque_alt"); ?></button>
                             <?php
                         }

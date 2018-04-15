@@ -355,7 +355,11 @@ class Certified
                 $data = array(
                     "text+icon" => $this->getCertification($type, $plays, "text+icon"),
                     "class" => $this->getCertification($type, $plays, "class"),
-                    "cert" => $certification
+                    "cert" => $certification,
+                    "text" => $this->getCertification($type, $plays, "text"),
+                    "value" => $this->getValueByCert($type, $plays),
+                    "disc" => $this->getCertification($type, $plays, "image"),
+                    "type" => $this->getTypeText()
                 );
                 return json_encode($data);
                 break;
@@ -363,6 +367,21 @@ class Certified
 
 		return $certification;
 	}
+
+	public function getTypeText(){
+	    switch (intval($this->settings->cert_type)){
+            case 2:
+                return Lang::get("both_x");
+                break;
+            case 1:
+                return Lang::get("pt_x");
+                break;
+            case 0:
+                return Lang::get("play_x");
+                break;
+        }
+        return "";
+    }
 
 	private function getDefaultCert($type, $plays)
 	{

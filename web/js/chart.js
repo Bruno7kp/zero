@@ -443,6 +443,9 @@ function loadPlaycount()
                         if(currentPlaque === 0 || currentPlaque.g !== data["cert"].g || currentPlaque.p !== data["cert"].p || currentPlaque.d !== data["cert"].d){
                             $(whereClass).removeClass('hide');
                             $(whereClass).addClass(data['class']);
+                            $(whereClass).find('[data-text]').attr('data-text', data['text']);
+                            $(whereClass).find('[data-value]').attr('data-value', data['value'] + "+ " + data['type'].toLowerCase());
+                            $(whereClass).find('[data-disc]').attr('data-disc', data['disc']);
                             $("[data-cert-header]").removeClass('hide');
                         }
                     }

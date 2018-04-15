@@ -242,6 +242,9 @@ class Lang
 		$messages["cert_o"][self::PT_BR] = "Certificados";
 		$messages["cert_o"][self::EN_US] = "Certifications";
 
+        $messages["cert_note"][self::PT_BR] = "de músicas/álbuns charteando e sem placa";
+        $messages["cert_note"][self::EN_US] = "of songs/albums on the chart and without plaque";
+
 		$messages["copy"][self::PT_BR] = "Copiar";
 		$messages["copy"][self::EN_US] = "Copy";
 

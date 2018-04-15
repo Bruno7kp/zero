@@ -424,7 +424,7 @@ function generateDefaultPlaque() {
                         sendToImgur(base64, certData, btn);
                     }, 1000);
                 } catch (e) {
-                    undisable(btn);
+                    undisable_alt(btn, getMsg("newplaque_alt"));
                     console.log(e);
                 }
             };
@@ -487,8 +487,8 @@ function removePlaque() {
     $(".remove-plaque").on('click', function (event) {
         event.preventDefault();
         if (confirm(getMsg("sure"))) {
-            id = $(this).attr('data-id');
-            div = $(this);
+            var id = $(this).attr('data-id');
+            var div = $(this);
             $.ajax({
                 url: baseUrl + '/delete/plaque/' + id,
                 dataType: 'json'
@@ -514,8 +514,8 @@ function removePlaque() {
 }
 
 function copyChart() {
-    copyBtn = $("#copy");
-    copyBtnAlt = $("#copy_alt");
+    var copyBtn = $("#copy");
+    var copyBtnAlt = $("#copy_alt");
 
     copyBtn.tooltipster({
         theme: 'tooltipster-blue',
@@ -571,14 +571,14 @@ function copyChart() {
 }
 
 function formSubmit() {
-    submitBtn = $(".send");
+    var submitBtn = $(".send");
     submitBtn.on('click', function (event) {
         event.preventDefault();
-        thisBtn = $(this);
+        var thisBtn = $(this);
         disable(thisBtn);
-        form = $(this).closest('form').serializeArray();
-        url = $(this).closest('form').attr('action');
-        method = $(this).closest('form').attr('method');
+        var form = $(this).closest('form').serializeArray();
+        var url = $(this).closest('form').attr('action');
+        var method = $(this).closest('form').attr('method');
         $.ajax({
             url: url,
             type: method,
@@ -655,9 +655,9 @@ function successAndGoTo(data) {
 }
 
 function showAlert(erro, message) {
-    type = "danger";
-    title = "Oops";
-    icon = "icon-sad-face fa-4x";
+    var type = "danger";
+    var title = "Oops";
+    var icon = "icon-sad-face fa-4x";
     if (erro == 0) {
         type = "success";
         title = getMsg('success');
@@ -692,12 +692,12 @@ function showAlert(erro, message) {
 }
 
 function updateYecAction() {
-    allon = 0;
+    var allon = 0;
     $(".yecupdaters").click(function (event) {
         /* Act on the event */
-        that = $(this);
+        var that = $(this);
         disable(that);
-        url = $(this).attr('data-url');
+        var url = $(this).attr('data-url');
         $.ajax({
             url: url,
             type: 'POST',
@@ -725,7 +725,7 @@ function updateYecAction() {
 
     $(".yecupdateall").click(function (event) {
         disable($(this));
-        yecs = $(".yecupdaters");
+        var yecs = $(".yecupdaters");
         console.log(allon);
         if (typeof yecs[allon] != "undefined") {
             yecs[allon].click();
@@ -742,7 +742,7 @@ function updateAction() {
     $(".updaters").click(function (event) {
         /* Act on the event */
         disable($(".updaters"));
-        url = $(this).attr('data-url');
+        var url = $(this).attr('data-url');
         $.ajax({
             url: url,
             type: 'POST',
@@ -765,7 +765,7 @@ function updateAction() {
 }
 
 function updateControl(weeks) {
-    total = weeks.length;
+    var total = weeks.length;
     if (total > 0) {
         loadStatus(0, total);
         updateWeek(0);
@@ -775,14 +775,14 @@ function updateControl(weeks) {
     }
 
     function updateWeek(index) {
-        val = weeks[index];
+        var val = weeks[index];
         $.ajax({
             url: baseUrl + '/update/week/' + val.from + "/" + val.to,
             dataType: 'json'
         })
             .done(function (data) {
                 console.log("success");
-                update = index + 1;
+                var update = index + 1;
                 loadStatus(update, total);
                 updateWeek(update);
             })
@@ -797,9 +797,9 @@ function updateControl(weeks) {
 }
 
 function loadStatus(actual, total) {
-    divAct = $("#updateaction");
-    perc = actual / total * 100;
-    txt = "<h2>" + getMsg('atting') + "</h2> " +
+    var divAct = $("#updateaction");
+    var perc = actual / total * 100;
+    var txt = "<h2>" + getMsg('atting') + "</h2> " +
         "<small class='text-muted'>" + actual + " / " + total + " </small>" +
         "<div class='progress'>" +
         "<div class='progress-bar progress-bar-default' role='progressbar' aria-valuenow='" + perc + "' aria-valuemin='0' aria-valuemax='100' style='width: " + perc + "%'>" +
@@ -817,8 +817,8 @@ function loadStatus(actual, total) {
 }
 
 function nothingNew() {
-    divAct = $("#updateaction");
-    txt = "<h2>" + getMsg('uptodate') + "</h2> " +
+    var divAct = $("#updateaction");
+    var txt = "<h2>" + getMsg('uptodate') + "</h2> " +
         "<small class='text-muted'>" + getMsg('nothingnew') + "</small>";
     divAct.html(txt);
     undisable_alt($(".new"), getMsg('updatenew'));
@@ -826,8 +826,8 @@ function nothingNew() {
 }
 
 function failMsg() {
-    divAct = $("#updateaction");
-    txt = "<h2>Oops</h2> " +
+    var divAct = $("#updateaction");
+    var txt = "<h2>Oops</h2> " +
         "<small class='text-muted'>" + getMsg('failload') + "</small>";
     divAct.html(txt);
     undisable_alt($(".new"), getMsg('updatenew'));
@@ -847,17 +847,17 @@ function routesFns() {
 }
 
 function loadOverall() {
-    cur = curPage.split("/");
-    login = cur[cur.length - 1];
+    var cur = curPage.split("/");
+    var login = cur[cur.length - 1];
 
-    if (login.length == 0) {
+    if (login.length === 0) {
         login = cur[cur.length - 2];
     }
     //loadAct(login, true);
-    alb = $(".top-albums");
-    rec = $(".recent");
-    art = $(".top-artists");
-    mus = $(".top-musics");
+    var alb = $(".top-albums");
+    var rec = $(".recent");
+    var art = $(".top-artists");
+    var mus = $(".top-musics");
     $.ajax({
         url: baseUrl + '/load_all/' + login + '/' + 5,
         dataType: 'json'
