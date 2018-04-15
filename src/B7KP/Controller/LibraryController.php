@@ -540,7 +540,8 @@ class LibraryController extends Controller
 			$music["music"] = $data["name"];
 			$music["artist"] = $data["artist"]["name"];
 			$music["userplaycount"] = $data["userplaycount"];
-			$music["img"] = empty($data['album']['image']['large']) ? $art["images"]["large"] : $data['album']['image']['large'];
+            $music["img"] = $art["images"]["large"];
+			//$music["img"] = empty($data['album']['image']['large']) ? $art["images"]["large"] : $data['album']['image']['large'];
 			$stats = $chart->getMusicStats($music["music"], $music["artist"], "");
 			//var_dump($stats);
 			$music["stats"] = $chart->extract($stats, false);

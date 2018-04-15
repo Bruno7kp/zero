@@ -310,9 +310,17 @@ function loadPlaycount()
 		var name = $(this).attr('data-name');
 		var user = $(this).attr('data-login');
 		name = name.replace(/\\/g, "");
+        name = encodeURI(name);
+        name = name.replace("+", "%2B");
+        name = name.replace("#", "%23");
+        name = name.replace("&", "%26");
 		var mbid = $(this).attr('data-mbid');
 		var artist = $(this).attr('data-artist');
 		artist = artist.replace(/\\/g, "");
+        artist = encodeURI(artist);
+        artist = artist.replace("+", "%2B");
+        artist = artist.replace("#", "%23");
+        artist = artist.replace("&", "%26");
 		var rankid = $(this).attr('id');
 		var td = $(this);
 		var last = "";
@@ -329,11 +337,7 @@ function loadPlaycount()
 		{
 			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json';
 		}
-		last = encodeURI(last);
-		last = last.replace("+", "%2B");
-		last = last.replace("#", "%23");
-		last = last.replace("%20&", "%20%26");
-		last = last.replace("&%20", "%26%20");
+
 		//console.log(last);
 		getF(last, td, type, user);
 		function getF(last, td, type, user)
@@ -352,12 +356,13 @@ function loadPlaycount()
 				    if(typeof data.track !== "undefined"){
                         plays = parseInt(data.track.userplaycount);
                         if(image.length > 0 || genPlaque.length > 0){
-                            if(typeof data.track.album !== "undefined" && data.track.album.image[3]["#text"] !== ""){
+                            loadArtImg(data.track.artist.name, "", $(image).find("img"), genPlaque);
+                            /**if(typeof data.track.album !== "undefined" && data.track.album.image[3]["#text"] !== ""){
                                 $(image).find("img").attr("src", data.track.album.image[3]["#text"]);
                                 $(genPlaque).attr("data-image", data.track.album.image[3]["#text"]);
                             }else{
                                 loadArtImg(data.track.artist.name, "", $(image).find("img"), genPlaque);
-                            }
+                            }**/
                         }
                     }else if(typeof data.album !== "undefined"){
                         plays = parseInt(data.album.userplaycount);
@@ -472,9 +477,13 @@ function setImg(rankid, img)
 
 function loadArtImg(name, mbid, seton,altseton)
 {
+    name = encodeURI(name);
+    name = name.replace("+", "%2B");
+    name = name.replace("#", "%23");
+    name = name.replace("&", "%26");
 	var last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
-	last = encodeURI(last);
-	$.ajax({
+
+    $.ajax({
 		url: last,
 		type: 'GET',
 		dataType: 'json'
