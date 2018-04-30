@@ -335,7 +335,7 @@ function loadPlaycount()
 		}
 		else
 		{
-			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json';
+			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json&autocorrect=0';
 		}
 
 		//console.log(last);

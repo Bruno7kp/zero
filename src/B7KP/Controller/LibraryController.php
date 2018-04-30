@@ -705,21 +705,24 @@ class LibraryController extends Controller
 		}
 	}
 
-	protected function getUserBg($user, $avatar = false)
+	protected function getUserBg($user, $avatar = false, $force = false)
 	{
 		$lfm 	= new LastFm();
-		$last 	= $lfm->setUser($user->login)->getUserInfo();
+		$lfm->setUser($user->login);
 		if($avatar)
 		{
+			$last = $lfm->getUserInfo();
 			$bgimage = str_replace("34s", "avatar170s", $last["image"]);
 		}
 		else
 		{
-			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
-			$bgimage = false;
-			if(isset($acts[0])): 
-				$bgimage = $acts[0]["images"]["mega"];
-			endif;
+            $bgimage = false;
+            if($force){
+                $acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+                if(isset($acts[0])):
+                    $bgimage = $acts[0]["images"]["mega"];
+                endif;
+            }
 		}
 
 		return $bgimage;

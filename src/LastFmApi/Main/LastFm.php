@@ -169,9 +169,9 @@ class LastFm
         return $this->artistApi->getInfo($vars);
     }
 
-    public function getMusicInfo($str, $artist, $mbid = null)
+    public function getMusicInfo($str, $artist, $mbid = null, $autocorrect = 0)
     {
-        $vars = array("track" => $str, "artist" => $artist,"mbid" => $mbid);
+        $vars = array("track" => $str, "artist" => $artist, "mbid" => $mbid, "autocorrect" => $autocorrect);
         
         $vars['username'] = $this->userName;
         

@@ -326,6 +326,7 @@ function generateDefaultPlaque() {
         certData.type = $(this).attr('data-type');
         certData.points = $(this).attr('data-points');
         certData.name = $(this).attr('data-name');
+        var originalName = certData.name;
         certData.artist = $(this).attr('data-artist');
         certData.image = $(this).attr('data-image');
         certData.login = $(this).attr('data-login');
@@ -421,6 +422,7 @@ function generateDefaultPlaque() {
                     canvas.add(dateText);
                     setTimeout(function () {
                         var base64 = canvas.toDataURL('png');
+                        certData.name = originalName;
                         sendToImgur(base64, certData, btn);
                     }, 1000);
                 } catch (e) {

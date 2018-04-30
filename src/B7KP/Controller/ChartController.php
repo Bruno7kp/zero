@@ -37,8 +37,9 @@ class ChartController extends Controller
 			}
 			$lfm 	= new LastFm();
 			$last 	= $lfm->setUser($user->login)->getUserInfo();
-			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+			//$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
 			$bgimage = false;
+			$acts = array();
 			if(isset($acts[0])): 
 				$bgimage = $acts[0]["images"]["mega"];
 			endif;
@@ -586,7 +587,7 @@ class ChartController extends Controller
 		return $return;
 	}
 
-	protected function getUserBg($user, $avatar = false)
+	protected function getUserBg($user, $avatar = false, $force = false)
 	{
 		$lfm 	= new LastFm();
 		$last 	= $lfm->setUser($user->login)->getUserInfo();
@@ -596,11 +597,14 @@ class ChartController extends Controller
 		}
 		else
 		{
-			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
-			$bgimage = false;
-			if(isset($acts[0])): 
-				$bgimage = $acts[0]["images"]["mega"];
-			endif;
+            $bgimage = false;
+            if($force){
+                $acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+
+                if(isset($acts[0])):
+                    $bgimage = $acts[0]["images"]["mega"];
+                endif;
+            }
 		}
 
 		return $bgimage;
