@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 08-Abr-2018 às 23:45
+-- Generation Time: 06-Maio-2018 às 16:00
 -- Versão do servidor: 10.1.31-MariaDB
 -- PHP Version: 5.6.34
 
@@ -191,7 +191,14 @@ CREATE TABLE `settings` (
   `hide_livechart` int(11) NOT NULL,
   `visibility` int(11) NOT NULL,
   `start_day` int(11) NOT NULL,
-  `show_wkl_cert` int(11) NOT NULL
+  `show_wkl_cert` int(11) NOT NULL,
+  `cert_name` varchar(20) DEFAULT NULL,
+  `plaque_type` int(2) NOT NULL DEFAULT '0',
+  `custom_unity` varchar(20) DEFAULT NULL,
+  `weight_alb_pls` decimal(7,2) NOT NULL DEFAULT '1.00',
+  `weight_alb_pts` decimal(7,2) NOT NULL DEFAULT '1.00',
+  `weight_mus_pls` decimal(7,2) NOT NULL DEFAULT '1.00',
+  `weight_mus_pts` decimal(7,2) NOT NULL DEFAULT '1.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -325,25 +332,25 @@ ALTER TABLE `yec`
 -- AUTO_INCREMENT for table `album_charts`
 --
 ALTER TABLE `album_charts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2881;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2961;
 
 --
 -- AUTO_INCREMENT for table `album_yec`
 --
 ALTER TABLE `album_yec`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=701;
 
 --
 -- AUTO_INCREMENT for table `artist_charts`
 --
 ALTER TABLE `artist_charts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2889;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2969;
 
 --
 -- AUTO_INCREMENT for table `artist_yec`
 --
 ALTER TABLE `artist_yec`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=701;
 
 --
 -- AUTO_INCREMENT for table `friend`
@@ -355,19 +362,19 @@ ALTER TABLE `friend`
 -- AUTO_INCREMENT for table `music_charts`
 --
 ALTER TABLE `music_charts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2891;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2971;
 
 --
 -- AUTO_INCREMENT for table `music_yec`
 --
 ALTER TABLE `music_yec`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=701;
 
 --
 -- AUTO_INCREMENT for table `plaque`
 --
 ALTER TABLE `plaque`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -385,13 +392,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `week`
 --
 ALTER TABLE `week`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=404;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=408;
 
 --
 -- AUTO_INCREMENT for table `yec`
 --
 ALTER TABLE `yec`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

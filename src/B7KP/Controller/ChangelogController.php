@@ -25,6 +25,7 @@ class ChangelogController extends Controller
 	public function showVersions()
 	{
 		$changes = array();
+		$changes["0.12.750"] = array("06.05.2018", Lang::get("v_multiply"));
 		$changes["0.12.250"] = array("14.04.2018", Lang::get("v_weekly_cert"), Lang::get("v_others"));
 		$changes["0.12.200"] = array("08.04.2018", Lang::get("v_new_cert_type"));
 		$changes["0.12.100"] = array("31.12.2016", Lang::get("v_yec"));
