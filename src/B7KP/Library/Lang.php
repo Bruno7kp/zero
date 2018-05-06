@@ -1031,6 +1031,8 @@ class Lang
         $messages["v_weekly_cert"][self::PT_BR] = "Certificados (por reproduções e plays+points) nos charts semanais.";
         $messages["v_weekly_cert"][self::EN_US] = "Certification (plays & plays + points) on weekly charts!.";
 
+        $messages["v_multiply"][self::PT_BR] = "Multiplicador de reproduções e pontos.";
+        $messages["v_multiply"][self::EN_US] = "Weight for plays + points.";
 		// noty
 
 		$messages["no_noty"][self::PT_BR] = "Nenhuma notificação encontrada";

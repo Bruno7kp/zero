@@ -42,8 +42,8 @@ class App
     {
         self::$name = "ZERO";
         self::$author = "Bruno7kp";
-        self::$version = "0.12.250";
-        self::$updatedate = "2018.04.14";
+        self::$version = "0.12.750";
+        self::$updatedate = "2018.05.06";
 
         switch ($_SERVER['SERVER_NAME']) {
             case 'localhost':
