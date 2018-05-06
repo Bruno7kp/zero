@@ -60,7 +60,7 @@ class Login
 		$set = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 		if($set == false)
 		{
-			$data = \B7KP\Entity\Settings::getAllDefaults();
+			$data = \B7KP\Entity\Settings::getAllDefaults($user->login);
 			$data->iduser = $user->id;
 			$this->factory->add("B7KP\Entity\Settings", $data);
 		}

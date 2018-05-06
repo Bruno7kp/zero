@@ -49,7 +49,7 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_points){
 									?>
 									<th class="text-center"><?php echo Lang::get('pt_x');?></th>
-									<th class="text-center"><?php echo Lang::get('both_x');?></th>
+									<th class="text-center"><?php echo empty($settings->custom_unity) ? Lang::get('both_x') : $settings->custom_unity;?></th>
 									<?php
 									}
 									?>
@@ -98,7 +98,7 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_points){
 									?>
 									<td class="text-center rk-col"><?php echo $pts;?></td>
-									<td class="text-center rk-col"><?php echo $pts + $value["playcount"];?></td>
+									<td class="text-center rk-col"><?php echo ($pts * $settings->weight_alb_pts) + ($value["playcount"] * $settings->weight_alb_pls);?></td>
 									<?php
 									}
 									?>
@@ -107,7 +107,7 @@ use B7KP\Utils\Snippets as S;
 										$c = new Certified($user, $this->factory);
 										switch ($settings->cert_type){
                                             case "2":
-                                                $cert = $c->getCertification("album", $pts + $value["playcount"], "text+icon");
+                                                $cert = $c->getCertification("album", ($pts * $settings->weight_alb_pts) + ($value["playcount"] * $settings->weight_alb_pls), "text+icon");
                                                 break;
                                             case "1":
                                                 $cert = $c->getCertification("album", $pts, "text+icon");

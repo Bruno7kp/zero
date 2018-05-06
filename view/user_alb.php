@@ -100,11 +100,11 @@ use B7KP\Utils\Functions as F;
 									</strong>
 								</div>
                                 <div class="col-md-2 col-sm-3 col-xs-6 text-center">
-                                    <small class="text-muted"><?php echo Lang::get('both_x');?></small>
+                                    <small class="text-muted"><?php echo empty($settings->custom_unity) ? Lang::get('both_x') : $settings->custom_unity;?></small>
                                     <br>
                                     <strong>
                                         <i class="ti-bar-chart-alt ico-color"></i>
-                                        <?php echo $points + $plays;?>
+                                        <?php echo ($points * $settings->weight_alb_pts) + ($plays * $settings->weight_alb_pls);?>
                                     </strong>
                                 </div>
 								<?php
@@ -114,8 +114,8 @@ use B7KP\Utils\Functions as F;
                                 $cert_type = "";
                                 switch ($settings->cert_type){
                                     case "2":
-                                        $pts = $points + $plays;
-                                        $cert_type = Lang::get("both_x");
+                                        $pts = ($points * $settings->weight_alb_pts) + ($plays * $settings->weight_alb_pls);
+                                        $cert_type = empty($settings->custom_unity) ? Lang::get('both_x') : $settings->custom_unity;
                                         break;
                                     case "1":
                                         $pts = $points;
@@ -170,11 +170,11 @@ use B7KP\Utils\Functions as F;
                                     data-type="album"
                                     data-name="<?php echo htmlentities($name, ENT_QUOTES);?>"
                                     data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"
-                                    data-image="<?php echo $album['img'];?>" data-login="<?php echo $user->login;?>"
+                                    data-image="<?php echo $album['img'];?>" data-login="<?php echo $settings->cert_name;?>"
                                     data-points="<?php echo $pts;?>"
                                     data-text="<?php echo $c->getCertification("album", $pts, "text");?>"
                                     data-disc="<?php echo $c->getCertification("album", $pts, "image");?>"
-                                    data-value="<?php echo $c->getValueByCert("album", $pts)."+ ".mb_strtolower($cert_type);?>"
+                                    data-value="<?php echo $c->getValueByCert("album", $pts)."+ ".($cert_type);?>"
                             >
                                 <?php echo Lang::get("gen_plaque");?>
                             </button>

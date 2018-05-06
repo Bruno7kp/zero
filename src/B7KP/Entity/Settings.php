@@ -161,6 +161,42 @@ class Settings extends Entity
 	*/
 	protected $show_wkl_cert;
 
+    /**
+     * @Assert(null=true)
+     */
+    protected $cert_name;
+
+    /**
+     * @Assert(null=false|int|option)
+     * @Options(values={"0": "default_plaque"}|settings={"translate": "1"})
+     */
+    protected $plaque_type;
+
+    /**
+     * @Assert(null=true)
+     */
+    protected $custom_unity;
+
+    /**
+     * @Assert(null=false|number|maxNum=10000|minNum=0.01)
+     */
+    protected $weight_alb_pls;
+
+    /**
+     * @Assert(null=false|number|maxNum=10000|minNum=0.01)
+     */
+    protected $weight_alb_pts;
+
+    /**
+     * @Assert(null=false|number|maxNum=10000|minNum=0.01)
+     */
+    protected $weight_mus_pls;
+
+    /**
+     * @Assert(null=false|number|maxNum=10000|minNum=0.01)
+     */
+    protected $weight_mus_pts;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -178,11 +214,11 @@ class Settings extends Entity
 		}
 	}
 
-	static function getAllDefaults()
+	static function getAllDefaults($username = "")
 	{
 		$def = new \stdClass();
-
-		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "hide_livechart", "theme", "start_day", "visibility", "show_wkl_cert");
+        $def->cert_name = $username;
+		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "hide_livechart", "theme", "start_day", "visibility", "show_wkl_cert", "custom_unity");
 
 		foreach ($items as $value) {
 			$def->$value = self::defaultValueFor($value);
@@ -248,6 +284,10 @@ class Settings extends Entity
 			case 'lang':
 				$for = Lang::detectLang();
 				break;
+
+            case 'custom_unity':
+                $for = "Plays + Points";
+                break;
 
 			default:
 				$for = "not found";
