@@ -72,7 +72,7 @@ class SettingsController extends Controller
 				else
 				{
 					$post->iduser = $this->user->id;
-					$rest = Settings::getAllDefaults();
+					$rest = Settings::getAllDefaults($this->user->login);
 					foreach ($rest as $key => $value) 
 					{
 						if(!isset($post->$key))

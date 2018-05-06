@@ -38,7 +38,7 @@ use B7KP\Core\App;
 <script src="<?php echo Url::asset('js/custom.js');?>"></script>
 <script src="<?php echo Url::asset('js/main.js');?>"></script>
 <script src="<?php echo Url::asset('js/script.js?v=3.3');?>"></script>
-<script src="<?php echo Url::asset('js/chart.js?v=3.3');?>"></script>
+<script src="<?php echo Url::asset('js/chart.js?v=3.4');?>"></script>
 <!-- cdn -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -52,7 +52,12 @@ use B7KP\Core\App;
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/locale/pt-br.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.4/moment-timezone-with-data.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.2.3/fabric.min.js" integrity="sha256-6jJ7FwCnUVTIphpgWnyaIvI6BmzIIdqRnPwoRPiNkeQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
 <script>
+    $(document).ready(function(){
+        $(".numb").mask("####0.00", {reverse: true});
+    });
+
     autoUpdateTime();
     function autoUpdateTime(){
 

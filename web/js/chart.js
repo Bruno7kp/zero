@@ -387,6 +387,14 @@ function loadPlaycount()
                     if(pp.length > 0)
                     {
                         var points = parseInt($(pp).attr('data-p'));
+                        var wPlays = parseFloat($(pp).attr('data-w-pl'));
+                        if(wPlays > 0){
+                            plays = plays * wPlays;
+                        }
+                        var wPoints = parseFloat($(pp).attr('data-w-pt'));
+                        if(wPoints > 0){
+                            points = points * wPoints;
+                        }
                         pp.text(plays + points);
                     }
                     var cert = $("[data-c=\"" + td.attr('id') + "\"]");
@@ -394,6 +402,12 @@ function loadPlaycount()
 					{
 					    var curr = parseInt($(cert).attr('data-p'));
 					    var rowClass = $("[data-class=\"" + td.attr('id') + "\"]");
+
+                        wPoints = parseFloat($(pp).attr('data-w-pt'));
+                        if(wPoints > 0){
+                            curr = curr * wPoints;
+                        }
+                        console.log(plays, curr);
 						getCert(user, type, plays + curr, cert, rowClass);
 					}
 					var gen = $("[data-gen=\"" + td.attr('id') + "\"]");
@@ -444,7 +458,7 @@ function loadPlaycount()
                             $(whereClass).removeClass('hide');
                             $(whereClass).addClass(data['class']);
                             $(whereClass).find('[data-text]').attr('data-text', data['text']);
-                            $(whereClass).find('[data-value]').attr('data-value', data['value'] + "+ " + data['type'].toLowerCase());
+                            $(whereClass).find('[data-value]').attr('data-value', data['value'] + "+ " + data['type']);
                             $(whereClass).find('[data-disc]').attr('data-disc', data['disc']);
                             $("[data-cert-header]").removeClass('hide');
                         }

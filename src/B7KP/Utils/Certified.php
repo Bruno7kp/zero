@@ -371,6 +371,8 @@ class Certified
 	public function getTypeText(){
 	    switch (intval($this->settings->cert_type)){
             case 2:
+                if(!empty($this->settings->custom_unity))
+                    return $this->settings->custom_unity;
                 return Lang::get("both_x");
                 break;
             case 1:

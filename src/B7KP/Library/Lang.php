@@ -222,6 +222,33 @@ class Lang
 		$messages["view_in_your"][self::PT_BR] = "Ver no seu perfil";
 		$messages["view_in_your"][self::EN_US] = "View in your profile";
 
+        $messages["weights"][self::PT_BR] = "Pesos (Plays + Points)";
+        $messages["weights"][self::EN_US] = "Weights (Plays + Points)";
+
+        $messages["weight_alb_pls"][self::PT_BR] = "Peso de reproduções de álbuns";
+        $messages["weight_alb_pls"][self::EN_US] = "Weight of album plays";
+
+        $messages["weight_alb_pts"][self::PT_BR] = "Peso de pontos de álbuns";
+        $messages["weight_alb_pts"][self::EN_US] = "Weight of album points";
+
+        $messages["weight_mus_pls"][self::PT_BR] = "Peso de reproduções de músicas";
+        $messages["weight_mus_pls"][self::EN_US] = "Weight of music plays";
+
+        $messages["weight_mus_pts"][self::PT_BR] = "Peso de pontos de músicas";
+        $messages["weight_mus_pts"][self::EN_US] = "Weight of music points";
+
+        $messages["plaque_type"][self::PT_BR] = "Modelo de placa";
+        $messages["plaque_type"][self::EN_US] = "Plaque model";
+
+        $messages["default_plaque"][self::PT_BR] = "Placa padrão";
+        $messages["default_plaque"][self::EN_US] = "Default plaque";
+
+        $messages["cert_name_exp"][self::PT_BR] = "Nome do certificado (padrão: seu nome de usuário)";
+        $messages["cert_name_exp"][self::EN_US] = "Certification name (default: your username)";
+
+        $messages["custom_unity_exp"][self::PT_BR] = "Nome da unidade de valor das reproduções + pontos (Ex: SPS, P+P)";
+        $messages["custom_unity_exp"][self::EN_US] = "Unit name of value of plays + points (Ex: SPS, P+P)";
+
 		// IMPORTANTE
 
 		$messages["acc_success"][self::PT_BR] = "Conta resetada com sucesso";

@@ -146,14 +146,14 @@ use B7KP\Utils\Snippets as S;
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
-											echo "<td class='text-center rk-col' data-p='".$pts."' data-pp='".md5($item->music)."'></td>";
+											echo "<td class='text-center rk-col' data-p='".$pts."' data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-pp='".md5($item->music)."'></td>";
 										}
 										if($settings->show_chart_cert)
 										{
 											$c = new Certified($user, $this->factory);
 											switch ($settings->cert_type){
                                                 case "2":
-                                                    echo "<td class='text-center rk-col' data-p='".$pts."' data-c='".md5($item->music)."'></td>";
+                                                    echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-p='".$pts."' data-c='".md5($item->music)."'></td>";
                                                     break;
                                                 case "1":
                                                     $cert = $c->getCertification("music", $pts, "text+icon");

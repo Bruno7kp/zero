@@ -366,7 +366,11 @@ if ($show_dropouts && $week > 1) {
                     <td><a target="_blank"
                            href="<?php echo Route::url("lib_" . substr($type, 0, 3), array("name" => Functions::fixLFM($name), "artist" => Functions::fixLFM($artist), "login" => $this->user->login)); ?>"><i
                                     class="ti-new-window"></i></a></td>
-                    <td <?php if ($cert_type != "1") { ?> data-p="<?php echo $points; ?>" data-c="<?php echo md5($name . $artist); ?>"<?php } ?>>
+                    <td <?php if ($cert_type != "1") { ?>
+                        data-p="<?php echo $points; ?>" data-c="<?php echo md5($name . $artist); ?>"
+                        <?php if($cert_type == "2") { $wname = substr($type, 0, 3); ?> data-w-pl='<?php echo $settings->{"weight_".$wname."_pls"};?>' data-w-pt='<?php echo $settings->{"weight_".$wname."_pts"};?>' <?php } ?>
+                    <?php } ?>>
+
                         <?php echo $certified; ?>
                     </td>
                     <?php
@@ -385,7 +389,9 @@ if ($show_dropouts && $week > 1) {
                     <?php if ($cert_type == "1") { ?>
                         <td><?php echo $points . " " . Lang::get("pt_x"); ?></td>
                     <?php } else { ?>
-                        <td data-p="<?php echo $points; ?>" data-pp="<?php echo md5($name . $artist); ?>"></td>
+                        <td data-p="<?php echo $points; ?>" data-pp="<?php echo md5($name . $artist); ?>"
+                            <?php if($cert_type == "2") { $wname = substr($type, 0, 3); ?> data-w-pl='<?php echo $settings->{"weight_".$wname."_pls"};?>' data-w-pt='<?php echo $settings->{"weight_".$wname."_pts"};?>' <?php } ?>
+                        ></td>
                     <?php } ?>
                     <td colspan="2">
                         <?php
@@ -394,7 +400,7 @@ if ($show_dropouts && $week > 1) {
                             <button class="btn no-margin btn-custom btn-info btn-sm"
                                     data-gen="<?php echo md5($name . $artist); ?>"
                                     data-plaque="default"
-                                    data-login="<?php echo $this->user->login;?>"
+                                    data-login="<?php echo $settings->cert_name;?>"
                                     data-type="<?php echo $type; ?>"
                                     data-name="<?php echo htmlentities($name, ENT_QUOTES); ?>"
                                     data-artist="<?php echo htmlentities($artist, ENT_QUOTES); ?>"
