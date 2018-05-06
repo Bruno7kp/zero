@@ -198,14 +198,14 @@ use B7KP\Library\Lang;
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
-											echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pls}' data-p='".$pts."' data-pp='".md5($item->album)."'></td>";
+											echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-pp='".md5($item->album)."'></td>";
 										}
 										if($settings->show_chart_cert)
 										{
                                             $c = new Certified($user, $this->factory);
                                             switch ($settings->cert_type){
                                                 case "2":
-                                                    echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pls}' data-p='".$pts."' data-c='".md5($item->album)."'></td>";
+                                                    echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-c='".md5($item->album)."'></td>";
                                                     break;
                                                 case "1":
                                                     $cert = $c->getCertification("album", $pts, "text+icon");
