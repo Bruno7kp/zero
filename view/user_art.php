@@ -64,7 +64,7 @@ use B7KP\Library\Lang;
 									<br>
 									<strong>
 										<i class="ti-control-play ico-color"></i>
-										<?php echo $plays;?>					
+										<span class="fmt-nmb"><?php echo $plays;?></span>					
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -95,7 +95,7 @@ use B7KP\Library\Lang;
 									<br>
 									<strong>
 										<i class="ti-bar-chart-alt ico-color"></i>
-										<?php echo $c->getArtistChartPoints($name);?>			
+										<span class="fmt-nmb"><?php echo $c->getArtistChartPoints($name);?></span>		
 									</strong>
 								</div>
                                 <div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -103,7 +103,7 @@ use B7KP\Library\Lang;
                                     <br>
                                     <strong>
                                         <i class="ti-bar-chart-alt ico-color"></i>
-                                        <?php echo $c->getArtistChartPoints($name) + $plays;?>
+                                        <span class="fmt-nmb"><?php echo $c->getArtistChartPoints($name) + $plays;?></span>
                                     </strong>
                                 </div>
 								<?php

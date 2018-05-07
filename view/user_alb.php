@@ -65,7 +65,7 @@ use B7KP\Utils\Functions as F;
 									<br>
 									<strong>
 										<i class="ti-control-play ico-color"></i>
-										<?php echo $plays;?>							
+										<span class="fmt-nmb"><?php echo $plays;?></span>						
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -96,7 +96,7 @@ use B7KP\Utils\Functions as F;
 									<br>
 									<strong>
 										<i class="ti-bar-chart-alt ico-color"></i>
-										<?php echo $points;?>			
+										<span class="fmt-nmb"><?php echo $points;?></span>		
 									</strong>
 								</div>
                                 <div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -104,7 +104,7 @@ use B7KP\Utils\Functions as F;
                                     <br>
                                     <strong>
                                         <i class="ti-bar-chart-alt ico-color"></i>
-                                        <?php echo ($points * $settings->weight_alb_pts) + ($plays * $settings->weight_alb_pls);?>
+                                        <span class="fmt-nmb"><?php echo ($points * $settings->weight_alb_pts) + ($plays * $settings->weight_alb_pls);?></span>
                                     </strong>
                                 </div>
 								<?php
