@@ -112,8 +112,11 @@ use B7KP\Library\Lang;
                 <h2 id="certified">Certificados</h2>
                 <p>Assim como na indústria fonográfica, no ZERO é possível "certificar" músicas e álbuns, veja a seguir como configurar.</p>
                 <h3>Configuração</h3>
-                <p>Acesse a página de <a href="<?php echo Route::url('settings');?>">configurações</a> e no fim da mesma terá um botão que o levará para a <a href="<?php echo Route::url('cert_settings');?>">configuração de certificados</a>, nela você pode habilitar os certificados e adicionar os valores que desejar para os certificados de Ouro, Platina e Diamante. Você pode escolher se as certificações serão baseados no número de reproduções ou nos <a href="#chartpoints">pontos</a>.</p>
+                <p>Acesse a página de <a href="<?php echo Route::url('settings');?>">configurações</a> e no fim da mesma terá um botão que o levará para a <a href="<?php echo Route::url('cert_settings');?>">configuração de certificados</a>, nela você pode habilitar os certificados e adicionar os valores que desejar para os certificados de Ouro, Platina e Diamante. Você pode escolher se as certificações serão baseados no número de reproduções, no número de <a href="#chartpoints">pontos</a> ou na soma de ambos.</p>
                 <p>Habilitando os certificados, será possível vê-los na página do álbum/música.</p>
+                <p>Caso utilize a soma de pontos e reproduções, você poderá definir pesos que cada um terá. É possível escolher valores de 0,01 até 10.000 como multiplicadores das reproduções e pontos de álbuns e músicas.</p>
+                <p>Assim você poderá dar um peso maior para as reproduções, por exemplo:</p>
+                <p>Reproduções tem peso 10, enquanto pontos tem peso 1, assim, um álbum com 250 reproduções e 700 pontos terá um total de 2.500 + 700 pontos no total, ou 3.200 pontos, ao invés dos 950 que teria caso ambos tivessem peso 1.</p>
                 <h3 id="plaque">Placas</h3>
                 <p>Você também pode gerar placas de certificado, para isso, habilite as placas na página de <a href="<?php echo Route::url('cert_settings');?>">configuração de certificados</a>, e depois acesse a página do álbum/música, no fim da página aparecerá um botão "gerar placa de certificado", aperte nele e aguarde alguns segundos, quando a placa ficar pronta ela irá aparecer na sua tela. Caso o álbum/música já tenha alguma placa gerada, você poderá visualizar a mesma acessando a página do respectivo álbum/música, onde aparecerá um novo botão "placas de certificados".</p>
                 <h2 id="info">Outras informações</h2>
@@ -133,7 +136,7 @@ use B7KP\Library\Lang;
                 <ul>
                     <li>Na página do artista, só é possível mostrar as músicas/álbuns que entraram no chart</li>
                     <li>Na página do álbum, não é possível mostrar as faixas do mesmo</li>
-                    <li>Nos charts e na página de música, é possível que seja mostrado a foto do artista e não a da capa do álbum onde ela está presente</li>
+                    <li>Nos charts e na página de música, irá ser mostrado a foto do artista e não a foto do álbum em que a música pertence</li>
                     <li>A lista de artistas com mais certificados só é visível e funcional para quem utilizar <b>pontos</b></li>
                     <li>A lista de certificados semanais mostrará o certificado conquistado até aquela semana para quem utilizar <b>pontos</b>, para os outros usuários será mostrado o certificado conquistado até a <b>data atual</b>, independente de qual semana esteja visualizando.</li>
                 </ul>
