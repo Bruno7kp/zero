@@ -56,6 +56,12 @@ use B7KP\Core\App;
 <script>
     $(document).ready(function(){
         $(".numb").mask("####0.00", {reverse: true});
+        if(curRoute !== "weekly_chart") {
+            $('.rk-col:not(:has(img), :has(span), :has(a), :empty), .fmt-nmb').mask('000.000.000.000.000', {reverse: true});
+            setInterval(function() {
+                $('.rk-col:not(:has(img), :has(span), :has(a), :empty)').mask('000.000.000.000.000', {reverse: true});
+            }, 3000);
+        }
     });
 
     autoUpdateTime();
