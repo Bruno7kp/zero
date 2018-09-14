@@ -21,7 +21,7 @@ class Url
 	static function getBaseUrl()
 	{
 		$url = "http://".$_SERVER['SERVER_NAME'].self::checkPort().dirname($_SERVER['PHP_SELF']);
-		$url = rtrim($url, "/");
+		$url = rtrim($url, "/\\");
 		return $url;
 	}
 
