@@ -78,16 +78,19 @@ class AnnotationReader implements iCache
 
 	private function scan()
 	{
-		unset($this->scan);
+		$this->scan = new \stdclass();
+		$this->scan->class = [];
+		$this->scan->property = [];
+		$this->scan->method = [];
 		$scanned_directory = $this->findPHPFiles();
 
 		foreach ($scanned_directory as $file) {
 			$class = str_replace(".php", "", $file);
 			if(class_exists($class))
 			{
-				$this->scan["class"][$class] = $this->setClass($class)->getClassAnnotations();
-				$this->scan["property"][$class] = $this->getPropertiesAnnotations();
-				$this->scan["method"][$class] = $this->getMethodsAnnotations();
+				$this->scan->class[$class] = $this->setClass($class)->getClassAnnotations();
+				$this->scan->property[$class] = $this->getPropertiesAnnotations();
+				$this->scan->method[$class] = $this->getMethodsAnnotations();
 			}
 		}
 
