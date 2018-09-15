@@ -45,32 +45,15 @@ class App
         self::$version = "0.12.750";
         self::$updatedate = "2018.05.06";
 
-        switch ($_SERVER['SERVER_NAME']) {
-            case 'localhost':
-                self::$environment = "DEV";
-                self::$db = "mysql";
-                self::$dbname = "mydb";
-                self::$host = "localhost";
-                self::$user = "root";
-                self::$password = "";
-                self::$dsn = self::setDsn();
-                self::$lastfmapikey = "68d81020be83713df69720b5acdf0a1f";
-                self::$lastfmapisecret = "daf57401387415299a1778da3544ab10";
-                break;
-
-            default:
-                self::$environment = "PROD";
-                self::$db = "mysql";
-                self::$dbname = "mydb";
-                self::$host = "127.0.0.1";
-                self::$user = "root";
-                self::$password = "";
-                self::$dsn = self::setDsn();
-                self::$lastfmapikey = "edaae45363abd9e14958641aa4addc32";
-                self::$lastfmapisecret = "5f43a1406ae7a87a261368dfadbdd0dd";
-                break;
-        }
-
+        self::$environment = getenv("ENV");
+        self::$db = getenv("DB");
+        self::$dbname = getenv("DB_NAME");
+        self::$host = getenv("DB_HOST");
+        self::$user = getenv("DB_USER");
+        self::$password = getenv("DB_PASS");
+        self::$dsn = self::setDsn();
+        self::$lastfmapikey = getenv("LASTFM_KEY");
+        self::$lastfmapisecret = getenv("LASTFM_SECRET");
         self::$loaded = true;
     }
 }

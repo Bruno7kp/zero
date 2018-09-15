@@ -1,6 +1,6 @@
 <?php 
 // Autoload
-function __autoload($className) 
+function zero_autoloader($className) 
 { 
 	if(!defined("MAIN_DIR"))
 	{
@@ -13,5 +13,5 @@ function __autoload($className)
 	{
 		require_once $file;
 	}
-} 
-?>
+}
+spl_autoload_register("zero_autoloader");
