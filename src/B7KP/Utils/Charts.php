@@ -111,7 +111,8 @@ class Charts
 		$filesystemAdapter = new Local(MAIN_DIR.'cache');
 		$filesystem        = new Filesystem($filesystemAdapter);
 		$pool = new FilesystemCachePool($filesystem);
-		$cacheName = $this->user->login."_".$type."_".intval($week->id);
+		$tagName = $this->user->login."_".$type;
+		$cacheName = $tagName."_".intval($week->id);
 
 		if($html && $settings)
 		{
@@ -167,7 +168,7 @@ class Charts
 		{
 			$list = $this->getTable($newlist, $type, $settings, $week->week);
 			$cache = $pool->getItem($cacheName);
-			$cache->set($list);
+			$cache->set($list)->setTags([$tagName]);
 			$pool->save($cache);
 		}
 		else

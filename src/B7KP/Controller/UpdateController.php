@@ -9,16 +9,24 @@ use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 use LastFmApi\Main\LastFm;
 
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+
 class UpdateController extends Controller
 {
 	private $settings;
 	private $user;
+	private $pool;
 
 	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 		$this->user = UserSession::getUser($this->factory);
 		$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
+		$filesystemAdapter = new Local(MAIN_DIR.'cache');
+		$filesystem        = new Filesystem($filesystemAdapter);
+		$this->pool = new FilesystemCachePool($filesystem);
 	}
 
 	/**
@@ -237,6 +245,8 @@ class UpdateController extends Controller
 				$error++;
 			}
 			$this->factory->removeBy("B7KP\Entity\Artist_charts", "idweek = ".$idweek." AND updated", $updated, "<");
+			$login = $this->user->login;
+			$this->pool->invalidateTags([$login."_artist"]);
 		}
 		return $error;
 	}
@@ -272,6 +282,8 @@ class UpdateController extends Controller
 				$error++;
 			}
 			$this->factory->removeBy("B7KP\Entity\Album_charts", "idweek = ".$idweek." AND updated", $updated, "<");
+			$login = $this->user->login;
+			$this->pool->invalidateTags([$login."_album"]);
 		}
 
 		return $error;
@@ -309,6 +321,8 @@ class UpdateController extends Controller
 				$error++;
 			}
 			$this->factory->removeBy("B7KP\Entity\Music_charts", "idweek = ".$idweek." AND updated", $updated, "<");
+			$login = $this->user->login;
+			$this->pool->invalidateTags([$login."_music"]);
 		}
 		return $error;
 	}
@@ -330,4 +344,3 @@ class UpdateController extends Controller
 		}
 	}
 }
-?>

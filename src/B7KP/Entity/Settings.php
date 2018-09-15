@@ -280,13 +280,13 @@ class Settings extends Entity
 			case 'visibility':
 			case 'show_wkl_cert':
 			case 'plaque_type':
+				$for = 0;
+				break;
+			case 'show_points':
 			case 'weight_alb_pls':
 			case 'weight_alb_pts':
 			case 'weight_mus_pls':
 			case 'weight_mus_pts':
-				$for = 0;
-				break;
-			case 'show_points':
 				$for = 1;
 				break;
 			case 'art_limit':

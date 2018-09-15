@@ -9,16 +9,24 @@ use B7KP\Library\Lang;
 use B7KP\Entity\User;
 use B7KP\Entity\Settings;
 
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+
 class SettingsController extends Controller
 {
 	private $settings;
 	private $user;
+	private $pool;
 
 	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 		$this->user = UserSession::getUser($this->factory);
 		$this->settings = $this->factory->findOneBy("B7KP\Entity\Settings", $this->user->id, "iduser");
+		$filesystemAdapter = new Local(MAIN_DIR.'cache');
+		$filesystem        = new Filesystem($filesystemAdapter);
+		$this->pool = new FilesystemCachePool($filesystem);
 	}
 
 	/**
@@ -52,6 +60,7 @@ class SettingsController extends Controller
 		if($this->isAjaxRequest())
 		{
 			$post->id = $this->user->id;
+			$login = $this->user->login;
 			if($this->checkAssert($post))
 			{
 				$post = $this->correctValues($post);
@@ -63,6 +72,7 @@ class SettingsController extends Controller
 					if($updated)
 					{
 						$response = array("erro" => 0, "message" => "Success", "call" => "goTo", "url" => $url);
+						$this->pool->invalidateTags([$login."_album", $login."_music", $login."_artist"]);
 					}
 					else
 					{
@@ -131,4 +141,3 @@ class SettingsController extends Controller
 		}
 	}
 }
-?>
