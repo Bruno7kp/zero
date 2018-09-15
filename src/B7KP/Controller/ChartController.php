@@ -153,7 +153,7 @@ class ChartController extends Controller
             if (is_array($week) && count($week) > 0) {
 				$week = $week[0];
                 // Get last modification time of the current PHP file
-                $content_last_mod_time = $file_last_mod_time = filemtime(__FILE__);
+                $content_last_mod_time = filemtime(__FILE__);
 
 				// Get last modification time of the main content (that user sees)
 				$cond = array("idweek" => $week->id);
@@ -164,13 +164,14 @@ class ChartController extends Controller
 
                 // Combine both to generate a unique ETag for a unique content
                 // Specification says ETag should be specified within double quotes
-                $etag = '"' . $file_last_mod_time . '.' . $content_last_mod_time . '.' . md5(serialize($settings)) . '"';
+                $etag = '"' . $content_last_mod_time . '.' . sha1(serialize($settings)) . '"';
 
                 // Set Cache-Control header
-                header('Cache-Control: max-age=31556926');
+                header('Cache-Control: max-age=31536000');
 
                 // Set ETag header
-                header('ETag: ' . $etag);
+				header('ETag: ' . $etag);
+				header_remove('Pragma');
 
                 // Check whether browser had sent a HTTP_IF_NONE_MATCH request header
                 if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
