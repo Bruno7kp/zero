@@ -10,3 +10,4 @@ gen
 .env
 composer.lock
 vendor/*
+cache/cache/*
