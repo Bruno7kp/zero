@@ -1,0 +1,8 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^2.5"
+    },
+    "autoload": {
+        "files": ["app/autoload.php"]
+    }
+}

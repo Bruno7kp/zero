@@ -7,3 +7,6 @@
 *.iml
 out
 gen
+.env
+composer.lock
+vendor/*
