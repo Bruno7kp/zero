@@ -218,7 +218,40 @@ class Settings extends Entity
 	{
 		$def = new \stdClass();
         $def->cert_name = $username;
-		$items = array("art_limit", "alb_limit", "mus_limit", "show_images", "show_dropouts", "show_first_image", "show_move", "show_playcounts", "lang", "alb_cert_gold", "alb_cert_platinum", "alb_cert_diamond", "mus_cert_gold", "mus_cert_platinum", "mus_cert_diamond", "show_cert", "show_chart_cert", "show_plaque", "cert_type", "show_times", "show_points", "hide_livechart", "theme", "start_day", "visibility", "show_wkl_cert", "custom_unity");
+		$items = array(
+			"art_limit", 
+			"alb_limit", 
+			"mus_limit", 
+			"show_images", 
+			"show_dropouts", 
+			"show_first_image", 
+			"show_move", 
+			"show_playcounts", 
+			"lang", 
+			"alb_cert_gold", 
+			"alb_cert_platinum", 
+			"alb_cert_diamond", 
+			"mus_cert_gold", 
+			"mus_cert_platinum", 
+			"mus_cert_diamond", 
+			"show_cert", 
+			"show_chart_cert", 
+			"show_plaque", 
+			"cert_type", 
+			"show_times", 
+			"show_points", 
+			"hide_livechart", 
+			"theme", 
+			"start_day", 
+			"visibility", 
+			"show_wkl_cert", 
+			"custom_unity", 
+			"plaque_type",
+			"weight_alb_pls",
+			"weight_alb_pts",
+			"weight_mus_pls",
+			"weight_mus_pts"
+		);
 
 		foreach ($items as $value) {
 			$def->$value = self::defaultValueFor($value);
@@ -246,6 +279,11 @@ class Settings extends Entity
 			case 'start_day':
 			case 'visibility':
 			case 'show_wkl_cert':
+			case 'plaque_type':
+			case 'weight_alb_pls':
+			case 'weight_alb_pts':
+			case 'weight_mus_pls':
+			case 'weight_mus_pts':
 				$for = 0;
 				break;
 			case 'show_points':
