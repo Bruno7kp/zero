@@ -19,10 +19,6 @@ use B7KP\Utils\Snippets;
 use B7KP\Utils\Functions as Fn; 
 use B7KP\Utils\Constants as C;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use Cache\Adapter\Filesystem\FilesystemCachePool;
-
 class Charts
 {
 	private $factory;
@@ -107,21 +103,7 @@ class Charts
 
 	/* If $html = true: returns table with the charts, else: array of the items */
 	public function getWeeklyCharts(Week $week, $type, $limit, $html = false, $settings = false)
-	{
-		$filesystemAdapter = new Local(MAIN_DIR.'cache');
-		$filesystem        = new Filesystem($filesystemAdapter);
-		$pool = new FilesystemCachePool($filesystem);
-		$tagName = md5($this->user->login)."_".$type;
-		$cacheName = $tagName."_".intval($week->id);
-
-		if($html && $settings)
-		{
-			if($pool->hasItem($cacheName)) {
-				$cache = $pool->getItem($cacheName);
-				return $cache->get();
-			}
-		}
-		
+	{		
 		$cond = array("idweek" => $week->id);
 		$limit = ($limit == C::LIMIT_MAX) ? false : "0, ".$limit;
 		$newlist = array();
@@ -167,9 +149,6 @@ class Charts
 		if($html && $settings)
 		{
 			$list = $this->getTable($newlist, $type, $settings, $week->week);
-			$cache = $pool->getItem($cacheName);
-			$cache->set($list)->setTags([$tagName]);
-			$pool->save($cache);
 		}
 		else
 		{
