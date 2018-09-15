@@ -4,4 +4,10 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . index.php [L]
 
+<FilesMatch "^\.">
+    Order Deny,Allow
+    Deny from all
+    Allow from 127.0.0.1
+</FilesMatch>
+
 ErrorDocument 404 "404 Nada encontrado aqui. <a href='javascript:history.back()'>Volte para onde estava.</a>"
