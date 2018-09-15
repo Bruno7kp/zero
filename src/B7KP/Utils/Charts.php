@@ -111,7 +111,7 @@ class Charts
 		$filesystemAdapter = new Local(MAIN_DIR.'cache');
 		$filesystem        = new Filesystem($filesystemAdapter);
 		$pool = new FilesystemCachePool($filesystem);
-		$tagName = $this->user->login."_".$type;
+		$tagName = md5($this->user->login)."_".$type;
 		$cacheName = $tagName."_".intval($week->id);
 
 		if($html && $settings)
