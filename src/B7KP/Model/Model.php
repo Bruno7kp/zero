@@ -44,8 +44,7 @@ class Model
 		}
 
 		$this->object = $this->findOneBy($entity, $arg->id);
-
-		if(count($this->object) != 1)
+		if(!$this->object)
 		{
 			throw new \Exception($entity." not found");
 		}
