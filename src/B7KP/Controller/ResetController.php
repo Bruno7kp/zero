@@ -10,14 +10,22 @@ use B7KP\Library\Route;
 use B7KP\Library\Lang;
 use B7KP\Entity\User;
 
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
+
 class ResetController extends Controller
 {
 	private $user, $settings;
+	private $pool;
 
 	function __construct(Model $factory)
 	{
 		parent::__construct($factory);
 		$this->user = UserSession::getUser($this->factory);
+		$filesystemAdapter = new Local(MAIN_DIR.'cache');
+		$filesystem        = new Filesystem($filesystemAdapter);
+		$this->pool = new FilesystemCachePool($filesystem);
 	}
 
 	/**
@@ -89,6 +97,7 @@ class ResetController extends Controller
 		}
 
 		$this->factory->removeBy("\B7KP\Entity\Week", "iduser", $this->user->id);
+		$login = $this->user->login;
+		$this->pool->invalidateTags([$login."_album", $login."_music", $login."_artist"]);
 	}
 }
-?>
