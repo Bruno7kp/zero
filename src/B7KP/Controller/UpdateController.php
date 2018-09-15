@@ -246,7 +246,7 @@ class UpdateController extends Controller
 			}
 			$this->factory->removeBy("B7KP\Entity\Artist_charts", "idweek = ".$idweek." AND updated", $updated, "<");
 			$login = $this->user->login;
-			$this->pool->invalidateTags([$login."_artist"]);
+			$this->pool->invalidateTags([md5($login)."_artist"]);
 		}
 		return $error;
 	}
@@ -283,7 +283,7 @@ class UpdateController extends Controller
 			}
 			$this->factory->removeBy("B7KP\Entity\Album_charts", "idweek = ".$idweek." AND updated", $updated, "<");
 			$login = $this->user->login;
-			$this->pool->invalidateTags([$login."_album"]);
+			$this->pool->invalidateTags([md5($login)."_album"]);
 		}
 
 		return $error;
@@ -322,7 +322,7 @@ class UpdateController extends Controller
 			}
 			$this->factory->removeBy("B7KP\Entity\Music_charts", "idweek = ".$idweek." AND updated", $updated, "<");
 			$login = $this->user->login;
-			$this->pool->invalidateTags([$login."_music"]);
+			$this->pool->invalidateTags([md5($login)."_music"]);
 		}
 		return $error;
 	}

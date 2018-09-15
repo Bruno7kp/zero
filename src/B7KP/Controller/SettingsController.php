@@ -60,7 +60,7 @@ class SettingsController extends Controller
 		if($this->isAjaxRequest())
 		{
 			$post->id = $this->user->id;
-			$login = $this->user->login;
+			$login = md5($this->user->login);
 			if($this->checkAssert($post))
 			{
 				$post = $this->correctValues($post);

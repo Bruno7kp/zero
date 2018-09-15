@@ -97,7 +97,7 @@ class ResetController extends Controller
 		}
 
 		$this->factory->removeBy("\B7KP\Entity\Week", "iduser", $this->user->id);
-		$login = $this->user->login;
+		$login = md5($this->user->login);
 		$this->pool->invalidateTags([$login."_album", $login."_music", $login."_artist"]);
 	}
 }
