@@ -202,25 +202,11 @@ class BaseApi
 
     private function process_response()
     {
-        $end = false;
-        $resp = "";
-        if(isset($this->response[10]) && $this->isJSON($this->response[10]))
-        {
-            $resp = $this->response[10];
-        }
-        else
-        {
-            for ($i=11; $end == false; $i++) { 
-                if(isset($this->response[$i])){
-                    $resp .= $this->response[$i];
-                }
-                else
-                {
-                    $end = true;
-                }
-            }
-        }
-        return json_decode($resp);
+
+        $response = implode($this->response);
+        $hb = explode("\r\n\r\n", $response, 2);
+        $realbody = $hb[1];
+        return json_decode($realbody);
     }
 
     /*
