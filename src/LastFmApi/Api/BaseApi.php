@@ -204,9 +204,12 @@ class BaseApi
     {
 
         $response = implode($this->response);
-        $hb = explode("\r\n\r\n", $response, 2);
-        $realbody = $hb[1];
-        return json_decode($realbody);
+        $hb = explode("{", $response, 2);
+	if (isset($hb[1])) {
+		$realbody = "{".$hb[1];
+        	return json_decode($realbody);
+	}
+        return "";
     }
 
     /*
