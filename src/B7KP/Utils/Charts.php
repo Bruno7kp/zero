@@ -469,6 +469,7 @@ class Charts
 
 	public function getMusicStats($name, $artist, $mbid)
 	{
+		$mbid = ""; // bug: ignore mbid
 		$name 	= addslashes($name);
 		$artist = addslashes($artist);
 		$limit  = $this->settings->mus_limit;
@@ -485,6 +486,7 @@ class Charts
 
 	public function getAlbumStats($name, $artist, $mbid)
 	{
+		$mbid = ""; // bug: ignore mbid
 		$name 	= addslashes($name);
 		$artist = addslashes($artist);
 		$limit  = $this->settings->alb_limit;
@@ -501,6 +503,7 @@ class Charts
 
 	public function getArtistStats($name, $mbid)
 	{
+		$mbid = ""; // bug: ignore mbid
 		$name 	= addslashes($name);
 		$cond = "artist_charts.art_mbid = '".$mbid."'";
 		$limit  = $this->settings->art_limit;
