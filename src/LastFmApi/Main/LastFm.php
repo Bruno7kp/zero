@@ -162,6 +162,7 @@ class LastFm
 
     public function getArtistInfo($str, $mbid = null)
     {
+        $mbid = ""; // bug: ignore mbid
         $vars = array("artist" => $str, "mbid" => $mbid);
         
         $vars['username'] = $this->userName;
@@ -171,6 +172,7 @@ class LastFm
 
     public function getMusicInfo($str, $artist, $mbid = null, $autocorrect = 0)
     {
+        $mbid = ""; // bug: ignore mbid
         $vars = array("track" => $str, "artist" => $artist, "mbid" => $mbid, "autocorrect" => $autocorrect);
         
         $vars['username'] = $this->userName;
@@ -180,6 +182,7 @@ class LastFm
 
     public function getAlbumInfo($str, $artist, $mbid = null)
     {
+        $mbid = ""; // bug: ignore mbid
         $vars = array("album" => $str, "artist" => $artist,"mbid" => $mbid);
 
         $vars['username'] = $this->userName;
