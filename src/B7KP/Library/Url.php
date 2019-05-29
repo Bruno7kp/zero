@@ -3,24 +3,29 @@ namespace B7KP\Library;
 
 class Url
 {
+	static function checkHttp()
+	{
+		$isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+		return $isHttps ? "https" : "http";
+	}
 
 	static function fix()
 	{
 		if(strpos($_SERVER['SERVER_NAME'], ".") > 0 && strpos($_SERVER['SERVER_NAME'], "www") === false)
 		{
-			header("Location: http://www.".$_SERVER['SERVER_NAME'].self::checkPort().$_SERVER['REQUEST_URI']);
+			header("Location: ".self::checkHttp()."://www.".$_SERVER['SERVER_NAME'].self::checkPort().$_SERVER['REQUEST_URI']);
 			die();
 		}
 	}
 
 	static function getFullUrl()
 	{
-		return "http://".$_SERVER['SERVER_NAME'].self::checkPort().$_SERVER['REQUEST_URI'];
+		return self::checkHttp()."://".$_SERVER['SERVER_NAME'].self::checkPort().$_SERVER['REQUEST_URI'];
 	}
 
 	static function getBaseUrl()
 	{
-		$url = "http://".$_SERVER['SERVER_NAME'].self::checkPort().dirname($_SERVER['PHP_SELF']);
+		$url = self::checkHttp()."://".$_SERVER['SERVER_NAME'].self::checkPort().dirname($_SERVER['PHP_SELF']);
 		$url = rtrim($url, "/\\");
 		return $url;
 	}
