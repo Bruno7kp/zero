@@ -380,8 +380,9 @@ class UserApi extends BaseApi
             $vars = array_merge($vars, $methodVars);
 
             if ($call = $this->apiGetCall($vars)) {
-                if (count($call->recenttracks->track) > 0) {
+                if (property_exists($call, "recenttracks") && count($call->recenttracks->track) > 0) {
                     $i = 0;
+                    $recentTracks = [];
                     foreach ($call->recenttracks->track as $track) {
                         $artist = (array) $track->artist;
                         $album = (array) $track->album;
@@ -599,7 +600,8 @@ class UserApi extends BaseApi
             $vars = array_merge($vars, $methodVars);
 
             if ($call = $this->apiGetCall($vars)) {
-                if (count($call->topalbums->album) > 0) {
+                $topalbums = [];
+                if (property_exists($call, "topalbums") && count($call->topalbums->album) > 0) {
                     $info = (array)($call->topalbums);
                     $info = $info["@attr"];
 
@@ -655,7 +657,8 @@ class UserApi extends BaseApi
             $vars = array_merge($vars, $methodVars);
 
             if ($call = $this->apiGetCall($vars)) {
-                if (count($call->topartists->artist) > 0) {
+                $topartists = [];
+                if (property_exists($call, "topartists") && count($call->topartists->artist) > 0) {
                     $info = (array)($call->topartists);
                     $info = $info["@attr"];
 
@@ -754,7 +757,8 @@ class UserApi extends BaseApi
             $vars = array_merge($vars, $methodVars);
 
             if ($call = $this->apiGetCall($vars)) {
-                if (count($call->toptracks->track) > 0) {
+                $toptracks = [];
+                if (property_exists($call, "toptracks") && count($call->toptracks->track) > 0) {
                     $info = (array)($call->toptracks);
                     $info = $info["@attr"];
 
