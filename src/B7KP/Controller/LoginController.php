@@ -32,9 +32,6 @@ class LoginController extends Controller
 	*/
 	public function checkLogin()
 	{
-		try {
-
-
 		$post = (object)$_POST;
 		$post->cookie = isset($post->cookie);
 		if($this->isAjaxRequest())
@@ -60,9 +57,6 @@ class LoginController extends Controller
 		else
 		{
 			$this->redirectToRoute("home");
-		}
-		} catch (\Exception $ex) {
-			echo json_encode(array("erro" => 1, "message" => $ex->getMessage()));
 		}
 	}
 
