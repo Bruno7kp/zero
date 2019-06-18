@@ -230,15 +230,15 @@ function loadimages()
 		if(type === "artist")
 		{
 			mbid = "";
-			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
+			last = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
 		else if(type === "album")
 		{
-			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&artist='+artist+'&album='+name+'&mbid='+mbid+'&format=json';
+			last = 'https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&artist='+artist+'&album='+name+'&mbid='+mbid+'&format=json';
 		}
 		else
 		{
-			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&artist='+artist+'&track='+name+'&mbid='+mbid+'&format=json';
+			last = 'https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&artist='+artist+'&track='+name+'&mbid='+mbid+'&format=json';
 		}
 		last = encodeURI(last);
 		last = last.replace("+", "%2B");
@@ -263,7 +263,7 @@ function loadimages()
 
 					var nartist = artistIn.replace("&", "%26").replace("+", "%2B");
 		
-					var newa = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
+					var newa = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
 					
 					getF(newa, td, true);
 				}
@@ -327,15 +327,15 @@ function loadPlaycount()
 		if(type === "artist")
 		{
 			mbid = "";
-			last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&mbid='+mbid+'&format=json';
+			last = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&mbid='+mbid+'&format=json';
 		}
 		else if(type === "album")
 		{
-			last = 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&album='+name+'&mbid=&format=json';
+			last = 'https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&album='+name+'&mbid=&format=json';
 		}
 		else
 		{
-			last = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json&autocorrect=0';
+			last = 'https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&username='+user+'&artist='+artist+'&track='+name+'&mbid=&format=json&autocorrect=0';
 		}
 
 		//console.log(last);
@@ -498,7 +498,7 @@ function loadArtImg(name, mbid, seton,altseton)
     name = name.replace("+", "%2B");
     name = name.replace("#", "%23");
     name = name.replace("&", "%26");
-	var last = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
+	var last = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
 
     $.ajax({
 		url: last,

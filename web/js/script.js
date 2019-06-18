@@ -166,7 +166,7 @@ function resetAcc() {
     $("img[get-user-image]").each(function (index, el) {
         user_img_tag = $(this);
         user_name = user_img_tag.attr('get-user-image');
-        get_img_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getinfo&api_key=' + apiKey + '&user=' + user_name + '&format=json';
+        get_img_url = 'https://ws.audioscrobbler.com/2.0/?method=user.getinfo&api_key=' + apiKey + '&user=' + user_name + '&format=json';
         $.ajax({
             url: get_img_url,
             dataType: 'json',
