@@ -1,7 +1,9 @@
 {
     "require": {
         "vlucas/phpdotenv": "^2.5",
-        "cache/filesystem-adapter": "^1.0"
+        "cache/filesystem-adapter": "^1.0",
+        "jwilsson/spotify-web-api-php": "^2.6",
+        "ext-json": "*"
     },
     "autoload": {
         "files": ["app/autoload.php"]

@@ -125,6 +125,44 @@ class ArtistController extends Controller
 		return $img;
 	}
 
+	/**
+	 * @Route(name=spotify|route=/spotify/token)
+	 */
+	public function getSpotifyToken()
+	{
+		$dao = Dao::getConn();
+		$dao->run("CREATE TABLE IF NOT EXISTS spotify (`id` int(11) NOT NULL AUTO_INCREMENT, `expiration` DATETIME, `token` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL, PRIMARY KEY (`id`))");
+		$accessToken = $tokenExpiration = null;
+
+		$tokens = $dao->select("spotify", "1 ORDER BY id DESC LIMIT 1", []);
+		if (count($tokens) > 0) {
+			$token = $tokens[0];
+			$now = new \DateTime("now + 10 minutes", new \DateTimeZone("UTC"));
+			$expiration = new \DateTime($token->expiration, new \DateTimeZone("UTC"));
+			if ($now < $expiration) {
+				$accessToken = $token->token;
+				$tokenExpiration = intval($expiration->format("U"));
+			}
+		}
+		if ($accessToken == null) {
+			$session = new \SpotifyWebAPI\Session(
+				'3d7a509e787544e48e06b2b757a27fc9',
+				'705222ffd43042debadc3f7ddaf55b06'
+			);
+
+			$session->requestCredentialsToken();
+			$accessToken = $session->getAccessToken();
+			$tokenExpiration = $session->getTokenExpiration();
+			$tokenDate = \DateTime::createFromFormat("U", $tokenExpiration, new \DateTimeZone("UTC"));
+			$dao->run("INSERT INTO spotify (expiration, token) VALUES ('". $tokenDate->format("Y-m-d H:i:s") ."' ,'" . $accessToken . "')");
+		}
+
+		echo json_encode([
+			"access_token" => $accessToken,
+			"expiration" => $tokenExpiration
+		]);
+	}
+
 	protected function checkAccess()
 	{
 		$this->user = UserSession::getUser($this->factory);

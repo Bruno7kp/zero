@@ -297,15 +297,15 @@ class Settings extends Entity
                 break;
 
             case 'show_images':
-                $for = false;
+                $for = 0;
                 break;
 
             case 'show_dropouts':
-                $for = false;
+                $for = 0;
                 break;
 
             case 'show_first_image':
-                $for = true;
+                $for = 0;
                 break;
 
             case 'show_move':
@@ -313,7 +313,7 @@ class Settings extends Entity
                 break;
 
             case 'show_playcounts':
-                $for = true;
+                $for = 1;
                 break;
 
             case 'lang':
