@@ -35,14 +35,14 @@ class AnnotationReader implements iCache
 			$this->parseToObject();
 			$forceupdate = false;
 		}
+		$return = array();
 		if($forceupdate)
 		{
 			self::$updated += 1;
 			return $this->scan()->loadCache()->find($cpm, $annotation, false);
 		}
-		else
+		else if ($this->scan !== null)
 		{
-			$return = array();
 			if($cpm == "class")
 			{
 				foreach ($this->scan->$cpm as $class => $value) {

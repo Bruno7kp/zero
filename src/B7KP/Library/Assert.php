@@ -332,6 +332,7 @@ class Assert
 
 	private function lastfm($rule, $field)
 	{
+		return;
 		if($rule && !empty($this->data->$field))
 		{
 			$lastfm = new LastFm();

@@ -8,7 +8,7 @@ class Cache
 
 	static function getJsonData($class, $file = "main")
 	{
-		$filejson = MAIN_DIR."cache/".$class."/".$file.".json";
+		$filejson = MAIN_DIR."cache/".md5($class)."/".$file.".json";
 		if(file_exists($filejson))
 		{
 			$content = file_get_contents($filejson);
@@ -18,7 +18,7 @@ class Cache
 
 	static function setJsonData($class, $data, $file = "main")
 	{
-		$dir = MAIN_DIR."cache/".$class;
+		$dir = MAIN_DIR."cache/".md5($class);
 		if(!file_exists($dir))
 		{
 			mkdir($dir, 0777, true);
