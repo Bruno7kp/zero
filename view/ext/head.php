@@ -14,12 +14,12 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<meta name="keywords" content="ZERO,lastfm,chart,charts,weekly,stats,tool,scrobble,music,música,semana,gráficos"/>
 	<meta property="og:locale" content="pt-br"/>
 	<meta property="og:title" content="<?php echo $title;?>">
-	<meta property="og:image" content="http://i.imgur.com/OOKNwlp.png">
+	<meta property="og:image" content="https://i.imgur.com/OOKNwlp.png">
 	<meta property="og:description" content="ZERO CHARTS - Personal / Last.fm Weekly Charts - Charts Semanais">
 	<meta property="og:site_name" content="<?php echo App::get('name');?>">
 	<meta property="og:type" content="website">
 	<title><?php echo $title;?></title>
-	<link rel="shortcut icon" href="http://i.imgur.com/OOKNwlp.png">
+	<link rel="shortcut icon" href="https://i.imgur.com/OOKNwlp.png">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/themify-icons.css');?>">
 <?php

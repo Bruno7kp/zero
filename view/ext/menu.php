@@ -12,7 +12,7 @@ use B7KP\Entity\User;
 	<div class="container">
 		
 		<!-- START #fh5co-logo -->
-		<h1 id="fh5co-logo" class="pull-left"><a href="<?php echo Route::url('home')?>"><img width=125 src="http://i.imgur.com/N1c2b3t.png"></a></h1>
+		<h1 id="fh5co-logo" class="pull-left"><a href="<?php echo Route::url('home')?>"><img width=125 src="https://i.imgur.com/N1c2b3t.png"></a></h1>
 		
 		<!-- START #fh5co-menu-wrap -->
 		<nav id="fh5co-menu-wrap" role="navigation">

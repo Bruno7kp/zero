@@ -4,13 +4,16 @@ $(document).ready(function(){
 
 function chartinit()
 {
-	loadimages();
+	getSpotifyAccessToken().then(function(token) {
+		loadimages(token);
+		loadPlaycount(token);
+	});
 	openChartRun();
 	pop();
 	updateUniqueWeek();
 	switchToSimpleCR();
 	editWeek();
-	loadPlaycount();
+
 }
 
 function getChartMsg(msgid)
@@ -214,7 +217,7 @@ function openChartRun()
 	});
 }
 
-function loadimages()
+function loadimages(token)
 {
 	var tds = $(".getimage");
 	$.each(tds, function(index, val) {
@@ -227,80 +230,76 @@ function loadimages()
 		var rankid = $(this).attr('id');
 		var td = $(this);
 		var last = "";
-		if(type === "artist")
-		{
-			mbid = "";
-			last = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+artist+'&mbid='+mbid+'&format=json';
-		}
-		else if(type === "album")
+		if(type === "album")
 		{
 			last = 'https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key='+apiKey+'&artist='+artist+'&album='+name+'&mbid='+mbid+'&format=json';
+			last = encodeURI(last);
+			last = last.replace("+", "%2B");
+			last = last.replace("#", "%23");
+			last = last.replace("%20&", "%20%26");
+			last = last.replace("&%20", "%26%20");
+			getF(last, td, artist);
+			function getF(last, td, artistIn)
+			{
+				$.ajax({
+					url: last,
+					type: 'GET',
+					dataType: 'json'
+				})
+					.done(function(data) {
+						if(artistIn === true)
+						{
+							type = "artist";
+						}
+						if(type === "music")
+						{
+
+							var nartist = artistIn.replace("&", "%26").replace("+", "%2B");
+
+							var newa = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
+
+							getF(newa, td, true);
+						}
+						else if(type === "album")
+						{
+							var img = data.album.image[1]["#text"];
+							setImg(td.attr('id'), img);
+						}
+						else
+						{
+							if(typeof data.artist !== "undefined")
+							{
+								img = data.artist.image[1]["#text"];
+							}
+							else
+							{
+								img = null;
+							}
+							setImg(td.attr('id'), img);
+						}
+
+						//console.log("success");
+					})
+					.fail(function() {
+						var img = null;
+						setImg(td.attr('id'), img);
+						//console.log("error");
+					})
+					.always(function() {
+						//console.log("complete");
+					});
+			}
 		}
 		else
 		{
-			last = 'https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key='+apiKey+'&artist='+artist+'&track='+name+'&mbid='+mbid+'&format=json';
-		}
-		last = encodeURI(last);
-		last = last.replace("+", "%2B");
-		last = last.replace("#", "%23");
-		last = last.replace("%20&", "%20%26");
-		last = last.replace("&%20", "%26%20");
-		getF(last, td, artist);
-		function getF(last, td, artistIn)
-		{
-			$.ajax({
-				url: last,
-				type: 'GET',
-				dataType: 'json'
-			})
-			.done(function(data) {
-				if(artistIn === true)
-				{
-					type = "artist";
-				}
-				if(type === "music")
-				{
-
-					var nartist = artistIn.replace("&", "%26").replace("+", "%2B");
-		
-					var newa = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+nartist+'&mbid=&format=json';
-					
-					getF(newa, td, true);
-				}
-				else if(type === "album")
-				{
-					var img = data.album.image[1]["#text"];
-					setImg(td.attr('id'), img);
-				}
-				else
-				{
-					if(typeof data.artist !== "undefined")
-					{
-						img = data.artist.image[1]["#text"];
-					}
-					else
-					{
-						img = null;
-					}
-					setImg(td.attr('id'), img);
-				}
-				
-				//console.log("success");
-			})
-			.fail(function() {
-				var img = null;
-				setImg(td.attr('id'), img);
-				//console.log("error");
-			})
-			.always(function() {
-				//console.log("complete");
+			loadSpotifyImage(artist, token).then(function(imageUrl) {
+				setImg(td.attr('id'), imageUrl);
 			});
 		}
-		 
 	});
 }
 
-function loadPlaycount()
+function loadPlaycount(token)
 {
 	var tds = $(".loadplaycount");
 	var loadplugin = false;
@@ -356,7 +355,7 @@ function loadPlaycount()
 				    if(typeof data.track !== "undefined"){
                         plays = parseInt(data.track.userplaycount);
                         if(image.length > 0 || genPlaque.length > 0){
-                            loadArtImg(data.track.artist.name, "", $(image).find("img"), genPlaque);
+                            loadArtImg(data.track.artist.name, "", $(image).find("img"), genPlaque, token);
                             /**if(typeof data.track.album !== "undefined" && data.track.album.image[3]["#text"] !== ""){
                                 $(image).find("img").attr("src", data.track.album.image[3]["#text"]);
                                 $(genPlaque).attr("data-image", data.track.album.image[3]["#text"]);
@@ -376,10 +375,7 @@ function loadPlaycount()
                     }else if(typeof data.artist !== "undefined"){
                         plays = parseInt(data.artist.userplaycount);
                         if(image.length > 0) {
-
-                            if(typeof data.artist.image !== "undefined" && data.artist.image[3]["#text"] !== ""){
-                                $(image).find("img").attr("src", data.artist.image[3]["#text"]);
-                            }
+							loadArtImg(data.artist.name, "", $(image).find("img"), $(image).find("img"), token);
                         }
 					}
                     td.text(plays);
@@ -492,35 +488,97 @@ function setImg(rankid, img)
 	}
 }
 
-function loadArtImg(name, mbid, seton,altseton)
+function loadArtImg(name, mbid, seton, altseton, token)
 {
-    name = encodeURI(name);
-    name = name.replace("+", "%2B");
-    name = name.replace("#", "%23");
-    name = name.replace("&", "%26");
-	var last = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key='+apiKey+'&artist='+name+'&mbid='+mbid+'&format=json';
-
-    $.ajax({
-		url: last,
-		type: 'GET',
-		dataType: 'json'
-	})
-	.done(function(data) {
-		var img = baseUrl + '/web/img/default-alb.png';
-		if(typeof data.artist !== 'undefined')
-		{
-			img = data.artist.image[3]["#text"];
-		}
-		$(seton).attr("src", img);
-		$(altseton).attr("data-image", img);
-	})
-	.fail(function() {
-        //
-	})
-	.always(function() {
-        //
+	loadSpotifyImage(name, token).then(function(imageUrl) {
+		$(seton).attr("src", imageUrl);
+		$(altseton).attr("data-image", imageUrl);
 	});
 	
+}
+
+function getSpotifyAccessToken() {
+	return fetch('/spotify/token', {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+		},
+		credentials: 'same-origin'
+	}).then((response) => {
+		if (response.status === 200) {
+			return response.json().then((data) => {
+				return data.access_token;
+			});
+		}
+		return false;
+	});
+}
+
+function cacheArtist(artistName, spotifyId, imageUrl) {
+	let date = new Date();
+	date.setMonth(date.getMonth() + 1);
+	let key = 'zero:' + artistName;
+	let value = {
+		name: artistName,
+		spotifyId: spotifyId,
+		imageUrl: imageUrl,
+		time: date.getTime()
+	};
+	window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getCachedImage(artistName) {
+	let date = new Date();
+	let key = 'zero:' + artistName;
+	let cached = window.localStorage.getItem(key);
+	if (cached && cached.length > 0) {
+		let data = JSON.parse(cached);
+		let expiration = new Date(data.time);
+		if (date < expiration) {
+			return data.imageUrl;
+		}
+	}
+	return false;
+}
+
+function loadSpotifyImage(artistName, token) {
+	let spotifyApi = new SpotifyWebApi();
+	spotifyApi.setAccessToken(token);
+	let cached = getCachedImage(artistName);
+	if (cached) {
+		return new Promise(function(resolve, reject) {
+			resolve(cached);
+		});
+	} else {
+		return spotifyApi.searchArtists(artistName, {limit: 1, offset: 0}).then((response) => {
+			if (typeof response.artists !== 'undefined') {
+				let artists = response.artists;
+				if (typeof response.artists.items !== 'undefined' && response.artists.items.length > 0) {
+					let artist = artists.items[0];
+					let imageUrl = baseUrl + '/web/img/default-art.png';
+					if (artist.images.length > 0) {
+						imageUrl = artist.images[0].url;
+					}
+					let artistId = artist.uri.replace("spotify:artist:", "");
+					cacheArtist(artistName, artistId, imageUrl);
+					return imageUrl;
+				}
+			}
+		});
+	}
+}
+
+function loadSpotifyImages() {
+	let els = document.querySelectorAll('[data-spotify-artist]');
+	getSpotifyAccessToken().then((token) => {
+		for (let i = 0; i < els.length; i++) {
+			let item = els[i];
+			let artistName = item.getAttribute('data-spotify-artist');
+			loadSpotifyImage(artistName, token).then((imageUrl) => {
+				item.src = imageUrl;
+			});
+		}
+	});
 }
 
 function offsetAnchor() {
