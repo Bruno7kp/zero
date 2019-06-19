@@ -41,7 +41,8 @@ class ProfileController extends Controller
 				$data->id = $user->id;
 				$this->factory->update("\B7KP\Entity\User", $data);
 			}
-			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
+			$acts = [];
+			//$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
 			$wksfm 	= $lfm->getWeeklyChartList();
 			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));
 			$divider = $wksfm;
@@ -89,8 +90,8 @@ class ProfileController extends Controller
 			$visibility = $perm->viewPermission($user, $this->factory, $settings->visibility);
 			$var = array
 					(
-						"user" 			=> $user, 
-						"lfm_href" 		=> $last["url"], 
+						"user" 			=> $user,
+						"lfm_href" 		=> $last["url"],
 						"lfm_image" 	=> str_replace("34s", "avatar170s", $last["image"]),
 						"lfm_playcount" => $last["playcount"],
 						"lfm_country" 	=> $last["country"],

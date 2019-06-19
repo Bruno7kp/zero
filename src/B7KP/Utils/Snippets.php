@@ -50,22 +50,11 @@ class Snippets
 	{
 		$perc = $playcount/$biggest*100;
 		$url = Route::url("lib_art", array("name" => F::fixLFM($name), "login" => $login));
-		if(empty($img))
-		{
-			$img = "
+		$img = "
 			<div class='col-xs-3 getimage imgfix' id='rankid".md5($name)."' data-type='artist' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'>
 			".self::loader(60)."
 			</div>
 			";
-		}
-		else
-		{
-			$img = "
-			<div class='col-xs-3'>
-				<img class='img-responsive' src='{$img}' alt='{$name}'>
-			</div>
-			";
-		}
 		return "
 		<div class='row'>
 			".$img."
@@ -129,21 +118,11 @@ class Snippets
 		$perc = $playcount/$biggest*100;
 		$url = Route::url("lib_mus", array("name" => F::fixLFM($name), "artist" => F::fixLFM($artist), "login" => $login));
 		$arturl = Route::url("lib_art", array("name" => F::fixLFM($artist), "login" => $login));
-		if(empty($img))
-		{
-			$img = "
+		$img = "
 			<div class='col-xs-3 getimage imgfix' id='rankid".md5($name)."' data-type='music' data-name='".htmlentities($name, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($artist, ENT_QUOTES)."'>
 			".self::loader(60)."
 			</div>
 			";
-		}
-		else
-		{
-			$img = "
-			<div class='col-xs-3'>
-				<img class='img-responsive' src='{$img}' alt='{$name}'>
-			</div>";
-		}
 		return "
 		<div class='row'>
 			".$img."
@@ -177,14 +156,13 @@ class Snippets
 		$lfm->setUser($user->login);
 		$art = $lfm->getMusicInfo($value->music, $value->artist, $value->mus_mbid);
 		$bgimg = $art['album']['image']['extralarge'];
-		if(empty($bgimg))
-		{
-			$artimg = $lfm->getArtistInfo($art['artist']['name'], $art['artist']['mbid']);
-			$bgimg = $artimg['images']['extralarge'];
-		}
 		$html = "<div class='row'>";
 		$html .= "<div class='col-xs-12'>";
-		$html .= "<div style='background: url(".$bgimg.") center; background-size:cover;'>";
+		if (empty($bgimg)) {
+			$html .= "<div style='background: url(".$bgimg.") center; background-size:cover;' data-spotify-artist-bg='".htmlentities($value->artist, ENT_QUOTES)."'>";
+		} else {
+			$html .= "<div style='background: url(".$bgimg.") center; background-size:cover;'>";
+		}
 		$html .= "<div class='bg text-center'>";
 		$html .= "<div class='row'>";
 		$html .= "<div class='col-sm-8 white'>";
@@ -202,7 +180,11 @@ class Snippets
 		$html .= "</div>"; // row3
 		$html .= "</div>"; // col-md-8
 		$html .= "<div class='col-sm-4'>";
-		$html .= "<img class='full' src='".$bgimg."'>";
+		if (empty($bgimg)) {
+			$html .= "<img class='full' src='/web/img/default-art.png' data-spotify-artist='".htmlentities($value->artist, ENT_QUOTES)."'>";
+		} else {
+			$html .= "<img class='full' src='".$bgimg."'>";
+		}
 		$html .= "</div>"; // col-md-4
 		$html .= "</div>"; // row2
 		$html .= "</div>"; // bg
@@ -220,7 +202,7 @@ class Snippets
 		$art = $lfm->getArtistInfo($value->artist, $value->art_mbid);
 		$html = "<div class='row'>";
 		$html .= "<div class='col-xs-12'>";
-		$html .= "<div style='background: url(".$art['images']['mega'].") center; background-size:cover;'>";
+		$html .= "<div style='background: url(".$art['images']['mega'].") center; background-size:cover;' data-spotify-artist-bg='".htmlentities($value->artist, ENT_QUOTES)."'>";
 		$html .= "<div class='bg text-center'>";
 		$html .= "<div class='row'>";
 		$html .= "<div class='col-sm-8 white'>";
@@ -238,7 +220,7 @@ class Snippets
 		$html .= "</div>"; // row3
 		$html .= "</div>"; // col-md-8
 		$html .= "<div class='col-sm-4'>";
-		$html .= "<img class='full' src='".$art['images']['extralarge']."'>";
+		$html .= "<img class='full' data-spotify-artist='".htmlentities($value->artist, ENT_QUOTES)."' src='".$art['images']['extralarge']."'>";
 		$html .= "</div>"; // col-md-4
 		$html .= "</div>"; // row2
 		$html .= "</div>"; // bg

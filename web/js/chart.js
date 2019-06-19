@@ -578,6 +578,14 @@ function loadSpotifyImages(token) {
 			item.src = imageUrl;
 		});
 	}
+	let bgs = document.querySelectorAll('[data-spotify-artist-bg]');
+	for (let i = 0; i < bgs.length; i++) {
+		let item = bgs[i];
+		let artistName = item.getAttribute('data-spotify-artist-bg');
+		loadSpotifyImage(artistName, token).then((imageUrl) => {
+			item.style.background = "url(" + imageUrl + ") center";
+		});
+	}
 }
 
 function offsetAnchor() {
