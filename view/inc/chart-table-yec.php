@@ -57,8 +57,12 @@ if($show_first_image && count($list)>0)
 	{
 		$fimg = $f["images"]["large"];
 	}
-	
-	echo "<div class='text-center bottomspace-xl'><img src='".$fimg."'/></div>";
+
+	if ($type == "album") {
+		echo "<div class='text-center bottomspace-xl'><img src='" . $fimg . "'/></div>";
+	} else {
+		echo "<div class='text-center bottomspace-xl'><img height='174' src='/web/img/default-art.png' data-spotify-artist='".htmlentities($first->artist, ENT_QUOTES)."'/></div>";
+	}
 }
 $lastw = array();
 ?>
