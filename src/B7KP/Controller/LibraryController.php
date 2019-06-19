@@ -716,7 +716,7 @@ class LibraryController extends Controller
 		}
 		else
 		{
-			return false; // last.fm não enia mais imagens do artista
+			return false; // last.fm não envia mais imagens do artista
             $bgimage = false;
             if($force){
                 $acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));

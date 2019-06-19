@@ -588,7 +588,7 @@ class ChartController extends Controller
         if ($avatar) {
             $bgimage = str_replace("34s", "avatar170s", $last["image"]);
         } else {
-	        return false; // last.fm não enia mais imagens do artista
+	        return false; // last.fm não envia mais imagens do artista
             $bgimage = false;
             if ($force) {
                 $acts = $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
