@@ -147,6 +147,7 @@ class SearchController extends Controller
 		}
 		else
 		{
+			return false; // last.fm não enia mais imagens do artista
 			$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
 			$bgimage = false;
 			if(isset($acts[0])): 
