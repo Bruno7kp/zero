@@ -42,7 +42,7 @@ use B7KP\Library\Lang;
 										<div class="jumbotron">
 											<div class="row">
 												<div class="col-xs-3">
-													<img src="http://i.imgur.com/OOKNwlp.png" class="img-responsive img-circle" get-user-image="<?php echo $value->login;?>">
+													<img src="https://i.imgur.com/OOKNwlp.png" class="img-responsive img-circle" get-user-image="<?php echo $value->login;?>">
 												</div>
 												<div class="col-xs-9">
 													<h3 class="no-margin">

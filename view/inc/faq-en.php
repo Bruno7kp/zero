@@ -58,7 +58,7 @@ use B7KP\Library\Lang;
             </div>
             <div class="col-md-10 col-sm-8 text-justify" id="fh5co-content">
                 <h2>O que é?</h2>
-                <!-- <img src="http://i.imgur.com/OOKNwlp.png" alt="Logo" class="fh5co-align-left img-responsive max-w-100"> -->
+                <!-- <img src="https://i.imgur.com/OOKNwlp.png" alt="Logo" class="fh5co-align-left img-responsive max-w-100"> -->
                 <p>Um lugar para os fanáticos por músicas e charts terem sua própria "HOT 100".<br/>
                     Com o ZERO você pode gerar charts semanais das músicas que você mais escuta baseado no seu Last.fm. Além disso, você também poderá acessar curiosidades de seus charts e criar 'certificados' para músicas e álbuns. Veja essas e outras ferramentas nas seções a seguir.</p>
                 <h2 id="lastfm">Last.fm</h2>
@@ -124,11 +124,11 @@ use B7KP\Library\Lang;
                 <p>Nas tabelas dos charts semanais, existe um ícone ao lado esquerdo de cada posição <a class="cr-icon"><i class="ti-stats-up"></i></a>, ao pressionar o mesmo, será mostrado o desempenho (chart-run) do artista/álbum/música em questão.</p>
                 <p>Nele, há um ícone que altera a forma em que o chart-run é mostrado <a class="switchto" style="font-size: smaller;"><i class="ti-layout-grid2"></i></a>, em blocos, ou apenas texto.<br/>
                     Ex:<br/>
-                    <img src="http://i.imgur.com/xnuMBnx.giff" alt="">
+                    <img src="https://i.imgur.com/xnuMBnx.giff" alt="">
                     <br/>
                     E na visualização por blocos, aos clicar nos blocos, será mostrado a semana e o número de reproduções.<br/>
                     Ex:<br/>
-                    <img src="http://i.imgur.com/n3D2ypx.gif" alt="">
+                    <img src="https://i.imgur.com/n3D2ypx.gif" alt="">
                 </p>
 
                 <h3 id="limitations">Limitações</h3>

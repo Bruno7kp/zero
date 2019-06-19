@@ -37,8 +37,9 @@ use B7KP\Core\App;
 <script src="<?php echo Url::asset('js/bootstrap-notify.min.js');?>"></script>
 <script src="<?php echo Url::asset('js/custom.js');?>"></script>
 <script src="<?php echo Url::asset('js/main.js');?>"></script>
+<script src="<?php echo Url::asset('js/spotify-web-api.js?v=1');?>"></script>
 <script src="<?php echo Url::asset('js/script.js?v=3.3');?>"></script>
-<script src="<?php echo Url::asset('js/chart.js?v=3.4');?>"></script>
+<script src="<?php echo Url::asset('js/chart.js?v=3.5');?>"></script>
 <!-- cdn -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>

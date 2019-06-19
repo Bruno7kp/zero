@@ -30,9 +30,9 @@
 					class : ''
 				});
 				if(theme){
-					cloneLogo.find("a").html("<img src='http://i.imgur.com/N1c2b3t.png' width=100>");
+					cloneLogo.find("a").html("<img src='https://i.imgur.com/N1c2b3t.png' width=100>");
 				}else{
-					cloneLogo.find("a").html("<img src='http://i.imgur.com/NvbfhEa.png' width=100>");
+					cloneLogo.find("a").html("<img src='https://i.imgur.com/NvbfhEa.png' width=100>");
 				}
 
 				$('<div id="fh5co-logo-mobile-wrap">').append(cloneLogo).insertBefore('#fh5co-header-section');
@@ -147,13 +147,13 @@
 			if ( $(window).scrollTop() > 70 ) {
 				$('#fh5co-header-section').addClass('fh5co-scrolled');
 				if(theme){
-					$('#fh5co-logo').find("a").html("<img src='http://i.imgur.com/N1c2b3t.png' width=125>");
+					$('#fh5co-logo').find("a").html("<img src='https://i.imgur.com/N1c2b3t.png' width=125>");
 				}else{
-					$('#fh5co-logo').find("a").html("<img src='http://i.imgur.com/NvbfhEa.png' width=125>");
+					$('#fh5co-logo').find("a").html("<img src='https://i.imgur.com/NvbfhEa.png' width=125>");
 				}
 			} else {
 				$('#fh5co-header-section').removeClass('fh5co-scrolled');
-				$('#fh5co-logo').find("a").html("<img width=125 src='http://i.imgur.com/N1c2b3t.png'>");
+				$('#fh5co-logo').find("a").html("<img width=125 src='https://i.imgur.com/N1c2b3t.png'>");
 			}
 
 
