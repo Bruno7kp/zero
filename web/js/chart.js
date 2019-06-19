@@ -4,9 +4,10 @@ $(document).ready(function(){
 
 function chartinit()
 {
-	getSpotifyAccessToken().then(function(token) {
-		loadimages(token);
-		loadPlaycount(token);
+	getSpotifyAccessToken().then(function(spotifyToken) {
+		loadimages(spotifyToken);
+		loadPlaycount(spotifyToken);
+		loadSpotifyImages(spotifyToken);
 	});
 	openChartRun();
 	pop();
@@ -568,17 +569,15 @@ function loadSpotifyImage(artistName, token) {
 	}
 }
 
-function loadSpotifyImages() {
+function loadSpotifyImages(token) {
 	let els = document.querySelectorAll('[data-spotify-artist]');
-	getSpotifyAccessToken().then((token) => {
-		for (let i = 0; i < els.length; i++) {
-			let item = els[i];
-			let artistName = item.getAttribute('data-spotify-artist');
-			loadSpotifyImage(artistName, token).then((imageUrl) => {
-				item.src = imageUrl;
-			});
-		}
-	});
+	for (let i = 0; i < els.length; i++) {
+		let item = els[i];
+		let artistName = item.getAttribute('data-spotify-artist');
+		loadSpotifyImage(artistName, token).then((imageUrl) => {
+			item.src = imageUrl;
+		});
+	}
 }
 
 function offsetAnchor() {
