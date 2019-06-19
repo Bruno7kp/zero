@@ -70,7 +70,7 @@ use B7KP\Utils\Snippets as S;
 								<tr>
 									<td class="text-center rk-col"><?php echo $value["rank"];?></td>
 									<td class="text-center">
-										<img class="img-circle" src="<?php echo $value["img"]; ?>" height="60">
+										<img class="img-circle" data-spotify-artist="<?php echo $value["artist"]; ?>" src="<?php echo $value["img"]; ?>" height="60" width="60">
 									</td>
 									<td class="rk-col">
 										<a href=<?php echo $liburl.F::fixLFM($value["artist"]);?>>
