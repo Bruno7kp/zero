@@ -188,7 +188,7 @@ CREATE TABLE `settings` (
   `show_times` int(11) NOT NULL,
   `theme` int(11) NOT NULL,
   `show_points` int(11) NOT NULL,
-  `hide_livechart` int(11) NOT NULL,
+  `hide_livecharts` int(11) NOT NULL,
   `visibility` int(11) NOT NULL,
   `start_day` int(11) NOT NULL,
   `show_wkl_cert` int(11) NOT NULL,
