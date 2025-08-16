@@ -425,6 +425,7 @@ function loadPlaycount(token)
 					 }, 1000);
 				}
 				i++;
+				$(".tablesorter").trigger("update");
 				//console.log("success");
 			})
 			.fail(function() {

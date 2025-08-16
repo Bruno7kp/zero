@@ -87,19 +87,19 @@ use B7KP\Utils\Snippets as S;
 							{
 							?>
 							<h2 class="text-center topspace-md"><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
-							<table class="chart-table no-no1 table-fluid topspace-md">
+							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
+								<thead>
 								<tr>
-									<th class="cr-col min center">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
-									<th class="center"><?php echo Lang::get('play_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('play_x')?></th>
 									<?php 
 									if($settings->show_points)
 									{
 									?>
-									<th class="center"><?php echo Lang::get('pt_x')?></th>
-									<th class="center"><?php echo Lang::get('both_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('pt_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('both_x')?></th>
 									<?php
 									}
 									?>
@@ -107,11 +107,13 @@ use B7KP\Utils\Snippets as S;
 									if($settings->show_chart_cert)
 									{
 									?>
-									<th class="center"><?php echo Lang::get('cert_s')?></th>
+									<th class="center sorter-false"><?php echo Lang::get('cert_s')?></th>
 									<?php
 									}
 									?>
 								</tr>
+								</thead>
+								<tbody>
 							<?php
 								foreach ($music as $item) 
 								{
@@ -126,9 +128,6 @@ use B7KP\Utils\Snippets as S;
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
-										echo "<td class='cr-col min'>";
-											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
-										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
 										if($show_times)
@@ -165,14 +164,9 @@ use B7KP\Utils\Snippets as S;
                                             }
 										}
 									echo "</tr>";
-									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='8'>";
-											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
-										echo "</td>";
-									echo "</tr>";
 
 								}
-								echo "</table>";
+								echo "</tbody></table>";
 							}
 							else
 							{

@@ -136,20 +136,20 @@ use B7KP\Library\Lang;
 							{
 							?>
 							<h2 class="text-center topspace-xxl"><?php echo Lang::get("alb_x");?></h2>
-							<table class="chart-table no-no1 table-fluid topspace-md">
+							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
+								<thead>
 								<tr>
-									<th class="cr-col min center">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
-									<th class="center">Img</th>
+									<th class="center sorter-false">Img</th>
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
-									<th class="center"><?php echo Lang::get('play_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('play_x')?></th>
 									<?php 
 									if($settings->show_points)
 									{
 									?>
-									<th class="center"><?php echo Lang::get('pt_x')?></th>
-									<th class="center"><?php echo Lang::get('both_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('pt_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('both_x')?></th>
 									<?php
 									}
 									?>
@@ -157,11 +157,13 @@ use B7KP\Library\Lang;
 									if($settings->show_chart_cert)
 									{
 									?>
-									<th class="center"><?php echo Lang::get('cert_s')?></th>
+									<th class="center sorter-false"><?php echo Lang::get('cert_s')?></th>
 									<?php
 									}
 									?>
 								</tr>
+								</thead>
+								<tbody>
 							<?php
 								foreach ($album as $item) 
 								{
@@ -176,9 +178,6 @@ use B7KP\Library\Lang;
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
-										echo "<td class='cr-col min'>";
-											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
-										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
 										if($show_times)
@@ -217,13 +216,15 @@ use B7KP\Library\Lang;
                                             }
 										}
 									echo "</tr>";
+									/***
 									echo "<tr style='display:none;' class='cr-row'>";
 										echo "<td colspan='8'>";
 											echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
 										echo "</td>";
 									echo "</tr>";
+									*/
 								}
-								echo "</table>";
+								echo "</tbody></table>";
 							}
 							else
 							{
@@ -237,13 +238,25 @@ use B7KP\Library\Lang;
 							{
 							?>
 							<h2 class="text-center topspace-xxl"><?php echo Lang::get("mus_x");?></h2>
-							<table class="chart-table no-no1 table-fluid topspace-md">
+							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
+								<thead>
 								<tr>
-									<th class="cr-col min center">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('play_x')?></th>
+									<?php
+									if($settings->show_points)
+									{
+									?>
+									<th class="center sorter-br-number"><?php echo Lang::get('pt_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('both_x')?></th>
+									<?php
+									}
+									?>
 								</tr>
+								</thead>
+								<tbody>
 							<?php
 								$max = 0;
 								foreach ($music as $item) 
@@ -255,6 +268,7 @@ use B7KP\Library\Lang;
 									$max++;
 									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
 									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
+									$pts = intval($item->stats["stats"]["alltime"]["overall"]["chartpoints"]);
 									$todate = $item->stats["stats"]["alltime"];
 									$cr = $item->stats["chartrun"];
 									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
@@ -263,9 +277,6 @@ use B7KP\Library\Lang;
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
-										echo "<td class='cr-col min'>";
-											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
-										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
 										if($show_times)
@@ -279,15 +290,23 @@ use B7KP\Library\Lang;
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
 										echo "</td>";
+										echo "<td id='".md5($item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
+										if($settings->show_points)
+										{
+											echo "<td class='text-center rk-col'>".$pts."</td>";
+											echo "<td class='text-center rk-col' data-p='".$pts."' data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-pp='".md5($item->music)."'></td>";
+										}
 									echo "</tr>";
+									/***
 									echo "<tr style='display:none;' class='cr-row'>";
 										echo "<td colspan='8'>";
 											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
+									*/
 
 								}
-								echo "</table>";
+								echo "</tbody></table>";
 								echo "<a class='btn btn-outline topspace-md' href=".Route::url('lib_art_music', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
 							}
 							else

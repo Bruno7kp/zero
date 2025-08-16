@@ -11,3 +11,4 @@ gen
 composer.lock
 vendor/*
 cache/cache/*
+cache/*.cache

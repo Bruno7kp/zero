@@ -608,8 +608,19 @@ function formSubmit() {
 }
 
 function sortTable() {
+    $.tablesorter.addParser({
+        id: 'br-number',
+        is: function(s) {
+            return /^\d{1,3}(\.\d{3})*(,\d+)?$/.test(s);
+        },
+        format: function(s) {
+            // Remove pontos (milhar), troca vírgula por ponto (decimal)
+            return parseFloat(s.replace(/\./g, '').replace(',', '.'));
+        },
+        type: 'numeric',
+    });
     $.tablesorter.themes.bootstrap = {
-        table: 'table table-bordered table-striped',
+        table: 'table table-striped',
         caption: 'caption',
         // header class names
         header: 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)

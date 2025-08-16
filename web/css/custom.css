@@ -431,3 +431,7 @@ a.white {
 	    padding-bottom: 15px;
 	}
 }
+
+.tablesorter td, .tablesorter th {
+    vertical-align: middle !important;
+}
