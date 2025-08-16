@@ -126,7 +126,7 @@ a.cr-btn.wksout{
     vertical-align: middle;
 }
 
-.chart-table tr:first-child {
+.chart-table tr:has(th):first-child {
 	border-bottom: solid 2px #ddd;
 }
 
