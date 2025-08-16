@@ -60,13 +60,39 @@ class LastFm
         return $this;
     }
 
+    private function cacheFetch($key, $ttl, callable $callback)
+    {
+        $cacheDir = __DIR__ . '/../../../cache/';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0777, true);
+        }
+        $cacheFile = $cacheDir . md5($key) . '.cache';
+
+        // Limpa arquivos expirados
+        foreach (glob($cacheDir . '*.cache') as $file) {
+            if (filemtime($file) + $ttl < time()) {
+                @unlink($file);
+            }
+        }
+
+        if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl) > time()) {
+            return unserialize(file_get_contents($cacheFile));
+        }
+        $data = $callback();
+        file_put_contents($cacheFile, serialize($data));
+        return $data;
+    }
+
     public function getUserInfo($vars = array())
     {
-        if(!isset($vars['user']))
-        {
+        if(!isset($vars['user'])) {
             $vars['user'] = $this->userName;
         }
-        return $this->userApi->getInfo($vars);
+        $cacheKey = 'userinfo_' . md5(json_encode($vars));
+        // 2 semanas = 14 dias = 1209600 segundos
+        return $this->cacheFetch($cacheKey, 1209600, function() use ($vars) {
+            return $this->userApi->getInfo($vars);
+        });
     }
 
     public function getUserTopArtist($vars = array())
