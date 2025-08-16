@@ -620,7 +620,7 @@ function sortTable() {
         type: 'numeric',
     });
     $.tablesorter.themes.bootstrap = {
-        table: 'table table-striped',
+        table: 'table',
         caption: 'caption',
         // header class names
         header: 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)
