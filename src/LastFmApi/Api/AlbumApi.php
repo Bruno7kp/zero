@@ -111,7 +111,7 @@ class AlbumApi extends BaseApi
                 $info['images']['mega'] = (string) $image[4]["#text"];
                 $info['listeners'] = (string) $call->album->listeners;
                 $info['playcount'] = (string) $call->album->playcount;
-                if (isset($call->album->tags) && isset($call->album->tags->tag) && ia_array($call->album->tags->tag)) {
+                if (isset($call->album->tags) && isset($call->album->tags->tag) && is_array($call->album->tags->tag)) {
                     foreach ($call->album->tags->tag as $tags) {
                         $info['toptags'][$i]['name'] = (string) $tags->name;
                         $info['toptags'][$i]['url'] = (string) $tags->url;
@@ -119,7 +119,7 @@ class AlbumApi extends BaseApi
                     }
                 }
                 $i = 0;
-                if (isset($call->album->tracks) && isset($call->album->tracks->track) && ia_array($call->album->tracks->track)) {
+                if (isset($call->album->tracks) && isset($call->album->tracks->track) && is_array($call->album->tracks->track)) {
                     foreach ($call->album->tracks->track as $track) {
                         $info['tracks'][$i]['name'] = isset($track->name) ? (string) $track->name : '';
                         $info['tracks'][$i]['url'] = isset($track->url) ? (string) $track->url : '';
