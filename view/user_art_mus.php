@@ -90,6 +90,7 @@ use B7KP\Utils\Snippets as S;
 							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
 								<thead>
 								<tr>
+									<th class="cr-col min center sorter-false">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
@@ -128,6 +129,9 @@ use B7KP\Utils\Snippets as S;
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
 										if($show_times)
@@ -163,6 +167,11 @@ use B7KP\Utils\Snippets as S;
                                                     break;
                                             }
 										}
+									echo "</tr>";
+									echo "<tr style='display:none;' class='cr-row'>";
+										echo "<td colspan='8'>";
+											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
+										echo "</td>";
 									echo "</tr>";
 
 								}

@@ -139,6 +139,7 @@ use B7KP\Library\Lang;
 							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
 								<thead>
 								<tr>
+									<th class="cr-col min center sorter-false">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
 									<th class="center sorter-false">Img</th>
 									<th><?php echo Lang::get('title');?></th>
@@ -178,6 +179,9 @@ use B7KP\Library\Lang;
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
 										if($show_times)
@@ -216,13 +220,13 @@ use B7KP\Library\Lang;
                                             }
 										}
 									echo "</tr>";
-									/***
+									
 									echo "<tr style='display:none;' class='cr-row'>";
 										echo "<td colspan='8'>";
 											echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
 										echo "</td>";
 									echo "</tr>";
-									*/
+									
 								}
 								echo "</tbody></table>";
 							}
@@ -241,6 +245,7 @@ use B7KP\Library\Lang;
 							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
 								<thead>
 								<tr>
+									<th class="cr-col min center sorter-false">+</th>
 									<th class="center"><?php echo Lang::get('pk');?></th>
 									<th><?php echo Lang::get('title');?></th>
 									<th class="center"><?php echo Lang::get('wk_x')?></th>
@@ -277,6 +282,9 @@ use B7KP\Library\Lang;
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
 										if($show_times)
@@ -297,13 +305,13 @@ use B7KP\Library\Lang;
 											echo "<td class='text-center rk-col' data-p='".$pts."' data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-pp='".md5($item->music)."'></td>";
 										}
 									echo "</tr>";
-									/***
+									
 									echo "<tr style='display:none;' class='cr-row'>";
 										echo "<td colspan='8'>";
 											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
-									*/
+									
 
 								}
 								echo "</tbody></table>";
