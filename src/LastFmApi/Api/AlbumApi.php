@@ -117,17 +117,23 @@ class AlbumApi extends BaseApi
                     $i++;
                 }
                 $i = 0;
-                foreach ($call->album->tracks->track as $track) {
-                    $info['tracks'][$i]['name'] = (string) $track->name;
-                    $info['tracks'][$i]['url'] = (string) $track->url;
-                    $info['tracks'][$i]['duration'] = (string) $track->duration;
-                    //$info['tracks'][$i]['streamable'] = (string) $track->streamable;
-                    //$info['tracks'][$i]['rank'] = (string) $track->rank;
-                    $info['tracks'][$i]['artist'] = array();
-                    $info['tracks'][$i]['artist']['name'] = $track->artist->name;
-                    $info['tracks'][$i]['artist']['mbid'] = isset($track->artist->mbid) ? $track->artist->mbid : "";
-                    $info['tracks'][$i]['artist']['url'] = $track->artist->url;
-                    $i++;
+                if (isset($call->album->tracks) && isset($call->album->tracks->track) && is_iterable($call->album->tracks->track)) {
+                    foreach ($call->album->tracks->track as $track) {
+                        $info['tracks'][$i]['name'] = isset($track->name) ? (string) $track->name : '';
+                        $info['tracks'][$i]['url'] = isset($track->url) ? (string) $track->url : '';
+                        $info['tracks'][$i]['duration'] = isset($track->duration) ? (string) $track->duration : '';
+                        $info['tracks'][$i]['artist'] = array();
+                        if (isset($track->artist)) {
+                            $info['tracks'][$i]['artist']['name'] = isset($track->artist->name) ? (string) $track->artist->name : '';
+                            $info['tracks'][$i]['artist']['mbid'] = isset($track->artist->mbid) ? (string) $track->artist->mbid : '';
+                            $info['tracks'][$i]['artist']['url'] = isset($track->artist->url) ? (string) $track->artist->url : '';
+                        } else {
+                            $info['tracks'][$i]['artist']['name'] = '';
+                            $info['tracks'][$i]['artist']['mbid'] = '';
+                            $info['tracks'][$i]['artist']['url'] = '';
+                        }
+                        $i++;
+                    }
                 }
                 // $info['wiki'] = array(
                 //     'summary' => (string) $call->album->wiki->summary,
