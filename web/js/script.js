@@ -635,7 +635,7 @@ function sortTable() {
         iconSortAsc: 'ti-angle-up', // class name added to icon when column has ascending sort
         iconSortDesc: 'ti-angle-down',
     };
-    $(".tablesorter").tablesorter({theme: "bootstrap", headerTemplate: '{content} {icon}', widgets: ["uitheme"]});
+    $(".tablesorter").tablesorter({theme: "bootstrap", headerTemplate: '{content} {icon}', cssChildRow: "cr-row", widgets: ["uitheme"]});
 }
 
 function disable(item) {

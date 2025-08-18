@@ -8,7 +8,7 @@ if(!isset($image))
 {
 	$bgstyle = "filter: blur(0px); -webkit-filter: blur(0px); -moz-filter: blur(0px);";
 }
-isset($image) && $image || $image = "https://i.imgur.com/R60fsP4.png";
+isset($image) && $image || $image = "https://i.imgur.com/y4ZHuCx.png";
 isset($subimage) || $subimage = "";
 isset($title) || $title = "<img src=https://i.imgur.com/imcNtzL.png height=100 />";
 isset($subtitle) || $subtitle = Lang::get('wel_to');
