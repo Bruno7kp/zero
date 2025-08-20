@@ -60,66 +60,68 @@ class LastFm
         return $this;
     }
 
-    private function cacheFetch($key, $ttl, callable $callback)
-    {
-        $cacheDir = __DIR__ . '/../../../cache/';
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0777, true);
-        }
-        $cacheFile = $cacheDir . md5($key) . '.cache';
-
-        // Limpa arquivos expirados
-        foreach (glob($cacheDir . '*.cache') as $file) {
-            if (filemtime($file) + $ttl < time()) {
-                @unlink($file);
-            }
-        }
-
-        if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl) > time()) {
-            return unserialize(file_get_contents($cacheFile));
-        }
-        $data = $callback();
-        file_put_contents($cacheFile, serialize($data));
-        return $data;
-    }
-
     public function getUserInfo($vars = array())
     {
         if(!isset($vars['user'])) {
             $vars['user'] = $this->userName;
         }
         $cacheKey = 'userinfo_' . md5(json_encode($vars));
-        // 2 semanas = 14 dias = 1209600 segundos
-        return $this->cacheFetch($cacheKey, 1209600, function() use ($vars) {
-            return $this->userApi->getInfo($vars);
-        });
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+        
+        $data = $this->userApi->getInfo($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function getUserTopArtist($vars = array())
     {
-        if(!isset($vars['user']))
-        {
+        if(!isset($vars['user'])) {
             $vars['user'] = $this->userName;
         }
-        return $this->userApi->getTopArtists($vars);
+        $cacheKey = 'usertopartist_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+
+        $data = $this->userApi->getTopArtists($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function getUserTopAlbum($vars = array())
     {
-        if(!isset($vars['user']))
-        {
+        if(!isset($vars['user'])) {
             $vars['user'] = $this->userName;
         }
-        return $this->userApi->getTopAlbums($vars);
+        $cacheKey = 'usertopalbum_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+
+        $data = $this->userApi->getTopAlbums($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function getUserTopMusic($vars = array())
     {
-        if(!isset($vars['user']))
-        {
+        if(!isset($vars['user'])) {
             $vars['user'] = $this->userName;
         }
-        return $this->userApi->getTopTracks($vars);
+        $cacheKey = 'usertopmusic_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+
+        $data = $this->userApi->getTopTracks($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function getRecentTrack($vars = array())
@@ -190,30 +192,48 @@ class LastFm
     {
         $mbid = ""; // bug: ignore mbid
         $vars = array("artist" => $str, "mbid" => $mbid);
-        
         $vars['username'] = $this->userName;
+        $cacheKey = 'artistinfo_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
         
-        return $this->artistApi->getInfo($vars);
+        $data = $this->artistApi->getInfo($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function getMusicInfo($str, $artist, $mbid = null, $autocorrect = 0)
     {
         $mbid = ""; // bug: ignore mbid
         $vars = array("track" => $str, "artist" => $artist, "mbid" => $mbid, "autocorrect" => $autocorrect);
-        
         $vars['username'] = $this->userName;
-        
-        return $this->trackApi->getInfo($vars);
+        $cacheKey = 'musicinfo_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+
+        $data = $this->trackApi->getInfo($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function getAlbumInfo($str, $artist, $mbid = null)
     {
         $mbid = ""; // bug: ignore mbid
-        $vars = array("album" => $str, "artist" => $artist,"mbid" => $mbid);
-
+        $vars = array("album" => $str, "artist" => $artist, "mbid" => $mbid);
         $vars['username'] = $this->userName;
-        
-        return $this->albumApi->getInfo($vars);
+        $cacheKey = 'albuminfo_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+
+        $data = $this->albumApi->getInfo($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function loadLibrary()
