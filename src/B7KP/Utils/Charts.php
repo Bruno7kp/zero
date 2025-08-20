@@ -26,6 +26,7 @@ class Charts
 	private $css_file = "chart.css";
 	static $referenceweek;
 	static $initialweek;
+	private $weekCache = []; // <-- Adicione esta propriedade
 	
 	function __construct(Model $factory, User $user)
 	{
@@ -303,16 +304,20 @@ class Charts
 		if($array[0] instanceof Music_charts || $array[0] instanceof Album_charts || $array[0] instanceof Artist_charts)
 		{
 			foreach ($array as $value) {
-				$week = $this->factory->findOneBy("B7KP\Entity\Week", $value->idweek);
+				$idweek = $value->idweek;
+				if (!isset($this->weekCache[$idweek])) {
+					$this->weekCache[$idweek] = $this->factory->findOneBy("B7KP\Entity\Week", $idweek);
+				}
+				$week = $this->weekCache[$idweek];
 				$thisweek = array();
-				$thisweek['week']['id'] = $value->idweek;
+				$thisweek['week']['id'] = $idweek;
 				$thisweek['week']['week'] = $week->week;
 				$thisweek['week']['from'] = $week->from_day;
 				$to = new \DateTime($week->to_day);
 				$to->modify('-1 day');
 				$thisweek['week']['to'] = $to->format('Y-m-d');
 				$thisweek['week']['to_orginal'] = $week->to_day;
-				$thisweek['week']['id'] = $value->idweek;
+				$thisweek['week']['id'] = $idweek;
 				$thisweek['rank']['rank'] = $value->rank;
 				$thisweek['playcount']['playcount'] = $value->playcount;
 				$stats[$week->week] = $thisweek;

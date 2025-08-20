@@ -50,6 +50,7 @@ class Login
 	static function logout($entity = "B7KP\Entity\User")
 	{
 		unset($_SESSION[App::get("name")][strtoupper($entity)]);
+		unset($_SESSION["lastfm_cache"]);
 		setcookie(App::get("name").strtoupper($entity), false, time()-31556926, "/");
 	}
 
