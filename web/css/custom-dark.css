@@ -241,3 +241,11 @@ a.cr-btn.wksout {
 .mfp-close-btn-in .mfp-close {
     color: #fff !important;
 }
+
+.tablesorter td, .tablesorter th {
+    vertical-align: middle !important;
+}
+
+table.no-header-bg > thead > tr > th {
+	background-color: transparent !important;
+}

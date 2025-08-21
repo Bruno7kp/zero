@@ -222,7 +222,7 @@ if ($show_dropouts && $week > 1) {
                 <td class='rk-col'><?php echo $totalweeks; ?></td>
             </tr>
             <tr style="display:none;" class="cr-row">
-                <td colspan="8">
+                <td colspan="10">
                     <?php
                     echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
                     ?>
@@ -236,7 +236,7 @@ if ($show_dropouts && $week > 1) {
     if ($show_dropouts && isset($lastw) && count($lastw) > 0) {
         ?>
         <tr>
-            <th colspan="8">
+            <th colspan="10">
                 <small class="topspace-lg"><?php echo Lang::get('dropouts'); ?></small>
             </th>
         </tr>
@@ -297,7 +297,7 @@ if ($show_dropouts && $week > 1) {
                 <td><?php echo $totalweeks; ?></td>
             </tr>
             <tr style="display:none;" class="cr-row">
-                <td colspan="8">
+                <td colspan="10">
                     <?php
                     echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
                     ?>
@@ -342,7 +342,7 @@ if ($show_dropouts && $week > 1) {
             }
             ?>
             <tr data-cert-header <?php if($cert_type != "1"){ ?>class="hide"<?php } ?>>
-                <th colspan="8">
+                <th colspan="10">
                     <small class="topspace-lg"><?php echo $new_cert_title; ?></small>
                 </th>
             </tr>

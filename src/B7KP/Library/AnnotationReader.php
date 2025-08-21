@@ -7,11 +7,13 @@ use B7KP\Utils\Functions;
 
 class AnnotationReader implements iCache
 {
-	private $reflection;
-	private $scan;
-	private $usecache = true;
-	private static $updated = 0;
-	private static $real_cache = false;
+    const CACHE_VERSION = '1.0.1'; // Altere este valor para forçar atualização do cache
+
+    private $reflection;
+    private $scan;
+    private $usecache = true;
+    private static $updated = 0;
+    private static $real_cache = false;
 	
 	function __construct()
 	{
@@ -27,7 +29,7 @@ class AnnotationReader implements iCache
 	* Se $forceupdate for 'true', antes de carregar, o arquivo será atualizado
 	* Se $usecache for 'false', $forceupdate também será, já que o arquivo não será utilizado
 	*/
-	public function find($cpm, $annotation, $forceupdate = true)
+	public function find($cpm, $annotation, $forceupdate = false)
 	{
 		if($this->useCache() == false)
 		{
@@ -82,6 +84,7 @@ class AnnotationReader implements iCache
 		$this->scan->class = [];
 		$this->scan->property = [];
 		$this->scan->method = [];
+		$this->scan->cache_version = self::CACHE_VERSION; // Salva a versão no cache
 		$scanned_directory = $this->findPHPFiles();
 
 		foreach ($scanned_directory as $file) {
@@ -204,6 +207,16 @@ class AnnotationReader implements iCache
 	{
 		if(self::$real_cache === false){
 			self::$real_cache = Cache::getJsonData(__CLASS__);
+		}
+		// Checa a versão do cache
+		if (
+			!isset(self::$real_cache->cache_version) ||
+			self::$real_cache->cache_version !== self::CACHE_VERSION
+		) {
+			// Versão diferente, força atualização
+			$this->scan();
+			self::$real_cache = $this->scan;
+			$this->saveCache();
 		}
 		$this->scan = self::$real_cache;
 		return $this;
