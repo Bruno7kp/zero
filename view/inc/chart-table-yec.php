@@ -88,7 +88,7 @@ $lastw = array();
 	if(!is_array($list) || count($list) == 0)
 	{
 		$list = array();
-		echo "<tr><td colspan='8'>".Lang::get('no_data')."</td></tr>";
+		echo "<tr><td colspan='10'>".Lang::get('no_data')."</td></tr>";
 	}
 	else
 	{
@@ -188,7 +188,7 @@ $lastw = array();
 			<td class='rk-col'><?php echo intval($totalweeks)."";?></td>
 		</tr>
 		<tr style="display:none;" class="cr-row">
-			<td colspan="8">
+			<td colspan="10">
 			<?php
 				echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
 			?>
