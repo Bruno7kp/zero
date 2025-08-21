@@ -36,7 +36,7 @@ isset($title) ?  $title = App::get("name")." - ".$title : $title = App::get("nam
 	<link rel="stylesheet" href="<?php echo Url::asset('css/style.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('lib/icomoon/style.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('lib/font-awesome/css/font-awesome.min.css');?>">
-	<link rel="stylesheet" href="<?php echo Url::asset('css/custom.css?v=3.6');?>">
+	<link rel="stylesheet" href="<?php echo Url::asset('css/custom.css?v=3.7');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/animate.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/chart.css');?>">
 	<link rel="stylesheet" href="<?php echo Url::asset('css/progress.bar.css');?>">
