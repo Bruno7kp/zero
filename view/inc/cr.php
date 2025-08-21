@@ -24,7 +24,7 @@ if(is_array($cr))
 	}
 ?>
 <div class="row text-center">
-<h3 class="bottomspace-xs">
+<h3 class="bottomspace-xs topspace-sm">
 	<a href="#!" class="switchto" style="font-size: smaller;">
 		<i class="ti-layout-grid2"></i></a> 
 	Chart-run: <a href=<?php echo $liburl;?>><?php echo $name;?></a> 

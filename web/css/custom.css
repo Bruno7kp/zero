@@ -435,3 +435,7 @@ a.white {
 .tablesorter td, .tablesorter th {
     vertical-align: middle !important;
 }
+
+table.no-header-bg > thead > tr > th {
+	background-color: transparent !important;
+}

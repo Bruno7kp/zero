@@ -87,7 +87,7 @@ use B7KP\Utils\Snippets as S;
 							{
 							?>
 							<h2 class="text-center topspace-md"><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
-							<table class="chart-table no-no1 table-fluid tablesorter topspace-md">
+							<table class="chart-table no-no1 table-fluid tablesorter topspace-md no-header-bg">
 								<thead>
 								<tr>
 									<th class="cr-col min center sorter-false">+</th>
