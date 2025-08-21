@@ -91,7 +91,7 @@ if ($show_dropouts && $week > 1) {
     //var_dump($lastw);
     if (!isset($list) || !is_array($list) || count($list) == 0) {
         $list = array();
-        echo "<tr><td colspan='8'>" . Lang::get('nodata_week') . "</td></tr>";
+        echo "<tr><td colspan='10'>" . Lang::get('nodata_week') . "</td></tr>";
     } else {
         foreach ($list as $value) {
             $todate = $value["stats"]["stats"]["todate"];

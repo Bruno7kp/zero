@@ -222,7 +222,7 @@ use B7KP\Library\Lang;
 									echo "</tr>";
 									
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='8'>";
+										echo "<td colspan='10'>";
 											echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
 										echo "</td>";
 									echo "</tr>";
@@ -307,7 +307,7 @@ use B7KP\Library\Lang;
 									echo "</tr>";
 									
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='8'>";
+										echo "<td colspan='10'>";
 											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
