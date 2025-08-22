@@ -1,6 +1,7 @@
 <?php
 use B7KP\Utils\Snippets;
 use B7KP\Utils\Charts;
+use B7KP\Utils\Certified;
 use B7KP\Library\Route;
 use B7KP\Library\Url;
 use B7KP\Library\Lang;
@@ -14,13 +15,41 @@ use B7KP\Utils\Snippets as S;
 	$head = array("title" => "{$user->login} - ".$artist["artist"]);
 	$this->render("ext/head.php", $head);
 
+	$show_times = $settings->show_times;
+	$limit = $settings->alb_limit;
 	$name = $artist["artist"];
-	$plays =  $artist["userplaycount"];
-	$totalwks = $artist["stats"]["stats"]["alltime"]["weeks"]["total"];
-	$totalwks = empty($totalwks) ? "N/C" : $totalwks;
-	$peak = $artist["stats"]["stats"]["alltime"]["overall"]["peak"];
-	$peak = empty($peak) ? "N/C" : $peak;
-	$times = $peak > 0 ? "(".$artist["stats"]["stats"]["alltime"]["rank"][$peak]."x)" : "";
+	$totalentries = 0;
+	$entriestop1 	= 0;
+	$entriestop5 	= 0;
+	$entriestop10 	= 0;
+	$entriestop20 	= 0;
+	$totalweeks = 0;
+	$wkstop1 	= 0;
+	$wkstop5 	= 0;
+	$wkstop10 	= 0;
+	$wkstop20 	= 0;
+	foreach ($album as $item) {
+		$pe = $item->stats["stats"]["alltime"]["overall"]["peak"];
+		$wk = $item->stats["stats"]["alltime"]["weeks"]["total"];
+		$totalentries++;
+		$totalweeks += $wk;
+		$wkstop1 += $item->stats["stats"]["alltime"]["weeks"]["top01"];
+		$wkstop5 += $item->stats["stats"]["alltime"]["weeks"]["top05"];
+		$wkstop10 += $item->stats["stats"]["alltime"]["weeks"]["top10"];
+		$wkstop20 += $item->stats["stats"]["alltime"]["weeks"]["top20"];
+		if($pe == 1) {
+			$entriestop1++;
+		}
+		if($pe <= 5) {
+			$entriestop5++;
+		}
+		if($pe <= 10) {
+			$entriestop10++;
+		}
+		if($pe <= 20) {
+			$entriestop20++;
+		}
+	}
 ?>
 
 	<body class="inner-min">
@@ -41,35 +70,64 @@ use B7KP\Utils\Snippets as S;
 							<img class="img-circle img-responsive" src="<?php echo $artist['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2><?php echo $name;?></h2>
+							<h2><?php echo Lang::get("alb_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
 							<div class="row">
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
-									<small class="text-muted"><?php echo Lang::get('play_x');?></small>
+									<small class="rk-sp bold">Top 1</small>
 									<br>
-									<strong>
-										<i class="ti-control-play ico-color"></i>
-										<?php echo $plays;?>					
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
-									<small class="text-muted"><?php echo Lang::get('wk_x');?></small>
-									<br>
-									<strong>
-										<i class="fa fa-calendar fa-fw ico-color"></i>
-										<?php echo $totalwks?>					
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
-									<small class="text-muted"><?php echo Lang::get('pk');?></small>
-									<br>
-									<strong>
-										<i class="ti-stats-up ico-color"></i>
-										<?php echo $peak;?>
+									<span>
+										<?php echo $entriestop1;?>
 										<small class="text-muted">
-											<?php echo $times;?>		
-										</small>			
-									</strong>
+											(<?php echo $wkstop1;?>x)		
+										</small>					
+									</span>
 								</div>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top 5</small>
+									<br>
+									<span>
+										<?php echo $entriestop5?>	
+										<small class="text-muted">
+											(<?php echo $wkstop5;?>x)		
+										</small>				
+									</span>
+								</div>
+								<?php if ($limit >= 10) { ?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top 10</small>
+									<br>
+									<span>
+										<?php echo $entriestop10;?>
+										<small class="text-muted">
+											(<?php echo $wkstop10;?>x)	
+										</small>			
+									</span>
+								</div>
+								<?php } ?>
+								<?php if ($limit >= 20) { ?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top 20</small>
+									<br>
+									<span>
+										<?php echo $entriestop20;?>
+										<small class="text-muted">
+											(<?php echo $wkstop20;?>x)		
+										</small>			
+									</span>
+								</div>
+								<?php } ?>
+								<?php if ($limit > 20) { ?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top <?php echo $limit;?></small>
+									<br>
+									<span>
+										<?php echo $totalentries;?>
+										<small class="text-muted">
+											(<?php echo $totalweeks;?>x)		
+										</small>			
+									</span>
+								</div>
+								<?php } ?>
 							</div>
 						</div>
 					</div>
@@ -79,41 +137,102 @@ use B7KP\Utils\Snippets as S;
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-8">
-							<h3><?php echo Lang::get("alb_x")." ".Lang::get("of")." <a href='".Route::url('lib_art', array("login" => $user->login, "name" => F::fixLFM($name)))."'>".$name."</a>";?></h3>
+						<div class="col-md-12">
 							<?php
 							if(count($album) > 0)
 							{
-								echo "	<table class='table middle tablesorteralt'>";
-								echo "	<thead>
-											<tr>
-												<th class=text-center>".Lang::get('pk')."</th>
-												<th colspan=2>
-													".Lang::get("alb")."
-												</th>
-												<th class=text-center>".Lang::get('wk_x')."</th>
-												<th class=text-center>".Lang::get('play_x')."</th>
-											</tr>
-										<thead>
-										<tbody class=large>";
+							?>
+							<table class="chart-table no-no1 table-fluid tablesorter topspace-md no-header-bg">
+								<thead>
+								<tr>
+									<th class="cr-col min center sorter-false">+</th>
+									<th class="center"><?php echo Lang::get('pk');?></th>
+									<th class="center sorter-false">Img</th>
+									<th><?php echo Lang::get('title');?></th>
+									<th class="center"><?php echo Lang::get('wk_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('play_x')?></th>
+									<?php 
+									if($settings->show_points)
+									{
+									?>
+									<th class="center sorter-br-number"><?php echo Lang::get('pt_x')?></th>
+									<th class="center sorter-br-number"><?php echo Lang::get('both_x')?></th>
+									<?php
+									}
+									?>
+									<?php 
+									if($settings->show_chart_cert)
+									{
+									?>
+									<th class="center sorter-false"><?php echo Lang::get('cert_s')?></th>
+									<?php
+									}
+									?>
+								</tr>
+								</thead>
+								<tbody>
+								<?php
 								foreach ($album as $item) 
 								{
+									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
+									$pts = intval($item->stats["stats"]["alltime"]["overall"]["chartpoints"]);
+									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
+									$todate = $item->stats["stats"]["alltime"];
+									$cr = $item->stats["chartrun"];
+									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$sp = "";
+									if($peak == 1):
+										$sp = "rk-sp";
+									endif;
 									echo "<tr>";
-										echo "<td class='text-center'>";
-											echo $item->peak;
+										echo "<td class='cr-col min'>";
+											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
 										echo "</td>";
-										echo "<td class='getimage' id='rankid".md5($item->album)."' data-type='album' data-name='".htmlentities($item->album, ENT_QUOTES)."' data-mbid='' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
+										echo "<td class='rk-col text-center ".$sp."'>";
+											echo $peak;
+										if($show_times)
+										{
+											echo "<br><span class='black'>".$times."x</span>";
+										}
+										echo "</td>";
+										echo "<td class=\"text-center\" data-i='".md5($item->album)."'><img width='64' src='".Url::getBaseUrl()."/web/img/default-alb.png'/></td>";
 										echo "<td>";
-											echo "<a class='mg-5' href=".Route::url('lib_mus', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
+											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
 										echo "</td>";
-										echo "<td class='text-center'>";
-											echo $item->weeks;
+										echo "<td class='text-center rk-col'>";
+											echo $weeks;
 										echo "</td>";
-										echo "<td id='".md5($item->album)."' class='text-center loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."'' data-artist='".htmlentities($name, ENT_QUOTES)."'>";
-											//echo $item->weeks;
+										echo "<td id='".md5($item->album)."' class='text-center rk-col loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
+										echo "</td>";
+										if($settings->show_points)
+										{
+											echo "<td class='text-center rk-col'>".$pts."</td>";
+											echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-pp='".md5($item->album)."'></td>";
+										}
+										if($settings->show_chart_cert)
+										{
+                                            $c = new Certified($user, $this->factory);
+                                            switch ($settings->cert_type){
+                                                case "2":
+                                                    echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-c='".md5($item->album)."'></td>";
+                                                    break;
+                                                case "1":
+                                                    $cert = $c->getCertification("album", $pts, "text+icon");
+                                                    echo '<td class="text-center rk-col"> '.$cert.'</td>';
+                                                    break;
+                                                default:
+                                                    echo "<td class='text-center rk-col' data-p='0' data-c='".md5($item->album)."'></td>";
+                                                    break;
+                                            }
+										}
+									echo "</tr>";
+									
+									echo "<tr style='display:none;' class='cr-row'>";
+										echo "<td colspan='10'>";
+											echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
 										echo "</td>";
 									echo "</tr>";
-
+									
 								}
 								echo "</tbody></table>";
 							}

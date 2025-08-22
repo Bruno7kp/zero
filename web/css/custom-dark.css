@@ -248,4 +248,5 @@ a.cr-btn.wksout {
 
 table.no-header-bg > thead > tr > th {
 	background-color: transparent !important;
+    border-bottom: 2px solid #999 !important;
 }

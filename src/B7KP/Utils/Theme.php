@@ -38,7 +38,7 @@ class Theme
 				if($mainbs){
 					$html = "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/cyborg/bootstrap.min.css\" class=\"themedark\">";
 				}else{
-					$html = "<link rel=\"stylesheet\" href=\"".Url::asset('css/custom-dark.css?v=3.7')."\" class=\"themedark\"><script>theme = 1;</script>";
+					$html = "<link rel=\"stylesheet\" href=\"".Url::asset('css/custom-dark.css?v=3.81')."\" class=\"themedark\"><script>theme = 1;</script>";
 				}
 
 				

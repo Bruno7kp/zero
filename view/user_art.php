@@ -135,7 +135,11 @@ use B7KP\Library\Lang;
 							if(count($album) > 0)
 							{
 							?>
-							<h2 class="text-center topspace-xxl"><?php echo Lang::get("alb_x");?></h2>
+							<h2 class="text-center topspace-xxl">
+								<a href="<?php echo Route::url('lib_art_album', array('login' => $user->login, 'artist' => F::fixLFM($name)));?>">
+									<?php echo Lang::get("alb_x");?>
+								</a>
+							</h2>
 							<table class="chart-table no-no1 table-fluid tablesorter topspace-md no-header-bg">
 								<thead>
 								<tr>
@@ -166,8 +170,14 @@ use B7KP\Library\Lang;
 								</thead>
 								<tbody>
 							<?php
+								$max = 0;
 								foreach ($album as $item) 
 								{
+									if($max == 5)
+									{
+										break;
+									}
+									$max++;
 									$peak = $item->stats["stats"]["alltime"]["overall"]["peak"];
 									$pts = intval($item->stats["stats"]["alltime"]["overall"]["chartpoints"]);
 									$times = $item->stats["stats"]["alltime"]["rank"][$peak];
@@ -229,6 +239,8 @@ use B7KP\Library\Lang;
 									
 								}
 								echo "</tbody></table>";
+								echo "<a class='btn btn-outline topspace-md' href=".Route::url('lib_art_album', array('login' => $user->login, 'artist' => F::fixLFM($name))).">".Lang::get('view')."</a>";
+
 							}
 							else
 							{
@@ -241,7 +253,11 @@ use B7KP\Library\Lang;
 							if(count($music) > 0)
 							{
 							?>
-							<h2 class="text-center topspace-xxl"><?php echo Lang::get("mus_x");?></h2>
+							<h2 class="text-center topspace-xxl">
+								<a href="<?php echo Route::url('lib_art_music', array('login' => $user->login, 'artist' => F::fixLFM($name)));?>">
+									<?php echo Lang::get("mus_x");?>
+								</a>
+							</h2>
 							<table class="chart-table no-no1 table-fluid tablesorter topspace-md no-header-bg">
 								<thead>
 								<tr>

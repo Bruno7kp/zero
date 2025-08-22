@@ -439,3 +439,7 @@ a.white {
 table.no-header-bg > thead > tr > th {
 	background-color: transparent !important;
 }
+
+th.min {
+	padding-left:10px!important;
+}

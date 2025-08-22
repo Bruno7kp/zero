@@ -29,7 +29,7 @@ class Snippets
 				<img class='img-responsive' src='{$img}' alt='{$name}'>
 			</div>
 			<div class='col-xs-9'>
-				<a href={$url} target='_blank'>{$name}</a>
+				<a href={$url}>{$name}</a>
 				<br>
 				".$album."
 				<small>{$artist}</small>
@@ -59,7 +59,7 @@ class Snippets
 		<div class='row'>
 			".$img."
 			<div class='col-xs-9'>
-				<a href={$url} target='_blank'>{$name}</a>
+				<a href={$url}>{$name}</a>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
@@ -97,9 +97,9 @@ class Snippets
 		<div class='row'>
 			".$img."
 			<div class='col-xs-9'>
-				<a href={$url} target='_blank'>{$name}</a> 
+				<a href={$url}>{$name}</a> 
 				<br>
-				<small class='text-muted'>".Lang::get('by')." <a href={$arturl} target='_blank'>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href={$arturl}>{$artist}</a></small>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
@@ -127,9 +127,9 @@ class Snippets
 		<div class='row'>
 			".$img."
 			<div class='col-xs-9'>
-				<a href=".$url." target='_blank'>{$name}</a> 
+				<a href=".$url.">{$name}</a> 
 				<br>
-				<small class='text-muted'>".Lang::get('by')." <a href={$arturl} target='_blank'>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href={$arturl}>{$artist}</a></small>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
