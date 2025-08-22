@@ -83,6 +83,10 @@ if(is_array($cr))
 		{
 			echo "<div class='dest divider'><b>Top 20</b><hr/>".$wkstop20."</div>";
 		}
+		if($limit > 20)
+		{
+			echo "<div class='dest divider'><b>Top ".$limit."</b><hr/>".$totalweeks."</div>";
+		}
 	}
 	?>
 	</div>

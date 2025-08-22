@@ -16,13 +16,40 @@ use B7KP\Utils\Snippets as S;
 	$this->render("ext/head.php", $head);
 
 	$show_times = $settings->show_times;
+	$limit = $settings->mus_limit;
 	$name = $artist["artist"];
-	$plays =  $artist["userplaycount"];
-	$totalwks = $artist["stats"]["stats"]["alltime"]["weeks"]["total"];
-	$totalwks = empty($totalwks) ? "N/C" : $totalwks;
-	$peak = $artist["stats"]["stats"]["alltime"]["overall"]["peak"];
-	$peak = empty($peak) ? "N/C" : $peak;
-	$times = $peak > 0 ? "(".$artist["stats"]["stats"]["alltime"]["rank"][$peak]."x)" : "";
+	$totalentries = 0;
+	$entriestop1 	= 0;
+	$entriestop5 	= 0;
+	$entriestop10 	= 0;
+	$entriestop20 	= 0;
+	$totalweeks = 0;
+	$wkstop1 	= 0;
+	$wkstop5 	= 0;
+	$wkstop10 	= 0;
+	$wkstop20 	= 0;
+	foreach ($music as $item) {
+		$pe = $item->stats["stats"]["alltime"]["overall"]["peak"];
+		$wk = $item->stats["stats"]["alltime"]["weeks"]["total"];
+		$totalentries++;
+		$totalweeks += $wk;
+		$wkstop1 += $item->stats["stats"]["alltime"]["weeks"]["top01"];
+		$wkstop5 += $item->stats["stats"]["alltime"]["weeks"]["top05"];
+		$wkstop10 += $item->stats["stats"]["alltime"]["weeks"]["top10"];
+		$wkstop20 += $item->stats["stats"]["alltime"]["weeks"]["top20"];
+		if($pe == 1) {
+			$entriestop1++;
+		}
+		if($pe <= 5) {
+			$entriestop5++;
+		}
+		if($pe <= 10) {
+			$entriestop10++;
+		}
+		if($pe <= 20) {
+			$entriestop20++;
+		}
+	}
 ?>
 
 	<body class="inner-min">
@@ -43,35 +70,64 @@ use B7KP\Utils\Snippets as S;
 							<img class="img-circle img-responsive" src="<?php echo $artist['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2><?php echo $name;?></h2>
+							<h2><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
 							<div class="row">
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
-									<small class="text-muted"><?php echo Lang::get('play_x');?></small>
+									<small class="rk-sp bold">Top 1</small>
 									<br>
-									<strong>
-										<i class="ti-control-play ico-color"></i>
-										<?php echo $plays;?>					
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
-									<small class="text-muted"><?php echo Lang::get('wk_x');?></small>
-									<br>
-									<strong>
-										<i class="fa fa-calendar fa-fw ico-color"></i>
-										<?php echo $totalwks?>					
-									</strong>
-								</div>
-								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
-									<small class="text-muted"><?php echo Lang::get('pk');?></small>
-									<br>
-									<strong>
-										<i class="ti-stats-up ico-color"></i>
-										<?php echo $peak;?>
+									<span>
+										<?php echo $entriestop1;?>
 										<small class="text-muted">
-											<?php echo $times;?>		
-										</small>			
-									</strong>
+											(<?php echo $wkstop1;?>x)		
+										</small>					
+									</span>
 								</div>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top 5</small>
+									<br>
+									<span>
+										<?php echo $entriestop5?>	
+										<small class="text-muted">
+											(<?php echo $wkstop5;?>x)		
+										</small>				
+									</span>
+								</div>
+								<?php if ($limit >= 10) { ?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top 10</small>
+									<br>
+									<span>
+										<?php echo $entriestop10;?>
+										<small class="text-muted">
+											(<?php echo $wkstop10;?>x)	
+										</small>			
+									</span>
+								</div>
+								<?php } ?>
+								<?php if ($limit >= 20) { ?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top 20</small>
+									<br>
+									<span>
+										<?php echo $entriestop20;?>
+										<small class="text-muted">
+											(<?php echo $wkstop20;?>x)		
+										</small>			
+									</span>
+								</div>
+								<?php } ?>
+								<?php if ($limit > 20) { ?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="rk-sp bold">Top <?php echo $limit;?></small>
+									<br>
+									<span>
+										<?php echo $totalentries;?>
+										<small class="text-muted">
+											(<?php echo $totalweeks;?>x)		
+										</small>			
+									</span>
+								</div>
+								<?php } ?>
 							</div>
 						</div>
 					</div>
@@ -86,7 +142,6 @@ use B7KP\Utils\Snippets as S;
 							if(count($music) > 0)
 							{
 							?>
-							<h2 class="text-center topspace-md"><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
 							<table class="chart-table no-no1 table-fluid tablesorter topspace-md no-header-bg">
 								<thead>
 								<tr>

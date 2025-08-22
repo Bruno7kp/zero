@@ -126,12 +126,19 @@ class LastFm
 
     public function getRecentTrack($vars = array())
     {
-        if(!isset($vars['user']))
-        {
+        if(!isset($vars['user'])) {
             $vars['user'] = $this->userName;
         }
         $vars['limit'] = 4;
-        return $this->userApi->getRecentTracks($vars);   
+        $cacheKey = 'recenttrack_' . md5(json_encode($vars));
+
+        if (isset($_SESSION['lastfm_cache'][$cacheKey])) {
+            return $_SESSION['lastfm_cache'][$cacheKey];
+        }
+
+        $data = $this->userApi->getRecentTracks($vars);
+        $_SESSION['lastfm_cache'][$cacheKey] = $data;
+        return $data;
     }
 
     public function setStartDate($var)
