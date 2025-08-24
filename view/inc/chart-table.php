@@ -258,7 +258,7 @@ if ($show_dropouts && $week > 1) {
             $wkstop10 = $todate["weeks"]["top10"];
             $wkstop20 = $todate["weeks"]["top20"];
             $peak = $todate["overall"]["peak"];
-            $crurl = Route::url("get_chartrun", array("type" => $type, "user" => $this->user->login, "name" => Functions::fixLFM($item->$type), "artist" => Functions::fixLFM($item->artist), "weekstart" => "first", "weekend" => $week));
+            $crurl = Route::url("get_chartrun", array("type" => $type, "user" => $this->user->login, "name" => Functions::fixLFM($name), "artist" => Functions::fixLFM($artist), "weekstart" => "first", "weekend" => $week));
             ?>
             <tr class="drops">
                 <span style="display: none" id="<?php echo md5($name . $artist); ?>" class="loadplaycount"

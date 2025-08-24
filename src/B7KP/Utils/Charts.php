@@ -522,6 +522,10 @@ class Charts
 			T1.music = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.rank <= '".$limit."';";
 		$stmt = $dao->getCrud()->getPDO()->query($sql);
 		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
+		if(empty($weeks))
+		{
+			$weeks = (object) array("artist" => $artist, "music" => $name, "weeks" => 0, "peak" => null, "peak_count" => 0, "points" => 0);
+		}
 		return $weeks;
 	}
 
@@ -574,6 +578,10 @@ class Charts
 			T1.album = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.rank <= '".$limit."';";
 		$stmt = $dao->getCrud()->getPDO()->query($sql);
 		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
+		if(empty($weeks))
+		{
+			$weeks = (object) array("artist" => $artist, "album" => $name, "weeks" => 0, "peak" => null, "peak_count" => 0, "points" => 0);
+		}
 		return $weeks;
 	}
 
@@ -629,6 +637,10 @@ class Charts
 			AND T1.rank <= '".$limit."';";
 		$stmt = $dao->getCrud()->getPDO()->query($sql);
 		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
+		if(empty($weeks))
+		{
+			$weeks = (object) array("artist" => $name, "weeks" => 0, "peak" => null, "peak_count" => 0, "points" => 0);
+		}
 		return $weeks;
 	}
 
