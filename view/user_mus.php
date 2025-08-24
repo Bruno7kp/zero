@@ -21,12 +21,12 @@ use B7KP\Utils\Snippets as S;
 	$name = $music["music"];
 	$artist = $music["artist"];
 	$plays =  $music["userplaycount"];
-	$totalwks = $music["stats"]["stats"]["alltime"]["weeks"]["total"];
+	$totalwks = $stats->weeks;
 	$totalwks = empty($totalwks) ? "N/C" : $totalwks;
-	$peak = $music["stats"]["stats"]["alltime"]["overall"]["peak"];
+	$peak = $stats->peak;
 	$peak = empty($peak) ? "N/C" : $peak;
-	$points = $music["stats"]["stats"]["alltime"]["overall"]["chartpoints"];
-	$times = $peak > 0 ? "(".$music["stats"]["stats"]["alltime"]["rank"][$peak]."x)" : "";
+	$points = $stats->points;
+	$times = $peak > 0 ? "(".$stats->peak_count."x)" : "";
 ?>
 
 	<body class="inner-min">
@@ -43,12 +43,12 @@ use B7KP\Utils\Snippets as S;
 						</div>
 					</div>
 					<div class="row topspace-md">
-						<div class="col-xs-4 col-sm-3 col-md-2">
+						<div class="col-xs-4 col-sm-3 col-md-2" data-i="<?php echo md5($name);?>">
 							<img class="img-circle img-responsive" src="<?php echo $music['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2 class="no-margin"><?php echo $name;?></h2>
-							<h3><?php echo Lang::get("by");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($artist)));?>><?php echo $artist;?></a>
+							<h2 class="no-margin"><?php echo htmlentities($name);?></h2>
+							<h3><?php echo Lang::get("by");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($artist)));?>><?php echo htmlentities($artist);?></a>
 							<?php 
 							$session = UserSession::getUser($this->factory);
 							if($session && $session->id != $user->id)
@@ -65,7 +65,10 @@ use B7KP\Utils\Snippets as S;
 									<br>
 									<strong>
 										<i class="ti-control-play ico-color"></i>
-										<span class="fmt-nmb"><?php echo $plays;?></span>				
+										<span class="loadplaycount" id="<?php echo md5($name); ?>"
+											data-type="music" data-login="<?php echo $user->login; ?>"
+											data-name="<?php echo htmlentities($name, ENT_QUOTES); ?>"
+											data-artist="<?php echo htmlentities($artist, ENT_QUOTES); ?>"><?php echo $plays;?></span>				
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -96,7 +99,7 @@ use B7KP\Utils\Snippets as S;
 									<br>
 									<strong>
 										<i class="ti-bar-chart-alt ico-color"></i>
-										<span class="fmt-nmb"><?php echo $points;?></span>		
+										<span class=""><?php echo $points;?></span>		
 									</strong>
 								</div>
                                 <div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -104,7 +107,7 @@ use B7KP\Utils\Snippets as S;
                                     <br>
                                     <strong>
                                         <i class="ti-bar-chart-alt ico-color"></i>
-                                        <span class="fmt-nmb"><?php echo ($points * $settings->weight_mus_pts) + ($plays * $settings->weight_mus_pls);?></span>
+                                        <span class="" data-w-pl="<?php echo $settings->weight_mus_pls;?>" data-w-pt="<?php echo $settings->weight_mus_pts;?>" data-p="<?php echo $stats->points;?>" data-pl="<?php echo $plays;?>" data-pts="<?php echo $stats->points;?>" data-pp="<?php echo md5($name);?>"><?php echo ($points * $settings->weight_mus_pts) + ($plays * $settings->weight_mus_pls);?></span>
                                     </strong>
                                 </div>
 								<?php
@@ -134,7 +137,7 @@ use B7KP\Utils\Snippets as S;
 									<br>
 									<?php
 									$txt = $c->getCertification("music", $pts, "text+icon");
-									echo " <strong>".$txt."</strong>"; 
+									echo " <strong data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-p='".$pts."' data-c='".md5($name)."'>".$txt."</strong>"; 
 									?>
 								</div>
 								<?php

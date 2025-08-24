@@ -443,3 +443,6 @@ table.no-header-bg > thead > tr > th {
 th.min {
 	padding-left:10px!important;
 }
+table h3 > a {
+	color: #28bbf8!important;
+}

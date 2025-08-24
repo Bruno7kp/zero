@@ -19,7 +19,7 @@ use B7KP\Library\Lang;
 			<section>
 				<div class="container">
 					<div class="row bottomspace-md">
-						<div class="col-xs-12">
+						<div class="col-xs-12 bottomspace-lg">
 							<?php 
 							$this->render("inc/profile-menu.php", array('user' => $user, 'usericon' => $lfm_image));
 							?>
@@ -27,7 +27,6 @@ use B7KP\Library\Lang;
 					</div>
 					<div class="row">
 						<div class="col-md-6 text-center bottomspace-md">
-							<h3 class="topspace-sm"><?php echo Lang::get('last_1_x');?></h3>
 							<div id="fh5co-tab-feature" class="fh5co-tab" style="display: block; width: 100%; margin: 0px;">
 								<ul class="resp-tabs-list hor_1 hidden-xs">
 									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab" style=""><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
@@ -214,13 +213,61 @@ use B7KP\Library\Lang;
 							<div class="row text-center bottomspace-sm">
 								<a href="<?php echo Route::url('full_chart_list', array('login' => $user->login));?>" class="btn topspace-md btn-sm btn-outline"><?php echo Lang::get("ch_li");?></a>
 							</div>
+						</div>
+						<div class="col-md-6">
+							<?php 
+							if($user->checkSelfPermission($this->factory) && !$settings->hide_livechart)
+							{
+							?>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md">Live chart</h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'artist'));?>><i class="ti-user"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'album'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+							</div>
+							<?php
+							}
+							?>
+							<div class="row text-center bottomspace-md">
+								<?php 
+								if($settings->show_cert && $settings->show_plaque)
+								{
+								?>
+								<div class="col-md-<?php echo $settings->cert_type == "1" ? "6" : "12"?> col-sm-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("plaque");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('plaque_gallery', array('login' => $user->login, 'type' => 'album', 'by' => 'artist'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('plaque_gallery', array('login' => $user->login, 'type' => 'music', 'by' => 'artist'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+								<?php
+								}
+								?>
+								<?php 
+								if($settings->show_cert && $settings->cert_type == "1")
+								{
+								?>
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("big_one_cert");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('user_cert_art', array('login'=> $user->login,'type' => 'album'));?>><i class="ti-user"></i> <i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('user_cert_art', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-user"></i> <i class="ti-music"></i></a>
+									</div>
+								</div>
+								<?php
+								}
+								?>
+							</div>
 							<?php 
 							if(count($years)){
 							?>
-							<div class="row text-center topspace-sm">
+							<div class="row text-center">
 								<div class="col-md-12 ">
-									<div class="divider bottomspace-sm">
-										<hr>
+									<div class="divider">
 										<?php
 											foreach ($years as $key => $value) 
 											{
@@ -347,131 +394,69 @@ use B7KP\Library\Lang;
 							</div>
 							<?php } ?>
 						</div>
-						<div class="col-md-6">
-							<h2 class="h3 text-center"><?php echo Lang::get('stats');?></h2>
-							<table class="table table-bordered middle">
-								<tr>
-									<td class="col-xs-8">
-										<?php echo Lang::get('big_one');?>
-									</td>
-									<td class="col-xs-4">
-										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo Lang::get('big_debut');?>
-									</td>
-									<td>
-										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'artist'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'album'));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'music'));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo Lang::get("big_num");?> #1 / Top 5 / etc...
-									</td>
-									<td>
-										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'artist', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
-
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo Lang::get('art_alb_mus');?>
-									</td>
-									<td>
-										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo Lang::get('big_debut_art');?>
-									</td>
-									<td>
-										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
-										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<?php echo Lang::get('allkill');?>
-									</td>
-									<td>
-										<a href="<?php echo Route::url('allkill', array('login' => $user->login));?>" class="no-margin btn btn-custom btn-info">ALL-KILL</a>
-									</td>
-								</tr>
-
-							</table>
-							<?php 
-							if($user->checkSelfPermission($this->factory) && !$settings->hide_livechart)
-							{
-							?>
+						<div class="col-md-12">
+							<h2 class="h3 text-center topspace-lg"><?php echo Lang::get('stats');?></h2>
 							<div class="row text-center bottomspace-md">
-								<div class="col-md-12 ">
+								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md">Live chart</h2>
-										<p class="pd"><?php echo Lang::get("live_chart");?></p>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'artist'));?>><i class="ti-user"></i></a>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'album'));?>><i class="icon-vynil except"></i></a>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('live_charts', array('type' => 'music'));?>><i class="ti-music"></i></a>
+										<h2 class="h3 topspace-md"><?php echo Lang::get("big_one");?></h2>
+										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="btn btn-custom btn-info"><i class="ti-user"></i></a>
+										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="btn btn-custom btn-info"><i class="ti-music"></i></a>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("big_debut");?></h2>
+										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'artist'));?>" class="btn btn-custom btn-info"><i class="ti-user"></i></a>
+										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'album'));?>" class="btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'music'));?>" class="btn btn-custom btn-info"><i class="ti-music"></i></a>
 									</div>
 								</div>
 							</div>
-							<?php
-							}
-							?>
-							
 							<div class="row text-center bottomspace-md">
-								<div class="col-md-12">
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("big_num");?> #1 / Top 5 / etc</h2>
+										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'artist', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i></a>
+										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-music"></i></a>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("art_alb_mus");?></h2>
+										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
+									</div>
+								</div>
+							</div>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h3 topspace-md"><?php echo Lang::get("big_debut_art");?></h2>
+										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
+										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12">
 									<div class="divider">
 										<h2 class="h3 topspace-md">Chart points</h2>
-										<p class="pd"><?php echo Lang::get("chart_points");?></p>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
 									</div>
 								</div>
 							</div>
-
-							<?php 
-							if($settings->show_cert && $settings->cert_type == "1")
-							{
-							?>
 							<div class="row text-center bottomspace-md">
-								<div class="col-md-12">
+								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("big_one_cert");?></h2>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('user_cert_art', array('login'=> $user->login,'type' => 'album'));?>><i class="ti-user"></i> <i class="icon-vynil except"></i></a>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('user_cert_art', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-user"></i> <i class="ti-music"></i></a>
+										<h2 class="h3 topspace-md"><?php echo Lang::get("allkill");?></h2>
+										<a href="<?php echo Route::url('allkill', array('login' => $user->login));?>" class="btn btn-custom btn-info">ALL-KILL</a>
 									</div>
+									
 								</div>
 							</div>
-							<?php
-							}
-							?>
-							<?php 
-							if($settings->show_cert && $settings->show_plaque)
-							{
-							?>
-							<div class="row text-center bottomspace-md">
-								<div class="col-md-12">
-									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("plaque");?></h2>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('plaque_gallery', array('login' => $user->login, 'type' => 'album', 'by' => 'artist'));?>><i class="icon-vynil except"></i></a>
-										<a class="btn btn-info btn-custom" href=<?php echo Route::url('plaque_gallery', array('login' => $user->login, 'type' => 'music', 'by' => 'artist'));?>><i class="ti-music"></i></a>
-									</div>
-								</div>
-							</div>
-							<?php
-							}
-							?>
 						</div>
 					</div>
 				</div>

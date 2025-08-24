@@ -16,7 +16,7 @@ use B7KP\Library\Lang;
 					<span class='friend'>".$add_friend."</span>
 				</h3>
 				";
-	$blocktitle = "<img class='img-circle' src='".$lfm_image."'>";
+	$blocktitle = "<img class='img-circle' data-u-img='".$user->login."' height='174' src='".$lfm_image."'>";
 	$lfm_bg = isset($lfm_bg) ? $lfm_bg : false;
 ?>
 	<body class="inner-page">
@@ -50,7 +50,7 @@ use B7KP\Library\Lang;
 							<br/>
 							<strong>
 							<i class="ti-control-play ico-color"></i>
-							<?php echo number_format($lfm_playcount);?>
+							<span data-u-pls="<?php echo ($user->login);?>"><?php echo number_format($lfm_playcount);?></span>
 							</strong>
 						</div>
 						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -58,7 +58,7 @@ use B7KP\Library\Lang;
 							<br/>
 							<strong>
 							<i class="fa fa-calendar-check-o fa-fw ico-color"></i>
-							<?php echo count($weeks);?>
+							<span data-u-wks="<?php echo ($user->login);?>"><?php echo count($weeks);?></span>
 							</strong>
 						</div>
 						<div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -66,7 +66,7 @@ use B7KP\Library\Lang;
 							<br/>
 							<strong>
 							<i class="ti-headphone ico-color"></i>
-							<?php echo $average;?>
+							<span data-u-avg="<?php echo ($user->login);?>"><?php echo $average;?></span>
 							</strong>
 						</div>
 						<div class="col-xs-12 bottomspace-md">

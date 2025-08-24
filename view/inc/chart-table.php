@@ -99,6 +99,7 @@ if ($show_dropouts && $week > 1) {
             $cr = $value["stats"]["chartrun"];
             $item = $value["item"];
             $cp_todate = $todate["overall"]["chartpoints"];
+            $crurl = Route::url("get_chartrun", array("type" => $type, "user" => $this->user->login, "name" => Functions::fixLFM($item->$type), "artist" => Functions::fixLFM($item->artist), "weekstart" => "first", "weekend" => $week));
 
             if ($show_dropouts) {
                 $thembid = substr($type, 0, 3) . "_mbid";
@@ -174,7 +175,7 @@ if ($show_dropouts && $week > 1) {
                       data-name="<?php echo htmlentities($name, ENT_QUOTES); ?>"
                       data-artist="<?php echo htmlentities($artist, ENT_QUOTES); ?>"></span>
                 <td class="cr-col min">
-                    <a class="cr-icon"><i class="ti-stats-up"></i></a>
+                    <a class="cr-icon" data-crb="<?php echo base64_encode($crurl)?>"><i class="ti-stats-up"></i></a>
                 </td>
                 <td class='rk-col'>
                     <?php echo $position; ?>
@@ -186,11 +187,11 @@ if ($show_dropouts && $week > 1) {
                         <img width="64" src="<?php echo Url::getBaseUrl() . "/web/img/default-alb.png"; ?>"/>
                     </td>
                     <?php ; endif; ?>
-                <td class="left"><?php echo $name; ?></td>
+                <td class="left"><?php echo htmlentities($name); ?></td>
                 <?php
                 if ($type != "artist") {
                     ?>
-                    <td class="left"><?php echo $artist; ?></td>
+                    <td class="left"><?php echo htmlentities($artist); ?></td>
                     <?php
                 }
                 if ($show_playcounts) {
@@ -222,9 +223,9 @@ if ($show_dropouts && $week > 1) {
                 <td class='rk-col'><?php echo $totalweeks; ?></td>
             </tr>
             <tr style="display:none;" class="cr-row">
-                <td colspan="10">
+                <td colspan="10" data-cr="<?php echo base64_encode($crurl)?>"><p>Loading...</p>
                     <?php
-                    echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
+                    //echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
                     ?>
                 </td>
             </tr>
@@ -257,6 +258,7 @@ if ($show_dropouts && $week > 1) {
             $wkstop10 = $todate["weeks"]["top10"];
             $wkstop20 = $todate["weeks"]["top20"];
             $peak = $todate["overall"]["peak"];
+            $crurl = Route::url("get_chartrun", array("type" => $type, "user" => $this->user->login, "name" => Functions::fixLFM($item->$type), "artist" => Functions::fixLFM($item->artist), "weekstart" => "first", "weekend" => $week));
             ?>
             <tr class="drops">
                 <span style="display: none" id="<?php echo md5($name . $artist); ?>" class="loadplaycount"
@@ -264,7 +266,7 @@ if ($show_dropouts && $week > 1) {
                       data-name="<?php echo htmlentities($name, ENT_QUOTES); ?>"
                       data-artist="<?php echo htmlentities($artist, ENT_QUOTES); ?>"></span>
                 <td class="cr-col min">
-                    <a class="cr-icon"><i class="ti-stats-up"></i></a>
+                    <a class="cr-icon" data-crb="<?php echo base64_encode($crurl)?>"><i class="ti-stats-up"></i></a>
                 </td>
                 <td>
                     <?php echo strtoupper(Lang::get('out')); ?>
@@ -276,11 +278,11 @@ if ($show_dropouts && $week > 1) {
                                                                                               src="<?php echo Url::getBaseUrl() . "/web/img/default-alb.png"; ?>"/>
                     </td>
                     <?php ; endif; ?>
-                <td class="left"><?php echo $name; ?></td>
+                <td class="left"><?php echo htmlentities($name); ?></td>
                 <?php
                 if ($type != "artist") {
                     ?>
-                    <td class="left"><?php echo $artist; ?></td>
+                    <td class="left"><?php echo htmlentities($artist); ?></td>
                     <?php
                 }
                 if ($show_playcounts) {
@@ -297,9 +299,9 @@ if ($show_dropouts && $week > 1) {
                 <td><?php echo $totalweeks; ?></td>
             </tr>
             <tr style="display:none;" class="cr-row">
-                <td colspan="10">
+                <td colspan="10" data-cr="<?php echo base64_encode($crurl)?>"><p>Loading...</p>
                     <?php
-                    echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
+                    // echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
                     ?>
                 </td>
             </tr>
@@ -388,9 +390,9 @@ if ($show_dropouts && $week > 1) {
                     }
                     ?>
                     <td class="left">
-                        <?php echo $name; ?>
+                        <?php echo htmlentities($name); ?>
                     </td>
-                    <td class="left"><?php echo $artist; ?></td>
+                    <td class="left"><?php echo htmlentities($artist); ?></td>
                     <?php if ($cert_type == "1") { ?>
                         <td><?php echo $points . " " . Lang::get("pt_x"); ?></td>
                     <?php } else { ?>

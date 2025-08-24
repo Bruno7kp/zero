@@ -700,8 +700,8 @@ class Lang
 		$messages["big_one"][self::PT_BR] = "Maior número de reproduções em uma semana";
 		$messages["big_one"][self::EN_US] = "Largest number of plays in one week";
 
-		$messages["big_one_cert"][self::PT_BR] = "Artistas com maior número de certificados";
-		$messages["big_one_cert"][self::EN_US] = "Artists with the most certificates";
+		$messages["big_one_cert"][self::PT_BR] = "Artistas mais certificados";
+		$messages["big_one_cert"][self::EN_US] = "Top certified artists";
 
 		$messages["big_debut_art"][self::PT_BR] = "Artistas com mais músicas/álbuns que estrearam em #1";
 		$messages["big_debut_art"][self::EN_US] = "Artists with more musics/albums which debuted at #1";

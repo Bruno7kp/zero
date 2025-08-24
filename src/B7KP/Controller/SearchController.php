@@ -139,6 +139,8 @@ class SearchController extends Controller
 
 	protected function getUserBg($user, $avatar = false)
 	{
+		return false;
+		/***
 		$lfm 	= new LastFm();
 		$last 	= $lfm->setUser($user)->getUserInfo();
 		if($avatar)
@@ -156,6 +158,7 @@ class SearchController extends Controller
 		}
 
 		return $bgimage;
+		**/
 	}
 }
 ?>

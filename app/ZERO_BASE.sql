@@ -401,6 +401,27 @@ ALTER TABLE `yec`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
 
+ALTER TABLE album_charts ADD INDEX idx_album_album (album(100));
+ALTER TABLE album_charts ADD INDEX idx_album_artist (artist(100));
+ALTER TABLE album_charts ADD INDEX idx_album_artist_album (artist(100), album(100));
+
+ALTER TABLE album_yec ADD INDEX idx_album_yec_album (album(100));
+ALTER TABLE album_yec ADD INDEX idx_album_yec_artist (artist(100));
+ALTER TABLE album_yec ADD INDEX idx_album_yec_artist_album (artist(100), album(100));
+
+ALTER TABLE artist_charts ADD INDEX idx_artist_charts_artist (artist(100));
+
+ALTER TABLE artist_yec ADD INDEX idx_artist_yec_artist (artist(100));
+
+ALTER TABLE music_charts ADD INDEX idx_music_charts_music (music(100));
+ALTER TABLE music_charts ADD INDEX idx_music_charts_artist (artist(100));
+ALTER TABLE music_charts ADD INDEX idx_music_charts_artist_music (artist(100), music(100));
+
+ALTER TABLE music_yec ADD INDEX idx_music_yec_music (music(100));
+ALTER TABLE music_yec ADD INDEX idx_music_yec_artist (artist(100));
+ALTER TABLE music_yec ADD INDEX idx_music_yec_artist_music (artist(100), music(100));
+
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

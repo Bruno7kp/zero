@@ -68,7 +68,7 @@ class BaseApi
 
     /**
      * Stores the auth variables used in all api calls
-     * @var array
+     * @var object|array
      */
     protected $auth;
 

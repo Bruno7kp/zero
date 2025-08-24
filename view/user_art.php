@@ -21,11 +21,12 @@ use B7KP\Library\Lang;
 
 	$name = $artist["artist"];
 	$plays =  $artist["userplaycount"];
-	$totalwks = $artist["stats"]["stats"]["alltime"]["weeks"]["total"];
+	$totalwks = $stats->weeks;
 	$totalwks = empty($totalwks) ? "N/C" : $totalwks;
-	$peak = $artist["stats"]["stats"]["alltime"]["overall"]["peak"];
+	$peak = $stats->peak;
 	$peak = empty($peak) ? "N/C" : $peak;
-	$times = $peak > 0 ? "(".$artist["stats"]["stats"]["alltime"]["rank"][$peak]."x)" : "";
+	$times = $peak > 0 ? "(".$stats->peak_count."x)" : "";
+	$crurl = Route::url("get_chartrun", array("type" => "artist", "user" => $user->login, "name" => F::fixLFM($name), "artist" => F::fixLFM($name), "weekstart" => "first", "weekend" => "last"));
 ?>
 
 	<body class="inner-min">
@@ -42,11 +43,11 @@ use B7KP\Library\Lang;
 						</div>
 					</div>
 					<div class="row topspace-md">
-						<div class="col-xs-4 col-sm-3 col-md-2">
+						<div class="col-xs-4 col-sm-3 col-md-2"  data-i="<?php echo md5($name);?>">
 							<img class="img-circle img-responsive" src="<?php echo $artist['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2><?php echo $name;?>
+							<h2><?php echo htmlentities($name);?>
 							<?php 
 							$session = UserSession::getUser($this->factory);
 							if($session && $session->id != $user->id)
@@ -64,7 +65,10 @@ use B7KP\Library\Lang;
 									<br>
 									<strong>
 										<i class="ti-control-play ico-color"></i>
-										<span class="fmt-nmb"><?php echo $plays;?></span>					
+										<span class="loadplaycount" id="<?php echo md5($name); ?>"
+											data-type="artist" data-login="<?php echo $user->login; ?>"
+											data-name="<?php echo htmlentities($name, ENT_QUOTES); ?>"
+											data-artist="<?php echo htmlentities($name, ENT_QUOTES); ?>"><?php echo $plays;?></span>					
 									</strong>
 								</div>
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -95,7 +99,7 @@ use B7KP\Library\Lang;
 									<br>
 									<strong>
 										<i class="ti-bar-chart-alt ico-color"></i>
-										<span class="fmt-nmb"><?php echo $c->getArtistChartPoints($name);?></span>		
+										<span class=""><?php echo $stats->points;?></span>		
 									</strong>
 								</div>
                                 <div class="col-md-2 col-sm-3 col-xs-6 text-center">
@@ -103,26 +107,24 @@ use B7KP\Library\Lang;
                                     <br>
                                     <strong>
                                         <i class="ti-bar-chart-alt ico-color"></i>
-                                        <span class="fmt-nmb"><?php echo $c->getArtistChartPoints($name) + $plays;?></span>
+                                        <span class="" data-w-pl="1" data-w-pt="1" data-p="<?php echo $stats->points;?>" data-pl="<?php echo $plays;?>" data-pts="<?php echo $stats->points;?>" data-pp="<?php echo md5($name);?>"><?php echo $stats->points + $plays;?></span>
                                     </strong>
                                 </div>
 								<?php
 								}
 								?>
+								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
+									<small class="text-muted">Chart-run</small>
+                                    <br>
+									<a class="cr-icon" href="javascript:void(0)" data-crb="<?php echo base64_encode($crurl)?>"><i class="ti-stats-up"></i></a>
+								</div>
 							</div>
 
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-12">
-							<?php if(!empty($times)): ?>
-							<hr/>
-							<?php ; endif; ?>
-						</div>
+						<div class="col-md-12" style="display: none" data-cr="<?php echo base64_encode($crurl)?>"></div>
 					</div>
-					<?php
-					echo S::chartRun("artist", $artist["stats"]["chartrun"], $user, $artist["stats"]["stats"]["alltime"], $limit, $name);
-					?>
 					<div class="row">
 						<div class="col-md-12">
 							<hr/>
@@ -184,13 +186,14 @@ use B7KP\Library\Lang;
 									$todate = $item->stats["stats"]["alltime"];
 									$cr = $item->stats["chartrun"];
 									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$crurl = Route::url("get_chartrun", array("type" => "album", "user" => $user->login, "name" => F::fixLFM($item->album), "artist" => F::fixLFM($item->artist), "weekstart" => "first", "weekend" => "last"));
 									$sp = "";
 									if($peak == 1):
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
 										echo "<td class='cr-col min'>";
-											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+											echo "<a class='cr-icon' data-crb='".base64_encode($crurl)."'><i class='ti-stats-up'></i></a>";
 										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
@@ -201,7 +204,7 @@ use B7KP\Library\Lang;
 										echo "</td>";
 										echo "<td class=\"text-center\" data-i='".md5($item->album)."'><img width='64' src='".Url::getBaseUrl()."/web/img/default-alb.png'/></td>";
 										echo "<td>";
-											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".$item->album."</a>";
+											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".htmlentities($item->album)."</a>";
 										echo "</td>";
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
@@ -232,8 +235,8 @@ use B7KP\Library\Lang;
 									echo "</tr>";
 									
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='10'>";
-											echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
+										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>Loading...</p>";
+											// echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
 										echo "</td>";
 									echo "</tr>";
 									
@@ -293,13 +296,14 @@ use B7KP\Library\Lang;
 									$todate = $item->stats["stats"]["alltime"];
 									$cr = $item->stats["chartrun"];
 									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$crurl = Route::url("get_chartrun", array("type" => "music", "user" => $user->login, "name" => F::fixLFM($item->music), "artist" => F::fixLFM($item->artist), "weekstart" => "first", "weekend" => "last"));
 									$sp = "";
 									if($peak == 1):
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
 										echo "<td class='cr-col min'>";
-											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+											echo "<a class='cr-icon' data-crb='".base64_encode($crurl)."'><i class='ti-stats-up'></i></a>";
 										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
@@ -323,8 +327,8 @@ use B7KP\Library\Lang;
 									echo "</tr>";
 									
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='10'>";
-											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
+										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>Loading...</p>";
+											// echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
 									

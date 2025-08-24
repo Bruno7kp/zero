@@ -23,6 +23,11 @@ class Dao
 		return self::$instance;
     }
 
+	public function getCrud()
+	{
+		return $this->crud;
+	}
+
     public function create($entity, $data)
     {
     	return $this->crud->insert($entity, $data);

@@ -16,6 +16,10 @@ class LastFm
     private $secret;
     private $token = false;
     private $artistApi;
+    private $albumApi;
+    private $trackApi;
+    private $libraryApi;
+    private $userApi;
     private $userName;
     private $artists = array();
     private $albums = array();

@@ -26,13 +26,13 @@ class Snippets
 		return "
 		<div class='row bottomspace-xs'>
 			<div class='col-xs-3'>
-				<img class='img-responsive' src='{$img}' alt='{$name}'>
+				<img class='img-responsive' src='{$img}' alt='".htmlentities($name)."'>
 			</div>
 			<div class='col-xs-9'>
-				<a href={$url}>{$name}</a>
+				<a href={$url}>".htmlentities($name)."</a>
 				<br>
 				".$album."
-				<small>{$artist}</small>
+				<small>".htmlentities($artist)."</small>
 			</div>
 		</div>
 		";
@@ -59,7 +59,7 @@ class Snippets
 		<div class='row'>
 			".$img."
 			<div class='col-xs-9'>
-				<a href={$url}>{$name}</a>
+				<a href={$url}>".htmlentities($name)."</a>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
@@ -90,16 +90,16 @@ class Snippets
 		{
 			$img = "
 			<div class='col-xs-3'>
-				<img class='img-responsive' src='{$img}' alt='{$name}'>
+				<img class='img-responsive' src='{$img}' alt='".htmlentities($name)."'>
 			</div>";
 		}
 		return "
 		<div class='row'>
 			".$img."
 			<div class='col-xs-9'>
-				<a href={$url}>{$name}</a> 
+				<a href={$url}>".htmlentities($name)."</a> 
 				<br>
-				<small class='text-muted'>".Lang::get('by')." <a href={$arturl}>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href={$arturl}>".htmlentities($artist)."</a></small>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
@@ -127,9 +127,9 @@ class Snippets
 		<div class='row'>
 			".$img."
 			<div class='col-xs-9'>
-				<a href=".$url.">{$name}</a> 
+				<a href=".$url.">".htmlentities($name)."</a> 
 				<br>
-				<small class='text-muted'>".Lang::get('by')." <a href={$arturl}>{$artist}</a></small>
+				<small class='text-muted'>".Lang::get('by')." <a href={$arturl}>".htmlentities($artist)."</a></small>
 				<br>
 				<small class='text-muted'>{$playcount} ".(Lang::get('play_x'))."</small>
 				<br>
