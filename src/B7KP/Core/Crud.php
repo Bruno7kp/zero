@@ -64,6 +64,10 @@ class Crud {
 		}
 	}
 
+	public function getPDO() {
+		return $this->pdo;
+	}
+
 	public function delete($table, $where, $bind="") {
 		$sql = "DELETE FROM " . $table . " WHERE " . $where . ";";
 		return $this->run($sql, $bind);

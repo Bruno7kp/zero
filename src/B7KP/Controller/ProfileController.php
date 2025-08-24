@@ -28,36 +28,33 @@ class ProfileController extends Controller
 		{
 			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$startday = $settings->start_day ? "friday" : "sunday";
-			$lfm 	= new LastFm();
-			$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
+			
 			if($user->lfm_register){
 				$date = new \DateTime($user->lfm_register);
 				$date = $date->format("Y.m.d");
 			}else{
+				$lfm 	= new LastFm();
+				$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
 				$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
 				$dateuser 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
 				$data = new \stdClass();
 				$data->lfm_register = $dateuser;
 				$data->id = $user->id;
 				$this->factory->update("\B7KP\Entity\User", $data);
-			}
-			$acts = [];
-			//$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
-			$wksfm 	= $lfm->getWeeklyChartList();
-			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));
-			$divider = $wksfm;
-			if($wksfm == 0)
-			{
-				$divider = 1;
-			}
-			$average = $last['playcount'] / $divider;
+			}		
+			$average = 0;
 			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
+			if(count($weeks) > 0){
+				$lastwk = $weeks[0];
+				$to = new \DateTime($lastwk->to_day);
+				$now = new \DateTime();
+				$diff = $to->diff($now);
+				$wksfm = count($weeks) + floor($diff->days / 7);
+			}else{
+				$wksfm = 0;
+			}
 			$bgimage = false;
 			$topartist = false;
-			if(isset($acts[0])): 
-				$bgimage = $acts[0]["images"]["mega"];
-				$topartist = $acts[0];
-			endif;
 
 			$user_session = UserSession::getUser($this->factory);
 			$add_friend = "";
@@ -91,10 +88,10 @@ class ProfileController extends Controller
 			$var = array
 					(
 						"user" 			=> $user,
-						"lfm_href" 		=> $last["url"],
-						"lfm_image" 	=> str_replace("34s", "avatar170s", $last["image"]),
-						"lfm_playcount" => $last["playcount"],
-						"lfm_country" 	=> $last["country"],
+						"lfm_href" 		=> "https://www.last.fm/user/".$user->login,
+						"lfm_image" 	=> "/web/img/default-art.png",
+						"lfm_playcount" => 0,
+						"lfm_country" 	=> null,
 						"lfm_bg" 		=> $bgimage,
 						"lfm_register"	=> $date,
 						"weeks" 		=> $weeks,

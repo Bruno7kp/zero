@@ -10,6 +10,7 @@ use B7KP\Utils\Certified;
 use B7KP\Utils\Charts;
 use B7KP\Utils\UserSession;
 use LastFmApi\Main\LastFm;
+use B7KP\Utils\Snippets;
 
 class ChartController extends Controller
 {
@@ -33,7 +34,7 @@ class ChartController extends Controller
                 $this->redirectToRoute("profile", array("login" => $user->login));
             }
             $lfm = new LastFm();
-            $last = $lfm->setUser($user->login)->getUserInfo();
+            //$last = $lfm->setUser($user->login)->getUserInfo();
             //$acts     = $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
             $bgimage = false;
             $acts = array();
@@ -77,7 +78,7 @@ class ChartController extends Controller
                 "settings" => $settings,
                 "user" => $user,
                 "lfm_bg" => $bgimage,
-                "lfm_image" => str_replace("34s", "avatar170s", $last["image"]),
+                "lfm_image" => "/web/img/default-art.png",
             );
             $this->render("mainchart.php", $var);
         } else {
@@ -91,6 +92,132 @@ class ChartController extends Controller
     public function fullChartsRedirect($login)
     {
         $this->redirectToRoute("full_charts_list", array("login" => $login, "type" => "artist"));
+    }
+
+    /**
+     * @Route(name=get_chartrun|route=/ajax/chartrun/{weekstart}/{weekend}/{type}/{user}/{name}/{artist})
+     */
+    public function getChartRun($weekstart, $weekend, $type, $user, $name, $artist = null)
+    {
+        // Busca o usuário
+        $userObj = $this->factory->findOneBy("B7KP\Entity\User", $user, "login");
+        if (!$userObj) {
+            echo json_encode(["error" => "User not found"]);
+            return;
+        }
+        if ($weekstart === "first") {
+            $weekstart = 1;
+        } else {
+            $weekstart = intval($weekstart);
+        }
+        $weekop = $this->factory->find("B7KP\Entity\Week", array("iduser" => $userObj->id, "week" => $weekstart), "week DESC");
+        if ($weekend === "last") {
+            $lastWeek = $this->factory->findOneBy("B7KP\Entity\Week", $userObj->id, "iduser", "week DESC");
+            if ($lastWeek) {
+                $weeked = [$lastWeek->week];
+            } else {
+                echo json_encode(["error" => "Week not found"]);
+                return;
+            }
+        } else {
+            $weekend = intval($weekend);
+            $weeked = $this->factory->find("B7KP\Entity\Week", array("iduser" => $userObj->id, "week" => $weekend), "week DESC");
+        }
+                
+        if (is_array($weekop) && count($weekop) > 0) {
+				$weekop = $weekop[0];
+        } else {
+            echo json_encode(["error" => "Week not found"]);
+            return;
+        }
+        if (is_array($weeked) && count($weeked) > 0) {
+				$weeked = $weeked[0];
+        } else {
+            echo json_encode(["error" => "Week not found"]);
+            return;
+        }
+
+        // Busca o settings do usuário
+        $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $userObj->id, "iduser");
+        if (!$settings) {
+            $settings = new \B7KP\Entity\Settings();
+        }
+
+        // Define o limite conforme o tipo
+        switch ($type) {
+            case "artist":
+                $limit = $settings->art_limit;
+                break;
+            case "album":
+                $limit = $settings->alb_limit;
+                break;
+            case "music":
+                $limit = $settings->mus_limit;
+                break;
+            default:
+                $limit = 50;
+        }
+
+        $chart = new \B7KP\Utils\Charts($this->factory, $userObj);
+
+        // Corrige os nomes recebidos na URL
+        $fixedName = urldecode($name);
+        $fixedName = str_replace("+", " ", $fixedName);
+        $fixedName = str_replace("%2b", "+", $fixedName);
+        $fixedName = str_replace("%2f", "/", $fixedName);
+        $fixedName = str_replace("%5c", "\\", $fixedName);
+
+        $fixedArtist = $artist;
+        if ($type !== "artist" && $artist !== null) {
+            $fixedArtist = urldecode($artist);
+            $fixedArtist = str_replace("+", " ", $fixedArtist);
+            $fixedArtist = str_replace("%2b", "+", $fixedArtist);
+            $fixedArtist = str_replace("%2f", "/", $fixedArtist);
+            $fixedArtist = str_replace("%5c", "\\", $fixedArtist);
+        }
+
+        // Busca os dados necessários para o chart run
+        switch ($type) {
+            case "artist":
+                $stats = $chart->getArtistStats($fixedName, "");
+                if (count($stats)) {
+                    $fixedName = $stats[0]->artist;
+                }
+                $extracted = $chart->extract($stats, false, $weeked->week, $weekop->week);
+                $chartrun = $extracted["chartrun"];
+                $alltime = $extracted["stats"]["todate"];
+                break;
+            case "album":
+                $stats = $chart->getAlbumStats($fixedName, $fixedArtist, "");
+                if (count($stats)) {
+                    $fixedName = $stats[0]->album;
+                    $fixedArtist = $stats[0]->artist;
+                }
+                $extracted = $chart->extract($stats, false, $weeked->week, $weekop->week);
+                $chartrun = $extracted["chartrun"];
+                $alltime = $extracted["stats"]["todate"];
+                break;
+            case "music":
+                $stats = $chart->getMusicStats($fixedName, $fixedArtist, "");
+                if (count($stats)) {
+                    $fixedName = $stats[0]->music;
+                    $fixedArtist = $stats[0]->artist;
+                }
+                $extracted = $chart->extract($stats, false, $weeked->week, $weekop->week);
+                $chartrun = $extracted["chartrun"];
+                $alltime = $extracted["stats"]["todate"];
+                break;
+            default:
+                echo json_encode(["error" => "Invalid type"]);
+                return;
+        }
+
+        // Gera o HTML do chart run
+        ob_start();
+        echo \B7KP\Utils\Snippets::chartRun($type, $chartrun, $userObj, $alltime, $limit, $fixedName, $fixedArtist);
+        $cr = ob_get_clean();
+
+        echo json_encode(["cr" => $cr]);
     }
 
     /**
@@ -583,6 +710,8 @@ class ChartController extends Controller
 
     protected function getUserBg($user, $avatar = false, $force = false)
     {
+        return false;
+        /***
         $lfm = new LastFm();
         $last = $lfm->setUser($user->login)->getUserInfo();
         if ($avatar) {
@@ -600,6 +729,7 @@ class ChartController extends Controller
         }
 
         return $bgimage;
+        **/
     }
 
     protected function isValidUser($login)

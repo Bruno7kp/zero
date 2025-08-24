@@ -472,17 +472,21 @@ class LibraryController extends Controller
 		$fixed = str_replace("%2b", "+", $fixed);
 		$fixed = str_replace("%2f", "/", $fixed);
 		$fixed = str_replace("%5c", "\\", $fixed);
-		$data = $lastfm->getArtistInfo($fixed);
+		//$data = $lastfm->getArtistInfo($fixed);
+		$data = true;
 
 		if($data)
 		{
-			$artist["artist"] = $data["name"];
-			$artist["userplaycount"] = $data["userplaycount"];
-			$artist["img"] = $data["images"]["large"];
-			$stats = $chart->getArtistStats($data["name"], "");
-			$album = $chart->getAlbumByArtist($data["name"], $settings->alb_limit);
-			$music = $chart->getMusicByArtist($data["name"], $settings->mus_limit);
-			$artist["stats"] = $chart->extract($stats, false);
+			//$data["name"] = str_replace("   ", " + ", $data["name"]);
+			$artist["artist"] = $fixed;
+			$artist["userplaycount"] = 0;
+			$artist["img"] = "/web/img/default-art.png";
+			$stats = $chart->getArtistStatsSingle($fixed, "");
+			if ($stats->weeks > 0) {
+				$artist["artist"] = $fixed = $stats->artist;
+			}
+			$album = $chart->getAlbumByArtist($fixed, $settings->alb_limit, 5);
+			$music = $chart->getMusicByArtist($fixed, $settings->mus_limit, 10);
 			foreach ($album as $key => $value) {
 				$albstats = $chart->getAlbumStats($value->album, $value->artist, "");
 				$album[$key]->stats = $chart->extract($albstats, false);
@@ -497,6 +501,7 @@ class LibraryController extends Controller
 						(
 							"user" => $user,
 							"artist" => $artist,
+							"stats" => $stats,
 							"album" => $album,
 							"music" => $music,
 							"limit" => $settings->art_limit,
@@ -506,7 +511,6 @@ class LibraryController extends Controller
 							"lfm_bg" 	=> $this->getUserBg($user),
 							"lfm_image" => $this->getUserBg($user, true)
 						);
-
 			$this->render("user_art.php", $vars);
 		}
 		else
@@ -536,26 +540,32 @@ class LibraryController extends Controller
 		$fixedart = str_replace("%2b", "+", $fixedart);
 		$fixedart = str_replace("%2f", "/", $fixedart);
 		$fixedart = str_replace("%5c", "\\", $fixedart);
-		$data = $lastfm->getMusicInfo($fixed, $fixedart);
-
+		//$data = $lastfm->getMusicInfo($fixed, $fixedart);
+		$data = true;
 
 		if($data)
 		{
-			$art = $lastfm->getArtistInfo($fixedart);
-			$music["music"] = $data["name"];
-			$music["artist"] = $data["artist"]["name"];
-			$music["userplaycount"] = $data["userplaycount"];
-            $music["img"] = $art["images"]["large"];
+			//$art = $lastfm->getArtistInfo($fixedart);
+			$music["music"] = $fixed;
+			$music["artist"] = str_replace("   ", " + ", $fixedart);
+			//$music["artist"] = $data["artist"]["name"];
+			$music["userplaycount"] = 0;
+            $music["img"] = "/web/img/default-art.png";
 			//$music["img"] = empty($data['album']['image']['large']) ? $art["images"]["large"] : $data['album']['image']['large'];
 			$stats = $chart->getMusicStats($music["music"], $music["artist"], "");
 			//var_dump($stats);
 			$music["stats"] = $chart->extract($stats, false);
-			$dao = Dao::getConn();
+			$stats = $chart->getMusicStatsSingle($fixed, $fixedart);
+			if ($stats->weeks > 0) {
+				$music["music"] = $stats->music;
+				$music["artist"] = $stats->artist;
+			}
 
 			$vars = array
 						(
 							"user" => $user,
 							"music" => $music,
+							"stats" => $stats,
 							"settings" => $settings,
 							"limit" => $settings->mus_limit,
 							"lfm_bg" 	=> $this->getUserBg($user),
@@ -591,25 +601,31 @@ class LibraryController extends Controller
 		$fixedart = str_replace("%2b", "+", $fixedart);
 		$fixedart = str_replace("%2f", "/", $fixedart);
 		$fixedart = str_replace("%5c", "\\", $fixedart);
-		$data = $lastfm->getAlbumInfo($fixed, $fixedart);
+		// $data = $lastfm->getAlbumInfo($fixed, $fixedart);
+		$data = true;
 
 
 		if($data)
 		{
-			$album["artist"] = $data["artist"];
-			$album["album"] = $data["name"];
-			$album["userplaycount"] = $data["userplaycount"];
-			$album["img"] = $data["images"]["large"];
+			$album["artist"] = str_replace("   ", " + ", $fixedart);
+			$album["album"] = $fixed;
+			$album["userplaycount"] = 0;
+			$album["img"] = "/web/img/default-art.png";
 			$stats = $chart->getAlbumStats($album["album"], $album["artist"], "");
 			//var_dump($stats);
 			$album["stats"] = $chart->extract($stats, false);
-			$dao = Dao::getConn();
+			$stats = $chart->getAlbumStatsSingle($album["album"], $album["artist"]);
+			if ($stats->weeks > 0) {
+				$album["album"] = $stats->album;
+				$album["artist"] = $stats->artist;
+			}
 
 			$vars = array
 						(
 							"user" => $user,
 							"settings" => $settings,
 							"album" => $album,
+							"stats" => $stats,
 							"limit" => $settings->alb_limit,
 							"lfm_bg" 	=> $this->getUserBg($user),
 							"lfm_image" => $this->getUserBg($user, true)
@@ -712,6 +728,8 @@ class LibraryController extends Controller
 
 	protected function getUserBg($user, $avatar = false, $force = false)
 	{
+		return false;
+		/***
 		$lfm 	= new LastFm();
 		$lfm->setUser($user->login);
 		if($avatar)
@@ -732,10 +750,13 @@ class LibraryController extends Controller
 		}
 
 		return $bgimage;
+		**/
 	}
 
 	protected function getBiggestPlaycount($user)
 	{
+		return 0;
+		/***
 		$lfm 	= new LastFm();
 		$lfm->setUser($user->login);
 		$acts 	= $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
@@ -746,6 +767,7 @@ class LibraryController extends Controller
 
 
 		return $plays;
+		**/
 	}
 
 	protected function checkAccess()

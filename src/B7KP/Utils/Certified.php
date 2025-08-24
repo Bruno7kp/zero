@@ -22,6 +22,8 @@ class Certified
 	private $album;
 	private $music;
 	private $type;
+	private $dao;
+	private $factory;
 	
 	function __construct(User $user, Model $factory)
 	{

@@ -46,6 +46,8 @@ class Functions
 		$name = str_replace("\\", "%255C", $name);
 		$name = str_replace("#", "%23", $name);
 		$name = str_replace("?", "%3F", $name);
+		$name = str_replace("<", "%3C", $name);
+    	$name = str_replace(">", "%3E", $name);
 		$name = str_replace(" ", "+", $name);
 		//var_dump($name);
 		return ($name);

@@ -14,7 +14,43 @@ function chartinit()
 	updateUniqueWeek();
 	switchToSimpleCR();
 	editWeek();
+	loadUserInfo();
 
+}
+
+function loadUserInfo()
+{
+	$("[data-u-pls]").each(function(index, val) {
+		var user = $(this).attr('data-u-pls');
+		var el = $(this);
+		$.ajax({
+			url: 'https://ws.audioscrobbler.com/2.0/?method=user.getinfo&api_key='+apiKey+'&user=' + user + '&format=json',
+			dataType: 'json'
+		})
+		.done(function(data) {
+			console.log(data);
+			if(typeof data.user.playcount !== "undefined")
+			{
+				$(el).text(data.user.playcount);
+				var wksEl = $("[data-u-wks='"+user+"']");
+				var avgEl = $("[data-u-avg='"+user+"']");
+				if(avgEl.length > 0)
+				{
+					$(avgEl).text(Math.floor(data.user.playcount / parseInt(wksEl.text())));
+				}
+			}
+			if (typeof data.user.image[2] != "undefined" && data.user.image[2]["#text"] != "") {
+				$("[data-u-img='"+user+"']").attr('src', data.user.image[2]["#text"]);
+			}
+		})
+		.fail(function() {
+			//console.log("error");
+		})
+		.always(function() {
+			//console.log("complete");
+		});
+		
+	});
 }
 
 function getChartMsg(msgid)
@@ -206,15 +242,62 @@ function pop()
 function openChartRun()
 {
 	$(".cr-icon").click(function(event) {
+		var crb = $(this).attr('data-crb');
+		if (typeof crb !== "undefined") {
+			var cr = $('[data-cr="'+crb+'"]');
+			var urlc = atob(crb);
+			const bytes = Uint8Array.from(urlc, c => c.charCodeAt(0));
+
+			// 3. Usar `TextDecoder` para decodificar os bytes como UTF-8
+			const decoder = new TextDecoder('utf-8');
+			const url = decoder.decode(bytes);
+			if(localStorage.getItem(crb) === null || localStorage.getItem(crb+"_expires") < Date.now())
+			{
+				localStorage.removeItem(crb);
+				localStorage.removeItem(crb+"_expires");
+				fetch(url)
+				.then(response => response.json())
+				.then(data => {
+					if (typeof data.cr !== "undefined")
+					{
+						cr.html(data.cr);
+						localStorage.setItem(crb, data.cr);
+						localStorage.setItem(crb+"_expires", Date.now() + 86400000);
+						pop();
+						switchToSimpleCR();
+					}
+				});
+			}
+			else
+			{
+				cr.html(localStorage.getItem(crb));
+				pop();
+				switchToSimpleCR();
+			}
+		}
+		
 		var trCr = $(this).closest('tr').next();
-		if(trCr.is(':visible'))
-		{
-			trCr.hide('400');
+		if (typeof trCr !== "undefined" && trCr.length > 0) {
+			if(trCr.is(':visible'))
+			{
+				trCr.hide('400');
+			}
+			else
+			{
+				trCr.show('400');
+			}
+		} else if (typeof cr !== "undefined" && cr.length > 0) {
+			if(cr.is(':visible'))
+			{
+				cr.hide('400');
+			}
+			else
+			{
+				cr.show('400');
+			}
+
 		}
-		else
-		{
-			trCr.show('400');
-		}
+		
 	});
 }
 
@@ -374,7 +457,7 @@ function loadPlaycount(token)
                             }
                         }
                     }else if(typeof data.artist !== "undefined"){
-                        plays = parseInt(data.artist.userplaycount);
+                        plays = parseInt(data.artist.stats.userplaycount);
                         if(image.length > 0) {
 							loadArtImg(data.artist.name, "", $(image).find("img"), $(image).find("img"), token);
                         }
@@ -404,7 +487,7 @@ function loadPlaycount(token)
                         if(wPoints > 0){
                             curr = curr * wPoints;
                         }
-                        console.log(plays, curr);
+                        //console.log(plays, curr);
 						getCert(user, type, plays + curr, cert, rowClass);
 					}
 					var gen = $("[data-gen=\"" + td.attr('id') + "\"]");
@@ -438,6 +521,7 @@ function loadPlaycount(token)
 
 		function getCert(user, type, plays, whereCert, whereClass)
 		{
+			if (Number.isNaN(plays) || plays < 1) return;
 			$.ajax({
 				url: baseUrl + '/ajax/cert/'+user+'/'+type+'/'+plays,
 				dataType: 'json'

@@ -70,7 +70,7 @@ use B7KP\Utils\Snippets as S;
 							<img class="img-circle img-responsive" src="<?php echo $artist['img'];?>">
 						</div>
 						<div class="col-xs-8 col-sm-9 col-md-10">
-							<h2><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo $name;?></a></h2>
+							<h2><?php echo Lang::get("mus_x")." ".Lang::get("of");?> <a href=<?php echo Route::url("lib_art", array("login" => $user->login, "name" => F::fixLFM($name)));?>><?php echo htmlentities($name);?></a></h2>
 							<div class="row">
 								<div class="col-md-2 col-sm-3 col-xs-6 text-center">
 									<small class="rk-sp bold">Top 1</small>
@@ -179,13 +179,14 @@ use B7KP\Utils\Snippets as S;
 									$pts = intval($item->stats["stats"]["alltime"]["overall"]["chartpoints"]);
 									$cr = $item->stats["chartrun"];
 									$weeks = $item->stats["stats"]["alltime"]["weeks"]["total"];
+									$crurl = Route::url("get_chartrun", array("type" => "music", "user" => $user->login, "name" => F::fixLFM($item->music), "artist" => F::fixLFM($item->artist), "weekstart" => "first", "weekend" => "last"));
 									$sp = "";
 									if($peak == 1):
 										$sp = "rk-sp";
 									endif;
 									echo "<tr>";
 										echo "<td class='cr-col min'>";
-											echo "<a class='cr-icon'><i class='ti-stats-up'></i></a>";
+											echo "<a class='cr-icon' data-crb='".base64_encode($crurl)."'><i class='ti-stats-up'></i></a>";
 										echo "</td>";
 										echo "<td class='rk-col text-center ".$sp."'>";
 											echo $peak;
@@ -224,8 +225,8 @@ use B7KP\Utils\Snippets as S;
 										}
 									echo "</tr>";
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='10'>";
-											echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
+										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>Loading...</p>";
+											// echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
 

@@ -27,8 +27,8 @@ if(is_array($cr))
 <h3 class="bottomspace-xs topspace-sm">
 	<a href="#!" class="switchto" style="font-size: smaller;">
 		<i class="ti-layout-grid2"></i></a> 
-	Chart-run: <a href=<?php echo $liburl;?>><?php echo $name;?></a> 
-	<?php if ($type != "artist"): echo Lang::get("of") ?> <a href=<?php echo $libarturl;?>><?php echo $artist;?></a> <?php ; endif;?>
+	Chart-run: <a href=<?php echo $liburl;?>><?php echo htmlentities($name);?></a> 
+	<?php if ($type != "artist"): echo Lang::get("of") ?> <a href=<?php echo $libarturl;?>><?php echo htmlentities($artist);?></a> <?php ; endif;?>
 </h3>
 
 <div class="col-md-12 text-center topspace-md main">

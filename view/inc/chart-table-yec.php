@@ -149,12 +149,12 @@ $lastw = array();
 			<?php if($show_images): ?>
 				<td class="getimage" id="rankid<?php echo $position;?>" data-type="<?php echo $type;?>" data-name="<?php echo htmlentities($name, ENT_QUOTES);?>" data-mbid="<?php echo $mbid;?>" data-artist="<?php echo htmlentities($artist, ENT_QUOTES);?>"><?php echo S::loader(33);?></td>
 			<?php ; endif;?>
-			<td class="left"><?php echo $name;?></td>
+			<td class="left"><?php echo htmlentities($name);?></td>
 			<?php 
 			if($type != "artist")
 			{ 
 			?>
-				<td class="left"><?php echo $artist;?></td> 
+				<td class="left"><?php echo htmlentities($artist);?></td> 
 			<?php 
 			}
 			if($show_playcounts)

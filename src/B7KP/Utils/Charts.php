@@ -2,6 +2,7 @@
 namespace B7KP\Utils;
 
 use B7KP\Core\Dao;
+use B7KP\Core\Crud;
 use B7KP\Model\Model;
 use B7KP\Entity\Week; 
 use B7KP\Entity\User; 
@@ -489,6 +490,41 @@ class Charts
 		return $weeks;
 	}
 
+	public function getMusicStatsSingle($name, $artist)
+	{
+		$name 	= addslashes($name);
+		$artist = addslashes($artist);
+		$limit  = $this->settings->alb_limit;
+		$dao = Dao::getConn();
+
+		$sql = "SELECT
+			T1.music,
+			T1.artist,
+			COUNT(T1.id) AS weeks,
+			T2.min_rank AS peak,
+			COUNT(CASE WHEN T1.rank = T2.min_rank THEN 1 END) AS peak_count,
+			COUNT(T1.id) * 100 - (SUM(T1.rank) - COUNT(T1.id)) * 2 as points
+		FROM
+			music_charts AS T1
+		JOIN week AS T3 ON T3.id = T1.idweek
+		JOIN (
+			SELECT
+				music,
+				MIN(rank) AS min_rank
+			FROM
+				music_charts
+			JOIN
+				week ON week.id = music_charts.idweek
+			WHERE
+				music = '".$name."' AND artist = '".$artist."' AND rank <= '".$limit."' AND week.iduser = '".$this->user->id."'
+		) AS T2 ON T1.music = T2.music
+		WHERE
+			T1.music = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.rank <= '".$limit."';";
+		$stmt = $dao->getCrud()->getPDO()->query($sql);
+		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
+		return $weeks;
+	}
+
 	public function getAlbumStats($name, $artist, $mbid)
 	{
 		$mbid = ""; // bug: ignore mbid
@@ -503,6 +539,41 @@ class Charts
 		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.id = album_charts.idweek AND week.iduser = '".$this->user->id."' AND album_charts.rank <= '".$limit."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Album_charts", $sql);
 
+		return $weeks;
+	}
+	
+	public function getAlbumStatsSingle($name, $artist)
+	{
+		$name 	= addslashes($name);
+		$artist = addslashes($artist);
+		$limit  = $this->settings->alb_limit;
+		$dao = Dao::getConn();
+
+		$sql = "SELECT
+			T1.album,
+			T1.artist,
+			COUNT(T1.id) AS weeks,
+			T2.min_rank AS peak,
+			COUNT(CASE WHEN T1.rank = T2.min_rank THEN 1 END) AS peak_count,
+			COUNT(T1.id) * 100 - (SUM(T1.rank) - COUNT(T1.id)) * 2 as points
+		FROM
+			album_charts AS T1
+		JOIN week AS T3 ON T3.id = T1.idweek
+		JOIN (
+			SELECT
+				album,
+				MIN(rank) AS min_rank
+			FROM
+				album_charts
+			JOIN
+				week ON week.id = album_charts.idweek
+			WHERE
+				album = '".$name."' AND artist = '".$artist."' AND rank <= '".$limit."' AND week.iduser = '".$this->user->id."'
+		) AS T2 ON T1.album = T2.album
+		WHERE
+			T1.album = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.rank <= '".$limit."';";
+		$stmt = $dao->getCrud()->getPDO()->query($sql);
+		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
 		return $weeks;
 	}
 
@@ -523,21 +594,61 @@ class Charts
 		return $weeks;
 	}
 
-	public function getAlbumByArtist($artist, $limit)
+	/**
+	 * @return object with weeks, peak, peak_count and points
+	 */
+	public function getArtistStatsSingle($name)
+	{
+		$name 	= addslashes($name);
+		$limit  = $this->settings->art_limit;
+		
+		$dao = Dao::getConn();
+		$sql = "SELECT
+			T1.artist,
+  			COUNT(T1.id) AS weeks,
+			T2.min_rank AS peak,
+			COUNT(CASE WHEN T1.rank = T2.min_rank THEN 1 END) AS peak_count,
+			COUNT(T1.id) * 100 - (SUM(T1.rank) - COUNT(T1.id)) * 2 as points
+			FROM
+			artist_charts AS T1
+			JOIN week AS T3 ON T3.id = T1.idweek
+			JOIN (
+				SELECT
+				artist,
+				MIN(rank) AS min_rank
+				FROM
+				artist_charts
+				JOIN
+        		week ON week.id = artist_charts.idweek
+				WHERE
+				artist = '".$name."' AND rank <= '".$limit."' AND week.iduser = '".$this->user->id."'
+			) AS T2 ON T1.artist = T2.artist
+			WHERE
+			T1.artist = '".$name."'
+			AND T3.iduser = '".$this->user->id."'
+			AND T1.rank <= '".$limit."';";
+		$stmt = $dao->getCrud()->getPDO()->query($sql);
+		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
+		return $weeks;
+	}
+
+	public function getAlbumByArtist($artist, $limit, $qtd = 0)
 	{
 		$dao = Dao::getConn();
 		$artist = addslashes($artist);
-		$sql = "SELECT a.album, a.artist, count(a.id) as weeks, min(rank) as peak FROM album_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.album ORDER BY peak ASC, weeks DESC";
+		$limitsql = ($qtd > 0) ? " LIMIT ".$qtd : "";
+		$sql = "SELECT a.album, a.artist, count(a.id) as weeks, min(rank) as peak FROM album_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.album ORDER BY peak ASC, weeks DESC".$limitsql;
 		$alb = $dao->run($sql);
 		return $alb;
 
 	}
 
-	public function getMusicByArtist($artist, $limit)
+	public function getMusicByArtist($artist, $limit, $qtd = 0)
 	{
 		$dao = Dao::getConn();
 		$artist = addslashes($artist);
-		$sql = "SELECT a.music, a.artist, count(a.id) as weeks, min(rank) as peak FROM music_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.music ORDER BY peak ASC, weeks DESC";
+		$limitsql = ($qtd > 0) ? " LIMIT ".$qtd : "";
+		$sql = "SELECT a.music, a.artist, count(a.id) as weeks, min(rank) as peak FROM music_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.music ORDER BY peak ASC, weeks DESC".$limitsql;
 		$mus = $dao->run($sql);
 		return $mus;
 	}
