@@ -202,40 +202,40 @@ use B7KP\Library\Lang;
 											echo "<br><span class='black'>".$times."x</span>";
 										}
 										echo "</td>";
-										echo "<td class=\"text-center\" data-i='".md5($item->album)."'><img width='64' src='".Url::getBaseUrl()."/web/img/default-alb.png'/></td>";
+										echo "<td class=\"text-center\" data-i='".md5('a'.$item->album)."'><img width='64' src='".Url::getBaseUrl()."/web/img/default-alb.png'/></td>";
 										echo "<td>";
 											echo "<a class='mg-5' href=".Route::url('lib_alb', array("login" => $user->login, "artist" => F::fixLFM($name), "name" => F::fixLFM($item->album))).">".htmlentities($item->album)."</a>";
 										echo "</td>";
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
 										echo "</td>";
-										echo "<td id='".md5($item->album)."' class='text-center rk-col loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
+										echo "<td id='".md5('a'.$item->album)."' class='text-center rk-col loadplaycount' data-type='album' data-login=".$user->login." data-name='".htmlentities($item->album, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
 										echo "</td>";
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
-											echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-pp='".md5($item->album)."'></td>";
+											echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-pp='".md5('a'.$item->album)."'></td>";
 										}
 										if($settings->show_chart_cert)
 										{
                                             $c = new Certified($user, $this->factory);
                                             switch ($settings->cert_type){
                                                 case "2":
-                                                    echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-c='".md5($item->album)."'></td>";
+                                                    echo "<td class='text-center rk-col' data-w-pl='{$settings->weight_alb_pls}' data-w-pt='{$settings->weight_alb_pts}' data-p='".$pts."' data-c='".md5('a'.$item->album)."'></td>";
                                                     break;
                                                 case "1":
                                                     $cert = $c->getCertification("album", $pts, "text+icon");
                                                     echo '<td class="text-center rk-col"> '.$cert.'</td>';
                                                     break;
                                                 default:
-                                                    echo "<td class='text-center rk-col' data-p='0' data-c='".md5($item->album)."'></td>";
+                                                    echo "<td class='text-center rk-col' data-p='0' data-c='".md5('a'.$item->album)."'></td>";
                                                     break;
                                             }
 										}
 									echo "</tr>";
 									
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>Loading...</p>";
+										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>".Lang::get("loading")."...</p>";
 											// echo S::chartRun("album", $cr, $user, $todate, $alimit, $item->album, $item->artist);
 										echo "</td>";
 									echo "</tr>";
@@ -318,16 +318,16 @@ use B7KP\Library\Lang;
 										echo "<td class='text-center rk-col'>";
 											echo $weeks;
 										echo "</td>";
-										echo "<td id='".md5($item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
+										echo "<td id='".md5('m'.$item->music)."' class='text-center rk-col loadplaycount' data-type='music' data-login=".$user->login." data-name='".htmlentities($item->music, ENT_QUOTES)."' data-artist='".htmlentities($name, ENT_QUOTES)."'></td>";
 										if($settings->show_points)
 										{
 											echo "<td class='text-center rk-col'>".$pts."</td>";
-											echo "<td class='text-center rk-col' data-p='".$pts."' data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-pp='".md5($item->music)."'></td>";
+											echo "<td class='text-center rk-col' data-p='".$pts."' data-w-pl='{$settings->weight_mus_pls}' data-w-pt='{$settings->weight_mus_pts}' data-pp='".md5('m'.$item->music)."'></td>";
 										}
 									echo "</tr>";
 									
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>Loading...</p>";
+										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>".Lang::get("loading")."...</p>";
 											// echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";

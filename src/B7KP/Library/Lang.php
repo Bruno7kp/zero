@@ -1090,6 +1090,9 @@ class Lang
 		$messages["ch_yecli"][self::PT_BR] = "YECs";
 		$messages["ch_yecli"][self::EN_US] = "YECs";
 
+		$messages["loading"][self::PT_BR] = "Carregando";
+		$messages["loading"][self::EN_US] = "Loading";
+
 
 		return $messages;
 	}
