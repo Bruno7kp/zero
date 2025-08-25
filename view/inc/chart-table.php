@@ -223,7 +223,7 @@ if ($show_dropouts && $week > 1) {
                 <td class='rk-col'><?php echo $totalweeks; ?></td>
             </tr>
             <tr style="display:none;" class="cr-row">
-                <td colspan="10" data-cr="<?php echo base64_encode($crurl)?>"><p>Loading...</p>
+                <td colspan="10" data-cr="<?php echo base64_encode($crurl)?>"><p><?php echo Lang::get('loading');?>...</p>
                     <?php
                     //echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
                     ?>
@@ -299,7 +299,7 @@ if ($show_dropouts && $week > 1) {
                 <td><?php echo $totalweeks; ?></td>
             </tr>
             <tr style="display:none;" class="cr-row">
-                <td colspan="10" data-cr="<?php echo base64_encode($crurl)?>"><p>Loading...</p>
+                <td colspan="10" data-cr="<?php echo base64_encode($crurl)?>"><p><?php echo Lang::get('loading');?>...</p>
                     <?php
                     // echo S::chartRun($type, $cr, $this->user, $todate, $limit, $name, $artist);
                     ?>

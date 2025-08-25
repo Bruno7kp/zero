@@ -29,12 +29,12 @@ use B7KP\Library\Lang;
 						<div class="col-md-6 text-center bottomspace-md">
 							<div id="fh5co-tab-feature" class="fh5co-tab" style="display: block; width: 100%; margin: 0px;">
 								<ul class="resp-tabs-list hor_1 hidden-xs">
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab" style=""><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab" style=""><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></li>
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab" style=""><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></span></li>
+									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab"><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
+									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab"><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></li>
+									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab"><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></span></li>
 								</ul>
 								<div class="resp-tabs-container hor_1 divider-lr divider-bottom">
-									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-0" style="">
+									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-0">
 										<div class="row">
 											<div class="col-md-12 text-center">
 												<h2 class="h3">Top <?php echo Lang::get('art_x');?></h2>
@@ -354,7 +354,7 @@ use B7KP\Library\Lang;
 													$mainlink = Url::getBaseUrl()."/user/".$user->login."/charts/music/year/";
 													$muslink = Url::getBaseUrl()."/user/".$user->login."/music/";
 													$actlink = $muslink.F::fixLFM($value["music"][0]->artist);
-													$alblink = $muslink.F::fixLFM($value["music"][0]->artist)."/".F::fixLFM($value["music"][0]->music);
+													$alblink = $muslink.F::fixLFM($value["music"][0]->artist)."/_/".F::fixLFM($value["music"][0]->music);
 													$weeklink = $mainlink.$value["year"];
 													$year = $mainlink.$value["year"];
 													$music = $value["music"][0];															
@@ -399,7 +399,7 @@ use B7KP\Library\Lang;
 							<div class="row text-center bottomspace-md">
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("big_one");?></h2>
+										<h2 class="h4 topspace-md"><?php echo Lang::get("big_one");?></h2>
 										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'artist'));?>" class="btn btn-custom btn-info"><i class="ti-user"></i></a>
 										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'album'));?>" class="btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
 										<a href="<?php echo Route::url('bwp', array('login' => $user->login, 'type' => 'music'));?>" class="btn btn-custom btn-info"><i class="ti-music"></i></a>
@@ -407,7 +407,7 @@ use B7KP\Library\Lang;
 								</div>
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("big_debut");?></h2>
+										<h2 class="h4 topspace-md"><?php echo Lang::get("big_debut");?></h2>
 										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'artist'));?>" class="btn btn-custom btn-info"><i class="ti-user"></i></a>
 										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'album'));?>" class="btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
 										<a href="<?php echo Route::url('b_debuts', array('login' => $user->login, 'type' => 'music'));?>" class="btn btn-custom btn-info"><i class="ti-music"></i></a>
@@ -417,7 +417,7 @@ use B7KP\Library\Lang;
 							<div class="row text-center bottomspace-md">
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("big_num");?> #1 / Top 5 / etc</h2>
+										<h2 class="h4 topspace-md"><?php echo Lang::get("big_num");?> #1 / Top 5 / etc</h2>
 										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'artist', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i></a>
 										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
 										<a href="<?php echo Route::url('mwa', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-music"></i></a>
@@ -425,7 +425,7 @@ use B7KP\Library\Lang;
 								</div>
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("art_alb_mus");?></h2>
+										<h2 class="h4 topspace-md"><?php echo Lang::get("art_alb_mus");?></h2>
 										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
 										<a href="<?php echo Route::url('mia', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
 									</div>
@@ -434,14 +434,14 @@ use B7KP\Library\Lang;
 							<div class="row text-center bottomspace-md">
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("big_debut_art");?></h2>
+										<h2 class="h4 topspace-md"><?php echo Lang::get("big_debut_art");?></h2>
 										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'album', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="icon-vynil except"></i></a>
 										<a href="<?php echo Route::url('debuts_by_main', array('login' => $user->login, 'type' => 'music', 'rank' => 1));?>" class="btn btn-custom btn-info"><i class="ti-user"></i><i class="ti-music"></i></a>
 									</div>
 								</div>
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md">Chart points</h2>
+										<h2 class="h4 topspace-md">Chart points</h2>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
 										<a class="btn btn-info btn-custom" href=<?php echo Route::url('pts_list', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
@@ -451,7 +451,7 @@ use B7KP\Library\Lang;
 							<div class="row text-center bottomspace-md">
 								<div class="col-md-6 col-sm-12">
 									<div class="divider">
-										<h2 class="h3 topspace-md"><?php echo Lang::get("allkill");?></h2>
+										<h2 class="h4 topspace-md"><?php echo Lang::get("allkill");?></h2>
 										<a href="<?php echo Route::url('allkill', array('login' => $user->login));?>" class="btn btn-custom btn-info">ALL-KILL</a>
 									</div>
 									

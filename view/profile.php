@@ -103,12 +103,12 @@ use B7KP\Library\Lang;
 						<div class="col-md-4 col-sm-5 col-xs-12">
 							<div id="fh5co-tab-feature" class="fh5co-tab" style="display: block; width: 100%; margin: 0px;">
 								<ul class="resp-tabs-list hor_1 hidden-xs">
-									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab" style=""><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
-                                    <li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab" style=""><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></span></li>
-                                    <li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab" style=""><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></li>
+									<li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-0" role="tab"><i class="fh5co-tab-menu-icon ti-user"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('art');?></span></li>
+                                    <li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-1" role="tab"><i class="fh5co-tab-menu-icon icon-vynil except"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('alb');?></span></li>
+                                    <li class="resp-tab-item hor_1" aria-controls="hor_1_tab_item-2" role="tab"><i class="fh5co-tab-menu-icon ti-music"></i>&nbsp;<span class="hidden-sm"><?php echo Lang::get('mus');?></span></li>
 								</ul>
 								<div class="resp-tabs-container hor_1 divider-lr divider-bottom">
-									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-0" style="">
+									<div class="resp-tab-content hor_1" aria-labelledby="hor_1_tab_item-0">
 										<div class="row">
 											<div class="col-md-12">
 												<h2 class="h3">Top <?php echo Lang::get('art_x');?></h2>

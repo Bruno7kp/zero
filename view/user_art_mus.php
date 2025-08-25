@@ -225,7 +225,7 @@ use B7KP\Utils\Snippets as S;
 										}
 									echo "</tr>";
 									echo "<tr style='display:none;' class='cr-row'>";
-										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>Loading...</p>";
+										echo "<td colspan='10' data-cr='".base64_encode($crurl)."'><p>".Lang::get("loading")."...</p>";
 											// echo S::chartRun("music", $cr, $user, $todate, $mlimit, $item->music, $item->artist);
 										echo "</td>";
 									echo "</tr>";
