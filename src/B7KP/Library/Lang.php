@@ -125,7 +125,7 @@ class Lang
 		$messages["mus"][self::PT_BR] = "Música";
 		$messages["mus"][self::EN_US] = "Music";
 		$messages["mus_x"][self::PT_BR] = "Músicas";
-		$messages["mus_x"][self::EN_US] = "Musics";
+		$messages["mus_x"][self::EN_US] = "Songs";
 
 		$messages["art"][self::PT_BR] = "Artista";
 		$messages["art"][self::EN_US] = "Artist";
@@ -222,7 +222,7 @@ class Lang
 		$messages["view_in_your"][self::PT_BR] = "Ver no seu perfil";
 		$messages["view_in_your"][self::EN_US] = "View in your profile";
 
-        $messages["weights"][self::PT_BR] = "Pesos (Plays + Points)";
+        $messages["weights"][self::PT_BR] = "Pesos (Reproduções + Pontos)";
         $messages["weights"][self::EN_US] = "Weights (Plays + Points)";
 
         $messages["weight_alb_pls"][self::PT_BR] = "Peso de reproduções de álbuns";
@@ -351,7 +351,7 @@ class Lang
 		$messages["none"][self::EN_US] = "None";
 		
 		$messages["old_pass"][self::PT_BR] = "Senha atual";
-		$messages["old_pass"][self::EN_US] = "Actual password";
+		$messages["old_pass"][self::EN_US] = "Current password";
 		
 		$messages["out"][self::PT_BR] = "SAIU";
 		$messages["out"][self::EN_US] = "OUT";
@@ -389,7 +389,7 @@ class Lang
 		$messages["reset_plaques"][self::EN_US] = "Remove plaques";
 
 		$messages["reset_plaques_txt"][self::PT_BR] = "Caso queira, você pode excluir todas as placas geradas por aqui.";
-		$messages["reset_plaques_txt"][self::EN_US] = "";
+		$messages["reset_plaques_txt"][self::EN_US] = "If you want, you can delete all plaques generated in here.";
 
 		$messages["reset_weeks"][self::PT_BR] = "Para alterar o dia de início dos charts, é preciso resetar sua conta (excluir os charts já gerados). Resete sua conta";
 		$messages["reset_weeks"][self::EN_US] = "To change the starting day of the charts, you need to reset your account (excluding the charts already generated). Reset your account";
@@ -653,7 +653,7 @@ class Lang
 		$messages["pt_x"][self::PT_BR] = "Pontos";
 		$messages["pt_x"][self::EN_US] = "Points";
 
-        $messages["both_x"][self::PT_BR] = "Plays + Points";
+        $messages["both_x"][self::PT_BR] = "Reproduções + Pontos";
         $messages["both_x"][self::EN_US] = "Plays + Points";
 
 		$messages["re_def"][self::PT_BR] = "Reentrada";
@@ -689,7 +689,7 @@ class Lang
 		$messages["alr"][self::EN_US] = "You already did that?";
 		
 		$messages["art_alb_mus"][self::PT_BR] = "Artistas com mais músicas/álbuns em #1";
-		$messages["art_alb_mus"][self::EN_US] = "Artists with more musics/albums at #1";
+		$messages["art_alb_mus"][self::EN_US] = "Artists with more songs/albums at #1";
 
 		$messages["big_debut"][self::PT_BR] = "Maiores estreias (debuts)";
 		$messages["big_debut"][self::EN_US] = "Biggest debuts";
@@ -704,7 +704,7 @@ class Lang
 		$messages["big_one_cert"][self::EN_US] = "Top certified artists";
 
 		$messages["big_debut_art"][self::PT_BR] = "Artistas com mais músicas/álbuns que estrearam em #1";
-		$messages["big_debut_art"][self::EN_US] = "Artists with more musics/albums which debuted at #1";
+		$messages["big_debut_art"][self::EN_US] = "Artists with more songs/albums which debuted at #1";
 
 		$messages["by_art"][self::PT_BR] = "Por artista";
 		$messages["by_art"][self::EN_US] = "By artist";
@@ -788,16 +788,16 @@ class Lang
 		$messages["last_1_x"][self::EN_US] = "Latest #1s";
 
 		$messages["last_user"][self::PT_BR] = "Usuário do Last.fm não encontrado.";
-		$messages["last_user"][self::EN_US] = "Last.fm username not found";
+		$messages["last_user"][self::EN_US] = "Last.fm username not found.";
 
 		$messages["live_chart"][self::PT_BR] = "Acompanhe como está o chart da semana atual até o momento.";
-		$messages["live_chart"][self::EN_US] = "See a preview of the chart of this week";
+		$messages["live_chart"][self::EN_US] = "See a preview of the chart of this week.";
 
 		$messages["lw_def"][self::PT_BR] = "Posição/reproduções na semana anterior";
 		$messages["lw_def"][self::EN_US] = "Position/plays in the previous week";
 
 		$messages["mus_cert"][self::PT_BR] = "Valores para certificados de músicas";
-		$messages["mus_cert"][self::EN_US] = "Values ​​for musics certificates";
+		$messages["mus_cert"][self::EN_US] = "Values ​​for songs certificates";
 
 		$messages["need_login"][self::PT_BR] = "É preciso estar logado para realizar esta ação";
 		$messages["need_login"][self::EN_US] = "You must be logged in to perform this action";
@@ -818,18 +818,18 @@ class Lang
 		$messages["note_app"][self::EN_US] = "To login on this site again, you must use your username and password, note that the password does not need to be the same as Last.fm.";
 
 		$messages["no_alb"][self::PT_BR] = "Nenhum álbum desse artista entrou nos charts.";
-		$messages["no_alb"][self::EN_US] = "No albums";
+		$messages["no_alb"][self::EN_US] = "No albums.";
 
 		$messages["no_data"][self::PT_BR] = "Nenhum dado para mostrar aqui.";
 		$messages["no_data"][self::EN_US] = "There's no data to show here.";
 
 		$messages["no_mus"][self::PT_BR] = "Nenhuma música desse artista entrou nos charts.";
-		$messages["no_mus"][self::EN_US] = "No musics";
+		$messages["no_mus"][self::EN_US] = "No songs from this artist have entered the charts.";
 
 		$messages["not_possible"][self::PT_BR] = "Não foi possível realizar a ação";
 		$messages["not_possible"][self::EN_US] = "Something went wrong";
 
-		$messages["not_show"][self::PT_BR] = "Nada para mostrar aqui";
+		$messages["not_show"][self::PT_BR] = "Nada para mostrar aqui.";
 		$messages["not_show"][self::EN_US] = "Nothing to show here.";
 
 		$messages["not_visible"][self::PT_BR] = "Este perfil é privado.";
@@ -884,7 +884,7 @@ class Lang
 		$messages["type_new_pass"][self::EN_US] = "Type your new password.";
 
 		$messages["tied"][self::PT_BR] = "Você pode alterar as posições dos artistas/álbuns/músicas que tiverem número de reproduções iguais, basta arrastar os itens entre si e apertar em 'editar'.";
-		$messages["tied"][self::EN_US] = "You can change the positions of artists / albums / songs that have the same number of reproductions, simply drag items between them";
+		$messages["tied"][self::EN_US] = "You can change the positions of artists/albums/songs that have the same number of plays, simply drag items between them and click 'edit'.";
 
 		$messages["tip_something"][self::PT_BR] = "Digite alguma coisa";
 		$messages["tip_something"][self::EN_US] = "Tip something";
@@ -902,10 +902,10 @@ class Lang
 		$messages["use_plaque"][self::EN_US] = "Enable certifications plaques";
 
 		$messages["unique_exp"][self::PT_BR] = "Cada música/álbum conta apenas uma vez.<br/> Ex: Artista X tem quatro músicas: <br/> Música 1: 2x platina, Música 2: 5x platina, Música 3: Ouro, Música 4: 1x Diamante + 2x platina; <br/> Total de: ouros: 1, platinas: 2, diamantes: 1, soma: 4.";
-		$messages["unique_exp"][self::EN_US] = "Each song / album features only once";
+		$messages["unique_exp"][self::EN_US] = "Each song/album features only once.";
 
 		$messages["weighted_exp"][self::PT_BR] = "Cada certificado ganha um peso diferente, o valor da platina sempre será 1, o valor do ouro e do diamante será relativo ao valor da platina.<br/> Ex: Valores: Ouro = 60, Platina = 100, Diamante = 600<br/> Ex: Pesos: Ouro = 0.6, Platina = 1, Diamante = 6<br/> Ex: Artista X tem quatro músicas: <br/> Música 1: 2x platina, Música 2: 5x platina, Música 3: Ouro, Música 4: 1x Diamante + 2x platina; <br/> Total de: ouros: 0.6, platinas: 9, diamantes: 6, soma: 15.6.";
-		$messages["weighted_exp"][self::EN_US] = "Each certificate gets a different weight, platinum will always have a value of 1, the value of gold and diamond is relative to platinum value";
+		$messages["weighted_exp"][self::EN_US] = "Each certificate gets a different weight, platinum will always have a value of 1, the value of gold and diamond is relative to platinum value.";
 
 		// VALOR CERTIFICADO
 
@@ -981,7 +981,7 @@ class Lang
 		$messages["v_delete"][self::EN_US] = "Delete account: delete all data";
 
 		$messages["v_search"][self::PT_BR] = "Buscar artistas/álbuns/músicas";
-		$messages["v_search"][self::EN_US] = "Search artists/albums/musics";
+		$messages["v_search"][self::EN_US] = "Search artists/albums/songs";
 
 		$messages["v_new_faq"][self::PT_BR] = "Novo FAQ";
 		$messages["v_new_faq"][self::EN_US] = "New FAQ";
@@ -1042,10 +1042,10 @@ class Lang
 		$messages["no_noty"][self::EN_US] = "No notification found";
 
 		$messages["noty_weeks_to_update"][self::PT_BR] = "Seus charts estão desatualizados";
-		$messages["noty_weeks_to_update"][self::EN_US] = "FAQ translation";
+		$messages["noty_weeks_to_update"][self::EN_US] = "Your charts are outdated";
 
 		$messages["noty_you_weeks_to_update"][self::PT_BR] = "Você tem {0} semana(s) desatualizada(s).";
-		$messages["noty_you_weeks_to_update"][self::EN_US] = "You have {0} semanas(s) out of date.";
+		$messages["noty_you_weeks_to_update"][self::EN_US] = "You have {0} outdated week(s)";
 
 		$messages["noty_friends_requests"][self::PT_BR] = "Pedido de amizade";
 		$messages["noty_friends_requests"][self::EN_US] = "Friend request";
@@ -1079,10 +1079,10 @@ class Lang
 		$messages["update_yec"][self::EN_US] = "Update YEC";
 
 		$messages["update_yec_notice"][self::PT_BR] = "Aperte nos botões abaixo para atualizar os respectivos YECs";
-		$messages["update_yec_notice"][self::EN_US] = "";
+		$messages["update_yec_notice"][self::EN_US] = "Click below to update your respective YECs.";
 
 		$messages["yec_update_error"][self::PT_BR] = "Ocorreu algum problema ao atualizar o YEC. Tente novamente mais tarde.";
-		$messages["yec_update_error"][self::EN_US] = "Oops something went wrong.";
+		$messages["yec_update_error"][self::EN_US] = "Oops something went wrong. Try again later.";
 
 		$messages["yec_update_success"][self::PT_BR] = "YEC atualizado com sucesso.";
 		$messages["yec_update_success"][self::EN_US] = "YEC updated.";
