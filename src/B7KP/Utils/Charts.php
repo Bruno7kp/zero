@@ -770,5 +770,371 @@ class Charts
 		$debuts = $dao->run($sql);
 		return $debuts;
 	}
+
+	public function getMostWeekBeforeNo1($type) {
+		$dao = Dao::getConn();
+		switch ($type) {
+			case 'artist':
+				$sql = "SELECT 
+							ac.artist,
+							MAX(w.week) AS week_no1,
+							COUNT(*) AS weeks_before_no1
+						FROM artist_charts ac
+						JOIN week w ON ac.idweek = w.id
+						WHERE w.iduser = ".$this->user->id."
+						AND w.week <= (
+							SELECT MIN(w2.week)
+							FROM artist_charts ac2
+							JOIN week w2 ON ac2.idweek = w2.id
+							WHERE ac2.artist = ac.artist
+								AND ac2.rank = 1
+								AND w2.iduser = ".$this->user->id."
+						)
+						GROUP BY ac.artist
+						ORDER BY weeks_before_no1 DESC
+						LIMIT 50;";
+				break;
+
+			case 'album':
+				$sql = "SELECT 
+							ac.artist,
+							ac.album,
+							MAX(w.week) AS week_no1,
+							COUNT(*) AS weeks_before_no1
+						FROM album_charts ac
+						JOIN week w ON ac.idweek = w.id
+						WHERE w.iduser = ".$this->user->id."
+						AND w.week <= (
+							SELECT MIN(w2.week)
+							FROM album_charts ac2
+							JOIN week w2 ON ac2.idweek = w2.id
+							WHERE ac2.artist = ac.artist
+								AND ac2.album = ac.album
+								AND ac2.rank = 1
+								AND w2.iduser = ".$this->user->id."
+						)
+						GROUP BY ac.artist, ac.album
+						ORDER BY weeks_before_no1 DESC
+						LIMIT 50;";
+				break;
+			
+			case 'music':
+			default:
+				$sql = "SELECT 
+							mc.artist,
+							mc.music,
+							MAX(w.week) AS week_no1,
+							COUNT(*) AS weeks_before_no1
+						FROM music_charts mc
+						JOIN week w ON mc.idweek = w.id
+						WHERE w.iduser = ".$this->user->id."
+						AND w.week <= (
+							SELECT MIN(w2.week)
+							FROM music_charts mc2
+							JOIN week w2 ON mc2.idweek = w2.id
+							WHERE mc2.artist = mc.artist
+								AND mc2.music = mc.music
+								AND mc2.rank = 1
+								AND w2.iduser = ".$this->user->id."
+						)
+						GROUP BY mc.artist, mc.music
+						ORDER BY weeks_before_no1 DESC
+						LIMIT 50;";
+				break;
+		}
+		
+		$most = $dao->run($sql);
+		return $most;
+	}
+
+	public function getMaxWeeksNo1Artist($iduser) {
+    	$dao = Dao::getConn();
+
+		$sql = "
+			SELECT ac.artist, w.week
+			FROM artist_charts ac
+			JOIN week w ON ac.idweek = w.id
+			WHERE ac.rank = 1 AND w.iduser = ".$iduser."
+			ORDER BY ac.artist, w.week
+		";
+
+		$rows = $dao->run($sql);
+
+		$result = [];
+		$currentKey = null;
+		$currentStreak = 0;
+		$maxStreak = 0;
+		$prevWeek = null;
+		$lastWeekOfMaxStreak = null;
+
+		$objects = [];
+
+		foreach ($rows as $row) {
+			$key = $row->artist;
+			
+			if ($key !== $currentKey) {
+				if ($currentKey !== null) {
+					// Salva o objeto do grupo anterior
+					$artist = $currentKey;
+					$objects[] = (object)[
+						'artist' => $artist,
+						'weeks' => $maxStreak,
+						'last_week_of_streak' => $lastWeekOfMaxStreak
+					];
+				}
+				$currentKey = $key;
+				$currentStreak = 1;
+				$maxStreak = 1;
+				$prevWeek = $row->week;
+				$lastWeekOfMaxStreak = $row->week;
+			} else {
+				if ($row->week == $prevWeek + 1) {
+					$currentStreak++;
+				} else {
+					$currentStreak = 1;
+				}
+				$prevWeek = $row->week;
+				if ($currentStreak > $maxStreak) {
+					$maxStreak = $currentStreak;
+					$lastWeekOfMaxStreak = $row->week;
+				}
+			}
+		}
+
+		// Último grupo
+		if ($currentKey !== null) {
+			$artist = $currentKey;
+			$objects[] = (object)[
+				'artist' => $artist,
+				'weeks' => $maxStreak,
+				'last_week_of_streak' => $lastWeekOfMaxStreak
+			];
+		}
+
+		// Ordena por semanas descendente e pega top 50
+		usort($objects, function($a, $b) {
+			return $b->weeks <=> $a->weeks;
+		});
+
+		return array_slice($objects, 0, 50);
+	}
+
+	public function getMaxWeeksNo1Album($iduser) {
+		$dao = Dao::getConn();
+
+		$sql = "SELECT ac.artist, ac.album, w.week
+			FROM album_charts ac
+			JOIN week w ON ac.idweek = w.id
+			WHERE ac.rank = 1 AND w.iduser = ".$iduser."
+			ORDER BY ac.artist, ac.album, w.week";
+
+		$rows = $dao->run($sql);
+
+		$result = [];
+		$currentKey = null;
+		$currentStreak = 0;
+		$maxStreak = 0;
+		$prevWeek = null;
+		$lastWeekOfMaxStreak = null;
+
+		$objects = [];
+
+		foreach ($rows as $row) {
+			$key = base64_encode($row->artist) . ' - ' . $row->album;
+			
+			if ($key !== $currentKey) {
+				if ($currentKey !== null) {
+					// Salva o objeto do grupo anterior
+					list($artist, $album) = explode(' - ', $currentKey, 2);
+					$objects[] = (object)[
+						'artist' => base64_decode($artist),
+						'album' => $album,
+						'weeks' => $maxStreak,
+						'last_week_of_streak' => $lastWeekOfMaxStreak
+					];
+				}
+				$currentKey = $key;
+				$currentStreak = 1;
+				$maxStreak = 1;
+				$prevWeek = $row->week;
+				$lastWeekOfMaxStreak = $row->week;
+			} else {
+				if ($row->week == $prevWeek + 1) {
+					$currentStreak++;
+				} else {
+					$currentStreak = 1;
+				}
+				$prevWeek = $row->week;
+				if ($currentStreak > $maxStreak) {
+					$maxStreak = $currentStreak;
+					$lastWeekOfMaxStreak = $row->week;
+				}
+			}
+		}
+
+		// Último grupo
+		if ($currentKey !== null) {
+			list($artist, $album) = explode(' - ', $currentKey, 2);
+			$objects[] = (object)[
+				'artist' => base64_decode($artist),
+				'album' => $album,
+				'weeks' => $maxStreak,
+				'last_week_of_streak' => $lastWeekOfMaxStreak
+			];
+		}
+
+		// Ordena por semanas descendente e pega top 50
+		usort($objects, function($a, $b) {
+			return $b->weeks <=> $a->weeks;
+		});
+
+		return array_slice($objects, 0, 50);
+	}
+
+	public function getMaxWeeksNo1Music($iduser) {
+		$dao = Dao::getConn();
+
+		$sql = "SELECT mc.artist, mc.music, w.week
+			FROM music_charts mc
+			JOIN week w ON mc.idweek = w.id
+			WHERE mc.rank = 1 AND w.iduser = ".$iduser."
+			ORDER BY mc.artist, mc.music, w.week";
+
+		$rows = $dao->run($sql);
+
+		$result = [];
+		$currentKey = null;
+		$currentStreak = 0;
+		$maxStreak = 0;
+		$prevWeek = null;
+		$lastWeekOfMaxStreak = null;
+
+		$objects = [];
+
+		foreach ($rows as $row) {
+			$key = base64_encode($row->artist) . ' - ' . $row->music;
+			
+			if ($key !== $currentKey) {
+				if ($currentKey !== null) {
+					// Salva o objeto do grupo anterior
+					list($artist, $music) = explode(' - ', $currentKey, 2);
+					$objects[] = (object)[
+						'artist' => base64_decode($artist),
+						'music' => $music,
+						'weeks' => $maxStreak,
+						'last_week_of_streak' => $lastWeekOfMaxStreak
+					];
+				}
+				$currentKey = $key;
+				$currentStreak = 1;
+				$maxStreak = 1;
+				$prevWeek = $row->week;
+				$lastWeekOfMaxStreak = $row->week;
+			} else {
+				if ($row->week == $prevWeek + 1) {
+					$currentStreak++;
+				} else {
+					$currentStreak = 1;
+				}
+				$prevWeek = $row->week;
+				if ($currentStreak > $maxStreak) {
+					$maxStreak = $currentStreak;
+					$lastWeekOfMaxStreak = $row->week;
+				}
+			}
+		}
+
+		// Último grupo
+		if ($currentKey !== null) {
+			list($artist, $music) = explode(' - ', $currentKey, 2);
+			$objects[] = (object)[
+				'artist' => base64_decode($artist),
+				'music' => $music,
+				'weeks' => $maxStreak,
+				'last_week_of_streak' => $lastWeekOfMaxStreak
+			];
+		}
+
+		// Ordena por semanas descendente e pega top 50
+		usort($objects, function($a, $b) {
+			return $b->weeks <=> $a->weeks;
+		});
+
+		return array_slice($objects, 0, 50);
+	}
+
+
+
+
+	public function getMostConsecutiveWeeksAtNo1($type) {
+		$dao = Dao::getConn();
+		switch ($type) {
+			case 'artist':
+				return $this->getMaxWeeksNo1Artist($this->user->id);
+				break;
+
+			case 'album':
+				return $this->getMaxWeeksNo1Album($this->user->id);
+				break;
+			
+			case 'music':
+			default:
+				return $this->getMaxWeeksNo1Music($this->user->id);
+				break;
+		}
+	}
+
+	public function getMostWeeksAtNo2WithoutHittingNo1($type) {
+		$dao = Dao::getConn();
+		switch ($type) {
+			case 'artist':
+				$sql = "SELECT ac.artist, COUNT(*) AS weeks_in_2
+					FROM artist_charts ac
+					JOIN week w ON ac.idweek = w.id AND w.iduser = ".$this->user->id."
+					LEFT JOIN artist_charts ac1
+						JOIN week w1 ON ac1.idweek = w1.id AND w1.iduser = ".$this->user->id."
+						AND ac1.rank = 1
+						ON ac.artist = ac1.artist
+					WHERE ac.rank = 2
+					AND ac1.artist IS NULL
+					GROUP BY ac.artist
+					ORDER BY weeks_in_2 DESC
+					LIMIT 50;";
+				break;
+
+			case 'album':
+				$sql = "SELECT ac.artist, ac.album, COUNT(*) AS weeks_in_2
+					FROM album_charts ac
+					JOIN week w ON ac.idweek = w.id AND w.iduser = ".$this->user->id."
+					LEFT JOIN album_charts ac1
+						JOIN week w1 ON ac1.idweek = w1.id AND w1.iduser = ".$this->user->id."
+						AND ac1.rank = 1
+						ON ac.artist = ac1.artist AND ac.album = ac1.album
+					WHERE ac.rank = 2
+					AND ac1.artist IS NULL
+					GROUP BY ac.artist, ac.album
+					ORDER BY weeks_in_2 DESC
+					LIMIT 50;";
+				break;
+			
+			case 'music':
+			default:
+				$sql = "SELECT mc.artist, mc.music, COUNT(*) AS weeks_in_2
+					FROM music_charts mc
+					JOIN week w ON mc.idweek = w.id AND w.iduser = ".$this->user->id."
+					LEFT JOIN music_charts mc1
+						JOIN week w1 ON mc1.idweek = w1.id AND w1.iduser = ".$this->user->id."
+						AND mc1.rank = 1
+						ON mc.artist = mc1.artist AND mc.music = mc1.music
+					WHERE mc.rank = 2
+					AND mc1.artist IS NULL
+					GROUP BY mc.artist, mc.music
+					ORDER BY weeks_in_2 DESC
+					LIMIT 50;";
+				break;
+		}
+		$most = $dao->run($sql);
+		return $most;
+	}
 	
 }
