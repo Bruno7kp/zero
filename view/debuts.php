@@ -14,6 +14,12 @@ use B7KP\Library\Lang;
 	$top = isset($top) ? $top : "1";
 	$signal = isset($signal) ? $signal : ">=";
 	$curRoute = Route::getName(Url::getRequest());
+	$date = new DateTime($user->lfm_register);
+	$startYear = intval($date->format("Y"));
+	if ($startYear < 2000) {
+		$startYear = 2000;
+	}
+	$currentYear = intval(date("Y"));
 ?>
 	<body class="inner-min">
 		<?php $this->render("ext/menu.php");?>
@@ -67,44 +73,72 @@ use B7KP\Library\Lang;
 					<div class="row text-center">
 						<div class="col-xs-12">
 							<div class="btn-group" role="group">
-								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'artist', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
-								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'album', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
-								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'music', 'top' => $top, 'signal' => $signal));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
+								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'artist', 'top' => $top, 'signal' => $signal, 'year' => $year));?>" class="no-margin btn btn-custom btn-info"><i class="ti-user"></i></a>
+								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'album', 'top' => $top, 'signal' => $signal, 'year' => $year));?>" class="no-margin btn btn-custom btn-info"><i class="icon-vynil except"></i></a>
+								<a href="<?php echo Route::url($curRoute, array('login' => $user->login, 'type' => 'music', 'top' => $top, 'signal' => $signal, 'year' => $year));?>" class="no-margin btn btn-custom btn-info"><i class="ti-music"></i></a>
 							</div>
 						</div>
 					</div>
 					<div class="row text-center topspace-sm">
-						<div class="col-xs-12">
-							<small><?php echo Lang::get("filter_rank");?></small>
-							<br/>
-							<div class="col-xs-3 col-xs-offset-3 col-sm-2 col-sm-offset-4 col-md-1 col-md-offset-5 text-center">
-								<select class="form-control urlselector">
-								<?php 
-								$signs = array(">=", "<=", "=", ">", "<");
-								foreach ($signs as $value) 
-								{
-								?>
-								<option <?php echo ($signal == $value ? "selected='selected'" : "");?>value="<?php echo Route::url("debuts_at", array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $value));?>">
-								<?php echo $value;?>
-								</option>
-								<?php
-								}
-								?>
-								</select>
+						<div class="col-xs-12 col-md-6">
+							<div class="row" style="border-right: 1px solid #999;">
+								<div class="col-xs-12 col-md-4 col-md-offset-8 text-center">
+									<small><?php echo Lang::get("filter_year");?></small>
+								</div>
+								<div class="col-xs-4 col-xs-offset-4 col-sm-2 col-sm-offset-5 col-md-4 col-md-offset-8 text-center">
+									<select class="form-control urlselector">
+										<option value="<?php echo Route::url(str_replace("_year", "", $curRoute), array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $signal));?>"><?php echo Lang::get("all");?></option>
+									<?php 
+									while ($startYear <= $currentYear) 
+									{
+									?>
+									<option <?php echo ($startYear == $year ? "selected='selected'" : "");?>value="<?php echo Route::url(strpos($curRoute, "_year") !== false ? $curRoute : $curRoute."_year", array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $signal, 'year' => $startYear));?>">
+									<?php echo $startYear;?>
+									</option>
+									<?php
+										$startYear++;
+									}
+									?>
+									</select>
+								</div>
 							</div>
-							<div class="col-xs-3 col-sm-2 col-md-1">
-								<select class="form-control urlselector">
-								<?php 
-								for ($i=0; $i < $limit; $i++) 
-								{ 
-								?>
-								<option <?php echo ($top == $i+1 ? "selected='selected'" : "");?>value="<?php echo Route::url("debuts_at", array('login' => $user->login, 'type' => $type, 'top' => ($i+1), 'signal' => $signal));?>">
-								<?php echo $i+1;?>
-								</option>
-								<?php
-								}
-								?>
-								</select>
+						</div>
+						<div class="col-xs-12 col-md-6">
+							<div class="row">
+								<div class="col-xs-12 col-md-4 text-center">
+									<small><?php echo Lang::get("filter_rank");?></small>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-3 col-xs-offset-3 col-sm-2 col-sm-offset-4 col-md-offset-0 col-md-2 text-center">
+									<select class="form-control urlselector">
+									<?php 
+									$signs = array(">=", "<=", "=", ">", "<");
+									foreach ($signs as $value) 
+									{
+									?>
+									<option <?php echo ($signal == $value ? "selected='selected'" : "");?>value="<?php echo Route::url(strpos($curRoute, "at") !== false ? $curRoute : str_replace("b_debuts", "debuts_at", $curRoute), array('login' => $user->login, 'type' => $type, 'top' => $top, 'signal' => $value, 'year' => $year));?>">
+									<?php echo $value;?>
+									</option>
+									<?php
+									}
+									?>
+									</select>
+								</div>
+								<div class="col-xs-3 col-sm-2 col-md-2">
+									<select class="form-control urlselector">
+									<?php 
+									for ($i=0; $i < $limit; $i++) 
+									{ 
+									?>
+									<option <?php echo ($top == $i+1 ? "selected='selected'" : "");?>value="<?php echo Route::url(strpos($curRoute, "at") !== false ? $curRoute : str_replace("b_debuts", "debuts_at", $curRoute), array('login' => $user->login, 'type' => $type, 'top' => ($i+1), 'signal' => $signal, 'year' => $year));?>">
+									<?php echo $i+1;?>
+									</option>
+									<?php
+									}
+									?>
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -141,13 +175,13 @@ use B7KP\Library\Lang;
 									<td class="text-center"><?php echo $key+1;?></td>
 									<td>
 										<a href=<?php echo $itemurl.F::fixLFM($value->artist).$rest;?>>
-										<?php echo $value->$type; ?>
+										<?php echo htmlentities($value->$type); ?>
 										</a>
 									</td>
 									<?php if($type != "artist") { ?>
 									<td>
 										<a href=<?php echo $itemurl.F::fixLFM($value->artist);?>>
-										<?php echo $value->artist; ?>
+										<?php echo htmlentities($value->artist); ?>
 										</a>
 									</td>
 									<?php } ?>

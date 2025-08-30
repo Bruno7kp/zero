@@ -340,7 +340,7 @@ class ChartController extends Controller
     /**
      * @Route(name=bwp|route=/user/{login}/charts/{type}/overall/bwp)
      */
-    public function biggestWeeklyPlaycounts($login, $type)
+    public function biggestWeeklyPlaycounts($login, $type, $year = null)
     {
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
@@ -348,13 +348,15 @@ class ChartController extends Controller
         $entity = "B7KP\Entity\\" . ucfirst($type) . "_charts";
         $table = $type . "_charts";
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+        $filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
         $limit = substr($type, 0, 3) . "_limit";
-        $biggest = $this->factory->findSql($entity, "SELECT t.* FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . " ORDER BY t.playcount DESC, w.week ASC LIMIT 0, 100");
+        $biggest = $this->factory->findSql($entity, "SELECT t.* FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " ORDER BY t.playcount DESC, w.week ASC LIMIT 0, 100");
         $vars = array
             (
             "user" => $user,
             "list" => $biggest,
             "type" => $type,
+            "year" => $year,
             "limit" => $settings->$limit,
             "lfm_bg" => $bgimage,
             "lfm_image" => $this->getUserBg($user, true),
@@ -363,9 +365,17 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=bwp_year|route=/user/{login}/charts/{type}/overall/bwp/{year})
+     */
+    public function biggestWeeklyPlaycountsByYear($login, $type, $year)
+    {
+        return $this->biggestWeeklyPlaycounts($login, $type, $year);
+    }
+
+    /**
      * @Route(name=bwp_at|route=/user/{login}/charts/{type}/overall/bwp/{signal}/{top})
      */
-    public function biggestWeeklyPlaycountsAt($login, $type, $signal, $top)
+    public function biggestWeeklyPlaycountsAt($login, $type, $signal, $top, $year = null)
     {
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
@@ -375,13 +385,15 @@ class ChartController extends Controller
         $table = $type . "_charts";
         $top = intval($top) > 1 ? intval($top) : 1;
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
+        $filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
         $limit = substr($type, 0, 3) . "_limit";
-        $biggest = $this->factory->findSql($entity, "SELECT t.* FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . " AND t.rank " . $signal . " " . $top . " ORDER BY t.playcount DESC, w.week ASC");
+        $biggest = $this->factory->findSql($entity, "SELECT t.* FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.rank " . $signal . " " . $top . " ORDER BY t.playcount DESC, w.week ASC");
         $vars = array
             (
             "user" => $user,
             "list" => $biggest,
             "type" => $type,
+            "year" => $year,
             "top" => $top,
             "signal" => $signal,
             "limit" => $settings->$limit,
@@ -392,9 +404,17 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=bwp_at_year|route=/user/{login}/charts/{type}/overall/bwp/{signal}/{top}/{year})
+     */
+    public function biggestWeeklyPlaycountsAtByYear($login, $type, $signal, $top, $year)
+    {
+        return $this->biggestWeeklyPlaycountsAt($login, $type, $signal, $top, $year);
+    }
+
+    /**
      * @Route(name=mwa|route=/user/{login}/charts/{type}/overall/mwa/top/{rank})
      */
-    public function moreWeeksAt($login, $type, $rank)
+    public function moreWeeksAt($login, $type, $rank, $year = null)
     {
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
@@ -412,13 +432,16 @@ class ChartController extends Controller
         $dao = Dao::getConn();
         $group = "";
         if ($type != "artist"): $group .= ", t." . $type;endif;
-        $biggest = $dao->run("SELECT t.*, count(w.week) as total FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . " AND t.rank <= " . $rank . " GROUP BY t.artist" . $group . " ORDER BY total DESC, w.week ASC");
+        $filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
+        $dao->run("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+        $biggest = $dao->run("SELECT t.*, count(w.week) as total FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.rank <= " . $rank . " GROUP BY t.artist" . $group . " ORDER BY total DESC, w.week ASC");
         $vars = array
             (
             "user" => $user,
             "list" => $biggest,
             "type" => $type,
             "rank" => $rank,
+            "year" => $year,
             "settings" => $settings,
             "lfm_bg" => $bgimage,
             "lfm_image" => $this->getUserBg($user, true),
@@ -427,9 +450,17 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=mwa_year|route=/user/{login}/charts/{type}/overall/mwa/top/{rank}/{year})
+     */
+    public function moreWeeksAtYear($login, $type, $rank, $year)
+    {
+        return $this->moreWeeksAt($login, $type, $rank, $year);
+    }
+
+    /**
      * @Route(name=mia|route=/user/{login}/charts/artist/overall/more/{type}/at/{rank})
      */
-    public function moreItemsAt($login, $type, $rank)
+    public function moreItemsAt($login, $type, $rank, $year = null)
     {
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
@@ -447,22 +478,34 @@ class ChartController extends Controller
             $rank = $settings->$limit;
         }
         $table = $type . "_charts";
+        $filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
         $dao = Dao::getConn();
 
         $col = "t." . $type;
-        $biggest = $dao->run("SELECT t.*, count(" . $col . ") as total, COUNT(DISTINCT " . $col . ") AS uniques FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . " AND t.rank <= " . $rank . " GROUP BY t.artist ORDER BY uniques DESC, total DESC");
+        $dao->run("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+        $biggest = $dao->run("SELECT t.*, count(" . $col . ") as total, COUNT(DISTINCT " . $col . ") AS uniques FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.rank <= " . $rank . " GROUP BY t.artist ORDER BY uniques DESC, total DESC");
         $vars = array
             (
             "user" => $user,
             "list" => $biggest,
             "type" => $type,
             "rank" => $rank,
+            "year" => $year,
             "settings" => $settings,
             "lfm_bg" => $bgimage,
             "lfm_image" => $this->getUserBg($user, true),
         );
         $this->render("mia.php", $vars);
     }
+
+    /**
+     * @Route(name=mia_year|route=/user/{login}/charts/artist/overall/more/{type}/at/{rank}/{year})
+     */
+    public function moreItemsAtYear($login, $type, $rank, $year)
+    {
+        return $this->moreItemsAt($login, $type, $rank, $year);
+    }
+
 
     /**
      * @Route(name=editwkchart|route=/editweek/{id}/{type})
@@ -511,15 +554,16 @@ class ChartController extends Controller
     /**
      * @Route(name=allkill|route=/user/{login}/charts/allkill)
      */
-    public function allKill($login)
+    public function allKill($login, $year = null)
     {
         $user = $this->isValidUser($login);
         $chart = new Charts($this->factory, $user);
-        $allkill = $chart->getAllKill();
+        $allkill = $chart->getAllKill($year);
         $vars = array
             (
             "user" => $user,
             "allkill" => $allkill,
+            "year" => $year,
             "lfm_bg" => $this->getUserBg($user),
             "lfm_image" => $this->getUserBg($user, true),
         );
@@ -528,14 +572,22 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=allkill_year|route=/user/{login}/charts/allkill/{year})
+     */
+    public function allKillYear($login, $year)
+    {
+        return $this->allKill($login, $year);
+    }
+
+    /**
      * @Route(name=b_debuts|route=/user/{login}/charts/{type}/overall/debuts)
      */
-    public function biggestDebuts($login, $type)
+    public function biggestDebuts($login, $type, $year = null)
     {
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
         $chart = new Charts($this->factory, $user);
-        $debuts = $chart->getBiggestDebuts($type, "", "playcount DESC");
+        $debuts = $chart->getBiggestDebuts($type, "", "playcount DESC", "", $year);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
@@ -543,6 +595,7 @@ class ChartController extends Controller
             "user" => $user,
             "list" => $debuts,
             "type" => $type,
+            "year" => $year,
             "limit" => $settings->$limit,
             "lfm_bg" => $this->getUserBg($user),
             "lfm_image" => $this->getUserBg($user, true),
@@ -552,9 +605,17 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=b_debuts_year|route=/user/{login}/charts/{type}/overall/debuts-year/{year})
+     */
+    public function biggestDebutsYear($login, $type, $year)
+    {
+        return $this->biggestDebuts($login, $type, $year);
+    }
+
+    /**
      * @Route(name=debuts_at|route=/user/{login}/charts/{type}/overall/debuts/{signal}/{top})
      */
-    public function biggestDebutsAt($login, $type, $signal, $top)
+    public function biggestDebutsAt($login, $type, $signal, $top, $year = null)
     {
         $user = $this->isValidUser($login);
         $signal = $this->isValidSignal($signal);
@@ -562,7 +623,7 @@ class ChartController extends Controller
         $top = intval($top) > 0 ? intval($top) : 1;
         $chart = new Charts($this->factory, $user);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top, "playcount DESC");
+        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top, "playcount DESC", "", $year);
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
             (
@@ -571,6 +632,7 @@ class ChartController extends Controller
             "type" => $type,
             "top" => $top,
             "signal" => $signal,
+            "year" => $year,
             "limit" => $settings->$limit,
             "lfm_bg" => $this->getUserBg($user),
             "lfm_image" => $this->getUserBg($user, true),
@@ -580,9 +642,17 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=debuts_at_year|route=/user/{login}/charts/{type}/overall/debuts-year/{signal}/{top}/{year})
+     */
+    public function biggestDebutsAtYear($login, $type, $signal, $top, $year)
+    {
+        return $this->biggestDebutsAt($login, $type, $signal, $top, $year);
+    }
+
+    /**
      * @Route(name=debuts_by_main|route=/user/{login}/charts/{type}/overall/awm/debuts)
      */
-    public function biggestDebutsAtByArtist($login, $type)
+    public function biggestDebutsAtByArtist($login, $type, $year = null)
     {
         $user = $this->isValidUser($login);
         $signal = "=";
@@ -592,7 +662,7 @@ class ChartController extends Controller
         $this->isValidType($type, $user);
         $chart = new Charts($this->factory, $user);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,");
+        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,", $year);
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
             (
@@ -601,6 +671,7 @@ class ChartController extends Controller
             "type" => $type,
             "top" => $top,
             "signal" => $signal,
+            "year" => $year,
             "limit" => $settings->$limit,
             "lfm_bg" => $this->getUserBg($user),
             "lfm_image" => $this->getUserBg($user, true),
@@ -610,9 +681,17 @@ class ChartController extends Controller
     }
 
     /**
+     * @Route(name=debuts_by_main_year|route=/user/{login}/charts/{type}/overall/awm/debuts-year/{year})
+     */
+    public function biggestDebutsAtByArtistYear($login, $type, $year)
+    {
+        return $this->biggestDebutsAtByArtist($login, $type, $year);
+    }
+
+    /**
      * @Route(name=debuts_by|route=/user/{login}/charts/{type}/overall/awm/debuts/{signal}/{top})
      */
-    public function biggestDebutsAtByArtistAtTop($login, $type, $signal, $top)
+    public function biggestDebutsAtByArtistAtTop($login, $type, $signal, $top, $year = null)
     {
         $user = $this->isValidUser($login);
         $signal = $this->isValidSignal($signal);
@@ -621,7 +700,7 @@ class ChartController extends Controller
         $top = intval($top) > 0 ? intval($top) : 1;
         $chart = new Charts($this->factory, $user);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,");
+        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,", $year);
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
             (
@@ -630,12 +709,21 @@ class ChartController extends Controller
             "type" => $type,
             "top" => $top,
             "signal" => $signal,
+            "year" => $year,
             "limit" => $settings->$limit,
             "lfm_bg" => $this->getUserBg($user),
             "lfm_image" => $this->getUserBg($user, true),
         );
 
         $this->render("debutsbyartist.php", $vars);
+    }
+
+    /**
+     * @Route(name=debuts_by_year|route=/user/{login}/charts/{type}/overall/awm/debuts-year/{signal}/{top}/{year})
+     */
+    public function biggestDebutsAtByArtistAtTopYear($login, $type, $signal, $top, $year)
+    {
+        return $this->biggestDebutsAtByArtistAtTop($login, $type, $signal, $top, $year);
     }
 
     /**
@@ -666,22 +754,31 @@ class ChartController extends Controller
     /**
      * @Route(name=pts_list|route=/user/{login}/charts/points/{type}/)
      */
-    public function pointsList($login, $type)
+    public function pointsList($login, $type, $year = null)
     {
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
         $chart = new Certified($user, $this->factory);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $list = $chart->getChartPointsList($type);
+        $list = $chart->getChartPointsList($type, $year);
         $vars = array
             (
             "user" => $user,
             "list" => $list,
             "type" => $type,
+            "year" => $year,
             "lfm_bg" => $this->getUserBg($user),
             "lfm_image" => $this->getUserBg($user, true),
         );
         $this->render("points.php", $vars);
+    }
+
+    /**
+     * @Route(name=pts_list_year|route=/user/{login}/charts/points/{type}/{year})
+     */
+    public function pointsListYear($login, $type, $year)
+    {
+        return $this->pointsList($login, $type, $year);
     }
 
     protected function checkAccess()

@@ -713,19 +713,21 @@ class Charts
 		return $html;
 	}
 
-	public function getAllKill()
+	public function getAllKill($year = null)
 	{
 		$dao = Dao::getConn();
-		$sql = "SELECT w.id as idweek, w.week as week, a.artist as artist, b.album as album, m.music as music FROM artist_charts a, album_charts b, music_charts m, week w, user u WHERE a.idweek = b.idweek AND a.idweek = m.idweek AND a.rank = 1 AND b.rank=1 AND m.rank=1 AND a.artist = b.artist AND a.artist=m.artist AND a.idweek = w.id AND b.idweek = w.id AND m.idweek = w.id AND w.iduser = u.id AND u.id = ".$this->user->id." ORDER BY week";
+		$filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
+		$sql = "SELECT w.id as idweek, w.week as week, a.artist as artist, b.album as album, m.music as music FROM artist_charts a, album_charts b, music_charts m, week w, user u WHERE a.idweek = b.idweek AND a.idweek = m.idweek".$filter." AND a.rank = 1 AND b.rank=1 AND m.rank=1 AND a.artist = b.artist AND a.artist=m.artist AND a.idweek = w.id AND b.idweek = w.id AND m.idweek = w.id AND w.iduser = u.id AND u.id = ".$this->user->id." ORDER BY week";
 		$allkill = $dao->run($sql);
 		return $allkill;
 	}
 
-	public function getBiggestDebuts($type, $and = "", $order = "", $select = "")
+	public function getBiggestDebuts($type, $and = "", $order = "", $select = "", $year = null)
 	{
 		$dao = Dao::getConn();
 		$and = (empty($and) ? "" : " AND ".$type."_charts.".$and);
 		$order = (empty($order) ? "" : " ORDER BY ".$type."_charts.".$order);
+		$filter = intval($year) > 0 ? " AND YEAR(week.to_day) = " . intval($year) : "";
 		switch ($type) {
 			case 'music':
 				$sql = "SELECT ".$select." music_charts.*, week.week from week, user, music_charts INNER JOIN 
@@ -735,7 +737,7 @@ class Charts
 						ON 
 						   music_charts.music=table2.music
 						   AND music_charts.artist=table2.artist
-						WHERE week.id = music_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id." 
+						WHERE week.id = music_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id.$filter." 
 						";
 				break;
 
@@ -747,7 +749,7 @@ class Charts
 						ON 
 						   album_charts.album=table2.album
 						   AND album_charts.artist=table2.artist
-						WHERE week.id = album_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id."   
+						WHERE week.id = album_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id.$filter."   
 						";
 				break;
 			
@@ -758,11 +760,13 @@ class Charts
 						) table2
 						ON 
 						   artist_charts.artist=table2.artist
-						WHERE week.id = artist_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id."   
+						WHERE week.id = artist_charts.idweek AND week.week = table2.debut AND week.iduser = user.id AND user.id = ".$this->user->id.$filter."   
 						";
 				break;
 		}
 		$sql .= $and.$order;
+		
+        $dao->run("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
 		$debuts = $dao->run($sql);
 		return $debuts;
 	}

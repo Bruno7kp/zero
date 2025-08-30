@@ -17,15 +17,26 @@ switch ($curroute) {
 	case 'yec_chart':
 	case 'live_charts':
 	case 'bwp':
+	case 'bwp_year':
 	case 'bwp_at':
+	case 'bwp_at_year':
 	case 'mwa':
+	case 'mwa':
+	case 'mwa_year':
 	case 'mia':
+	case 'mia_year':
 	case 'allkill':
+	case 'allkill_year':
 	case 'b_debuts':
+	case 'b_debuts_year':
 	case 'debuts_at':
+	case 'debuts_at_year':
 	case 'debuts_by':
+	case 'debuts_by_year':
 	case 'debuts_by_main':
+	case 'debuts_by_main_year':
 	case 'pts_list':
+	case 'pts_list_year':
 	case 'user_cert_art':
 	case 'plaque_gallery':
 		$a_char = "active";

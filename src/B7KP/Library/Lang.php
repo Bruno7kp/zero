@@ -299,6 +299,9 @@ class Lang
 		$messages["filter_rank"][self::PT_BR] = "Filtre por posição";
 		$messages["filter_rank"][self::EN_US] = "Filter by position";
 
+		$messages["filter_year"][self::PT_BR] = "Filtre por ano";
+		$messages["filter_year"][self::EN_US] = "Filter by year";
+
 		$messages["filter"][self::PT_BR] = "Filtro";
 		$messages["filter"][self::EN_US] = "Filter";
 
@@ -684,6 +687,9 @@ class Lang
 
 		$messages["allkill"][self::PT_BR] = "Artistas que ficaram em #1 em todos os charts na mesma semana";
 		$messages["allkill"][self::EN_US] = "All-kill";
+
+		$messages["all"][self::PT_BR] = "Todos";
+		$messages["all"][self::EN_US] = "All";
 		
 		$messages["alr"][self::PT_BR] = "Já fez isso?";
 		$messages["alr"][self::EN_US] = "You already did that?";
