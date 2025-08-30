@@ -56,12 +56,12 @@ use B7KP\Library\Lang;
 								</div>
 								<div class="col-xs-4 col-xs-offset-4 col-sm-2 col-sm-offset-5 col-md-2 col-md-offset-5 text-center">
 									<select class="form-control urlselector">
-										<option value="<?php echo Route::url(str_replace("_year", "", $curRoute), array('login' => $user->login, 'type' => $type, 'rank' => $rank));?>"><?php echo Lang::get("all");?></option>
+										<option value="<?php echo Route::url(str_replace("_year", "", $curRoute), array('login' => $user->login, 'type' => $type));?>"><?php echo Lang::get("all");?></option>
 									<?php 
 									while ($startYear <= $currentYear) 
 									{
 									?>
-									<option <?php echo ($startYear == $year ? "selected='selected'" : "");?>value="<?php echo Route::url("pts_list_year", array('login' => $user->login, 'type' => $type, 'rank' => $rank, 'year' => $startYear));?>">
+									<option <?php echo ($startYear == $year ? "selected='selected'" : "");?>value="<?php echo Route::url("pts_list_year", array('login' => $user->login, 'type' => $type, 'year' => $startYear));?>">
 									<?php echo $startYear;?>
 									</option>
 									<?php
