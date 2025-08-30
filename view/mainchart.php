@@ -454,7 +454,32 @@ use B7KP\Library\Lang;
 										<h2 class="h4 topspace-md"><?php echo Lang::get("allkill");?></h2>
 										<a href="<?php echo Route::url('allkill', array('login' => $user->login));?>" class="btn btn-custom btn-info">ALL-KILL</a>
 									</div>
-									
+								</div>
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h4 topspace-md"><?php echo Lang::get("weeks_to_no1");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_to_no1', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_to_no1', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_to_no1', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+							</div>
+							<div class="row text-center bottomspace-md">
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h4 topspace-md"><?php echo Lang::get("weeks_sequel_no1");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_sequel_no1', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_sequel_no1', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_sequel_no1', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12">
+									<div class="divider">
+										<h2 class="h4 topspace-md"><?php echo Lang::get("weeks_peak_no2");?></h2>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_peak_no2', array('login'=> $user->login,'type' => 'artist'));?>><i class="ti-user"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_peak_no2', array('login'=> $user->login,'type' => 'album'));?>><i class="icon-vynil except"></i></a>
+										<a class="btn btn-info btn-custom" href=<?php echo Route::url('wks_peak_no2', array('login'=> $user->login,'type' => 'music'));?>><i class="ti-music"></i></a>
+									</div>
 								</div>
 							</div>
 						</div>

@@ -674,6 +674,9 @@ class Lang
 		$messages["wk_x"][self::PT_BR] = "Semanas";
 		$messages["wk_x"][self::EN_US] = "Weeks";
 
+		$messages["wk_to_pk"][self::PT_BR] = "Semanas até o #1";
+		$messages["wk_to_pk"][self::EN_US] = "Weeks to #1";
+
 		$messages["wk_min"][self::PT_BR] = "Sem.";
 		$messages["wk_min"][self::EN_US] = "Wks";
 
@@ -711,6 +714,18 @@ class Lang
 
 		$messages["big_debut_art"][self::PT_BR] = "Artistas com mais músicas/álbuns que estrearam em #1";
 		$messages["big_debut_art"][self::EN_US] = "Artists with more musics/albums which debuted at #1";
+
+		$messages["weeks_to_no1"][self::PT_BR] = "Mais semanas até chegar ao #1";
+		$messages["weeks_to_no1"][self::EN_US] = "More weeks to reach #1";
+
+		$messages["weeks_sequel_no1"][self::PT_BR] = "Mais semanas consecutivas em #1";
+		$messages["weeks_sequel_no1"][self::EN_US] = "More consecutive weeks at #1";
+
+		$messages["weeks_sequel"][self::PT_BR] = "Semanas consecutivas";
+		$messages["weeks_sequel"][self::EN_US] = "Consecutive weeks";
+
+		$messages["weeks_peak_no2"][self::PT_BR] = "Mais semanas com pico #2";
+		$messages["weeks_peak_no2"][self::EN_US] = "More weeks with peak #2";
 
 		$messages["by_art"][self::PT_BR] = "Por artista";
 		$messages["by_art"][self::EN_US] = "By artist";
@@ -1042,6 +1057,12 @@ class Lang
 		
 		$messages["v_cache"][self::PT_BR] = "Adicionado cache para as páginas de charts semanais.";
         $messages["v_cache"][self::EN_US] = "Added cache for weekly chart pages.";
+
+		$messages["v_new_stats"][self::PT_BR] = "Adicionado novas estatísticas.";
+        $messages["v_new_stats"][self::EN_US] = "Added new stats.";
+
+		$messages["v_sort"][self::PT_BR] = "Adicionada ordenação para as listas de álbuns/músicas dos artistas.";
+        $messages["v_sort"][self::EN_US] = "Added sorting for the artists albums/musics lists.";
 		// noty
 
 		$messages["no_noty"][self::PT_BR] = "Nenhuma notificação encontrada";

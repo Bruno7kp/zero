@@ -781,6 +781,69 @@ class ChartController extends Controller
         return $this->pointsList($login, $type, $year);
     }
 
+    /**
+     * @Route(name=wks_to_no1|route=/user/{login}/charts/wtn1/{type})
+     */
+    public function weeksToNo1($login, $type)
+    {
+        $user = $this->isValidUser($login);
+        $this->isValidType($type, $user);
+        $chart = new Charts($this->factory, $user);
+        $list = $chart->getMostWeekBeforeNo1($type);
+        $vars = array
+            (
+            "user" => $user,
+            "list" => $list,
+            "type" => $type,
+            "lfm_bg" => $this->getUserBg($user),
+            "lfm_image" => $this->getUserBg($user, true),
+        );
+
+        return $this->render("wtn1.php", $vars);
+    }
+
+    /**
+     * @Route(name=wks_sequel_no1|route=/user/{login}/charts/wsn1/{type})
+     */
+    public function weeksSequelNo1($login, $type)
+    {
+        $user = $this->isValidUser($login);
+        $this->isValidType($type, $user);
+        $chart = new Charts($this->factory, $user);
+        $list = $chart->getMostConsecutiveWeeksAtNo1($type);
+        $vars = array
+            (
+            "user" => $user,
+            "list" => $list,
+            "type" => $type,
+            "lfm_bg" => $this->getUserBg($user),
+            "lfm_image" => $this->getUserBg($user, true),
+        );
+
+        return $this->render("wsn1.php", $vars);
+    }
+
+    /**
+     * @Route(name=wks_peak_no2|route=/user/{login}/charts/wpn2/{type})
+     */
+    public function weeksAtPeak2($login, $type)
+    {
+        $user = $this->isValidUser($login);
+        $this->isValidType($type, $user);
+        $chart = new Charts($this->factory, $user);
+        $list = $chart->getMostWeeksAtNo2WithoutHittingNo1($type);
+        $vars = array
+            (
+            "user" => $user,
+            "list" => $list,
+            "type" => $type,
+            "lfm_bg" => $this->getUserBg($user),
+            "lfm_image" => $this->getUserBg($user, true),
+        );
+
+        return $this->render("wpn2.php", $vars);
+    }
+
     protected function checkAccess()
     {
         if (UserSession::getUser($this->factory) == false) {

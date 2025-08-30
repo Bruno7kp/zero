@@ -39,6 +39,9 @@ switch ($curroute) {
 	case 'pts_list_year':
 	case 'user_cert_art':
 	case 'plaque_gallery':
+	case 'wks_to_no1':
+	case 'wks_sequel_no1':
+	case 'wks_peak_no2':
 		$a_char = "active";
 		break;
 

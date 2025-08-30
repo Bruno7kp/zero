@@ -42,8 +42,8 @@ class App
     {
         self::$name = "ZERO";
         self::$author = "Bruno7kp";
-        self::$version = "0.13.000";
-        self::$updatedate = "2018.09.15";
+        self::$version = "0.14.000";
+        self::$updatedate = "2025.08.30";
 
         self::$environment = getenv("ENV");
         self::$db = getenv("DB");
