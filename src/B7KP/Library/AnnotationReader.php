@@ -7,7 +7,7 @@ use B7KP\Utils\Functions;
 
 class AnnotationReader implements iCache
 {
-    const CACHE_VERSION = '1.0.4'; // Altere este valor para forçar atualização do cache
+    const CACHE_VERSION = '1.0.5-c'; // Altere este valor para forçar atualização do cache
 
     private $reflection;
     private $scan;

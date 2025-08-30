@@ -11,6 +11,13 @@ use B7KP\Library\Lang;
 <?php
 	$head = array("title" => "{$user->login} Charts - All-Kill");
 	$this->render("ext/head.php", $head);
+	$curRoute = Route::getName(Url::getRequest());
+	$date = new DateTime($user->lfm_register);
+	$startYear = intval($date->format("Y"));
+	if ($startYear < 2000) {
+		$startYear = 2000;
+	}
+	$currentYear = intval(date("Y"));
 ?>
 	<body class="inner-min">
 		<?php $this->render("ext/menu.php");?>
@@ -29,6 +36,31 @@ use B7KP\Library\Lang;
 						<div class="col-xs-12">
 							<h3 class="h3">ALL-KILL</h3>
 							<p><?php echo Lang::get('allkill');?></p>
+						</div>
+					</div>
+					<div class="row bottomspace-sm">
+						<div class="col-xs-12">
+							<div class="row">
+								<div class="col-xs-12 text-center">
+									<small><?php echo Lang::get("filter_year");?></small>
+								</div>
+								<div class="col-xs-4 col-xs-offset-4 col-sm-2 col-sm-offset-5 col-md-2 col-md-offset-5 text-center">
+									<select class="form-control urlselector">
+										<option value="<?php echo Route::url("allkill", array('login' => $user->login, 'type' => $type, 'rank' => $rank));?>"><?php echo Lang::get("all");?></option>
+									<?php 
+									while ($startYear <= $currentYear) 
+									{
+									?>
+									<option <?php echo ($startYear == $year ? "selected='selected'" : "");?>value="<?php echo Route::url("allkill_year", array('login' => $user->login, 'type' => $type, 'rank' => $rank, 'year' => $startYear));?>">
+									<?php echo $startYear;?>
+									</option>
+									<?php
+										$startYear++;
+									}
+									?>
+									</select>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="row">
@@ -60,17 +92,17 @@ use B7KP\Library\Lang;
 									<td class="text-center"><?php echo $key+1;?></td>
 									<td>
 										<a href=<?php echo $itemurl.F::fixLFM($value->artist);?>>
-										<?php echo $value->artist; ?>
+										<?php echo htmlentities($value->artist); ?>
 										</a>
 									</td>
 									<td>
 										<a href=<?php echo $itemurl.F::fixLFM($value->artist)."/".F::fixLFM($value->album);?>>
-										<?php echo $value->album; ?>
+										<?php echo htmlentities($value->album); ?>
 										</a>
 									</td>
 									<td>
 										<a href=<?php echo $itemurl.F::fixLFM($value->artist)."/_/".F::fixLFM($value->music);?>>
-										<?php echo $value->music; ?>
+										<?php echo htmlentities($value->music); ?>
 										</a>
 									</td>
 									<td class="text-center"><?php echo "<a href='".$url."'>".$value->week."</a>"; ?></td>
