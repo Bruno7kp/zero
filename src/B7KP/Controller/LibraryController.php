@@ -75,8 +75,9 @@ class LibraryController extends Controller
 			{
 				$vars = array("from" => $from_day, "to" => $to_day);
 			}
-			$list = $lfm->$fn($vars);
-			$this->render("live_.php", array("week" => ($weeks[0]->week + 1), "user" => $user,"list" => $list, "type" => $type, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
+			$list = [];
+			//$list = $lfm->$fn($vars);
+			$this->render("live_.php", array("time" => $vars,"week" => ($weeks[0]->week + 1), "user" => $user,"list" => $list, "type" => $type, "lfm_bg" => $this->getUserBg($user), "lfm_image" => $this->getUserBg($user, true)));
 		}
 	}
 
