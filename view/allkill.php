@@ -51,7 +51,7 @@ use B7KP\Library\Lang;
 									while ($startYear <= $currentYear) 
 									{
 									?>
-									<option <?php echo ($startYear == $year ? "selected='selected'" : "");?>value="<?php echo Route::url("allkill_year", array('login' => $user->login, 'type' => $type, 'rank' => $rank, 'year' => $startYear));?>">
+									<option <?php echo ($startYear == $year ? "selected='selected'" : "");?>value="<?php echo Route::url("allkill_year", array('login' => $user->login, 'year' => $startYear));?>">
 									<?php echo $startYear;?>
 									</option>
 									<?php

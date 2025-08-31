@@ -33,14 +33,6 @@ class ChartController extends Controller
             if (!$visibility) {
                 $this->redirectToRoute("profile", array("login" => $user->login));
             }
-            $lfm = new LastFm();
-            //$last = $lfm->setUser($user->login)->getUserInfo();
-            //$acts     = $lfm->getUserTopArtist(array("limit" => 1, "period" => "overall"));
-            $bgimage = false;
-            $acts = array();
-            if (isset($acts[0])):
-                $bgimage = $acts[0]["images"]["mega"];
-            endif;
             $numberones = array();
             $cond = array("iduser" => $user->id);
             $weeks = $this->factory->find("B7KP\Entity\Week", $cond, "week DESC", "0, 5");
@@ -77,7 +69,7 @@ class ChartController extends Controller
                 "years" => $numberonesy,
                 "settings" => $settings,
                 "user" => $user,
-                "lfm_bg" => $bgimage,
+                "lfm_bg" => false,
                 "lfm_image" => "/web/img/default-art.png",
             );
             $this->render("mainchart.php", $var);
@@ -292,6 +284,10 @@ class ChartController extends Controller
                 // Combine both to generate a unique ETag for a unique content
                 // Specification says ETag should be specified within double quotes
                 $etag = '"' . $content_last_mod_time . '.' . sha1(serialize($settings)) . '"';
+
+                // Define a valid Expires date (current time + 1 year)
+                $expires_time = time() + 31536000;
+                header('Expires: ' . gmdate('D, d M Y H:i:s', $expires_time) . ' GMT');
 
                 // Set Cache-Control header
                 header('Cache-Control: max-age=31536000');
