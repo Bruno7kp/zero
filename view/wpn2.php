@@ -65,7 +65,7 @@ use B7KP\Library\Lang;
                                 $weekurl = Url::getBaseUrl()."/user/".$user->login."/charts/".$type."/week/";
 								foreach ($list as $key => $value) 
 								{
-                                    $url = $weekurl.$value->last_week_of_streak;
+                                    //$url = $weekurl.$value->last_week_of_streak;
 									$rest = $type != "artist" ? $type == "album" ? "/".F::fixLFM($value->$type) : "/_/".F::fixLFM($value->$type) : "" ;
 								?>
 								<tr>
