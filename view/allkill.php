@@ -46,7 +46,7 @@ use B7KP\Library\Lang;
 								</div>
 								<div class="col-xs-4 col-xs-offset-4 col-sm-2 col-sm-offset-5 col-md-2 col-md-offset-5 text-center">
 									<select class="form-control urlselector">
-										<option value="<?php echo Route::url("allkill", array('login' => $user->login, 'type' => $type, 'rank' => $rank));?>"><?php echo Lang::get("all");?></option>
+										<option value="<?php echo Route::url("allkill", array('login' => $user->login));?>"><?php echo Lang::get("all");?></option>
 									<?php 
 									while ($startYear <= $currentYear) 
 									{
