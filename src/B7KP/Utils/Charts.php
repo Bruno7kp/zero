@@ -494,7 +494,7 @@ class Charts
 	{
 		$name 	= addslashes($name);
 		$artist = addslashes($artist);
-		$limit  = $this->settings->alb_limit;
+		$limit  = $this->settings->mus_limit;
 		$dao = Dao::getConn();
 
 		$sql = "SELECT
