@@ -615,7 +615,7 @@ function cacheArtist(artistName, spotifyId, imageUrl) {
 
 function getCachedImage(artistName) {
 	let date = new Date();
-	let key = 'zero:' + artistName;
+	let key = 'zero-v1:' + artistName;
 	let cached = window.localStorage.getItem(key);
 	if (cached && cached.length > 0) {
 		let data = JSON.parse(cached);
@@ -631,14 +631,16 @@ function loadSpotifyImage(artistName, token) {
 	let spotifyApi = new SpotifyWebApi();
 	spotifyApi.setAccessToken(token);
 	let cached = getCachedImage(artistName);
+	console.log(cached);
 	if (cached) {
 		return new Promise(function(resolve, reject) {
 			resolve(cached);
 		});
 	} else {
-		return spotifyApi.searchArtists(artistName, {limit: 1, offset: 0}).then((response) => {
+		return spotifyApi.searchArtists(artistName, {limit: 2, offset: 0}).then((response) => {
 			if (typeof response.artists !== 'undefined') {
 				let artists = response.artists;
+				console.log(artists);
 				if (typeof response.artists.items !== 'undefined' && response.artists.items.length > 0) {
 					let artist = artists.items[0];
 					let imageUrl = baseUrl + '/web/img/default-art.png';
