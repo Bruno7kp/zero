@@ -237,7 +237,7 @@ if ($show_dropouts && $week > 1) {
     if ($show_dropouts && isset($lastw) && count($lastw) > 0) {
         ?>
         <tr>
-            <th colspan="10">
+            <th colspan="10" class="dropout-th">
                 <small class="topspace-lg"><?php echo Lang::get('dropouts'); ?></small>
             </th>
         </tr>
