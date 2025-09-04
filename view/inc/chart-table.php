@@ -344,7 +344,7 @@ if ($show_dropouts && $week > 1) {
             }
             ?>
             <tr data-cert-header <?php if($cert_type != "1"){ ?>class="hide"<?php } ?>>
-                <th colspan="10">
+                <th colspan="10" class="dropout-th">
                     <small class="topspace-lg"><?php echo $new_cert_title; ?></small>
                 </th>
             </tr>
