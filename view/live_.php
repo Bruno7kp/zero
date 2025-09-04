@@ -145,6 +145,12 @@ use B7KP\Library\Lang;
 				</tr>
 			</table>
 			<script>
+				function fixLFM(name) {
+					return name.replace(/\+/g, "%252B").replace(/\//g, "%252F").replace(/\\/g, "%255C").replace(/#/g, "%23").replace(/\?/g, "%3F").replace(/</g, "%3C").replace(/>/g, "%3E").replace(/'/g, "%27").replace(/"/g, "%22").replace(/\[/g, "%5B").replace(/\]/g, "%5D").replace(/ /g, "+");
+				}
+				function htmlEntities(str) {
+					return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+				}
 				$(document).ready(function() {
 					const el = $("[data-live]");
 					let type = el.attr("data-live");
@@ -178,13 +184,25 @@ use B7KP\Library\Lang;
 							const row = table.find("tr:eq(1)");
 							let i = 0;
 							for(const artist of artists) {
+								let artLink = otherLink = "";
+								artLink = (type == "artist")
+									? "<a href='/user/" + login + "/music/" + fixLFM(artist.name) + "'>" + htmlEntities(artist.name) + "</a>"
+									: "<a href='/user/" + login + "/music/" + fixLFM(artist.artist["#text"]) + "'>" + htmlEntities(artist.artist["#text"]) + "</a>";
+								if (type == "album") {
+									otherLink = "<a href='/user/" + login + "/music/" + fixLFM(artist.artist["#text"]) + "/" + fixLFM(artist.name) + "'>" + htmlEntities(artist.name) + "</a>";
+								} else if (type == "track") {
+									otherLink = "<a href='/user/" + login + "/music/" + fixLFM(artist.artist["#text"]) + "/_/" + fixLFM(artist.name) + "'>" + htmlEntities(artist.name) + "</a>";
+								}
 								const clone = row.clone();
 								clone.find("td:eq(1)").text(i + 1);
-								clone.find("td:eq(3)").text(artist.name);
 								if (type != "artist") {
-									clone.find("td:eq(4)").html(artist.artist["#text"]);
+									clone.find("td:eq(3)")
+										.html(otherLink);
+									clone.find("td:eq(4)").html(artLink);
 									clone.find("td:eq(5)").text(artist.playcount);
 								} else {
+									clone.find("td:eq(3)")
+										.html(artLink);
 									clone.find("td:eq(4)").text(artist.playcount);
 								}
 								clone.find("td:eq(2)")

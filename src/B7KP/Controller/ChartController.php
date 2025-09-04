@@ -785,7 +785,7 @@ class ChartController extends Controller
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
         $chart = new Charts($this->factory, $user);
-        $list = $chart->getMostWeekBeforeNo1($type);
+        $list = [];//$chart->getMostWeekBeforeNo1($type);
         $vars = array
             (
             "user" => $user,
@@ -806,7 +806,7 @@ class ChartController extends Controller
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
         $chart = new Charts($this->factory, $user);
-        $list = $chart->getMostConsecutiveWeeksAtNo1($type);
+        $list = [];//$chart->getMostConsecutiveWeeksAtNo1($type);
         $vars = array
             (
             "user" => $user,
@@ -827,7 +827,7 @@ class ChartController extends Controller
         $user = $this->isValidUser($login);
         $this->isValidType($type, $user);
         $chart = new Charts($this->factory, $user);
-        $list = $chart->getMostWeeksAtNo2WithoutHittingNo1($type);
+        $list = [];//$chart->getMostWeeksAtNo2WithoutHittingNo1($type);
         $vars = array
             (
             "user" => $user,
