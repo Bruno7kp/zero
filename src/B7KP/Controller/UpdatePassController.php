@@ -12,6 +12,7 @@ use B7KP\Entity\User;
 class UpdatePassController extends Controller
 {
 	private $user;
+	private $passError;
 
 	function __construct(Model $factory)
 	{
