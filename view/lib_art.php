@@ -58,9 +58,15 @@ use B7KP\Utils\Snippets as S;
 								$liburl = Url::getBaseUrl()."/user/".$user->login."/music/";
 								foreach ($list as $value) 
 								{
-									$totalweeks = $value["stats"]["stats"]["alltime"]["weeks"]["total"];
-									$peak = $value["stats"]["stats"]["alltime"]["overall"]["peak"];
-									$pts = intval($value["stats"]["stats"]["alltime"]["overall"]["chartpoints"]);
+									$totalweeks = 0;
+									$peak = 0;
+									$pts = 0;
+									if ($value["stats"]) {
+										$totalweeks = $value["stats"]["stats"]["alltime"]["weeks"]["total"];
+										$peak = $value["stats"]["stats"]["alltime"]["overall"]["peak"];
+										$pts = intval($value["stats"]["stats"]["alltime"]["overall"]["chartpoints"]);
+									}
+									
 									if(empty($totalweeks) && empty($peak))
 									{
 										$totalweeks = "N/C";

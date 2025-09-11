@@ -12,6 +12,7 @@ use B7KP\Library\Url;
 class Friends
 {
 	private $user_session;
+	private $factory;
 	
 	function __construct(Model $factory)
 	{

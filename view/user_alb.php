@@ -152,7 +152,9 @@ use B7KP\Utils\Functions as F;
 						</div>
 					</div>
 					<?php
+					if ($album["stats"]) {
 					echo S::chartRun("album", $album["stats"]["chartrun"], $user, $album["stats"]["stats"]["alltime"], $limit, $name, $artist);
+					}
 					?>
 					<div class="row">
 						<div class="col-md-12">

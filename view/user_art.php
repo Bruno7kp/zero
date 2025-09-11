@@ -134,7 +134,7 @@ use B7KP\Library\Lang;
 						<div class="col-md-12">
 
 							<?php 
-							if(count($album) > 0)
+							if(is_countable($album) && count($album) > 0)
 							{
 							?>
 							<h2 class="text-center topspace-xxl">
@@ -253,7 +253,7 @@ use B7KP\Library\Lang;
 						</div>
 						<div class="col-md-12">
 							<?php
-							if(count($music) > 0)
+							if(is_countable($music) && count($music) > 0)
 							{
 							?>
 							<h2 class="text-center topspace-xxl">

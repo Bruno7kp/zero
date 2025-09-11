@@ -43,10 +43,11 @@ if ($show_first_image && count($list) > 0) {
         $t = substr($type, 0, 3) . "_mbid";
         $f = $lfm->$get($first->$type, $first->artist, $first->$t);
     }
+    $fimg = "";
     if ($type == "music") {
         $fa = $lfm->getArtistInfo($f["artist"]["name"]);
         $fimg = $fa["images"]["large"];
-    } else {
+    } else if ($f && $f["images"]) {
         $fimg = $f["images"]["large"];
     }
 

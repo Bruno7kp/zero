@@ -35,7 +35,7 @@ use B7KP\Library\Lang;
 					$artist = $value["artist"]["name"];
 					$artmbid = $value["artist"]["mbid"];
 				}
-					echo "<li class='list-group-item pd-list-fix' data-playcount=".$value["playcount"]." data-name='".htmlentities($value["name"], ENT_QUOTES)."' data-artist='".htmlentities($artist, ENT_QUOTES)."' data-mbid='".$value["mbid"]."' data-artist-mbid='".$artmbid."''>".$name."</li>";
+					echo "<li class='list-group-item pd-list-fix' data-playcount=".$value["playcount"]." data-name='".htmlentities($value["name"] ?? '', ENT_QUOTES)."' data-artist='".htmlentities($artist ?? '', ENT_QUOTES)."' data-mbid='".$value["mbid"]."' data-artist-mbid='".$artmbid."''>".$name."</li>";
 
 				if(!isset($list[$key+1]) || $list[$key+1]["playcount"] != $value["playcount"])
 				{

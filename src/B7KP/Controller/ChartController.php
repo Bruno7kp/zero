@@ -45,9 +45,9 @@ class ChartController extends Controller
                 $to->modify('-1 day');
                 $numberones[$i]["to"] = $to->format("Y.m.d");
                 $cond = array("idweek" => $week->id);
-                $numberones[$i]["album"] = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
-                $numberones[$i]["artist"] = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
-                $numberones[$i]["music"] = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
+                $numberones[$i]["album"] = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
+                $numberones[$i]["artist"] = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
+                $numberones[$i]["music"] = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
                 $i++;
             }
             $numberonesy = array();
@@ -57,9 +57,9 @@ class ChartController extends Controller
             foreach ($years as $year) {
                 $numberonesy[$i]["year"] = $year->year;
                 $cond = array("idyec" => $year->id);
-                $numberonesy[$i]["album"] = $this->factory->find("B7KP\Entity\\Album_yec", $cond, "updated DESC, rank ASC", "0, 1");
-                $numberonesy[$i]["artist"] = $this->factory->find("B7KP\Entity\\Artist_yec", $cond, "updated DESC, rank ASC", "0, 1");
-                $numberonesy[$i]["music"] = $this->factory->find("B7KP\Entity\\Music_yec", $cond, "updated DESC, rank ASC", "0, 1");
+                $numberonesy[$i]["album"] = $this->factory->find("B7KP\Entity\\Album_yec", $cond, "updated DESC, `rank` ASC", "0, 1");
+                $numberonesy[$i]["artist"] = $this->factory->find("B7KP\Entity\\Artist_yec", $cond, "updated DESC, `rank` ASC", "0, 1");
+                $numberonesy[$i]["music"] = $this->factory->find("B7KP\Entity\\Music_yec", $cond, "updated DESC, `rank` ASC", "0, 1");
                 $i++;
             }
             // get yecs no. 1s
@@ -104,9 +104,9 @@ class ChartController extends Controller
         }
         $weekop = $this->factory->find("B7KP\Entity\Week", array("iduser" => $userObj->id, "week" => $weekstart), "week DESC");
         if ($weekend === "last") {
-            $lastWeek = $this->factory->findOneBy("B7KP\Entity\Week", $userObj->id, "iduser", "week DESC");
-            if ($lastWeek) {
-                $weeked = [$lastWeek->week];
+            $lastWeek = $this->factory->find("B7KP\Entity\Week", array("iduser" => $userObj->id), "week DESC LIMIT 1");
+            if (count($lastWeek) > 0) {
+                $weeked = $lastWeek;
             } else {
                 echo json_encode(["error" => "Week not found"]);
                 return;
@@ -115,6 +115,8 @@ class ChartController extends Controller
             $weekend = intval($weekend);
             $weeked = $this->factory->find("B7KP\Entity\Week", array("iduser" => $userObj->id, "week" => $weekend), "week DESC");
         }
+
+        //var_dump($weeked);
                 
         if (is_array($weekop) && count($weekop) > 0) {
 				$weekop = $weekop[0];
@@ -176,6 +178,7 @@ class ChartController extends Controller
                     $fixedName = $stats[0]->artist;
                 }
                 $extracted = $chart->extract($stats, false, $weeked->week, $weekop->week);
+                //var_dump($extracted);
                 $chartrun = $extracted["chartrun"];
                 $alltime = $extracted["stats"]["todate"];
                 break;
@@ -203,6 +206,8 @@ class ChartController extends Controller
                 echo json_encode(["error" => "Invalid type"]);
                 return;
         }
+
+        //var_dump($type, $chartrun, $userObj, $alltime, $limit, $fixedName, $fixedArtist);
 
         // Gera o HTML do chart run
         ob_start();
@@ -242,7 +247,7 @@ class ChartController extends Controller
                 $numberones[$i]["album"] = array();
                 $numberones[$i]["artist"] = array();
                 $numberones[$i]["music"] = array();
-                $numberones[$i][$type] = $this->factory->find("B7KP\Entity\\" . ucfirst($type) . "_charts", $cond, "updated DESC, rank ASC", "0, 1");
+                $numberones[$i][$type] = $this->factory->find("B7KP\Entity\\" . ucfirst($type) . "_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
                 $i++;
             }
             $var = array
@@ -276,7 +281,7 @@ class ChartController extends Controller
 
 				// Get last modification time of the main content (that user sees)
 				$cond = array("idweek" => $week->id);
-				$getUpdated = $this->factory->find("B7KP\Entity\\" . ucfirst($type) . "_charts", $cond, "updated DESC, rank ASC", "0, 1");
+				$getUpdated = $this->factory->find("B7KP\Entity\\" . ucfirst($type) . "_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
 				if(count($getUpdated) > 0) {
 					$content_last_mod_time = $getUpdated[0]->updated;
 				}
@@ -383,7 +388,7 @@ class ChartController extends Controller
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
         $filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
         $limit = substr($type, 0, 3) . "_limit";
-        $biggest = $this->factory->findSql($entity, "SELECT t.* FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.rank " . $signal . " " . $top . " ORDER BY t.playcount DESC, w.week ASC");
+        $biggest = $this->factory->findSql($entity, "SELECT t.* FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.`rank` " . $signal . " " . $top . " ORDER BY t.playcount DESC, w.week ASC");
         $vars = array
             (
             "user" => $user,
@@ -430,7 +435,7 @@ class ChartController extends Controller
         if ($type != "artist"): $group .= ", t." . $type;endif;
         $filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
         $dao->run("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
-        $biggest = $dao->run("SELECT t.*, count(w.week) as total FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.rank <= " . $rank . " GROUP BY t.artist" . $group . " ORDER BY total DESC, w.week ASC");
+        $biggest = $dao->run("SELECT t.*, count(w.week) as total FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.`rank` <= " . $rank . " GROUP BY t.artist" . $group . " ORDER BY total DESC, w.week ASC");
         $vars = array
             (
             "user" => $user,
@@ -479,7 +484,7 @@ class ChartController extends Controller
 
         $col = "t." . $type;
         $dao->run("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
-        $biggest = $dao->run("SELECT t.*, count(" . $col . ") as total, COUNT(DISTINCT " . $col . ") AS uniques FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.rank <= " . $rank . " GROUP BY t.artist ORDER BY uniques DESC, total DESC");
+        $biggest = $dao->run("SELECT t.*, count(" . $col . ") as total, COUNT(DISTINCT " . $col . ") AS uniques FROM " . $table . " t, week w, user u WHERE t.idweek = w.id AND w.iduser = u.id AND u.id = " . $user->id . $filter . " AND t.`rank` <= " . $rank . " GROUP BY t.artist ORDER BY uniques DESC, total DESC");
         $vars = array
             (
             "user" => $user,
@@ -619,7 +624,7 @@ class ChartController extends Controller
         $top = intval($top) > 0 ? intval($top) : 1;
         $chart = new Charts($this->factory, $user);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top, "playcount DESC", "", $year);
+        $debuts = $chart->getBiggestDebuts($type, "`rank` " . $signal . " " . $top, "playcount DESC", "", $year);
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
             (
@@ -658,7 +663,7 @@ class ChartController extends Controller
         $this->isValidType($type, $user);
         $chart = new Charts($this->factory, $user);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,", $year);
+        $debuts = $chart->getBiggestDebuts($type, "`rank` " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,", $year);
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
             (
@@ -696,7 +701,7 @@ class ChartController extends Controller
         $top = intval($top) > 0 ? intval($top) : 1;
         $chart = new Charts($this->factory, $user);
         $settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
-        $debuts = $chart->getBiggestDebuts($type, "rank " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,", $year);
+        $debuts = $chart->getBiggestDebuts($type, "`rank` " . $signal . " " . $top . " GROUP BY " . $type . "_charts.artist ORDER BY total DESC", "", "COUNT(" . $type . "_charts." . $type . ") as total,", $year);
         $limit = substr($type, 0, 3) . "_limit";
         $vars = array
             (

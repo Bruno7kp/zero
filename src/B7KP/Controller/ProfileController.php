@@ -29,11 +29,11 @@ class ProfileController extends Controller
 			$settings = $this->factory->findOneBy("B7KP\Entity\Settings", $user->id, "iduser");
 			$startday = $settings->start_day ? "friday" : "sunday";
 			
+			$lfm 	= new LastFm();
 			if($user->lfm_register){
 				$date = new \DateTime($user->lfm_register);
 				$date = $date->format("Y.m.d");
 			}else{
-				$lfm 	= new LastFm();
 				$last 	= $lfm->setUser($user->login)->setStartDate($startday)->getUserInfo();
 				$date 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y.m.d");
 				$dateuser 	= \DateTime::createFromFormat("U",$last['registered'])->format("Y-m-d");
@@ -43,16 +43,12 @@ class ProfileController extends Controller
 				$this->factory->update("\B7KP\Entity\User", $data);
 			}		
 			$average = 0;
+
+
+			$wksfm 	= $lfm->getWeeklyChartList();
+			$wksfm 	= count($lfm->removeWeeksBeforeDate($wksfm, $date, $user->id));
 			$weeks 	= $this->factory->find("B7KP\Entity\Week", array("iduser" => $user->id), "week DESC");
-			if(count($weeks) > 0){
-				$lastwk = $weeks[0];
-				$to = new \DateTime($lastwk->to_day);
-				$now = new \DateTime();
-				$diff = $to->diff($now);
-				$wksfm = count($weeks) + floor($diff->days / 7);
-			}else{
-				$wksfm = 0;
-			}
+
 			$bgimage = false;
 			$topartist = false;
 

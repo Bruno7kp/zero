@@ -43,7 +43,7 @@ class MusicController extends Controller
 		$music = $lastfm->getMusicInfo($name, $artist);
 		if(is_array($music))
 		{
-			$usersdata = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM music_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.music = '".addslashes($music["name"])."' AND t.artist = '".addslashes($music["artist"]["name"])."' AND t.rank = 1 GROUP BY u.id ORDER BY total DESC");
+			$usersdata = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM music_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.music = '".addslashes($music["name"])."' AND t.artist = '".addslashes($music["artist"]["name"])."' AND t.`rank` = 1 GROUP BY u.id ORDER BY total DESC");
 			$totalcharts = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM music_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.music = '".addslashes($music["name"])."' AND t.artist = '".addslashes($music["artist"]["name"])."' GROUP BY u.id ORDER BY total DESC");
 			$totalusers = 0;
 			$totaln1 = 0;

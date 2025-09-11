@@ -20,7 +20,11 @@ class Crud {
 		);
 		try {
 			//parent::__construct($dsn, $user, $passwd, $options);
-			$this->pdo = PDO4You::getInstance('crud', $dsn, $user, $passwd, $options);
+			$dsn .= ';ssl-mode=DISABLED';
+
+        	// Substitui PDO4You por PDO puro
+        	$this->pdo = new PDO($dsn, $user, $passwd, $options);
+			//$this->pdo = PDO4You::getInstance('crud', $dsn.';ssl-mode=DISABLED', $user, $passwd, $options);
 		} catch (\PDOException $e) {
 			$this->error = $e->getMessage();
 		}
@@ -90,9 +94,9 @@ class Crud {
 
 		if(false !== ($list = $this->run($sql))) {
 			$fields = array();
-			//var_dump($list);
+			//var_dump($list);die();
 			foreach($list as $record)
-				$fields[] = $record->{strtolower($key)};
+				$fields[] = $record->{$key};
 			return array_values(array_intersect($fields, array_keys($info)));
 		}
 		return array();
@@ -110,7 +114,9 @@ class Crud {
 
 	public function insert($table, $info) {
 		$fields = $this->filter($table, $info);
-		$sql = "INSERT INTO " . $table . " (" . implode($fields, ", ") . ") VALUES (:" . implode($fields, ", :") . ");";
+		if(in_array("rank", $fields))
+			$fields[array_search("rank", $fields)] = "`rank`";
+		$sql = "INSERT INTO " . $table . " (" . implode(", ", $fields) . ") VALUES (:" . implode(", :", $fields) . ");";
 		$bind = array();
 		foreach($fields as $field)
 			$bind[":$field"] = $info[$field];
@@ -118,6 +124,11 @@ class Crud {
 	}
 
 	public function multi_insert($table, $fields, $data) {
+		if(is_array($fields) && in_array("rank", $fields))
+			$fields[array_search("rank", $fields)] = "`rank`";
+		if(is_string($fields) && strpos($fields, "rank") !== false)
+			$fields = str_replace('`rank`', 'rank', $fields);
+			$fields = str_replace('rank', '`rank`', $fields);
 		$cols = "(?";
 		for ($i=1; $i < count(explode(",", $fields)); $i++) { 
 			$cols .= ", ?";
@@ -155,7 +166,7 @@ class Crud {
 				elseif(preg_match("/^(" . implode("|", array("insert")) . ") /i", $this->sql))
 					return $this->pdo->lastInsertId();
 			}	
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			$this->error = $e->getMessage();	
 			$this->debug();
 			return false;

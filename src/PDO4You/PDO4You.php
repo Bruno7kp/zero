@@ -304,7 +304,7 @@ class PDO4You implements Config
                             $pass = isset($conf['password']) ? $conf['password'] : null;
                             $base = isset($conf['name']) ? $conf['name'] : null;
                         } else {
-                            $part = preg_split('~[.]~', preg_replace('~[\s]{1,}~', null, $adapter));
+                            $part = preg_split('~[.]~', preg_replace('~[\s]{1,}~', '', $adapter));
                             $conf = count($part) == 2 ? @$datafile['PDO4YOU_ADAPTER'][$part[0]][$part[1]] : @$datafile['PDO4YOU_ADAPTER'][$part[0]];
 
                             // Checks if the selected adapter in the instance exists
@@ -1116,7 +1116,7 @@ class PDO4You implements Config
 
         if (is_array($oArr)) {
             foreach ($oArr as $k => $v) {
-                $k = preg_split('~[:]~', preg_replace('~[\s]{1,}~', null, $k));
+                $k = preg_split('~[:]~', preg_replace('~[\s]{1,}~', '', $k));
                 $t = &$nArr;
                 foreach ($k as $x) {
                     $t = &$t[$x];
@@ -1173,9 +1173,9 @@ class PDO4You implements Config
     /**
      * As the builder, we make __clone private to prevent cloning instance of the class
      * 
-     * @access final private
+     * @access private
      */
-    final private function __clone()
+    private function __clone()
     {
         
     }

@@ -8,6 +8,7 @@ use B7KP\Model\Model;
 
 class PermissionCheck
 {
+	private $entity;
 
 	function __construct($entity)
 	{
