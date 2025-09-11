@@ -27,7 +27,7 @@ abstract class Entity
 		return isset($this->$property);
 	}
 
-	final private function set($property, $value)
+	private function set($property, $value)
 	{
 		if($this->setable($property))
 		{

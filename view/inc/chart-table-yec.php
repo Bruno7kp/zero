@@ -48,12 +48,13 @@ if($show_first_image && count($list)>0)
 		$t = substr($type, 0,3)."_mbid";
 		$f = $lfm->$get($first->$type, $first->artist, $first->$t);
 	}
+	$fimg = "";
 	if($type == "music")
 	{
 		$fa = $lfm->getArtistInfo($f["artist"]["name"]);
 		$fimg = $fa["images"]["large"];
 	}
-	else
+	else if ($f && $f["images"])
 	{
 		$fimg = $f["images"]["large"];
 	}
@@ -94,11 +95,21 @@ $lastw = array();
 	{
 		foreach ($list as $value) 
 		{
-			$todate 	= $value["stats"]["stats"]["todate"];
-			//$stats 		= $value["stats"]["chartrun"][$lw];
-			$cr 		= $value["stats"]["chartrun"];
-			$item 		= $value["item"];
-			$cp_todate 	= $todate["overall"]["chartpoints"];
+			$item = $value["item"];
+			$totalweeks = $wkstop1 = $wkstop5 = $wkstop10 = $wkstop20 = 0;
+			if ($value && $value["stats"]) {
+				$todate 	= $value["stats"]["stats"]["todate"];
+				//$stats 		= $value["stats"]["chartrun"][$lw];
+				$cr 		= $value["stats"]["chartrun"];
+				
+				$cp_todate 	= $todate["overall"]["chartpoints"];
+				$totalweeks = $todate["weeks"]["total"];
+				$wkstop1 	= $todate["weeks"]["top01"];
+				$wkstop5 	= $todate["weeks"]["top05"];
+				$wkstop10 	= $todate["weeks"]["top10"];
+				$wkstop20 	= $todate["weeks"]["top20"];
+			}
+			
 
 			// vars
 			$position 	= $item->rank;
@@ -111,11 +122,7 @@ $lastw = array();
 			$pmclass  	= false;
 			$playsmove  = false;
 			$move  		= false;
-			$totalweeks = $todate["weeks"]["total"];
-			$wkstop1 	= $todate["weeks"]["top01"];
-			$wkstop5 	= $todate["weeks"]["top05"];
-			$wkstop10 	= $todate["weeks"]["top10"];
-			$wkstop20 	= $todate["weeks"]["top20"];
+			
 			$peak 		= isset($todate["overall"]["peak"]) ? $todate["overall"]["peak"] : 0;
 			$t = substr($type, 0,3)."_mbid";
 			$mbid = $item->$t;

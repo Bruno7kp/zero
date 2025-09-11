@@ -29,7 +29,7 @@ class App
 
         if(property_exists(__CLASS__, $property))
         {
-            return self::$$property;
+            return self::${$property};
         }
     }
 
@@ -45,15 +45,15 @@ class App
         self::$version = "0.14.000";
         self::$updatedate = "2025.08.30";
 
-        self::$environment = getenv("ENV");
-        self::$db = getenv("DB");
-        self::$dbname = getenv("DB_NAME");
-        self::$host = getenv("DB_HOST");
-        self::$user = getenv("DB_USER");
-        self::$password = getenv("DB_PASS");
+        self::$environment = $_ENV["ENV"];
+        self::$db = $_ENV["DB"];
+        self::$dbname = $_ENV["DB_NAME"];
+        self::$host = $_ENV["DB_HOST"];
+        self::$user = $_ENV["DB_USER"];
+        self::$password = $_ENV["DB_PASS"];
         self::$dsn = self::setDsn();
-        self::$lastfmapikey = getenv("LASTFM_KEY");
-        self::$lastfmapisecret = getenv("LASTFM_SECRET");
+        self::$lastfmapikey = $_ENV["LASTFM_KEY"];
+        self::$lastfmapisecret = $_ENV["LASTFM_SECRET"];
         self::$loaded = true;
     }
 }

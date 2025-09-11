@@ -152,7 +152,9 @@ use B7KP\Utils\Snippets as S;
 						</div>
 					</div>
 					<?php
+					if ($music["stats"]) {
 					echo S::chartRun("music", $music["stats"]["chartrun"], $user, $music["stats"]["stats"]["alltime"], $limit, $name, $artist);
+					}
 					?>
 					<div class="row">
 						<div class="col-md-12">

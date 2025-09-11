@@ -7,6 +7,8 @@ use B7KP\Library\Route;
 abstract class Controller
 {
 	protected $factory;
+
+	public $assertErrors = [];
 	
 	function __construct(Model $factory)
 	{

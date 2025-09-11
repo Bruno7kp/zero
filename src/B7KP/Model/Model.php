@@ -6,6 +6,7 @@ use B7KP\Core\Dao;
 class Model
 {
 	protected $dao;
+	protected $object;
 	
 	function __construct(Dao $dao)
 	{

@@ -15,6 +15,7 @@ use LastFmApi\Main\LastFm;
 class YecController extends Controller
 {
 	private $user;
+	private $settings;
 
 	function __construct(Model $factory)
 	{
@@ -50,9 +51,9 @@ class YecController extends Controller
 			{
 				$numberones[$i]["year"] = $year->year;
 				$cond = array("idyec" => $year->id);
-				$numberones[$i]["album"]  = $this->factory->find("B7KP\Entity\\Album_yec", $cond, "updated DESC, rank ASC", "0, 1");
-				$numberones[$i]["artist"]  = $this->factory->find("B7KP\Entity\\Artist_yec", $cond, "updated DESC, rank ASC", "0, 1");
-				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\\Music_yec", $cond, "updated DESC, rank ASC", "0, 1");
+				$numberones[$i]["album"]  = $this->factory->find("B7KP\Entity\\Album_yec", $cond, "updated DESC, `rank` ASC", "0, 1");
+				$numberones[$i]["artist"]  = $this->factory->find("B7KP\Entity\\Artist_yec", $cond, "updated DESC, `rank` ASC", "0, 1");
+				$numberones[$i]["music"]  = $this->factory->find("B7KP\Entity\\Music_yec", $cond, "updated DESC, `rank` ASC", "0, 1");
 				$i++;
 			}
 			$var = array
@@ -215,7 +216,7 @@ class YecController extends Controller
 			if($cut > 1){
 				$data = array_slice($data, 0, $cut);
 			}
-			$id = $this->factory->multiAdd('B7KP\Entity\Artist_yec', "idyec, artist, art_mbid, playcount, rank, updated", $data);
+			$id = $this->factory->multiAdd('B7KP\Entity\Artist_yec', "idyec, artist, art_mbid, playcount, `rank`, updated", $data);
 
 			if(!$id > 0)
 			{
@@ -251,7 +252,7 @@ class YecController extends Controller
 			if($cut > 1){
 				$data = array_slice($data, 0, $cut);
 			}
-			$id = $this->factory->multiAdd('B7KP\Entity\Album_yec', "idyec, album, alb_mbid, artist, art_mbid, playcount, rank, updated", $data);
+			$id = $this->factory->multiAdd('B7KP\Entity\Album_yec', "idyec, album, alb_mbid, artist, art_mbid, playcount, `rank`, updated", $data);
 			if(!$id > 0)
 			{
 				$error++;
@@ -288,7 +289,7 @@ class YecController extends Controller
 			if($cut > 1){
 				$data = array_slice($data, 0, $cut);
 			}
-			$id = $this->factory->multiAdd('B7KP\Entity\Music_yec', "idyec, music, mus_mbid, artist, art_mbid, playcount, rank, updated", $data);
+			$id = $this->factory->multiAdd('B7KP\Entity\Music_yec', "idyec, music, mus_mbid, artist, art_mbid, playcount, `rank`, updated", $data);
 			if(!$id > 0)
 			{
 				$error++;

@@ -202,7 +202,7 @@ class UpdateController extends Controller
             if ($cut > 1) {
                 $data = array_slice($data, 0, $cut);
             }
-            $id = $this->factory->multiAdd('B7KP\Entity\Artist_charts', "idweek, artist, art_mbid, playcount, rank, updated", $data);
+            $id = $this->factory->multiAdd('B7KP\Entity\Artist_charts', "idweek, artist, art_mbid, playcount, `rank`, updated", $data);
             if (!$id > 0) {
                 $error++;
             }
@@ -235,7 +235,7 @@ class UpdateController extends Controller
             if ($cut > 1) {
                 $data = array_slice($data, 0, $cut);
             }
-            $id = $this->factory->multiAdd('B7KP\Entity\Album_charts', "idweek, album, alb_mbid, artist, art_mbid, playcount, rank, updated", $data);
+            $id = $this->factory->multiAdd('B7KP\Entity\Album_charts', "idweek, album, alb_mbid, artist, art_mbid, playcount, `rank`, updated", $data);
             if (!$id > 0) {
                 $error++;
             }
@@ -269,7 +269,7 @@ class UpdateController extends Controller
             if ($cut > 1) {
                 $data = array_slice($data, 0, $cut);
             }
-            $id = $this->factory->multiAdd('B7KP\Entity\Music_charts', "idweek, music, mus_mbid, artist, art_mbid, playcount, rank, updated", $data);
+            $id = $this->factory->multiAdd('B7KP\Entity\Music_charts', "idweek, music, mus_mbid, artist, art_mbid, playcount, `rank`, updated", $data);
             if (!$id > 0) {
                 $error++;
             }

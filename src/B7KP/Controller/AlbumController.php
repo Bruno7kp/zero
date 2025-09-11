@@ -43,7 +43,7 @@ class AlbumController extends Controller
 		$album = $lastfm->getAlbumInfo($name, $artist);
 		if(is_array($album))
 		{
-			$usersdata = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM album_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.album = '".addslashes($album["name"])."' AND t.artist = '".addslashes($album["artist"])."' AND t.rank = 1 GROUP BY u.id ORDER BY total DESC");
+			$usersdata = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM album_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.album = '".addslashes($album["name"])."' AND t.artist = '".addslashes($album["artist"])."' AND t.`rank` = 1 GROUP BY u.id ORDER BY total DESC");
 			$totalcharts = $dao->run("SELECT count(t.id) as total, u.id as iduser FROM album_charts t, week w, user u WHERE u.id = w.iduser AND t.idweek = w.id AND t.album = '".addslashes($album["name"])."' AND t.artist = '".addslashes($album["artist"])."' GROUP BY u.id ORDER BY total DESC");
 			$totalusers = 0;
 			$totaln1 = 0;

@@ -17,7 +17,7 @@ use B7KP\Library\Url;
 use B7KP\Library\Route; 
 use B7KP\Library\Lang; 
 use B7KP\Utils\Snippets; 
-use B7KP\Utils\Functions as Fn; 
+use B7KP\Utils\Functions as Fnx; 
 use B7KP\Utils\Constants as C;
 
 class Charts
@@ -28,6 +28,7 @@ class Charts
 	static $referenceweek;
 	static $initialweek;
 	private $weekCache = []; // <-- Adicione esta propriedade
+	private $settings;
 	
 	function __construct(Model $factory, User $user)
 	{
@@ -111,7 +112,7 @@ class Charts
 		$newlist = array();
 		switch ($type) {
 			case 'album':
-				$list  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", $limit);
+				$list  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, `rank` ASC", $limit);
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
@@ -123,7 +124,7 @@ class Charts
 				break;
 
 			case 'artist':
-				$list = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", $limit);
+				$list = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, `rank` ASC", $limit);
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
@@ -135,7 +136,7 @@ class Charts
 				break;
 			
 			default:
-				$list  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", $limit);
+				$list  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, `rank` ASC", $limit);
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
@@ -166,11 +167,11 @@ class Charts
 		$cond = array("idyec" => $year->id);
 		$limit = ($limit == C::LIMIT_MAX) ? false : "0, ".$limit;
 		$newlist = array();
-		$fyec = $this->getWeekNumber(Fn::getFirstDayOfFirstWeekOfYear($year->year));
-		$lyec = $this->getWeekNumber(Fn::getLastDayOfLastWeekOfYear($year->year), false);
+		$fyec = $this->getWeekNumber(Fnx::getFirstDayOfFirstWeekOfYear($year->year));
+		$lyec = $this->getWeekNumber(Fnx::getLastDayOfLastWeekOfYear($year->year), false);
 		switch ($type) {
 			case 'album':
-				$list  = $this->factory->find("B7KP\Entity\Album_yec", $cond, "updated DESC, rank ASC", $limit);
+				$list  = $this->factory->find("B7KP\Entity\Album_yec", $cond, "updated DESC, `rank` ASC", $limit);
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
@@ -182,7 +183,7 @@ class Charts
 				break;
 
 			case 'artist':
-				$list = $this->factory->find("B7KP\Entity\Artist_yec", $cond, "updated DESC, rank ASC", $limit);
+				$list = $this->factory->find("B7KP\Entity\Artist_yec", $cond, "updated DESC, `rank` ASC", $limit);
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getArtistStats($value->artist, $value->art_mbid);
@@ -194,7 +195,7 @@ class Charts
 				break;
 			
 			default:
-				$list  = $this->factory->find("B7KP\Entity\Music_yec", $cond, "updated DESC, rank ASC", $limit);
+				$list  = $this->factory->find("B7KP\Entity\Music_yec", $cond, "updated DESC, `rank` ASC", $limit);
 				$i = 0;
 				foreach ($list as $key => $value) {
 					$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
@@ -484,7 +485,7 @@ class Charts
 		{
 			$cond = "music_charts.music = '$name' AND music_charts.artist = '$artist'";
 		}
-		$sql = "SELECT music_charts.* FROM music_charts, week WHERE ".$cond." AND week.id = music_charts.idweek AND week.iduser = '".$this->user->id."' AND music_charts.rank <= '".$limit."' GROUP BY music_charts.id ORDER BY week.week DESC, music_charts.updated";
+		$sql = "SELECT music_charts.* FROM music_charts, week WHERE ".$cond." AND week.id = music_charts.idweek AND week.iduser = '".$this->user->id."' AND music_charts.`rank` <= '".$limit."' GROUP BY music_charts.id ORDER BY week.week DESC, music_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Music_charts", $sql);
 
 		return $weeks;
@@ -502,24 +503,24 @@ class Charts
 			T1.artist,
 			COUNT(T1.id) AS weeks,
 			T2.min_rank AS peak,
-			COUNT(CASE WHEN T1.rank = T2.min_rank THEN 1 END) AS peak_count,
-			COUNT(T1.id) * 100 - (SUM(T1.rank) - COUNT(T1.id)) * 2 as points
+			COUNT(CASE WHEN T1.`rank` = T2.min_rank THEN 1 END) AS peak_count,
+			COUNT(T1.id) * 100 - (SUM(T1.`rank`) - COUNT(T1.id)) * 2 as points
 		FROM
 			music_charts AS T1
 		JOIN week AS T3 ON T3.id = T1.idweek
 		JOIN (
 			SELECT
 				music,
-				MIN(rank) AS min_rank
+				MIN(`rank`) AS min_rank
 			FROM
 				music_charts
 			JOIN
 				week ON week.id = music_charts.idweek
 			WHERE
-				music = '".$name."' AND artist = '".$artist."' AND rank <= '".$limit."' AND week.iduser = '".$this->user->id."'
+				music = '".$name."' AND artist = '".$artist."' AND `rank` <= '".$limit."' AND week.iduser = '".$this->user->id."'
 		) AS T2 ON T1.music = T2.music
 		WHERE
-			T1.music = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.rank <= '".$limit."';";
+			T1.music = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.`rank` <= '".$limit."';";
 		$stmt = $dao->getCrud()->getPDO()->query($sql);
 		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
 		if(empty($weeks))
@@ -540,7 +541,7 @@ class Charts
 		{
 			$cond = "album_charts.album = '$name' AND album_charts.artist = '$artist'";
 		}
-		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.id = album_charts.idweek AND week.iduser = '".$this->user->id."' AND album_charts.rank <= '".$limit."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
+		$sql = "SELECT album_charts.* FROM album_charts, week WHERE ".$cond." AND week.id = album_charts.idweek AND week.iduser = '".$this->user->id."' AND album_charts.`rank` <= '".$limit."' GROUP BY album_charts.id ORDER BY week.week DESC, album_charts.updated";
 		$weeks = $this->factory->findSql("B7KP\Entity\Album_charts", $sql);
 
 		return $weeks;
@@ -558,24 +559,24 @@ class Charts
 			T1.artist,
 			COUNT(T1.id) AS weeks,
 			T2.min_rank AS peak,
-			COUNT(CASE WHEN T1.rank = T2.min_rank THEN 1 END) AS peak_count,
-			COUNT(T1.id) * 100 - (SUM(T1.rank) - COUNT(T1.id)) * 2 as points
+			COUNT(CASE WHEN T1.`rank` = T2.min_rank THEN 1 END) AS peak_count,
+			COUNT(T1.id) * 100 - (SUM(T1.`rank`) - COUNT(T1.id)) * 2 as points
 		FROM
 			album_charts AS T1
 		JOIN week AS T3 ON T3.id = T1.idweek
 		JOIN (
 			SELECT
 				album,
-				MIN(rank) AS min_rank
+				MIN(`rank`) AS min_rank
 			FROM
 				album_charts
 			JOIN
 				week ON week.id = album_charts.idweek
 			WHERE
-				album = '".$name."' AND artist = '".$artist."' AND rank <= '".$limit."' AND week.iduser = '".$this->user->id."'
+				album = '".$name."' AND artist = '".$artist."' AND `rank` <= '".$limit."' AND week.iduser = '".$this->user->id."'
 		) AS T2 ON T1.album = T2.album
 		WHERE
-			T1.album = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.rank <= '".$limit."';";
+			T1.album = '".$name."' AND T1.artist = '".$artist."' AND T3.iduser = '".$this->user->id."' AND T1.`rank` <= '".$limit."';";
 		$stmt = $dao->getCrud()->getPDO()->query($sql);
 		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
 		if(empty($weeks))
@@ -595,7 +596,7 @@ class Charts
 		{
 			$cond = "artist_charts.artist = '$name'";
 		}
-		$sql = "SELECT artist_charts.* FROM artist_charts, week WHERE ".$cond." AND week.id = artist_charts.idweek AND week.iduser = '".$this->user->id."' AND artist_charts.rank <= '".$limit."' GROUP BY artist_charts.id ORDER BY week.week DESC, artist_charts.updated";
+		$sql = "SELECT artist_charts.* FROM artist_charts, week WHERE ".$cond." AND week.id = artist_charts.idweek AND week.iduser = '".$this->user->id."' AND artist_charts.`rank` <= '".$limit."' GROUP BY artist_charts.id ORDER BY week.week DESC, artist_charts.updated";
 
 		$weeks = $this->factory->findSql("B7KP\Entity\Artist_charts", $sql);
 
@@ -608,33 +609,36 @@ class Charts
 	public function getArtistStatsSingle($name)
 	{
 		$name 	= addslashes($name);
-		$limit  = $this->settings->art_limit;
+		$limit  = (int)$this->settings->art_limit;
 		
 		$dao = Dao::getConn();
 		$sql = "SELECT
 			T1.artist,
   			COUNT(T1.id) AS weeks,
-			T2.min_rank AS peak,
-			COUNT(CASE WHEN T1.rank = T2.min_rank THEN 1 END) AS peak_count,
-			COUNT(T1.id) * 100 - (SUM(T1.rank) - COUNT(T1.id)) * 2 as points
+			COALESCE(T2.min_rank, 0) AS peak,
+			SUM(CASE WHEN T1.`rank` = COALESCE(T2.min_rank, 0) THEN 1 ELSE 0 END) AS peak_count,
+			COUNT(T1.id) * 100 - (SUM(T1.`rank`) - COUNT(T1.id)) * 2 as points
 			FROM
 			artist_charts AS T1
 			JOIN week AS T3 ON T3.id = T1.idweek
-			JOIN (
+			LEFT JOIN (
 				SELECT
 				artist,
-				MIN(rank) AS min_rank
+				week.iduser,
+				MIN(`rank`) AS min_rank
 				FROM
 				artist_charts
 				JOIN
         		week ON week.id = artist_charts.idweek
 				WHERE
-				artist = '".$name."' AND rank <= '".$limit."' AND week.iduser = '".$this->user->id."'
-			) AS T2 ON T1.artist = T2.artist
+				artist = '".$name."' AND `rank` <= ".$limit." AND week.iduser = ".$this->user->id."
+				GROUP BY artist, week.iduser
+			) AS T2 ON T1.artist = T2.artist AND T3.iduser = T2.iduser
 			WHERE
 			T1.artist = '".$name."'
-			AND T3.iduser = '".$this->user->id."'
-			AND T1.rank <= '".$limit."';";
+			AND T3.iduser = ".$this->user->id."
+			AND T1.`rank` <= ".$limit.";";
+			//var_dump($sql);
 		$stmt = $dao->getCrud()->getPDO()->query($sql);
 		$weeks = $stmt->fetch(\PDO::FETCH_OBJ);
 		if(empty($weeks))
@@ -649,7 +653,7 @@ class Charts
 		$dao = Dao::getConn();
 		$artist = addslashes($artist);
 		$limitsql = ($qtd > 0) ? " LIMIT ".$qtd : "";
-		$sql = "SELECT a.album, a.artist, count(a.id) as weeks, min(rank) as peak FROM album_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.album ORDER BY peak ASC, weeks DESC".$limitsql;
+		$sql = "SELECT a.album, a.artist, count(a.id) as weeks, min(`rank`) as peak FROM album_charts a, week w WHERE a.artist = '".$artist."' AND `rank` <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.album ORDER BY peak ASC, weeks DESC".$limitsql;
 		$alb = $dao->run($sql);
 		return $alb;
 
@@ -660,7 +664,7 @@ class Charts
 		$dao = Dao::getConn();
 		$artist = addslashes($artist);
 		$limitsql = ($qtd > 0) ? " LIMIT ".$qtd : "";
-		$sql = "SELECT a.music, a.artist, count(a.id) as weeks, min(rank) as peak FROM music_charts a, week w WHERE a.artist = '".$artist."' AND rank <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.music ORDER BY peak ASC, weeks DESC".$limitsql;
+		$sql = "SELECT a.music, a.artist, count(a.id) as weeks, min(`rank`) as peak FROM music_charts a, week w WHERE a.artist = '".$artist."' AND `rank` <= ".$limit." AND w.id = a.idweek AND w.iduser = '".$this->user->id."' GROUP BY a.music ORDER BY peak ASC, weeks DESC".$limitsql;
 		$mus = $dao->run($sql);
 		return $mus;
 	}
@@ -674,9 +678,9 @@ class Charts
 		$to->modify('-1 day');
 		$to = $to->format("Y.m.d");
 		$cond = array("idweek" => $week->id);
-		$album  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, rank ASC", "0, 1");
-		$artist = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, rank ASC", "0, 1");
-		$music  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, rank ASC", "0, 1");
+		$album  = $this->factory->find("B7KP\Entity\Album_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
+		$artist = $this->factory->find("B7KP\Entity\Artist_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
+		$music  = $this->factory->find("B7KP\Entity\Music_charts", $cond, "updated DESC, `rank` ASC", "0, 1");
 		$lfm = new \LastFmApi\Main\LastFm();
 		$lfm->setUser($this->user->login);
 		$html .= "<div class='text-center bottomspace-sm'>";
@@ -689,14 +693,14 @@ class Charts
 			//var_dump($ext);
 			$move = $ext[$week->week]['rank']['move'];
 			$icon = $this->aux('getMoveIcon', $move);
-			$html .= Snippets::specArtRow($value, $this->user, Fn::formatNum($move), $icon);
+			$html .= Snippets::specArtRow($value, $this->user, Fnx::formatNum($move), $icon);
 		}
 		foreach ($album as $value) {
 			$chartstats = $this->getAlbumStats($value->album, $value->artist, $value->alb_mbid);
 			$ext = $this->extract($chartstats);
 			$move = $ext[$week->week]['rank']['move'];
 			$icon = $this->aux('getMoveIcon', $move);
-			$html .= Snippets::specAlbRow($value, $this->user, Fn::formatNum($move), $icon);
+			$html .= Snippets::specAlbRow($value, $this->user, Fnx::formatNum($move), $icon);
 		}
 		foreach ($music as $value) {
 			$chartstats = $this->getMusicStats($value->music, $value->artist, $value->mus_mbid);
@@ -704,7 +708,7 @@ class Charts
 			//var_dump($ext);
 			$move = $ext[$week->week]['rank']['move'];
 			$icon = $this->aux('getMoveIcon', $move);
-			$html .= Snippets::specMusRow($value, $this->user, Fn::formatNum($move), $icon);
+			$html .= Snippets::specMusRow($value, $this->user, Fnx::formatNum($move), $icon);
 		}
 		$artlink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'artist', 'week' => $week->week));
 		$alblink = Route::url('weekly_chart', array('login' => $this->user->login, 'type' => 'album', 'week' => $week->week));
@@ -717,7 +721,7 @@ class Charts
 	{
 		$dao = Dao::getConn();
 		$filter = intval($year) > 0 ? " AND YEAR(w.to_day) = " . intval($year) : "";
-		$sql = "SELECT w.id as idweek, w.week as week, a.artist as artist, b.album as album, m.music as music FROM artist_charts a, album_charts b, music_charts m, week w, user u WHERE a.idweek = b.idweek AND a.idweek = m.idweek".$filter." AND a.rank = 1 AND b.rank=1 AND m.rank=1 AND a.artist = b.artist AND a.artist=m.artist AND a.idweek = w.id AND b.idweek = w.id AND m.idweek = w.id AND w.iduser = u.id AND u.id = ".$this->user->id." ORDER BY week";
+		$sql = "SELECT w.id as idweek, w.week as week, a.artist as artist, b.album as album, m.music as music FROM artist_charts a, album_charts b, music_charts m, week w, user u WHERE a.idweek = b.idweek AND a.idweek = m.idweek".$filter." AND a.`rank` = 1 AND b.rank=1 AND m.rank=1 AND a.artist = b.artist AND a.artist=m.artist AND a.idweek = w.id AND b.idweek = w.id AND m.idweek = w.id AND w.iduser = u.id AND u.id = ".$this->user->id." ORDER BY week";
 		$allkill = $dao->run($sql);
 		return $allkill;
 	}
@@ -787,7 +791,7 @@ class Charts
 							FROM artist_charts ac2
 							JOIN week w2 ON ac2.idweek = w2.id
 							WHERE ac2.artist = ac.artist
-								AND ac2.rank = 1
+								AND ac2.`rank` = 1
 								AND w2.iduser = ".$this->user->id."
 						)
 						GROUP BY ac.artist
@@ -810,7 +814,7 @@ class Charts
 							JOIN week w2 ON ac2.idweek = w2.id
 							WHERE ac2.artist = ac.artist
 								AND ac2.album = ac.album
-								AND ac2.rank = 1
+								AND ac2.`rank` = 1
 								AND w2.iduser = ".$this->user->id."
 						)
 						GROUP BY ac.artist, ac.album
@@ -834,7 +838,7 @@ class Charts
 							JOIN week w2 ON mc2.idweek = w2.id
 							WHERE mc2.artist = mc.artist
 								AND mc2.music = mc.music
-								AND mc2.rank = 1
+								AND mc2.`rank` = 1
 								AND w2.iduser = ".$this->user->id."
 						)
 						GROUP BY mc.artist, mc.music
@@ -854,7 +858,7 @@ class Charts
 			SELECT ac.artist, w.week
 			FROM artist_charts ac
 			JOIN week w ON ac.idweek = w.id
-			WHERE ac.rank = 1 AND w.iduser = ".$iduser."
+			WHERE ac.`rank` = 1 AND w.iduser = ".$iduser."
 			ORDER BY ac.artist, w.week
 		";
 
@@ -925,7 +929,7 @@ class Charts
 		$sql = "SELECT ac.artist, ac.album, w.week
 			FROM album_charts ac
 			JOIN week w ON ac.idweek = w.id
-			WHERE ac.rank = 1 AND w.iduser = ".$iduser."
+			WHERE ac.`rank` = 1 AND w.iduser = ".$iduser."
 			ORDER BY ac.artist, ac.album, w.week";
 
 		$rows = $dao->run($sql);
@@ -997,7 +1001,7 @@ class Charts
 		$sql = "SELECT mc.artist, mc.music, w.week
 			FROM music_charts mc
 			JOIN week w ON mc.idweek = w.id
-			WHERE mc.rank = 1 AND w.iduser = ".$iduser."
+			WHERE mc.`rank` = 1 AND w.iduser = ".$iduser."
 			ORDER BY mc.artist, mc.music, w.week";
 
 		$rows = $dao->run($sql);
@@ -1093,9 +1097,9 @@ class Charts
 					JOIN week w ON ac.idweek = w.id AND w.iduser = ".$this->user->id."
 					LEFT JOIN artist_charts ac1
 						JOIN week w1 ON ac1.idweek = w1.id AND w1.iduser = ".$this->user->id."
-						AND ac1.rank = 1
+						AND ac1.`rank` = 1
 						ON ac.artist = ac1.artist
-					WHERE ac.rank = 2
+					WHERE ac.`rank` = 2
 					AND ac1.artist IS NULL
 					GROUP BY ac.artist
 					ORDER BY weeks_in_2 DESC
@@ -1108,9 +1112,9 @@ class Charts
 					JOIN week w ON ac.idweek = w.id AND w.iduser = ".$this->user->id."
 					LEFT JOIN album_charts ac1
 						JOIN week w1 ON ac1.idweek = w1.id AND w1.iduser = ".$this->user->id."
-						AND ac1.rank = 1
+						AND ac1.`rank` = 1
 						ON ac.artist = ac1.artist AND ac.album = ac1.album
-					WHERE ac.rank = 2
+					WHERE ac.`rank` = 2
 					AND ac1.artist IS NULL
 					GROUP BY ac.artist, ac.album
 					ORDER BY weeks_in_2 DESC
@@ -1124,9 +1128,9 @@ class Charts
 					JOIN week w ON mc.idweek = w.id AND w.iduser = ".$this->user->id."
 					LEFT JOIN music_charts mc1
 						JOIN week w1 ON mc1.idweek = w1.id AND w1.iduser = ".$this->user->id."
-						AND mc1.rank = 1
+						AND mc1.`rank` = 1
 						ON mc.artist = mc1.artist AND mc.music = mc1.music
-					WHERE mc.rank = 2
+					WHERE mc.`rank` = 2
 					AND mc1.artist IS NULL
 					GROUP BY mc.artist, mc.music
 					ORDER BY weeks_in_2 DESC
