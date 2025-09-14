@@ -14,8 +14,10 @@
     "@mantine/core": "^8.3.1",
     "@mantine/hooks": "^8.3.1",
     "@reduxjs/toolkit": "^2.9.0",
+    "i18next": "^25.5.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-i18next": "^15.7.3",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1"
   },
