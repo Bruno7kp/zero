@@ -1,0 +1,56 @@
+# zero/docker-compose.yml
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    volumes:
+      - ./backend:/var/www/html
+    networks:
+      - zero-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - zero-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend/Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: npm run dev
+    depends_on:
+      - app
+    networks:
+      - zero-network
+
+  nginx:
+    build:
+      context: ./docker/nginx
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8081:80"
+    depends_on:
+      - app
+      - frontend
+    networks:
+      - zero-network
+
+volumes:
+  db-data:
+
+networks:
+  zero-network:
+    driver: bridge
