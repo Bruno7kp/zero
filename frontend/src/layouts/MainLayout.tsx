@@ -5,10 +5,12 @@ import { AppShell, NavLink } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Header } from '../components/Header';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from "../contexts/AuthContext.tsx";
 
 const MainLayout: React.FC = () => {
     const [mobileMenuOpened, { toggle: toggleMobileMenu }] = useDisclosure();
     const { t } = useTranslation();
+    const { isAuthenticated } = useAuth();
 
     return (
         <AppShell
@@ -22,10 +24,14 @@ const MainLayout: React.FC = () => {
 
             <AppShell.Navbar p="md" hiddenFrom="sm">
                 {/* Itens do menu mobile aqui */}
-                <NavLink label={t('Charts')} component="a" href="/charts" onClick={toggleMobileMenu} />
-                <NavLink label={t('Live')} component="a" href="/live" onClick={toggleMobileMenu} />
+                {isAuthenticated && (
+                    <>
+                        <NavLink label={t('charts')} component="a" href="/charts" onClick={toggleMobileMenu} />
+                        <NavLink label={t('live')} component="a" href="/live" onClick={toggleMobileMenu} />
+                    </>
+                )}
                 <NavLink label={t('FAQ')} component="a" href="/faq" onClick={toggleMobileMenu} />
-                <NavLink label={t('Fórum')} component="a" href="/forum" onClick={toggleMobileMenu} />
+                <NavLink label={t('forum')} component="a" href="/forum" onClick={toggleMobileMenu} />
             </AppShell.Navbar>
 
             <AppShell.Main>

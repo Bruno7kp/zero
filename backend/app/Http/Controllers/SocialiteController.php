@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
+
+class SocialiteController extends Controller
+{
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback(Request $request)
+    {
+        try {
+            // Se vier um token no corpo (fluxo One Tap / @react-oauth/google), validamos o ID token
+            if ($request->isMethod('post') && $request->filled('token')) {
+                $idToken = $request->input('token');
+
+                // Validar o ID token diretamente no endpoint do Google
+                // OBS: Em produção, considere usar verificação por chave pública (JWKS) para reduzir latência.
+                $response = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken));
+                if ($response === false) {
+                    throw new \Exception('Could not validate ID token');
+                }
+
+                $payload = json_decode($response, true);
+                $aud = $payload['aud'] ?? null;
+                // Aceitar múltiplos client_ids via env GOOGLE_CLIENT_IDS (separados por vírgula) ou fallback para GOOGLE_CLIENT_ID
+                $allowedClientIds = array_filter(array_map('trim', explode(',', env('GOOGLE_CLIENT_IDS', (string) config('services.google.client_id')))));
+                if (!is_array($payload) || empty($payload['email']) || !$aud || !in_array($aud, $allowedClientIds, true)) {
+                    throw new \Exception('Invalid ID token payload (aud/email mismatch)');
+                }
+
+                $email = $payload['email'];
+                $name = $payload['name'] ?? ($payload['given_name'] ?? 'User');
+                $avatar = $payload['picture'] ?? null;
+                $googleId = $payload['sub'] ?? null;
+
+                $user = User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => $name,
+                        'google_id' => $googleId,
+                        'email_verified_at' => now(),
+                        'password' => Hash::make(Str::random(16)),
+                        'avatar' => $avatar,
+                    ]
+                );
+
+                // Se já existia e não tinha google_id/avatar, atualiza de forma segura
+                $updates = [];
+                if (!$user->google_id && $googleId) { $updates['google_id'] = $googleId; }
+                if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
+                if (!empty($updates)) { $user->fill($updates)->save(); }
+
+                // Criar token de acesso do Sanctum
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return response()->json([
+                    'user' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'avatar' => $user->avatar,
+                    ],
+                    'token' => $token,
+                ]);
+            }
+
+            // Fallback para o fluxo clássico (redirect GET) usando Socialite
+            $socialiteUser = Socialite::driver('google')->stateless()->user();
+
+            $user = User::firstOrCreate(
+                ['email' => $socialiteUser->getEmail()],
+                [
+                    'name' => $socialiteUser->getName(),
+                    'google_id' => $socialiteUser->getId(),
+                    'email_verified_at' => now(),
+                    'password' => Hash::make(Str::random(16)), // Senha aleatória
+                    'avatar' => $socialiteUser->getAvatar(),
+                ]
+            );
+
+            // Criar token de acesso do Sanctum
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'user' => [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar' => $user->avatar,
+                ],
+                'token' => $token,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Google Socialite login failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Authentication failed.'], 401);
+        }
+    }
+}

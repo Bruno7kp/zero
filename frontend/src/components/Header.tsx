@@ -18,13 +18,11 @@ import {
     IconSettings,
     IconLogout,
     IconBrandGithub,
-    //IconQuestionMark,
-    //IconUsers,
-    IconPalette, // Novo ícone para o seletor de tema
+    IconPalette,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-//import { useDisclosure } from '@mantine/hooks';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
     mobileMenuOpened: boolean;
@@ -32,28 +30,36 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ mobileMenuOpened, toggleMobileMenu }) => {
-    const { setColorScheme } = useMantineColorScheme(); // Adicionado setColorScheme
+    const { setColorScheme } = useMantineColorScheme();
     const { i18n, t } = useTranslation();
+    const { user, isAuthenticated, logout } = useAuth(); // Usando o hook de autenticação
 
     const changeLanguage = (lng: 'en' | 'pt') => {
         i18n.changeLanguage(lng);
     };
 
+    const handleLogout = () => {
+        logout();
+    };
+
     const menuItems = (
         <Group visibleFrom="sm">
-            <Button component={NavLink} to="/charts" variant="subtle">{t('Charts')}</Button>
-            <Button component={NavLink} to="/live" variant="subtle">{t('Live')}</Button>
+            {isAuthenticated && (
+                <>
+                    <Button component={NavLink} to="/charts" variant="subtle">{t('charts')}</Button>
+                    <Button component={NavLink} to="/live" variant="subtle">{t('live')}</Button>
+                </>
+            )}
             <Button component={NavLink} to="/faq" variant="subtle">{t('FAQ')}</Button>
-            <Button component={NavLink} to="/forum" variant="subtle">{t('Fórum')}</Button>
+            <Button component={NavLink} to="/forum" variant="subtle">{t('forum')}</Button>
         </Group>
     );
 
     const rightSection = (
         <Group>
-            {/* Botão do GitHub em primeiro */}
             <ActionIcon
                 component="a"
-                href="https://github.com/seu-usuario"
+                href="https://github.com/bruno7kp/zero"
                 target="_blank"
                 variant="subtle"
                 size="lg"
@@ -62,7 +68,6 @@ export const Header: React.FC<HeaderProps> = ({ mobileMenuOpened, toggleMobileMe
                 <IconBrandGithub style={{ width: rem(20), height: rem(20) }} />
             </ActionIcon>
 
-            {/* Dropdown de Idioma */}
             <Menu shadow="md" width={150}>
                 <Menu.Target>
                     <ActionIcon variant="subtle" size="lg" aria-label={t('changeLanguage')}>
@@ -75,7 +80,6 @@ export const Header: React.FC<HeaderProps> = ({ mobileMenuOpened, toggleMobileMe
                 </Menu.Dropdown>
             </Menu>
 
-            {/* Dropdown de Tema (novo) */}
             <Menu shadow="md" width={150}>
                 <Menu.Target>
                     <ActionIcon variant="subtle" size="lg" aria-label={t('toggleTheme')}>
@@ -92,21 +96,51 @@ export const Header: React.FC<HeaderProps> = ({ mobileMenuOpened, toggleMobileMe
                 </Menu.Dropdown>
             </Menu>
 
-            {/* Dropdown de Usuário */}
-            <Menu shadow="md" width={200}>
-                <Menu.Target>
-                    <ActionIcon variant="subtle" size="lg" aria-label={t('userMenu')}>
-                        <IconUserCircle style={{ width: rem(24), height: rem(24) }} />
-                    </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown>
-                    <Menu.Label>{t('user')}</Menu.Label>
-                    <Menu.Item leftSection={<IconUserCircle style={{ width: rem(14), height: rem(14) }} />}>{t('profile')}</Menu.Item>
-                    <Menu.Item leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>{t('settings')}</Menu.Item>
-                    <Menu.Divider />
-                    <Menu.Item leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}>{t('logout')}</Menu.Item>
-                </Menu.Dropdown>
-            </Menu>
+            {/* Renderização condicional do botão de Login ou do Dropdown de Usuário */}
+            {!isAuthenticated ? (
+                // Botão de Login para usuários não autenticados
+                <Button component={NavLink} to="/login" variant="default">
+                    {t('signIn')}
+                </Button>
+            ) : (
+                // Dropdown de Usuário para usuários autenticados
+                <Menu shadow="md" width={200}>
+                    <Menu.Target>
+                        <ActionIcon variant="subtle" size="lg" aria-label={t('userMenu')}>
+                            <IconUserCircle style={{ width: rem(24), height: rem(24) }} />
+                        </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                        <Menu.Label>
+                            <Text fw={500} size="sm">
+                                {user?.name || t('user')}
+                            </Text>
+                        </Menu.Label>
+                        <Menu.Item
+                            component={NavLink}
+                            to="/profile"
+                            leftSection={<IconUserCircle style={{ width: rem(14), height: rem(14) }} />}
+                        >
+                            {t('profile')}
+                        </Menu.Item>
+                        <Menu.Item
+                            component={NavLink}
+                            to="/settings"
+                            leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
+                        >
+                            {t('settings')}
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item
+                            color="red"
+                            leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}
+                            onClick={handleLogout}
+                        >
+                            {t('logout')}
+                        </Menu.Item>
+                    </Menu.Dropdown>
+                </Menu>
+            )}
         </Group>
     );
 

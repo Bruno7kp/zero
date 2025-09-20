@@ -8,6 +8,10 @@ services:
       - ./backend:/var/www/html
     networks:
       - zero-network
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: ./backend/.env
 
   db:
     image: mysql:8.0
@@ -18,6 +22,11 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - zero-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
