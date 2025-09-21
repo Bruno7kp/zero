@@ -1,40 +1,95 @@
 {
   "translation": {
-    "login": "Entrar",
-    "logout": "Sair",
-    "home": "Início",
-    "about": "Sobre",
-    "contact": "Contato",
-    "chart": "Chart",
-    "charts": "Charts",
-    "chartList": "Lista de Charts",
-    "chartCreate": "Criar Chart",
-    "chartEdit": "Editar Chart",
-    "chartDelete": "Excluir Chart",
-    "chartView": "Visualizar Chart",
-    "chartViewAll": "Visualizar Todos os Charts",
-    "forum": "Fórum",
-    "settings": "Configurações",
-    "profile": "Perfil",
-    "live": "Live",
-    "changeLanguage": "Trocar Idioma",
-    "lightTheme": "Tema Claro",
-    "darkTheme": "Tema Escuro",
-    "theme": "Tema",
-    "toggleTheme": "Trocar Tema",
-    "user": "Usuário",
-    "userMenu": "Usuário",
-    "invalidEmail": "Email inválido",
-    "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
-    "welcome": "Bem-vindo de volta!",
-    "noAccount": "Não tem uma conta ainda?",
-    "register": "Cadastre-se",
-    "email": "Email",
-    "password": "Senha",
-    "yourPassword": "Sua senha",
-    "rememberMe": "Lembre-me",
-    "forgotPassword": "Esqueceu a senha?",
-    "signIn": "Entrar",
-    "googleSignIn": "Entrar com o Google"
+    "user": {
+      "title": "Usuário",
+      "forum": "Fórum",
+      "faq": "FAQ",
+      "profile": "Perfil",
+      "changeLanguage": "Mudar idioma",
+      "login": "Entrar",
+      "logout": "Sair",
+      "friends": "Amigos"
+    },
+    "charts": {
+      "title": "Charts",
+      "live": "Live"
+    },
+    "library": {
+      "title": "Biblioteca"
+    },
+    "theme": {
+      "title": "Tema",
+      "toggle": "Alterar tema",
+      "light": "Tema Claro",
+      "dark": "Tema Escuro"
+    },
+    "settings": {
+      "title": "Configurações",
+      "loadingCharts": "Carregando seus charts...",
+      "pageTitle": "Configurações",
+      "pageDescription": "Aqui você pode gerenciar suas configurações de usuário e seus charts.",
+      "activeChartLabel": "Chart Ativo",
+      "activeChartPlaceholder": "Selecione seu chart principal",
+      "noCharts": "Você ainda não tem nenhum chart. Crie um novo para começar."
+    },
+    "forms": {
+      "createChart": {
+        "title": "Criar novo chart",
+        "nameLabel": "Nome do chart",
+        "namePlaceholder": "Ex: Janet's Official Charts",
+        "nameRequired": "O nome do chart é obrigatório",
+        "sourceLabel": "Fonte dos dados",
+        "sourcePlaceholder": "Selecione a fonte",
+        "lastfmUsernameLabel": "Usuário do Last.fm",
+        "lastfmUsernamePlaceholder": "Ex: bruno7kp",
+        "lastfmUsernameRequired": "O usuário do Last.fm é obrigatório",
+        "startDateLabel": "Data de início dos charts",
+        "startDatePlaceholder": "Ex: 2021-01-01",
+        "startDateRequired": "A data de início é obrigatória",
+        "startDateDayMismatch": "A data selecionada deve cair em um(a) {{day}}",
+        "dayOfWeekLabel": "Dia da semana",
+        "timezoneLabel": "Fuso horário",
+        "timezonePlaceholder": "Selecione o fuso horário",
+        "musicCutoffLabel": "Limite de músicas",
+        "albumCutoffLabel": "Limite de álbuns",
+        "artistCutoffLabel": "Limite de artistas",
+        "formulaNameLabel": "Nome da unidade de valor das reproduções + pontos",
+        "musicPointsWeightLabel": "Peso dos pontos das músicas",
+        "musicPlaysWeightLabel": "Peso das execuções das músicas",
+        "albumPointsWeightLabel": "Peso dos pontos dos álbuns",
+        "albumPlaysWeightLabel": "Peso das execuções dos álbuns",
+        "musicGoldLabel": "Valor para o certificado de Ouro de músicas",
+        "musicPlatinumLabel": "Valor para o certificado de Platina de músicas",
+        "musicDiamondLabel": "Valor para o certificado de Diamante de músicas",
+        "albumGoldLabel": "Valor para o certificado de Ouro de álbuns",
+        "albumPlatinumLabel": "Valor para o certificado de Platina de álbuns",
+        "albumDiamondLabel": "Valor para o certificado de Diamante de álbuns",
+        "cutoffMin": "O valor mínimo é {{min}}",
+        "valueOrderError": "O valor deve ser maior que {{prev}}",
+        "createButton": "Criar chart",
+        "sourceTitle": "Configurações gerais",
+        "formulaTitle": "Pontos",
+        "certificationTitle": "Certificados"
+      }
+    },
+    "errors": {
+      "notAuthenticated": "Você precisa estar autenticado para realizar esta ação.",
+      "failedToCreateChart": "Falha ao criar o chart.",
+      "unknown": "Erro desconhecido."
+    },
+    "values": {
+      "gold": "Ouro",
+      "platinum": "Platina",
+      "diamond": "Diamante"
+    },
+    "days": {
+      "0": "Domingo",
+      "1": "Segunda-feira",
+      "2": "Terça-feira",
+      "3": "Quarta-feira",
+      "4": "Quinta-feira",
+      "5": "Sexta-feira",
+      "6": "Sábado"
+    }
   }
 }

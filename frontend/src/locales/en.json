@@ -1,40 +1,95 @@
 {
   "translation": {
-    "login": "Login",
-    "logout": "Logout",
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "chart": "Chart",
-    "charts": "Charts",
-    "chartList": "Chart List",
-    "chartCreate": "Create Chart",
-    "chartEdit": "Edit Chart",
-    "chartDelete": "Delete Chart",
-    "chartView": "View Chart",
-    "chartViewAll": "View All Charts",
-    "forum": "Forum",
-    "settings": "Settings",
-    "profile": "Profile",
-    "live": "Live",
-    "changeLanguage": "Change Language",
-    "lightTheme": "Light Theme",
-    "darkTheme": "Dark Theme",
-    "theme": "Theme",
-    "toggleTheme": "Toggle Theme",
-    "user": "User",
-    "userMenu": "User",
-    "invalidEmail": "Invalid email",
-    "passwordTooShort": "Password should include at least 6 characters",
-    "welcome": "Welcome back!",
-    "noAccount": "Do not have an account yet?",
-    "register": "Register",
-    "email": "Email",
-    "password": "Password",
-    "yourPassword": "Your password",
-    "rememberMe": "Remember me",
-    "forgotPassword": "Forgot password?",
-    "signIn": "Sign in",
-    "googleSignIn": "Sign in with Google"
+    "user": {
+      "title": "User",
+      "forum": "Forum",
+      "faq": "FAQ",
+      "profile": "Profile",
+      "changeLanguage": "Change language",
+      "login": "Login",
+      "logout": "Logout",
+      "friends": "Friends"
+    },
+    "charts": {
+      "title": "Charts",
+      "live": "Live"
+    },
+    "library": {
+      "title": "Library"
+    },
+    "theme": {
+      "title": "Theme",
+      "toggle": "Toggle theme",
+      "light": "Light Theme",
+      "dark": "Dark Theme"
+    },
+    "settings": {
+      "title": "Settings",
+      "loadingCharts": "Loading your charts...",
+      "pageTitle": "Settings Page",
+      "pageDescription": "Here you can manage your user settings and charts.",
+      "activeChartLabel": "Active Chart",
+      "activeChartPlaceholder": "Select your main chart",
+      "noCharts": "You don't have any charts yet. Create a new one to get started."
+    },
+    "forms": {
+      "createChart": {
+        "title": "Create New Chart",
+        "nameLabel": "Chart Name",
+        "namePlaceholder": "Ex: Janet's Official Charts",
+        "nameRequired": "Chart name is required",
+        "sourceLabel": "Data Source",
+        "sourcePlaceholder": "Select the source",
+        "lastfmUsernameLabel": "Last.fm Username",
+        "lastfmUsernamePlaceholder": "Ex: bruno7kp",
+        "lastfmUsernameRequired": "Last.fm username is required",
+        "startDateLabel": "Charts start date",
+        "startDatePlaceholder": "Ex: 2021-01-01",
+        "startDateRequired": "Start date is required",
+        "startDateDayMismatch": "The selected date must fall on a {{day}}",
+        "dayOfWeekLabel": "Day of week",
+        "timezoneLabel": "Timezone",
+        "timezonePlaceholder": "Select timezone",
+        "musicCutoffLabel": "Songs limit",
+        "albumCutoffLabel": "Albums limit",
+        "artistCutoffLabel": "Artists limit",
+        "formulaNameLabel": "Name of plays + points value unit",
+        "musicPointsWeightLabel": "Songs points weight",
+        "musicPlaysWeightLabel": "Songs plays weight",
+        "albumPointsWeightLabel": "Albums points weight",
+        "albumPlaysWeightLabel": "Albums plays weight",
+        "musicGoldLabel": "Value for Gold certification for songs",
+        "musicPlatinumLabel": "Value for Platinum certification for songs",
+        "musicDiamondLabel": "Value for Diamond certification for songs",
+        "albumGoldLabel": "Value for Gold certification for albums",
+        "albumPlatinumLabel": "Value for Platinum certification for albums",
+        "albumDiamondLabel": "Value for Diamond certification for albums",
+        "cutoffMin": "Minimum value is {{min}}",
+        "valueOrderError": "Value must be greater than {{prev}}",
+        "createButton": "Create Chart",
+        "sourceTitle": "Chart settings",
+        "formulaTitle": "Points",
+        "certificationTitle": "Certification"
+      }
+    },
+    "errors": {
+      "notAuthenticated": "You need to be authenticated to perform this action.",
+      "failedToCreateChart": "Failed to create chart.",
+      "unknown": "Unknown error."
+    },
+    "values": {
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond"
+    },
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    }
   }
 }
