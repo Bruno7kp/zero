@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({ mobileOpened, toggleMobile, desk
                     component={Link}
                     to="/">
                     <Image
-                        src={ colorScheme !== 'dark' ? "https://i.imgur.com/NvbfhEa.png" : "https://i.imgur.com/N1c2b3t.png" }
+                        src={ colorScheme !== 'dark' ? "/zero-black.png" : "/zero-white.png" }
                         radius="md"
                         h={40}
                         w="auto"

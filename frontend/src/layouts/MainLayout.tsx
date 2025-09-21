@@ -1,7 +1,7 @@
 // src/layouts/MainLayout.tsx
 import React from 'react';
 import { Outlet, NavLink as ReactNavLink } from 'react-router-dom';
-import { AppShell, NavLink, rem, ThemeIcon, Group, Text, Anchor } from '@mantine/core';
+import { AppShell, NavLink, rem, ThemeIcon, Group, Text, Anchor, useMantineColorScheme, useMantineTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Header } from '../components/Header';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,8 @@ const MainLayout: React.FC = () => {
     const { t } = useTranslation();
     const { isAuthenticated } = useAuth();
     const currentYear = new Date().getFullYear();
+    const { colorScheme } = useMantineColorScheme();
+    const theme = useMantineTheme();
 
     return (
         <AppShell
@@ -137,7 +139,14 @@ const MainLayout: React.FC = () => {
                 </AppShell.Section>
             </AppShell.Navbar>
 
-            <AppShell.Main>
+            <AppShell.Main
+                style={{
+                    backgroundColor:
+                        colorScheme === 'dark'
+                            ? theme.colors.dark[8]
+                            : theme.colors.gray[1],
+                }}
+            >
                 <Outlet />
             </AppShell.Main>
         </AppShell>

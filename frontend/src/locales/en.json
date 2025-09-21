@@ -25,11 +25,12 @@
     },
     "settings": {
       "title": "Settings",
+      "chartTitle": "Configurações dos charts",
       "loadingCharts": "Loading your charts...",
-      "pageTitle": "Settings Page",
       "pageDescription": "Here you can manage your user settings and charts.",
-      "activeChartLabel": "Active Chart",
+      "activeChartLabel": "Active chart",
       "activeChartPlaceholder": "Select your main chart",
+      "activeChartInfo": "You can create multiple charts, each with different settings and Last.fm accounts. Choose which one you want as your main chart to view right now — and switch between them anytime.",
       "noCharts": "You don't have any charts yet. Create a new one to get started."
     },
     "forms": {
