@@ -55,6 +55,7 @@
         "albumCutoffLabel": "Albums limit",
         "artistCutoffLabel": "Artists limit",
         "formulaNameLabel": "Name of plays + points value unit",
+        "formulaDescription": "'Points' are used to generate the certificates. You can define the formula for how these points are calculated by adjusting the weight between two measures: Plays and Stability Points. Stability Points are based on the positions songs reach in the charts — with 100 points awarded for #1, 99 for #2, and so on.",
         "musicPointsWeightLabel": "Songs points weight",
         "musicPlaysWeightLabel": "Songs plays weight",
         "albumPointsWeightLabel": "Albums points weight",

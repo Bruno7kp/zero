@@ -1,3 +1,4 @@
+// src/contexts/ChartContext.tsx
 import React, {
     createContext,
     useContext,
@@ -12,7 +13,25 @@ interface Chart {
     id: number;
     user_id: number;
     name: string;
-    json: string;
+    source: string;
+    lastfm_username: string;
+    start_date: string;
+    day_of_week: number;
+    timezone: string;
+    music_cutoff: number;
+    album_cutoff: number;
+    artist_cutoff: number;
+    formula_name: string;
+    music_points_weight: number;
+    music_plays_weight: number;
+    album_points_weight: number;
+    album_plays_weight: number;
+    music_gold_value: number;
+    music_platinum_value: number;
+    music_diamond_value: number;
+    album_gold_value: number;
+    album_platinum_value: number;
+    album_diamond_value: number;
     created_at: string;
     updated_at: string;
 }
@@ -29,12 +48,14 @@ const ChartContext = createContext<ChartContextProps | undefined>(undefined);
 
 export const ChartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [charts, setCharts] = useState<Chart[]>([]);
-    const [activeChartId, setActiveChartId] = useState<number | null>(null);
+    const [activeChartId, setActiveChartId] = useState<number | null>(() => {
+        const storedId = localStorage.getItem('active-chart-id');
+        return storedId ? Number(storedId) : null;
+    });
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAuthLoading } = useAuth();
 
     const fetchCharts = useCallback(async () => {
-        // Recupera o token diretamente do localStorage
         const token = localStorage.getItem('user-token');
         if (!token) {
             setCharts([]);
@@ -67,14 +88,24 @@ export const ChartProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }, []);
 
     useEffect(() => {
+        if (isAuthLoading) {
+            return;
+        }
         if (isAuthenticated) {
             fetchCharts();
         } else {
             setCharts([]);
             setActiveChartId(null);
-            setIsLoading(false);
         }
-    }, [isAuthenticated, fetchCharts]);
+    }, [isAuthenticated, fetchCharts, isAuthLoading]);
+
+    useEffect(() => {
+        if (activeChartId) {
+            localStorage.setItem('active-chart-id', String(activeChartId));
+        } else {
+            localStorage.removeItem('active-chart-id');
+        }
+    }, [activeChartId]);
 
     const value = {
         charts,

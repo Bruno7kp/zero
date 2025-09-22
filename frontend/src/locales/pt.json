@@ -8,11 +8,19 @@
       "changeLanguage": "Mudar idioma",
       "login": "Entrar",
       "logout": "Sair",
-      "friends": "Amigos"
+      "friends": "Amigos",
+      "terms": "Termos de uso",
+      "privacy": "Política de privacidade",
+      "rights": "Todos os direitos reservados"
     },
     "charts": {
       "title": "Charts",
-      "live": "Live"
+      "plays": "Reproduções",
+      "stability": "Pontos de Estabilidade",
+      "points": "Pontos",
+      "live": "Live",
+      "sales": "vendas",
+      "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina."
     },
     "library": {
       "title": "Biblioteca"
@@ -54,22 +62,23 @@
         "musicCutoffLabel": "Limite de músicas",
         "albumCutoffLabel": "Limite de álbuns",
         "artistCutoffLabel": "Limite de artistas",
-        "formulaNameLabel": "Nome da unidade de valor das reproduções + pontos",
-        "musicPointsWeightLabel": "Peso dos pontos das músicas",
-        "musicPlaysWeightLabel": "Peso das execuções das músicas",
-        "albumPointsWeightLabel": "Peso dos pontos dos álbuns",
-        "albumPlaysWeightLabel": "Peso das execuções dos álbuns",
-        "musicGoldLabel": "Valor para o certificado de Ouro de músicas",
-        "musicPlatinumLabel": "Valor para o certificado de Platina de músicas",
-        "musicDiamondLabel": "Valor para o certificado de Diamante de músicas",
-        "albumGoldLabel": "Valor para o certificado de Ouro de álbuns",
-        "albumPlatinumLabel": "Valor para o certificado de Platina de álbuns",
-        "albumDiamondLabel": "Valor para o certificado de Diamante de álbuns",
+        "formulaNameLabel": "Nome da unidade de valor das 'vendas'",
+        "formulaDescription": "As 'vendas' são utilizados para gerar os certificados. Você pode definir a fórmula de cálculo dessas 'vendas', ajustando o peso entre duas medidas: Reproduções e Pontos de Estabilidade. Os Pontos de Estabilidade são calculados com base nas posições que as músicas alcançam nos charts — sendo atribuídos 100 pontos para a posição #1, 99 para a #2 e assim sucessivamente.",
+        "musicPointsWeightLabel": "Peso dos Pontos de Estabilidade das músicas",
+        "musicPlaysWeightLabel": "Peso das Reproduções das músicas",
+        "albumPointsWeightLabel": "Peso dos Pontos de Estabilidade dos álbuns",
+        "albumPlaysWeightLabel": "Peso das Reproduções dos álbuns",
+        "musicGoldLabel": "Valor para o Disco de Ouro de músicas",
+        "musicPlatinumLabel": "Valor para o Disco de Platina de músicas",
+        "musicDiamondLabel": "Valor para o Disco de Diamante de músicas",
+        "albumGoldLabel": "Valor para o Disco de Ouro de álbuns",
+        "albumPlatinumLabel": "Valor para o Disco de Platina de álbuns",
+        "albumDiamondLabel": "Valor para o Disco de Diamante de álbuns",
         "cutoffMin": "O valor mínimo é {{min}}",
         "valueOrderError": "O valor deve ser maior que {{prev}}",
         "createButton": "Criar chart",
         "sourceTitle": "Configurações gerais",
-        "formulaTitle": "Pontos",
+        "formulaTitle": "Vendas",
         "certificationTitle": "Certificados"
       }
     },
@@ -77,6 +86,14 @@
       "notAuthenticated": "Você precisa estar autenticado para realizar esta ação.",
       "failedToCreateChart": "Falha ao criar o chart.",
       "unknown": "Erro desconhecido."
+    },
+    "notifications": {
+      "charts": {
+        "save": {
+          "success": "O chart {{chart}} foi criado.",
+          "error": "Falha ao criar o chart."
+        }
+      }
     },
     "values": {
       "gold": "Ouro",

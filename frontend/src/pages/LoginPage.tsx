@@ -1,20 +1,19 @@
 // src/pages/LoginPage.tsx
 import React from 'react';
 import {
-    Paper,
-    Title,
     Container,
-    Group,
+    Group, Card, Text, Divider, Image, Anchor, useMantineColorScheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
     const { t } = useTranslation();
     const { loginWithGoogle, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const { colorScheme } = useMantineColorScheme();
 
     // Redirecionar para a home se o usuário já estiver autenticado
     React.useEffect(() => {
@@ -34,16 +33,33 @@ const LoginPage: React.FC = () => {
 
     return (
         <Container size={420} my={40}>
-            <Title ta="center">{t('welcome')}</Title>
+            <Group justify="center">
+                <Anchor
+                    component={Link}
+                    mb="lg"
+                    to="/">
+                    <Image
+                        src={ colorScheme !== 'dark' ? "/zero-black.png" : "/zero-white.png" }
+                        radius="md"
+                        h={40}
+                        w="auto"
+                        fit="contain"
+                    />
+                </Anchor>
+            </Group>
 
-            <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+            <Card shadow="md">
+                <Group justify="center">
+                    <Text fw={600} size="lg">{t('user.login')}</Text>
+                </Group>
+                <Divider variant="dashed" size="sm" my="xs"/>
                 <Group grow mb="md" mt="md" justify="center">
                     <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={handleGoogleFailure}
                     />
                 </Group>
-            </Paper>
+            </Card>
         </Container>
     );
 };

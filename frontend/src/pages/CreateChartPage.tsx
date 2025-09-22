@@ -1,5 +1,5 @@
 // src/pages/CreateChartPage.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Button,
     TextInput,
@@ -9,33 +9,40 @@ import {
     Select,
     NumberInput,
     Grid,
-    Container
+    Card,
+    ThemeIcon,
+    rem,
+    Divider,
+    Group,
+    Code
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 import { useCharts } from '../contexts/ChartContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom'; // Importe o hook de navegação
+import { useNavigate, NavLink, useParams } from 'react-router-dom';
 import '@mantine/dates/styles.css';
+import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
+import {IconCheck, IconListNumbers, IconSettings} from "@tabler/icons-react";
 
 const CreateChartPage = () => {
     const { t, i18n } = useTranslation();
-    const navigate = useNavigate(); // Inicialize o hook de navegação
+    const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
 
-    // Objeto de mapeamento para locais do dayjs
     const localeMapping = {
         'pt': 'pt-br',
     };
-
-    // Obtém o código de idioma atual e o mapeia para o local do dayjs
     const locale = localeMapping[i18n.language as keyof typeof localeMapping] || i18n.language;
 
-    const { fetchCharts } = useCharts();
+    const { charts, fetchCharts, isLoading } = useCharts();
     const { isAuthenticated } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isFormInitialized, setIsFormInitialized] = useState(false); // ✅ Novo estado
 
     const dayOfWeekOptions = [
         { value: '0', label: t('days.0') },
@@ -60,7 +67,7 @@ const CreateChartPage = () => {
             music_cutoff: 20,
             album_cutoff: 20,
             artist_cutoff: 20,
-            formula_name: 'points',
+            formula_name: t('charts.sales'),
             music_points_weight: 0,
             music_plays_weight: 1,
             album_points_weight: 0,
@@ -82,7 +89,7 @@ const CreateChartPage = () => {
             if (!values.start_date) {
                 errors.start_date = t('forms.createChart.startDateRequired');
             } else {
-                const dayOfWeek = values.start_date.getDay();
+                const dayOfWeek = dayjs(values.start_date).day();
                 if (dayOfWeek.toString() !== values.day_of_week) {
                     const selectedDayName = dayOfWeekOptions.find(d => d.value === values.day_of_week)?.label;
                     errors.start_date = t('forms.createChart.startDateDayMismatch', { day: selectedDayName });
@@ -120,6 +127,46 @@ const CreateChartPage = () => {
         },
     });
 
+    useEffect(() => {
+        if (id && !isLoading && charts.length > 0 && !isFormInitialized) { // ✅ Nova condição: !isFormInitialized
+            const chartToEdit = charts.find(c => c.id === Number(id));
+            if (chartToEdit) {
+                form.setValues({
+                    name: chartToEdit.name,
+                    source: chartToEdit.source,
+                    lastfm_username: chartToEdit.lastfm_username,
+                    start_date: dayjs(chartToEdit.start_date).toDate(),
+                    day_of_week: String(chartToEdit.day_of_week),
+                    timezone: chartToEdit.timezone,
+                    music_cutoff: chartToEdit.music_cutoff,
+                    album_cutoff: chartToEdit.album_cutoff,
+                    artist_cutoff: chartToEdit.artist_cutoff,
+                    formula_name: chartToEdit.formula_name,
+                    music_points_weight: chartToEdit.music_points_weight,
+                    music_plays_weight: chartToEdit.music_plays_weight,
+                    album_points_weight: chartToEdit.album_points_weight,
+                    album_plays_weight: chartToEdit.album_plays_weight,
+                    music_gold_value: chartToEdit.music_gold_value,
+                    music_platinum_value: chartToEdit.music_platinum_value,
+                    music_diamond_value: chartToEdit.music_diamond_value,
+                    album_gold_value: chartToEdit.album_gold_value,
+                    album_platinum_value: chartToEdit.album_platinum_value,
+                    album_diamond_value: chartToEdit.album_diamond_value,
+                });
+                setIsFormInitialized(true); // ✅ Define a flag para true após inicializar o formulário
+            } else {
+                notifications.show({
+                    message: t('errors.chartNotFound'),
+                    color: 'red',
+                });
+                navigate('/settings');
+            }
+        } else if (id && !isLoading && charts.length === 0) {
+            fetchCharts();
+        }
+    }, [id, charts, form, navigate, t, fetchCharts, isLoading, isFormInitialized]);
+
+
     const handleSubmit = async (values: typeof form.values) => {
         if (!form.validate()) {
             return;
@@ -134,18 +181,25 @@ const CreateChartPage = () => {
         setIsSubmitting(true);
         setError(null);
 
+        if (!values.start_date) {
+            return;
+        }
+
         const chartData = {
             name: values.name,
             json: JSON.stringify({
                 ...values,
-                start_date: values.start_date?.toISOString().split('T')[0],
+                start_date: dayjs(values.start_date).format('YYYY-MM-DD'),
                 day_of_week: parseInt(values.day_of_week),
             }),
         };
 
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/api/charts/${id}` : '/api/charts';
+
         try {
-            const response = await fetch('/api/charts', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -159,7 +213,13 @@ const CreateChartPage = () => {
             }
 
             await fetchCharts();
-            // Redirecione o usuário de volta para a página de configurações após o sucesso
+
+            notifications.show({
+                message: t(`notifications.charts.${id ? 'update' : 'save'}.success`, { chart: chartData.name }),
+                color: 'green',
+                icon: <IconCheck />,
+            });
+
             navigate('/settings');
         } catch (e: any) {
             setError(e.message || t('errors.unknown'));
@@ -168,17 +228,50 @@ const CreateChartPage = () => {
         }
     };
 
+    const pageTitle = id ? t('forms.editChart.title') : t('forms.createChart.title');
+    const buttonLabel = id ? t('forms.editChart.saveButton') : t('forms.createChart.createButton');
+
     return (
-        <Container size="xl" p="xs">
-            <Flex direction="column">
-                <Title order={2}>{t('forms.createChart.title')}</Title>
-                <form onSubmit={form.onSubmit(handleSubmit)}>
-                    <Grid mt="sm">
-                        <Grid.Col span={{ base: 12 }}>
+        <Flex direction="column" p="xs" gap="sm">
+            <Flex align="center" gap="sm">
+                <NavLink to="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
+                        <ThemeIcon variant="light" color="blue" size="md">
+                            <IconSettings style={{ width: rem(20), height: rem(20) }} />
+                        </ThemeIcon>
+                        {t('settings.title')}
+                    </Title>
+                </NavLink>
+
+                <Divider size="sm" orientation="vertical" />
+
+                <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
+                    <ThemeIcon variant="light" color="blue" size="md">
+                        <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
+                    </ThemeIcon>
+                    {t('charts.title')}
+                </Title>
+            </Flex>
+            <Divider variant="solid" size="sm" my="md"/>
+            <Grid>
+                <Grid.Col span={{ base: 12 }}>
+                    <Title order={2}>
+                        <ThemeIcon variant="light" color="blue" size="md" me="sm">
+                            <IconListNumbers style={{ width: rem(20), height: rem(20) }}/>
+                        </ThemeIcon>
+                        {pageTitle}
+                    </Title>
+                </Grid.Col>
+            </Grid>
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+                <Grid>
+                    <Grid.Col span={{ base: 12, lg: 8 }}>
+                        <Card shadow="md" p="md">
+                            <Group justify="space-between">
+                                <Text fw={600} size="lg">{t('forms.createChart.sourceTitle')}</Text>
+                            </Group>
+                            <Divider variant="dashed" size="sm" my="xs"/>
                             <Grid>
-                                <Grid.Col span={{ base: 12 }}>
-                                    <Title order={4}>{t('forms.createChart.sourceTitle')}</Title>
-                                </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
                                     <TextInput
                                         label={t('forms.createChart.nameLabel')}
@@ -231,82 +324,109 @@ const CreateChartPage = () => {
                                     />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.musicCutoffLabel')} {...form.getInputProps('music_cutoff')} />
+                                    <NumberInput min={5} max={100} label={t('forms.createChart.musicCutoffLabel')} {...form.getInputProps('music_cutoff')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.albumCutoffLabel')} {...form.getInputProps('album_cutoff')} />
+                                    <NumberInput min={5} max={100} label={t('forms.createChart.albumCutoffLabel')} {...form.getInputProps('album_cutoff')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.artistCutoffLabel')} {...form.getInputProps('artist_cutoff')} />
+                                    <NumberInput min={5} max={100} label={t('forms.createChart.artistCutoffLabel')} {...form.getInputProps('artist_cutoff')} />
                                 </Grid.Col>
                             </Grid>
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12 }}>
+                        </Card>
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, lg: 8 }}>
+                        <Card shadow="md" p="md">
+                            <Group justify="space-between">
+                                <Text fw={600} size="lg">{t('forms.createChart.formulaTitle')}</Text>
+                            </Group>
+                            <Divider variant="dashed" size="sm" my="xs"/>
+                            <Group justify="space-between">
+                                <Text size="sm">{t('forms.createChart.formulaDescription')}</Text>
+                            </Group>
+                            <Divider variant="dashed" size="sm" my="xs"/>
                             <Grid>
-                                <Grid.Col span={{ base: 12 }}>
-                                    <Title order={4}>{t('forms.createChart.formulaTitle')}</Title>
+                                <Grid.Col span={{ base: 12, md: 4 }}>
+                                    <Grid>
+                                        <Grid.Col span={12}>
+                                            <TextInput label={t('forms.createChart.formulaNameLabel')} {...form.getInputProps('formula_name')} />
+                                        </Grid.Col>
+                                        <Grid.Col span={12}>
+                                            <Text size="xs">{t('charts.salesExample')}</Text>
+                                        </Grid.Col>
+                                    </Grid>
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <TextInput label={t('forms.createChart.formulaNameLabel')} {...form.getInputProps('formula_name')} />
+                                    <Grid>
+                                        <Grid.Col span={12}>
+                                            <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.musicPlaysWeightLabel')} {...form.getInputProps('music_plays_weight')} />
+                                        </Grid.Col>
+                                        <Grid.Col span={12}>
+                                            <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.musicPointsWeightLabel')} {...form.getInputProps('music_points_weight')} />
+                                        </Grid.Col>
+                                        <Grid.Col span={12}>
+                                            <Code color="var(--mantine-color-blue-light)">({t('charts.plays')}*{form.values.music_plays_weight}) + ({t('charts.stability')}*{form.values.music_points_weight})</Code>
+                                        </Grid.Col>
+                                    </Grid>
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.musicPointsWeightLabel')} {...form.getInputProps('music_points_weight')} />
-                                </Grid.Col>
-                                <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.musicPlaysWeightLabel')} {...form.getInputProps('music_plays_weight')} />
-                                </Grid.Col>
-                                <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.albumPointsWeightLabel')} {...form.getInputProps('album_points_weight')} />
-                                </Grid.Col>
-                                <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.albumPlaysWeightLabel')} {...form.getInputProps('album_plays_weight')} />
+                                    <Grid>
+                                        <Grid.Col span={12}>
+                                            <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.albumPlaysWeightLabel')} {...form.getInputProps('album_plays_weight')} />
+                                        </Grid.Col>
+                                        <Grid.Col span={12}>
+                                            <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.albumPointsWeightLabel')} {...form.getInputProps('album_points_weight')} />
+                                        </Grid.Col>
+                                        <Grid.Col span={12}>
+                                            <Code color="var(--mantine-color-blue-light)">({t('charts.plays')}*{form.values.album_plays_weight}) + ({t('charts.stability')}*{form.values.album_points_weight})</Code>
+                                        </Grid.Col>
+                                    </Grid>
                                 </Grid.Col>
                             </Grid>
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12 }}>
+                        </Card>
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, lg: 8 }}>
+                        <Card shadow="md" p="md">
+                            <Group justify="space-between">
+                                <Text fw={600} size="lg">{t('forms.createChart.certificationTitle')}</Text>
+                            </Group>
+                            <Divider variant="dashed" size="sm" my="xs"/>
                             <Grid>
-                                <Grid.Col span={{ base: 12 }}>
-                                    <Title order={4}>{t('forms.createChart.certificationTitle')}</Title>
+                                <Grid.Col span={{ base: 12, md: 4 }}>
+                                    <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.musicGoldLabel')} {...form.getInputProps('music_gold_value')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.musicGoldLabel')} {...form.getInputProps('music_gold_value')} />
+                                    <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.musicPlatinumLabel')} {...form.getInputProps('music_platinum_value')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.musicPlatinumLabel')} {...form.getInputProps('music_platinum_value')} />
+                                    <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.musicDiamondLabel')} {...form.getInputProps('music_diamond_value')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.musicDiamondLabel')} {...form.getInputProps('music_diamond_value')} />
+                                    <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.albumGoldLabel')} {...form.getInputProps('album_gold_value')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.albumGoldLabel')} {...form.getInputProps('album_gold_value')} />
+                                    <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.albumPlatinumLabel')} {...form.getInputProps('album_platinum_value')} />
                                 </Grid.Col>
                                 <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.albumPlatinumLabel')} {...form.getInputProps('album_platinum_value')} />
-                                </Grid.Col>
-                                <Grid.Col span={{ base: 12, md: 4 }}>
-                                    <NumberInput label={t('forms.createChart.albumDiamondLabel')} {...form.getInputProps('album_diamond_value')} />
+                                    <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.albumDiamondLabel')} {...form.getInputProps('album_diamond_value')} />
                                 </Grid.Col>
                             </Grid>
-                        </Grid.Col>
+                        </Card>
+                    </Grid.Col>
 
-
-
-
-
-                        <Grid.Col span={12}>
-                            {error && (
-                                <Text c="red" size="sm">
-                                    {error}
-                                </Text>
-                            )}
-                            <Button type="submit" mt="md" fullWidth loading={isSubmitting}>
-                                {t('forms.createChart.createButton')}
-                            </Button>
-                        </Grid.Col>
-                    </Grid>
-                </form>
-            </Flex>
-        </Container>
+                    <Grid.Col span={12}>
+                        {error && (
+                            <Text c="red" size="sm">
+                                {error}
+                            </Text>
+                        )}
+                        <Button type="submit" loading={isSubmitting}>
+                            {buttonLabel}
+                        </Button>
+                    </Grid.Col>
+                </Grid>
+            </form>
+        </Flex>
     );
 };
 

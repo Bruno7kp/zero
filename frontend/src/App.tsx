@@ -13,10 +13,27 @@ import MainLayout from './layouts/MainLayout';
 import { useAuth } from './contexts/AuthContext';
 import './i18n';
 import CreateChartPage from "./pages/CreateChartPage.tsx";
+import { Loader, Center, Flex, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 // Componente para proteger rotas. Redireciona para o login se não estiver autenticado.
 const ProtectedRoute = ({ children }: { children: JSX.Element; }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAuthLoading } = useAuth();
+    const { t } = useTranslation();
+
+    // Se a autenticação ainda está sendo carregada, mostre um loader
+    if (isAuthLoading) {
+        return (
+            <Center style={{ height: '100vh' }}>
+                <Flex direction="column" align="center" gap="md">
+                    <Loader size="xl" />
+                    <Text>{t('settings.loadingAuth')}</Text>
+                </Flex>
+            </Center>
+        );
+    }
+
+    // Redireciona para a página de login se o usuário não estiver autenticado
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
@@ -35,6 +52,8 @@ function App() {
                 <Route index element={<HomePage />} />
                 <Route path="faq" element={<FaqPage />} />
                 <Route path="forum" element={<ForumPage />} />
+                <Route path="terms" element={<FaqPage />} />
+                <Route path="privacy" element={<FaqPage />} />
 
                 {/* Rotas protegidas */}
                 <Route
@@ -62,6 +81,22 @@ function App() {
                     }
                 />
                 <Route
+                    path="library"
+                    element={
+                        <ProtectedRoute>
+                            <ProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="friends"
+                    element={
+                        <ProtectedRoute>
+                            <ProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="settings"
                     element={
                         <ProtectedRoute>
@@ -71,6 +106,14 @@ function App() {
                 />
                 <Route
                     path="settings/chart"
+                    element={
+                        <ProtectedRoute>
+                            <CreateChartPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="settings/chart/:id"
                     element={
                         <ProtectedRoute>
                             <CreateChartPage />

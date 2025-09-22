@@ -1,6 +1,6 @@
 // src/layouts/MainLayout.tsx
 import React from 'react';
-import { Outlet, NavLink as ReactNavLink } from 'react-router-dom';
+import { Outlet, NavLink as ReactNavLink, Link } from 'react-router-dom';
 import { AppShell, NavLink, rem, ThemeIcon, Group, Text, Anchor, useMantineColorScheme, useMantineTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Header } from '../components/Header';
@@ -10,7 +10,10 @@ import {
     IconFlame,
     IconInfoCircle,
     IconListNumbers,
-    IconMessageCircle, IconPlaylist, IconSettings, IconUsers
+    IconMessageCircle,
+    IconPlaylist,
+    IconSettings,
+    IconUsers
 } from "@tabler/icons-react";
 
 const MainLayout: React.FC = () => {
@@ -72,7 +75,7 @@ const MainLayout: React.FC = () => {
                                 to="/library"
                                 component={ReactNavLink}
                                 onClick={toggleMobile}
-                                color="red"
+                                color="blue"
                             />
                             <NavLink
                                 leftSection={
@@ -83,7 +86,7 @@ const MainLayout: React.FC = () => {
                                 to="/friends"
                                 component={ReactNavLink}
                                 onClick={toggleMobile}
-                                color="red"
+                                color="blue"
                             />
                         </>
                     )}
@@ -126,13 +129,13 @@ const MainLayout: React.FC = () => {
                     )}
                     <Group p="sm">
                         <Text size="xs">
-                            © {currentYear} ZeroCharts. Todos os direitos reservados.<br/>
-                            <Anchor href="/termos-de-uso" size="sm">
-                                Termos de Uso
+                            © {currentYear} ZeroCharts. {t('user.rights')}.<br/>
+                            <Anchor component={Link} to="/terms" size="sm">
+                                {t('user.terms')}
                             </Anchor>
                             {' | '}
-                            <Anchor href="/politica-de-privacidade" size="sm">
-                                Política de Privacidade
+                            <Anchor component={Link} to="/privacy" size="sm">
+                                {t('user.privacy')}
                             </Anchor>
                         </Text>
                     </Group>

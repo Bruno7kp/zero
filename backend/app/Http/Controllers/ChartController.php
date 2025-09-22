@@ -24,14 +24,29 @@ class ChartController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'data' => 'nullable|json',
+            'start_date' => 'required|date',
+            'day_of_week' => 'required|integer',
+            'source' => 'required|string|max:255',
+            'lastfm_username' => 'nullable|string|max:255',
+            'timezone' => 'required|string|max:255',
+            'music_cutoff' => 'required|integer',
+            'album_cutoff' => 'required|integer',
+            'artist_cutoff' => 'required|integer',
+            'formula_name' => 'required|string|max:255',
+            'music_points_weight' => 'required|numeric',
+            'music_plays_weight' => 'required|numeric',
+            'album_points_weight' => 'required|numeric',
+            'album_plays_weight' => 'required|numeric',
+            'music_gold_value' => 'required|integer',
+            'music_platinum_value' => 'required|integer',
+            'music_diamond_value' => 'required|integer',
+            'album_gold_value' => 'required|integer',
+            'album_platinum_value' => 'required|integer',
+            'album_diamond_value' => 'required|integer',
         ]);
 
-        // Cria o chart para o usuário autenticado
-        $chart = Auth::user()->charts()->create([
-            'name' => $validatedData['name'],
-            'data' => $validatedData['data'] ? json_decode($validatedData['data'], true) : null,
-        ]);
+        // Cria o chart para o usuário autenticado, incluindo o campo 'data'
+        $chart = Auth::user()->charts()->create($validatedData);
 
         return response()->json($chart, 201);
     }

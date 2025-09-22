@@ -17,8 +17,8 @@ import {
 import { useCharts } from '../contexts/ChartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
-import {IconListNumbers, IconSettings} from "@tabler/icons-react";
+import { NavLink} from 'react-router-dom';
+import { IconListNumbers, IconSettings} from "@tabler/icons-react";
 
 const SettingsPage = () => {
     const { isAuthenticated } = useAuth();
@@ -49,16 +49,14 @@ const SettingsPage = () => {
 
     return (
         <Flex direction="column" p="xs" gap="sm">
-            <Grid>
-                <Grid.Col span={{ base: 12 }}>
-                    <Title order={2}>
-                        <ThemeIcon variant="light" color="blue" size="md" me="sm">
-                            <IconSettings style={{ width: rem(20), height: rem(20) }}/>
-                        </ThemeIcon>
-                        {t('settings.title')}
-                    </Title>
-                </Grid.Col>
-            </Grid>
+            <Flex align="center" gap="sm">
+                <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
+                    <ThemeIcon variant="light" color="blue" size="md">
+                        <IconSettings style={{ width: rem(20), height: rem(20) }} />
+                    </ThemeIcon>
+                    {t('settings.title')}
+                </Title>
+            </Flex>
             <Divider variant="solid" size="sm" my="md"/>
             <Grid>
                 <Grid.Col span={{ base: 12 }}>
@@ -66,7 +64,7 @@ const SettingsPage = () => {
                         <ThemeIcon variant="light" color="blue" size="md" me="sm">
                             <IconListNumbers style={{ width: rem(20), height: rem(20) }}/>
                         </ThemeIcon>
-                        {t('settings.chartTitle')}
+                        {t('charts.title')}
                     </Title>
                 </Grid.Col>
             </Grid>
@@ -74,7 +72,7 @@ const SettingsPage = () => {
                 <Grid.Col span={{base: 12, md: 8, lg: 6}}>
                     <Card shadow="md" p="md">
                         <Group justify="space-between">
-                            <Text fw={500} size="lg">{t('settings.activeChartPlaceholder')}</Text>
+                            <Text fw={600} size="lg">{t('settings.activeChartPlaceholder')}</Text>
                         </Group>
                         <Divider variant="dashed" size="sm" my="xs"/>
                         <Group justify="space-between" mb="xs">
@@ -102,11 +100,16 @@ const SettingsPage = () => {
                         </Flex>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={{base: 12}}>
+            </Grid>
+            <Grid>
+                <Grid.Col span={{base: 12, md: 8, lg: 6}}>
                     {charts.length > 0 && (
-                        <Text c="dimmed" mt="md">
-                            {t('settings.noCharts')}
-                        </Text>
+                        <Card shadow="md" p="md">
+                            <Group justify="space-between">
+                                <Text fw={600} size="lg">{t('charts.title')}</Text>
+                            </Group>
+                            <Divider variant="dashed" size="sm" my="xs"/>
+                        </Card>
                     )}
                 </Grid.Col>
             </Grid>
