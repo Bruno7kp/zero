@@ -6,6 +6,7 @@ import { ChartProvider } from '../contexts/ChartContext';
 import { BrowserRouter } from 'react-router-dom';
 import { DatesProvider } from '@mantine/dates';
 import { Notifications } from '@mantine/notifications';
+import { ModalsProvider } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 
 const theme = createTheme({
@@ -28,8 +29,10 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                 <ChartProvider>
                     <MantineProvider theme={theme} defaultColorScheme="dark">
                         <DatesProvider settings={{ locale: langKey || 'en' }}>
-                            <Notifications position="top-left" />
-                            <BrowserRouter>{children}</BrowserRouter>
+                            <ModalsProvider>
+                                <Notifications position="top-left" />
+                                <BrowserRouter>{children}</BrowserRouter>
+                            </ModalsProvider>
                         </DatesProvider>
                     </MantineProvider>
                 </ChartProvider>

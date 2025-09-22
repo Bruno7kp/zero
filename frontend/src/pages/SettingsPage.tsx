@@ -1,3 +1,4 @@
+// src/pages/SettingsPage.tsx
 import { useEffect } from 'react';
 import {
     Flex,
@@ -12,17 +13,22 @@ import {
     rem,
     Divider,
     Group,
-    Card
+    Card,
+    ActionIcon
 } from '@mantine/core';
 import { useCharts } from '../contexts/ChartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { NavLink} from 'react-router-dom';
-import { IconListNumbers, IconSettings} from "@tabler/icons-react";
+import {generatePath, Link, NavLink} from 'react-router-dom';
+import {IconEdit, IconListNumbers, IconSettings, IconTrash} from "@tabler/icons-react";
+import { DataTable } from "mantine-datatable";
+import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 const SettingsPage = () => {
     const { isAuthenticated } = useAuth();
-    const { charts, isLoading, activeChartId, fetchCharts, setActiveChartId } = useCharts();
+    const { charts, isLoading, activeChartId, fetchCharts, setActiveChartId, deleteChart } = useCharts();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -41,6 +47,35 @@ const SettingsPage = () => {
             </Center>
         );
     }
+
+    const openDeleteModal = (chartId: number, chartName: string) =>
+        modals.openConfirmModal({
+            title: t('forms.deleteChart.title', { name: chartName }),
+            children: (
+                <Text size="sm">
+                    {t('forms.deleteChart.message', { name: chartName })}
+                </Text>
+            ),
+            labels: { confirm: t('forms.deleteChart.deleteButton'), cancel: t('forms.deleteChart.cancelButton') },
+            confirmProps: { color: 'red' },
+            onCancel: () => console.log('Deleção cancelada'),
+            onConfirm: async () => {
+                const success = await deleteChart(chartId);
+                if (success) {
+                    notifications.show({
+                        message: t('notifications.charts.delete.success', { chart: chartName }),
+                        color: 'green',
+                        icon: <IconCheck />,
+                    });
+                } else {
+                    notifications.show({
+                        message: t('notifications.charts.delete.error', { chart: chartName }),
+                        color: 'red',
+                        icon: <IconX />,
+                    });
+                }
+            },
+        });
 
     const chartOptions = charts.map(chart => ({
         value: String(chart.id),
@@ -94,7 +129,7 @@ const SettingsPage = () => {
                                 clearable
                                 style={{ flex: 1 }}
                             />
-                            <Button component={NavLink} to="/settings/chart" mt="md">
+                            <Button component={NavLink} to="/settings/add-chart" mt="md">
                                 {t('forms.createChart.title')}
                             </Button>
                         </Flex>
@@ -109,6 +144,40 @@ const SettingsPage = () => {
                                 <Text fw={600} size="lg">{t('charts.title')}</Text>
                             </Group>
                             <Divider variant="dashed" size="sm" my="xs"/>
+                            <DataTable
+                                backgroundColor="transparent"
+                                columns={[
+                                    { accessor: 'name', title: t('charts.title') },
+                                    { accessor: 'lastfm_username', title: t('forms.createChart.lastfmUsernameLabel') },
+                                    {
+                                        accessor: 'actions',
+                                        title: t('charts.actions'),
+                                        textAlign: 'right',
+                                        render: (chart) => (
+                                            <Group gap={4} justify="right" wrap="nowrap">
+                                                <ActionIcon
+                                                    component={Link}
+                                                    size="sm"
+                                                    variant="subtle"
+                                                    color="blue"
+                                                    to={generatePath('/settings/charts/:id', { id: chart.id.toString() })}
+                                                >
+                                                    <IconEdit size={16} />
+                                                </ActionIcon>
+                                                <ActionIcon
+                                                    size="sm"
+                                                    variant="subtle"
+                                                    color="red"
+                                                    onClick={() => openDeleteModal(chart.id, chart.name)}
+                                                >
+                                                    <IconTrash size={16} />
+                                                </ActionIcon>
+                                            </Group>
+                                        )
+                                    }
+                                ]}
+                                records={charts}
+                            />
                         </Card>
                     )}
                 </Grid.Col>

@@ -105,7 +105,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="settings/chart"
+                    path="settings/add-chart"
                     element={
                         <ProtectedRoute>
                             <CreateChartPage />
@@ -113,7 +113,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="settings/chart/:id"
+                    path="settings/charts/:id"
                     element={
                         <ProtectedRoute>
                             <CreateChartPage />

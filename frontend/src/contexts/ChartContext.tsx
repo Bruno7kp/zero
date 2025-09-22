@@ -42,6 +42,9 @@ interface ChartContextProps {
     activeChartId: number | null;
     fetchCharts: () => Promise<void>;
     setActiveChartId: (id: number | null) => void;
+    deleteChart: (chartId: number) => Promise<boolean>;
+    createChart: (chartData: any) => Promise<boolean>;
+    updateChart: (chartId: number, chartData: any) => Promise<boolean>;
 }
 
 const ChartContext = createContext<ChartContextProps | undefined>(undefined);
@@ -87,6 +90,83 @@ export const ChartProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
     }, []);
 
+    const createChart = useCallback(async (chartData: any) => {
+        const token = localStorage.getItem('user-token');
+        if (!token) return false;
+
+        try {
+            const response = await fetch('/api/charts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(chartData),
+            });
+
+            if (!response.ok) throw new Error('Falha ao criar o chart');
+
+            await fetchCharts();
+            return true;
+        } catch (error) {
+            console.error('Falha ao criar o chart:', error);
+            return false;
+        }
+    }, [fetchCharts]);
+
+    const updateChart = useCallback(async (chartId: number, chartData: any) => {
+        const token = localStorage.getItem('user-token');
+        if (!token) return false;
+
+        try {
+            const response = await fetch(`/api/charts/${chartId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(chartData),
+            });
+
+            if (!response.ok) throw new Error('Falha ao atualizar o chart');
+
+            await fetchCharts();
+            return true;
+        } catch (error) {
+            console.error('Falha ao atualizar o chart:', error);
+            return false;
+        }
+    }, [fetchCharts]);
+
+    const deleteChart = useCallback(async (chartId: number) => {
+        const token = localStorage.getItem('user-token');
+        if (!token) {
+            console.error('Nenhum token de autenticação encontrado.');
+            return false;
+        }
+
+        try {
+            const response = await fetch(`/api/charts/${chartId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Falha ao deletar o chart');
+            }
+
+            await fetchCharts();
+            setActiveChartId((prevId) => (prevId === chartId ? null : prevId));
+            return true; // Retorna sucesso
+        } catch (error) {
+            console.error('Falha ao deletar o chart:', error);
+            return false; // Retorna falha
+        }
+    }, [fetchCharts]);
+
     useEffect(() => {
         if (isAuthLoading) {
             return;
@@ -113,6 +193,9 @@ export const ChartProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         activeChartId,
         fetchCharts,
         setActiveChartId,
+        deleteChart,
+        createChart,
+        updateChart,
     };
 
     return (

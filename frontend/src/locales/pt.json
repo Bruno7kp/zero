@@ -19,6 +19,7 @@
       "stability": "Pontos de Estabilidade",
       "points": "Pontos",
       "live": "Live",
+      "actions": "Ações",
       "sales": "vendas",
       "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina."
     },
@@ -80,6 +81,16 @@
         "sourceTitle": "Configurações gerais",
         "formulaTitle": "Vendas",
         "certificationTitle": "Certificados"
+      },
+      "editChart": {
+        "title": "Editar chart",
+        "saveButton": "Salvar"
+      },
+      "deleteChart": {
+        "title": "Excluir chart",
+        "message": "Tem certeza que deseja excluir este chart?",
+        "deleteButton": "Excluir",
+        "cancelButton": "Cancelar"
       }
     },
     "errors": {
@@ -92,6 +103,14 @@
         "save": {
           "success": "O chart {{chart}} foi criado.",
           "error": "Falha ao criar o chart."
+        },
+        "update": {
+          "success": "O chart {{chart}} foi atualizado.",
+          "error": "Falha ao atualizar o chart."
+        },
+        "delete": {
+          "success": "O chart {{chart}} foi removido.",
+          "error": "Falha ao remover o chart."
         }
       }
     },

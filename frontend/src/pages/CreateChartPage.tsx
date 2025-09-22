@@ -26,7 +26,7 @@ import { useNavigate, NavLink, useParams } from 'react-router-dom';
 import '@mantine/dates/styles.css';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import {IconCheck, IconListNumbers, IconSettings} from "@tabler/icons-react";
+import { IconCheck, IconListNumbers, IconSettings, IconX } from "@tabler/icons-react";
 
 const CreateChartPage = () => {
     const { t, i18n } = useTranslation();
@@ -38,11 +38,11 @@ const CreateChartPage = () => {
     };
     const locale = localeMapping[i18n.language as keyof typeof localeMapping] || i18n.language;
 
-    const { charts, fetchCharts, isLoading } = useCharts();
+    const { charts, fetchCharts, isLoading, createChart, updateChart } = useCharts();
     const { isAuthenticated } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isFormInitialized, setIsFormInitialized] = useState(false); // ✅ Novo estado
+    const [isFormInitialized, setIsFormInitialized] = useState(false);
 
     const dayOfWeekOptions = [
         { value: '0', label: t('days.0') },
@@ -128,7 +128,7 @@ const CreateChartPage = () => {
     });
 
     useEffect(() => {
-        if (id && !isLoading && charts.length > 0 && !isFormInitialized) { // ✅ Nova condição: !isFormInitialized
+        if (id && !isLoading && charts.length > 0 && !isFormInitialized) {
             const chartToEdit = charts.find(c => c.id === Number(id));
             if (chartToEdit) {
                 form.setValues({
@@ -153,7 +153,7 @@ const CreateChartPage = () => {
                     album_platinum_value: chartToEdit.album_platinum_value,
                     album_diamond_value: chartToEdit.album_diamond_value,
                 });
-                setIsFormInitialized(true); // ✅ Define a flag para true após inicializar o formulário
+                setIsFormInitialized(true);
             } else {
                 notifications.show({
                     message: t('errors.chartNotFound'),
@@ -172,8 +172,7 @@ const CreateChartPage = () => {
             return;
         }
 
-        const token = localStorage.getItem('user-token');
-        if (!isAuthenticated || !token) {
+        if (!isAuthenticated) {
             setError(t('errors.notAuthenticated'));
             return;
         }
@@ -186,46 +185,34 @@ const CreateChartPage = () => {
         }
 
         const chartData = {
-            name: values.name,
-            json: JSON.stringify({
-                ...values,
-                start_date: dayjs(values.start_date).format('YYYY-MM-DD'),
-                day_of_week: parseInt(values.day_of_week),
-            }),
+            ...values,
+            start_date: dayjs(values.start_date).format('YYYY-MM-DD'),
+            day_of_week: parseInt(values.day_of_week),
         };
 
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `/api/charts/${id}` : '/api/charts';
+        let success = false;
+        if (id) {
+            success = await updateChart(Number(id), chartData);
+        } else {
+            success = await createChart(chartData);
+        }
 
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(chartData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || t('errors.failedToCreateChart'));
-            }
-
-            await fetchCharts();
-
+        if (success) {
             notifications.show({
                 message: t(`notifications.charts.${id ? 'update' : 'save'}.success`, { chart: chartData.name }),
                 color: 'green',
                 icon: <IconCheck />,
             });
-
             navigate('/settings');
-        } catch (e: any) {
-            setError(e.message || t('errors.unknown'));
-        } finally {
-            setIsSubmitting(false);
+        } else {
+            notifications.show({
+                message: t(`notifications.charts.${id ? 'update' : 'save'}.error`, { chart: chartData.name }),
+                color: 'red',
+                icon: <IconX />,
+            });
         }
+
+        setIsSubmitting(false);
     };
 
     const pageTitle = id ? t('forms.editChart.title') : t('forms.createChart.title');

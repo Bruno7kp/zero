@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rotas para gerenciar charts
     Route::get('/charts', [ChartController::class, 'index']);
     Route::post('/charts', [ChartController::class, 'store']);
+    Route::put('/charts/{chart}', [ChartController::class, 'update']);
+    Route::delete('/charts/{chart}', [ChartController::class, 'destroy']);
 });
 
 
