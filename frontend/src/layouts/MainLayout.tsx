@@ -18,7 +18,7 @@ import {
 
 const MainLayout: React.FC = () => {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
     const { t } = useTranslation();
     const { isAuthenticated } = useAuth();
     const currentYear = new Date().getFullYear();
@@ -127,8 +127,8 @@ const MainLayout: React.FC = () => {
                             color="blue"
                         />
                     )}
-                    <Group p="sm">
-                        <Text size="xs">
+                    <Group p="sm" align="center">
+                        <Text size="xs" ta="center">
                             © {currentYear} ZeroCharts. {t('user.rights')}.<br/>
                             <Anchor component={Link} to="/terms" size="sm">
                                 {t('user.terms')}

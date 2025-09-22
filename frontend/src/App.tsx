@@ -54,6 +54,7 @@ function App() {
                 <Route path="forum" element={<ForumPage />} />
                 <Route path="terms" element={<FaqPage />} />
                 <Route path="privacy" element={<FaqPage />} />
+                <Route path="changelog" element={<FaqPage />} />
 
                 {/* Rotas protegidas */}
                 <Route

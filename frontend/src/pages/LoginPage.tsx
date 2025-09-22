@@ -14,6 +14,7 @@ const LoginPage: React.FC = () => {
     const { loginWithGoogle, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const { colorScheme } = useMantineColorScheme();
+    const currentYear = new Date().getFullYear();
 
     // Redirecionar para a home se o usuário já estiver autenticado
     React.useEffect(() => {
@@ -58,6 +59,19 @@ const LoginPage: React.FC = () => {
                         onSuccess={handleGoogleSuccess}
                         onError={handleGoogleFailure}
                     />
+                </Group>
+                <Divider variant="dashed" size="sm" my="xs"/>
+                <Group p="sm" justify="center">
+                    <Text size="xs" ta="center">
+                        © {currentYear} ZeroCharts. {t('user.rights')}.<br/>
+                        <Anchor component={Link} to="/terms" size="sm">
+                            {t('user.terms')}
+                        </Anchor>
+                        {' | '}
+                        <Anchor component={Link} to="/privacy" size="sm">
+                            {t('user.privacy')}
+                        </Anchor>
+                    </Text>
                 </Group>
             </Card>
         </Container>

@@ -127,6 +127,33 @@
       "4": "Quinta-feira",
       "5": "Sexta-feira",
       "6": "Sábado"
+    },
+    "changelog": {
+      "v1-0-0": {
+        "title": "Atualização 1.0.0 - Nova versão do Zero!",
+        "description": "O Zero foi repaginado completamente, com uma nova interface e um novo sistema de charts, muito mais rápido"
+      }
+    },
+    "home": {
+      "hero": {
+        "title": "ZeroCharts",
+        "subtitle": "Crie seus próprios charts musicais!"
+      },
+      "about": {
+        "title": "Seus Charts, Suas Regras",
+        "feature1Title": "Escute sua música",
+        "feature1Description": "Conecte o Last.fm com seu reprodutor de músicas para registrar o que você escuta",
+        "feature2Title": "Personalize seu chart",
+        "feature2Description": "O Zero vai montar o seu chart semanal conforme a sua personalização",
+        "feature3Title": "\"No meu chart foi hit!\"",
+        "feature3Description": "Acompanhe a performance de seus artistas, álbuns e músicas favoritos ao longo do tempo em seus charts",
+        "ctaLoggedIn": "Veja seus charts",
+        "ctaLoggedOut": "Entre para criar seus charts"
+      },
+      "latestUpdate": {
+        "title": "Última atualização",
+        "button": "Ver todas as atualizações"
+      }
     }
   }
 }
