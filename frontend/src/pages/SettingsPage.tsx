@@ -20,11 +20,11 @@ import { useCharts } from '../contexts/ChartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import {generatePath, Link, NavLink} from 'react-router-dom';
-import {IconEdit, IconListNumbers, IconSettings, IconTrash} from "@tabler/icons-react";
-import { DataTable } from "mantine-datatable";
+import {IconEdit, IconListNumbers, IconSettings, IconTrash} from '@tabler/icons-react';
+import { DataTable } from 'mantine-datatable';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck, IconX } from '@tabler/icons-react';
 
 const SettingsPage = () => {
     const { isAuthenticated } = useAuth();

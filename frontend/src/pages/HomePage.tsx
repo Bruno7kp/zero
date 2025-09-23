@@ -65,7 +65,7 @@ const HomePage: React.FC = () => {
             >
                 <Flex direction="column" align="center" style={{ zIndex: 1, textAlign: 'center' }}>
                     <Image
-                        src={colorScheme !== 'dark' ? "/zero-black.png" : "/zero-white.png"}
+                        src="/zero-white.png"
                         radius="md"
                         h={80}
                         w="auto"

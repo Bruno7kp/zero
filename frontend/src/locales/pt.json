@@ -14,12 +14,16 @@
       "rights": "Todos os direitos reservados"
     },
     "charts": {
+      "live_chart_period": "{{from}} - {{to}}",
       "title": "Charts",
       "plays": "Reproduções",
       "stability": "Pontos de Estabilidade",
       "points": "Pontos",
       "live": "Live",
       "actions": "Ações",
+      "artist": "Artista",
+      "album": "Álbum",
+      "track": "Música",
       "sales": "vendas",
       "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina."
     },

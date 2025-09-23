@@ -14,9 +14,7 @@ const ProfilePage = () => {
 
     return (
         <div style={{ padding: '20px', textAlign: 'center' }}>
-            <h1>Perfil do Usuário</h1>
-            <p>Bem-vindo, {user.name}!</p>
-            <p>Email: {user.email}</p>
+            <h1>Página em construção</h1>
         </div>
     );
 };
