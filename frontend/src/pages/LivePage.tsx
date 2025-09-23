@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Divider, Flex, rem, ThemeIcon, Title, Loader, Alert, Anchor, Text, SegmentedControl, Center, Card, Group } from '@mantine/core';
+import {
+    Divider, Flex, rem, ThemeIcon, Title, Loader, Alert, Anchor, Text, SegmentedControl, Center, Card, Group,
+    Container, useMantineTheme, useMantineColorScheme
+} from '@mantine/core';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import {IconFlame, IconInfoCircle, IconMicrophone, IconMusic, IconDisc} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +30,8 @@ const LivePage = () => {
     const [chartName, setChartName] = useState<string>('');
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
+    const theme = useMantineTheme();
+    const { colorScheme } = useMantineColorScheme();
 
     useEffect(() => {
         const fetchLiveChart = async () => {
@@ -172,67 +177,76 @@ const LivePage = () => {
                 <DataTable
                     columns={columns}
                     records={chartData}
+                    styles={{
+                        table: {
+                            background: colorScheme === 'dark'
+                                ? theme.colors.dark[6]
+                                : 'white',
+                        },
+                    }}
                 />
             </Card>
         );
     };
 
     return (
-        <Flex direction="column" p="xs" gap="sm">
-            <Flex align="center" gap="sm">
-                <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                    <ThemeIcon variant="light" color="red" size="md">
-                        <IconFlame style={{ width: rem(20), height: rem(20) }} />
-                    </ThemeIcon>
-                    {t('charts.live')}
-                    {chartName && ` - ${chartName}`}
-                </Title>
-            </Flex>
-            <Divider variant="solid" size="sm" my="md"/>
-            <Flex gap="sm" direction="column">
-                <Flex justify="center" align="center" style={{ width: '100%' }}>
-                    <SegmentedControl
-                        value={chartType}
-                        withItemsBorders={false}
-                        onChange={(value: string) => setChartType(value)}
-                        data={[
-                            {
-                                label: (
-                                    <Center style={{ display: 'flex', alignItems: 'center', gap: rem(6) }}>
-                                        <IconMicrophone style={{ width: rem(16), height: rem(16) }} />
-                                        <span>{t('charts.artist')}</span>
-                                    </Center>
-                                ),
-                                value: 'artist',
-                            },
-                            {
-                                label: (
-                                    <Center style={{ display: 'flex', alignItems: 'center', gap: rem(6) }}>
-                                        <IconDisc style={{ width: rem(16), height: rem(16) }} />
-                                        <span>{t('charts.album')}</span>
-                                    </Center>
-                                ),
-                                value: 'album',
-                            },
-                            {
-                                label: (
-                                    <Center style={{ display: 'flex', alignItems: 'center', gap: rem(6) }}>
-                                        <IconMusic style={{ width: rem(16), height: rem(16) }} />
-                                        <span>{t('charts.track')}</span>
-                                    </Center>
-                                ),
-                                value: 'track',
-                            },
-                        ]}
-                        color="blue"
-                    />
+        <Container>
+            <Flex direction="column" p="xs" gap="sm">
+                <Flex justify="center" align="center" gap="sm">
+                    <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
+                        <ThemeIcon variant="light" color="red" size="md">
+                            <IconFlame style={{ width: rem(20), height: rem(20) }} />
+                        </ThemeIcon>
+                        {t('charts.live')}
+                        {chartName && ` - ${chartName}`}
+                    </Title>
                 </Flex>
-                <Group justify="center">
-                    <Text size="sm" c="dimmed">{t('charts.live_chart_period', { from: startDate, to: endDate })}</Text>
-                </Group>
-                {renderTable()}
+                <Divider variant="solid" size="sm" my="md"/>
+                <Flex gap="sm" direction="column">
+                    <Flex justify="center" align="center" style={{ width: '100%' }}>
+                        <SegmentedControl
+                            value={chartType}
+                            withItemsBorders={false}
+                            onChange={(value: string) => setChartType(value)}
+                            data={[
+                                {
+                                    label: (
+                                        <Center style={{ display: 'flex', alignItems: 'center', gap: rem(6) }}>
+                                            <IconMicrophone style={{ width: rem(16), height: rem(16) }} />
+                                            <span>{t('charts.artist')}</span>
+                                        </Center>
+                                    ),
+                                    value: 'artist',
+                                },
+                                {
+                                    label: (
+                                        <Center style={{ display: 'flex', alignItems: 'center', gap: rem(6) }}>
+                                            <IconDisc style={{ width: rem(16), height: rem(16) }} />
+                                            <span>{t('charts.album')}</span>
+                                        </Center>
+                                    ),
+                                    value: 'album',
+                                },
+                                {
+                                    label: (
+                                        <Center style={{ display: 'flex', alignItems: 'center', gap: rem(6) }}>
+                                            <IconMusic style={{ width: rem(16), height: rem(16) }} />
+                                            <span>{t('charts.track')}</span>
+                                        </Center>
+                                    ),
+                                    value: 'track',
+                                },
+                            ]}
+                            color="blue"
+                        />
+                    </Flex>
+                    <Group justify="center">
+                        <Text size="sm" c="dimmed">{t('charts.live_chart_period', { from: startDate, to: endDate })}</Text>
+                    </Group>
+                    {renderTable()}
+                </Flex>
             </Flex>
-        </Flex>
+        </Container>
     );
 };
 

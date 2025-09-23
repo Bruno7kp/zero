@@ -14,7 +14,7 @@
       "rights": "Todos os direitos reservados"
     },
     "charts": {
-      "live_chart_period": "{{from}} - {{to}}",
+      "live_chart_period": "{{from}} - agora",
       "title": "Charts",
       "plays": "Reproduções",
       "stability": "Pontos de Estabilidade",
@@ -133,6 +133,7 @@
       "6": "Sábado"
     },
     "changelog": {
+      "current": "v1.0.0",
       "v1-0-0": {
         "title": "Atualização 1.0.0 - Nova versão do Zero!",
         "description": "O Zero foi repaginado completamente, com uma nova interface e um novo sistema de charts, muito mais rápido"
