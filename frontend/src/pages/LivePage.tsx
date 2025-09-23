@@ -37,7 +37,7 @@ const LivePage = () => {
         const fetchLiveChart = async () => {
             if (!activeChartId) {
                 setChartData([]);
-                setError("Selecione um chart nas configurações para visualizar os dados.");
+                setError(t('errors.selectActiveChart'));
                 return;
             }
 
@@ -100,7 +100,7 @@ const LivePage = () => {
                 setChartData(limitedData);
             } catch (err) {
                 console.error("Falha ao buscar o live chart:", err);
-                setError("Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.");
+                setError(t("errors.dataError"));
             } finally {
                 setLoading(false);
             }
@@ -151,12 +151,12 @@ const LivePage = () => {
 
         if (error) {
             return (
-                <Alert icon={<IconInfoCircle />} color="blue" title="Informação">
+                <Alert icon={<IconInfoCircle />} color="blue" title={t('errors.warning')}>
                     <Text>{error}</Text>
                     {activeChartId === null && (
                         <Text mt="sm">
                             <Anchor component={Link} to="/settings">
-                                Clique aqui para selecionar um chart nas configurações.
+                                {t('errors.noActiveChart')}
                             </Anchor>
                         </Text>
                     )}
@@ -166,8 +166,8 @@ const LivePage = () => {
 
         if (chartData.length === 0) {
             return (
-                <Alert icon={<IconInfoCircle />} color="blue" title="Nenhum dado">
-                    Nenhum dado de chart disponível para a semana atual.
+                <Alert icon={<IconInfoCircle />} color="blue" title={t('errors.noData.title')}>
+                    {t('errors.noData.description')}
                 </Alert>
             );
         }
@@ -241,7 +241,9 @@ const LivePage = () => {
                         />
                     </Flex>
                     <Group justify="center">
-                        <Text size="sm" c="dimmed">{t('charts.live_chart_period', { from: startDate, to: endDate })}</Text>
+                        {chartName && (
+                            <Text size="sm" c="dimmed">{t('charts.live_chart_period', { from: startDate, to: endDate })}</Text>
+                        )}
                     </Group>
                     {renderTable()}
                 </Flex>

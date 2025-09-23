@@ -98,9 +98,17 @@
       }
     },
     "errors": {
+      "warning": "Atenção",
       "notAuthenticated": "Você precisa estar autenticado para realizar esta ação.",
       "failedToCreateChart": "Falha ao criar o chart.",
-      "unknown": "Erro desconhecido."
+      "unknown": "Erro desconhecido.",
+      "selectActiveChart": "Selecione um chart nas configurações para visualizar os dados.",
+      "noActiveChart": "Clique aqui para selecionar um chart",
+      "dataError": "Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.",
+      "noData": {
+        "title": "Sem dados",
+        "description": "Nenhum dado de chart disponível para a semana atual."
+      }
     },
     "notifications": {
       "charts": {
@@ -133,10 +141,11 @@
       "6": "Sábado"
     },
     "changelog": {
+      "title": "Atualizações",
       "current": "v1.0.0",
       "v1-0-0": {
         "title": "Atualização 1.0.0 - Nova versão do Zero!",
-        "description": "O Zero foi repaginado completamente, com uma nova interface e um novo sistema de charts, muito mais rápido"
+        "description": "O Zero foi repaginado completamente, com uma nova interface e muito mais rápido"
       }
     },
     "home": {
