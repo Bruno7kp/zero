@@ -8,6 +8,7 @@ import ForumPage from './pages/ForumPage';
 import LivePage from './pages/LivePage';
 import ProfilePage from './pages/ProfilePage';
 import ChartsPage from './pages/ChartsPage';
+import ChartsWeekPage from './pages/ChartsWeekPage';
 import SettingsPage from './pages/SettingsPage';
 import MainLayout from './layouts/MainLayout';
 import { useAuth } from './contexts/AuthContext';
@@ -62,6 +63,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ChartsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="charts/week/:week?/:type?"
+                    element={
+                        <ProtectedRoute>
+                            <ChartsWeekPage />
                         </ProtectedRoute>
                     }
                 />

@@ -1,6 +1,7 @@
 //import React from 'react';
 
 import {Divider, Flex, rem, ThemeIcon, Title, Container, Grid, Alert, Text, Anchor} from "@mantine/core";
+import { ChartWeekTop1Summary } from '../components/ChartWeekTop1Summary';
 import { ChartSyncProgress } from '../components/ChartSyncProgress';
 import {IconInfoCircle, IconListNumbers} from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
@@ -41,6 +42,9 @@ const ChartsPage = () => {
                     </Title>
                 </Flex>
                 <Divider variant="solid" size="sm" my="md"/>
+                {activeChartId !== null && activeChart && (
+                    <ChartWeekTop1Summary chartId={`${activeChart.id}`} />
+                )}
                 { activeChartId === null ? (
                     renderError()
                 ) : activeChart ? (

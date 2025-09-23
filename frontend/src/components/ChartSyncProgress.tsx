@@ -4,7 +4,12 @@ import { Progress, Text, Paper, Group, Button } from '@mantine/core';
 import { useChartDb } from '../hooks/useChartDb';
 import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
 import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
+import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface ChartSyncProgressProps {
   chart: {
@@ -25,10 +30,6 @@ const chartTypes = [
   { type: 'track', getChart: getWeeklyTrackChart, cutoffKey: 'music_cutoff' },
 ];
 
-function getWeekStart(date: dayjs.Dayjs, cutoffDay: number) {
-  const diff = (date.day() - cutoffDay + 7) % 7;
-  return date.subtract(diff, 'day').startOf('day');
-}
 
 export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) => {
   const { getChartDataByWeek, saveChartData } = useChartDb();
@@ -39,15 +40,7 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) =
 
   // Calcula as semanas a carregar
   useEffect(() => {
-    const start = getWeekStart(dayjs(chart.start_date), chart.day_of_week);
-    const today = dayjs().tz(chart.timezone).startOf('day');
-    let week = start;
-    const weeksArr: string[] = [];
-    while (week.isBefore(today)) {
-      weeksArr.push(week.format('YYYY-MM-DD'));
-      week = week.add(7, 'day');
-    }
-    setWeeks(weeksArr);
+    setWeeks(getClosedChartWeeks(chart.start_date, chart.day_of_week, chart.timezone));
   }, [chart.start_date, chart.day_of_week, chart.timezone]);
 
   // Conta quantas semanas já estão salvas no IndexedDB para esse chart
