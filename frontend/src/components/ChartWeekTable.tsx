@@ -65,14 +65,25 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps & { columns: typeof de
       .then(setData);
   }, [chart.id, week, type]);
 
-  // Busca stats para entidades expandidas
+  // Busca stats para todos os itens assim que os dados são carregados
   useEffect(() => {
-    if (!expanded) return;
-    const entityId = expanded;
-    getChartStats(`${chart.id}`, type, entityId).then((stats: any) => {
-      setStatsMap((prev: Record<string, any>) => ({ ...prev, [entityId]: stats }));
+    if (!data.length) return;
+    const missing = data.filter(row => !statsMap[row.entityId]);
+    if (missing.length === 0) return;
+    Promise.all(
+      missing.map(row =>
+        getChartStats(`${chart.id}`, type, row.entityId).then((stats: any) => [row.entityId, stats])
+      )
+    ).then(results => {
+      setStatsMap(prev => {
+        const next = { ...prev };
+        for (const [entityId, stats] of results) {
+          next[entityId] = stats;
+        }
+        return next;
+      });
     });
-  }, [expanded, chart.id, type]);
+  }, [data, chart.id, type, statsMap]);
 
   // Colunas dinâmicas
   const visibleColumns = useMemo(() => columns.filter(c => c.visible), [columns]);
