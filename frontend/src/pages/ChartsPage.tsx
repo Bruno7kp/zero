@@ -1,6 +1,7 @@
 //import React from 'react';
 
 import {Divider, Flex, rem, ThemeIcon, Title, Container, Grid, Alert, Text, Anchor} from "@mantine/core";
+import { ChartSyncProgress } from '../components/ChartSyncProgress';
 import {IconInfoCircle, IconListNumbers} from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import {useCharts} from "../contexts/ChartContext.tsx";
@@ -9,6 +10,7 @@ import {Link} from "react-router-dom";
 const ChartsPage = () => {
     const { t } = useTranslation();
     const { charts, activeChartId } = useCharts();
+    const activeChart = charts.find((c) => c.id === activeChartId) || null;
     const renderError = () => {
         return (
             <Grid>
@@ -39,7 +41,11 @@ const ChartsPage = () => {
                     </Title>
                 </Flex>
                 <Divider variant="solid" size="sm" my="md"/>
-                { activeChartId === null ? (renderError()) : (<div>adas</div>) }
+                { activeChartId === null ? (
+                    renderError()
+                ) : activeChart ? (
+                    <ChartSyncProgress chart={activeChart} />
+                ) : null }
             </Flex>
         </Container>
     );

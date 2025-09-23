@@ -24,6 +24,7 @@
     "@tabler/icons-react": "^3.35.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
+    "dexie": "^4.2.0",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "mantine-datatable": "^8.2.0",
