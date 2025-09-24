@@ -25,7 +25,15 @@
       "album": "Álbum",
       "track": "Música",
       "sales": "vendas",
-      "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina."
+      "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina.",
+      "lastWeek": "Última semana",
+      "sync": "Sincronização de semanas",
+      "toSync": "Sincronizar",
+      "synced": "Sincronizado",
+      "syncStatus": "{{loadedWeeks}} de {{weeks}} semanas carregadas",
+      "view": "Ver chart",
+      "viewAll": "Ver todos os charts",
+      "viewLive": "Ver prévia da semana atual"
     },
     "library": {
       "title": "Biblioteca"
@@ -105,6 +113,7 @@
       "selectActiveChart": "Selecione um chart nas configurações para visualizar os dados.",
       "noActiveChart": "Clique aqui para selecionar um chart",
       "dataError": "Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.",
+      "noTop1Data": "Nenhum dado encontrado. Sincronize as semanas para visualizar os #1s da última semana.",
       "noData": {
         "title": "Sem dados",
         "description": "Nenhum dado de chart disponível para a semana atual."

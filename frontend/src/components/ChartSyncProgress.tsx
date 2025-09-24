@@ -1,6 +1,6 @@
 // src/components/ChartSyncProgress.tsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { Progress, Text, Paper, Group, Button } from '@mantine/core';
+import { Progress, Text, Group, Button, Card, Divider, rem, ThemeIcon } from '@mantine/core';
 import { useChartDb } from '../hooks/useChartDb';
 import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
 import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
@@ -8,6 +8,8 @@ import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { useTranslation } from 'react-i18next';
+import { IconRefresh } from "@tabler/icons-react";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -37,6 +39,7 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) =
   const [loadedWeeks, setLoadedWeeks] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Calcula as semanas a carregar
   useEffect(() => {
@@ -110,16 +113,22 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) =
   };
 
   return (
-    <Paper shadow="xs" p="md" withBorder>
-      <Group justify="space-between" align="center" mb="xs">
-        <Text size="md" fw={500}>Sincronização de semanas</Text>
-        <Button onClick={handleSync} loading={loading} disabled={loadedWeeks === weeks.length} size="xs">
-          {loadedWeeks === weeks.length ? 'Sincronizado' : 'Sincronizar'}
-        </Button>
-      </Group>
-      <Progress value={weeks.length === 0 ? 0 : (loadedWeeks / weeks.length) * 100} mb="xs" />
-      <Text size="sm">{loadedWeeks} de {weeks.length} semanas carregadas</Text>
-      {error && <Text c="red" size="sm">{error}</Text>}
-    </Paper>
+      <Card shadow="md" p="md">
+          <Group>
+              <ThemeIcon variant="light" size="md">
+                  <IconRefresh style={{ width: rem(20), height: rem(20) }} />
+              </ThemeIcon>
+              <Text fw={600} size="lg">{t('charts.sync')}</Text>
+          </Group>
+          <Divider variant="dashed" size="sm" my="xs"/>
+          <Group justify="space-between" align="center" mb="xs">
+              <Text size="md">{t('charts.syncStatus', { loadedWeeks, weeks: weeks.length })}</Text>
+              <Button onClick={handleSync} loading={loading} disabled={loadedWeeks === weeks.length} size="xs">
+                  {loadedWeeks === weeks.length ? t('charts.synced') : t('charts.toSync')}
+              </Button>
+          </Group>
+          <Progress value={weeks.length === 0 ? 0 : (loadedWeeks / weeks.length) * 100} mb="xs" />
+          {error && <Text c="red" size="sm">{error}</Text>}
+    </Card>
   );
 };

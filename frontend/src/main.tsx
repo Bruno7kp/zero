@@ -6,6 +6,7 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import 'mantine-datatable/styles.css';
+import './assets/styles/custom.css';
 import { AppProviders } from './providers/AppProviders';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

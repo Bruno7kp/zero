@@ -1,0 +1,12 @@
+.masonry-grid {
+  display: flex;
+  gap: 1rem;
+}
+
+.masonry-column {
+  background-clip: padding-box;
+}
+
+.masonry-column > div {
+    margin-bottom: 1rem;
+}

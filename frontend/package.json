@@ -31,6 +31,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",
+    "react-masonry-css": "^1.0.16",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.1",
     "recharts": "^2.15.4",

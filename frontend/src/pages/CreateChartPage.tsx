@@ -26,7 +26,15 @@ import { useNavigate, NavLink, useParams } from 'react-router-dom';
 import '@mantine/dates/styles.css';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import { IconCheck, IconListNumbers, IconSettings, IconX } from "@tabler/icons-react";
+import {
+    IconCalculator,
+    IconCheck,
+    IconDisc,
+    IconListNumbers,
+    IconSettings,
+    IconUserCog,
+    IconX
+} from '@tabler/icons-react';
 
 const CreateChartPage = () => {
     const { t, i18n } = useTranslation();
@@ -237,25 +245,18 @@ const CreateChartPage = () => {
                         <ThemeIcon variant="light" color="blue" size="md">
                             <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
                         </ThemeIcon>
-                        {t('charts.title')}
+                        {pageTitle}
                     </Title>
                 </Flex>
                 <Divider variant="solid" size="sm" my="md"/>
-                <Grid>
-                    <Grid.Col span={{ base: 12 }}>
-                        <Title order={2}>
-                            <ThemeIcon variant="light" color="blue" size="md" me="sm">
-                                <IconListNumbers style={{ width: rem(20), height: rem(20) }}/>
-                            </ThemeIcon>
-                            {pageTitle}
-                        </Title>
-                    </Grid.Col>
-                </Grid>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Grid>
                         <Grid.Col span={{ base: 12 }}>
                             <Card shadow="md" p="md">
-                                <Group justify="space-between">
+                                <Group>
+                                    <ThemeIcon variant="light" size="md">
+                                        <IconUserCog style={{ width: rem(20), height: rem(20) }} />
+                                    </ThemeIcon>
                                     <Text fw={600} size="lg">{t('forms.createChart.sourceTitle')}</Text>
                                 </Group>
                                 <Divider variant="dashed" size="sm" my="xs"/>
@@ -325,7 +326,10 @@ const CreateChartPage = () => {
                         </Grid.Col>
                         <Grid.Col span={{ base: 12 }}>
                             <Card shadow="md" p="md">
-                                <Group justify="space-between">
+                                <Group>
+                                    <ThemeIcon variant="light" size="md">
+                                        <IconCalculator style={{ width: rem(20), height: rem(20) }} />
+                                    </ThemeIcon>
                                     <Text fw={600} size="lg">{t('forms.createChart.formulaTitle')}</Text>
                                 </Group>
                                 <Divider variant="dashed" size="sm" my="xs"/>
@@ -375,7 +379,10 @@ const CreateChartPage = () => {
                         </Grid.Col>
                         <Grid.Col span={{ base: 12 }}>
                             <Card shadow="md" p="md">
-                                <Group justify="space-between">
+                                <Group>
+                                    <ThemeIcon variant="light" size="md">
+                                        <IconDisc style={{ width: rem(20), height: rem(20) }} />
+                                    </ThemeIcon>
                                     <Text fw={600} size="lg">{t('forms.createChart.certificationTitle')}</Text>
                                 </Group>
                                 <Divider variant="dashed" size="sm" my="xs"/>

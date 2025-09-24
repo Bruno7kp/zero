@@ -2,26 +2,22 @@
 import { useEffect } from 'react';
 import {
     Flex,
-    Select,
     Title,
     Text,
     Loader,
     Center,
-    Button,
     Grid,
     ThemeIcon,
     rem,
     Divider,
-    Group,
-    Card,
-    ActionIcon, Container
+    Container
 } from '@mantine/core';
 import { useCharts } from '../contexts/ChartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Link, NavLink } from 'react-router-dom';
-import { IconEdit, IconSettings, IconTrash } from '@tabler/icons-react';
-import { DataTable } from 'mantine-datatable';
+import { IconSettings } from '@tabler/icons-react';
+import ActiveChartCard from '../components/ActiveChartCard';
+import ChartsListCard from '../components/ChartsListCard';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
@@ -96,80 +92,19 @@ const SettingsPage = () => {
                 <Divider variant="solid" size="sm" my="md"/>
                 <Grid>
                     <Grid.Col span={{base: 12}}>
-                        <Card shadow="md" p="md">
-                            <Group justify="space-between">
-                                <Text fw={600} size="lg">{t('settings.activeChartPlaceholder')}</Text>
-                            </Group>
-                            <Divider variant="dashed" size="sm" my="xs"/>
-                            <Group justify="space-between" mb="xs">
-                                <Text fw={500} size="sm">{t('settings.activeChartInfo')}</Text>
-                                {charts.length === 0 && (
-                                    <Text size="sm" c="red">
-                                        {t('settings.noCharts')}
-                                    </Text>
-                                )}
-                            </Group>
-                            <Flex gap="md" align="flex-end">
-                                <Select
-                                    label={t('settings.activeChartLabel')}
-                                    placeholder={t('settings.activeChartPlaceholder')}
-                                    data={chartOptions}
-                                    value={activeChartId ? String(activeChartId) : null}
-                                    onChange={(value) => setActiveChartId(value ? Number(value) : null)}
-                                    allowDeselect
-                                    clearable
-                                    style={{ flex: 1 }}
-                                />
-                                <Button component={NavLink} to="/settings/add-chart" mt="md">
-                                    {t('forms.createChart.title')}
-                                </Button>
-                            </Flex>
-                        </Card>
+                        <ActiveChartCard
+                          charts={charts}
+                          activeChartId={activeChartId}
+                          setActiveChartId={setActiveChartId}
+                          t={t}
+                          chartOptions={chartOptions}
+                        />
                     </Grid.Col>
                 </Grid>
                 <Grid>
                     <Grid.Col span={{base: 12}}>
                         {charts.length > 0 && (
-                            <Card shadow="md" p="md">
-                                <Group justify="space-between">
-                                    <Text fw={600} size="lg">{t('charts.title')}</Text>
-                                </Group>
-                                <Divider variant="dashed" size="sm" my="xs"/>
-                                <DataTable
-                                    backgroundColor="transparent"
-                                    columns={[
-                                        { accessor: 'name', title: t('charts.title') },
-                                        { accessor: 'lastfm_username', title: t('forms.createChart.lastfmUsernameLabel') },
-                                        {
-                                            accessor: 'actions',
-                                            title: t('charts.actions'),
-                                            textAlign: 'right',
-                                            render: (chart) => (
-                                                <Group gap={4} justify="right" wrap="nowrap">
-                                                    <ActionIcon
-                                                        component={Link}
-                                                        size="sm"
-                                                        variant="subtle"
-                                                        color="blue"
-                                                        to={generatePath('/settings/charts/:id', { id: chart.id.toString() })}
-                                                    >
-                                                        <IconEdit size={16} />
-                                                    </ActionIcon>
-                                                    <ActionIcon
-                                                        size="sm"
-                                                        variant="subtle"
-                                                        color="red"
-                                                        onClick={() => openDeleteModal(chart.id, chart.name)}
-                                                    >
-                                                        <IconTrash size={16} />
-                                                    </ActionIcon>
-                                                </Group>
-                                            )
-                                        }
-                                    ]}
-                                    records={charts}
-                                />
-                            </Card>
+                          <ChartsListCard charts={charts} t={t} openDeleteModal={openDeleteModal} />
                         )}
                     </Grid.Col>
                 </Grid>
