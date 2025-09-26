@@ -37,14 +37,14 @@
       "view": "Ver chart",
       "viewAll": "Ver todos os charts",
       "viewLive": "Ver prévia da semana atual",
-      "rankLabel": "Rank - Posição",
+      "rankLabel": "Rank: Posição",
       "deltaRankLabel": "Variação da posição",
       "imageLabel": "Imagem",
-      "titleLabel": "Title - Título",
-      "playsLabel": "Plays - Reproduções",
+      "titleLabel": "Title: Título",
+      "playsLabel": "Plays: Reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
-      "peakLabel": "Peak - Pico",
-      "weeksLabel": "Weeks - Semanas"
+      "peakLabel": "Peak: Pico",
+      "weeksLabel": "Weeks: Semanas"
     },
     "library": {
       "title": "Biblioteca"

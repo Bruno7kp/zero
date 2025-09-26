@@ -51,11 +51,9 @@ interface ChartWeekControlsProps {
 	onChange: (week: string, type: string) => void;
 	view: 'table' | 'grid' | 'list';
 	setView: (v: 'table' | 'grid' | 'list') => void;
-	columns: any[];
-	toggleColumn: (key: string) => void;
 }
 
-export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, week, type, onChange, view, setView, columns, toggleColumn }) => {
+export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, week, type, onChange, view, setView }) => {
 	const { t, i18n } = useTranslation();
 	const reduxLanguage = useSelector((state: any) => state.i18n.language);
 	React.useEffect(() => {
@@ -78,9 +76,9 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	// Valor do input: sempre o início da semana selecionada no timezone do chart
 	const inputValue = week ? dayjs(week).toDate() : null;
 	const [popoverOpened, setPopoverOpened] = useState(false);
-    const cutoffType = type === 'track' ? 'music_cutoff' : `${type}_cutoff`;
-    const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
-    const topType = `charts.${type}sTop`;
+	const cutoffType = type === 'track' ? 'music_cutoff' : `${type}_cutoff`;
+	const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
+	const topType = `charts.${type}sTop`;
 
 	return (
 		<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between">
@@ -157,7 +155,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			{/* Direita: seleção de visualização + botão de colunas */}
 			<Flex gap="xs" align="center">
 				{/* Botão de colunas, só mostra se for tabela */}
-				{view === 'table' && <ChartWeekTableColumnsMenu columns={columns} toggleColumn={toggleColumn} />}
+				   {view === 'table' && <ChartWeekTableColumnsMenu />}
 				<SegmentedControl
 					value={view}
 					onChange={v => setView(v as any)}

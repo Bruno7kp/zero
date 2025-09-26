@@ -7,20 +7,22 @@ import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/c
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
 import { IconFilter } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { updateColumn } from '../store/columnsSlice';
 
-export const defaultColumns = [
-    { key: 'rank', label: 'Rank', labelComplete: 'Rank - Posição', visible: true },
-    { key: 'deltaRankBadge', label: 'Variação da posição', visible: true },
-    { key: 'image', label: 'Image', visible: true },
-    { key: 'name', label: 'Title', labelComplete: 'Title - Título', visible: true },
-    { key: 'plays', label: 'Plays', labelComplete: 'Plays - Reproduções', visible: true },
-    { key: 'deltaPlaysBadge', label: 'Variação de reproduções', visible: true },
-    { key: 'peak', label: 'Peak', labelComplete: 'Peak - Pico', visible: true },
-    { key: 'totalWeeks', label: 'Weeks', labelComplete: 'Weeks - Semanas', visible: true },
-];
 
-export function ChartWeekTableColumnsMenu({ columns, toggleColumn }: { columns: typeof defaultColumns, toggleColumn: (key: string) => void }) {
+
+export function ChartWeekTableColumnsMenu() {
     const [opened, setOpened] = useState(false);
+    const { t } = useTranslation();
+    const dispatch = useDispatch<AppDispatch>();
+    const columns = useSelector((state: RootState) => state.columns.columns);
+    const handleToggle = (key: string) => {
+        const col = columns.find((c: any) => c.key === key);
+        if (col) {
+            dispatch(updateColumn({ key, visible: !col.visible }));
+        }
+    };
     return (
         <Menu shadow="md" width={200} opened={opened} onChange={setOpened} closeOnItemClick={false}>
             <Menu.Target>
@@ -29,12 +31,12 @@ export function ChartWeekTableColumnsMenu({ columns, toggleColumn }: { columns: 
                 </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-                {columns.map((col) => (
+                {columns.map((col: any) => (
                     <Menu.Item key={col.key}>
                         <Checkbox
                             checked={col.visible}
-                            onChange={() => toggleColumn(col.key)}
-                            label={col.labelComplete || col.label || col.key}
+                            onChange={() => handleToggle(col.key)}
+                            label={col.labelComplete ? t(col.labelComplete) : t(col.label) || col.key}
                         />
                     </Menu.Item>
                 ))}
@@ -43,19 +45,15 @@ export function ChartWeekTableColumnsMenu({ columns, toggleColumn }: { columns: 
     );
 }
 
-interface ChartWeekTableProps {
-    chart: any;
-    week?: string;
-    type: string;
-    columns: typeof defaultColumns;
-    toggleColumn: (key: string) => void;
-}
 
-export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, columns }) => {
-    // Redux selectors
+
+
+export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string }> = ({ chart, week, type }) => {
     const dispatch = useDispatch<AppDispatch>();
     const data = useSelector((state: RootState) => state.charts.data);
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
+    const columns = useSelector((state: RootState) => state.columns.columns);
+    const { t } = useTranslation();
 
     // Busca dados da semana
     useEffect(() => {
@@ -71,12 +69,14 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     }, [data, chart.id, type, week, dispatch]);
 
     // Colunas dinâmicas
-    const visibleColumns = useMemo(() => columns.filter(c => c.visible), [columns]);
+    const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
     // Opção para mostrar/esconder badge delta
-    const showDeltaBadge = columns.find(c => c.key === 'deltaRankBadge')?.visible;
-    const showDeltaPlaysBadge = columns.find(c => c.key === 'deltaPlaysBadge')?.visible;
+    const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
+    const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
-    const filteredColumns = visibleColumns.filter(c => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
+    const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
+
+
 
 
     // Row expansion
@@ -118,11 +118,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         }
         return { color, label };
     }
-    const dtColumns: DataTableColumn<ChartData>[] = filteredColumns.map((col): DataTableColumn<ChartData> => {
+    const dtColumns: DataTableColumn<ChartData>[] = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
         // Centraliza todos os heads exceto 'name'
         const base = {
             accessor: col.key,
-            title: col.label,
+            title: col.labelComplete ? t(col.label) : t(col.labelComplete) || col.key,
             textAlign: col.key === 'name' ? 'left' : ('center' as const) as DataTableColumnTextAlign,
             width: col.key === 'name' ? undefined : 80,
         };
