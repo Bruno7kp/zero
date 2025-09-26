@@ -11,7 +11,7 @@ import ChartsPage from './pages/ChartsPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
 import SettingsPage from './pages/SettingsPage';
 import MainLayout from './layouts/MainLayout';
-import { useAuth } from './contexts/AuthContext';
+import { useSelector } from 'react-redux';
 import './i18n';
 import CreateChartPage from "./pages/CreateChartPage.tsx";
 import { Loader, Center, Flex, Text } from '@mantine/core';
@@ -19,10 +19,12 @@ import { useTranslation } from 'react-i18next';
 
 // Componente para proteger rotas. Redireciona para o login se não estiver autenticado.
 const ProtectedRoute = ({ children }: { children: JSX.Element; }) => {
-    const { isAuthenticated, isAuthLoading } = useAuth();
+    const user = useSelector((state: any) => state.auth.user);
+    const token = useSelector((state: any) => state.auth.token);
+    const isAuthLoading = useSelector((state: any) => state.auth.isAuthLoading);
+    const isAuthenticated = !!user && !!token;
     const { t } = useTranslation();
 
-    // Se a autenticação ainda está sendo carregada, mostre um loader
     if (isAuthLoading) {
         return (
             <Center style={{ height: '100vh' }}>
@@ -34,7 +36,6 @@ const ProtectedRoute = ({ children }: { children: JSX.Element; }) => {
         );
     }
 
-    // Redireciona para a página de login se o usuário não estiver autenticado
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }

@@ -20,8 +20,8 @@ import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
-import { useCharts } from '../contexts/ChartContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCharts, createChart, updateChart } from '../store/chartsSlice';
 import { useNavigate, NavLink, useParams } from 'react-router-dom';
 import '@mantine/dates/styles.css';
 import dayjs from 'dayjs';
@@ -35,19 +35,21 @@ import {
     IconUserCog,
     IconX
 } from '@tabler/icons-react';
+// import { useSelector } from 'react-redux';
 
 const CreateChartPage = () => {
     const { t, i18n } = useTranslation();
+    // const reduxLanguage = useSelector((state: any) => state.i18n.language); // not used
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
 
-    const localeMapping = {
-        'pt': 'pt-br',
-    };
+    const localeMapping = { 'pt': 'pt-br' };
     const locale = localeMapping[i18n.language as keyof typeof localeMapping] || i18n.language;
 
-    const { charts, fetchCharts, isLoading, createChart, updateChart } = useCharts();
-    const { isAuthenticated } = useAuth();
+    const dispatch = useDispatch();
+    const charts = useSelector((state: any) => state.charts.charts);
+    const isLoading = useSelector((state: any) => state.charts.loading);
+    const isAuthenticated = useSelector((state: any) => state.auth.user !== null && !!state.auth.token);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isFormInitialized, setIsFormInitialized] = useState(false);
@@ -137,8 +139,8 @@ const CreateChartPage = () => {
 
     useEffect(() => {
         if (id && !isLoading && charts.length > 0 && !isFormInitialized) {
-            const chartToEdit = charts.find(c => c.id === Number(id));
-            if (chartToEdit) {
+            const chartToEdit = charts.find((c: any) => c.id === Number(id));
+            if (chartToEdit) { 
                 form.setValues({
                     name: chartToEdit.name,
                     source: chartToEdit.source,
@@ -170,7 +172,7 @@ const CreateChartPage = () => {
                 navigate('/settings');
             }
         } else if (id && !isLoading && charts.length === 0) {
-            fetchCharts();
+            dispatch<any>(fetchCharts());
         }
     }, [id, charts, form, navigate, t, fetchCharts, isLoading, isFormInitialized]);
 
@@ -198,28 +200,26 @@ const CreateChartPage = () => {
             day_of_week: parseInt(values.day_of_week),
         };
 
-        let success = false;
-        if (id) {
-            success = await updateChart(Number(id), chartData);
-        } else {
-            success = await createChart(chartData);
-        }
-
-        if (success) {
+    // let success = false;
+        try {
+            if (id) {
+                await dispatch<any>(updateChart({ chartId: Number(id), chartData })).unwrap();
+            } else {
+                await dispatch<any>(createChart(chartData)).unwrap();
+            }
             notifications.show({
                 message: t(`notifications.charts.${id ? 'update' : 'save'}.success`, { chart: chartData.name }),
                 color: 'green',
                 icon: <IconCheck />,
             });
             navigate('/settings');
-        } else {
+        } catch (e) {
             notifications.show({
                 message: t(`notifications.charts.${id ? 'update' : 'save'}.error`, { chart: chartData.name }),
                 color: 'red',
                 icon: <IconX />,
             });
         }
-
         setIsSubmitting(false);
     };
 

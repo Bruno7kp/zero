@@ -6,12 +6,14 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../contexts/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { loginWithGoogle } from '../store/authSlice';
 import {Link, useNavigate} from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
     const { t } = useTranslation();
-    const { loginWithGoogle, isAuthenticated } = useAuth();
+    const dispatch = useDispatch();
+    const isAuthenticated = useSelector((state: any) => state.auth.user !== null);
     const navigate = useNavigate();
     const { colorScheme } = useMantineColorScheme();
     const currentYear = new Date().getFullYear();
@@ -25,7 +27,7 @@ const LoginPage: React.FC = () => {
 
     const handleGoogleSuccess = async (credentialResponse: any) => {
         // Enviar a resposta do Google para a nossa função de login do contexto
-        await loginWithGoogle(credentialResponse);
+        await dispatch(loginWithGoogle(credentialResponse)).unwrap();
     };
 
     const handleGoogleFailure = () => {

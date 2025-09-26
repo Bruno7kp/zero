@@ -16,7 +16,6 @@ import {
     useMantineTheme, Image,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
 import { NavLink } from 'react-router-dom';
 import {
     IconArrowRight,
@@ -26,10 +25,20 @@ import {
     IconSettings,
     IconStar,
 } from '@tabler/icons-react';
+import { useSelector } from 'react-redux';
 
 const HomePage: React.FC = () => {
-    const { t } = useTranslation();
-    const { isAuthenticated } = useAuth();
+    const { t, i18n } = useTranslation();
+    const reduxLanguage = useSelector((state: any) => state.i18n.language);
+    React.useEffect(() => {
+        if (i18n.language !== reduxLanguage) {
+            i18n.changeLanguage(reduxLanguage);
+        }
+    }, [reduxLanguage, i18n]);
+
+    const user = useSelector((state: any) => state.auth.user);
+    const token = useSelector((state: any) => state.auth.token);
+    const isAuthenticated = !!user && !!token;
     const { colorScheme } = useMantineColorScheme();
     const theme = useMantineTheme();
 

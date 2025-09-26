@@ -28,26 +28,55 @@ import {
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { loginWithGoogle, logout as reduxLogout } from '../store/authSlice';
+import { setTheme } from '../store/themeSlice';
+import { setLanguage } from '../store/i18nSlice';
 
 export const Header: React.FC = () => {
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const dispatch = useDispatch();
+    const user = useSelector((state: any) => state.auth.user);
+    const isAuthenticated = useSelector((state: any) => state.auth.user !== null);
+    const reduxTheme = useSelector((state: any) => state.theme.value);
+    const reduxLanguage = useSelector((state: any) => state.i18n.language);
+    const { colorScheme, setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
     const { i18n, t } = useTranslation();
-    const { user, isAuthenticated, logout } = useAuth(); // Usando o hook de autenticação
-
-    const changeLanguage = (lng: 'en' | 'pt') => {
-        i18n.changeLanguage(lng);
-    };
 
     const handleLogout = () => {
-        logout();
+        dispatch(reduxLogout()).unwrap();
+    };
+
+    // Sincroniza Redux -> Mantine
+    React.useEffect(() => {
+        if (reduxTheme !== colorScheme) {
+            setColorScheme(reduxTheme);
+        }
+    }, [reduxTheme, colorScheme, setColorScheme]);
+
+    // Sincroniza Redux -> i18next
+    React.useEffect(() => {
+        if (i18n.language !== reduxLanguage) {
+            i18n.changeLanguage(reduxLanguage);
+        }
+    }, [reduxLanguage, i18n]);
+
+    // Ao trocar tema pelo botão
+    const handleToggleTheme = () => {
+        const nextTheme = colorScheme === 'dark' ? 'light' : 'dark';
+        dispatch(setTheme(nextTheme));
+        setColorScheme(nextTheme);
+    };
+
+    // Ao trocar idioma pelo menu
+    const changeLanguage = (lng: 'en' | 'pt') => {
+        dispatch(setLanguage(lng));
     };
 
     const rightSection = (
         <Group>
             <ActionIcon
-                onClick={() => toggleColorScheme()}
+                onClick={handleToggleTheme}
                 variant="subtle"
                 size="lg"
                 aria-label={t('theme.toggle')}

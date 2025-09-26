@@ -24,6 +24,9 @@
       "artist": "Artista",
       "album": "Álbum",
       "track": "Música",
+      "artistsTop": "Top {{cutoff}} Artistas",
+      "albumsTop": "Top {{cutoff}} Álbuns",
+      "tracksTop": "Top {{cutoff}} Músicas",
       "sales": "vendas",
       "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina.",
       "lastWeek": "Última semana",
@@ -33,7 +36,15 @@
       "syncStatus": "{{loadedWeeks}} de {{weeks}} semanas carregadas",
       "view": "Ver chart",
       "viewAll": "Ver todos os charts",
-      "viewLive": "Ver prévia da semana atual"
+      "viewLive": "Ver prévia da semana atual",
+      "rankLabel": "Rank - Posição",
+      "deltaRankLabel": "Variação da posição",
+      "imageLabel": "Imagem",
+      "titleLabel": "Title - Título",
+      "playsLabel": "Plays - Reproduções",
+      "deltaPlaysLabel": "Variação de reproduções",
+      "peakLabel": "Peak - Pico",
+      "weeksLabel": "Weeks - Semanas"
     },
     "library": {
       "title": "Biblioteca"

@@ -1,13 +1,14 @@
 import React, { type ReactNode } from 'react';
 import { MantineProvider, createTheme } from '@mantine/core';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from '../contexts/AuthContext';
-import { ChartProvider } from '../contexts/ChartContext';
 import { BrowserRouter } from 'react-router-dom';
 import { DatesProvider } from '@mantine/dates';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
+import { Provider } from 'react-redux';
+import { store } from '../store';
+
 
 const theme = createTheme({
     defaultRadius: 'lg',
@@ -24,19 +25,17 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
     const langKey = i18n.language.split('-')[0];
 
     return (
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-            <AuthProvider>
-                <ChartProvider>
-                    <MantineProvider theme={theme} defaultColorScheme="dark">
-                        <DatesProvider settings={{ locale: langKey || 'en' }}>
-                            <ModalsProvider>
-                                <Notifications position="top-left" />
-                                <BrowserRouter>{children}</BrowserRouter>
-                            </ModalsProvider>
-                        </DatesProvider>
-                    </MantineProvider>
-                </ChartProvider>
-            </AuthProvider>
-        </GoogleOAuthProvider>
+        <Provider store={store}>
+            <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                <MantineProvider theme={theme} defaultColorScheme="dark">
+                    <DatesProvider settings={{ locale: langKey || 'en' }}>
+                        <ModalsProvider>
+                            <Notifications position="top-left" />
+                            <BrowserRouter>{children}</BrowserRouter>
+                        </ModalsProvider>
+                    </DatesProvider>
+                </MantineProvider>
+            </GoogleOAuthProvider>
+        </Provider>
     );
 };

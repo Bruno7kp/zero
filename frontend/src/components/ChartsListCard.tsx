@@ -13,7 +13,7 @@ const ChartsListCard = ({ charts, t, openDeleteModal }) => (
       </ThemeIcon>
       <Text fw={600} size="lg">{t('charts.title')}</Text>
     </Group>
-    <Divider variant="dashed" size="sm" my="xs"/>
+    <Divider variant="dashed" size="sm" my="xs" />
     <DataTable
       backgroundColor="transparent"
       columns={[
@@ -23,7 +23,7 @@ const ChartsListCard = ({ charts, t, openDeleteModal }) => (
           accessor: 'actions',
           title: t('charts.actions'),
           textAlign: 'right',
-          render: (chart) => (
+          render: (chart: any) => (
             <Group gap={4} justify="right" wrap="nowrap">
               <ActionIcon
                 component={Link}

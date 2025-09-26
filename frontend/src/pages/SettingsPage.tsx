@@ -12,8 +12,9 @@ import {
     Divider,
     Container
 } from '@mantine/core';
-import { useCharts } from '../contexts/ChartContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import type { AppDispatch } from '../store';
+import { fetchCharts, setActiveChartId, deleteChart } from '../store/chartsSlice';
 import { useTranslation } from 'react-i18next';
 import { IconSettings } from '@tabler/icons-react';
 import ActiveChartCard from '../components/ActiveChartCard';
@@ -23,15 +24,33 @@ import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 const SettingsPage = () => {
-    const { isAuthenticated } = useAuth();
-    const { charts, isLoading, activeChartId, fetchCharts, setActiveChartId, deleteChart } = useCharts();
-    const { t } = useTranslation();
+    const dispatch = useDispatch<AppDispatch>();
+    const charts = useSelector((state: any) => state.charts.charts);
+    const isLoading = useSelector((state: any) => state.charts.loading);
+    const activeChartId = useSelector((state: any) => state.charts.activeChartId);
+    const isAuthenticated = useSelector((state: any) => state.auth.user !== null);
+    const { t, i18n } = useTranslation();
+    const reduxLanguage = useSelector((state: any) => state.i18n.language);
+
 
     useEffect(() => {
         if (isAuthenticated) {
-            fetchCharts();
+            dispatch(fetchCharts());
         }
-    }, [isAuthenticated, fetchCharts]);
+    }, [isAuthenticated, dispatch]);
+
+    // Set activeChartId to first chart if none is selected
+    useEffect(() => {
+        if (charts.length > 0 && activeChartId == null) {
+            dispatch(setActiveChartId(charts[0].id));
+        }
+    }, [charts, activeChartId, dispatch]);
+
+    useEffect(() => {
+        if (i18n.language !== reduxLanguage) {
+            i18n.changeLanguage(reduxLanguage);
+        }
+    }, [reduxLanguage, i18n]);
 
     if (isLoading) {
         return (
@@ -56,14 +75,14 @@ const SettingsPage = () => {
             confirmProps: { color: 'red' },
             onCancel: () => console.log('Deleção cancelada'),
             onConfirm: async () => {
-                const success = await deleteChart(chartId);
-                if (success) {
+                try {
+                    await dispatch(deleteChart(chartId) as any).unwrap();
                     notifications.show({
                         message: t('notifications.charts.delete.success', { chart: chartName }),
                         color: 'green',
                         icon: <IconCheck />,
                     });
-                } else {
+                } catch {
                     notifications.show({
                         message: t('notifications.charts.delete.error', { chart: chartName }),
                         color: 'red',
@@ -73,10 +92,9 @@ const SettingsPage = () => {
             },
         });
 
-    const chartOptions = charts.map(chart => ({
-        value: String(chart.id),
-        label: chart.name,
-    }));
+    const handleSetActiveChartId = (id: number) => {
+        dispatch(setActiveChartId(id));
+    };
 
     return (
         <Container>
@@ -95,9 +113,9 @@ const SettingsPage = () => {
                         <ActiveChartCard
                           charts={charts}
                           activeChartId={activeChartId}
-                          setActiveChartId={setActiveChartId}
+                          setActiveChartId={handleSetActiveChartId}
                           t={t}
-                          chartOptions={chartOptions}
+                          chartOptions={charts.map((chart: any) => ({ value: String(chart.id), label: chart.name }))}
                         />
                     </Grid.Col>
                 </Grid>

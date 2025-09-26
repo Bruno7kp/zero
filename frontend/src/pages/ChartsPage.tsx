@@ -16,7 +16,7 @@ import { ChartSyncProgress } from '../components/ChartSyncProgress';
 import { ChartLiveSummary } from "../components/ChartLiveSummary";
 import { IconInfoCircle, IconListNumbers} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { useCharts } from '../contexts/ChartContext.tsx';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Masonry from 'react-masonry-css';
 import { useState } from 'react';
@@ -25,8 +25,9 @@ import { useState } from 'react';
 const ChartsPage = () => {
     const [chartName, setChartName] = useState<string>('');
     const { t } = useTranslation();
-    const { charts, activeChartId } = useCharts();
-    const activeChart = charts.find((c) => c.id === activeChartId) || null;
+    const charts = useSelector((state: any) => state.charts.charts);
+    const activeChartId = useSelector((state: any) => state.charts.activeChartId);
+    const activeChart = charts.find((c: any) => c.id === activeChartId) || null;
     if (chartName === '' && activeChart) {
         setChartName(activeChart.name);
     }

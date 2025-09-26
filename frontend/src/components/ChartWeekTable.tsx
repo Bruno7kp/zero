@@ -1,179 +1,235 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { DataTable } from 'mantine-datatable';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import { DataTable, type DataTableColumnTextAlign } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
-import { Paper, Button, Text, Checkbox, Menu, ActionIcon } from '@mantine/core';
-import { db } from '../db/indexedDb';
+import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
-import { getChartStats } from '../utils/getChartStats';
+import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
 import { IconFilter } from '@tabler/icons-react';
 
 export const defaultColumns = [
-  { key: 'rank', label: 'Posição', visible: true },
-  { key: 'deltaRank', label: 'Δ Posição', visible: true },
-  { key: 'peak', label: 'Pico', visible: true },
-  { key: 'image', label: 'Imagem', visible: true },
-  { key: 'name', label: 'Nome', visible: true },
-  { key: 'plays', label: 'Reproduções', visible: true },
-  { key: 'deltaPlays', label: 'Δ Reproduções', visible: true },
-  { key: 'totalWeeks', label: 'Total Semanas', visible: true },
-  { key: 'expand', label: '', visible: true },
+    { key: 'rank', label: 'Rank', labelComplete: 'Rank - Posição', visible: true },
+    { key: 'deltaRankBadge', label: 'Variação da posição', visible: true },
+    { key: 'image', label: 'Image', visible: true },
+    { key: 'name', label: 'Title', labelComplete: 'Title - Título', visible: true },
+    { key: 'plays', label: 'Plays', labelComplete: 'Plays - Reproduções', visible: true },
+    { key: 'deltaPlaysBadge', label: 'Variação de reproduções', visible: true },
+    { key: 'peak', label: 'Peak', labelComplete: 'Peak - Pico', visible: true },
+    { key: 'totalWeeks', label: 'Weeks', labelComplete: 'Weeks - Semanas', visible: true },
 ];
 
 export function ChartWeekTableColumnsMenu({ columns, toggleColumn }: { columns: typeof defaultColumns, toggleColumn: (key: string) => void }) {
-  const [opened, setOpened] = useState(false);
-  return (
-    <Menu shadow="md" width={200} opened={opened} onChange={setOpened} closeOnItemClick={false}>
-      <Menu.Target>
-        <ActionIcon size="lg" variant="subtle" onClick={() => setOpened((o) => !o)}>
-          <IconFilter size={18} />
-        </ActionIcon>
-      </Menu.Target>
-      <Menu.Dropdown>
-        {columns.map((col) => (
-          <Menu.Item key={col.key}>
-            <Checkbox
-              checked={col.visible}
-              onChange={() => toggleColumn(col.key)}
-              label={col.label || col.key}
-            />
-          </Menu.Item>
-        ))}
-      </Menu.Dropdown>
-    </Menu>
-  );
+    const [opened, setOpened] = useState(false);
+    return (
+        <Menu shadow="md" width={200} opened={opened} onChange={setOpened} closeOnItemClick={false}>
+            <Menu.Target>
+                <ActionIcon size="lg" variant="subtle" onClick={() => setOpened((o) => !o)}>
+                    <IconFilter size={18} />
+                </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+                {columns.map((col) => (
+                    <Menu.Item key={col.key}>
+                        <Checkbox
+                            checked={col.visible}
+                            onChange={() => toggleColumn(col.key)}
+                            label={col.labelComplete || col.label || col.key}
+                        />
+                    </Menu.Item>
+                ))}
+            </Menu.Dropdown>
+        </Menu>
+    );
 }
 
 interface ChartWeekTableProps {
-  chart: any;
-  week?: string;
-  type: string;
+    chart: any;
+    week?: string;
+    type: string;
+    columns: typeof defaultColumns;
+    toggleColumn: (key: string) => void;
 }
 
+export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, columns }) => {
+    // Redux selectors
+    const dispatch = useDispatch<AppDispatch>();
+    const data = useSelector((state: RootState) => state.charts.data);
+    const statsMap = useSelector((state: RootState) => state.charts.statsMap);
 
-export const ChartWeekTable: React.FC<ChartWeekTableProps & { columns: typeof defaultColumns, toggleColumn: (key: string) => void }> = ({ chart, week, type, columns }) => {
-  const [data, setData] = useState<ChartData[]>([]);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [statsMap, setStatsMap] = useState<Record<string, any>>({});
+    // Busca dados da semana
+    useEffect(() => {
+        if (!week) return;
+        dispatch(fetchChartData({ chartId: `${chart.id}`, chartType: type, week }));
+    }, [chart.id, week, type, dispatch]);
 
-  // Busca dados da semana
-  useEffect(() => {
-    if (!week) return;
-    db.charts_data
-      .where(['chartId', 'chartType', 'week'])
-      .equals([`${chart.id}`, type, week])
-      .toArray()
-      .then(setData);
-  }, [chart.id, week, type]);
+    // Busca stats até a semana selecionada
+    useEffect(() => {
+        if (!data.length || !week) return;
+        const cutoff = 100;
+        dispatch(fetchStatsMap({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+    }, [data, chart.id, type, week, dispatch]);
 
-  // Busca stats para todos os itens assim que os dados são carregados
-  useEffect(() => {
-    if (!data.length) return;
-    const missing = data.filter(row => !statsMap[row.entityId]);
-    if (missing.length === 0) return;
-    Promise.all(
-      missing.map(row =>
-        getChartStats(`${chart.id}`, type, row.entityId).then((stats: any) => [row.entityId, stats])
-      )
-    ).then(results => {
-      setStatsMap(prev => {
-        const next = { ...prev };
-        for (const [entityId, stats] of results) {
-          next[entityId] = stats;
-        }
-        return next;
-      });
-    });
-  }, [data, chart.id, type, statsMap]);
-
-  // Colunas dinâmicas
-  const visibleColumns = useMemo(() => columns.filter(c => c.visible), [columns]);
+    // Colunas dinâmicas
+    const visibleColumns = useMemo(() => columns.filter(c => c.visible), [columns]);
+    // Opção para mostrar/esconder badge delta
+    const showDeltaBadge = columns.find(c => c.key === 'deltaRankBadge')?.visible;
+    const showDeltaPlaysBadge = columns.find(c => c.key === 'deltaPlaysBadge')?.visible;
+    // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
+    const filteredColumns = visibleColumns.filter(c => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
 
 
-  // Row expansion
-  const renderExpansion: DataTableRowExpansionProps<ChartData>['content'] = ({ record }) => {
-    const stats = statsMap[record.entityId];
-    return (
-      <Paper p="sm">
-        {stats ? (
-          <div>
-            <Text size="sm" fw={500}>Stats:</Text>
-            <pre style={{ fontSize: 12 }}>{JSON.stringify(stats, null, 2)}</pre>
-            {/* Aqui pode renderizar o chart-run e outros dados bonitos */}
-          </div>
-        ) : (
-          <Text size="sm">Carregando stats...</Text>
-        )}
-      </Paper>
-    );
-  };
-
-  // Monta colunas para o DataTable
-  const dtColumns: DataTableColumn<ChartData>[] = visibleColumns.map(col => {
-    if (col.key === 'expand') {
-      return {
-        accessor: 'expand',
-        title: '',
-        render: (row) => (
-          <Button size="xs" onClick={() => setExpanded(row.entityId)}>
-            {expanded === row.entityId ? 'Fechar' : 'Expandir'}
-          </Button>
-        ),
-      };
-    }
-    if (col.key === 'image') {
-      return {
-        accessor: 'image',
-        title: 'Imagem',
-        render: () => <div style={{ width: 40, height: 40, background: '#eee' }} />,
-      };
-    }
-    if (col.key === 'name') {
-      return {
-        accessor: 'name',
-        title: 'Nome',
-        render: (row) => (
-          <div>
-            <Text fw={700}>{row.name}</Text>
-            {row.artistName && <Text size="xs">{row.artistName}</Text>}
-          </div>
-        ),
-      };
-    }
-    if (col.key === 'peak') {
-      return {
-        accessor: 'peak',
-        title: 'Pico',
-        render: (row) => {
-          const stats = statsMap[row.entityId];
-          return stats?.peak?.position ?? '-';
-        },
-      };
-    }
-    if (col.key === 'totalWeeks') {
-      return {
-        accessor: 'totalWeeks',
-        title: 'Total Semanas',
-        render: (row) => {
-          const stats = statsMap[row.entityId];
-          return stats?.totals?.withinCutoff ?? '-';
-        },
-      };
-    }
-    return {
-      accessor: col.key as keyof ChartData,
-      title: col.label,
+    // Row expansion
+    const renderExpansion: DataTableRowExpansionProps<ChartData>['content'] = ({ record }) => {
+        const stats = statsMap[record.entityId];
+        return (
+            <Paper p="sm">
+                {stats ? (
+                    <div>
+                        <Text size="sm" fw={500}>Stats:</Text>
+                        <pre style={{ fontSize: 12 }}>{JSON.stringify(stats, null, 2)}</pre>
+                        {/* Aqui pode renderizar o chart-run e outros dados bonitos */}
+                    </div>
+                ) : (
+                    <Text size="sm">Carregando stats...</Text>
+                )}
+            </Paper>
+        );
     };
-  });
 
-  return (
-    <Paper shadow="xs" p="md" withBorder>
-      <DataTable
-        columns={dtColumns}
-        records={data}
-        rowExpansion={{ content: renderExpansion }}
-        highlightOnHover
-        minHeight={300}
-      />
-    </Paper>
-  );
+    // Monta colunas para o DataTable
+    // Função utilitária para cor/label do badge
+    function getDeltaBadgeProps(delta: any, stats?: any) {
+        let color = 'gray';
+        let label = delta;
+        if (typeof delta === 'number') {
+            if (delta > 0) { color = 'green'; label = `+${delta}`; }
+            else if (delta < 0) { color = 'red'; label = `${delta}`; }
+            else { color = 'gray'; label = '='; }
+        } else if (delta === 'NEW') {
+            const totalWeeks = stats?.totals?.withinCutoff ?? 1;
+            if (totalWeeks > 1) {
+                color = 'yellow'; label = 'RE';
+            } else {
+                color = 'blue'; label = 'NEW';
+            }
+        } else if (delta === 'RE') {
+            color = 'yellow'; label = 'RE';
+        }
+        return { color, label };
+    }
+    const dtColumns: DataTableColumn<ChartData>[] = filteredColumns.map((col): DataTableColumn<ChartData> => {
+        // Centraliza todos os heads exceto 'name'
+        const base = {
+            accessor: col.key,
+            title: col.label,
+            textAlign: col.key === 'name' ? 'left' : ('center' as const) as DataTableColumnTextAlign,
+            width: col.key === 'name' ? undefined : 80,
+        };
+        if (col.key === 'rank') {
+            return {
+                ...base,
+                render: (row, _index) => {
+                    let badge = null;
+                    if (showDeltaBadge) {
+                        const stats = statsMap[row.entityId];
+                        const { color, label } = getDeltaBadgeProps(row.deltaRank, stats);
+                        badge = (
+                            <Badge variant="light" color={color} size="xs">{label}</Badge>
+                        );
+                    }
+                    return (
+                        <Flex direction="column" align="center">
+                            <Text fw={700} size="lg">{row.rank}</Text>
+                            {badge}
+                        </Flex>
+                    );
+                }
+            };
+        }
+        if (col.key === 'plays') {
+            return {
+                ...base,
+                render: (row, _index) => {
+                    let badge = null;
+                    if (showDeltaPlaysBadge) {
+                        const stats = statsMap[row.entityId];
+                        const { color, label } = getDeltaBadgeProps(row.deltaPlays, stats);
+                        badge = (
+                            <Badge variant="light" color={color} size="xs">{label}</Badge>
+                        );
+                    }
+                    return (
+                        <Flex direction="column" align="center">
+                            <Text fw={700}>{row.plays}</Text>
+                            {badge}
+                        </Flex>
+                    );
+                }
+            };
+        }
+        if (col.key === 'name') {
+            return {
+                ...base,
+                render: (row, _index) => (
+                    <Flex>
+                        <Flex mr="sm" justify="center" align="center">
+                            <div style={{ width: 40, height: 40, background: '#eee' }} />
+                        </Flex>
+                        <Flex direction="column" justify="center" align="flex-start">
+                            <Text fw={700}>{row.name}</Text>
+                            {row.artistName && <Text size="sm">{row.artistName}</Text>}
+                        </Flex>
+                    </Flex>
+                ),
+            };
+        }
+        if (col.key === 'peak') {
+            return {
+                ...base,
+                render: (row, _index) => {
+                    const stats = statsMap[row.entityId];
+                    const peakVal = stats?.peak?.position ?? '-';
+                    return (
+                        <Flex direction="column" align="center">
+                            <Text fw={700}>{peakVal}</Text>
+                        </Flex>
+                    );
+                },
+            };
+        }
+        if (col.key === 'totalWeeks') {
+            return {
+                ...base,
+                render: (row, _index) => {
+                    const stats = statsMap[row.entityId];
+                    const totalWeeks = stats?.totals?.withinCutoff ?? '-';
+                    return (
+                        <Flex direction="column" align="center">
+                            <Text fw={700}>{totalWeeks}</Text>
+                        </Flex>
+                    );
+                },
+            };
+        }
+        return {
+            ...base,
+            render: (row, _index) => {
+                // Garante que o tipo de retorno é um ReactNode
+                return <Text>{row.id}</Text>;
+            }
+        };
+    });
+
+    return (
+        <Paper shadow="xs" p="md" withBorder>
+            <DataTable
+                columns={dtColumns}
+                records={data}
+                rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
+                highlightOnHover
+                minHeight={300}
+            />
+        </Paper>
+    );
 };

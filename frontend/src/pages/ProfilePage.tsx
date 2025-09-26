@@ -1,8 +1,8 @@
 //import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useSelector } from 'react-redux';
 
 const ProfilePage = () => {
-    const { user } = useAuth();
+    const user = useSelector((state: any) => state.auth.user);
 
     if (!user) {
         return (

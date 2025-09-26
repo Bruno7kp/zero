@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Divider, Flex, rem, ThemeIcon, Title, Loader, Alert, Anchor, Text, SegmentedControl, Center, Card, Group,
     Container, useMantineTheme, useMantineColorScheme
@@ -6,7 +6,7 @@ import {
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import {IconFlame, IconInfoCircle, IconMicrophone, IconMusic, IconDisc} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { useCharts } from "../contexts/ChartContext.tsx";
+import { useSelector } from 'react-redux';
 import { getWeeklyArtistChart, getWeeklyTrackChart, getWeeklyAlbumChart, type FormattedChartItem } from '../services/lastfm.ts';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -21,8 +21,16 @@ dayjs.extend(timezone);
 dayjs.extend(localizedFormat);
 
 const LivePage = () => {
-    const { t } = useTranslation();
-    const { charts, activeChartId } = useCharts();
+    const { t, i18n } = useTranslation();
+    const reduxLanguage = useSelector((state: any) => state.i18n.language);
+    React.useEffect(() => {
+        if (i18n.language !== reduxLanguage) {
+            i18n.changeLanguage(reduxLanguage);
+        }
+    }, [reduxLanguage, i18n]);
+
+    const charts = useSelector((state: any) => state.charts.charts);
+    const activeChartId = useSelector((state: any) => state.charts.activeChartId);
     const [chartData, setChartData] = useState<FormattedChartItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -45,7 +53,7 @@ const LivePage = () => {
             setError(null);
 
             try {
-                const activeChart = charts.find(chart => chart.id === activeChartId);
+                const activeChart = charts.find((chart: any) => chart.id === activeChartId);
 
                 if (!activeChart || activeChart.day_of_week === undefined || !activeChart.timezone || !activeChart.lastfm_username) {
                     throw new Error("Dados do chart incompletos. Verifique 'day_of_week', 'timezone' e 'lastfm_username'.");
@@ -91,7 +99,7 @@ const LivePage = () => {
                 }
 
                 // Pega o limite de corte
-                const cutoffKey = `${chartType}_cutoff`;
+                const cutoffKey = chartType === 'track' ? 'music_cutoff' : `${chartType}_cutoff`;
                 const cutoff = (activeChart as any)[cutoffKey] !== undefined ? (activeChart as any)[cutoffKey] : 100;
 
                 // Limita a lista para o limite de corte + 10

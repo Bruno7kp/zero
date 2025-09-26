@@ -17,9 +17,17 @@ import { useTranslation } from 'react-i18next';
 import {
     IconBrandGithub
 } from "@tabler/icons-react";
+import { useSelector } from 'react-redux';
 
 const MainLayout: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const reduxLanguage = useSelector((state: any) => state.i18n.language);
+    React.useEffect(() => {
+        if (i18n.language !== reduxLanguage) {
+            i18n.changeLanguage(reduxLanguage);
+        }
+    }, [reduxLanguage, i18n]);
+
     const currentYear = new Date().getFullYear();
     const { colorScheme } = useMantineColorScheme();
     const theme = useMantineTheme();
