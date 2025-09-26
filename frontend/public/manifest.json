@@ -1,0 +1,13 @@
+{
+  "name": "ZeroCharts",
+  "short_name": "ZeroCharts",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#181c2a",
+  "theme_color": "#181c2a",
+  "description": "Charts e estatísticas musicais",
+  "icons": [
+    { "src": "/zero-icon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/zero-icon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
