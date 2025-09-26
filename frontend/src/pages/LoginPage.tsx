@@ -27,7 +27,7 @@ const LoginPage: React.FC = () => {
 
     const handleGoogleSuccess = async (credentialResponse: any) => {
         // Enviar a resposta do Google para a nossa função de login do contexto
-        await dispatch(loginWithGoogle(credentialResponse)).unwrap();
+        await dispatch(loginWithGoogle(credentialResponse) as any).unwrap();
     };
 
     const handleGoogleFailure = () => {

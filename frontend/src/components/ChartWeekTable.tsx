@@ -6,6 +6,10 @@ import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datata
 import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
+import { ChartItemStatsLoader } from './ChartItemStatsLoader';
+import { useState as useReactState } from 'react';
+import { db } from '../db/indexedDb';
+import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
 import { IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
@@ -76,26 +80,16 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
 
-
-
-
     // Row expansion
-    const renderExpansion: DataTableRowExpansionProps<ChartData>['content'] = ({ record }) => {
-        const stats = statsMap[record.entityId];
-        return (
-            <Paper p="sm">
-                {stats ? (
-                    <div>
-                        <Text size="sm" fw={500}>Stats:</Text>
-                        <pre style={{ fontSize: 12 }}>{JSON.stringify(stats, null, 2)}</pre>
-                        {/* Aqui pode renderizar o chart-run e outros dados bonitos */}
-                    </div>
-                ) : (
-                    <Text size="sm">Carregando stats...</Text>
-                )}
-            </Paper>
-        );
-    };
+    // Exibe stats gerais (todas as semanas) ao expandir
+    const renderExpansion: DataTableRowExpansionProps<ChartData>['content'] = ({ record }) => (
+        <ChartItemStatsLoader
+            chartId={record.chartId}
+            chartType={record.chartType}
+            entityId={record.entityId}
+            week={week}
+        />
+    );
 
     // Monta colunas para o DataTable
     // Função utilitária para cor/label do badge

@@ -84,6 +84,9 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
     prevPlays = !isCutoff ? w.plays : null;
   }
 
+  // Monta o chartRun (todas as semanas, posição e plays)
+  const chartRun = items.map(w => ({ week: w.week, position: w.rank, plays: w.plays }));
+
   const stats: ChartStats = {
     chartId,
     chartType,
@@ -91,6 +94,7 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
     peak,
     sequences,
     totals,
+    chartRun,
   };
   await db.charts_stats.put(stats);
 }

@@ -29,7 +29,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { loginWithGoogle, logout as reduxLogout } from '../store/authSlice';
+import { logout as reduxLogout } from '../store/authSlice';
 import { setTheme } from '../store/themeSlice';
 import { setLanguage } from '../store/i18nSlice';
 
@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
     const { i18n, t } = useTranslation();
 
     const handleLogout = () => {
-        dispatch(reduxLogout()).unwrap();
+        dispatch(reduxLogout() as any).unwrap();
     };
 
     // Sincroniza Redux -> Mantine

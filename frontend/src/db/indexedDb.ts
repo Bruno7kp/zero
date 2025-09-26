@@ -25,6 +25,7 @@ export interface ChartStats {
   peak?: any;
   totals?: any;
   sequences?: any;
+  chartRun?: Array<{ week: string; position: number; plays: number }>;
 }
 
 export class ZeroChartsDB extends Dexie {

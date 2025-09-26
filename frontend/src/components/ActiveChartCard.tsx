@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { Card, Group, ThemeIcon, Text, Divider, Grid, Select, Flex, Button, rem } from '@mantine/core';
 import { IconStar } from '@tabler/icons-react';
 import { NavLink } from 'react-router-dom';
