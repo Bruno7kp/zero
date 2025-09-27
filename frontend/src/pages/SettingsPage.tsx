@@ -73,7 +73,7 @@ function SettingsPage() {
             setReindexedWeeks(prev => prev + 1);
           }
         }
-      } catch (e) {
+      } catch {
         // ignore
       } finally {
         if (!cancelled) setReindexing(false);
