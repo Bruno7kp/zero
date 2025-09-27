@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { apiUrl } from '../config';
 
 export interface User {
   name: string;
@@ -27,7 +28,7 @@ const initialState: AuthState = {
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
   async (googleResponse: any) => {
-    const response = await fetch('http://localhost:8081/api/auth/google/callback', {
+  const response = await fetch(apiUrl('/auth/google/callback'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: googleResponse.credential }),

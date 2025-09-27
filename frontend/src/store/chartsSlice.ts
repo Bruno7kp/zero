@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import { db } from '../db/indexedDb';
+import { apiUrl } from '../config';
 import type { ChartData } from '../db/indexedDb';
 
 export interface ChartsState {
@@ -56,7 +57,7 @@ export const fetchCharts = createAsyncThunk(
     // Busca token do Redux ou localStorage
     const state: any = getState();
     const token = state.auth?.token || localStorage.getItem('user-token');
-    const response = await fetch('http://localhost:8081/api/charts', {
+  const response = await fetch(apiUrl('/charts'), {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!response.ok) throw new Error('Erro ao buscar charts');
@@ -70,7 +71,7 @@ export const deleteChart = createAsyncThunk(
     try {
       const state: any = getState();
       const token = state.auth?.token || localStorage.getItem('user-token');
-      const response = await fetch(`http://localhost:8081/api/charts/${chartId}`, {
+  const response = await fetch(apiUrl(`/charts/${chartId}`), {
         method: 'DELETE',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -115,7 +116,7 @@ export const createChart = createAsyncThunk(
   async (chartData: any, { dispatch, getState }) => {
     const state: any = getState();
     const token = state.auth?.token || localStorage.getItem('user-token');
-    const response = await fetch('http://localhost:8081/api/charts', {
+  const response = await fetch(apiUrl('/charts'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +135,7 @@ export const updateChart = createAsyncThunk(
   async ({ chartId, chartData }: { chartId: number, chartData: any }, { dispatch, getState }) => {
     const state: any = getState();
     const token = state.auth?.token || localStorage.getItem('user-token');
-    const response = await fetch(`http://localhost:8081/api/charts/${chartId}`, {
+  const response = await fetch(apiUrl(`/charts/${chartId}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
