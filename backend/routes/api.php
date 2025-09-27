@@ -4,6 +4,7 @@ use App\Http\Controllers\ChartController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SocialiteController; // Vamos criar este controlador
+use Illuminate\Support\Facades\Cache;
 
 // Rota para redirecionar para o provedor
 Route::get('/auth/google/redirect', [SocialiteController::class, 'redirectToGoogle']);
@@ -23,6 +24,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/charts', [ChartController::class, 'store']);
     Route::put('/charts/{chart}', [ChartController::class, 'update']);
     Route::delete('/charts/{chart}', [ChartController::class, 'destroy']);
+});
+
+// Health check (sem auth) - pode ser usado por monitoria / load balancer
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'time' => now()->toIso8601String(),
+        'cache' => Cache::getDefaultDriver(),
+        'app_env' => config('app.env'),
+    ]);
 });
 
 

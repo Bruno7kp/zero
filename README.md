@@ -58,22 +58,29 @@ Frontend (`frontend/.env`):
 - `VITE_API_BASE_URL=http://localhost:8081/api`
 - `VITE_GOOGLE_CLIENT_ID=...`
 
-## Build Produção (Resumo)
-1. Definir `APP_ENV=production`, `APP_DEBUG=false` no backend.
-2. Ajustar `APP_URL` e `VITE_API_BASE_URL` para o domínio final (HTTPS).
-3. Rodar build frontend:
-```
-cd frontend
-npm ci
-npm run build
-```
-4. Servir `frontend/dist` via nginx (ou outro CDN) e apontar `/api` para o backend.
-5. Rodar:
-```
-php artisan migrate --force
-php artisan config:cache route:cache view:cache
-```
-6. Configurar fila (opcional futuro) `php artisan queue:work`.
+## Build / Deploy Produção (Resumo)
+ Arquitetura de produção (Opção A) configurada:
+ - `docker/backend/Dockerfile.prod` (PHP-FPM + vendor + otimizações)
+ - `docker/nginx/Dockerfile.fullstack.prod` (Nginx servindo SPA + proxy FastCGI para Laravel)
+
+ Pipeline ( `.github/workflows/ci.yml` ):
+ 1. Testes + lint
+ 2. Build e push imagens: `*-backend` (php-fpm) e `*-web` (nginx + SPA)
+ 3. Servidor: `docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d`
+
+Passos manuais mínimos se não usar compose de produção ainda:
+1. Criar `.env` backend com `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://seu.dominio`.
+2. Definir `VITE_API_BASE_URL=https://seu.dominio/api` em tempo de build (frontend) ou via reverse proxy.
+3. Gerar APP_KEY se vazio (entrypoint já tenta gerar se `RUN_MIGRATIONS=true`).
+4. Executar migrações (`php artisan migrate --force`).
+5. (Opcional) Cache de config/rotas/views (entrypoint já cobre se `CACHE_OPTIMIZE=true`).
+6. Configurar fila futura: `php artisan queue:work --tries=1`.
+
+Variáveis do entrypoint backend:
+- `RUN_MIGRATIONS=true|false`
+- `CACHE_OPTIMIZE=true|false`
+
+ Compose de produção já incluso: `docker-compose.prod.yml` (serviços: backend, web, db).
 
 ## Scripts Principais
 Frontend `package.json`:

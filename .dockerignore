@@ -1,0 +1,12 @@
+node_modules
+frontend/node_modules
+backend/vendor
+frontend/dist
+.git
+.github
+Dockerfile*
+docker-compose*.yml
+*.log
+.env
+.env.*
+storage/logs

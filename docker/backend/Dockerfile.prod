@@ -1,0 +1,51 @@
+## Backend production image for ZeroCharts (Laravel)
+# Multi-stage to install dependencies separately and produce a slim runtime.
+
+FROM composer:2 AS vendor
+ARG GIT_SHA=dev
+WORKDIR /app
+COPY ../../backend/composer.json ../../backend/composer.lock ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts --no-progress --optimize-autoloader
+
+FROM php:8.2-fpm-alpine AS base
+ARG GIT_SHA=dev
+WORKDIR /var/www/html
+
+RUN apk add --no-cache \
+    bash curl zip unzip git libzip-dev oniguruma-dev icu-dev libpng libpng-dev libjpeg-turbo libjpeg-turbo-dev freetype freetype-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql gd zip opcache intl \
+    && rm -rf /tmp/*
+
+# Copy application source
+COPY ../../backend /var/www/html
+
+# Copy vendor from previous stage
+COPY --from=vendor /app/vendor /var/www/html/vendor
+
+# Ensure storage & cache writable
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && find storage -type d -exec chmod 775 {} \; \
+    && chmod 775 bootstrap/cache
+
+# (Opcional) Copiar ini customizado se existir (ignorado se ausente)
+ARG PHP_INI_OVERRIDE=../../backend/php.ini-production
+RUN if [ -f "$PHP_INI_OVERRIDE" ]; then cp "$PHP_INI_OVERRIDE" /usr/local/etc/php/conf.d/zz-production.ini ; fi || true
+
+# Entrypoint handles APP_KEY + migrations / cache
+COPY docker/backend/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV APP_ENV=production \
+    PHP_OPCACHE_VALIDATE_TIMESTAMPS=0 \
+    PHP_OPCACHE_PRELOAD=/var/www/html/preload.php \
+    PHP_OPCACHE_PRELOAD_USER=www-data
+
+LABEL org.opencontainers.image.source="https://github.com/Bruno7kp/zero" \
+    org.opencontainers.image.revision="$GIT_SHA" \
+    org.opencontainers.image.title="zero-backend" \
+    org.opencontainers.image.description="ZeroCharts Laravel backend"
+
+EXPOSE 9000
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["php-fpm"]

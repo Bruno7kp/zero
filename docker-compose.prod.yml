@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  backend:
+    image: ghcr.io/bruno7kp/zero-backend:latest
+    env_file: backend/.env.production
+    environment:
+      RUN_MIGRATIONS: "true"
+      CACHE_OPTIMIZE: "true"
+    depends_on:
+      - db
+    networks:
+      - zero-net
+    volumes:
+      - app-storage:/var/www/html/storage
+      - app-cache:/var/www/html/bootstrap/cache
+
+  web:
+    image: ghcr.io/bruno7kp/zero-web:latest
+    depends_on:
+      - backend
+    networks:
+      - zero-net
+    ports:
+      - "8081:80"  # expõe internamente para Apache proxy -> 8081
+
+  db:
+    image: mysql:8.0
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
+    env_file: backend/.env.production
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - zero-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+  app-storage:
+  app-cache:
+
+networks:
+  zero-net:
+    driver: bridge
+
