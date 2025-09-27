@@ -3,7 +3,6 @@ version: "3.9"
 services:
   backend:
     image: ghcr.io/bruno7kp/zero-backend:main
-    env_file: backend/.env.production
     environment:
       RUN_MIGRATIONS: "true"
       CACHE_OPTIMIZE: "true"

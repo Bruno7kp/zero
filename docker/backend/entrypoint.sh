@@ -5,10 +5,24 @@ echo "[entrypoint] Starting ZeroCharts Laravel backend (env: ${APP_ENV:-unknown}
 
 cd /var/www/html
 
-# Ensure .env exists (in case only .env.production was mounted/copied elsewhere)
-if [ ! -f .env ] && [ -f .env.production ]; then
-  echo "[entrypoint] .env missing – copying from .env.production"
-  cp .env.production .env
+# Ensure .env exists or differs in critical keys; sync from .env.production if needed
+if [ -f .env.production ]; then
+  if [ ! -f .env ]; then
+    echo "[entrypoint] .env missing – copying from .env.production"
+    cp .env.production .env
+  else
+    # Compare critical keys (GOOGLE_CALLBACK_URL, APP_KEY, DB_CONNECTION)
+    PROD_CB=$(grep '^GOOGLE_CALLBACK_URL=' .env.production | cut -d '=' -f2- || true)
+    CURR_CB=$(grep '^GOOGLE_CALLBACK_URL=' .env | cut -d '=' -f2- || true)
+    PROD_DB=$(grep '^DB_CONNECTION=' .env.production | cut -d '=' -f2- || true)
+    CURR_DB=$(grep '^DB_CONNECTION=' .env | cut -d '=' -f2- || true)
+    PROD_KEY=$(grep '^APP_KEY=' .env.production | cut -d '=' -f2- || true)
+    CURR_KEY=$(grep '^APP_KEY=' .env | cut -d '=' -f2- || true)
+    if [ "$PROD_CB" != "$CURR_CB" ] || [ -n "$PROD_KEY" -a "$PROD_KEY" != "$CURR_KEY" ] || [ "$PROD_DB" != "$CURR_DB" ]; then
+      echo "[entrypoint] Detected drift in critical env keys – syncing .env from .env.production"
+      cp .env.production .env
+    fi
+  fi
 fi
 
 # If using sqlite, ensure database file exists
@@ -52,5 +66,5 @@ if [ "${CACHE_OPTIMIZE:-true}" = "true" ]; then
   php artisan view:cache || true
 fi
 
-echo "[entrypoint] Ready: launching php-fpm"
+echo "[entrypoint] Ready: launching php-fpm (GOOGLE_CALLBACK_URL=$(grep '^GOOGLE_CALLBACK_URL=' .env | cut -d '=' -f2-))"
 exec "$@"
