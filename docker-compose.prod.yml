@@ -10,6 +10,7 @@ services:
     networks:
       - zero-net
     volumes:
+      - ./backend/.env.production:/var/www/html/.env.production:ro
       - app-storage:/var/www/html/storage
       - app-cache:/var/www/html/bootstrap/cache
       - sqlite-data:/var/www/html/database
