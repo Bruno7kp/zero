@@ -39,7 +39,8 @@ RUN chmod +x /entrypoint.sh
 ENV APP_ENV=production \
     PHP_OPCACHE_VALIDATE_TIMESTAMPS=0 \
     PHP_OPCACHE_PRELOAD=/var/www/html/preload.php \
-    PHP_OPCACHE_PRELOAD_USER=www-data
+    PHP_OPCACHE_PRELOAD_USER=www-data \
+    APP_GIT_SHA=$GIT_SHA
 
 LABEL org.opencontainers.image.source="https://github.com/Bruno7kp/zero" \
     org.opencontainers.image.revision="$GIT_SHA" \

@@ -33,6 +33,7 @@ Route::get('/health', function () {
         'time' => now()->toIso8601String(),
         'cache' => Cache::getDefaultDriver(),
         'app_env' => config('app.env'),
+        'git_sha' => env('APP_GIT_SHA', 'dev'),
     ]);
 });
 
