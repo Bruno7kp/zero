@@ -2,6 +2,18 @@
 set -euo pipefail
 
 echo "[entrypoint] Starting ZeroCharts Laravel backend (env: ${APP_ENV:-unknown})"
+if [ ! -d vendor/laravel ]; then
+  echo "[entrypoint][FATAL] vendor directory incomplete (vendor/laravel missing). Aborting." >&2
+fi
+
+if [ ! -f .env.production ]; then
+  if [ -f .env.production.example ]; then
+    echo "[entrypoint] .env.production missing – seeding from example (REMINDER: fill secrets!)."
+    cp .env.production.example .env.production
+  else
+    echo "[entrypoint][WARN] Neither .env.production nor example present." >&2
+  fi
+fi
 
 cd /var/www/html
 
@@ -51,6 +63,9 @@ if [ -f .env ]; then
     fi
   fi
 fi
+
+echo "[entrypoint] Laravel version: $(php artisan --version 2>/dev/null || echo 'unknown')"
+echo "[entrypoint] Google callback (post-env sync): $(grep '^GOOGLE_CALLBACK_URL=' .env | cut -d '=' -f2-)"
 
 # Run migrations (optional toggle)
 if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
