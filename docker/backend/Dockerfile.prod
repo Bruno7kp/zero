@@ -12,9 +12,9 @@ ARG GIT_SHA=dev
 WORKDIR /var/www/html
 
 RUN apk add --no-cache \
-    bash curl zip unzip git libzip-dev oniguruma-dev icu-dev libpng libpng-dev libjpeg-turbo libjpeg-turbo-dev freetype freetype-dev \
+    bash curl zip unzip git libzip-dev oniguruma-dev icu-dev libpng libpng-dev libjpeg-turbo libjpeg-turbo-dev freetype freetype-dev sqlite sqlite-libs \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd zip opcache intl \
+    && docker-php-ext-install pdo pdo_mysql gd zip opcache intl pdo_sqlite \
     && rm -rf /tmp/*
 
 # Copy application source
