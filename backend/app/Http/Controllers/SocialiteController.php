@@ -15,6 +15,7 @@ class SocialiteController extends Controller
     {
         // Using API route group (no session), so we must use stateless() to avoid session/state exceptions
         try {
+            Log::error('[DEBUG_OAUTH] Entering redirectToGoogle method');
             $cfg = config('services.google');
             Log::info('Google OAuth redirect init', [
                 'client_id' => $cfg['client_id'] ?? null,

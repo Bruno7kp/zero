@@ -7,7 +7,11 @@ use App\Http\Controllers\SocialiteController; // Vamos criar este controlador
 use Illuminate\Support\Facades\Cache;
 
 // Rota para redirecionar para o provedor
-Route::get('/auth/google/redirect', [SocialiteController::class, 'redirectToGoogle']);
+// Temporary diagnostic wrapper: logs before calling controller to ensure request hits PHP layer
+Route::get('/auth/google/redirect', function () {
+    \Log::error('[DEBUG_OAUTH] Route /auth/google/redirect hit');
+    return app(SocialiteController::class)->redirectToGoogle();
+});
 
 // Rota de callback para processar a resposta do Google (POST para One Tap)
 Route::post('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
