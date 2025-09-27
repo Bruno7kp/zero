@@ -24,12 +24,6 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
     // pega só "pt" em vez de "pt-BR", se necessário
     const langKey = i18n.language.split('-')[0];
 
-    if (import.meta.env.PROD) {
-        // Debug temporário: confirmar que o build incorporou a env
-        // eslint-disable-next-line no-console
-        console.log('VITE_GOOGLE_CLIENT_ID =', import.meta.env.VITE_GOOGLE_CLIENT_ID);
-    }
-
     return (
         <Provider store={store}>
             <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
