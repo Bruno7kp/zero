@@ -86,8 +86,10 @@ export const deleteChart = createAsyncThunk(
         return rejectWithValue(msg);
       }
       // Remove dados locais relacionados ao chart (weeks + stats)
-      await db.charts_data.where('chartId').equals(String(chartId)).delete();
-      await db.charts_stats.where('chartId').equals(String(chartId)).delete();
+  await db.charts_data.where('chartId').equals(String(chartId)).delete();
+  await db.charts_stats.where('chartId').equals(String(chartId)).delete();
+  // Remove marcações de semanas completas, se tabela existir (versão >=12)
+  try { await db.chart_weeks.where('chartId').equals(String(chartId)).delete(); } catch { /* ignore if older schema */ }
       // Atualiza lista
       dispatch(fetchCharts());
       return chartId;
@@ -103,6 +105,7 @@ export const clearChartLocalData = createAsyncThunk(
   async (chartId: number) => {
     await db.charts_data.where('chartId').equals(String(chartId)).delete();
     await db.charts_stats.where('chartId').equals(String(chartId)).delete();
+    try { await db.chart_weeks.where('chartId').equals(String(chartId)).delete(); } catch { /* ignore */ }
     return chartId;
   }
 );

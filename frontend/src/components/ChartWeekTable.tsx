@@ -108,22 +108,26 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
 
     // Monta colunas para o DataTable
     // Função utilitária para cor/label do badge
-    function getDeltaBadgeProps(delta: any, stats?: any) {
+    function getDeltaBadgeProps(delta: any) {
+        // Rules:
+        //  - number > 0 => +N green
+        //  - number < 0 => -N red
+        //  - number === 0 => '=' gray
+        //  - 'NEW' => blue
+        //  - 'RE'  => yellow
+        //  - anything else / '-' => gray
         let color = 'gray';
-        let label = delta;
+        let label: string | number = delta;
         if (typeof delta === 'number') {
             if (delta > 0) { color = 'green'; label = `+${delta}`; }
             else if (delta < 0) { color = 'red'; label = `${delta}`; }
             else { color = 'gray'; label = '='; }
         } else if (delta === 'NEW') {
-            const totalWeeks = stats?.totals?.withinCutoff ?? 1;
-            if (totalWeeks > 1) {
-                color = 'yellow'; label = 'RE';
-            } else {
-                color = 'blue'; label = 'NEW';
-            }
+            color = 'blue'; label = 'NEW';
         } else if (delta === 'RE') {
             color = 'yellow'; label = 'RE';
+        } else if (delta === '-' || delta == null) {
+            color = 'gray'; label = '-';
         }
         return { color, label };
     }
@@ -141,8 +145,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
                 render: (row, _index) => {
                     let badge = null;
                     if (showDeltaBadge) {
-                        const stats = statsMap[row.entityId];
-                        const { color, label } = getDeltaBadgeProps(row.deltaRank, stats);
+                        const { color, label } = getDeltaBadgeProps(row.deltaRank);
                         badge = (
                             <Badge variant="light" color={color} size="xs">{label}</Badge>
                         );
@@ -162,8 +165,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
                 render: (row, _index) => {
                     let badge = null;
                     if (showDeltaPlaysBadge) {
-                        const stats = statsMap[row.entityId];
-                        const { color, label } = getDeltaBadgeProps(row.deltaPlays, stats);
+                        const { color, label } = getDeltaBadgeProps(row.deltaPlays);
                         badge = (
                             <Badge variant="light" color={color} size="xs">{label}</Badge>
                         );

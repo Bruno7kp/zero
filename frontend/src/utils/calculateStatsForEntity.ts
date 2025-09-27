@@ -33,6 +33,10 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
       seqTop5 = 0;
       seqTop10 = 0;
       seqWithinCutoff = 0;
+      // IMPORTANT: ao haver um gap a entidade esteve ausente pelo menos 1 semana.
+      // Precisamos forçar detecção de RE-ENTRY na próxima avaliação de delta.
+      prevRank = null;
+      prevPlays = null;
     }
 
     totals.totalPlays += w.plays || 0;
@@ -47,8 +51,13 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
       // Delta
       let deltaRank: number | string = '-';
       let deltaPlays: number | string = '-';
-      if (prevRank === null) deltaRank = 'NEW';
-      else deltaRank = (prevRank && w.rank) ? prevRank - w.rank : '-';
+      if (prevRank === null) {
+        // Se houve aparição anterior dentro do cutoff => RE, caso contrário NEW
+        const previousAppear = items.find((it, i2) => i2 < idx && it.rank && it.rank <= cutoff);
+        deltaRank = previousAppear ? 'RE' : 'NEW';
+      } else {
+        deltaRank = (prevRank && w.rank) ? prevRank - w.rank : '-';
+      }
 
       if (prevPlays === null) deltaPlays = 'NEW';
       else deltaPlays = (w.plays !== undefined && prevPlays !== undefined) ? w.plays - prevPlays : '-';
@@ -80,6 +89,7 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
       seqWithinCutoff = 0;
     }
 
+    // Se a semana está fora do cutoff, reset para que próxima aparição seja NEW/RE
     prevRank = !isCutoff ? w.rank : null;
     prevPlays = !isCutoff ? w.plays : null;
   }

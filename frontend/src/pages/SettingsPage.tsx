@@ -1,5 +1,5 @@
 // src/pages/SettingsPage.tsx (clean minimal debug version)
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Center,
   Loader,
@@ -19,6 +19,7 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
 import { fetchCharts, setActiveChartId, deleteChart, clearChartLocalData } from '../store/chartsSlice';
+import { db } from '../db/indexedDb';
 import { syncCharts } from '../store/syncSlice';
 import { useTranslation } from 'react-i18next';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
@@ -43,6 +44,43 @@ function SettingsPage() {
   useEffect(() => {
     if (isAuthenticated) dispatch(fetchCharts());
   }, [isAuthenticated, dispatch]);
+
+  const [reindexing, setReindexing] = useState(false);
+  const [reindexedWeeks, setReindexedWeeks] = useState(0);
+
+  // Background reindex / upgrade legacy completeness marking -> new status table
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (!(db as any).chart_weeks) return;
+        setReindexing(true);
+        const allData = await db.charts_data.toArray();
+        const byChart: Record<string, { [week: string]: { [type: string]: boolean } }> = {};
+        for (const row of allData) {
+          if (!byChart[row.chartId]) byChart[row.chartId] = {};
+          if (!byChart[row.chartId][row.week]) byChart[row.chartId][row.week] = {};
+          byChart[row.chartId][row.week][row.chartType] = true;
+        }
+        const types = ['artist','album','track'];
+        for (const cid of Object.keys(byChart)) {
+          for (const wk of Object.keys(byChart[cid]).sort()) {
+            if (cancelled) break;
+            const existing = await (db as any).chart_weeks.get([cid, wk]);
+            if (existing) continue; // don't overwrite, migration already handled
+            const hasAll = types.every(tp => byChart[cid][wk][tp]);
+            await (db as any).chart_weeks.put({ chartId: cid, week: wk, status: hasAll ? 'complete' : 'partial' });
+            setReindexedWeeks(prev => prev + 1);
+          }
+        }
+      } catch (e) {
+        // ignore
+      } finally {
+        if (!cancelled) setReindexing(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Ensure i18n sync with redux
   useEffect(() => {
@@ -141,10 +179,16 @@ function SettingsPage() {
             <Badge color={isOnline ? 'green' : 'red'} variant="light" leftSection={isOnline ? <IconCloudCheck size={14} /> : <IconCloudOff size={14} />}>{isOnline ? t('settings.online') : t('settings.offline')}</Badge>
             {syncState.lastFullChartsSync && (
               <Tooltip label={syncState.lastFullChartsSync}>
-                <Badge variant="outline" color="blue">{t('settings.lastSync')}: {new Date(syncState.lastFullChartsSync).toLocaleString()}</Badge>
+                <Badge variant="light" color="blue">{t('settings.lastSync')}: {new Date(syncState.lastFullChartsSync).toLocaleString()}</Badge>
               </Tooltip>
             )}
-            <Badge variant="outline" color="grape">{t('settings.chartsCount')}: {chartsCount}</Badge>
+            <Badge variant="light" color="grape">{t('settings.chartsCount')}: {chartsCount}</Badge>
+            {reindexing && (
+              <Badge variant="dot" color="indigo">{t('settings.reindexingWeeks')}</Badge>
+            )}
+            {!reindexing && reindexedWeeks > 0 && (
+              <Badge variant="light" color="indigo">{t('settings.reindexedWeeks', { count: reindexedWeeks })}</Badge>
+            )}
           </Group>
           <Group gap="xs">
             <Tooltip label={isOnline ? t('settings.syncNow') : t('settings.needOnline')}>

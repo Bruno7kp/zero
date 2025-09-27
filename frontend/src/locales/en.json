@@ -34,6 +34,8 @@
       "toSync": "To sync",
       "synced": "Synced",
       "syncStatus": "{{loadedWeeks}} of {{weeks}} weeks loaded",
+  "complete": "Complete",
+  "partial": "Partial",
       "view": "View chart",
       "viewAll": "View all charts",
       "viewLive": "View current week preview",
@@ -71,6 +73,7 @@
         "needOnlineForCert": "Go online to update certification",
         "noData": "No data",
         "reload": "Reload playcount"
+        ,"periodWeeks": "{{count}} week(s)"
       }
     },
     "library": {
@@ -100,7 +103,9 @@
       "needOnline": "Needs connection",
       "sync": "Sync",
       "clearChartData": "Clear local data",
-      "chartsCount": "Charts"
+      "chartsCount": "Charts",
+      "reindexingWeeks": "Reindexing weeks...",
+      "reindexedWeeks": "Weeks reindexed: {{count}}"
     },
     "forms": {
       "createChart": {
@@ -165,6 +170,13 @@
       "noData": {
         "title": "No data",
         "description": "No chart data available for the current week."
+      },
+      "lastfm": {
+        "rateLimit": "Last.fm rate limit exceeded. Please wait and try again.",
+        "network": "Network error contacting Last.fm.",
+        "userNotFound": "Last.fm user not found.",
+        "weekFetchFailed": "Failed to fetch week {{week}} from Last.fm.",
+        "unknown": "Unknown Last.fm error."
       }
     },
     "notifications": {

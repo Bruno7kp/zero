@@ -41,26 +41,51 @@ interface LastFmResponse {
 }
 
 // Generic fetch. For methods that need 'username' (track.getInfo / album.getInfo) we pass a flag.
+class LastFmApiError extends Error {
+        code?: number;
+        httpStatus?: number;
+        constructor(message: string, opts: { code?: number; httpStatus?: number } = {}) {
+                super(message);
+                this.name = 'LastFmApiError';
+                this.code = opts.code;
+                this.httpStatus = opts.httpStatus;
+        }
+}
+
 const fetchLastFmApi = async (
     method: string,
     user: string,
     from?: string,
     to?: string,
-    extra: Record<string,string> = {},
+    extra: Record<string, string> = {},
     useUsernameParam: boolean = false
 ): Promise<LastFmResponse> => {
     try {
-        const base: Record<string,string> = { method, api_key: LASTFM_API_KEY, format: 'json', ...(from ? { from } : {}), ...(to ? { to } : {}), ...extra };
+        const base: Record<string, string> = {
+            method,
+            api_key: LASTFM_API_KEY,
+            format: 'json',
+            ...(from ? { from } : {}),
+            ...(to ? { to } : {}),
+            ...extra,
+        };
         if (user) {
-            if (useUsernameParam) base.username = user; else base.user = user;
+            if (useUsernameParam) base.username = user;
+            else base.user = user;
         }
         const params = new URLSearchParams(base);
         const lurl = `${LASTFM_API_URL}?${params.toString()}`;
         const response = await fetch(lurl);
         if (!response.ok) {
-            throw new Error(`Erro na requisição à API: ${response.statusText}`);
+            throw new LastFmApiError(`[LASTFM][HTTP:${response.status}] ${response.statusText}`, { httpStatus: response.status });
         }
         const json = await response.json();
+        if ((json as any)?.error) {
+            // Last.fm error codes (e.g., 6 user not found, 29 rate limit, etc.)
+            const code = (json as any).error;
+            const msg = (json as any).message || 'Error';
+            throw new LastFmApiError(`[LASTFM][CODE:${code}] ${msg}`, { code });
+        }
         return json;
     } catch (error) {
         console.error(`Erro ao buscar ${method}:`, error);
@@ -69,7 +94,7 @@ const fetchLastFmApi = async (
 };
 
 export const getWeeklyArtistChart = async (user: string, from: string, to: string): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklyartistchart', user, from, to);
+    const data = await fetchLastFmApi('user.getweeklyartistchart', user, from, to, { limit: '120' });
     const artists = data?.weeklyartistchart?.artist;
 
     if (!artists) {
@@ -84,7 +109,7 @@ export const getWeeklyArtistChart = async (user: string, from: string, to: strin
 };
 
 export const getWeeklyTrackChart = async (user: string, from: string, to: string): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklytrackchart', user, from, to);
+    const data = await fetchLastFmApi('user.getweeklytrackchart', user, from, to, { limit: '120' });
     const tracks = data?.weeklytrackchart?.track;
 
     if (!tracks) {
@@ -100,7 +125,7 @@ export const getWeeklyTrackChart = async (user: string, from: string, to: string
 };
 
 export const getWeeklyAlbumChart = async (user: string, from: string, to: string): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklyalbumchart', user, from, to);
+    const data = await fetchLastFmApi('user.getweeklyalbumchart', user, from, to, { limit: '120' });
     const albums = data?.weeklyalbumchart?.album;
 
     if (!albums) {
