@@ -12,9 +12,9 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
   if (!items.length) return;
 
   let prevRank: number | null = null, prevPlays: number | null = null;
-  let peak = { position: Infinity, weeksAtPeak: 0, longestSequenceAtPeak: 0, weeksToPeak: 0 };
-  let sequences = { rank1: 0, top5: 0, top10: 0, withinCutoff: 0 };
-  let totals = { totalPoints: 0, totalPlays: 0, top5: 0, top10: 0, withinCutoff: 0 };
+  const peak = { position: Infinity, weeksAtPeak: 0, longestSequenceAtPeak: 0, weeksToPeak: 0 };
+  const sequences = { rank1: 0, top5: 0, top10: 0, withinCutoff: 0 };
+  const totals = { totalPoints: 0, totalPlays: 0, top5: 0, top10: 0, withinCutoff: 0 };
 
   let seqPeak = 0, seqRank1 = 0, seqTop5 = 0, seqTop10 = 0, seqWithinCutoff = 0;
 
@@ -22,10 +22,10 @@ export async function calculateStatsForEntity(chartId: string, chartType: string
   for (let idx = 0; idx < items.length; idx++) {
     const w = items[idx];
     // Lógica de reinício de sequências
-    let prevWeek = idx > 0 ? dayjs(items[idx - 1].week) : null;
-    let currentWeek = dayjs(w.week);
-    let hasGap = prevWeek && !prevWeek.add(7, 'day').isSame(currentWeek, 'day');
-    let isCutoff = w.rank && w.rank > cutoff;
+  const prevWeek = idx > 0 ? dayjs(items[idx - 1].week) : null;
+  const currentWeek = dayjs(w.week);
+  const hasGap = prevWeek && !prevWeek.add(7, 'day').isSame(currentWeek, 'day');
+  const isCutoff = w.rank && w.rank > cutoff;
 
     if (hasGap) {
       seqPeak = 0;

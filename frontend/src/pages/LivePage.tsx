@@ -116,7 +116,7 @@ const LivePage = () => {
 
         // Re-executa a busca sempre que o chart ativo, a lista de charts ou o tipo de chart mudar
         fetchLiveChart();
-    }, [activeChartId, charts, chartType]);
+    }, [activeChartId, charts, chartType, t]);
 
     // Define as colunas do Mantine DataTable
     const columns: DataTableColumn<FormattedChartItem>[] = [

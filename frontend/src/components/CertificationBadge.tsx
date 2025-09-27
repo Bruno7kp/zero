@@ -35,7 +35,7 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
       nextWeekDay: chart.day_of_week,
     }).then(r => { if (mounted) setResult(r); }).finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
-  }, [chart, chartType, totals.totalPoints, entity.name, entity.artistName, username, online, forceReloadToken]);
+  }, [chart, chartType, totals, entity, username, online, forceReloadToken]);
 
   const colorMap: Record<string, string> = {
     none: 'gray',

@@ -23,7 +23,7 @@ export const ChartsWeekPage: React.FC = () => {
     React.useEffect(() => {
         if (weekParam && weekParam !== selectedWeek) setSelectedWeek(weekParam);
         if (typeParam && typeParam !== selectedType) setSelectedType(typeParam);
-    }, [weekParam, typeParam]);
+    }, [weekParam, typeParam, selectedWeek, selectedType]);
 
     // Atualiza rota ao trocar semana/tipo internamente
     const handleChange = (week: string, type: string) => {

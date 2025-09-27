@@ -222,7 +222,7 @@ const CreateChartPage = () => {
                 icon: <IconCheck />,
             });
             navigate('/settings');
-        } catch (_err) {
+        } catch {
             notifications.show({
                 message: t(`notifications.charts.${id ? 'update' : 'save'}.error`, { chart: chartData.name }),
                 color: 'red',

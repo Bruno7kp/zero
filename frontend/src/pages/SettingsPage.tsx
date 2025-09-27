@@ -132,8 +132,8 @@ function SettingsPage() {
 
   // Listener para ação de limpar dados locais de um chart
   useEffect(() => {
-    const handler = (e: any) => {
-  const { chartId, chartName } = e.detail || {};
+    const handler = ({ detail }: any) => {
+  const { chartId, chartName } = detail || {};
       if (!chartId) return;
       modals.openConfirmModal({
         title: t('settings.clearChartData') + ': ' + chartName,
@@ -144,7 +144,7 @@ function SettingsPage() {
           try {
             await dispatch(clearChartLocalData(chartId) as any).unwrap();
             notifications.show({ message: t('notifications.cache.chartCleared', { chart: chartName }), color: 'green', icon: <IconCheck /> });
-          } catch (_err) {
+          } catch {
               notifications.show({ message: 'Failed', color: 'red', icon: <IconX /> });
           }
         }

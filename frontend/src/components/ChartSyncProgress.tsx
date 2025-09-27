@@ -154,7 +154,7 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
           } catch (err: any) {
             failed = true;
             // Classifica o erro para tradução adequada
-            let key = 'errors.lastfm.weekFetchFailed';
+            const key = 'errors.lastfm.weekFetchFailed';
             let specific: string | undefined;
             const msg: string = err?.message || '';
             if (msg.includes('[LASTFM][CODE:29]') || msg.includes('rate') || msg.toLowerCase().includes('limit')) {

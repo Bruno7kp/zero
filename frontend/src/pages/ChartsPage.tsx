@@ -36,7 +36,7 @@ const ChartsPage = () => {
         } else {
             setChartName('');
         }
-    }, [activeChart?.id, activeChart?.name]);
+    }, [activeChart]);
     const breakpointColumns = {
         default: 2, // desktop
         1100: 2,    // tablet landscape
