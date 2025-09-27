@@ -177,7 +177,7 @@ const CreateChartPage = () => {
         } else if (id && !isLoading && charts.length === 0) {
             dispatch<any>(fetchCharts());
         }
-    }, [id, charts, form, navigate, t, fetchCharts, isLoading, isFormInitialized, dispatch]);
+    }, [id, charts, form, navigate, t, isLoading, isFormInitialized, dispatch]);
 
 
     const handleSubmit = async (values: typeof form.values) => {
