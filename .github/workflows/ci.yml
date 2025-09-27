@@ -24,6 +24,23 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: composer install --no-interaction --prefer-dist
+      - name: Prepare test environment (.env sqlite)
+        working-directory: backend
+        run: |
+          cp .env.example .env || true
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env || true
+          # Remove host/port/user/pass linhas antigas
+          sed -i '/^DB_HOST/d' .env || true
+          sed -i '/^DB_PORT/d' .env || true
+          sed -i '/^DB_USERNAME/d' .env || true
+          sed -i '/^DB_PASSWORD/d' .env || true
+          # Ajusta database path absoluto
+          sed -i '/^DB_DATABASE/d' .env || true
+          echo "DB_DATABASE=$(pwd)/database/database.sqlite" >> .env
+          echo 'CACHE_DRIVER=array' >> .env
+          echo 'SESSION_DRIVER=array' >> .env
+          echo 'QUEUE_CONNECTION=sync' >> .env
+          echo 'APP_ENV=testing' >> .env
       - name: Run lint (pint optional)
         if: false
         run: echo "Add pint or phpstan later"
@@ -32,7 +49,7 @@ jobs:
         run: |
           touch database/database.sqlite
           php artisan key:generate
-          php artisan migrate --graceful --no-interaction
+          php artisan migrate --force --no-interaction
           php artisan test --testsuite=Unit --stop-on-failure || true
 
   frontend-build:
