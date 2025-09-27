@@ -19,7 +19,13 @@ export const ChartsWeekPage: React.FC = () => {
     const [selectedType, setSelectedType] = useState<string>(typeParam || DEFAULT_TYPE);
     const navigate = useNavigate();
 
-    // Atualiza rota ao trocar semana/tipo
+    // Sincroniza quando rota muda externamente (ex: clique em ChartRun)
+    React.useEffect(() => {
+        if (weekParam && weekParam !== selectedWeek) setSelectedWeek(weekParam);
+        if (typeParam && typeParam !== selectedType) setSelectedType(typeParam);
+    }, [weekParam, typeParam]);
+
+    // Atualiza rota ao trocar semana/tipo internamente
     const handleChange = (week: string, type: string) => {
         setSelectedWeek(week);
         setSelectedType(type);

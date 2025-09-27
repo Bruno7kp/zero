@@ -66,7 +66,7 @@ function SettingsPage() {
     }
   }, [charts, activeChartId, dispatch]);
 
-  const handleSetActiveChartId = (id: number) => dispatch(setActiveChartId(id));
+  const handleSetActiveChartId = (id: number | null) => dispatch(setActiveChartId(id));
   const handleSync = () => dispatch(syncCharts());
 
   // Global cache clear removed; per-chart clearing implemented via event listener below

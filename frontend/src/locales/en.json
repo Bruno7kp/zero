@@ -44,7 +44,34 @@
       "playsLabel": "Plays",
       "deltaPlaysLabel": "Plays change",
       "peakLabel": "Peak",
-      "weeksLabel": "Weeks"
+      "weeksLabel": "Weeks",
+      "stats": {
+        "title": "Stats",
+        "weeksOnChart": "Weeks on chart",
+        "sequences": "Longest Sequence",
+        "top1": "Top 1",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "topX": "Top {{x}}",
+        "topCutoff": "Top (cutoff)",
+        "peak": "Peak",
+        "run": "Chart Run",
+        "loading": "Loading stats...",
+        "highlightsTitle": "Highlights",
+        "points": "Points",
+        "noCert": "No certification",
+        "currentValue": "{{value}} {{unit}}",
+        "nextAt": "Next at {{value}}",
+        "remaining": "Remaining {{value}}",
+        "remainingToSame": "Remaining {{value}} to {{multiple}}x {{level}}",
+        "remainingToHigher": "Remaining {{value}} to {{level}}",
+        "week": "Week {{n}}",
+        "playsLabel": "plays",
+        "showWeek": "Show this week",
+        "needOnlineForCert": "Go online to update certification",
+        "noData": "No data",
+        "reload": "Reload playcount"
+      }
     },
     "library": {
       "title": "Library"
@@ -72,7 +99,7 @@
       "syncNow": "Sync now",
       "needOnline": "Needs connection",
       "sync": "Sync",
-  "clearChartData": "Clear local data",
+      "clearChartData": "Clear local data",
       "chartsCount": "Charts"
     },
     "forms": {
@@ -85,7 +112,6 @@
         "sourcePlaceholder": "Select the source",
         "lastfmUsernameLabel": "Last.fm Username",
         "lastfmUsernamePlaceholder": "Ex: bruno7kp",
-        "lastfmUsernameRequired": "Last.fm username is required",
         "startDateLabel": "Charts start date",
         "startDatePlaceholder": "Ex: 2021-01-01",
         "startDateRequired": "Start date is required",

@@ -1,0 +1,116 @@
+import React from 'react';
+import { Card, Group, Text, ThemeIcon, Stack, Tooltip, Progress, ActionIcon } from '@mantine/core';
+import { IconDisc, IconRefresh } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { computeCertification, type CertificationResult } from '../utils/certification';
+import { useOfflineStatus } from '../hooks/useOfflineStatus';
+
+interface Props {
+  chart: any;
+  chartType: 'album' | 'track';
+  totals: { totalPoints?: number; totalPlays?: number };
+  entity: { name: string; artistName: string };
+  username?: string;
+  dayOfWeek?: number; // next calculation day (chart.day_of_week?)
+}
+
+export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, entity, username }) => {
+  const { t } = useTranslation();
+  const { isOnline: online } = useOfflineStatus();
+  const [result, setResult] = React.useState<CertificationResult | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [forceReloadToken, setForceReloadToken] = React.useState(0);
+  const playsWeight = chartType === 'track' ? (chart.music_plays_weight || 0) : (chart.album_plays_weight || 0);
+
+  React.useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    computeCertification({
+      chart,
+      chartType,
+      totals,
+      entity,
+      username,
+      offline: !online,
+      nextWeekDay: chart.day_of_week,
+    }).then(r => { if (mounted) setResult(r); }).finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
+  }, [chart, chartType, totals.totalPoints, entity.name, entity.artistName, username, online, forceReloadToken]);
+
+  const colorMap: Record<string, string> = {
+    none: 'gray',
+    gold: 'yellow',
+    platinum: 'cyan',
+    diamond: 'grape'
+  };
+
+  if (!result) {
+    if (!online && playsWeight > 0) {
+      return (
+        <Card p="sm" withBorder>
+          <Text size="xs" c="red" ta="center">{t('charts.stats.needOnlineForCert')}</Text>
+        </Card>
+      );
+    }
+    if (playsWeight > 0 && !username) {
+      return (
+        <Card p="sm" withBorder>
+          <Text size="xs" c="red" ta="center">Last.fm username ausente no chart</Text>
+        </Card>
+      );
+    }
+    return <Card p="sm" withBorder><Text size="xs" ta="center">{loading ? t('charts.stats.loading') : t('charts.stats.noData')}</Text></Card>;
+  }
+
+  const { level, multiplier, remainingToNext, nextTarget, totalFormula, nextType, nextLevel, nextMultiple } = result;
+  // Hide component entirely if all thresholds configured as 0 (no certification logic set)
+  const gold = chartType === 'track' ? (chart.music_gold_value || 0) : (chart.album_gold_value || 0);
+  const platinum = chartType === 'track' ? (chart.music_platinum_value || 0) : (chart.album_platinum_value || 0);
+  const diamond = chartType === 'track' ? (chart.music_diamond_value || 0) : (chart.album_diamond_value || 0);
+  if (gold === 0 && platinum === 0 && diamond === 0) return null;
+  const color = colorMap[level];
+  const formulaName = chart.formula_name || 'Sales';
+
+  const nextPct = nextTarget ? Math.min(100, (totalFormula / nextTarget) * 100) : 100;
+
+  return (
+    <Card p="sm" withBorder>
+      <Group wrap="nowrap" align="center" gap="sm">
+        <ThemeIcon size={46} radius="xl" color={color} variant="filled"><IconDisc size={28} /></ThemeIcon>
+        <Stack gap={2} style={{ flex: 1 }}>
+          <Text fw={700} size="sm" tt="uppercase">
+            {level !== 'none' ? `${multiplier > 1 ? multiplier + 'x ' : ''}${t('values.' + level)}` : t('charts.stats.noCert')}
+          </Text>
+          <Text size="xs" c="dimmed">{t('charts.stats.currentValue', { value: Math.floor(totalFormula), unit: formulaName })}</Text>
+          {remainingToNext !== null && nextTarget !== null && (
+            <Tooltip label={
+              nextType === 'same' && nextMultiple && nextLevel
+                ? t('charts.stats.nextAt', { value: `${nextMultiple}x ${t('values.' + nextLevel)}` })
+                : nextLevel
+                  ? t('charts.stats.nextAt', { value: t('values.' + nextLevel) })
+                  : t('charts.stats.nextAt', { value: Math.floor(nextTarget) })
+            }>
+              <div>
+                <Progress value={nextPct} size="xs" color={color} radius="xl" />
+                <Text size="10px" ta="right" c="dimmed">
+                  {nextType === 'same' && nextMultiple && nextLevel
+                    ? t('charts.stats.remainingToSame', { value: Math.max(0, Math.ceil(remainingToNext)), multiple: nextMultiple, level: t('values.' + nextLevel) })
+                    : nextLevel
+                      ? t('charts.stats.remainingToHigher', { value: Math.max(0, Math.ceil(remainingToNext)), level: t('values.' + nextLevel) })
+                      : t('charts.stats.remaining', { value: Math.max(0, Math.ceil(remainingToNext)) })}
+                </Text>
+              </div>
+            </Tooltip>
+          )}
+        </Stack>
+        {online && !loading && (
+          <Tooltip label={t('charts.stats.reload')}>
+            <ActionIcon variant="subtle" size="sm" onClick={() => setForceReloadToken(v => v + 1)} aria-label="reload">
+              <IconRefresh size={14} />
+            </ActionIcon>
+          </Tooltip>
+        )}
+      </Group>
+    </Card>
+  );
+};

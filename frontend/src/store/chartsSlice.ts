@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import { db } from '../db/indexedDb';
 import type { ChartData } from '../db/indexedDb';
 
@@ -149,7 +149,7 @@ const chartsSlice = createSlice({
   name: 'charts',
   initialState,
   reducers: {
-    setActiveChartId(state, action) {
+    setActiveChartId(state, action: PayloadAction<number | null>) {
       state.activeChartId = action.payload;
     },
     setCharts(state, action) {

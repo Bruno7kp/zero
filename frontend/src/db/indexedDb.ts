@@ -31,12 +31,14 @@ export interface ChartStats {
 export class ZeroChartsDB extends Dexie {
   charts_data!: Table<ChartData, number>;
   charts_stats!: Table<ChartStats, [string, string, string]>;
+  playcount_cache!: Table<{ key: string; value: number; expires: number }, string>;
 
   constructor() {
     super('ZeroChartsDB');
-    this.version(10).stores({
+    this.version(11).stores({
       charts_data: `++id, chartId, chartType, entityId, week, rank, plays, name, artistName, [chartId+chartType], [chartId+chartType+week], [chartId+chartType+entityId], &[chartId+chartType+entityId+week]`,
-      charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`
+      charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`,
+      playcount_cache: `key, expires`
     });
   }
 }

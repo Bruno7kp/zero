@@ -36,16 +36,32 @@ interface LastFmResponse {
             '@attr': { rank: string };
         }[];
     };
+    track?: any;
+    album?: any;
 }
 
-const fetchLastFmApi = async (method: string, user: string, from: string, to: string): Promise<LastFmResponse> => {
+// Generic fetch. For methods that need 'username' (track.getInfo / album.getInfo) we pass a flag.
+const fetchLastFmApi = async (
+    method: string,
+    user: string,
+    from?: string,
+    to?: string,
+    extra: Record<string,string> = {},
+    useUsernameParam: boolean = false
+): Promise<LastFmResponse> => {
     try {
-        const lurl = `${LASTFM_API_URL}?method=${method}&user=${user}&api_key=${LASTFM_API_KEY}&format=json&from=${from}&to=${to}`;
+        const base: Record<string,string> = { method, api_key: LASTFM_API_KEY, format: 'json', ...(from ? { from } : {}), ...(to ? { to } : {}), ...extra };
+        if (user) {
+            if (useUsernameParam) base.username = user; else base.user = user;
+        }
+        const params = new URLSearchParams(base);
+        const lurl = `${LASTFM_API_URL}?${params.toString()}`;
         const response = await fetch(lurl);
         if (!response.ok) {
             throw new Error(`Erro na requisição à API: ${response.statusText}`);
         }
-        return await response.json();
+        const json = await response.json();
+        return json;
     } catch (error) {
         console.error(`Erro ao buscar ${method}:`, error);
         throw error;
@@ -97,4 +113,25 @@ export const getWeeklyAlbumChart = async (user: string, from: string, to: string
         artist: album.artist['#text'],
         playcount: parseInt(album.playcount, 10),
     }));
+};
+
+export const getTrackInfo = async (user: string, artist: string, track: string) => {
+    // Primeiro tenta sem autocorrect para manter consistência; se não vier userplaycount tenta com autocorrect=1
+    let data = await fetchLastFmApi('track.getInfo', user, undefined, undefined, { artist, track, autocorrect: '0' }, true);
+    if (!data?.track?.userplaycount) {
+        try {
+            data = await fetchLastFmApi('track.getInfo', user, undefined, undefined, { artist, track, autocorrect: '1' }, true);
+        } catch {/* ignore fallback error */}
+    }
+    return data?.track;
+};
+
+export const getAlbumInfo = async (user: string, artist: string, album: string) => {
+    let data = await fetchLastFmApi('album.getInfo', user, undefined, undefined, { artist, album }, true);
+    if (!data?.album?.userplaycount) {
+        try {
+            data = await fetchLastFmApi('album.getInfo', user, undefined, undefined, { artist, album, autocorrect: '1' }, true);
+        } catch {/* ignore */}
+    }
+    return data?.album;
 };

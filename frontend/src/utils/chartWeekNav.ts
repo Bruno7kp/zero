@@ -1,5 +1,3 @@
-import { getClosedChartWeeks } from '../utils/chartWeekUtils';
-
 export function getPrevNextWeek(weeks: string[], currentWeek?: string) {
   if (!weeks.length || !currentWeek) return { prev: undefined, next: undefined };
   const idx = weeks.indexOf(currentWeek);

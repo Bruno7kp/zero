@@ -44,7 +44,34 @@
       "playsLabel": "Plays: Reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
       "peakLabel": "Peak: Pico",
-      "weeksLabel": "Weeks: Semanas"
+      "weeksLabel": "Weeks: Semanas",
+      "stats": {
+        "title": "Estatísticas",
+        "weeksOnChart": "Semanas no chart",
+        "sequences": "Maior sequência",
+        "top1": "Top 1",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "topX": "Top {{x}}",
+        "topCutoff": "Top (limite)",
+        "peak": "Pico",
+        "run": "Chart Run",
+        "loading": "Carregando estatísticas...",
+        "highlightsTitle": "Destaques",
+        "points": "Pontos",
+        "noCert": "Sem certificado",
+        "currentValue": "{{value}} {{unit}}",
+        "nextAt": "Próximo em {{value}}",
+        "remaining": "Faltam {{value}}",
+        "remainingToSame": "Faltam {{value}} para {{multiple}}x {{level}}",
+        "remainingToHigher": "Faltam {{value}} para {{level}}",
+        "week": "Semana {{n}}",
+        "playsLabel": "reproduções",
+        "showWeek": "Ver esta semana",
+        "needOnlineForCert": "Conecte-se para atualizar certificação",
+        "noData": "Sem dados",
+        "reload": "Recarregar playcount"
+      }
     },
     "library": {
       "title": "Biblioteca"
@@ -72,7 +99,7 @@
       "syncNow": "Sincronizar agora",
       "needOnline": "Requer conexão",
       "sync": "Sync",
-  "clearChartData": "Limpar dados locais",
+      "clearChartData": "Limpar dados locais",
       "chartsCount": "Charts"
     },
     "forms": {
@@ -85,7 +112,6 @@
         "sourcePlaceholder": "Selecione a fonte",
         "lastfmUsernameLabel": "Usuário do Last.fm",
         "lastfmUsernamePlaceholder": "Ex: bruno7kp",
-        "lastfmUsernameRequired": "O usuário do Last.fm é obrigatório",
         "startDateLabel": "Data de início dos charts",
         "startDatePlaceholder": "Ex: 2021-01-01",
         "startDateRequired": "A data de início é obrigatória",

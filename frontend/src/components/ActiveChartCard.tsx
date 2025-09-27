@@ -2,8 +2,22 @@
 import { Card, Group, ThemeIcon, Text, Divider, Grid, Select, Flex, Button, rem } from '@mantine/core';
 import { IconStar } from '@tabler/icons-react';
 import { NavLink } from 'react-router-dom';
+import type { TFunction } from 'i18next';
 
-const ActiveChartCard = ({
+interface ActiveChartOption {
+  value: string;
+  label: string;
+}
+
+interface ActiveChartCardProps {
+  charts: { id: number; name: string; [key: string]: any }[];
+  activeChartId: number | null;
+  setActiveChartId: (id: number | null) => void;
+  t: TFunction;
+  chartOptions: ActiveChartOption[];
+}
+
+const ActiveChartCard: React.FC<ActiveChartCardProps> = ({
   charts,
   activeChartId,
   setActiveChartId,
