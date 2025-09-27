@@ -23,6 +23,9 @@ services:
       - zero-net
     ports:
       - "8081:80"  # expõe internamente para Apache proxy -> 8081
+    volumes:
+      # Mount nginx config to apply updates without rebuilding image
+      - ./docker/nginx/nginx.fullstack.prod.conf:/etc/nginx/conf.d/default.conf:ro
 
 
 volumes:
