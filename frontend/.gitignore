@@ -15,6 +15,7 @@ dist-ssr
 # Env files (do not commit secrets)
 .env
 .env.production
+!.env.production  # exceção: versionar .env.production para build (contém apenas client_id público)
 
 # Editor directories and files
 .vscode/*

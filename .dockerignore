@@ -7,7 +7,7 @@ frontend/dist
 Dockerfile*
 docker-compose*.yml
 *.log
-.env
-.env.*
-!frontend/.env.production
+.env                 # ignora só .env raiz
+/.env.*              # ignora somente arquivos .env.* na raiz
+!frontend/.env.production  # re-inclui o .env.production do frontend para build
 storage/logs
