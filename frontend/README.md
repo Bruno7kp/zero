@@ -1,69 +1,65 @@
-# React + TypeScript + Vite
+# ZeroCharts Frontend (React + Vite + TS)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação SPA que consome a API Laravel e armazena dados históricos localmente (IndexedDB via Dexie) para estatísticas offline.
 
-Currently, two official plugins are available:
+## Principais Tecnologias
+- React + Vite + TypeScript
+- Mantine UI
+- Redux Toolkit (charts, sync, auth, i18n)
+- Dexie (IndexedDB) com migrações (ex: status de semanas: partial/complete)
+- i18next (multi-idioma)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Scripts
+| Comando | Descrição |
+|---------|-----------|
+| `npm run dev` | Dev server (porta 5173) |
+| `npm run build` | Build de produção (gera `dist/`) |
+| `npm run preview` | Servir build local |
+| `npm run lint` | ESLint (fail em error, warnings tolerados) |
 
-## Expanding the ESLint configuration
+## Variáveis de Ambiente (`frontend/.env`)
+| Variável | Uso |
+|----------|-----|
+| VITE_API_BASE_URL | Base para chamadas (em prod usamos `/api`) |
+| VITE_GOOGLE_CLIENT_ID | OAuth Google (opcional) |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Estrutura Resumida
+```
+src/
+  components/        # UI reutilizável
+  pages/             # Páginas (routing)
+  store/             # Redux slices
+  db/                # Dexie + tipos + migrações
+  utils/             # Cálculos de stats, helpers
+  hooks/             # Hooks customizados (offline, db, etc.)
+  locales/           # Traduções i18n
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## IndexedDB / Dexie
+- Versão inclui tabela `chart_weeks` para marcar `partial` / `complete`.
+- Migrações devem ser idempotentes; sempre aumentar versão + adicionar transformação.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Estratégia de Cache (Produção)
+- Assets com hash: cache longo (30d, immutable)
+- `index.html`: `no-cache, no-store` para garantir atualização de versão
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## CI
+- Lint + build em push para `main` e `refactor`.
+- Imagem Docker final (nginx + SPA) construída no mesmo pipeline que backend.
+
+## Fluxo de Branches (ver backend README para detalhes)
+- `refactor`: staging
+- `main`: produção
+
+## Desenvolvimento
+1. Criar chart e sincronizar semanas (track/album/artist) via Last.fm.
+2. Stats são recalculadas incrementalmente e persistidas.
+3. Offline: leitura de dados e algumas métricas seguem disponíveis; certificações podem exigir online.
+
+## Próximos Melhorias Sugeridas
+- Reativar regra `@typescript-eslint/no-explicit-any` gradualmente
+- Adicionar testes de componentes críticos (ex: cálculo de stats isolado)
+- Reportar `GIT_SHA` na UI (ex: footer) consumindo `/api/health`
+
+## Licença
+Mesmo escopo do backend (MIT, salvo menções específicas).

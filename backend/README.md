@@ -70,6 +70,43 @@ docker compose exec app php artisan view:cache
 5. `php artisan config:cache route:cache view:cache`
 6. Configurar worker de filas se necessário (`php artisan queue:work`)
 
+### Pipeline / Branch Strategy
+
+Fluxo adotado (Opção A - Staging + Produção):
+
+Branches principais:
+- `refactor` (staging): integração de features. Cada push gera imagens Docker tagueadas `:refactor` e `:sha-<short>`.
+- `main` (produção): somente código aprovado. Push gera imagens `:main`, `:sha-<short>` e `:latest`.
+
+Workflow CI (`.github/workflows/ci.yml`):
+1. Executa testes backend + lint/build frontend em push para `main` ou `refactor`.
+2. Publica imagens no GHCR (backend e web) com metadados automáticos.
+
+Tags geradas por push:
+- Sempre: `:<branch>` e `:sha-<shortsha>`
+- Em `main`: adicional `:latest`
+
+Promoção de staging para produção:
+1. Abrir PR de `refactor` → `main` (ou merge direto se trabalho solo).
+2. Após merge, atualizar ambiente de produção (pull + up) ou pipeline de deploy automático.
+
+Rollback rápido:
+- Usar tag `:sha-<short>` anterior (substituir tag no `docker-compose.prod.yml` e `docker compose up -d`).
+
+Opcional futuro:
+- Workflow de "promote" (retag sem rebuild) e tags semânticas (`vX.Y.Z`).
+
+### Health / Observabilidade
+- Endpoint `/api/health` retorna status básico (pode-se estender para incluir `GIT_SHA`).
+
+### Staging vs Produção
+| Ambiente | Fonte de Imagem | Tag sugerida | Objetivo |
+|----------|-----------------|--------------|----------|
+| Staging  | `refactor`      | `:refactor`  | Testar features integradas |
+| Produção | `main`          | `:main` (ou digest) | Estável, só código aprovado |
+
+Para maior segurança, após `docker pull`, capturar digest (`docker inspect --format='{{index .RepoDigests 0}}' imagem:tag`) e fixá-lo no compose.
+
 ### Frontend Integração
 O frontend consome a API usando `VITE_API_BASE_URL` (variável no `frontend/.env`). Endpoints montados via helper centralizado.
 
