@@ -14,19 +14,18 @@ export async function calculateStatsForEntityUntilWeek(chartId: string, chartTyp
   const filtered = items.filter(item => item.week <= untilWeek);
   if (!filtered.length) return;
 
-  let prevRank: number | null = null, prevPlays: number | null = null;
-  let peak = { position: Infinity, weeksAtPeak: 0, longestSequenceAtPeak: 0, weeksToPeak: 0 };
-  let sequences = { rank1: 0, top5: 0, top10: 0, withinCutoff: 0 };
-  let totals = { totalPoints: 0, totalPlays: 0, top5: 0, top10: 0, withinCutoff: 0 };
+  const peak = { position: Infinity, weeksAtPeak: 0, longestSequenceAtPeak: 0, weeksToPeak: 0 };
+  const sequences = { rank1: 0, top5: 0, top10: 0, withinCutoff: 0 };
+  const totals = { totalPoints: 0, totalPlays: 0, top5: 0, top10: 0, withinCutoff: 0 };
 
   let seqPeak = 0, seqRank1 = 0, seqTop5 = 0, seqTop10 = 0, seqWithinCutoff = 0;
 
   for (let idx = 0; idx < filtered.length; idx++) {
     const w = filtered[idx];
-    let prevWeek = idx > 0 ? dayjs(filtered[idx - 1].week) : null;
-    let currentWeek = dayjs(w.week);
-    let hasGap = prevWeek && !prevWeek.add(7, 'day').isSame(currentWeek, 'day');
-    let isCutoff = w.rank && w.rank > cutoff;
+  const prevWeek = idx > 0 ? dayjs(filtered[idx - 1].week) : null;
+  const currentWeek = dayjs(w.week);
+  const hasGap = prevWeek && !prevWeek.add(7, 'day').isSame(currentWeek, 'day');
+  const isCutoff = w.rank && w.rank > cutoff;
 
     if (hasGap) {
       seqPeak = 0;
@@ -66,8 +65,7 @@ export async function calculateStatsForEntityUntilWeek(chartId: string, chartTyp
       seqWithinCutoff = 0;
     }
 
-    prevRank = !isCutoff ? w.rank : null;
-    prevPlays = !isCutoff ? w.plays : null;
+  // (removido prevRank/prevPlays não utilizados)
   }
 
   const stats: ChartStats = {

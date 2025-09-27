@@ -17,7 +17,6 @@ export class RouteErrorBoundary extends React.Component<React.PropsWithChildren,
 
   componentDidCatch(error: Error, info: any) {
     // Log detalhado no console para diagnóstico (pode integrar com serviço externo depois)
-    // eslint-disable-next-line no-console
     console.error('[RouteErrorBoundary] Caught error:', error, info);
     this.setState({ info });
   }
