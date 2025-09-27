@@ -7,9 +7,6 @@ import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/c
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { useState as useReactState } from 'react';
-import { db } from '../db/indexedDb';
-import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
 import { IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
@@ -21,29 +18,35 @@ export function ChartWeekTableColumnsMenu() {
     const { t } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const columns = useSelector((state: RootState) => state.columns.columns);
+    const mandatory = ['rank', 'name'];
     const handleToggle = (key: string) => {
+        if (mandatory.includes(key)) return; // não permite desmarcar colunas obrigatórias
         const col = columns.find((c: any) => c.key === key);
         if (col) {
             dispatch(updateColumn({ key, visible: !col.visible }));
         }
     };
     return (
-        <Menu shadow="md" width={200} opened={opened} onChange={setOpened} closeOnItemClick={false}>
+        <Menu shadow="md" width={250} opened={opened} onChange={setOpened} closeOnItemClick={false}>
             <Menu.Target>
                 <ActionIcon size="lg" variant="subtle" onClick={() => setOpened((o) => !o)}>
                     <IconFilter size={18} />
                 </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-                {columns.map((col: any) => (
-                    <Menu.Item key={col.key}>
-                        <Checkbox
-                            checked={col.visible}
-                            onChange={() => handleToggle(col.key)}
-                            label={col.labelComplete ? t(col.labelComplete) : t(col.label) || col.key}
-                        />
-                    </Menu.Item>
-                ))}
+                {columns.map((col: any) => {
+                    const isMandatory = mandatory.includes(col.key);
+                    return (
+                        <Menu.Item key={col.key}>
+                            <Checkbox
+                                checked={true ? (isMandatory ? true : col.visible) : col.visible}
+                                disabled={isMandatory}
+                                onChange={() => handleToggle(col.key)}
+                                label={(col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
+                            />
+                        </Menu.Item>
+                    );
+                })}
             </Menu.Dropdown>
         </Menu>
     );
@@ -58,6 +61,17 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     const columns = useSelector((state: RootState) => state.columns.columns);
     const { t } = useTranslation();
+
+    // Garante que colunas obrigatórias estejam sempre visíveis
+    useEffect(() => {
+        const mandatory = ['rank', 'name'];
+        mandatory.forEach(key => {
+            const col: any = columns.find((c: any) => c.key === key);
+            if (col && !col.visible) {
+                dispatch(updateColumn({ key, visible: true }));
+            }
+        });
+    }, [columns, dispatch]);
 
     // Busca dados da semana
     useEffect(() => {
@@ -77,6 +91,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
     // Opção para mostrar/esconder badge delta
     const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
     const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
+    const showImage = columns.find((c: any) => c.key === 'image')?.visible;
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
 
@@ -167,9 +182,11 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
                 ...base,
                 render: (row, _index) => (
                     <Flex>
-                        <Flex mr="sm" justify="center" align="center">
-                            <div style={{ width: 40, height: 40, background: '#eee' }} />
-                        </Flex>
+                        {showImage && (
+                            <Flex mr="sm" justify="center" align="center">
+                                <div style={{ width: 40, height: 40, background: '#eee' }} />
+                            </Flex>
+                        )}
                         <Flex direction="column" justify="center" align="flex-start">
                             <Text fw={700}>{row.name}</Text>
                             {row.artistName && <Text size="sm">{row.artistName}</Text>}

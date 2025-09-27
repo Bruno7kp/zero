@@ -8,11 +8,43 @@
       "changeLanguage": "Change language",
       "login": "Login",
       "logout": "Logout",
-      "friends": "Friends"
+      "friends": "Friends",
+      "terms": "Terms of Use",
+      "privacy": "Privacy Policy",
+      "rights": "All rights reserved"
     },
     "charts": {
+      "live_chart_period": "{{from}} - now",
       "title": "Charts",
-      "live": "Live"
+      "plays": "Plays",
+      "stability": "Stability Points",
+      "points": "Points",
+      "live": "Live",
+      "actions": "Actions",
+      "artist": "Artist",
+      "album": "Album",
+      "track": "Track",
+      "artistsTop": "Top {{cutoff}} Artists",
+      "albumsTop": "Top {{cutoff}} Albums",
+      "tracksTop": "Top {{cutoff}} Tracks",
+      "sales": "sales",
+      "salesExample": "E.g.: 'Control' by Janet Jackson reached 100,000 *sales / copies / units / points / streams* achieving a Platinum certification.",
+      "lastWeek": "Last week",
+      "sync": "Weeks sync",
+      "toSync": "To sync",
+      "synced": "Synced",
+      "syncStatus": "{{loadedWeeks}} of {{weeks}} weeks loaded",
+      "view": "View chart",
+      "viewAll": "View all charts",
+      "viewLive": "View current week preview",
+      "rankLabel": "Rank: Position",
+      "deltaRankLabel": "Position change",
+      "imageLabel": "Image",
+      "titleLabel": "Title",
+      "playsLabel": "Plays",
+      "deltaPlaysLabel": "Plays change",
+      "peakLabel": "Peak",
+      "weeksLabel": "Weeks"
     },
     "library": {
       "title": "Library"
@@ -25,13 +57,23 @@
     },
     "settings": {
       "title": "Settings",
-      "chartTitle": "Configurações dos charts",
+      "chartTitle": "Charts settings",
       "loadingCharts": "Loading your charts...",
+      "loadingAuth": "Authenticating...",
       "pageDescription": "Here you can manage your user settings and charts.",
       "activeChartLabel": "Active chart",
       "activeChartPlaceholder": "Select your main chart",
       "activeChartInfo": "You can create multiple charts, each with different settings and Last.fm accounts. Choose which one you want as your main chart to view right now — and switch between them anytime.",
-      "noCharts": "You don't have any charts yet. Create a new one to get started."
+      "noCharts": "You don't have any charts yet. Create a new one to get started.",
+      "online": "Online",
+      "offline": "Offline",
+      "lastSync": "Last sync",
+      "totalWeeksCached": "Weeks cached",
+      "syncNow": "Sync now",
+      "needOnline": "Needs connection",
+      "sync": "Sync",
+  "clearChartData": "Clear local data",
+      "chartsCount": "Charts"
     },
     "forms": {
       "createChart": {
@@ -54,30 +96,69 @@
         "musicCutoffLabel": "Songs limit",
         "albumCutoffLabel": "Albums limit",
         "artistCutoffLabel": "Artists limit",
-        "formulaNameLabel": "Name of plays + points value unit",
-        "formulaDescription": "'Points' are used to generate the certificates. You can define the formula for how these points are calculated by adjusting the weight between two measures: Plays and Stability Points. Stability Points are based on the positions songs reach in the charts — with 100 points awarded for #1, 99 for #2, and so on.",
-        "musicPointsWeightLabel": "Songs points weight",
+        "formulaNameLabel": "Name of the 'sales' value unit",
+        "formulaDescription": "'Sales' are used to generate the certifications. You can define the formula for how these 'sales' are calculated by adjusting the weight between two measures: Plays and Stability Points. Stability Points are based on the positions songs reach in the charts — with 100 points awarded for #1, 99 for #2, and so on.",
+        "musicPointsWeightLabel": "Songs stability points weight",
         "musicPlaysWeightLabel": "Songs plays weight",
-        "albumPointsWeightLabel": "Albums points weight",
+        "albumPointsWeightLabel": "Albums stability points weight",
         "albumPlaysWeightLabel": "Albums plays weight",
-        "musicGoldLabel": "Value for Gold certification for songs",
-        "musicPlatinumLabel": "Value for Platinum certification for songs",
-        "musicDiamondLabel": "Value for Diamond certification for songs",
-        "albumGoldLabel": "Value for Gold certification for albums",
-        "albumPlatinumLabel": "Value for Platinum certification for albums",
-        "albumDiamondLabel": "Value for Diamond certification for albums",
+        "musicGoldLabel": "Value for songs Gold certification",
+        "musicPlatinumLabel": "Value for songs Platinum certification",
+        "musicDiamondLabel": "Value for songs Diamond certification",
+        "albumGoldLabel": "Value for albums Gold certification",
+        "albumPlatinumLabel": "Value for albums Platinum certification",
+        "albumDiamondLabel": "Value for albums Diamond certification",
         "cutoffMin": "Minimum value is {{min}}",
         "valueOrderError": "Value must be greater than {{prev}}",
         "createButton": "Create Chart",
-        "sourceTitle": "Chart settings",
-        "formulaTitle": "Points",
-        "certificationTitle": "Certification"
+        "sourceTitle": "General settings",
+        "formulaTitle": "Sales",
+        "certificationTitle": "Certifications"
+      },
+      "editChart": {
+        "title": "Edit chart",
+        "saveButton": "Save"
+      },
+      "deleteChart": {
+        "title": "Delete chart",
+        "message": "Are you sure you want to delete this chart?",
+        "deleteButton": "Delete",
+        "cancelButton": "Cancel"
       }
     },
     "errors": {
+      "warning": "Warning",
       "notAuthenticated": "You need to be authenticated to perform this action.",
+      "offlineAction": "This action requires an internet connection.",
       "failedToCreateChart": "Failed to create chart.",
-      "unknown": "Unknown error."
+      "unknown": "Unknown error.",
+      "selectActiveChart": "Select a chart in settings to view data.",
+      "noActiveChart": "Click here to select a chart",
+      "dataError": "An error occurred while loading data. Try again later.",
+      "noTop1Data": "No data found. Sync the weeks to view last week's #1s.",
+      "noData": {
+        "title": "No data",
+        "description": "No chart data available for the current week."
+      }
+    },
+    "notifications": {
+      "charts": {
+        "save": {
+          "success": "Chart {{chart}} was created.",
+          "error": "Failed to create chart."
+        },
+        "update": {
+          "success": "Chart {{chart}} was updated.",
+          "error": "Failed to update chart."
+        },
+        "delete": {
+          "success": "Chart {{chart}} was removed.",
+          "error": "Failed to remove chart."
+        }
+      },
+      "cache": {
+        "chartCleared": "Local data cleared for {{chart}}"
+      }
     },
     "values": {
       "gold": "Gold",
@@ -92,6 +173,35 @@
       "4": "Thursday",
       "5": "Friday",
       "6": "Saturday"
+    },
+    "changelog": {
+      "title": "Updates",
+      "current": "v1.0.0",
+      "v1-0-0": {
+        "title": "Update 1.0.0 - New version of Zero!",
+        "description": "Zero has been completely revamped with a new interface and much faster performance"
+      }
+    },
+    "home": {
+      "hero": {
+        "title": "ZeroCharts",
+        "subtitle": "Create your own music charts!"
+      },
+      "about": {
+        "title": "Your Charts, Your Rules",
+        "feature1Title": "Listen to your music",
+        "feature1Description": "Connect Last.fm with your music player to scrobble what you listen to",
+        "feature2Title": "Customize your chart",
+        "feature2Description": "Zero will build your weekly chart based on your customization",
+        "feature3Title": "'It was a hit on my chart!'",
+        "feature3Description": "Track the performance of your favorite artists, albums and tracks over time in your charts",
+        "ctaLoggedIn": "View your charts",
+        "ctaLoggedOut": "Log in to create your charts"
+      },
+      "latestUpdate": {
+        "title": "Latest update",
+        "button": "View all updates"
+      }
     }
   }
 }

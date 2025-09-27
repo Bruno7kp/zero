@@ -1,6 +1,6 @@
 // src/components/ChartSyncProgress.tsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { Progress, Text, Group, Button, Card, Divider, rem, ThemeIcon } from '@mantine/core';
+import { Progress, Text, Group, Button, Card, Divider, rem, ThemeIcon, Alert } from '@mantine/core';
 import { useChartDb } from '../hooks/useChartDb';
 import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
 import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
@@ -10,6 +10,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
 import { IconRefresh } from "@tabler/icons-react";
+import { useOfflineStatus } from '../hooks/useOfflineStatus';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -24,6 +25,7 @@ interface ChartSyncProgressProps {
     album_cutoff: number;
     music_cutoff: number;
   };
+  onSyncComplete?: () => void;
 }
 
 const chartTypes = [
@@ -33,13 +35,14 @@ const chartTypes = [
 ];
 
 
-export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) => {
+export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onSyncComplete }) => {
   const { getChartDataByWeek, saveChartData } = useChartDb();
   const [weeks, setWeeks] = useState<string[]>([]);
   const [loadedWeeks, setLoadedWeeks] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+  const { isOnline } = useOfflineStatus();
 
   // Calcula as semanas a carregar
   useEffect(() => {
@@ -105,6 +108,9 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) =
         }
         setLoadedWeeks(i + 1);
       }
+      // Reconta semanas carregadas após sync completo
+      await countLoadedWeeks();
+      onSyncComplete?.();
     } catch (e: any) {
       setError(e.message || 'Erro ao sincronizar');
     } finally {
@@ -123,11 +129,16 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart }) =
           <Divider variant="dashed" size="sm" my="xs"/>
           <Group justify="space-between" align="center" mb="xs">
               <Text size="md">{t('charts.syncStatus', { loadedWeeks, weeks: weeks.length })}</Text>
-              <Button onClick={handleSync} loading={loading} disabled={loadedWeeks === weeks.length} size="xs">
+              <Button onClick={handleSync} loading={loading} disabled={!isOnline || loadedWeeks === weeks.length} size="xs" variant={!isOnline ? 'outline' : 'filled'}>
                   {loadedWeeks === weeks.length ? t('charts.synced') : t('charts.toSync')}
               </Button>
           </Group>
           <Progress value={weeks.length === 0 ? 0 : (loadedWeeks / weeks.length) * 100} mb="xs" />
+          {!isOnline && (
+            <Alert title={t('errors.warning')} color="yellow" variant="light" mt="xs" radius="sm">
+              {t('settings.needOnline')} - {t('errors.offlineAction')}
+            </Alert>
+          )}
           {error && <Text c="red" size="sm">{error}</Text>}
     </Card>
   );

@@ -6,13 +6,14 @@ import themeReducer from './themeSlice';
 import i18nReducer from './i18nSlice';
 import authReducer from './authSlice';
 import columnsReducer from './columnsSlice';
+import syncReducer from './syncSlice';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns'],
+  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync'],
 };
 
 const rootReducer = combineReducers({
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   i18n: i18nReducer,
   auth: authReducer,
   columns: columnsReducer,
+  sync: syncReducer,
 });
 
 export const store = configureStore({

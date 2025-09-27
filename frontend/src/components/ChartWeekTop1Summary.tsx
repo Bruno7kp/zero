@@ -12,45 +12,58 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 
 interface ChartWeekTop1SummaryProps {
-  chartId: string;
-  week?: string;
+    chartId: string;
+    week?: string;
+    refreshKey?: number; // muda quando sync completa para reprocessar
 }
 
-export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ chartId, week }) => {
-  const [top1, setTop1] = useState<{ type: string; name: string; artistName: string; entityId: string }[]>([]);
-  const [weekStr, setWeekStr] = useState<string | undefined>(week);
-  const { t } = useTranslation();
+export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ chartId, week, refreshKey }) => {
+    const [top1, setTop1] = useState<{ type: string; name: string; artistName: string; entityId: string }[]>([]);
+    const [weekStr, setWeekStr] = useState<string | undefined>(week);
+    const { t } = useTranslation();
 
-  useEffect(() => {
-    async function fetchTop1() {
-      // Descobre a semana mais recente se não informada
-      let targetWeek = weekStr;
-      if (!targetWeek) {
-        const all = await db.charts_data
-          .where('chartId')
-          .equals(chartId)
-          .toArray();
-        const weeks = Array.from(new Set(all.map(i => i.week))).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-        targetWeek = weeks[0];
-        setWeekStr(targetWeek);
-      }
-      if (!targetWeek) return;
-      // Busca o #1 de cada tipo
-      const types = ['artist', 'album', 'track'];
-      const results = await Promise.all(
-        types.map(async (type) => {
-          const recs = await db.charts_data
-            .where(['chartId', 'chartType', 'week'])
-            .equals([chartId, type, targetWeek!])
-            .toArray();
-          const top = recs.find(r => r.rank === 1);
-          return top ? { type, name: top.name, artistName: top.artistName, entityId: top.entityId } : null;
-        })
-      );
-      setTop1(results.filter(Boolean) as any);
-    }
-    fetchTop1();
-  }, [chartId, weekStr]);
+    useEffect(() => {
+        let cancelled = false;
+        async function fetchTop1() {
+            try {
+                let targetWeek = week;
+                if (!targetWeek) {
+                    const all = await db.charts_data
+                        .where('chartId')
+                        .equals(chartId)
+                        .toArray();
+                    const weeks = Array.from(new Set(all.map(i => i.week))).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+                    targetWeek = weeks[0];
+                }
+                if (!targetWeek) {
+                    if (!cancelled) {
+                        setTop1([]);
+                        setWeekStr(undefined);
+                    }
+                    return;
+                }
+                if (!cancelled) setWeekStr(targetWeek);
+                const types = ['artist', 'album', 'track'];
+                const results = await Promise.all(
+                    types.map(async (type) => {
+                        const recs = await db.charts_data
+                            .where(['chartId', 'chartType', 'week'])
+                            .equals([chartId, type, targetWeek!])
+                            .toArray();
+                        const top = recs.find(r => r.rank === 1);
+                        return top ? { type, name: top.name, artistName: top.artistName, entityId: top.entityId } : null;
+                    })
+                );
+                if (!cancelled) setTop1(results.filter(Boolean) as any);
+            } catch {
+                if (!cancelled) {
+                    setTop1([]);
+                }
+            }
+        }
+        fetchTop1();
+        return () => { cancelled = true; };
+    }, [chartId, week, refreshKey]);
 
         if (!weekStr || !top1 || top1.length === 0) {
             return (

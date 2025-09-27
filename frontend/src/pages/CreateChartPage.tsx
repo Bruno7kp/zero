@@ -35,6 +35,8 @@ import {
     IconUserCog,
     IconX
 } from '@tabler/icons-react';
+import { Alert } from '@mantine/core';
+import { useOfflineStatus } from '../hooks/useOfflineStatus';
 // import { useSelector } from 'react-redux';
 
 const CreateChartPage = () => {
@@ -53,6 +55,7 @@ const CreateChartPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isFormInitialized, setIsFormInitialized] = useState(false);
+    const { isOnline } = useOfflineStatus();
 
     const dayOfWeekOptions = [
         { value: '0', label: t('days.0') },
@@ -179,6 +182,12 @@ const CreateChartPage = () => {
 
     const handleSubmit = async (values: typeof form.values) => {
         if (!form.validate()) {
+            return;
+        }
+
+        if (!isOnline) {
+            notifications.show({ message: t('errors.offlineAction'), color: 'yellow' });
+            setError(t('errors.offlineAction'));
             return;
         }
 
@@ -410,12 +419,17 @@ const CreateChartPage = () => {
                         </Grid.Col>
 
                         <Grid.Col span={12}>
+                            {(!isOnline) && (
+                                <Alert color="yellow" title={t('errors.warning')} mb="sm" variant="light">
+                                    {t('errors.offlineAction')}
+                                </Alert>
+                            )}
                             {error && (
-                                <Text c="red" size="sm">
+                                <Text c="red" size="sm" mb="sm">
                                     {error}
                                 </Text>
                             )}
-                            <Button type="submit" loading={isSubmitting}>
+                            <Button type="submit" loading={isSubmitting} disabled={!isOnline}>
                                 {buttonLabel}
                             </Button>
                         </Grid.Col>

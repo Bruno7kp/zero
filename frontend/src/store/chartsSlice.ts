@@ -66,14 +66,43 @@ export const fetchCharts = createAsyncThunk(
 
 export const deleteChart = createAsyncThunk(
   'charts/deleteChart',
-  async (chartId: number, { dispatch }) => {
-    // Substitua por sua chamada real de API
-    const response = await fetch(`http://localhost:8081/api/charts/${chartId}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Erro ao deletar chart');
-    // Após deletar, atualiza a lista
-    dispatch(fetchCharts());
+  async (chartId: number, { dispatch, getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token || localStorage.getItem('user-token');
+      const response = await fetch(`http://localhost:8081/api/charts/${chartId}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          'Accept': 'application/json'
+        },
+      });
+      if (!response.ok) {
+        let msg = `Erro ao deletar chart (status ${response.status})`;
+        try {
+          const data = await response.json();
+          if (data?.message) msg = data.message;
+        } catch {/* ignore parse error */}
+        return rejectWithValue(msg);
+      }
+      // Remove dados locais relacionados ao chart (weeks + stats)
+      await db.charts_data.where('chartId').equals(String(chartId)).delete();
+      await db.charts_stats.where('chartId').equals(String(chartId)).delete();
+      // Atualiza lista
+      dispatch(fetchCharts());
+      return chartId;
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Erro ao deletar chart');
+    }
+  }
+);
+
+// Limpa apenas os dados (weeks + stats) de um chart preservando a configuração no backend
+export const clearChartLocalData = createAsyncThunk(
+  'charts/clearChartLocalData',
+  async (chartId: number) => {
+    await db.charts_data.where('chartId').equals(String(chartId)).delete();
+    await db.charts_stats.where('chartId').equals(String(chartId)).delete();
     return chartId;
   }
 );
@@ -153,6 +182,14 @@ const chartsSlice = createSlice({
       .addCase(deleteChart.fulfilled, (state, action) => {
         state.charts = state.charts.filter(chart => chart.id !== action.payload);
       });
+    // clearChartLocalData does not alter charts list; optional side-effects could reset current stats/data
+    builder.addCase(clearChartLocalData.fulfilled, (state, action) => {
+      if (state.activeChartId === action.payload) {
+        // If active chart was cleared, also clear currently loaded week data & stats map
+        state.data = [];
+        state.statsMap = {};
+      }
+    });
   },
 });
 

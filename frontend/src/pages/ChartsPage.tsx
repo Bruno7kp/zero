@@ -19,18 +19,24 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Masonry from 'react-masonry-css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 const ChartsPage = () => {
     const [chartName, setChartName] = useState<string>('');
+    const [refreshKey, setRefreshKey] = useState(0);
     const { t } = useTranslation();
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
     const activeChart = charts.find((c: any) => c.id === activeChartId) || null;
-    if (chartName === '' && activeChart) {
-        setChartName(activeChart.name);
-    }
+    // Sincroniza nome do chart ativo sem disparar setState durante render
+    useEffect(() => {
+        if (activeChart) {
+            setChartName(activeChart.name);
+        } else {
+            setChartName('');
+        }
+    }, [activeChart?.id, activeChart?.name]);
     const breakpointColumns = {
         default: 2, // desktop
         1100: 2,    // tablet landscape
@@ -75,8 +81,8 @@ const ChartsPage = () => {
                         className="masonry-grid"
                         columnClassName="masonry-column"
                     >
-                        <ChartSyncProgress chart={activeChart} />
-                        <ChartWeekTop1Summary chartId={`${activeChart.id}`} />
+                        <ChartSyncProgress chart={activeChart} onSyncComplete={() => setRefreshKey(k => k + 1)} />
+                        <ChartWeekTop1Summary chartId={`${activeChart.id}`} refreshKey={refreshKey} />
                         <ChartLiveSummary />
                     </Masonry>
                 )}

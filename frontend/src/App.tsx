@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import ChartsPage from './pages/ChartsPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
 import SettingsPage from './pages/SettingsPage';
+import RouteErrorBoundary from './components/RouteErrorBoundary';
 import MainLayout from './layouts/MainLayout';
 import { useSelector } from 'react-redux';
 import './i18n';
@@ -111,7 +112,9 @@ function App() {
                     path="settings"
                     element={
                         <ProtectedRoute>
-                            <SettingsPage />
+                            <RouteErrorBoundary>
+                                <SettingsPage />
+                            </RouteErrorBoundary>
                         </ProtectedRoute>
                     }
                 />

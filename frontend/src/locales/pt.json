@@ -59,11 +59,21 @@
       "title": "Configurações",
       "chartTitle": "Configurações dos charts",
       "loadingCharts": "Carregando seus charts...",
+      "loadingAuth": "Autenticando...",
       "pageDescription": "Aqui você pode gerenciar suas configurações de usuário e seus charts.",
       "activeChartLabel": "Chart ativo",
       "activeChartPlaceholder": "Selecione seu chart principal",
       "activeChartInfo": "Você pode criar vários charts, cada um com configurações e contas do Last.fm diferentes. Escolha qual será o seu chart principal para visualizar no momento — e alterne entre eles sempre que quiser.",
-      "noCharts": "Você ainda não tem nenhum chart. Crie um novo para começar."
+      "noCharts": "Você ainda não tem nenhum chart. Crie um novo para começar.",
+      "online": "Online",
+      "offline": "Offline",
+      "lastSync": "Último sync",
+      "totalWeeksCached": "Semanas em cache",
+      "syncNow": "Sincronizar agora",
+      "needOnline": "Requer conexão",
+      "sync": "Sync",
+  "clearChartData": "Limpar dados locais",
+      "chartsCount": "Charts"
     },
     "forms": {
       "createChart": {
@@ -119,6 +129,7 @@
     "errors": {
       "warning": "Atenção",
       "notAuthenticated": "Você precisa estar autenticado para realizar esta ação.",
+      "offlineAction": "Esta ação requer conexão com a internet.",
       "failedToCreateChart": "Falha ao criar o chart.",
       "unknown": "Erro desconhecido.",
       "selectActiveChart": "Selecione um chart nas configurações para visualizar os dados.",
@@ -145,6 +156,9 @@
           "error": "Falha ao remover o chart."
         }
       }
+    ,"cache": {
+      "chartCleared": "Dados locais limpos para {{chart}}"
+    }
     },
     "values": {
       "gold": "Ouro",
