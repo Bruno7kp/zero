@@ -9,4 +9,5 @@ docker-compose*.yml
 *.log
 .env
 .env.*
+!frontend/.env.production
 storage/logs

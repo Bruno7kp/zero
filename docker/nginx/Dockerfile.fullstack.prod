@@ -10,6 +10,7 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
 	VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 RUN npm ci --no-audit --no-fund
 COPY ../../frontend .
+COPY ../../frontend/.env.production ./.env.production
 RUN npm run build
 
 # Não precisamos compilar nada do backend aqui além da pasta public
