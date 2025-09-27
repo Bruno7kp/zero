@@ -13,7 +13,21 @@ class SocialiteController extends Controller
 {
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        // Using API route group (no session), so we must use stateless() to avoid session/state exceptions
+        try {
+            $cfg = config('services.google');
+            Log::info('Google OAuth redirect init', [
+                'client_id' => $cfg['client_id'] ?? null,
+                'redirect' => $cfg['redirect'] ?? null,
+                'env_callback' => env('GOOGLE_CALLBACK_URL'),
+            ]);
+            return Socialite::driver('google')->stateless()->redirect();
+        } catch (\Throwable $e) {
+            Log::error('Google OAuth redirect failure: ' . $e->getMessage(), [
+                'trace_top' => collect(explode("\n", $e->getTraceAsString()))->take(5)->all(),
+            ]);
+            return response()->json(['error' => 'OAuth redirect failed'], 500);
+        }
     }
 
     public function handleGoogleCallback(Request $request)
