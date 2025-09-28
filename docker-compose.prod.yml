@@ -10,6 +10,8 @@ services:
       # Debug flags (remove after solving):
       # OAUTH_DIAG: "1"
       OAUTH_FORCE_FALLBACK: "1"
+      # Hybrid flag: if set to "true" ativa Socialite para redirect e callback; se "false" usa fluxo manual
+      OAUTH_USE_SOCIALITE: "false"
     networks:
       - zero-net
     volumes:

@@ -5,12 +5,38 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
 class SocialiteController extends Controller
 {
+    // Generate a stateless signed state token: ts|rand|hmac
+    private function buildStateToken(int $ttlSeconds = 300): string
+    {
+        $ts = time();
+        $rand = bin2hex(random_bytes(8));
+        $secret = config('app.key') ?: env('APP_KEY', 'key');
+        $data = $ts . '|' . $rand;
+        $sig = hash_hmac('sha256', $data, $secret);
+        return $ts . '|' . $rand . '|' . $sig;
+    }
+
+    private function validateStateToken(?string $state, int $ttlSeconds = 300): bool
+    {
+        if (!$state) return false;
+        $parts = explode('|', $state);
+        if (count($parts) !== 3) return false;
+        [$ts, $rand, $sig] = $parts;
+        if (!ctype_digit($ts)) return false;
+        if ((time() - (int)$ts) > $ttlSeconds) return false; // expired
+        $secret = config('app.key') ?: env('APP_KEY', 'key');
+        $data = $ts . '|' . $rand;
+        $expected = hash_hmac('sha256', $data, $secret);
+        return hash_equals($expected, $sig);
+    }
+
     private function manualGoogleRedirectUrl(): string
     {
         $clientId = env('GOOGLE_CLIENT_ID');
@@ -28,7 +54,8 @@ class SocialiteController extends Controller
         $scopes = urlencode('openid email profile');
         $redirect = urlencode($callback);
         $base = 'https://accounts.google.com/o/oauth2/v2/auth';
-        $query = "client_id={$clientId}&redirect_uri={$redirect}&response_type=code&scope={$scopes}&access_type=online&prompt=select_account";
+        $state = urlencode($this->buildStateToken());
+        $query = "client_id={$clientId}&redirect_uri={$redirect}&response_type=code&scope={$scopes}&access_type=online&prompt=select_account&state={$state}";
         return $base . '?' . $query;
     }
     public function redirectToGoogle()
@@ -42,13 +69,15 @@ class SocialiteController extends Controller
             // Detect config repository readiness before using helper
             $configRepoBound = function_exists('app') && app()->bound('config');
             error_log('[RAW_OAUTH] pre_config repo_bound=' . ($configRepoBound ? 'yes' : 'no'));
-            if (!$configRepoBound || env('OAUTH_FORCE_FALLBACK')) {
-                error_log('[RAW_OAUTH] using manual fallback redirect (configRepoBound=' . ($configRepoBound?'yes':'no') . ')');
+            $useSocialite = filter_var(env('OAUTH_USE_SOCIALITE', false), FILTER_VALIDATE_BOOLEAN);
+            if (!$configRepoBound || env('OAUTH_FORCE_FALLBACK') || !$useSocialite) {
+                error_log('[RAW_OAUTH] using manual fallback redirect (configRepoBound=' . ($configRepoBound?'yes':'no') . ', useSocialite=' . ($useSocialite?'yes':'no') . ')');
                 $url = $this->manualGoogleRedirectUrl();
                 if ($diag) {
                     return response()->json([
                         'diag' => true,
                         'phase' => 'fallback-manual',
+                        'use_socialite' => $useSocialite,
                         'url' => $url,
                     ]);
                 }
@@ -159,7 +188,112 @@ class SocialiteController extends Controller
                 ]);
             }
 
-            // Fallback para o fluxo clássico (redirect GET) usando Socialite
+            $useSocialite = filter_var(env('OAUTH_USE_SOCIALITE', false), FILTER_VALIDATE_BOOLEAN);
+            if (!$useSocialite) {
+                // Fluxo manual de troca de code por tokens (sem Socialite)
+                $code = $request->query('code');
+                $state = $request->query('state');
+                if (!$code) {
+                    return response()->json(['error' => 'Missing authorization code'], 400);
+                }
+                if (!$this->validateStateToken($state)) {
+                    return response()->json(['error' => 'Invalid or expired state'], 400);
+                }
+
+                $clientId = env('GOOGLE_CLIENT_ID');
+                $clientSecret = env('GOOGLE_CLIENT_SECRET');
+                $redirectUri = env('GOOGLE_CALLBACK_URL');
+                if (!$clientId || !$clientSecret || !$redirectUri) {
+                    return response()->json(['error' => 'Google OAuth env incomplete'], 500);
+                }
+
+                $tokenResp = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                    'code' => $code,
+                    'client_id' => $clientId,
+                    'client_secret' => $clientSecret,
+                    'redirect_uri' => $redirectUri,
+                    'grant_type' => 'authorization_code',
+                ]);
+
+                if (!$tokenResp->ok()) {
+                    Log::error('Google manual token exchange failed', ['status' => $tokenResp->status(), 'body' => $tokenResp->body()]);
+                    return response()->json(['error' => 'Token exchange failed'], 401);
+                }
+
+                $tokenJson = $tokenResp->json();
+                $accessToken = $tokenJson['access_token'] ?? null;
+                $idToken = $tokenJson['id_token'] ?? null;
+                if (!$accessToken) {
+                    return response()->json(['error' => 'Missing access token'], 401);
+                }
+
+                // Obter dados do usuário (preferir endpoint userinfo oficial)
+                $userinfo = Http::withToken($accessToken)->get('https://openidconnect.googleapis.com/v1/userinfo');
+                if (!$userinfo->ok()) {
+                    Log::warning('Google userinfo failed; attempting tokeninfo fallback', ['status' => $userinfo->status()]);
+                    if ($idToken) {
+                        $ti = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken));
+                        $payload = $ti ? json_decode($ti, true) : null;
+                    } else {
+                        return response()->json(['error' => 'User info retrieval failed'], 401);
+                    }
+                } else {
+                    $payload = $userinfo->json();
+                }
+
+                if (!is_array($payload) || empty($payload['email'])) {
+                    return response()->json(['error' => 'Invalid user payload'], 401);
+                }
+
+                $email = $payload['email'];
+                $name = $payload['name'] ?? ($payload['given_name'] ?? 'User');
+                $avatar = $payload['picture'] ?? null;
+                $googleId = $payload['sub'] ?? null;
+
+                $user = User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => $name,
+                        'google_id' => $googleId,
+                        'email_verified_at' => now(),
+                        'password' => Hash::make(Str::random(16)),
+                        'avatar' => $avatar,
+                    ]
+                );
+
+                $updates = [];
+                if (!$user->google_id && $googleId) { $updates['google_id'] = $googleId; }
+                if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
+                if ($updates) { $user->fill($updates)->save(); }
+
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                if (env('OAUTH_DIAG')) {
+                    return response()->json([
+                        'diag' => true,
+                        'mode' => 'manual-code-exchange',
+                        'scopes' => $payload['scope'] ?? null,
+                        'state_valid' => true,
+                        'user' => [
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'avatar' => $user->avatar,
+                        ],
+                        'token' => $token,
+                    ]);
+                }
+
+                return response()->json([
+                    'user' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'avatar' => $user->avatar,
+                    ],
+                    'token' => $token,
+                ]);
+            }
+
+            // Fluxo Socialite clássico (ativo somente se OAUTH_USE_SOCIALITE=true)
             $socialiteUser = Socialite::driver('google')->stateless()->user();
 
             $user = User::firstOrCreate(
@@ -173,7 +307,6 @@ class SocialiteController extends Controller
                 ]
             );
 
-            // Criar token de acesso do Sanctum
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
