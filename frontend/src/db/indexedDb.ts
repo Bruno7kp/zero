@@ -42,50 +42,39 @@ export class ZeroChartsDB extends Dexie {
 
   constructor() {
     super('ZeroChartsDB');
-    this.version(11).stores({
+    // Consolidated final schema (bumped to v14 to force a one-time idempotent upgrade for any lingering data)
+    this.version(14).stores({
       charts_data: `++id, chartId, chartType, entityId, week, rank, plays, name, artistName, [chartId+chartType], [chartId+chartType+week], [chartId+chartType+entityId], &[chartId+chartType+entityId+week]`,
       charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`,
-      playcount_cache: `key, expires`
-    });
-    this.version(12).stores({
-      // v12 introduce table (compound PRIMARY KEY [chartId+week]) with a numeric completed flag
-      // IMPORTANT: use '[chartId+week]' (WITHOUT &). '&' would denote a unique index and Dexie would treat it differently,
-      // and changing it later triggers: UpgradeError Not yet support for changing primary key.
-      chart_weeks: `[chartId+week], chartId, week, completed`
-    });
-
-    // v13: keep EXACT SAME primary key, only replace 'completed' flag with string 'status'
-    this.version(13).stores({
+      playcount_cache: `key, expires`,
       chart_weeks: `[chartId+week], chartId, week, status`
     }).upgrade(async (tx) => {
+      // Idempotent conversion: if any legacy rows still have 'completed', map them.
       try {
         const table: any = tx.table('chart_weeks');
         await table.toCollection().modify((row: any) => {
-          if (row.completed) {
-            row.status = 'complete';
-          } else if (!row.status) {
-            // rows without completed flag (shouldn't happen) become partial as conservative default
-            row.status = 'partial';
-          }
+          if (row.completed && !row.status) row.status = 'complete';
+          if (!row.status) row.status = 'partial';
           delete row.completed;
         });
-      } catch (e) {
-        // silent – migration best-effort
-        console.warn('[Dexie][v13 upgrade] chart_weeks migration issue', e);
-      }
+      } catch {/* ignore */}
     });
   }
 }
 export const db = new ZeroChartsDB();
 
-// Auto-recovery: if prior versions used a different primary key and user upgraded, handle UpgradeError gracefully.
-// If the data in chart_weeks is derivable (cache-like) we can drop and recreate; otherwise prompt user.
-db.open().catch(async (e) => {
-  if (/UpgradeError/i.test(e?.name || '') && /primary key/i.test(e?.message || '')) {
-    console.warn('[Dexie] Detected primary key change conflict – recreating local DB', e);
-    await db.delete();
-    await db.open();
-  } else {
-    console.error('[Dexie] Failed to open DB', e);
-  }
-});
+// Basic open promise. Primary key change conflicts shouldn't happen now, but keep a safety reset.
+export const dbReady: Promise<void> = db.open()
+  .then(() => {})
+  .catch(async (e) => {
+    if (/UpgradeError/i.test(e?.name || '') && /primary key/i.test(e?.message || '')) {
+      console.warn('[Dexie] PK upgrade conflict (unexpected) – recreating DB', e);
+      await db.delete();
+      await db.open();
+    } else {
+      console.error('[Dexie] Failed to open DB', e);
+    }
+  });
+
+// Optional convenience function for callers wanting to ensure readiness on app bootstrap
+export async function ensureDbReady() { await dbReady; }
