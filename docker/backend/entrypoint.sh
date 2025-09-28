@@ -51,6 +51,21 @@ if grep -q '^DB_CONNECTION=sqlite' .env 2>/dev/null; then
       mkdir -p "$(dirname "$DB_FILE")"
       touch "$DB_FILE"
       chown www-data:www-data "$DB_FILE" || true
+      chmod 660 "$DB_FILE" || true
+      chmod 770 "$(dirname "$DB_FILE")" || true
+    else
+      # File exists – ensure ownership and write permission
+      if [ ! -w "$DB_FILE" ]; then
+        echo "[entrypoint] Fixing sqlite database file permissions (was not writable)"
+        chown www-data:www-data "$DB_FILE" 2>/dev/null || true
+        chmod 660 "$DB_FILE" 2>/dev/null || true
+      fi
+      DB_DIR="$(dirname "$DB_FILE")"
+      if [ ! -w "$DB_DIR" ]; then
+        echo "[entrypoint] Fixing sqlite database directory permissions (was not writable)"
+        chown www-data:www-data "$DB_DIR" 2>/dev/null || true
+        chmod 770 "$DB_DIR" 2>/dev/null || true
+      fi
     fi
   fi
 fi
@@ -71,11 +86,27 @@ fi
 echo "[entrypoint] Laravel version: $(php artisan --version 2>/dev/null || echo 'unknown')"
 echo "[entrypoint] Google callback (post-env sync): $(grep '^GOOGLE_CALLBACK_URL=' .env | cut -d '=' -f2-)"
 
+# Quick sanity: ensure sqlite (if used) is writable by php-fpm
+if grep -q '^DB_CONNECTION=sqlite' .env 2>/dev/null; then
+  DB_FILE_LINE=$(grep '^DB_DATABASE=' .env || true)
+  DB_FILE=${DB_FILE_LINE#DB_DATABASE=}
+  if [ -f "$DB_FILE" ]; then
+    if [ ! -w "$DB_FILE" ]; then
+      echo "[entrypoint][WARN] SQLite file not writable at runtime; attempting permission repair (phase2)"
+      chown www-data:www-data "$DB_FILE" 2>/dev/null || true
+      chmod 660 "$DB_FILE" 2>/dev/null || true
+    fi
+  fi
+fi
+
 # Run migrations (optional toggle)
 if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
   echo "[entrypoint] Running migrations..."
   php artisan migrate --force || echo "[entrypoint] WARN: migrations failed"
 fi
+
+# Ensure personal access tokens table exists (if using Sanctum)
+php artisan tinker --execute="if(!Schema::hasTable('personal_access_tokens')){echo '[[entrypoint]] tokens table missing – running migrate again';}" >/dev/null 2>&1 || true
 
 # Cache config/routes/views (can be skipped with CACHE_OPTIMIZE=false)
 if [ "${CACHE_OPTIMIZE:-true}" = "true" ]; then
