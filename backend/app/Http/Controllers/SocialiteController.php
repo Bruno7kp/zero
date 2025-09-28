@@ -134,18 +134,24 @@ class SocialiteController extends Controller
     public function handleGoogleCallback(Request $request)
     {
         try {
+            error_log('[RAW_OAUTH_CB] enter method verb='.$request->method().' has_token=' . ($request->filled('token')?'yes':'no') . ' query_code=' . ($request->query('code')?'yes':'no'));
             // Se vier um token no corpo (fluxo One Tap / @react-oauth/google), validamos o ID token
             if ($request->isMethod('post') && $request->filled('token')) {
+                error_log('[RAW_OAUTH_CB] branch=onetap-token');
                 $idToken = $request->input('token');
 
                 // Validar o ID token diretamente no endpoint do Google
                 // OBS: Em produção, considere usar verificação por chave pública (JWKS) para reduzir latência.
-                $response = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken));
+                $tokenInfoUrl = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken);
+                error_log('[RAW_OAUTH_CB] validating_id_token url='.$tokenInfoUrl);
+                $response = @file_get_contents($tokenInfoUrl);
                 if ($response === false) {
+                    error_log('[RAW_OAUTH_CB] tokeninfo_request_failed');
                     throw new \Exception('Could not validate ID token');
                 }
 
                 $payload = json_decode($response, true);
+                error_log('[RAW_OAUTH_CB] tokeninfo_decoded keys=' . implode(',', array_keys($payload ?? [])));
                 $aud = $payload['aud'] ?? null;
                 // Aceitar múltiplos client_ids via env GOOGLE_CLIENT_IDS (separados por vírgula) ou fallback para GOOGLE_CLIENT_ID
                 $allowedClientIds = array_filter(array_map('trim', explode(',', env('GOOGLE_CLIENT_IDS', (string) config('services.google.client_id')))));
@@ -189,14 +195,18 @@ class SocialiteController extends Controller
             }
 
             $useSocialite = filter_var(env('OAUTH_USE_SOCIALITE', false), FILTER_VALIDATE_BOOLEAN);
+            error_log('[RAW_OAUTH_CB] after_token_branch useSocialite=' . ($useSocialite?'yes':'no'));
             if (!$useSocialite) {
+                error_log('[RAW_OAUTH_CB] branch=manual-code-exchange');
                 // Fluxo manual de troca de code por tokens (sem Socialite)
                 $code = $request->query('code');
                 $state = $request->query('state');
                 if (!$code) {
+                    error_log('[RAW_OAUTH_CB] missing_code');
                     return response()->json(['error' => 'Missing authorization code'], 400);
                 }
                 if (!$this->validateStateToken($state)) {
+                    error_log('[RAW_OAUTH_CB] invalid_state value=' . ($state ?? 'null'));
                     return response()->json(['error' => 'Invalid or expired state'], 400);
                 }
 
@@ -207,6 +217,7 @@ class SocialiteController extends Controller
                     return response()->json(['error' => 'Google OAuth env incomplete'], 500);
                 }
 
+                error_log('[RAW_OAUTH_CB] exchanging_code');
                 $tokenResp = Http::asForm()->post('https://oauth2.googleapis.com/token', [
                     'code' => $code,
                     'client_id' => $clientId,
@@ -216,32 +227,40 @@ class SocialiteController extends Controller
                 ]);
 
                 if (!$tokenResp->ok()) {
+                    error_log('[RAW_OAUTH_CB] token_exchange_failed status='.$tokenResp->status());
                     Log::error('Google manual token exchange failed', ['status' => $tokenResp->status(), 'body' => $tokenResp->body()]);
                     return response()->json(['error' => 'Token exchange failed'], 401);
                 }
 
                 $tokenJson = $tokenResp->json();
+                error_log('[RAW_OAUTH_CB] token_exchange_ok keys=' . implode(',', array_keys($tokenJson)));
                 $accessToken = $tokenJson['access_token'] ?? null;
                 $idToken = $tokenJson['id_token'] ?? null;
                 if (!$accessToken) {
+                    error_log('[RAW_OAUTH_CB] missing_access_token');
                     return response()->json(['error' => 'Missing access token'], 401);
                 }
 
                 // Obter dados do usuário (preferir endpoint userinfo oficial)
+                error_log('[RAW_OAUTH_CB] fetching_userinfo');
                 $userinfo = Http::withToken($accessToken)->get('https://openidconnect.googleapis.com/v1/userinfo');
                 if (!$userinfo->ok()) {
+                    error_log('[RAW_OAUTH_CB] userinfo_failed status='.$userinfo->status());
                     Log::warning('Google userinfo failed; attempting tokeninfo fallback', ['status' => $userinfo->status()]);
                     if ($idToken) {
                         $ti = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken));
                         $payload = $ti ? json_decode($ti, true) : null;
                     } else {
+                        error_log('[RAW_OAUTH_CB] userinfo_and_tokeninfo_failed');
                         return response()->json(['error' => 'User info retrieval failed'], 401);
                     }
                 } else {
                     $payload = $userinfo->json();
+                    error_log('[RAW_OAUTH_CB] userinfo_ok keys=' . implode(',', array_keys($payload)));
                 }
 
                 if (!is_array($payload) || empty($payload['email'])) {
+                    error_log('[RAW_OAUTH_CB] invalid_payload');
                     return response()->json(['error' => 'Invalid user payload'], 401);
                 }
 
@@ -250,6 +269,7 @@ class SocialiteController extends Controller
                 $avatar = $payload['picture'] ?? null;
                 $googleId = $payload['sub'] ?? null;
 
+                error_log('[RAW_OAUTH_CB] upserting_user email='.$email);
                 $user = User::firstOrCreate(
                     ['email' => $email],
                     [
@@ -266,6 +286,7 @@ class SocialiteController extends Controller
                 if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
                 if ($updates) { $user->fill($updates)->save(); }
 
+                error_log('[RAW_OAUTH_CB] creating_sanctum_token user_id='.$user->id);
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 if (env('OAUTH_DIAG')) {
@@ -294,7 +315,9 @@ class SocialiteController extends Controller
             }
 
             // Fluxo Socialite clássico (ativo somente se OAUTH_USE_SOCIALITE=true)
+            error_log('[RAW_OAUTH_CB] branch=socialite');
             $socialiteUser = Socialite::driver('google')->stateless()->user();
+            error_log('[RAW_OAUTH_CB] socialite_user_loaded email='.$socialiteUser->getEmail());
 
             $user = User::firstOrCreate(
                 ['email' => $socialiteUser->getEmail()],
@@ -318,6 +341,7 @@ class SocialiteController extends Controller
                 'token' => $token,
             ]);
         } catch (\Exception $e) {
+            error_log('[RAW_OAUTH_CB] exception '.get_class($e).': '.$e->getMessage());
             Log::error('Google Socialite login failed: ' . $e->getMessage());
             return response()->json(['error' => 'Authentication failed.'], 401);
         }
