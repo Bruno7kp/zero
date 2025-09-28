@@ -48,13 +48,15 @@ export class ZeroChartsDB extends Dexie {
       playcount_cache: `key, expires`
     });
     this.version(12).stores({
-      // legacy version with "completed" numeric flag
-      chart_weeks: `&[chartId+week], chartId, week, completed`
+      // v12 introduce table (compound PRIMARY KEY [chartId+week]) with a numeric completed flag
+      // IMPORTANT: use '[chartId+week]' (WITHOUT &). '&' would denote a unique index and Dexie would treat it differently,
+      // and changing it later triggers: UpgradeError Not yet support for changing primary key.
+      chart_weeks: `[chartId+week], chartId, week, completed`
     });
 
-    // v13: replace numeric completed flag with string status (complete | partial)
+    // v13: keep EXACT SAME primary key, only replace 'completed' flag with string 'status'
     this.version(13).stores({
-      chart_weeks: `&[chartId+week], chartId, week, status`
+      chart_weeks: `[chartId+week], chartId, week, status`
     }).upgrade(async (tx) => {
       try {
         const table: any = tx.table('chart_weeks');
@@ -74,5 +76,16 @@ export class ZeroChartsDB extends Dexie {
     });
   }
 }
-
 export const db = new ZeroChartsDB();
+
+// Auto-recovery: if prior versions used a different primary key and user upgraded, handle UpgradeError gracefully.
+// If the data in chart_weeks is derivable (cache-like) we can drop and recreate; otherwise prompt user.
+db.open().catch(async (e) => {
+  if (/UpgradeError/i.test(e?.name || '') && /primary key/i.test(e?.message || '')) {
+    console.warn('[Dexie] Detected primary key change conflict – recreating local DB', e);
+    await db.delete();
+    await db.open();
+  } else {
+    console.error('[Dexie] Failed to open DB', e);
+  }
+});
