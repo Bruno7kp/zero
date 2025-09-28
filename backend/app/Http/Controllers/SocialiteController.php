@@ -17,26 +17,51 @@ class SocialiteController extends Controller
         try {
             // Raw debug (goes to php-fpm stdout) – helps when Log facade not writing
             error_log('[RAW_OAUTH] entering redirectToGoogle');
-            if (env('OAUTH_DIAG', false)) {
-                return response()->json([
-                    'diag' => true,
-                    'phase' => 'pre-socialite',
-                    'config_google' => config('services.google'),
-                    'callback_env' => env('GOOGLE_CALLBACK_URL'),
-                ]);
+            $diag = env('OAUTH_DIAG');
+            $verbose = env('OAUTH_DIAG_VERBOSE');
+            $cfg = config('services.google');
+            if ($diag) {
+                error_log('[RAW_OAUTH] cfg_snapshot ' . json_encode([
+                    'client_id_present' => (bool)($cfg['client_id'] ?? null),
+                    'redirect' => $cfg['redirect'] ?? null,
+                ]));
             }
             Log::error('[DEBUG_OAUTH] Entering redirectToGoogle method');
-            $cfg = config('services.google');
             Log::info('Google OAuth redirect init', [
                 'client_id' => $cfg['client_id'] ?? null,
                 'redirect' => $cfg['redirect'] ?? null,
                 'env_callback' => env('GOOGLE_CALLBACK_URL'),
             ]);
-            return Socialite::driver('google')->stateless()->redirect();
+            error_log('[RAW_OAUTH] before_driver');
+            $driver = Socialite::driver('google');
+            error_log('[RAW_OAUTH] driver_created');
+            if (method_exists($driver, 'stateless')) {
+                $driver = $driver->stateless();
+                error_log('[RAW_OAUTH] stateless_applied');
+            }
+            if ($diag) {
+                return response()->json([
+                    'diag' => true,
+                    'phase' => 'pre-redirect',
+                    'redirect_config' => $cfg['redirect'] ?? null,
+                ]);
+            }
+            error_log('[RAW_OAUTH] before_redirect_call');
+            $resp = $driver->redirect();
+            error_log('[RAW_OAUTH] redirect_response_object');
+            return $resp;
         } catch (\Throwable $e) {
             Log::error('Google OAuth redirect failure: ' . $e->getMessage(), [
                 'trace_top' => collect(explode("\n", $e->getTraceAsString()))->take(5)->all(),
             ]);
+            error_log('[RAW_OAUTH] exception '.get_class($e).': '.$e->getMessage());
+            if (env('OAUTH_DIAG')) {
+                return response()->json([
+                    'error' => 'OAuth redirect failed',
+                    'ex' => get_class($e),
+                    'message' => $e->getMessage(),
+                ], 500);
+            }
             return response()->json(['error' => 'OAuth redirect failed'], 500);
         }
     }
