@@ -1,21 +1,14 @@
 <?php
-// routes/api.php
+// routes/api.php (clean restored)
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SocialiteController; // Vamos criar este controlador
 use Illuminate\Support\Facades\Cache;
 
-// Rota para redirecionar para o provedor
-// Temporary diagnostic wrapper: logs before calling controller to ensure request hits PHP layer
-Route::get('/auth/google/redirect', function () {
-    \Log::error('[DEBUG_OAUTH] Route /auth/google/redirect hit');
-    return app(SocialiteController::class)->redirectToGoogle();
-});
-
-// Rota de callback para processar a resposta do Google (POST para One Tap)
+// Google OAuth (redirect + callback GET/POST)
+Route::get('/auth/google/redirect', [SocialiteController::class, 'redirectToGoogle']);
 Route::post('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
-// Também aceitar GET (fluxo clássico de redirect)
 Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -23,14 +16,12 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    // Rotas para gerenciar charts
     Route::get('/charts', [ChartController::class, 'index']);
     Route::post('/charts', [ChartController::class, 'store']);
     Route::put('/charts/{chart}', [ChartController::class, 'update']);
     Route::delete('/charts/{chart}', [ChartController::class, 'destroy']);
 });
 
-// Health check (sem auth) - pode ser usado por monitoria / load balancer
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
