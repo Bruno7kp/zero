@@ -5,7 +5,11 @@ services:
     image: ghcr.io/bruno7kp/zero-backend:main
     environment:
       RUN_MIGRATIONS: "true"
-      CACHE_OPTIMIZE: "true"
+      # Temporarily disable optimization while debugging OAuth redirect fatal
+      CACHE_OPTIMIZE: "false"
+      # Debug flags (remove after solving):
+      OAUTH_DIAG: "1"
+      OAUTH_FORCE_FALLBACK: "1"
     networks:
       - zero-net
     volumes:
