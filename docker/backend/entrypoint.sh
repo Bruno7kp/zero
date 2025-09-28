@@ -54,18 +54,20 @@ if grep -q '^DB_CONNECTION=sqlite' .env 2>/dev/null; then
       chmod 660 "$DB_FILE" || true
       chmod 770 "$(dirname "$DB_FILE")" || true
     else
-      # File exists – ensure ownership and write permission
-      if [ ! -w "$DB_FILE" ]; then
-        echo "[entrypoint] Fixing sqlite database file permissions (was not writable)"
+      # File exists – ensure ownership & perms (cannot rely on -w because running as root)
+      FILE_OWNER=$(stat -c '%U' "$DB_FILE" 2>/dev/null || echo root)
+      if [ "$FILE_OWNER" != "www-data" ]; then
+        echo "[entrypoint] Adjusting sqlite file owner (was $FILE_OWNER)"
         chown www-data:www-data "$DB_FILE" 2>/dev/null || true
-        chmod 660 "$DB_FILE" 2>/dev/null || true
       fi
+      chmod 660 "$DB_FILE" 2>/dev/null || true
       DB_DIR="$(dirname "$DB_FILE")"
-      if [ ! -w "$DB_DIR" ]; then
-        echo "[entrypoint] Fixing sqlite database directory permissions (was not writable)"
+      DIR_OWNER=$(stat -c '%U' "$DB_DIR" 2>/dev/null || echo root)
+      if [ "$DIR_OWNER" != "www-data" ]; then
+        echo "[entrypoint] Adjusting sqlite directory owner (was $DIR_OWNER)"
         chown www-data:www-data "$DB_DIR" 2>/dev/null || true
-        chmod 770 "$DB_DIR" 2>/dev/null || true
       fi
+      chmod 770 "$DB_DIR" 2>/dev/null || true
     fi
   fi
 fi
