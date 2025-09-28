@@ -15,6 +15,16 @@ class SocialiteController extends Controller
     {
         // Using API route group (no session), so we must use stateless() to avoid session/state exceptions
         try {
+            // Raw debug (goes to php-fpm stdout) – helps when Log facade not writing
+            error_log('[RAW_OAUTH] entering redirectToGoogle');
+            if (env('OAUTH_DIAG', false)) {
+                return response()->json([
+                    'diag' => true,
+                    'phase' => 'pre-socialite',
+                    'config_google' => config('services.google'),
+                    'callback_env' => env('GOOGLE_CALLBACK_URL'),
+                ]);
+            }
             Log::error('[DEBUG_OAUTH] Entering redirectToGoogle method');
             $cfg = config('services.google');
             Log::info('Google OAuth redirect init', [
