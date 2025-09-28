@@ -10,7 +10,7 @@ import 'mantine-datatable/styles.css';
 import './assets/styles/custom.css';
 import { AppProviders } from './providers/AppProviders';
 
-function Root() {
+export function Root() {
     const [ready, setReady] = useState(false);
     useEffect(() => {
         let mounted = true;
