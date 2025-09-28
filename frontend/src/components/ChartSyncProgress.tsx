@@ -138,8 +138,9 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
           try {
             const from = dayjs.tz(week, chart.timezone).unix().toString();
             const to = dayjs.tz(week, chart.timezone).add(7, 'day').unix().toString();
-            const items = await getChart(chart.lastfm_username, from, to);
             const cutoff = chart[cutoffKey as keyof typeof chart] as number;
+            const limit = cutoff + 10;
+            const items = await getChart(chart.lastfm_username, from, to, limit);
             const enriched = items.slice(0, cutoff).map((item) => ({
               chartId: `${chart.id}`,
               chartType: type,

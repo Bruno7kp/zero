@@ -93,14 +93,13 @@ const fetchLastFmApi = async (
     }
 };
 
-export const getWeeklyArtistChart = async (user: string, from: string, to: string): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklyartistchart', user, from, to, { limit: '120' });
-    const artists = data?.weeklyartistchart?.artist;
 
+export const getWeeklyArtistChart = async (user: string, from: string, to: string, limit: number): Promise<FormattedChartItem[]> => {
+    const data = await fetchLastFmApi('user.getweeklyartistchart', user, from, to, { limit: String(limit) });
+    const artists = data?.weeklyartistchart?.artist;
     if (!artists) {
         return [];
     }
-
     return artists.map(artist => ({
         rank: parseInt(artist['@attr'].rank, 10),
         name: artist.name,
@@ -108,14 +107,13 @@ export const getWeeklyArtistChart = async (user: string, from: string, to: strin
     }));
 };
 
-export const getWeeklyTrackChart = async (user: string, from: string, to: string): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklytrackchart', user, from, to, { limit: '120' });
-    const tracks = data?.weeklytrackchart?.track;
 
+export const getWeeklyTrackChart = async (user: string, from: string, to: string, limit: number): Promise<FormattedChartItem[]> => {
+    const data = await fetchLastFmApi('user.getweeklytrackchart', user, from, to, { limit: String(limit) });
+    const tracks = data?.weeklytrackchart?.track;
     if (!tracks) {
         return [];
     }
-
     return tracks.map(track => ({
         rank: parseInt(track['@attr'].rank, 10),
         name: track.name,
@@ -124,14 +122,13 @@ export const getWeeklyTrackChart = async (user: string, from: string, to: string
     }));
 };
 
-export const getWeeklyAlbumChart = async (user: string, from: string, to: string): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklyalbumchart', user, from, to, { limit: '120' });
-    const albums = data?.weeklyalbumchart?.album;
 
+export const getWeeklyAlbumChart = async (user: string, from: string, to: string, limit: number): Promise<FormattedChartItem[]> => {
+    const data = await fetchLastFmApi('user.getweeklyalbumchart', user, from, to, { limit: String(limit) });
+    const albums = data?.weeklyalbumchart?.album;
     if (!albums) {
         return [];
     }
-
     return albums.map(album => ({
         rank: parseInt(album['@attr'].rank, 10),
         name: album.name,

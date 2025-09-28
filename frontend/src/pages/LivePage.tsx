@@ -81,31 +81,27 @@ const LivePage = () => {
                 const from = fromDate.unix().toString();
                 const to = toDate.unix().toString();
 
-                let data: FormattedChartItem[];
+                // Pega o limite de corte
+                const cutoffKey = chartType === 'track' ? 'music_cutoff' : `${chartType}_cutoff`;
+                const cutoff = (activeChart as any)[cutoffKey] !== undefined ? (activeChart as any)[cutoffKey] : 100;
+                const limit = cutoff + 10;
 
-                // Chama a função da API correta com base no tipo de chart selecionado
+                let data: FormattedChartItem[];
                 switch (chartType) {
                     case 'artist':
-                        data = await getWeeklyArtistChart(activeChart.lastfm_username, from, to);
+                        data = await getWeeklyArtistChart(activeChart.lastfm_username, from, to, limit);
                         break;
                     case 'track':
-                        data = await getWeeklyTrackChart(activeChart.lastfm_username, from, to);
+                        data = await getWeeklyTrackChart(activeChart.lastfm_username, from, to, limit);
                         break;
                     case 'album':
-                        data = await getWeeklyAlbumChart(activeChart.lastfm_username, from, to);
+                        data = await getWeeklyAlbumChart(activeChart.lastfm_username, from, to, limit);
                         break;
                     default:
                         throw new Error("Tipo de chart desconhecido.");
                 }
 
-                // Pega o limite de corte
-                const cutoffKey = chartType === 'track' ? 'music_cutoff' : `${chartType}_cutoff`;
-                const cutoff = (activeChart as any)[cutoffKey] !== undefined ? (activeChart as any)[cutoffKey] : 100;
-
-                // Limita a lista para o limite de corte + 10
-                const limitedData = data.slice(0, cutoff + 10);
-
-                setChartData(limitedData);
+                setChartData(data);
             } catch (err) {
                 console.error("Falha ao buscar o live chart:", err);
                 setError(t("errors.dataError"));
