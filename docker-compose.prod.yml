@@ -5,11 +5,8 @@ services:
     image: ghcr.io/bruno7kp/zero-backend:main
     environment:
       RUN_MIGRATIONS: "true"
-      # Temporarily disable optimization while debugging OAuth redirect fatal
-      CACHE_OPTIMIZE: "false"
-      # Debug flags (remove after solving):
-      # OAUTH_DIAG: "1"
-      OAUTH_FORCE_FALLBACK: "1"
+      CACHE_OPTIMIZE: "true"
+      # (Optional debug) OAUTH_DIAG: "1"
       # Hybrid flag: if set to "true" ativa Socialite para redirect e callback; se "false" usa fluxo manual
       OAUTH_USE_SOCIALITE: "false"
     networks:
