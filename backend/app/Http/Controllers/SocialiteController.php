@@ -11,6 +11,16 @@ use Illuminate\Support\Str;
 
 class SocialiteController extends Controller
 {
+    private function manualGoogleRedirectUrl(): string
+    {
+        $clientId = env('GOOGLE_CLIENT_ID');
+        $callback = env('GOOGLE_CALLBACK_URL');
+        $scopes = urlencode('openid email profile');
+        $redirect = urlencode($callback);
+        $base = 'https://accounts.google.com/o/oauth2/v2/auth';
+        $query = "client_id={$clientId}&redirect_uri={$redirect}&response_type=code&scope={$scopes}&access_type=online&prompt=select_account";
+        return $base . '?' . $query;
+    }
     public function redirectToGoogle()
     {
         // Using API route group (no session), so we must use stateless() to avoid session/state exceptions
@@ -19,6 +29,22 @@ class SocialiteController extends Controller
             error_log('[RAW_OAUTH] entering redirectToGoogle');
             $diag = env('OAUTH_DIAG');
             $verbose = env('OAUTH_DIAG_VERBOSE');
+            // Detect config repository readiness before using helper
+            $configRepoBound = function_exists('app') && app()->bound('config');
+            error_log('[RAW_OAUTH] pre_config repo_bound=' . ($configRepoBound ? 'yes' : 'no'));
+            if (!$configRepoBound || env('OAUTH_FORCE_FALLBACK')) {
+                error_log('[RAW_OAUTH] using manual fallback redirect (configRepoBound=' . ($configRepoBound?'yes':'no') . ')');
+                $url = $this->manualGoogleRedirectUrl();
+                if ($diag) {
+                    return response()->json([
+                        'diag' => true,
+                        'phase' => 'fallback-manual',
+                        'url' => $url,
+                    ]);
+                }
+                return redirect()->away($url)->header('Cache-Control','no-store');
+            }
+
             $cfg = config('services.google');
             if ($diag) {
                 error_log('[RAW_OAUTH] cfg_snapshot ' . json_encode([
