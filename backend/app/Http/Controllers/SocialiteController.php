@@ -15,6 +15,16 @@ class SocialiteController extends Controller
     {
         $clientId = env('GOOGLE_CLIENT_ID');
         $callback = env('GOOGLE_CALLBACK_URL');
+        if (empty($clientId) || empty($callback)) {
+            // Fallback to config if env not populated yet
+            try {
+                $cfg = config('services.google');
+                $clientId = $clientId ?: ($cfg['client_id'] ?? '');
+                $callback = $callback ?: ($cfg['redirect'] ?? '');
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
         $scopes = urlencode('openid email profile');
         $redirect = urlencode($callback);
         $base = 'https://accounts.google.com/o/oauth2/v2/auth';
