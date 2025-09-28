@@ -136,63 +136,80 @@ class SocialiteController extends Controller
         try {
             error_log('[RAW_OAUTH_CB] enter method verb='.$request->method().' has_token=' . ($request->filled('token')?'yes':'no') . ' query_code=' . ($request->query('code')?'yes':'no'));
             // Se vier um token no corpo (fluxo One Tap / @react-oauth/google), validamos o ID token
-            if ($request->isMethod('post') && $request->filled('token')) {
-                error_log('[RAW_OAUTH_CB] branch=onetap-token');
-                $idToken = $request->input('token');
+            if ($request->isMethod('post')) {
+                // Aceita 'token' ou 'credential' (Google One Tap normalmente usa 'credential')
+                $idToken = $request->input('token') ?: $request->input('credential');
+                if (!$idToken) {
+                    // Fallback: tentar interpretar raw body JSON caso cabeçalho Content-Type esteja incorreto
+                    $raw = $request->getContent();
+                    if ($raw) {
+                        $decoded = json_decode($raw, true);
+                        if (is_array($decoded)) {
+                            $idToken = $decoded['token'] ?? $decoded['credential'] ?? null;
+                        }
+                    }
+                }
+                if ($idToken) {
+                    error_log('[RAW_OAUTH_CB] branch=onetap-token field=' . ($request->has('token')?'token':($request->has('credential')?'credential':'raw-fallback')));
+                }
+                if ($idToken) {
+                    // Validar o ID token diretamente no endpoint do Google
+                    // OBS: Em produção, considere usar verificação por chave pública (JWKS) para reduzir latência.
+                    $tokenInfoUrl = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken);
+                    error_log('[RAW_OAUTH_CB] validating_id_token url='.$tokenInfoUrl);
+                    $response = @file_get_contents($tokenInfoUrl);
+                    if ($response === false) {
+                        error_log('[RAW_OAUTH_CB] tokeninfo_request_failed');
+                        throw new \Exception('Could not validate ID token');
+                    }
 
-                // Validar o ID token diretamente no endpoint do Google
-                // OBS: Em produção, considere usar verificação por chave pública (JWKS) para reduzir latência.
-                $tokenInfoUrl = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken);
-                error_log('[RAW_OAUTH_CB] validating_id_token url='.$tokenInfoUrl);
-                $response = @file_get_contents($tokenInfoUrl);
-                if ($response === false) {
-                    error_log('[RAW_OAUTH_CB] tokeninfo_request_failed');
-                    throw new \Exception('Could not validate ID token');
+                    $payload = json_decode($response, true);
+                    error_log('[RAW_OAUTH_CB] tokeninfo_decoded keys=' . implode(',', array_keys($payload ?? [])));
+                    $aud = $payload['aud'] ?? null;
+                    // Aceitar múltiplos client_ids via env GOOGLE_CLIENT_IDS (separados por vírgula) ou fallback para GOOGLE_CLIENT_ID
+                    $allowedClientIds = array_filter(array_map('trim', explode(',', env('GOOGLE_CLIENT_IDS', (string) config('services.google.client_id')))));
+                    if (!is_array($payload) || empty($payload['email']) || !$aud || !in_array($aud, $allowedClientIds, true)) {
+                        throw new \Exception('Invalid ID token payload (aud/email mismatch)');
+                    }
+
+                    $email = $payload['email'];
+                    $name = $payload['name'] ?? ($payload['given_name'] ?? 'User');
+                    $avatar = $payload['picture'] ?? null;
+                    $googleId = $payload['sub'] ?? null;
+
+                    $user = User::firstOrCreate(
+                        ['email' => $email],
+                        [
+                            'name' => $name,
+                            'google_id' => $googleId,
+                            'email_verified_at' => now(),
+                            'password' => Hash::make(Str::random(16)),
+                            'avatar' => $avatar,
+                        ]
+                    );
+
+                    // Se já existia e não tinha google_id/avatar, atualiza de forma segura
+                    $updates = [];
+                    if (!$user->google_id && $googleId) { $updates['google_id'] = $googleId; }
+                    if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
+                    if (!empty($updates)) { $user->fill($updates)->save(); }
+
+
+                    }
+
+                    // Criar token de acesso do Sanctum
+                    $token = $user->createToken('auth_token')->plainTextToken;
+
+                    return response()->json([
+                        'user' => [
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'avatar' => $user->avatar,
+                        ],
+                        'token' => $token,
+                    ]);
                 }
 
-                $payload = json_decode($response, true);
-                error_log('[RAW_OAUTH_CB] tokeninfo_decoded keys=' . implode(',', array_keys($payload ?? [])));
-                $aud = $payload['aud'] ?? null;
-                // Aceitar múltiplos client_ids via env GOOGLE_CLIENT_IDS (separados por vírgula) ou fallback para GOOGLE_CLIENT_ID
-                $allowedClientIds = array_filter(array_map('trim', explode(',', env('GOOGLE_CLIENT_IDS', (string) config('services.google.client_id')))));
-                if (!is_array($payload) || empty($payload['email']) || !$aud || !in_array($aud, $allowedClientIds, true)) {
-                    throw new \Exception('Invalid ID token payload (aud/email mismatch)');
-                }
-
-                $email = $payload['email'];
-                $name = $payload['name'] ?? ($payload['given_name'] ?? 'User');
-                $avatar = $payload['picture'] ?? null;
-                $googleId = $payload['sub'] ?? null;
-
-                $user = User::firstOrCreate(
-                    ['email' => $email],
-                    [
-                        'name' => $name,
-                        'google_id' => $googleId,
-                        'email_verified_at' => now(),
-                        'password' => Hash::make(Str::random(16)),
-                        'avatar' => $avatar,
-                    ]
-                );
-
-                // Se já existia e não tinha google_id/avatar, atualiza de forma segura
-                $updates = [];
-                if (!$user->google_id && $googleId) { $updates['google_id'] = $googleId; }
-                if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
-                if (!empty($updates)) { $user->fill($updates)->save(); }
-
-                // Criar token de acesso do Sanctum
-                $token = $user->createToken('auth_token')->plainTextToken;
-
-                return response()->json([
-                    'user' => [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'avatar' => $user->avatar,
-                    ],
-                    'token' => $token,
-                ]);
-            }
 
             $useSocialite = filter_var(env('OAUTH_USE_SOCIALITE', false), FILTER_VALIDATE_BOOLEAN);
             error_log('[RAW_OAUTH_CB] after_token_branch useSocialite=' . ($useSocialite?'yes':'no'));
