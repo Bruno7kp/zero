@@ -7,11 +7,13 @@ import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/c
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { IconFilter } from '@tabler/icons-react';
+import { IconFilter, IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
 
 
+
+import { defaultColumns } from '../store/columnsSlice';
 
 export function ChartWeekTableColumnsMenu() {
     const [opened, setOpened] = useState(false);
@@ -23,9 +25,15 @@ export function ChartWeekTableColumnsMenu() {
     // Garante que a coluna altVariation está presente no Redux
     useEffect(() => {
         if (!columns.find((c: any) => c.key === 'altVariation')) {
-            dispatch(updateColumn({ key: 'altVariation', label: 'Δ', visible: false }));
+            dispatch(updateColumn({ key: 'altVariation', visible: false }));
         }
     }, [columns, dispatch]);
+
+    // Mapeia visibilidade do Redux para a ordem e labels do defaultColumns
+    const columnsWithVisibility = defaultColumns.map((col: { key: string; label: string; labelComplete?: string; visible: boolean }) => {
+        const reduxCol = columns.find((c: any) => c.key === col.key);
+        return { ...col, visible: reduxCol ? reduxCol.visible : col.visible };
+    });
 
     const handleToggle = (key: string) => {
         if (mandatory.includes(key)) return; // não permite desmarcar colunas obrigatórias
@@ -42,15 +50,15 @@ export function ChartWeekTableColumnsMenu() {
                 </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-                {columns.map((col: any) => {
+                {columnsWithVisibility.map((col: any) => {
                     const isMandatory = mandatory.includes(col.key);
                     return (
                         <Menu.Item key={col.key}>
                             <Checkbox
-                                checked={true ? (isMandatory ? true : col.visible) : col.visible}
+                                checked={isMandatory ? true : col.visible}
                                 disabled={isMandatory}
                                 onChange={() => handleToggle(col.key)}
-                                label={col.key === 'altVariation' ? 'Δ' : (col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
+                                label={(col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
                             />
                         </Menu.Item>
                     );
@@ -60,18 +68,14 @@ export function ChartWeekTableColumnsMenu() {
     );
 }
 
-
-
-
 interface ChartWeekTableProps {
     chart: any;
     week?: string;
     type: string;
-    showAltVariationColumn?: boolean;
     altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
 }
 
-export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, showAltVariationColumn = false, altVariation }) => {
+export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, altVariation }) => {
     const data = useSelector((state: RootState) => state.charts.data);
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     const columns = useSelector((state: RootState) => state.columns.columns);
@@ -252,33 +256,68 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         // Remove qualquer coluna Δ já existente
         dtColumns = dtColumns.filter(col => col.accessor !== 'altVariation');
         // Cria a coluna Δ
-        const altVariationCol = {
+        const altVariationCol: DataTableColumn<ChartData> = {
             accessor: 'altVariation',
-            title: 'Δ',
+            title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />, 
             textAlign: 'center',
-            width: 60,
+            width: 80,
+            cellsStyle: () => ({ paddingRight: 0 }),
             render: (row: ChartData, index: number) => {
                 let value: any = altVariation ? altVariation(row, index) : false;
-                let color = 'gray', label = '', variant = 'light', leftIcon = null;
+                let color = 'gray', color2 = 'gray', label = '', rightIcon = null;
                 if (value === 'NEW') {
-                    color = 'blue'; label = 'NEW';
+                    color2 = color = 'blue'; label = 'NEW'; rightIcon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />;
                 } else if (value === 'RE') {
-                    color = 'yellow'; label = 'RE';
+                    color2 = color = 'yellow'; label = 'RE'; rightIcon = <IconArrowBackUp size={20} style={{ verticalAlign: 'middle', transform: "scaleX(-1)" }} />;
                 } else if (typeof value === 'number' && value < 0) {
-                    color = 'red'; label = String(value); leftIcon = <span style={{fontWeight:700,marginRight:2}}>▼</span>;
+                    color2 = color = 'red'; label = String(value); rightIcon = <IconCaretDownFilled size={16} style={{ verticalAlign: 'middle' }} />;
                 } else if (typeof value === 'number' && value > 0) {
-                    color = 'green'; label = `+${value}`;
+                    color2 = color = 'green'; label = `+${value}`; rightIcon = <IconCaretUpFilled size={16} style={{ verticalAlign: 'middle' }} />;
                 } else if (value === 0 || value === '=') {
-                    color = 'gray'; label = '=';
+                    color2 = 'gray'; color = 'gray'; label = '=';  rightIcon = ' ';
                 } else if (!value || value === '-') {
-                    color = 'gray'; label = '';
+                    color2 = color = 'gray'; label = '';
                 } else {
                     label = String(value);
                 }
                 return label ? (
-                    <Badge color={color} variant={variant} size="md" style={{minWidth:36, fontWeight:700, fontSize:13, display:'flex',alignItems:'center',justifyContent:'center'}}>
-                        {leftIcon}{label}
-                    </Badge>
+                    <Flex direction="row" gap="sm" align="center" style={{ height: 40 }}>
+                        <Badge 
+                            color={color} 
+                            variant="light" 
+                            size="md" 
+                            style={{
+                                borderRadius: 0,
+                                width: 40,
+                                padding: 0,
+                                fontWeight: 700,
+                                fontSize: 12,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            {label}
+                        </Badge>
+                        <Badge 
+                            color={color2} 
+                            variant={color2 === 'gray' ? 'light' : 'filled'}
+                            size="md" 
+                            style={{
+                                borderRadius: 0,
+                                width: 15,
+                                height: '100%',
+                                minHeight: 32,
+                                padding: 0,
+                                display: 'flex',
+                                alignItems: 'stretch',
+                            }}
+                        >
+                            <Flex align="center" justify="center" style={{height: '100%', width: '100%'}}>
+                                {rightIcon}
+                            </Flex>
+                        </Badge>
+                    </Flex>
                 ) : null;
             }
         };
