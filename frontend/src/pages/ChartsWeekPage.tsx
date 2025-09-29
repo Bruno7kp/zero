@@ -47,6 +47,7 @@ export const ChartsWeekPage: React.FC = () => {
     const isSync = chart && selectedWeek === weekParam && selectedType === (typeParam || DEFAULT_TYPE);
 
     return (
+        <>
         <Container size={isMobile ? '100%' : 'md'} px="xs">
             <ChartWeekControls
                 chart={chart}
@@ -56,6 +57,8 @@ export const ChartsWeekPage: React.FC = () => {
                 view={view}
                 setView={setView}
             />
+        </Container>
+        <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs">
             {!isSync ? (
                 <Center py="xl"><Loader /></Center>
             ) : (
@@ -87,6 +90,7 @@ export const ChartsWeekPage: React.FC = () => {
                 </>
             )}
         </Container>
+        </>
     );
 };
 

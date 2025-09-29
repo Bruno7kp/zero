@@ -202,7 +202,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     <Flex>
                         {showImage && (
                             <Flex mr="sm" justify="center" align="center">
-                                <div style={{ width: 40, height: 40, background: '#eee' }} />
+                                <img
+                                    src="https://lastfm.freetls.fastly.net/i/u/300x300/d0c78dc3a80e2e45ac4972089360a051.jpg"
+                                    alt={row.name}
+                                    style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 0 }}
+                                />
                             </Flex>
                         )}
                         <Flex direction="column" justify="center" align="flex-start">

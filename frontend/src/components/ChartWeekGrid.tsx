@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
-import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme, Divider } from '@mantine/core';
 import { IconPlus, IconStarFilled, IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled } from '@tabler/icons-react';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
@@ -35,10 +35,30 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
       label = String(value);
     }
     return label ? (
-      <Badge color={color} variant={color === 'gray' ? 'light' : 'filled'} size="md" px={4} style={{ position: 'absolute', top: 8, right: 8, zIndex: 2, borderRadius: 4, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-        {icon}
-        <span style={{ fontWeight: 700, fontSize: 12 }}>{label}</span>
-      </Badge>
+      <Badge
+        color={color}
+        variant="filled"
+        size="md"
+        px={4}
+        style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 2,
+            borderRadius: 4,
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '4px 6px',
+        }}
+        >
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {icon}
+                <span style={{ fontWeight: 700, fontSize: 12 }}>{label}</span>
+            </span>
+        </Badge>
+
     ) : null;
   }
   const dispatch = useDispatch();
@@ -68,12 +88,9 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     dispatch(fetchStatsMap({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
   }, [data, chart?.id, type, week, dispatch]);
 
-  // Grid breakpoints: 5 (lg), 4 (md), 2 (base)
-  const getSpan = () => ({ base: 6, md: 3, lg: 2 });
-
   return (
     <>
-      <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title={modalRow?.name || 'Detalhes'} size="lg">
+      <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title={modalRow?.name || 'Detalhes'} size="xl">
         {modalRow && (
           <ChartItemStatsLoader
             chartId={modalRow.chartId}
@@ -96,23 +113,49 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   <ActionIcon
                     size="sm"
                     variant="filled"
-                    color="dark.2"
+                    color="gray"
                     style={{ position: 'absolute', top: 8, left: 8, zIndex: 2 }}
                     onClick={() => { setModalRow(row); setModalOpen(true); }}
                   >
                     <IconPlus size={16} />
                   </ActionIcon>
                   {/* Posição (rank) canto inferior esquerdo */}
-                  <Badge color={row.rank === 1 ? 'blue' : 'gray'} variant="filled" style={{ position: 'absolute', left: 8, bottom: 8, zIndex: 2, fontWeight: 700 }}>{row.rank}</Badge>
-                  {/* Imagem (placeholder) */}
+                  <Badge
+                    color={row.rank === 1 ? 'red' : 'red'}
+                    size="xl"
+                    variant="filled"
+                    py="xl"
+                    px="xs"
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      bottom: 0,
+                      zIndex: 2,
+                      fontWeight: 800,
+                      fontSize: 32,
+                      minWidth: 40,
+                      borderTopRightRadius: 12,
+                      borderTopLeftRadius: 0,
+                      borderBottomRightRadius: 0,
+                      borderBottomLeftRadius: 0,
+                    }}
+                  >
+                    {row.rank}
+                  </Badge>
+                  {/* Imagem real */}
                   {showImage && (
-                    <Box style={{ width: '100%', height: '100%' }} />
+                    <img
+                      src="https://lastfm.freetls.fastly.net/i/u/300x300/d0c78dc3a80e2e45ac4972089360a051.jpg"
+                      alt={row.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0 }}
+                    />
                   )}
                 </Box>
                 <Box px="sm" py={8} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 64 }}>
                   <Text fw={700} size="md" lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
                   {row.artistName && <Text size="sm" c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
                 </Box>
+                {(showPlays || showPeak || showTotalWeeks) && (
                 <Group px="sm" pb="sm" style={{ minHeight: 36, width: '100%', justifyContent: 'space-between', gap: 4, display: 'flex' }}>
                   {showPlays && (
                     <Box style={{ textAlign: 'center', flex: 1 }}>
@@ -133,6 +176,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                     </Box>
                   )}
                 </Group>
+                )}
               </Card>
             </Grid.Col>
           );

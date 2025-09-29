@@ -102,17 +102,10 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
                     return (
                       <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0 }}>
                         {showImage && (
-                          <Box
-                            w={72}
-                            style={{
-                              height: 72,
-                              width: 72,
-                              background: '#eee',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: 0,
-                            }}
+                          <img
+                            src="https://lastfm.freetls.fastly.net/i/u/300x300/d0c78dc3a80e2e45ac4972089360a051.jpg"
+                            alt={row.name}
+                            style={{ height: 72, width: 72, objectFit: 'cover', borderRadius: 0 }}
                           />
                         )}
                         <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0 }}>
