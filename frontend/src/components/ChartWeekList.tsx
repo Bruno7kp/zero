@@ -70,7 +70,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
         const stats = statsMap[row.entityId];
         const rowId = String(row.id);
         return (
-          <Card key={rowId} shadow="md" p={0} radius="md" withBorder style={{ background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white', }}>
+          <Card key={rowId} shadow="md" p={0} radius="md" style={{ background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white', }}>
             <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: 72 }}>
               <Flex align="center" gap="md" wrap="wrap" style={{ flex: 1 }}>
                 {filteredColumns.map((col: any) => {
