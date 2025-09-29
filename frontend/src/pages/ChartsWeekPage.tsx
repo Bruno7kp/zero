@@ -19,7 +19,10 @@ export const ChartsWeekPage: React.FC = () => {
     const { week: weekParam, type: typeParam } = useParams();
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
-    const [view, setView] = useState<'table' | 'grid' | 'list'>('table');
+    const [view, setView] = useState<'table' | 'grid' | 'list'>(() => {
+        const saved = typeof window !== 'undefined' ? localStorage.getItem('chartWeekView') : null;
+        return (saved === 'table' || saved === 'grid' || saved === 'list') ? saved : 'table';
+    });
     const chart = useMemo(() => charts.find((c: any) => c.id === activeChartId) || null, [charts, activeChartId]);
     const [selectedWeek, setSelectedWeek] = useState<string | undefined>(weekParam);
     const [selectedType, setSelectedType] = useState<string>(typeParam || DEFAULT_TYPE);

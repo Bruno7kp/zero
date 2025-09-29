@@ -2,13 +2,10 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
 import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
-import { Card, Flex, Text, Badge, Collapse, ActionIcon, Box, Divider } from '@mantine/core';
+import { Card, Flex, Text, Badge, Collapse, ActionIcon, Box, Divider, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled, IconChevronDown, IconChevronUp, IconStarFilled } from '@tabler/icons-react';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { useTranslation } from 'react-i18next';
-
-
 
 interface ChartWeekListProps {
   chart: any;
@@ -18,13 +15,13 @@ interface ChartWeekListProps {
 }
 
 export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type, altVariation }) => {
-
-
   const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
   const statsMap = useSelector((state: any) => state.charts.statsMap);
   const columns = useSelector((state: any) => state.columns.columns);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
 
   // Buscar dados ao trocar semana/tipo/chart
   useEffect(() => {
@@ -45,7 +42,6 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
   const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
-
 
   function getDeltaBadgeProps(delta: any) {
     let color = 'gray';
@@ -74,7 +70,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
         const stats = statsMap[row.entityId];
         const rowId = String(row.id);
         return (
-          <Card key={rowId} shadow="md" p={0} radius="md" withBorder>
+          <Card key={rowId} shadow="md" p={0} radius="md" withBorder style={{ background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white', }}>
             <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: 72 }}>
               <Flex align="center" gap="md" wrap="wrap" style={{ flex: 1 }}>
                 {filteredColumns.map((col: any) => {
