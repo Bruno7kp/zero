@@ -92,7 +92,7 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
             }>
               <div>
                 <Progress value={nextPct} size="xs" color={color} radius="xl" />
-                <Text size="10px" ta="right" c="dimmed">
+                <Text size="10px" ta="left" c="dimmed">
                   {nextType === 'same' && nextMultiple && nextLevel
                     ? t('charts.stats.remainingToSame', { value: Math.max(0, Math.ceil(remainingToNext)), multiple: nextMultiple, level: t('values.' + nextLevel) })
                     : nextLevel

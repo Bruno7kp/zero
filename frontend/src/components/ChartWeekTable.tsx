@@ -171,7 +171,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     }
                     return (
                         <Flex direction="column" align="center">
-                            <Text fw={700} size="lg">{row.rank}</Text>
+                            <Text fw={700} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
                             {badge}
                         </Flex>
                     );
@@ -224,7 +224,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     const peakVal = stats?.peak?.position ?? '-';
                     return (
                         <Flex direction="column" align="center">
-                            <Text fw={700}>{peakVal}</Text>
+                            <Text fw={700} c={peakVal === 1 ? 'blue' : undefined}>{peakVal}</Text>
                         </Flex>
                     );
                 },
