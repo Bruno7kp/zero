@@ -19,6 +19,14 @@ export function ChartWeekTableColumnsMenu() {
     const dispatch = useDispatch<AppDispatch>();
     const columns = useSelector((state: RootState) => state.columns.columns);
     const mandatory = ['rank', 'name'];
+
+    // Garante que a coluna altVariation está presente no Redux
+    useEffect(() => {
+        if (!columns.find((c: any) => c.key === 'altVariation')) {
+            dispatch(updateColumn({ key: 'altVariation', label: 'Δ', visible: false }));
+        }
+    }, [columns, dispatch]);
+
     const handleToggle = (key: string) => {
         if (mandatory.includes(key)) return; // não permite desmarcar colunas obrigatórias
         const col = columns.find((c: any) => c.key === key);
@@ -42,7 +50,7 @@ export function ChartWeekTableColumnsMenu() {
                                 checked={true ? (isMandatory ? true : col.visible) : col.visible}
                                 disabled={isMandatory}
                                 onChange={() => handleToggle(col.key)}
-                                label={(col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
+                                label={col.key === 'altVariation' ? 'Δ' : (col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
                             />
                         </Menu.Item>
                     );
@@ -55,14 +63,20 @@ export function ChartWeekTableColumnsMenu() {
 
 
 
-export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string }> = ({ chart, week, type }) => {
-    const dispatch = useDispatch<AppDispatch>();
+interface ChartWeekTableProps {
+    chart: any;
+    week?: string;
+    type: string;
+    showAltVariationColumn?: boolean;
+    altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
+}
+
+export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, showAltVariationColumn = false, altVariation }) => {
     const data = useSelector((state: RootState) => state.charts.data);
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     const columns = useSelector((state: RootState) => state.columns.columns);
+    const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
-
-    // Garante que colunas obrigatórias estejam sempre visíveis
     useEffect(() => {
         const mandatory = ['rank', 'name'];
         mandatory.forEach(key => {
@@ -88,6 +102,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
 
     // Colunas dinâmicas
     const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
+    const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
     // Opção para mostrar/esconder badge delta
     const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
     const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
@@ -131,8 +146,8 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         }
         return { color, label };
     }
-    const dtColumns: DataTableColumn<ChartData>[] = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
-        // Centraliza todos os heads exceto 'name'
+    // Mapeamento das colunas para o DataTable
+    let dtColumns: DataTableColumn<ChartData>[] = useMemo(() => filteredColumns.map((col: any): DataTableColumn<ChartData> => {
         const base = {
             accessor: col.key,
             title: col.labelComplete ? t(col.label) : t(col.labelComplete) || col.key,
@@ -142,7 +157,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         if (col.key === 'rank') {
             return {
                 ...base,
-                render: (row, _index) => {
+                render: (row: ChartData, _index: number) => {
                     let badge = null;
                     if (showDeltaBadge) {
                         const { color, label } = getDeltaBadgeProps(row.deltaRank);
@@ -162,7 +177,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         if (col.key === 'plays') {
             return {
                 ...base,
-                render: (row, _index) => {
+                render: (row: ChartData, _index: number) => {
                     let badge = null;
                     if (showDeltaPlaysBadge) {
                         const { color, label } = getDeltaBadgeProps(row.deltaPlays);
@@ -182,7 +197,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         if (col.key === 'name') {
             return {
                 ...base,
-                render: (row, _index) => (
+                render: (row: ChartData, _index: number) => (
                     <Flex>
                         {showImage && (
                             <Flex mr="sm" justify="center" align="center">
@@ -200,7 +215,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         if (col.key === 'peak') {
             return {
                 ...base,
-                render: (row, _index) => {
+                render: (row: ChartData, _index: number) => {
                     const stats = statsMap[row.entityId];
                     const peakVal = stats?.peak?.position ?? '-';
                     return (
@@ -214,7 +229,7 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         if (col.key === 'totalWeeks') {
             return {
                 ...base,
-                render: (row, _index) => {
+                render: (row: ChartData, _index: number) => {
                     const stats = statsMap[row.entityId];
                     const totalWeeks = stats?.totals?.withinCutoff ?? '-';
                     return (
@@ -227,12 +242,58 @@ export const ChartWeekTable: React.FC<{ chart: any; week?: string; type: string 
         }
         return {
             ...base,
-            render: (row, _index) => {
-                // Garante que o tipo de retorno é um ReactNode
+            render: (row: ChartData, _index: number) => {
                 return <Text>{row.id}</Text>;
             }
         };
-    });
+    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap]);
+    // Adiciona coluna de variação visual se ativada (agora controlada pelo Redux)
+    if (showAltVariationRedux) {
+        // Remove qualquer coluna Δ já existente
+        dtColumns = dtColumns.filter(col => col.accessor !== 'altVariation');
+        // Cria a coluna Δ
+        const altVariationCol = {
+            accessor: 'altVariation',
+            title: 'Δ',
+            textAlign: 'center',
+            width: 60,
+            render: (row: ChartData, index: number) => {
+                let value: any = altVariation ? altVariation(row, index) : false;
+                let color = 'gray', label = '', variant = 'light', leftIcon = null;
+                if (value === 'NEW') {
+                    color = 'blue'; label = 'NEW';
+                } else if (value === 'RE') {
+                    color = 'yellow'; label = 'RE';
+                } else if (typeof value === 'number' && value < 0) {
+                    color = 'red'; label = String(value); leftIcon = <span style={{fontWeight:700,marginRight:2}}>▼</span>;
+                } else if (typeof value === 'number' && value > 0) {
+                    color = 'green'; label = `+${value}`;
+                } else if (value === 0 || value === '=') {
+                    color = 'gray'; label = '=';
+                } else if (!value || value === '-') {
+                    color = 'gray'; label = '';
+                } else {
+                    label = String(value);
+                }
+                return label ? (
+                    <Badge color={color} variant={variant} size="md" style={{minWidth:36, fontWeight:700, fontSize:13, display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        {leftIcon}{label}
+                    </Badge>
+                ) : null;
+            }
+        };
+        // Encontra o índice da coluna rank
+        const rankIdx = dtColumns.findIndex(col => col.accessor === 'rank');
+        if (rankIdx !== -1) {
+            dtColumns = [
+                ...dtColumns.slice(0, rankIdx + 1),
+                altVariationCol,
+                ...dtColumns.slice(rankIdx + 1)
+            ];
+        } else {
+            dtColumns = [altVariationCol, ...dtColumns];
+        }
+    }
 
     return (
         <Paper shadow="xs" p="md" withBorder>

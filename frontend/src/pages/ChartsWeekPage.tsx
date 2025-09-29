@@ -1,3 +1,7 @@
+// Função de variação para a coluna Δ: usa exatamente o mesmo valor do badge da coluna rank
+function getAltVariation(row: any) {
+    return row.deltaRank;
+}
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -44,9 +48,14 @@ export const ChartsWeekPage: React.FC = () => {
                 view={view}
                 setView={setView}
             />
-            {view === 'table' && (
-                <ChartWeekTable chart={chart} week={selectedWeek} type={selectedType} />
-            )}
+                        {view === 'table' && (
+                                <ChartWeekTable
+                                    chart={chart}
+                                    week={selectedWeek}
+                                    type={selectedType}
+                                    altVariation={getAltVariation}
+                                />
+                        )}
             {view === 'grid' && <ChartWeekGrid chart={chart} week={selectedWeek} type={selectedType} />}
             {view === 'list' && <ChartWeekList chart={chart} week={selectedWeek} type={selectedType} />}
         </Container>
