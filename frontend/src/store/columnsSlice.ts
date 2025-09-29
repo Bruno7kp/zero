@@ -35,6 +35,15 @@ const getInitialColumns = (): ColumnConfig[] => {
       return defaultColumns;
     }
   }
+  // Detecta mobile pelo userAgent (só na primeira carga, não afeta quem já tem localStorage)
+  const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|Mobile/i.test(window.navigator.userAgent);
+  if (isMobile) {
+    return defaultColumns.map(col =>
+      ['rank', 'name', 'plays'].includes(col.key)
+        ? { ...col, visible: true }
+        : { ...col, visible: false }
+    );
+  }
   return defaultColumns;
 };
 

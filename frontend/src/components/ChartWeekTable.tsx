@@ -10,9 +10,6 @@ import { ChartItemStatsLoader } from './ChartItemStatsLoader';
 import { IconFilter, IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
-
-
-
 import { defaultColumns } from '../store/columnsSlice';
 
 export function ChartWeekTableColumnsMenu() {

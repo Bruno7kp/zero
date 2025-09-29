@@ -10,10 +10,12 @@ import { ChartWeekTable } from '../components/ChartWeekTable';
 import { ChartWeekGrid } from '../components/ChartWeekGrid';
 import { ChartWeekList } from '../components/ChartWeekList';
 import { Container } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 const DEFAULT_TYPE = 'artist';
 
 export const ChartsWeekPage: React.FC = () => {
+    const isMobile = useMediaQuery('(max-width: 48em)'); // Mantine md breakpoint
     const { week: weekParam, type: typeParam } = useParams();
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -39,7 +41,7 @@ export const ChartsWeekPage: React.FC = () => {
     if (!chart) return <div>Nenhum chart ativo.</div>;
 
     return (
-        <Container>
+        <Container size={isMobile ? '100%' : 'md'} px="xs">
             <ChartWeekControls
                 chart={chart}
                 week={selectedWeek}

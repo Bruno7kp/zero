@@ -80,8 +80,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
 	const topType = `charts.${type}sTop`;
 
-	return (
-		<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between">
+		return (
+			<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between" direction={{ base: 'column', sm: 'row' }}>
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
 				<Flex direction="column" justify="center" align="center" style={{ width: '100%' }}>
