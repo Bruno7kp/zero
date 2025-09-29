@@ -9,7 +9,7 @@ import { ChartWeekControls } from '../components/ChartWeekControls';
 import { ChartWeekTable } from '../components/ChartWeekTable';
 import { ChartWeekGrid } from '../components/ChartWeekGrid';
 import { ChartWeekList } from '../components/ChartWeekList';
-import { Container } from '@mantine/core';
+import { Container, Loader, Center } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
 const DEFAULT_TYPE = 'artist';
@@ -40,6 +40,9 @@ export const ChartsWeekPage: React.FC = () => {
 
     if (!chart) return <div>Nenhum chart ativo.</div>;
 
+    // Loading: só renderiza tabela se chart.id, selectedWeek e selectedType batem com a rota
+    const isSync = chart && selectedWeek === weekParam && selectedType === (typeParam || DEFAULT_TYPE);
+
     return (
         <Container size={isMobile ? '100%' : 'md'} px="xs">
             <ChartWeekControls
@@ -50,16 +53,36 @@ export const ChartsWeekPage: React.FC = () => {
                 view={view}
                 setView={setView}
             />
-                        {view === 'table' && (
-                                <ChartWeekTable
-                                    chart={chart}
-                                    week={selectedWeek}
-                                    type={selectedType}
-                                    altVariation={getAltVariation}
-                                />
-                        )}
-            {view === 'grid' && <ChartWeekGrid chart={chart} week={selectedWeek} type={selectedType} />}
-            {view === 'list' && <ChartWeekList chart={chart} week={selectedWeek} type={selectedType} />}
+            {!isSync ? (
+                <Center py="xl"><Loader /></Center>
+            ) : (
+                <>
+                    {view === 'table' && (
+                        <ChartWeekTable
+                            chart={chart}
+                            week={selectedWeek}
+                            type={selectedType}
+                            altVariation={getAltVariation}
+                        />
+                    )}
+                    {view === 'grid' && (
+                        <ChartWeekGrid
+                            chart={chart}
+                            week={selectedWeek}
+                            type={selectedType}
+                            altVariation={getAltVariation}
+                        />
+                    )}
+                    {view === 'list' && (
+                        <ChartWeekList
+                            chart={chart}
+                            week={selectedWeek}
+                            type={selectedType}
+                            altVariation={getAltVariation}
+                        />
+                    )}
+                </>
+            )}
         </Container>
     );
 };

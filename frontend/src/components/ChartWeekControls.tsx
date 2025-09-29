@@ -155,7 +155,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			{/* Direita: seleção de visualização + botão de colunas */}
 			<Flex gap="xs" align="center">
 				{/* Botão de colunas, só mostra se for tabela */}
-				   {view === 'table' && <ChartWeekTableColumnsMenu />}
+				<ChartWeekTableColumnsMenu />
 				<SegmentedControl
 					value={view}
 					onChange={v => setView(v as any)}

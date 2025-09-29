@@ -261,19 +261,19 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             cellsStyle: () => ({ paddingRight: 0 }),
             render: (row: ChartData, index: number) => {
                 let value: any = altVariation ? altVariation(row, index) : false;
-                let color = 'gray', color2 = 'gray', label = '', rightIcon = null;
+                let color = 'gray', label = '', rightIcon = null;
                 if (value === 'NEW') {
-                    color2 = color = 'blue'; label = 'NEW'; rightIcon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />;
+                    color = 'blue'; label = 'NEW'; rightIcon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />;
                 } else if (value === 'RE') {
-                    color2 = color = 'yellow'; label = 'RE'; rightIcon = <IconArrowBackUp size={20} style={{ verticalAlign: 'middle', transform: "scaleX(-1)" }} />;
+                    color = 'yellow'; label = 'RE'; rightIcon = <IconArrowBackUp stroke={3} size={16} style={{ verticalAlign: 'middle', transform: "scaleX(-1)" }} />;
                 } else if (typeof value === 'number' && value < 0) {
-                    color2 = color = 'red'; label = String(value); rightIcon = <IconCaretDownFilled size={16} style={{ verticalAlign: 'middle' }} />;
+                    color = 'red'; label = String(value); rightIcon = <IconCaretDownFilled size={16} style={{ verticalAlign: 'middle' }} />;
                 } else if (typeof value === 'number' && value > 0) {
-                    color2 = color = 'green'; label = `+${value}`; rightIcon = <IconCaretUpFilled size={16} style={{ verticalAlign: 'middle' }} />;
+                    color = 'green'; label = `+${value}`; rightIcon = <IconCaretUpFilled size={16} style={{ verticalAlign: 'middle' }} />;
                 } else if (value === 0 || value === '=') {
-                    color2 = 'gray'; color = 'gray'; label = '=';  rightIcon = ' ';
+                    color = 'gray'; label = '=';  rightIcon = ' ';
                 } else if (!value || value === '-') {
-                    color2 = color = 'gray'; label = '';
+                    color = 'gray'; label = '';
                 } else {
                     label = String(value);
                 }
@@ -297,8 +297,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                             {label}
                         </Badge>
                         <Badge 
-                            color={color2} 
-                            variant={color2 === 'gray' ? 'light' : 'filled'}
+                            color={color} 
+                            variant={color === 'gray' ? 'light' : 'filled'}
                             size="md" 
                             style={{
                                 borderRadius: 0,
