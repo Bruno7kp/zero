@@ -47,9 +47,7 @@ export const ChartsWeekPage: React.FC = () => {
         navigate(`/charts/week/${week}/${type}`);
     };
 
-    if (!chart) {
-        return <div>Nenhum chart ativo.</div>;
-    }
+    const noChart = !chart;
 
     // Sincronizado com rota
     const isSync = chart && selectedWeek === weekParam && selectedType === (typeParam || DEFAULT_TYPE);
@@ -71,20 +69,25 @@ export const ChartsWeekPage: React.FC = () => {
     return (
         <>
         <Container size={isMobile ? '100%' : 'md'} px="xs">
-            <ChartWeekControls
-                chart={chart}
-                week={selectedWeek}
-                type={selectedType}
-                onChange={handleChange}
-                view={view}
-                setView={setView}
-            />
+            {!noChart && (
+              <ChartWeekControls
+                  chart={chart}
+                  week={selectedWeek}
+                  type={selectedType}
+                  onChange={handleChange}
+                  view={view}
+                  setView={setView}
+              />
+            )}
         </Container>
         <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs" style={{ position: 'relative' }}>
-            {(!hasAnyData && !isTransitioning) && (
+            {noChart && (
+                <Center py="xl"><div>Nenhum chart ativo.</div></Center>
+            )}
+            {!noChart && (!hasAnyData && !isTransitioning) && (
                 <Center py="xl"><Loader /></Center>
             )}
-            {hasAnyData && (
+            {!noChart && hasAnyData && (
                 <>
                     {view === 'table' && (
                         <ChartWeekTable

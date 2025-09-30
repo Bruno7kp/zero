@@ -289,7 +289,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 return <Text>{row.id}</Text>;
             }
         };
-    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId]);
+    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type]);
     // Adiciona coluna de variação visual se ativada (agora controlada pelo Redux)
     if (showAltVariationRedux) {
         // Remove qualquer coluna Δ já existente
