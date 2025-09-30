@@ -141,7 +141,7 @@ const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'altVariation' && showAltVariationRedux) {
-              let value: any = altVariation ? altVariation(row, idx) : false;
+              const value: any = altVariation ? altVariation(row, idx) : false;
               let color = 'gray', label = '', icon = null;
               if (value === 'NEW') { color = 'blue'; label = 'NEW'; icon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />; }
               else if (value === 'RE') { color = 'yellow'; label = 'RE'; icon = <IconArrowBackUp stroke={3} size={14} style={{ verticalAlign: 'middle', transform: 'scaleX(-1)' }} />; }
@@ -217,7 +217,8 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   // Badge util agora está fora
 
   const useProgressive = data.length > 120;
-  const progressive = useProgressive ? useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 18, adaptive: true, disableBelow: 260, targetDurationMs: 260 }) : { items: data, done: true, total: data.length } as any;
+  const progressiveAll = useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 18, adaptive: true, disableBelow: 260, targetDurationMs: 260 });
+  const progressive = useProgressive ? progressiveAll : { items: data, done: true, total: data.length } as any;
   const visibleRows = progressive.items as ChartData[];
   const showLoadingTail = useProgressive && !progressive.done;
 

@@ -26,8 +26,8 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   // Função para renderizar o ícone de variação
   function renderAltVariation(row: ChartData, idx: number) {
     if (!showAltVariationRedux) return null;
-    let value: any = altVariation ? altVariation(row, idx) : false;
-    let color = 'gray', label = '', icon = null;
+  const value: any = altVariation ? altVariation(row, idx) : false;
+  let color = 'gray', label = '', icon = null;
     if (value === 'NEW') {
       color = 'blue'; label = 'NEW'; icon = <IconStarFilled size={14} style={{ verticalAlign: 'middle' }} />;
     } else if (value === 'RE') {
@@ -121,7 +121,8 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
 
   // Progressive reveal dos cards (melhora percepção de velocidade em listas grandes)
   const useProgressive = safeDisplayedData.length > 120;
-  const progressive = useProgressive ? useProgressiveReveal(safeDisplayedData, { initial: 30, step: 36, intervalMs: 24, adaptive: true, disableBelow: 180, targetDurationMs: 240 }) : { items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any;
+  const progressiveAll = useProgressiveReveal(safeDisplayedData, { initial: 30, step: 36, intervalMs: 24, adaptive: true, disableBelow: 180, targetDurationMs: 240 });
+  const progressive = useProgressive ? progressiveAll : { items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any;
   const visibleCards = progressive.items;
   const showLoadingTail = useProgressive && !progressive.done;
 

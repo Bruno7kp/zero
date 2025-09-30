@@ -50,13 +50,12 @@ export class SpotifyApi {
   }
 }
 
-export interface SpotifyApiManagerConfig extends SpotifyTokenConfig {}
 
 export class SpotifyApiManager {
   private tokenManager: SpotifyTokenManager;
   private api: SpotifyApi;
 
-  constructor(config: SpotifyApiManagerConfig) {
+  constructor(config: SpotifyTokenConfig) {
     this.tokenManager = new SpotifyTokenManager(config);
     this.api = new SpotifyApi({ accessToken: '' }); // será ajustado pelo setAccessToken
   }

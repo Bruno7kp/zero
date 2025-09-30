@@ -196,15 +196,12 @@ export const fetchStatsMapIncremental = createAsyncThunk(
           dispatch(cacheStatsSnapshot({ cacheKey, snapshot, now: Date.now() }));
         }
         const total = performance.now() - t0;
-        // eslint-disable-next-line no-console
         console.log(`[stats] fast-path ${entities.length} entidades total=${total.toFixed(1)}ms (query=${queryMs.toFixed(1)} compute=${computeMs.toFixed(1)}) modo=${mode}${mode==='global'?` rows=${globalRowsCount}`:''}`);
         if (total > 400) {
-          // eslint-disable-next-line no-console
           console.warn('[stats] fast-path lento; considerar worker ou fallback incremental');
         }
         return;
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn('[stats] fast-path falhou, usando incremental', e);
       }
     }
@@ -255,7 +252,6 @@ export const fetchStatsMapIncremental = createAsyncThunk(
     dispatch(finishStatsIncremental(requestId));
     const finalState: any = getState();
     dispatch(cacheStatsSnapshot({ cacheKey, snapshot: finalState.charts.statsMap, now: Date.now() }));
-    // eslint-disable-next-line no-console
     console.log(`[stats] incremental concluído ${(performance.now() - tGlobal).toFixed(1)}ms cacheKey=${cacheKey}`);
   }
 );

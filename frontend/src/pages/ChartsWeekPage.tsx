@@ -47,7 +47,9 @@ export const ChartsWeekPage: React.FC = () => {
         navigate(`/charts/week/${week}/${type}`);
     };
 
-    if (!chart) return <div>Nenhum chart ativo.</div>;
+    if (!chart) {
+        return <div>Nenhum chart ativo.</div>;
+    }
 
     // Sincronizado com rota
     const isSync = chart && selectedWeek === weekParam && selectedType === (typeParam || DEFAULT_TYPE);

@@ -289,7 +289,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 return <Text>{row.id}</Text>;
             }
         };
-    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap]);
+    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap, loadingStats, type, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, altVariation]);
     // Adiciona coluna de variação visual se ativada (agora controlada pelo Redux)
     if (showAltVariationRedux) {
         // Remove qualquer coluna Δ já existente
@@ -374,7 +374,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     }
 
     const useProgressive = data.length > 120; // desativa para listas pequenas
-    const progressive = useProgressive ? useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 }) : { items: data, done: true, total: data.length } as any;
+    const progressiveAll = useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 });
+    const progressive = useProgressive ? progressiveAll : { items: data, done: true, total: data.length } as any;
     const displayedRecords = progressive.items as ChartData[];
     const showLoadingTail = useProgressive && !progressive.done;
 

@@ -51,8 +51,8 @@ export function useSpotifyImage({ entityId, name, type, clientId, clientSecret }
         } else {
           setImageUrl(null);
         }
-      } catch (e) {
-        // fallback: não faz nada
+      } catch {
+        // fallback silencioso
       }
       setLoading(false);
     }
