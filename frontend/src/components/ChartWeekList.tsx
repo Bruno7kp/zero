@@ -258,7 +258,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
   const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
-  const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'deltaPercentPlaysBadge' && c.key !== 'image');
+  const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
 
   // Badge util agora está fora
 

@@ -3,22 +3,23 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface ColumnConfig {
   key: string;
+  isColumn?: boolean;
   label: string;
   labelComplete?: string;
   visible: boolean;
 }
 
 export const defaultColumns: ColumnConfig[] = [
-  { key: 'rank', label: 'Rank', labelComplete: 'charts.rankLabel', visible: true },
-  { key: 'deltaRankBadge', label: 'charts.deltaRankLabel', visible: true },
-  { key: 'altVariation', label: 'charts.altVariationLabel', visible: false },
-  { key: 'image', label: 'charts.imageLabel', visible: true },
-  { key: 'name', label: 'Title', labelComplete: 'charts.titleLabel', visible: true },
-  { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true },
-  { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: true },
-  { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true },
-  { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true },
-  { key: 'totalWeeks', label: 'Weeks', labelComplete: 'charts.weeksLabel', visible: true },
+  { key: 'rank', label: 'Rank', labelComplete: 'charts.rankLabel', visible: true, isColumn: true },
+  { key: 'deltaRankBadge', label: 'charts.deltaRankLabel', visible: true, isColumn: false },
+  { key: 'altVariation', label: 'charts.altVariationLabel', visible: false, isColumn: true },
+  { key: 'image', label: 'charts.imageLabel', visible: true, isColumn: false },
+  { key: 'name', label: 'Title', labelComplete: 'charts.titleLabel', visible: true, isColumn: true },
+  { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true, isColumn: true },
+  { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: true, isColumn: false },
+  { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true, isColumn: false },
+  { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true, isColumn: true },
+  { key: 'totalWeeks', label: 'Weeks', labelComplete: 'charts.weeksLabel', visible: true, isColumn: true },
 ];
 
 const getInitialColumns = (): ColumnConfig[] => {

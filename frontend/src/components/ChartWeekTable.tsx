@@ -173,7 +173,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
     const showImage = columns.find((c: any) => c.key === 'image')?.visible;
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
-    const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'deltaPercentPlaysBadge' && c.key !== 'image');
+    const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
 
     // Row expansion
     // Exibe stats gerais (todas as semanas) ao expandir

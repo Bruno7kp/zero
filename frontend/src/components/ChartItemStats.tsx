@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Grid, Text, Box, Card, Divider, Group, ThemeIcon, rem } from '@mantine/core';
+import { Paper, Grid, Text, Card, Divider, Group, ThemeIcon, rem } from '@mantine/core';
 import { CertificationBadge } from './CertificationBadge';
 import { ChartRun } from './ChartRun';
 import { useTranslation } from 'react-i18next';

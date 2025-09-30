@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ChartWeekTableColumnsMenu } from './ChartWeekTable';
 import { ImageEditModal } from './ImageEditModal';
 import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
