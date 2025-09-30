@@ -32,6 +32,7 @@ export const ChartsWeekPage: React.FC = () => {
     const [displayedWeek, setDisplayedWeek] = useState<string | undefined>(weekParam);
     const [displayedType, setDisplayedType] = useState<string>(typeParam || DEFAULT_TYPE);
     const chartsData = useSelector((state: any) => state.charts.data);
+    const loadingData = useSelector((state: any) => state.charts.loadingData);
     const navigate = useNavigate();
 
     // Sincroniza quando rota muda externamente (ex: clique em ChartRun)
@@ -51,21 +52,18 @@ export const ChartsWeekPage: React.FC = () => {
 
     // Sincronizado com rota
     const isSync = chart && selectedWeek === weekParam && selectedType === (typeParam || DEFAULT_TYPE);
-    // Está em transição de semana/tipo (aguardando dados novos)
-    const isTransitioning = (selectedWeek !== displayedWeek) || (selectedType !== displayedType);
     const hasAnyData = Array.isArray(chartsData) && chartsData.length > 0;
+    // Semana alvo diferente da atualmente exibida
+    const isSwitchingTarget = (selectedWeek !== displayedWeek) || (selectedType !== displayedType);
 
     React.useEffect(() => {
-        if (
-            isSync &&
-            Array.isArray(chartsData) &&
-            chartsData.length > 0 &&
-            (displayedWeek !== selectedWeek || displayedType !== selectedType)
-        ) {
+        if (!isSync) return;
+        // Só troca semana exibida quando a requisição terminou (loadingData false)
+        if (!loadingData && (displayedWeek !== selectedWeek || displayedType !== selectedType)) {
             setDisplayedWeek(selectedWeek);
             setDisplayedType(selectedType);
         }
-    }, [isSync, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
+    }, [isSync, loadingData, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
         <Container size={isMobile ? '100%' : 'md'} px="xs">
@@ -80,14 +78,11 @@ export const ChartsWeekPage: React.FC = () => {
               />
             )}
         </Container>
-        <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs" style={{ position: 'relative' }}>
+        <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs" style={{ position: 'relative', minHeight: 180 }}>
             {noChart && (
                 <Center py="xl"><div>Nenhum chart ativo.</div></Center>
             )}
-            {!noChart && (!hasAnyData && !isTransitioning) && (
-                <Center py="xl"><Loader /></Center>
-            )}
-            {!noChart && hasAnyData && (
+            {!noChart && (
                 <>
                     {view === 'table' && (
                         <ChartWeekTable
@@ -119,12 +114,14 @@ export const ChartsWeekPage: React.FC = () => {
                             clientSecret={SPOTIFY_SECRET}
                         />
                     )}
-                    {isTransitioning && (
-                        <Box style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(1px)' }}>
-                            <Center style={{ width: '100%', height: '100%' }}>
-                                <Loader size="sm" />
-                            </Center>
+                    {/* Spinner discreto no canto durante transição */}
+                    {isSwitchingTarget && loadingData && (
+                        <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 5 }}>
+                            <Loader size="xs" />
                         </Box>
+                    )}
+                    {!loadingData && !hasAnyData && !isSwitchingTarget && (
+                        <Center py="md"><div style={{ opacity: 0.7, fontSize: 14 }}>Sem dados para esta semana.</div></Center>
                     )}
                 </>
             )}

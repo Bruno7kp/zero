@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ImageEditModal } from './ImageEditModal';
 import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { IconPlus, IconStarFilled, IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled } from '@tabler/icons-react';
@@ -115,9 +115,28 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
 
   useEffect(() => {
     if (!data.length || !week || !chart?.id) return;
-    const cutoff = 100;
-    dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
-  }, [data, chart?.id, type, week, dispatch]);
+    dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
+  }, [data, week, chart?.id, type, dispatch]);
+
+  // Stats diferidos somente se peak ou totalWeeks estiverem visíveis
+  useEffect(() => {
+    if (!data.length || !week || !chart?.id) return;
+    const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+    if (!wantsStats) return;
+    let cancelled = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const id = setTimeout(() => {
+        if (cancelled) return;
+        const cutoff = 100;
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+      }, 900);
+      (window as any).__gridStatsTimer = id;
+    }));
+    return () => {
+      cancelled = true;
+      if ((window as any).__gridStatsTimer) clearTimeout((window as any).__gridStatsTimer);
+    };
+  }, [data, chart?.id, type, week, dispatch, columns]);
 
   // Progressive reveal dos cards (melhora percepção de velocidade em listas grandes)
   const useProgressive = safeDisplayedData.length > 120;

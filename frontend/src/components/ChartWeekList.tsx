@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
-import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { Card, Flex, Text, Badge, Collapse, ActionIcon, Box, Divider, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled, IconChevronDown, IconChevronUp, IconStarFilled } from '@tabler/icons-react';
@@ -228,12 +228,30 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     dispatch(fetchChartData({ chartId: `${chart.id}`, chartType: type, week }));
   }, [chart?.id, week, type, dispatch]);
 
-  // Buscar stats ao trocar dados/semana
   useEffect(() => {
     if (!data.length || !week || !chart?.id) return;
-    const cutoff = 100;
-    dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
-  }, [data, chart?.id, type, week, dispatch]);
+    dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
+  }, [data, week, chart?.id, type, dispatch]);
+
+  // Stats diferidos: só agenda se colunas que dependem de stats estiverem visíveis (peak/totalWeeks)
+  useEffect(() => {
+    if (!data.length || !week || !chart?.id) return;
+    const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+    if (!wantsStats) return;
+    let cancelled = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const id = setTimeout(() => {
+        if (cancelled) return;
+        const cutoff = 100;
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+      }, 900);
+      (window as any).__listStatsTimer = id;
+    }));
+    return () => {
+      cancelled = true;
+      if ((window as any).__listStatsTimer) clearTimeout((window as any).__listStatsTimer);
+    };
+  }, [data, chart?.id, type, week, dispatch, columns]);
 
   const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
   const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;

@@ -6,7 +6,7 @@ import { DataTable, type DataTableColumnTextAlign } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
 import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
-import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
 import { IconFilter, IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
@@ -105,12 +105,34 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         dispatch(fetchChartData({ chartId: `${chart.id}`, chartType: type, week }));
     }, [chart.id, week, type, dispatch]);
 
-    // Busca stats até a semana selecionada
+    // Recalcula deltas (NEW/RE e variações) assim que os dados da semana chegam
     useEffect(() => {
         if (!data.length || !week) return;
-        const cutoff = 100;
-        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
-    }, [data, chart.id, type, week, dispatch]);
+        dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
+    }, [data, week, chart.id, type, dispatch]);
+
+    // Agendamento diferido dos stats (carrega só depois de um pequeno atraso para não impactar troca de semana)
+    useEffect(() => {
+        if (!data.length || !week) return;
+        // Só agenda se alguma coluna de stats estiver visível (peak ou totalWeeks)
+        const wantsStats = columns.some((c: any) => c.key === 'peak' && c.visible) || columns.some((c: any) => c.key === 'totalWeeks' && c.visible);
+        if (!wantsStats) return; // evita custo se usuário ocultou
+        let cancelled = false;
+        // dupla rAF para garantir pintura da semana, depois timeout para dar respiro
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            const id = setTimeout(() => {
+                if (cancelled) return;
+                const cutoff = 100;
+                dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+            }, 900); // atraso ~1s perceptivo, ajustável
+            // store id em closure; cleanup abaixo
+            (window as any).__tableStatsTimer = id;
+        }));
+        return () => {
+            cancelled = true;
+            if ((window as any).__tableStatsTimer) clearTimeout((window as any).__tableStatsTimer);
+        };
+    }, [data, chart.id, type, week, dispatch, columns]);
 
     // Colunas dinâmicas
     const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);

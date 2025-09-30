@@ -104,10 +104,18 @@
       "syncNow": "Sync now",
       "needOnline": "Needs connection",
       "sync": "Sync",
-      "clearChartData": "Clear local data",
+      "clearChartData": "Clear weeks saved in your browser",
       "chartsCount": "Charts",
       "reindexingWeeks": "Reindexing weeks...",
-      "reindexedWeeks": "Weeks reindexed: {{count}}"
+      "reindexedWeeks": "Weeks reindexed: {{count}}",
+      "rebuildStats": "Rebuild general stats",
+      "rebuild": "Rebuild",
+      "rebuildStatsConfirm": "This will delete and recompute all general stats for {{chart}}. Continue?",
+      "rebuildStatsDone": "General stats rebuilt for {{chart}}",
+      "rebuildStatsFailed": "Failed to rebuild general stats",
+      "rebuildStatsFor": "Rebuild: {{chart}}"
+      ,"rebuildStatsProgress": "Rebuilding {{chart}} ({{current}} / {{total}})",
+      "clearChartProgress": "Clearing local data for {{chart}}"
     },
     "forms": {
       "createChart": {
@@ -150,7 +158,10 @@
       },
       "editChart": {
         "title": "Edit chart",
-        "saveButton": "Save"
+        "saveButton": "Save",
+        "keyFieldsChangeTitle": "Core settings changed",
+        "keyFieldsChangeMessage": "You changed core fields that alter how weeks are generated: {{fields}}. This will invalidate existing cached weeks and stats. Apply changes and clear local data?",
+        "applyAndReload": "Apply & Clear Local Data"
       },
       "deleteChart": {
         "title": "Delete chart",

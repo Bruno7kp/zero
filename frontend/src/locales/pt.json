@@ -104,10 +104,18 @@
       "syncNow": "Sincronizar agora",
       "needOnline": "Requer conexão",
       "sync": "Sync",
-      "clearChartData": "Limpar dados locais",
+      "clearChartData": "Apagar semanas salvas no navegador",
       "chartsCount": "Charts",
       "reindexingWeeks": "Reindexando semanas...",
-      "reindexedWeeks": "Semanas reindexadas: {{count}}"
+      "reindexedWeeks": "Semanas reindexadas: {{count}}",
+      "rebuildStats": "Reprocessar stats gerais",
+      "rebuild": "Reprocessar",
+      "rebuildStatsConfirm": "Isto irá apagar e recalcular todos os stats gerais para {{chart}}. Continuar?",
+      "rebuildStatsDone": "Stats gerais reconstruídos para {{chart}}",
+      "rebuildStatsFailed": "Falha ao reconstruir stats gerais",
+      "rebuildStatsFor": "Rebuild: {{chart}}"
+      ,"rebuildStatsProgress": "Reprocessando {{chart}} ({{current}} / {{total}})",
+      "clearChartProgress": "Limpando dados locais de {{chart}}"
     },
     "forms": {
       "createChart": {
@@ -150,7 +158,10 @@
       },
       "editChart": {
         "title": "Editar chart",
-        "saveButton": "Salvar"
+        "saveButton": "Salvar",
+        "keyFieldsChangeTitle": "Configurações centrais alteradas",
+        "keyFieldsChangeMessage": "Você alterou campos centrais que mudam como as semanas são geradas: {{fields}}. Isso vai invalidar semanas e stats já armazenados localmente. Aplicar mudanças e limpar dados locais?",
+        "applyAndReload": "Aplicar e Limpar Dados"
       },
       "deleteChart": {
         "title": "Excluir chart",

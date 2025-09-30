@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Text, Group, Button, Card, Divider, rem, ThemeIcon, Alert, Tooltip, Badge } from '@mantine/core';
 import { useChartDb } from '../hooks/useChartDb';
 import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
-import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
+import { applyBatchWeeks } from '../utils/incrementalFullStats';
 import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -180,16 +180,10 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
         }
 
         // Todas as três requisições deram certo: salvar e calcular stats
+        // Salva dados e aplica stats incrementais em lote por tipo
         for (const result of pendingResults) {
           await saveChartData(result.enriched);
-          for (const item of result.enriched) {
-            await calculateStatsForEntity(
-              item.chartId,
-              item.chartType,
-              item.entityId,
-              result.cutoff
-            );
-          }
+          await applyBatchWeeks(result.enriched, result.cutoff);
         }
         await markWeekComplete(`${chart.id}`, week);
         setPartialWeeks(p => (p > 0 ? p - 1 : 0));
