@@ -1,8 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { ImageEditModal } from './ImageEditModal';
+import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
-import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme, Divider } from '@mantine/core';
+import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
+import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { IconPlus, IconStarFilled, IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled } from '@tabler/icons-react';
+import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
 
@@ -10,10 +14,15 @@ interface ChartWeekGridProps {
   chart: any;
   week?: string;
   type: string;
+  clientId: string;
+  clientSecret: string;
   altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
 }
 
-export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type, altVariation }) => {
+export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type, clientId, clientSecret, altVariation }) => {
+  const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
+  // Memorize the last image for each entityId, and only update when a new image is loaded
+  // This ensures the image only changes when the new one is ready
   // Função para renderizar o ícone de variação
   function renderAltVariation(row: ChartData, idx: number) {
     if (!showAltVariationRedux) return null;
@@ -61,9 +70,25 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
 
     ) : null;
   }
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
+  // Persist previous data while new data is loading to prevent flicker
+  const [displayedData, setDisplayedData] = useState<any[]>(data);
+  const prevDataRef = useRef<any[]>(data);
+  useEffect(() => {
+    // Só troca displayedData quando data realmente muda para não-vazio
+    if (Array.isArray(data) && data.length > 0) {
+      setDisplayedData(data);
+      prevDataRef.current = data;
+    }
+    // Se data ficou vazio, mantém o anterior (NÃO limpa displayedData)
+    // Isso evita flicker total
+  }, [data]);
+
+  // Garante que displayedData nunca fique vazio
+  const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
   const statsMap = useSelector((state: any) => state.charts.statsMap);
+  const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const columns = useSelector((state: any) => state.columns.columns);
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
   const showPeak = columns.find((c: any) => c.key === 'peak')?.visible;
@@ -73,9 +98,15 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
 
-  // Modal state
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [modalRow, setModalRow] = React.useState<ChartData | null>(null);
+  // Modal de detalhes
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalRow, setModalRow] = useState<ChartData | null>(null);
+  // Modal de imagem
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [imageModalRow] = useState<ChartData | null>(null); // setImageModalRow unused
+  const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
+  // Forçar atualização da imagem ao salvar
+  const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
 
   useEffect(() => {
     if (!week || !chart?.id) return;
@@ -85,8 +116,14 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   useEffect(() => {
     if (!data.length || !week || !chart?.id) return;
     const cutoff = 100;
-    dispatch(fetchStatsMap({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+    dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
   }, [data, chart?.id, type, week, dispatch]);
+
+  // Progressive reveal dos cards (melhora percepção de velocidade em listas grandes)
+  const useProgressive = safeDisplayedData.length > 120;
+  const progressive = useProgressive ? useProgressiveReveal(safeDisplayedData, { initial: 30, step: 36, intervalMs: 24, adaptive: true, disableBelow: 180, targetDurationMs: 240 }) : { items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any;
+  const visibleCards = progressive.items;
+  const showLoadingTail = useProgressive && !progressive.done;
 
   return (
     <>
@@ -101,7 +138,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
         )}
       </Modal>
       <Grid gutter="md" columns={30}>
-        {data.map((row: ChartData, idx: number) => {
+        {visibleCards.map((row: ChartData, idx: number) => {
           const stats = statsMap[row.entityId];
           return (
             <Grid.Col key={row.id} span={{ base: 15, md: 10, lg: 6 }}>
@@ -142,12 +179,41 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   >
                     {row.rank}
                   </Badge>
-                  {/* Imagem real */}
+                  {/* Imagem do Spotify ou placeholder */}
                   {showImage && (
-                    <img
-                      src="https://lastfm.freetls.fastly.net/i/u/300x300/d0c78dc3a80e2e45ac4972089360a051.jpg"
-                      alt={row.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0 }}
+                    <SpotifyImageWithModal
+                      entityId={row.entityId}
+                      name={row.name}
+                      artistName={row.artistName}
+                      type={type === 'artist' || type === 'album' || type === 'track' ? type : 'artist'}
+                      clientId={clientId}
+                      clientSecret={clientSecret}
+                      forceUpdate={imageForceUpdate[row.entityId]}
+                      width={'100%'}
+                      height={'100%'}
+                      borderRadius={12}
+                      style={{ aspectRatio: '1/1', minHeight: 0, minWidth: 0 }}
+                      lastImageUrl={lastImageUrlByEntityId[row.entityId]}
+                      onImageChange={() => {
+                        if (row.entityId) {
+                          setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
+                          // Não atualiza a imagem imediatamente, só quando a nova carregar
+                        }
+                      }}
+                      onImageLoad={(url: string) => {
+                        // Só troca a imagem quando a nova já está pronta, com delay para suavizar
+                        if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
+                          setTimeout(() => {
+                            setLastImageUrlByEntityId(prev => {
+                              // Garante que não mudou de entityId durante o delay
+                              if (prev[row.entityId] !== url) {
+                                return { ...prev, [row.entityId]: url };
+                              }
+                              return prev;
+                            });
+                          }, 1000);
+                        }
+                      }}
                     />
                   )}
                 </Box>
@@ -166,13 +232,13 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   {showPeak && (
                     <Box style={{ textAlign: 'center', flex: 1 }}>
                       <Text size="xs" c="dimmed">Peak</Text>
-                      <Text fw={700} size="sm">{stats?.peak?.position ?? '-'}</Text>
+                      <Text fw={700} size="sm">{stats?.peak?.position ?? (loadingStats ? '…' : '-')}</Text>
                     </Box>
                   )}
                   {showTotalWeeks && (
                     <Box style={{ textAlign: 'center', flex: 1 }}>
                       <Text size="xs" c="dimmed">Weeks</Text>
-                      <Text fw={700} size="sm">{stats?.totals?.withinCutoff ?? '-'}</Text>
+                      <Text fw={700} size="sm">{stats?.totals?.withinCutoff ?? (loadingStats ? '…' : '-')}</Text>
                     </Box>
                   )}
                 </Group>
@@ -182,6 +248,29 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
           );
         })}
       </Grid>
+      {showLoadingTail && (
+        <Box py="sm" style={{ textAlign: 'center' }}>
+          <Text size="xs" c="dimmed">Carregando {visibleCards.length}/{progressive.total}…</Text>
+        </Box>
+      )}
+      {/* Modal de imagem grande e edição */}
+      <ImageEditModal
+        opened={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        entityId={imageModalRow?.entityId || ''}
+        name={imageModalRow?.name || ''}
+        artistName={imageModalRow?.artistName || ''}
+        imageUrl={imageModalUrl || ''}
+        type={type === 'artist' || type === 'album' || type === 'track' ? type : 'artist'}
+        clientId={clientId}
+        clientSecret={clientSecret}
+        onImageChange={url => {
+          setImageModalUrl(url);
+          if (imageModalRow?.entityId) {
+            setImageForceUpdate(fu => ({ ...fu, [imageModalRow.entityId]: (fu[imageModalRow.entityId] || 0) + 1 }));
+          }
+        }}
+      />
     </>
   );
 };

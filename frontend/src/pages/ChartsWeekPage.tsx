@@ -1,7 +1,3 @@
-// Função de variação para a coluna Δ: usa exatamente o mesmo valor do badge da coluna rank
-function getAltVariation(row: any) {
-    return row.deltaRank;
-}
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -9,10 +5,17 @@ import { ChartWeekControls } from '../components/ChartWeekControls';
 import { ChartWeekTable } from '../components/ChartWeekTable';
 import { ChartWeekGrid } from '../components/ChartWeekGrid';
 import { ChartWeekList } from '../components/ChartWeekList';
-import { Container, Loader, Center } from '@mantine/core';
+import { Container, Loader, Center, Box } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
 const DEFAULT_TYPE = 'artist';
+const SPOTIFY_TOKEN = 'd686abb030b34dc2b3446b06507ded9b';
+const SPOTIFY_SECRET = '7611153438b2440fa4a7e22c3311f2d6';
+
+// Função de variação para a coluna Δ: usa exatamente o mesmo valor do badge da coluna rank
+function getAltVariation(row: any) {
+    return row.deltaRank;
+}
 
 export const ChartsWeekPage: React.FC = () => {
     const isMobile = useMediaQuery('(max-width: 48em)'); // Mantine md breakpoint
@@ -26,6 +29,9 @@ export const ChartsWeekPage: React.FC = () => {
     const chart = useMemo(() => charts.find((c: any) => c.id === activeChartId) || null, [charts, activeChartId]);
     const [selectedWeek, setSelectedWeek] = useState<string | undefined>(weekParam);
     const [selectedType, setSelectedType] = useState<string>(typeParam || DEFAULT_TYPE);
+    const [displayedWeek, setDisplayedWeek] = useState<string | undefined>(weekParam);
+    const [displayedType, setDisplayedType] = useState<string>(typeParam || DEFAULT_TYPE);
+    const chartsData = useSelector((state: any) => state.charts.data);
     const navigate = useNavigate();
 
     // Sincroniza quando rota muda externamente (ex: clique em ChartRun)
@@ -43,9 +49,23 @@ export const ChartsWeekPage: React.FC = () => {
 
     if (!chart) return <div>Nenhum chart ativo.</div>;
 
-    // Loading: só renderiza tabela se chart.id, selectedWeek e selectedType batem com a rota
+    // Sincronizado com rota
     const isSync = chart && selectedWeek === weekParam && selectedType === (typeParam || DEFAULT_TYPE);
+    // Está em transição de semana/tipo (aguardando dados novos)
+    const isTransitioning = (selectedWeek !== displayedWeek) || (selectedType !== displayedType);
+    const hasAnyData = Array.isArray(chartsData) && chartsData.length > 0;
 
+    React.useEffect(() => {
+        if (
+            isSync &&
+            Array.isArray(chartsData) &&
+            chartsData.length > 0 &&
+            (displayedWeek !== selectedWeek || displayedType !== selectedType)
+        ) {
+            setDisplayedWeek(selectedWeek);
+            setDisplayedType(selectedType);
+        }
+    }, [isSync, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
         <Container size={isMobile ? '100%' : 'md'} px="xs">
@@ -58,34 +78,48 @@ export const ChartsWeekPage: React.FC = () => {
                 setView={setView}
             />
         </Container>
-        <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs">
-            {!isSync ? (
+        <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs" style={{ position: 'relative' }}>
+            {(!hasAnyData && !isTransitioning) && (
                 <Center py="xl"><Loader /></Center>
-            ) : (
+            )}
+            {hasAnyData && (
                 <>
                     {view === 'table' && (
                         <ChartWeekTable
                             chart={chart}
-                            week={selectedWeek}
-                            type={selectedType}
+                            week={displayedWeek || ''}
+                            type={displayedType}
                             altVariation={getAltVariation}
+                            clientId={SPOTIFY_TOKEN}
+                            clientSecret={SPOTIFY_SECRET}
                         />
                     )}
                     {view === 'grid' && (
                         <ChartWeekGrid
                             chart={chart}
-                            week={selectedWeek}
-                            type={selectedType}
+                            week={displayedWeek}
+                            type={displayedType}
                             altVariation={getAltVariation}
+                            clientId={SPOTIFY_TOKEN}
+                            clientSecret={SPOTIFY_SECRET}
                         />
                     )}
                     {view === 'list' && (
                         <ChartWeekList
                             chart={chart}
-                            week={selectedWeek}
-                            type={selectedType}
+                            week={displayedWeek}
+                            type={displayedType}
                             altVariation={getAltVariation}
+                            clientId={SPOTIFY_TOKEN}
+                            clientSecret={SPOTIFY_SECRET}
                         />
+                    )}
+                    {isTransitioning && (
+                        <Box style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(1px)' }}>
+                            <Center style={{ width: '100%', height: '100%' }}>
+                                <Loader size="sm" />
+                            </Center>
+                        </Box>
                     )}
                 </>
             )}

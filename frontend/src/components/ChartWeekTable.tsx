@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { ImageEditModal } from './ImageEditModal';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { DataTable, type DataTableColumnTextAlign } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
 import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
-import { fetchChartData, fetchStatsMap } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
 import { IconFilter, IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
+import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
 import { defaultColumns } from '../store/columnsSlice';
@@ -67,14 +70,22 @@ export function ChartWeekTableColumnsMenu() {
 
 interface ChartWeekTableProps {
     chart: any;
-    week?: string;
+    week: string;
     type: string;
     altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
+    clientId: string;
+    clientSecret: string;
 }
 
-export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, altVariation }) => {
+export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
+    // Para edição de imagem
+    const [imageModalRow, setImageModalRow] = useState<any>(null);
+    const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
+    const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
+    const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
     const data = useSelector((state: RootState) => state.charts.data);
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
+    const loadingStats = useSelector((state: RootState) => state.charts.loadingStats);
     const columns = useSelector((state: RootState) => state.columns.columns);
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
@@ -98,7 +109,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     useEffect(() => {
         if (!data.length || !week) return;
         const cutoff = 100;
-        dispatch(fetchStatsMap({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
     }, [data, chart.id, type, week, dispatch]);
 
     // Colunas dinâmicas
@@ -198,23 +209,50 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         if (col.key === 'name') {
             return {
                 ...base,
-                render: (row: ChartData, _index: number) => (
-                    <Flex>
-                        {showImage && (
-                            <Flex mr="sm" justify="center" align="center">
-                                <img
-                                    src="https://lastfm.freetls.fastly.net/i/u/300x300/d0c78dc3a80e2e45ac4972089360a051.jpg"
-                                    alt={row.name}
-                                    style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 0 }}
-                                />
+                render: (row: ChartData, _index: number) => {
+                    return (
+                        <Flex>
+                            {showImage && (
+                                <Flex
+                                    mr="sm"
+                                    justify="center"
+                                    align="center"
+                                    onClick={e => e.stopPropagation()}
+                                    onMouseDown={e => e.stopPropagation()}
+                                >
+                                    <SpotifyImageWithModal
+                                        entityId={row.entityId}
+                                        name={row.name}
+                                        artistName={row.artistName}
+                                        type={type as 'artist' | 'album' | 'track'}
+                                        clientId={clientId}
+                                        clientSecret={clientSecret}
+                                        forceUpdate={imageForceUpdate[row.entityId]}
+                                        width={40}
+                                        height={40}
+                                        borderRadius={0}
+                                        style={{ minWidth: 40, maxWidth: 40 }}
+                                        lastImageUrl={lastImageUrlByEntityId[row.entityId]}
+                                        onImageChange={() => {
+                                            setImageForceUpdate(f => ({ ...f, [row.entityId]: Date.now() }));
+                                            // Não troca a imagem imediatamente, só quando a nova carregar
+                                        }}
+                                        onImageLoad={(url: string) => {
+                                            // Só troca a imagem quando a nova já está pronta
+                                            if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
+                                                setLastImageUrlByEntityId(prev => ({ ...prev, [row.entityId]: url }));
+                                            }
+                                        }}
+                                    />
+                                </Flex>
+                            )}
+                            <Flex direction="column" justify="center" align="flex-start">
+                                <Text fw={700}>{row.name}</Text>
+                                {row.artistName && <Text size="sm">{row.artistName}</Text>}
                             </Flex>
-                        )}
-                        <Flex direction="column" justify="center" align="flex-start">
-                            <Text fw={700}>{row.name}</Text>
-                            {row.artistName && <Text size="sm">{row.artistName}</Text>}
                         </Flex>
-                    </Flex>
-                ),
+                    );
+                },
             };
         }
         if (col.key === 'peak') {
@@ -225,7 +263,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     const peakVal = stats?.peak?.position ?? '-';
                     return (
                         <Flex direction="column" align="center">
-                            <Text fw={700} c={peakVal === 1 ? 'blue' : undefined}>{peakVal}</Text>
+                            <Text fw={700} c={peakVal === 1 ? 'blue' : undefined}>{stats ? peakVal : (loadingStats ? '…' : '-')}</Text>
                         </Flex>
                     );
                 },
@@ -239,7 +277,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     const totalWeeks = stats?.totals?.withinCutoff ?? '-';
                     return (
                         <Flex direction="column" align="center">
-                            <Text fw={700}>{totalWeeks}</Text>
+                            <Text fw={700}>{stats ? totalWeeks : (loadingStats ? '…' : '-')}</Text>
                         </Flex>
                     );
                 },
@@ -335,15 +373,42 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         }
     }
 
+    const useProgressive = data.length > 120; // desativa para listas pequenas
+    const progressive = useProgressive ? useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 }) : { items: data, done: true, total: data.length } as any;
+    const displayedRecords = progressive.items as ChartData[];
+    const showLoadingTail = useProgressive && !progressive.done;
+
     return (
-        <Paper shadow="xs" p="md" withBorder>
-            <DataTable
-                columns={dtColumns}
-                records={data}
-                rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
-                highlightOnHover
-                minHeight={300}
+        <>
+            <Paper shadow="xs" p="md" withBorder>
+                <DataTable
+                    columns={dtColumns}
+                    records={displayedRecords}
+                    rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
+                    highlightOnHover
+                    minHeight={300}
+                />
+                {showLoadingTail && (
+                    <Flex justify="center" py="sm">
+                        <Text size="xs" c="dimmed">Carregando {displayedRecords.length}/{progressive.total}…</Text>
+                    </Flex>
+                )}
+            </Paper>
+            <ImageEditModal
+                opened={!!imageModalRow}
+                onClose={() => setImageModalRow(null)}
+                entityId={imageModalRow?.entityId || ''}
+                name={imageModalRow?.name || ''}
+                artistName={imageModalRow?.artistName}
+                imageUrl={imageModalUrl || ''}
+                type={type as 'artist' | 'album' | 'track'}
+                clientId={clientId}
+                clientSecret={clientSecret}
+                onImageChange={url => {
+                    setImageForceUpdate(f => ({ ...f, [imageModalRow.entityId]: Date.now() }));
+                    setImageModalUrl(url);
+                }}
             />
-        </Paper>
+        </>
     );
 };

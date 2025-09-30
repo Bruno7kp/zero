@@ -242,5 +242,13 @@
         "button": "Ver todas as atualizações"
       }
     }
+  },
+  "imageEditModal": {
+    "title": "Imagem",
+    "squareWarning": "A imagem deve ser quadrada!",
+    "domainNotice": "Por segurança, só é possível usar imagens de sites confiáveis como Last.fm, Spotify, Imgur, Unsplash, etc. Caso queira usar uma imagem própria, faça upload em um serviço como Imgur ou Cloudinary e cole o link aqui.",
+    "urlPlaceholder": "URL da imagem",
+    "save": "Salvar",
+    "fetchSpotify": "Buscar do Spotify"
   }
 }
