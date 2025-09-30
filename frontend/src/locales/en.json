@@ -46,6 +46,7 @@
       "titleLabel": "Title",
       "playsLabel": "Plays",
       "deltaPlaysLabel": "Plays change",
+      "deltaPercentPlaysLabel": "Plays % change",
       "peakLabel": "Peak",
       "weeksLabel": "Weeks",
       "stats": {

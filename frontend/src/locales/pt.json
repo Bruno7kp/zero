@@ -46,6 +46,7 @@
       "titleLabel": "Title: Título",
       "playsLabel": "Plays: Reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
+      "deltaPercentPlaysLabel": "Variação % de reproduções",
       "peakLabel": "Peak: Pico",
       "weeksLabel": "Weeks: Semanas",
       "stats": {

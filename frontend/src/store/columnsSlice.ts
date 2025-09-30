@@ -16,6 +16,7 @@ export const defaultColumns: ColumnConfig[] = [
   { key: 'name', label: 'Title', labelComplete: 'charts.titleLabel', visible: true },
   { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true },
   { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: true },
+  { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true },
   { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true },
   { key: 'totalWeeks', label: 'Weeks', labelComplete: 'charts.weeksLabel', visible: true },
 ];

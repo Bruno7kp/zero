@@ -118,9 +118,10 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // Opção para mostrar/esconder badge delta
     const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
     const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
+    const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
     const showImage = columns.find((c: any) => c.key === 'image')?.visible;
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
-    const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
+    const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'deltaPercentPlaysBadge' && c.key !== 'image');
 
     // Row expansion
     // Exibe stats gerais (todas as semanas) ao expandir
@@ -135,7 +136,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
 
     // Monta colunas para o DataTable
     // Função utilitária para cor/label do badge
-    function getDeltaBadgeProps(delta: any) {
+    function getDeltaBadgeProps(delta: any, showPercent: boolean = false, currentValue: number = 0) {
         // Rules:
         //  - number > 0 => +N green
         //  - number < 0 => -N red
@@ -146,8 +147,24 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         let color = 'gray';
         let label: string | number = delta;
         if (typeof delta === 'number') {
-            if (delta > 0) { color = 'green'; label = `+${delta}`; }
-            else if (delta < 0) { color = 'red'; label = `${delta}`; }
+            if (delta > 0) { 
+                color = 'green';
+                if (showPercent && currentValue - delta > 0) { 
+                    const percent = ((delta / (currentValue - delta)) * 100);
+                    label = `+${percent.toFixed(0)}%`; 
+                } else {
+                    label = `+${delta}`; 
+                }
+            }
+            else if (delta < 0) {
+                color = 'red';
+                if (showPercent && currentValue - delta > 0) {
+                    const percent = ((delta / (currentValue - delta)) * 100);
+                    label = `${percent.toFixed(0)}%`;
+                } else {
+                    label = `${delta}`;
+                }
+            }
             else { color = 'gray'; label = '='; }
         } else if (delta === 'NEW') {
             color = 'blue'; label = 'NEW';
@@ -192,7 +209,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 render: (row: ChartData, _index: number) => {
                     let badge = null;
                     if (showDeltaPlaysBadge) {
-                        const { color, label } = getDeltaBadgeProps(row.deltaPlays);
+                        const { color, label } = getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays);
                         badge = (
                             <Badge variant="light" color={color} size="xs">{label}</Badge>
                         );
@@ -289,7 +306,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 return <Text>{row.id}</Text>;
             }
         };
-    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type]);
+    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type]);
     // Adiciona coluna de variação visual se ativada (agora controlada pelo Redux)
     if (showAltVariationRedux) {
         // Remove qualquer coluna Δ já existente

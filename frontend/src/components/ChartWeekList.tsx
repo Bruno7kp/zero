@@ -19,19 +19,46 @@ interface ChartWeekListProps {
 }
 
 // Utilitário fora do componente principal para não recriar a cada render
-function getDeltaBadgeProps(delta: any) {
+function getDeltaBadgeProps(delta: any, showPercent: boolean = false, currentValue: number = 0) {
+  // Rules:
+  //  - number > 0 => +N green
+  //  - number < 0 => -N red
+  //  - number === 0 => '=' gray
+  //  - 'NEW' => blue
+  //  - 'RE'  => yellow
+  //  - anything else / '-' => gray
   let color = 'gray';
   let label: string | number = delta;
   if (typeof delta === 'number') {
-    if (delta > 0) { color = 'green'; label = `+${delta}`; }
-    else if (delta < 0) { color = 'red'; label = `${delta}`; }
-    else { color = 'gray'; label = '='; }
+    if (delta > 0) {
+      color = 'green';
+      if (showPercent && currentValue - delta > 0) {
+        const percent = ((delta / (currentValue - delta)) * 100);
+        label = `+${percent.toFixed(0)}%`;
+      } else {
+        label = `+${delta}`;
+      }
+    } else if (delta < 0) {
+      color = 'red';
+      if (showPercent && currentValue - delta > 0) {
+        const percent = ((delta / (currentValue - delta)) * 100);
+        label = `${percent.toFixed(0)}%`;
+      } else {
+        label = `${delta}`;
+      }
+    } else {
+      color = 'gray';
+      label = '=';
+    }
   } else if (delta === 'NEW') {
-    color = 'blue'; label = 'NEW';
+    color = 'blue';
+    label = 'NEW';
   } else if (delta === 'RE') {
-    color = 'yellow'; label = 'RE';
+    color = 'yellow';
+    label = 'RE';
   } else if (delta === '-' || delta == null) {
-    color = 'gray'; label = '-';
+    color = 'gray';
+    label = '-';
   }
   return { color, label };
 }
@@ -43,6 +70,7 @@ const ChartWeekListRow: React.FC<{
   filteredColumns: any[];
   showDeltaBadge: boolean;
   showDeltaPlaysBadge: boolean;
+  showDeltaPercentPlaysBadge: boolean;
   showAltVariationRedux: boolean;
   showImage: boolean;
   altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
@@ -52,7 +80,7 @@ const ChartWeekListRow: React.FC<{
   colorScheme: string;
   theme: any;
   week?: string;
-}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
+}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const [expanded, setExpanded] = useState(false);
@@ -85,7 +113,7 @@ const ChartWeekListRow: React.FC<{
                   <Text fw={700} size="xl">{row.plays}</Text>
                   {showDeltaPlaysBadge && (
                     <Badge variant="light" color={getDeltaBadgeProps(row.deltaPlays).color} size="xs">
-                      {getDeltaBadgeProps(row.deltaPlays).label}
+                      {getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays).label}
                     </Badge>
                   )}
                 </Flex>
@@ -211,8 +239,9 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
   const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
   const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
+  const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
-  const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'image');
+  const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'deltaPercentPlaysBadge' && c.key !== 'image');
 
   // Badge util agora está fora
 
@@ -232,6 +261,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           filteredColumns={filteredColumns}
           showDeltaBadge={showDeltaBadge}
           showDeltaPlaysBadge={showDeltaPlaysBadge}
+          showDeltaPercentPlaysBadge={showDeltaPercentPlaysBadge}
           showAltVariationRedux={showAltVariationRedux}
           showImage={showImage}
           altVariation={altVariation}
