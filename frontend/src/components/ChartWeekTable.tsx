@@ -289,7 +289,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 return <Text>{row.id}</Text>;
             }
         };
-    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap, loadingStats, type, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, altVariation]);
+    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId]);
     // Adiciona coluna de variação visual se ativada (agora controlada pelo Redux)
     if (showAltVariationRedux) {
         // Remove qualquer coluna Δ já existente
@@ -302,7 +302,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             width: 80,
             cellsStyle: () => ({ paddingRight: 0 }),
             render: (row: ChartData, index: number) => {
-                let value: any = altVariation ? altVariation(row, index) : false;
+                const value: any = altVariation ? altVariation(row, index) : false;
                 let color = 'gray', label = '', rightIcon = null;
                 if (value === 'NEW') {
                     color = 'blue'; label = 'NEW'; rightIcon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />;

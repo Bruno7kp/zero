@@ -72,7 +72,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	// Se receber props controladas, sincroniza o estado local
 	useEffect(() => {
 		if (propView && propView !== view) setView(propView);
-	}, [propView]);
+	}, [propView, view]);
 
 	const handleSetView = (v: 'table' | 'grid' | 'list') => {
 		setView(v);

@@ -144,8 +144,9 @@ export const fetchStatsMapIncremental = createAsyncThunk(
           const MAX_GLOBAL_QUERY_MS = 250;
           if (globalRowsCount > entities.length * ROWS_FACTOR_LIMIT || queryMsPreview > MAX_GLOBAL_QUERY_MS) {
             mode = 'range';
-            // eslint-disable-next-line no-console
-            console.log(`[stats] fast-path global fallback→range reason=${globalRowsCount > entities.length * ROWS_FACTOR_LIMIT ? 'rows' : 'time'} rows=${globalRowsCount} ms=${queryMsPreview.toFixed(1)} ent=${entities.length}`);
+            if (import.meta.env.MODE !== 'production') {
+              console.log(`[stats] fast-path global fallback→range reason=${globalRowsCount > entities.length * ROWS_FACTOR_LIMIT ? 'rows' : 'time'} rows=${globalRowsCount} ms=${queryMsPreview.toFixed(1)} ent=${entities.length}`);
+            }
           } else {
             const map: Record<string, ChartData[]> = {};
             for (const r of globalRows) {
@@ -196,13 +197,15 @@ export const fetchStatsMapIncremental = createAsyncThunk(
           dispatch(cacheStatsSnapshot({ cacheKey, snapshot, now: Date.now() }));
         }
         const total = performance.now() - t0;
-        console.log(`[stats] fast-path ${entities.length} entidades total=${total.toFixed(1)}ms (query=${queryMs.toFixed(1)} compute=${computeMs.toFixed(1)}) modo=${mode}${mode==='global'?` rows=${globalRowsCount}`:''}`);
-        if (total > 400) {
-          console.warn('[stats] fast-path lento; considerar worker ou fallback incremental');
+  if (import.meta.env.MODE !== 'production') {
+          console.log(`[stats] fast-path ${entities.length} entidades total=${total.toFixed(1)}ms (query=${queryMs.toFixed(1)} compute=${computeMs.toFixed(1)}) modo=${mode}${mode==='global'?` rows=${globalRowsCount}`:''}`);
+          if (total > 400) {
+            console.warn('[stats] fast-path lento; considerar worker ou fallback incremental');
+          }
         }
         return;
       } catch (e) {
-        console.warn('[stats] fast-path falhou, usando incremental', e);
+  if (import.meta.env.MODE !== 'production') console.warn('[stats] fast-path falhou, usando incremental', e);
       }
     }
 
@@ -252,7 +255,9 @@ export const fetchStatsMapIncremental = createAsyncThunk(
     dispatch(finishStatsIncremental(requestId));
     const finalState: any = getState();
     dispatch(cacheStatsSnapshot({ cacheKey, snapshot: finalState.charts.statsMap, now: Date.now() }));
-    console.log(`[stats] incremental concluído ${(performance.now() - tGlobal).toFixed(1)}ms cacheKey=${cacheKey}`);
+  if (import.meta.env.MODE !== 'production') {
+      console.log(`[stats] incremental concluído ${(performance.now() - tGlobal).toFixed(1)}ms cacheKey=${cacheKey}`);
+    }
   }
 );
 
