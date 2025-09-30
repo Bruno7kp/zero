@@ -39,12 +39,14 @@
       "view": "View chart",
       "viewAll": "View all charts",
       "viewLive": "View current week preview",
-      "rankLabel": "Rank: Position",
-      "deltaRankLabel": "Position change",
+      "rankLabel": "Rank",
+      "deltaRankLabel": "Rank change (badge)",
+      "altVariationLabel": "Rank change (column)",
       "imageLabel": "Image",
       "titleLabel": "Title",
       "playsLabel": "Plays",
       "deltaPlaysLabel": "Plays change",
+      "deltaPercentPlaysLabel": "Plays % change",
       "peakLabel": "Peak",
       "weeksLabel": "Weeks",
       "stats": {
@@ -241,5 +243,13 @@
         "button": "View all updates"
       }
     }
+  },
+  "imageEditModal": {
+    "title": "Image",
+    "squareWarning": "The image must be square!",
+    "domainNotice": "For security, you can only use images from trusted sites like Last.fm, Spotify, Imgur, Unsplash, etc. If you want to use your own image, upload it to a service like Imgur or Cloudinary and paste the link here.",
+    "urlPlaceholder": "Image URL",
+    "save": "Save",
+    "fetchSpotify": "Fetch from Spotify"
   }
 }

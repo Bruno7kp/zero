@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -44,16 +44,16 @@ const chartTypes = [
 ];
 
 
-interface ChartWeekControlsProps {
+type ChartWeekControlsProps = {
 	chart: any;
 	week?: string;
 	type: string;
 	onChange: (week: string, type: string) => void;
-	view: 'table' | 'grid' | 'list';
-	setView: (v: 'table' | 'grid' | 'list') => void;
-}
+	view?: 'table' | 'grid' | 'list';
+	setView?: (v: 'table' | 'grid' | 'list') => void;
+};
 
-export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, week, type, onChange, view, setView }) => {
+export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, week, type, onChange, view: propView, setView: propSetView }) => {
 	const { t, i18n } = useTranslation();
 	const reduxLanguage = useSelector((state: any) => state.i18n.language);
 	React.useEffect(() => {
@@ -61,6 +61,24 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			i18n.changeLanguage(reduxLanguage);
 		}
 	}, [reduxLanguage, i18n]);
+
+	// Persistência do tipo de visualização
+	const VIEW_KEY = 'chartWeekView';
+	const [view, setView] = React.useState<'table' | 'grid' | 'list'>(() => {
+		const saved = typeof window !== 'undefined' ? localStorage.getItem(VIEW_KEY) : null;
+		return (saved === 'table' || saved === 'grid' || saved === 'list') ? saved : 'table';
+	});
+
+	// Se receber props controladas, sincroniza o estado local
+	useEffect(() => {
+		if (propView && propView !== view) setView(propView);
+	}, [propView, view]);
+
+	const handleSetView = (v: 'table' | 'grid' | 'list') => {
+		setView(v);
+		localStorage.setItem(VIEW_KEY, v);
+		if (propSetView) propSetView(v);
+	};
 	const localeMapping: Record<string, string> = { 'pt': 'pt-br' };
 	const locale = localeMapping[i18n.language] || i18n.language;
 	// Semanas válidas para navegação
@@ -80,8 +98,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
 	const topType = `charts.${type}sTop`;
 
-	return (
-		<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between">
+		return (
+			<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between" direction={{ base: 'column', sm: 'row' }}>
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
 				<Flex direction="column" justify="center" align="center" style={{ width: '100%' }}>
@@ -155,10 +173,10 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			{/* Direita: seleção de visualização + botão de colunas */}
 			<Flex gap="xs" align="center">
 				{/* Botão de colunas, só mostra se for tabela */}
-				   {view === 'table' && <ChartWeekTableColumnsMenu />}
+				<ChartWeekTableColumnsMenu />
 				<SegmentedControl
 					value={view}
-					onChange={v => setView(v as any)}
+					onChange={v => handleSetView(v as 'table' | 'grid' | 'list')}
 					data={[
 						{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
 						{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },

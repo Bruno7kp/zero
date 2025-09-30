@@ -8,13 +8,15 @@ export interface ColumnConfig {
   visible: boolean;
 }
 
-const defaultColumns: ColumnConfig[] = [
+export const defaultColumns: ColumnConfig[] = [
   { key: 'rank', label: 'Rank', labelComplete: 'charts.rankLabel', visible: true },
   { key: 'deltaRankBadge', label: 'charts.deltaRankLabel', visible: true },
+  { key: 'altVariation', label: 'charts.altVariationLabel', visible: false },
   { key: 'image', label: 'charts.imageLabel', visible: true },
   { key: 'name', label: 'Title', labelComplete: 'charts.titleLabel', visible: true },
   { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true },
   { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: true },
+  { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true },
   { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true },
   { key: 'totalWeeks', label: 'Weeks', labelComplete: 'charts.weeksLabel', visible: true },
 ];
@@ -24,7 +26,7 @@ const getInitialColumns = (): ColumnConfig[] => {
   if (stored) {
     try {
       const userPrefs: { key: string; visible: boolean }[] = JSON.parse(stored);
-      // Merge userPrefs with defaultColumns
+      // Sempre usa as labels e ordem do defaultColumns, só aplica visibilidade do localStorage
       return defaultColumns.map(col => {
         const pref = userPrefs.find(u => u.key === col.key);
         return pref ? { ...col, visible: pref.visible } : col;
@@ -34,6 +36,15 @@ const getInitialColumns = (): ColumnConfig[] => {
       return defaultColumns;
     }
   }
+  // Detecta mobile pelo userAgent (só na primeira carga, não afeta quem já tem localStorage)
+  const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|Mobile/i.test(window.navigator.userAgent);
+  if (isMobile) {
+    return defaultColumns.map(col =>
+      ['rank', 'name', 'plays'].includes(col.key)
+        ? { ...col, visible: true }
+        : { ...col, visible: false }
+    );
+  }
   return defaultColumns;
 };
 
@@ -42,23 +53,30 @@ const columnsSlice = createSlice({
   initialState: { columns: getInitialColumns() },
   reducers: {
     setColumns(state, action: PayloadAction<ColumnConfig[]>) {
-      state.columns = action.payload;
-      // Save only {key, visible}
-      const toSave = action.payload.map(col => ({ key: col.key, visible: col.visible }));
+      // Sempre usa a ordem e labels do defaultColumns, só aplica visibilidade do payload
+      const merged = defaultColumns.map(col => {
+        const found = action.payload.find(c => c.key === col.key);
+        return found ? { ...col, visible: found.visible } : col;
+      });
+      state.columns = merged;
+      const toSave = merged.map(col => ({ key: col.key, visible: col.visible }));
       localStorage.setItem('chartWeekColumns', JSON.stringify(toSave));
     },
     updateColumn(state, action: PayloadAction<{ key: string; visible: boolean }>) {
-      const idx = state.columns.findIndex(c => c.key === action.payload.key);
-      if (idx !== -1) {
-        state.columns[idx].visible = action.payload.visible;
-        // Save only {key, visible}
-        const toSave = state.columns.map(col => ({ key: col.key, visible: col.visible }));
-        localStorage.setItem('chartWeekColumns', JSON.stringify(toSave));
-      }
+      // Atualiza visibilidade mantendo ordem e labels do defaultColumns
+      const merged = defaultColumns.map(col => {
+        const found = state.columns.find(c => c.key === col.key);
+        if (col.key === action.payload.key) {
+          return { ...col, visible: action.payload.visible };
+        }
+        return found ? { ...col, visible: found.visible } : col;
+      });
+      state.columns = merged;
+      const toSave = merged.map(col => ({ key: col.key, visible: col.visible }));
+      localStorage.setItem('chartWeekColumns', JSON.stringify(toSave));
     },
     resetColumns(state) {
-      state.columns = defaultColumns;
-      // Save only {key, visible}
+      state.columns = [...defaultColumns];
       const toSave = defaultColumns.map(col => ({ key: col.key, visible: col.visible }));
       localStorage.setItem('chartWeekColumns', JSON.stringify(toSave));
     }

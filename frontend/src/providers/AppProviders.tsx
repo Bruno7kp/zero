@@ -12,6 +12,7 @@ import { store } from '../store';
 
 const theme = createTheme({
     defaultRadius: 'lg',
+    fontFamily: 'Inter, Greycliff CF, sans-serif',
 });
 
 interface AppProvidersProps {

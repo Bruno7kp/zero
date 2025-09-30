@@ -76,17 +76,14 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
     el.scrollTop = el.scrollHeight;
   }, [highlightWeek, run]);
 
-  // Datas inicial e final
-  const first = sorted[0];
-  const last = sorted[sorted.length - 1];
-  const firstDate = dayjs(first?.week).format('DD/MM/YYYY');
-  const lastDate = dayjs(last?.week).add(6, 'day').format('DD/MM/YYYY');
+  // Calcula o peak (menor valor de position no run)
+  const peak = React.useMemo(() => {
+    if (!run || run.length === 0) return undefined;
+    return Math.min(...run.map(r => r.position));
+  }, [run]);
 
   return (
     <Box ref={containerRef} style={{ width: '100%', maxHeight: 240, overflowY: 'auto', paddingRight: 4 }}>
-      <Text size="10px" ta="center" fw={600} mb={4}>
-        {firstDate} — {lastDate}
-      </Text>
       <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
         {sequence.map((item, idx) => {
           if (item.type === 'out') {
@@ -96,6 +93,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                 size="xl"
                 color="dimmed"
                 variant="light"
+                title='OUT'
                 style={{
                   borderRadius: 6,
                   minWidth: 32,
@@ -108,7 +106,6 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                   lineHeight: 1.1,
                 }}
               >
-                <span style={{ fontSize: 8, fontWeight: 700, display: 'block', lineHeight: 1 }}>out</span>
                 <span style={{ fontSize: 8, fontWeight: 700, display: 'block', lineHeight: 1 }}>{item.count}x</span>
               </Badge>
             );
@@ -138,8 +135,8 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                     onClick={() => handleToggle(point.week)}
                     size="xl"
                     p={0}
-                    variant={point.position === 1 || point.week === highlightWeek ? 'outline' : 'default'}
-                    color={point.position === 1 && point.week !== highlightWeek ? 'blue' : 'teal'}
+                    variant={point.position === peak || point.week === highlightWeek ? 'outline' : 'default'}
+                    color={point.position === peak && point.week !== highlightWeek ? 'blue' : 'teal'}
                     data-week={point.week}
                     style={{ borderRadius: 6, minWidth: 32 }}
                   >

@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import ActiveChartCard from '../components/ActiveChartCard';
 import ChartsListCard from '../components/ChartsListCard';
+import { ClearSpotifyImagesButton } from '../components/ClearSpotifyImagesButton';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 // import { db } from '../db/indexedDb'; // no longer needed for global clear
@@ -194,6 +195,7 @@ function SettingsPage() {
             <Tooltip label={isOnline ? t('settings.syncNow') : t('settings.needOnline')}>
               <Button leftSection={<IconRefresh size={16} />} size="xs" onClick={handleSync} disabled={!isOnline || syncState.syncing} loading={syncState.syncing}>{t('settings.sync')}</Button>
             </Tooltip>
+            <ClearSpotifyImagesButton />
           </Group>
         </Group>
         
