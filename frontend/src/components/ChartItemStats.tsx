@@ -45,7 +45,7 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
           const diamond = chartType === 'track' ? (chart?.music_diamond_value || 0) : (chart?.album_diamond_value || 0);
           if (gold === 0 && platinum === 0 && diamond === 0) return null;
           return (
-            <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Grid.Col span={{ base: 12, sm: 4 }}>
               <CertificationBadge
                 chart={chart}
                 chartType={chartType as any}

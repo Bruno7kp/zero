@@ -7,12 +7,13 @@ import { SpotifyApiManager } from '../services/SpotifyApi';
 interface UseSpotifyImageOptions {
   entityId: string;
   name: string;
+  artist?: string;
   type: 'track' | 'artist' | 'album';
   clientId: string;
   clientSecret: string;
 }
 
-export function useSpotifyImage({ entityId, name, type, clientId, clientSecret }: UseSpotifyImageOptions) {
+export function useSpotifyImage({ entityId, name, artist, type, clientId, clientSecret }: UseSpotifyImageOptions) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   // Mantém a última imagem válida até a nova ser carregada
@@ -34,8 +35,14 @@ export function useSpotifyImage({ entityId, name, type, clientId, clientSecret }
       }
       // 2. Busca na API do Spotify usando o manager
       try {
+        let searchName = name;
+        if (type === 'artist') {
+          searchName = name;
+        } else if ((type === 'track' || type === 'album') && artist) {
+          searchName = name + ' ' + artist;
+        }
         const apiManager = new SpotifyApiManager({ clientId, clientSecret });
-        const result = await apiManager.search({ q: name, type, limit: 2 });
+        const result = await apiManager.search({ q: searchName, type, limit: 2 });
         let url = '';
         if (type === 'artist' && result.artists?.items?.[0]?.images?.[0]?.url) {
           url = result.artists.items[0].images[0].url;

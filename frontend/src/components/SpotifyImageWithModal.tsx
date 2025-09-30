@@ -46,6 +46,7 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
   const { imageUrl } = useSpotifyImage({
     entityId: baseEntityId + (forceUpdate ? `_${forceUpdate}` : ''),
     name,
+    artist: artistName,
     type,
     clientId,
     clientSecret,

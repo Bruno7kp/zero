@@ -101,12 +101,12 @@ export const ImageEditModal: React.FC<ImageEditModalProps> = ({
         setError('URL não é uma imagem válida.');
         setLoading(false);
         return;
-  setDomainError(null);
-    if (!isAllowedImageDomain(inputUrl)) {
-      setDomainError('Apenas imagens de sites populares de música são permitidas.');
-    } else {
-      setDomainError(null);
-    }
+        setDomainError(null);
+        if (!isAllowedImageDomain(inputUrl)) {
+          setDomainError('Apenas imagens de sites populares de música são permitidas.');
+        } else {
+          setDomainError(null);
+        }
       }
       await spotifyImagesDb.images.put({ entityId, imageUrl: inputUrl, updatedAt: Date.now() });
       setImgPreview(inputUrl);
@@ -173,7 +173,7 @@ export const ImageEditModal: React.FC<ImageEditModalProps> = ({
       )}
   {!isSquare && <Text color="red" size="sm" mb="sm">{t('imageEditModal.squareWarning', 'A imagem deve ser quadrada!')}</Text>}
       <Box mb="xs">
-        <Text color="gray" size="xs" style={{ marginBottom: 4 }}>{t('imageEditModal.domainNotice', 'Por segurança, só é possível usar imagens de sites confiáveis como Last.fm, Spotify, Imgur, Unsplash, etc. Caso queira usar uma imagem própria, faça upload em um serviço como Imgur ou Cloudinary e cole o link aqui.')}</Text>
+        <Text c="dimmed" size="xs" style={{ marginBottom: 4 }}>{t('imageEditModal.domainNotice', 'Por segurança, só é possível usar imagens de sites confiáveis como Last.fm, Spotify, Imgur, Unsplash, etc. Caso queira usar uma imagem própria, faça upload em um serviço como Imgur ou Cloudinary e cole o link aqui.')}</Text>
       </Box>
       <Box mb="sm">
         <input
@@ -184,7 +184,7 @@ export const ImageEditModal: React.FC<ImageEditModalProps> = ({
           placeholder={t('imageEditModal.urlPlaceholder', 'URL da imagem')}
         />
       </Box>
-      {error && <Text color="red" size="sm" mb="sm">{error}</Text>}
+      {error && <Text c="red" size="sm" mb="sm">{error}</Text>}
       <Group>
         <button
           style={{ padding: '6px 16px', borderRadius: 4, background: theme.colors.blue[6], color: 'white', border: 'none', fontWeight: 600, cursor: loading || !imgPreview || !isSquare ? 'not-allowed' : 'pointer' }}
