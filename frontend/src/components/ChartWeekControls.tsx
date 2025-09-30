@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -84,11 +85,33 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	// Semanas válidas para navegação
 	const weeks = getClosedChartWeeks(chart.start_date, chart.day_of_week, chart.timezone);
 	const { prev, next } = getPrevNextWeek(weeks, week);
+	// Bloqueio simplificado: sempre trava 2000ms após clique de navegação/tipo
+	const [locked, setLocked] = React.useState(false);
+	const navLockRef = React.useRef(false);
+	const timerRef = React.useRef<number | null>(null);
+	const FIXED_LOCK_MS = 1500; // 1.5s conforme solicitado
+	const isBusy = locked || navLockRef.current;
+	const clearLock = () => {
+		if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+		navLockRef.current = false;
+		setLocked(false);
+	};
+	React.useEffect(() => () => clearLock(), []);
+	const triggerChange = (nextWeek: string, nextType: string) => {
+		if (navLockRef.current || locked) return;
+		flushSync(() => { navLockRef.current = true; setLocked(true); });
+		if (timerRef.current) clearTimeout(timerRef.current);
+		timerRef.current = window.setTimeout(() => { clearLock(); }, FIXED_LOCK_MS);
+		requestAnimationFrame(() => onChange(nextWeek, nextType));
+	};
+
 	const handlePrev = () => {
-		if (prev) onChange(prev, type);
+		if (!prev || isBusy) return;
+		triggerChange(prev, type);
 	};
 	const handleNext = () => {
-		if (next) onChange(next, type);
+		if (!next || isBusy) return;
+		triggerChange(next, type);
 	};
 
 	// Valor do input: sempre o início da semana selecionada no timezone do chart
@@ -119,14 +142,15 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			{/* Esquerda: seleção de tipo */}
 			<SegmentedControl
 				value={type}
-				onChange={v => v && onChange(week || '', v)}
-				data={chartTypes.map(({ value, icon }) => ({ label: icon, value }))}
+				onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
+				data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
 				size="sm"
 				withItemsBorders={false}
+				disabled={isBusy}
 			/>
 			{/* Centro: navegação de semana */}
 			<Flex gap="xs" align="center">
-				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev}><IconArrowLeft size={18} /></Button>
+				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<Popover
 					position="bottom"
 					shadow="md"
@@ -140,7 +164,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 							variant={inputValue ? 'filled' : 'default'}
 							color="blue"
 							size="lg"
-							onClick={() => setPopoverOpened((o) => !o)}
+							onClick={() => { setPopoverOpened((o) => !o); }}
 						>
 							<IconCalendar size={20} />
 						</ActionIcon>
@@ -167,7 +191,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 						/>
 					</Popover.Dropdown>
 				</Popover>
-				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next}><IconArrowRight size={18} /></Button>
+				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next || isBusy}><IconArrowRight size={18} /></Button>
 			</Flex>
 
 			{/* Direita: seleção de visualização + botão de colunas */}
@@ -176,7 +200,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				<ChartWeekTableColumnsMenu />
 				<SegmentedControl
 					value={view}
-					onChange={v => handleSetView(v as 'table' | 'grid' | 'list')}
+					onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}
 					data={[
 						{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
 						{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
