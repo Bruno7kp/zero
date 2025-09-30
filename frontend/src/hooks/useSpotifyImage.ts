@@ -65,7 +65,7 @@ export function useSpotifyImage({ entityId, name, artist, type, clientId, client
     }
     if (entityId && name && clientId && clientSecret) fetchImage();
     return () => { cancelled = true; };
-  }, [entityId, name, type, clientId, clientSecret]);
+  }, [entityId, name, artist, type, clientId, clientSecret]);
 
   // Retorna a última imagem válida enquanto está carregando
   return { imageUrl: imageUrl || lastValidImage.current, loading };
