@@ -33,7 +33,6 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
   forceUpdate = 0,
   width = 72,
   height = 72,
-  borderRadius = 8,
   style = {},
   onImageChange,
   lastImageUrl,
@@ -74,8 +73,7 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#e0e0e0',
-          borderRadius,
+          background: 'transparent',
           overflow: 'hidden',
           ...style,
         }}
@@ -84,7 +82,7 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
           <img
             src={fallbackImage}
             alt={name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius, cursor: 'pointer' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
             onClick={e => {
               e.stopPropagation();
               setModalOpen(true);

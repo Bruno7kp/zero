@@ -144,7 +144,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
           return (
             <Grid.Col key={row.id} span={{ base: 15, md: 10, lg: 6 }}>
               <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
-                <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: '#eee', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
+                <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
                   {/* Variação canto superior direito */}
                   {renderAltVariation(row, idx)}
                   {/* Botão modal canto superior esquerdo */}
@@ -192,7 +192,6 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                       forceUpdate={imageForceUpdate[row.entityId]}
                       width={'100%'}
                       height={'100%'}
-                      borderRadius={12}
                       style={{ aspectRatio: '1/1', minHeight: 0, minWidth: 0 }}
                       lastImageUrl={lastImageUrlByEntityId[row.entityId]}
                       onImageChange={() => {
