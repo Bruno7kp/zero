@@ -136,7 +136,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                     size="xl"
                     p={0}
                     variant={point.position === peak || point.week === highlightWeek ? 'outline' : 'default'}
-                    color={point.position === peak && point.week !== highlightWeek ? 'blue' : 'teal'}
+                    color={point.position === peak && point.week !== highlightWeek ? 'teal' : 'blue'}
                     data-week={point.week}
                     style={{ borderRadius: 6, minWidth: 32 }}
                   >

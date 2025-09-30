@@ -9,18 +9,49 @@ import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { IconFilter, IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
+import { IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp, IconSettings } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
 import { defaultColumns } from '../store/columnsSlice';
 
-export function ChartWeekTableColumnsMenu() {
+// Permite configurações de colunas separadas para cada tipo de visualização (table/list/grid)
+export function ChartWeekTableColumnsMenu({ viewType, onColumnsChange }: { viewType: 'table' | 'list' | 'grid', onColumnsChange?: (cols: any[]) => void }) {
     const [opened, setOpened] = useState(false);
     const { t } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const columns = useSelector((state: RootState) => state.columns.columns);
     const mandatory = ['rank', 'name'];
+
+    // Chave de storage por tipo de visualização
+    const storageKey = `chart_columns_${viewType}`;
+
+    // Carrega do localStorage ao trocar viewType
+    useEffect(() => {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    parsed.forEach((col: any) => {
+                        dispatch(updateColumn({ key: col.key, visible: col.visible }));
+                    });
+                    if (onColumnsChange) onColumnsChange(parsed);
+                }
+            } catch {}
+        } else {
+            // Se não houver, salva o default atual
+            localStorage.setItem(storageKey, JSON.stringify(columns));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [viewType]);
+
+    // Sempre que columns mudar, salva no localStorage para o tipo atual
+    useEffect(() => {
+        localStorage.setItem(storageKey, JSON.stringify(columns));
+        if (onColumnsChange) onColumnsChange(columns);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [columns]);
 
     // Garante que a coluna altVariation está presente no Redux
     useEffect(() => {
@@ -46,7 +77,7 @@ export function ChartWeekTableColumnsMenu() {
         <Menu shadow="md" width={250} opened={opened} onChange={setOpened} closeOnItemClick={false}>
             <Menu.Target>
                 <ActionIcon size="lg" variant="subtle" onClick={() => setOpened((o) => !o)}>
-                    <IconFilter size={18} />
+                    <IconSettings size={18} />
                 </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
@@ -122,8 +153,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         requestAnimationFrame(() => requestAnimationFrame(() => {
             const id = setTimeout(() => {
                 if (cancelled) return;
-                const cutoff = 100;
-                dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+                dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
             }, 900); // atraso ~1s perceptivo, ajustável
             // store id em closure; cleanup abaixo
             (window as any).__tableStatsTimer = id;

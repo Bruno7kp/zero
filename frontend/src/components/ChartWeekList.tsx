@@ -211,8 +211,8 @@ const ChartWeekListRow: React.FC<{
           </>
         )}
       </Collapse>
-    </Card>
-  );
+  </Card>
+  )
 });
 
 export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
@@ -242,8 +242,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const id = setTimeout(() => {
         if (cancelled) return;
-        const cutoff = 100;
-        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
       }, 900);
       (window as any).__listStatsTimer = id;
     }));
@@ -297,6 +296,6 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
       </Flex>
     )}
     {/* Modal agora é controlado pelo SpotifyImageWithModal */}
-  </Flex>
+      </Flex>
   );
 };

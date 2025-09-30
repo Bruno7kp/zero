@@ -196,15 +196,15 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 			{/* Direita: seleção de visualização + botão de colunas */}
 			<Flex gap="xs" align="center">
-				{/* Botão de colunas, só mostra se for tabela */}
-				<ChartWeekTableColumnsMenu />
+				   {/* Botão de colunas, agora respeita viewType */}
+				   <ChartWeekTableColumnsMenu viewType={view} />
 				<SegmentedControl
 					value={view}
 					onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}
 					data={[
 						{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
-						{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
 						{ label: (<Center><IconList size={18} /></Center>), value: 'list' },
+						{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
 					]}
 					size="sm"
 					withItemsBorders={false}

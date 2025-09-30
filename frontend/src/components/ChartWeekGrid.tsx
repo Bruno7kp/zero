@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { ChartWeekTableColumnsMenu } from './ChartWeekTable';
 import { ImageEditModal } from './ImageEditModal';
 import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
@@ -20,6 +21,21 @@ interface ChartWeekGridProps {
 }
 
 export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type, clientId, clientSecret, altVariation }) => {
+  // Sincroniza colunas do grid com localStorage
+  useEffect(() => {
+    const storageKey = 'chart_columns_grid';
+    const stored = localStorage.getItem(storageKey);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((col: any) => {
+            dispatch({ type: 'columns/updateColumn', payload: { key: col.key, visible: col.visible } });
+          });
+        }
+      } catch {}
+    }
+  }, []);
   const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
   // Memorize the last image for each entityId, and only update when a new image is loaded
   // This ensures the image only changes when the new one is ready
@@ -127,8 +143,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const id = setTimeout(() => {
         if (cancelled) return;
-        const cutoff = 100;
-        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
       }, 900);
       (window as any).__gridStatsTimer = id;
     }));
@@ -178,7 +193,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   </ActionIcon>
                   {/* Posição (rank) canto inferior esquerdo */}
                   <Badge
-                    color={row.rank === 1 ? 'red' : 'red'}
+                    color={row.rank === 1 ? 'blue' : 'red'}
                     size="xl"
                     variant="filled"
                     py="xl"
@@ -251,7 +266,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   {showPeak && (
                     <Box style={{ textAlign: 'center', flex: 1 }}>
                       <Text size="xs" c="dimmed">Peak</Text>
-                      <Text fw={700} size="sm">{stats?.peak?.position ?? (loadingStats ? '…' : '-')}</Text>
+                      <Text fw={700} size="sm" c={stats?.peak?.position === 1 ? 'blue' : undefined}>{stats?.peak?.position ?? (loadingStats ? '…' : '-')}</Text>
                     </Box>
                   )}
                   {showTotalWeeks && (
