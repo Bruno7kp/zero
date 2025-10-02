@@ -7,10 +7,9 @@ import { ChartWeekGrid } from '../components/ChartWeekGrid';
 import { ChartWeekList } from '../components/ChartWeekList';
 import { Container, Loader, Center, Box } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
 
 const DEFAULT_TYPE = 'artist';
-const SPOTIFY_TOKEN = 'd686abb030b34dc2b3446b06507ded9b';
-const SPOTIFY_SECRET = '7611153438b2440fa4a7e22c3311f2d6';
 
 // Função de variação para a coluna Δ: usa exatamente o mesmo valor do badge da coluna rank
 function getAltVariation(row: any) {

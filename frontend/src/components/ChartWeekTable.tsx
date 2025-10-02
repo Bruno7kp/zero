@@ -369,7 +369,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />, 
             textAlign: 'center',
             width: 80,
-            cellsStyle: () => ({ paddingRight: 0 }),
+            cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
             render: (row: ChartData, index: number) => {
                 const value: any = altVariation ? altVariation(row, index) : false;
                 let color = 'gray', label = '', rightIcon = null;

@@ -185,7 +185,7 @@ const ChartWeekListRow: React.FC<{
                   variant={color === 'gray' ? 'light' : 'filled'}
                   px={0}
                   mx={0}
-                  style={{ borderRadius: 0, width: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ borderRadius: 0, width: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     {icon}
