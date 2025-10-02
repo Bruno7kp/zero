@@ -6,7 +6,7 @@ import { ChartWeekTable } from '../components/ChartWeekTable';
 import { ChartWeekGrid } from '../components/ChartWeekGrid';
 import { ChartWeekList } from '../components/ChartWeekList';
 import { Container, Loader, Center, Box } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
 
 const DEFAULT_TYPE = 'artist';
@@ -17,7 +17,7 @@ function getAltVariation(row: any) {
 }
 
 export const ChartsWeekPage: React.FC = () => {
-    const isMobile = useMediaQuery('(max-width: 48em)'); // Mantine md breakpoint
+    const isMobile = useIsMobile();
     const { week: weekParam, type: typeParam } = useParams();
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -33,6 +33,8 @@ export const ChartsWeekPage: React.FC = () => {
     const chartsData = useSelector((state: any) => state.charts.data);
     const loadingData = useSelector((state: any) => state.charts.loadingData);
     const navigate = useNavigate();
+    const columnsState = useSelector((state: any) => state.columns);
+    const currentContainerSize = columnsState?.views?.[view]?.settings?.containerSize || (view === 'grid' ? 'xl' : 'md');
 
     // Sincroniza quando rota muda externamente (ex: clique em ChartRun)
     React.useEffect(() => {
@@ -65,66 +67,66 @@ export const ChartsWeekPage: React.FC = () => {
     }, [isSync, loadingData, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
-        <Container size={isMobile ? '100%' : 'md'} px="xs">
-            {!noChart && (
-              <ChartWeekControls
-                  chart={chart}
-                  week={selectedWeek}
-                  type={selectedType}
-                  onChange={handleChange}
-                  view={view}
-                  setView={setView}
-              />
-            )}
-        </Container>
-        <Container size={isMobile ? '100%' : view === 'grid' ? '100%' : 'md'} px="xs" style={{ position: 'relative', minHeight: 180 }}>
-            {noChart && (
-                <Center py="xl"><div>Nenhum chart ativo.</div></Center>
-            )}
-            {!noChart && (
-                <>
-                    {view === 'table' && (
-                        <ChartWeekTable
-                            chart={chart}
-                            week={displayedWeek || ''}
-                            type={displayedType}
-                            altVariation={getAltVariation}
-                            clientId={SPOTIFY_TOKEN}
-                            clientSecret={SPOTIFY_SECRET}
-                        />
-                    )}
-                    {view === 'grid' && (
-                        <ChartWeekGrid
-                            chart={chart}
-                            week={displayedWeek}
-                            type={displayedType}
-                            altVariation={getAltVariation}
-                            clientId={SPOTIFY_TOKEN}
-                            clientSecret={SPOTIFY_SECRET}
-                        />
-                    )}
-                    {view === 'list' && (
-                        <ChartWeekList
-                            chart={chart}
-                            week={displayedWeek}
-                            type={displayedType}
-                            altVariation={getAltVariation}
-                            clientId={SPOTIFY_TOKEN}
-                            clientSecret={SPOTIFY_SECRET}
-                        />
-                    )}
-                    {/* Spinner discreto no canto durante transição */}
-                    {isSwitchingTarget && loadingData && (
-                        <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 5 }}>
-                            <Loader size="xs" />
-                        </Box>
-                    )}
-                    {!loadingData && !hasAnyData && !isSwitchingTarget && (
-                        <Center py="md"><div style={{ opacity: 0.7, fontSize: 14 }}>Sem dados para esta semana.</div></Center>
-                    )}
-                </>
-            )}
-        </Container>
+            <Container size={isMobile ? '100%' : "md"} px="xs">
+                {!noChart && (
+                    <ChartWeekControls
+                        chart={chart}
+                        week={selectedWeek}
+                        type={selectedType}
+                        onChange={handleChange}
+                        view={view}
+                        setView={setView}
+                    />
+                )}
+            </Container>
+            <Container size={isMobile ? '100%' : currentContainerSize} px="xs" style={{ position: 'relative', minHeight: 180 }}>
+                {noChart && (
+                    <Center py="xl"><div>Nenhum chart ativo.</div></Center>
+                )}
+                {!noChart && (
+                    <>
+                        {view === 'table' && (
+                            <ChartWeekTable
+                                chart={chart}
+                                week={displayedWeek || ''}
+                                type={displayedType}
+                                altVariation={getAltVariation}
+                                clientId={SPOTIFY_TOKEN}
+                                clientSecret={SPOTIFY_SECRET}
+                            />
+                        )}
+                        {view === 'grid' && (
+                            <ChartWeekGrid
+                                chart={chart}
+                                week={displayedWeek}
+                                type={displayedType}
+                                altVariation={getAltVariation}
+                                clientId={SPOTIFY_TOKEN}
+                                clientSecret={SPOTIFY_SECRET}
+                            />
+                        )}
+                        {view === 'list' && (
+                            <ChartWeekList
+                                chart={chart}
+                                week={displayedWeek}
+                                type={displayedType}
+                                altVariation={getAltVariation}
+                                clientId={SPOTIFY_TOKEN}
+                                clientSecret={SPOTIFY_SECRET}
+                            />
+                        )}
+                        {/* Spinner discreto no canto durante transição */}
+                        {isSwitchingTarget && loadingData && (
+                            <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 5 }}>
+                                <Loader size="xs" />
+                            </Box>
+                        )}
+                        {!loadingData && !hasAnyData && !isSwitchingTarget && (
+                            <Center py="md"><div style={{ opacity: 0.7, fontSize: 14 }}>Sem dados para esta semana.</div></Center>
+                        )}
+                    </>
+                )}
+            </Container>
         </>
     );
 };

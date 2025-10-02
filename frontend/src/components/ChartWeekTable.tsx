@@ -32,7 +32,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const data = useSelector((state: RootState) => state.charts.data);
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     const loadingStats = useSelector((state: RootState) => state.charts.loadingStats);
-    const columns = useSelector((state: RootState) => state.columns.columns);
+    const columns = useSelector((state: RootState) => (state as any).columns?.views?.table?.columns || (state as any).columns?.columns || []);
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
     useEffect(() => {
@@ -40,7 +40,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         mandatory.forEach(key => {
             const col: any = columns.find((c: any) => c.key === key);
             if (col && !col.visible) {
-                dispatch(updateColumn({ key, visible: true }));
+                dispatch(updateColumn({ view: 'table', key, visible: true }));
             }
         });
     }, [columns, dispatch]);

@@ -218,7 +218,7 @@ const ChartWeekListRow: React.FC<{
 export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
   const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
-  const columns = useSelector((state: any) => state.columns.columns);
+  const columns = useSelector((state: any) => (state.columns?.views?.list?.columns) || state.columns?.columns || []);
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
 

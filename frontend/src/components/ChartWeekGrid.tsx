@@ -29,7 +29,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           parsed.forEach((col: any) => {
-            dispatch({ type: 'columns/updateColumn', payload: { key: col.key, visible: col.visible } });
+            dispatch({ type: 'columns/updateColumn', payload: { view: 'grid', key: col.key, visible: col.visible } });
           });
         }
       } catch {}
@@ -104,7 +104,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
   const statsMap = useSelector((state: any) => state.charts.statsMap);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
-  const columns = useSelector((state: any) => state.columns.columns);
+  const columns = useSelector((state: any) => (state.columns?.views?.grid?.columns) || state.columns?.columns || []);
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
   const showPeak = columns.find((c: any) => c.key === 'peak')?.visible;
   const showPlays = columns.find((c: any) => c.key === 'plays')?.visible;
