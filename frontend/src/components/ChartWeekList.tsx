@@ -252,6 +252,32 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     };
   }, [data, chart?.id, type, week, dispatch, columns]);
 
+  // Refetch incremental quando usuário habilita colunas de stats depois
+  const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible), [columns]);
+  const [statsColsPrev, setStatsColsPrev] = useState(statsColumnsVisible);
+  useEffect(() => {
+    if (statsColumnsVisible && !statsColsPrev && data.length && week && chart?.id) {
+      dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+    }
+    if (statsColsPrev !== statsColumnsVisible) setStatsColsPrev(statsColumnsVisible);
+  }, [statsColumnsVisible, statsColsPrev, data, week, chart?.id, type, dispatch]);
+
+  // Fallback de reforço se stats não chegarem
+  useEffect(() => {
+    if (!statsColumnsVisible || !data.length || !week || !chart?.id) return;
+    const state: any = (window as any).__reduxStateCache; // opcional se existir caching global
+  const hasAny = data.some((r: any) => {
+      const s = (state?.charts?.statsMap || ({} as any))[r.entityId];
+      return s && s.totals && s.totals.withinCutoff != null;
+    });
+    // Se não temos acesso a state global via hack, fazemos checagem via dispatch indireta (omitido). Simplesmente agenda fallback:
+    if (hasAny) return;
+    const id = setTimeout(() => {
+      dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+    }, 1300);
+    return () => clearTimeout(id);
+  }, [statsColumnsVisible, data, week, chart?.id, type, dispatch]);
+
   const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
   const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
   const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;

@@ -595,8 +595,17 @@ const chartsSlice = createSlice({
     beginStatsRevalidation(state, action: PayloadAction<string>) { state.statsRequestId = action.payload; state.revalidatingStats = true; /* mantém loadingStats=false para evitar flicker */ },
     partialStatsLoaded(state, action: PayloadAction<{ requestId: string; partial: Record<string, any> }>) { if (state.statsRequestId !== action.payload.requestId) return; state.statsMap = { ...state.statsMap, ...action.payload.partial }; },
     finishStatsIncremental(state, action: PayloadAction<string>) { if (state.statsRequestId === action.payload) { state.loadingStats = false; state.revalidatingStats = false; } },
-    replaceStatsSnapshot(state, action: PayloadAction<Record<string, any>>) { state.statsMap = { ...action.payload }; },
-    cacheStatsSnapshot(state, action: PayloadAction<{ cacheKey: string; snapshot: Record<string, any>; now: number }>) { state.statsCache[action.payload.cacheKey] = { data: action.payload.snapshot, createdAt: action.payload.now }; },
+    // Antes: substituía completamente o statsMap, causando perda de entries já calculadas
+    // Agora: faz merge para não apagar stats existentes quando um snapshot parcial é aplicado
+    replaceStatsSnapshot(state, action: PayloadAction<Record<string, any>>) {
+      state.statsMap = { ...state.statsMap, ...action.payload };
+    },
+    cacheStatsSnapshot(state, action: PayloadAction<{ cacheKey: string; snapshot: Record<string, any>; now: number }>) {
+      const { cacheKey, snapshot, now } = action.payload;
+      if (!state.statsCache) state.statsCache = {} as any;
+      const prev = state.statsCache[cacheKey]?.data || {};
+      state.statsCache[cacheKey] = { data: { ...prev, ...snapshot }, createdAt: now };
+    },
     clearStatsCache(state) { state.statsCache = {}; },
     removeStatsCacheEntry(state, action: PayloadAction<string>) { delete state.statsCache[action.payload]; },
     invalidateStatsForChart(state, action: PayloadAction<{ chartId: string | number; chartType?: string; fromWeek?: string }>) {

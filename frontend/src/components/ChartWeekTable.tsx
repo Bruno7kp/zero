@@ -63,17 +63,14 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // Agendamento diferido dos stats (carrega só depois de um pequeno atraso para não impactar troca de semana)
     useEffect(() => {
         if (!data.length || !week) return;
-        // Só agenda se alguma coluna de stats estiver visível (peak ou totalWeeks)
-        const wantsStats = columns.some((c: any) => c.key === 'peak' && c.visible) || columns.some((c: any) => c.key === 'totalWeeks' && c.visible);
-        if (!wantsStats) return; // evita custo se usuário ocultou
+        const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+        if (!wantsStats) return;
         let cancelled = false;
-        // dupla rAF para garantir pintura da semana, depois timeout para dar respiro
         requestAnimationFrame(() => requestAnimationFrame(() => {
             const id = setTimeout(() => {
                 if (cancelled) return;
                 dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
-            }, 900); // atraso ~1s perceptivo, ajustável
-            // store id em closure; cleanup abaixo
+            }, 600); // levemente reduzido
             (window as any).__tableStatsTimer = id;
         }));
         return () => {
@@ -81,6 +78,36 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             if ((window as any).__tableStatsTimer) clearTimeout((window as any).__tableStatsTimer);
         };
     }, [data, chart.id, type, week, dispatch, columns]);
+
+    // Refetch incremental quando usuário habilita colunas de stats após já ter carregado dados
+    const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible), [columns]);
+    const [statsColumnsPrev, setStatsColumnsPrev] = useState(statsColumnsVisible);
+    useEffect(() => {
+        if (statsColumnsVisible && !statsColumnsPrev && data.length && week) {
+            dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+        }
+        if (statsColumnsPrev !== statsColumnsVisible) setStatsColumnsPrev(statsColumnsVisible);
+    }, [statsColumnsVisible, statsColumnsPrev, data, week, chart.id, type, dispatch]);
+
+    // Fallback: se colunas de stats visíveis mas statsMap continua vazio após pequeno intervalo, força uma nova tentativa
+    useEffect(() => {
+        if (!statsColumnsVisible || !data.length || !week) return;
+        const hasAnyStats = data.some((r: any) => {
+            const s = (statsMap as any)[r.entityId];
+            return s && s.totals && s.totals.withinCutoff != null;
+        });
+        if (hasAnyStats) return;
+        const id = setTimeout(() => {
+            const stillEmpty = data.every((r: any) => {
+                const s = (statsMap as any)[r.entityId];
+                return !s || !s.totals || s.totals.withinCutoff == null;
+            });
+            if (stillEmpty) {
+                dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+            }
+        }, 1200);
+        return () => clearTimeout(id);
+    }, [statsColumnsVisible, statsMap, data, week, chart.id, type, dispatch]);
 
     // Colunas dinâmicas
     const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
@@ -149,7 +176,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     let dtColumns: DataTableColumn<ChartData>[] = useMemo(() => filteredColumns.map((col: any): DataTableColumn<ChartData> => {
         const base = {
             accessor: col.key,
-            title: col.labelComplete ? t(col.label) : t(col.labelComplete) || col.key,
+            title: (col.label ?? t(col.label)) || col.key,
             textAlign: col.key === 'name' ? 'left' : ('center' as const) as DataTableColumnTextAlign,
             width: col.key === 'name' ? undefined : 80,
         };
