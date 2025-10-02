@@ -10,7 +10,7 @@ dayjs.extend(timezone);
 import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import { getPrevNextWeek } from '../utils/chartWeekNav';
 import { Button, SegmentedControl, Flex, Center, VisuallyHidden, Text, Title } from '@mantine/core';
-import { ChartWeekColumnsModal } from './ChartWeekColumnsModal';
+import { ChartWeekColumnsDrawer } from './ChartWeekColumnsDrawer';
 import { Calendar } from '@mantine/dates';
 import { Popover, ActionIcon } from '@mantine/core';
 import { IconCalendar } from '@tabler/icons-react';
@@ -197,7 +197,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			{/* Direita: seleção de visualização + botão de colunas */}
 			<Flex gap="xs" align="center">
 				{/* Botão de colunas, agora respeita viewType */}
-				<ChartWeekColumnsModal viewType={view} />
+				<ChartWeekColumnsDrawer viewType={view} />
 				<SegmentedControl
 					value={view}
 					onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}

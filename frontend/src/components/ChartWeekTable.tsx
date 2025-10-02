@@ -13,9 +13,6 @@ import { IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFille
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
-// defaultColumns removido daqui (agora usado no modal de colunas)
-
-// (ChartWeekTableColumnsMenu foi movido para ChartWeekColumnsModal.tsx)
 
 interface ChartWeekTableProps {
     chart: any;
