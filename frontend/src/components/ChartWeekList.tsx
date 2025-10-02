@@ -111,7 +111,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
                   <Text fw={700} size="xl">{row.plays}</Text>
-                  {showDeltaPlaysBadge && (
+                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && (
                     <Badge variant="light" color={getDeltaBadgeProps(row.deltaPlays).color} size="xs">
                       {getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays).label}
                     </Badge>

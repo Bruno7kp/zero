@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Checkbox, Stack, Group, Button, Paper, Drawer } from '@mantine/core';
+import { Stack, Group, Button, Paper, Drawer, Text, SegmentedControl, Divider } from '@mantine/core';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay } from '../store/columnsSlice';
 import { IconSettings } from '@tabler/icons-react';
 
 interface ChartWeekColumnsDrawerProps {
@@ -19,8 +19,10 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
     const columns = viewConfig?.columns || defaultColumns;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
+    // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
+    const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const [opened, setOpened] = useState(false);
-    const mandatory = ['rank', 'name'];
+    // Colunas obrigatórias (rank, name) exibidas como sempre visíveis (badge), sem toggle
 
     const storageKey = `chart_columns_${viewType}`; // legado (ainda lido para migração leve se necessário)
 
@@ -62,11 +64,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         return { ...col, visible: reduxCol ? reduxCol.visible : col.visible };
     });
 
-    const handleToggle = (key: string) => {
-        if (mandatory.includes(key)) return;
-        const col = columns.find((c: any) => c.key === key);
-    if (viewConfig && col) dispatch(updateColumn({ view: viewType, key, visible: !col.visible }));
-    };
+    // Toggles agora são feitos inline em cada SegmentedControl
 
     const handleReset = () => {
         if (viewConfig) dispatch(resetColumns({ view: viewType }));
@@ -76,15 +74,9 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         if (viewConfig) dispatch(setContainerSize({ view: viewType, size }));
     };
 
-    // Agrupamentos de seções
-    const sections: { title: string; items: string[] }[] = [
-        { title: t('charts.rankLabel'), items: ['rank', 'deltaRankBadge', 'altVariation'] },
-        { title: t('charts.imageLabel'), items: ['image'] },
-        { title: t('charts.titleLabel'), items: ['name'] },
-        { title: t('charts.playsLabel'), items: ['plays', 'deltaPlaysBadge', 'deltaPercentPlaysBadge'] },
-        { title: t('charts.peakLabel'), items: ['peak'] },
-        { title: t('charts.weeksLabel'), items: ['totalWeeks'] },
-    ];
+    // Ordem agora definida diretamente na renderização das seções abaixo
+
+    const viewTypeLabel = viewType === 'table' ? 'charts.tableView' : viewType === 'list' ? 'charts.listView' : 'charts.gridView';
 
     return (
         <>
@@ -98,50 +90,127 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 size="md"
                 withCloseButton={false}
                 overlayProps={{ opacity: 0 }}
-                title={t('charts.columnsConfig')}
+                title={`${t('charts.columnsConfig')}: ${t(viewTypeLabel)}`}
                 styles={{
                     content: { boxShadow: '0 0 16px 0 rgba(0,0,0,0.15)' },
                 }}
             >
-                <Paper p="md" radius={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <Stack gap="sm" style={{ overflowY: 'auto' }}>
-                                                {/* Seletor de tamanho do container (desktop apenas) */}
-                                                {!isMobile && (
-                                                    <Group gap="xs">
-                                                            <strong style={{ fontSize: 12 }}>{t('charts.columns')}: size</strong>
-                                                            {(['md','lg','xl','100%'] as const).map(size => (
-                                                                    <Button
-                                                                        key={size}
-                                                                        size="xs"
-                                                                        variant={containerSize === size ? 'filled' : 'light'}
-                                                                        onClick={() => handleContainerSize(size)}
-                                                                    >{size}</Button>
-                                                            ))}
-                                                    </Group>
-                                                )}
-                        {sections.map(section => {
-                            const sectionItems = columnsWithVisibility.filter(c => section.items.includes(c.key));
-                            if (!sectionItems.length) return null;
-                            return (
-                                <Stack key={section.title} gap={4} style={{ border: '1px solid var(--mantine-color-gray-3)', padding: 8 }}>
-                                    <div style={{ fontWeight: 600, fontSize: 13 }}>{section.title}</div>
-                                    {sectionItems.map(col => {
-                                        const isMandatory = mandatory.includes(col.key);
-                                        return (
-                                            <Checkbox
-                                                key={col.key}
-                                                checked={isMandatory ? true : col.visible}
-                                                disabled={isMandatory}
-                                                onChange={() => handleToggle(col.key)}
-                                                label={(col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
-                                            />
-                                        );
-                                    })}
-                                </Stack>
-                            );
-                        })}
+                <Paper p="sm" radius={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <Stack gap={6} style={{ overflowY: 'auto' }}>
+                        {/* Seletor de tamanho do container (desktop apenas) */}
+                        {!isMobile && (
+                            <Stack gap={2}>
+                                <Text size="sm" fw={600}>{t('charts.size')}</Text>
+                                <SegmentedControl
+                                    fullWidth
+                                    size="xs"
+                                    value={containerSize}
+                                    onChange={(v) => handleContainerSize(v as 'md' | 'lg' | 'xl' | '100%')}
+                                    data={[
+                                        { label: 'MD', value: 'md' },
+                                        { label: 'LG', value: 'lg' },
+                                        { label: 'XL', value: 'xl' },
+                                        { label: '100%', value: '100%' }
+                                    ]}
+                                />
+                            </Stack>
+                        )}
+                        {!isMobile && <Divider my={4} />}
+                        {/* Exibição da variação de rank */}
+                        <Stack gap={2}>
+                            <Text size="sm" fw={600}>{t('charts.rankVariationLocationLabel')}</Text>
+                            {viewType === 'grid' ? (
+                                <SegmentedControl
+                                    fullWidth
+                                    size="xs"
+                                    value={rankVariationLocation === 'hidden' ? 'hidden' : 'under'}
+                                    onChange={(v) => dispatch(setRankVariationLocation({ view: viewType, location: (v === 'hidden' ? 'hidden' : 'under') }))}
+                                    data={[
+                                        { label: t('charts.show'), value: 'under' },
+                                        { label: t('charts.hide'), value: 'hidden' }
+                                    ]}
+                                />
+                            ) : (
+                                <SegmentedControl
+                                    fullWidth
+                                    size="xs"
+                                    value={rankVariationLocation}
+                                    onChange={(v) => dispatch(setRankVariationLocation({ view: viewType, location: v as 'under' | 'column' | 'hidden' }))}
+                                    data={[
+                                        { label: t('charts.rankVariationUnder'), value: 'under' },
+                                        { label: t('charts.rankVariationColumn'), value: 'column' },
+                                        { label: t('charts.hide'), value: 'hidden' }
+                                    ]}
+                                />
+                            )}
+                        </Stack>
+                        <Divider my={6} />
+                        {/* Imagem */}
+                        <Stack gap={2}>
+                            <Text size="sm" fw={600}>{t('charts.imageLabel')}</Text>
+                            <SegmentedControl
+                                fullWidth
+                                size="xs"
+                                value={columnsWithVisibility.find(c => c.key === 'image')?.visible ? 'show' : 'hide'}
+                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'image', visible: v === 'show' }))}
+                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                            />
+                        </Stack>
+                        <Divider my={6} />
+                        {/* Plays */}
+                        <Stack gap={2}>
+                            <Text size="sm" fw={600}>{t('charts.playsLabel')}</Text>
+                            <SegmentedControl
+                                fullWidth
+                                size="xs"
+                                value={columnsWithVisibility.find(c => c.key === 'plays')?.visible ? 'show' : 'hide'}
+                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'plays', visible: v === 'show' }))}
+                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                            />
+                        </Stack>
+                        {/* Variação de reproduções (após plays) */}
+                        {viewType !== 'grid' && (
+                            <Stack gap={2}>
+                                <Text size="sm" fw={600}>{t('charts.playsVariationDisplayLabel')}</Text>
+                                <SegmentedControl
+                                    size="xs"
+                                    fullWidth
+                                    value={(viewConfig?.settings as any)?.playsVariationDisplay || 'percent'}
+                                    onChange={(value) => dispatch(setPlaysVariationDisplay({ view: viewType, display: value as 'hidden' | 'absolute' | 'percent' }))}
+                                    data={[
+                                        { label: t('charts.playsVariationDisplay_hidden'), value: 'hidden' },
+                                        { label: t('charts.playsVariationDisplay_absolute'), value: 'absolute' },
+                                        { label: t('charts.playsVariationDisplay_percent'), value: 'percent' },
+                                    ]}
+                                />
+                            </Stack>
+                        )}
+                        {viewType !== 'grid' && <Divider my={6} />}
+                        {/* Peak */}
+                        <Stack gap={2}>
+                            <Text size="sm" fw={600}>{t('charts.peakLabel')}</Text>
+                            <SegmentedControl
+                                fullWidth
+                                size="xs"
+                                value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'}
+                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))}
+                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                            />
+                        </Stack>
+                        <Divider my={6} />
+                        {/* Weeks */}
+                        <Stack gap={2}>
+                            <Text size="sm" fw={600}>{t('charts.weeksLabel')}</Text>
+                            <SegmentedControl
+                                fullWidth
+                                size="xs"
+                                value={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ? 'show' : 'hide'}
+                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'totalWeeks', visible: v === 'show' }))}
+                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                            />
+                        </Stack>
                     </Stack>
-                    <Group justify="space-between" mt="sm" style={{ marginTop: 'auto' }}>
+                    <Group justify="space-between" mt={8} style={{ marginTop: 'auto' }}>
                         <Button variant="light" size="xs" onClick={handleReset}>{t('common.reset')}</Button>
                         <Button size="xs" onClick={() => setOpened(false)}>{t('common.close')}</Button>
                     </Group>

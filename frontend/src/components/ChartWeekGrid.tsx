@@ -40,7 +40,9 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   // This ensures the image only changes when the new one is ready
   // Função para renderizar o ícone de variação
   function renderAltVariation(row: ChartData, idx: number) {
-    if (!showAltVariationRedux) return null;
+    // In grid mode we rely on deltaRankBadge visibility (mapped by rankVariationLocation) not altVariation column
+    const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
+    if (!showDelta) return null;
   const value: any = altVariation ? altVariation(row, idx) : false;
   let color = 'gray', label = '', icon = null;
     if (value === 'NEW') {
@@ -109,7 +111,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   const showPeak = columns.find((c: any) => c.key === 'peak')?.visible;
   const showPlays = columns.find((c: any) => c.key === 'plays')?.visible;
   const showTotalWeeks = columns.find((c: any) => c.key === 'totalWeeks')?.visible;
-  const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
+  // altVariation column is never used in grid (mapping forces it off); badge visibility controls variation
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
 

@@ -14,6 +14,8 @@ export interface ColumnConfig {
 // Configurações adicionais por view que não são booleanas
 export interface ViewSettings {
   containerSize: 'md' | 'lg' | 'xl' | '100%';
+  rankVariationLocation?: 'under' | 'column' | 'hidden';
+  playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista
 }
 
 export interface ViewConfig {
@@ -30,7 +32,7 @@ export const defaultColumns: ColumnConfig[] = [
   { key: 'image', label: 'charts.imageLabel', visible: true, isColumn: false },
   { key: 'name', label: 'Title', labelComplete: 'charts.titleLabel', visible: true, isColumn: true },
   { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true, isColumn: true },
-  { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: true, isColumn: false },
+  { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: false, isColumn: false },
   { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true, isColumn: false },
   { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true, isColumn: true },
   { key: 'totalWeeks', label: 'Weeks', labelComplete: 'charts.weeksLabel', visible: true, isColumn: true },
@@ -40,9 +42,9 @@ export const defaultColumns: ColumnConfig[] = [
 const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
-  table: { containerSize: 'md' },
-  list: { containerSize: 'md' },
-  grid: { containerSize: 'xl' },
+  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent' },
+  list: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent' },
+  grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationDisplay: 'hidden' },
 };
 
 // Alinha uma lista de colunas existente ao default (mantém ordem do default e visibilidades quando existir)
@@ -50,6 +52,40 @@ function alignColumns(existing: any): ColumnConfig[] {
   return defaultColumns.map(dc => {
     const found = Array.isArray(existing) ? existing.find((c: any) => c.key === dc.key) : undefined;
     return found ? { ...dc, visible: !!found.visible } : { ...dc };
+  });
+}
+
+// Infer a location from legacy boolean columns
+function inferRankVariationLocation(cols: ColumnConfig[]): 'under' | 'column' | 'hidden' {
+  const deltaBadge = cols.find(c => c.key === 'deltaRankBadge');
+  const altVar = cols.find(c => c.key === 'altVariation');
+  if (altVar?.visible) return 'column';
+  if (deltaBadge?.visible) return 'under';
+  return 'hidden';
+}
+
+function applyRankVariationMapping(cols: ColumnConfig[], location: 'under' | 'column' | 'hidden', view: 'table' | 'list' | 'grid'): ColumnConfig[] {
+  return cols.map(c => {
+    if (c.key === 'deltaRankBadge') {
+      if (view === 'grid') return { ...c, visible: location !== 'hidden' }; // grid: only show/hide badge overlay
+      return { ...c, visible: location === 'under' };
+    }
+    if (c.key === 'altVariation') {
+      if (view === 'grid') return { ...c, visible: false }; // grid will not use separate column
+      return { ...c, visible: location === 'column' };
+    }
+    return c;
+  });
+}
+
+function applyPlaysVariationDisplay(cols: ColumnConfig[], display: 'hidden' | 'absolute' | 'percent', view: 'table' | 'list' | 'grid'): ColumnConfig[] {
+  if (view === 'grid') {
+    return cols.map(c => (c.key === 'deltaPlaysBadge' || c.key === 'deltaPercentPlaysBadge') ? { ...c, visible: false } : c);
+  }
+  return cols.map(c => {
+    if (c.key === 'deltaPlaysBadge') return { ...c, visible: display === 'absolute' };
+    if (c.key === 'deltaPercentPlaysBadge') return { ...c, visible: display === 'percent' };
+    return c;
   });
 }
 
@@ -71,12 +107,34 @@ function mergeWithDefaults(partial: any): ColumnsState {
   (['table','list','grid'] as const).forEach(view => {
     const incomingView = partial.views?.[view];
     if (incomingView) {
-      // Columns
-      base.views[view].columns = alignColumns(incomingView.columns);
-      // Settings
+      // Columns first
+      let aligned = alignColumns(incomingView.columns);
       const incSettings = incomingView.settings || {};
+      let location = incSettings.rankVariationLocation;
+      if (!(location === 'under' || location === 'column' || location === 'hidden')) {
+        location = inferRankVariationLocation(aligned);
+      }
+      if (view === 'grid') location = location === 'hidden' ? 'hidden' : 'under';
+      aligned = applyRankVariationMapping(aligned, location, view);
+      // plays variation (migração de formato antigo se existir)
+      let display: 'hidden' | 'absolute' | 'percent' = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
+      if (incomingView.settings) {
+        const s = incomingView.settings as any;
+        if (s.playsVariationDisplay === 'hidden' || s.playsVariationDisplay === 'absolute' || s.playsVariationDisplay === 'percent') {
+          display = s.playsVariationDisplay;
+        } else if (s.playsVariationLocation || s.playsVariationMode) {
+          // converter antigo (location + mode)
+          if (s.playsVariationLocation === 'hidden') display = 'hidden';
+          else if (s.playsVariationMode === 'absolute') display = 'absolute';
+          else if (s.playsVariationMode === 'percent') display = 'percent';
+        }
+      }
+      aligned = applyPlaysVariationDisplay(aligned, display, view);
+      base.views[view].columns = aligned;
       base.views[view].settings = {
         containerSize: ['md','lg','xl','100%'].includes(incSettings.containerSize) ? incSettings.containerSize : DEFAULT_VIEW_SETTINGS[view].containerSize,
+        rankVariationLocation: location,
+        playsVariationDisplay: display,
       };
     }
   });
@@ -99,7 +157,19 @@ function buildInitialState(): ColumnsState {
   // Se havia formato legado simples, aplica a TODAS as views como ponto de partida
   if (legacySingle) {
     (['table','list','grid'] as const).forEach(v => {
-      initial.views[v].columns = alignColumns(legacySingle);
+      let aligned = alignColumns(legacySingle);
+      const loc = inferRankVariationLocation(aligned);
+      if (v === 'grid' && loc === 'column') {
+        // grid não tem coluna - converte para under
+        aligned = applyRankVariationMapping(aligned, 'under', v);
+        initial.views[v].settings.rankVariationLocation = 'under';
+      } else {
+        aligned = applyRankVariationMapping(aligned, loc, v);
+        initial.views[v].settings.rankVariationLocation = loc;
+      }
+      aligned = applyPlaysVariationDisplay(aligned, DEFAULT_VIEW_SETTINGS[v].playsVariationDisplay || 'percent', v);
+      initial.views[v].settings.playsVariationDisplay = DEFAULT_VIEW_SETTINGS[v].playsVariationDisplay;
+      initial.views[v].columns = aligned;
     });
   }
 
@@ -108,7 +178,25 @@ function buildInitialState(): ColumnsState {
       const raw = localStorage.getItem(`chart_columns_config_${view}`);
       if (!raw) return;
       const parsed = JSON.parse(raw);
-      initial.views[view].columns = alignColumns(parsed?.columns);
+      let aligned = alignColumns(parsed?.columns);
+      let loc: any = inferRankVariationLocation(aligned);
+      const storedLoc = parsed?.settings?.rankVariationLocation;
+      if (storedLoc === 'under' || storedLoc === 'column' || storedLoc === 'hidden') loc = storedLoc;
+      if (view === 'grid' && loc === 'column') loc = 'under';
+      aligned = applyRankVariationMapping(aligned, loc, view);
+      // migra plays variation antiga se existir
+      let display: 'hidden' | 'absolute' | 'percent' = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
+      const s = (parsed?.settings || {}) as any;
+      if (s.playsVariationDisplay === 'hidden' || s.playsVariationDisplay === 'absolute' || s.playsVariationDisplay === 'percent') display = s.playsVariationDisplay;
+      else if (s.playsVariationLocation || s.playsVariationMode) {
+        if (s.playsVariationLocation === 'hidden') display = 'hidden';
+        else if (s.playsVariationMode === 'absolute') display = 'absolute';
+        else if (s.playsVariationMode === 'percent') display = 'percent';
+      }
+      aligned = applyPlaysVariationDisplay(aligned, display, view);
+      initial.views[view].columns = aligned;
+      initial.views[view].settings.rankVariationLocation = loc;
+      initial.views[view].settings.playsVariationDisplay = display;
       const size = parsed?.settings?.containerSize;
       if (['md','lg','xl','100%'].includes(size)) initial.views[view].settings.containerSize = size;
     } catch { /* noop */ }
@@ -149,11 +237,31 @@ const columnsSlice = createSlice({
       state.views[view].columns = cloneDefaults();
       // Reseta também o tamanho do container para o default da view
       state.views[view].settings.containerSize = DEFAULT_VIEW_SETTINGS[view].containerSize;
+      state.views[view].settings.rankVariationLocation = DEFAULT_VIEW_SETTINGS[view].rankVariationLocation;
+      state.views[view].settings.playsVariationDisplay = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay;
+      state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', view);
       persistView(view, state.views[view]);
     },
     setContainerSize(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; size: 'md' | 'lg' | 'xl' | '100%' }>) {
       const { view, size } = action.payload;
       state.views[view].settings.containerSize = size;
+      persistView(view, state.views[view]);
+    },
+    setRankVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; location: 'under' | 'column' | 'hidden' }>) {
+      let { view, location } = action.payload;
+      if (view === 'grid') location = location === 'hidden' ? 'hidden' : 'under';
+      state.views[view].settings.rankVariationLocation = location;
+      state.views[view].columns = applyRankVariationMapping(state.views[view].columns, location, view);
+      // reaplicar plays mapping
+      const disp = state.views[view].settings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, disp, view);
+      persistView(view, state.views[view]);
+    },
+    setPlaysVariationDisplay(state, action: PayloadAction<{ view: 'table' | 'list'; display: 'hidden' | 'absolute' | 'percent' }>) {
+      const { view, display } = action.payload;
+      state.views[view].settings.playsVariationDisplay = display;
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, view);
       persistView(view, state.views[view]);
     },
     // (migrateLegacy removido - merge automático cobre casos)
@@ -171,5 +279,5 @@ const columnsSlice = createSlice({
   }
 });
 
-export const { updateColumn, resetColumns, setContainerSize } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay } = columnsSlice.actions;
 export default columnsSlice.reducer;

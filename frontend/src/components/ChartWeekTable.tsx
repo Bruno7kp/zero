@@ -202,7 +202,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 ...base,
                 render: (row: ChartData, _index: number) => {
                     let badge = null;
-                    if (showDeltaPlaysBadge) {
+                    if (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) {
                         const { color, label } = getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays);
                         badge = (
                             <Badge variant="light" color={color} size="xs">{label}</Badge>
