@@ -71,11 +71,12 @@
         "remainingToHigher": "Faltam {{value}} para {{level}}",
         "week": "Semana {{n}}",
         "playsLabel": "reproduções",
+        "outOfChart": "Fora do chart por {{n}} semana(s)",
         "showWeek": "Ver esta semana",
         "needOnlineForCert": "Conecte-se para atualizar certificação",
         "noData": "Sem dados",
-        "reload": "Recarregar playcount"
-        ,"periodWeeks": "{{count}} semana(s)"
+        "reload": "Recarregar playcount",
+        "periodWeeks": "{{count}} semana(s)"
       }
     },
     "library": {
@@ -108,13 +109,13 @@
       "chartsCount": "Charts",
       "reindexingWeeks": "Reindexando semanas...",
       "reindexedWeeks": "Semanas reindexadas: {{count}}",
-      "rebuildStats": "Reprocessar stats gerais",
+      "rebuildStats": "Reprocessar estatísticas gerais",
       "rebuild": "Reprocessar",
-      "rebuildStatsConfirm": "Isto irá apagar e recalcular todos os stats gerais para {{chart}}. Continuar?",
-      "rebuildStatsDone": "Stats gerais reconstruídos para {{chart}}",
-      "rebuildStatsFailed": "Falha ao reconstruir stats gerais",
-      "rebuildStatsFor": "Rebuild: {{chart}}"
-      ,"rebuildStatsProgress": "Reprocessando {{chart}} ({{current}} / {{total}})",
+      "rebuildStatsConfirm": "Isto irá apagar e recalcular todas as estatísticas gerais para {{chart}}. Continuar?",
+      "rebuildStatsDone": "Estatísticas gerais reconstruídas para {{chart}}",
+      "rebuildStatsFailed": "Falha ao reconstruir estatísticas gerais",
+      "rebuildStatsFor": "Rebuild: {{chart}}",
+      "rebuildStatsProgress": "Reprocessando {{chart}} ({{current}} / {{total}})",
       "clearChartProgress": "Limpando dados locais de {{chart}}"
     },
     "forms": {
@@ -206,10 +207,10 @@
           "success": "O chart {{chart}} foi removido.",
           "error": "Falha ao remover o chart."
         }
+      },
+      "cache": {
+        "chartCleared": "Dados locais limpos para {{chart}}"
       }
-    ,"cache": {
-      "chartCleared": "Dados locais limpos para {{chart}}"
-    }
     },
     "values": {
       "gold": "Ouro",

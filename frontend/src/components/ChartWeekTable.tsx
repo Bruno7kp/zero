@@ -368,7 +368,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             accessor: 'altVariation',
             title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />, 
             textAlign: 'center',
-            width: 80,
+            width: 70,
             cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
             render: (row: ChartData, index: number) => {
                 const value: any = altVariation ? altVariation(row, index) : false;

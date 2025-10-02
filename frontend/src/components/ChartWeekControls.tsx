@@ -121,13 +121,13 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
 	const topType = `charts.${type}sTop`;
 
-		return (
-			<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between" direction={{ base: 'column', sm: 'row' }}>
+	return (
+		<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between" direction={{ base: 'column', sm: 'row' }}>
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
 				<Flex direction="column" justify="center" align="center" style={{ width: '100%' }}>
-                    <Title order={2}>{t(topType, {cutoff})}</Title>
-                    <Title order={5}>{chart.name}</Title>
+					<Title order={2}>{t(topType, { cutoff })}</Title>
+					<Title order={5}>{chart.name}</Title>
 					<Text fw={600} size="sm">
 						{(() => {
 							const start = dayjs(inputValue);
@@ -196,8 +196,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 			{/* Direita: seleção de visualização + botão de colunas */}
 			<Flex gap="xs" align="center">
-				   {/* Botão de colunas, agora respeita viewType */}
-				   <ChartWeekTableColumnsMenu viewType={view} />
+				{/* Botão de colunas, agora respeita viewType */}
+				<ChartWeekTableColumnsMenu viewType={view} />
 				<SegmentedControl
 					value={view}
 					onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}

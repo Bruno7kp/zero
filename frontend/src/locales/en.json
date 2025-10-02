@@ -34,8 +34,8 @@
       "toSync": "To sync",
       "synced": "Synced",
       "syncStatus": "{{loadedWeeks}} of {{weeks}} weeks loaded",
-  "complete": "Complete",
-  "partial": "Partial",
+      "complete": "Complete",
+      "partial": "Partial",
       "view": "View chart",
       "viewAll": "View all charts",
       "viewLive": "View current week preview",
@@ -71,11 +71,12 @@
         "remainingToHigher": "Remaining {{value}} to {{level}}",
         "week": "Week {{n}}",
         "playsLabel": "plays",
+        "outOfChart": "Out of chart for {{n}} week(s)",
         "showWeek": "Show this week",
         "needOnlineForCert": "Go online to update certification",
         "noData": "No data",
-        "reload": "Reload playcount"
-        ,"periodWeeks": "{{count}} week(s)"
+        "reload": "Reload playcount",
+        "periodWeeks": "{{count}} week(s)"
       }
     },
     "library": {
@@ -113,8 +114,8 @@
       "rebuildStatsConfirm": "This will delete and recompute all general stats for {{chart}}. Continue?",
       "rebuildStatsDone": "General stats rebuilt for {{chart}}",
       "rebuildStatsFailed": "Failed to rebuild general stats",
-      "rebuildStatsFor": "Rebuild: {{chart}}"
-      ,"rebuildStatsProgress": "Rebuilding {{chart}} ({{current}} / {{total}})",
+      "rebuildStatsFor": "Rebuild: {{chart}}",
+      "rebuildStatsProgress": "Rebuilding {{chart}} ({{current}} / {{total}})",
       "clearChartProgress": "Clearing local data for {{chart}}"
     },
     "forms": {
