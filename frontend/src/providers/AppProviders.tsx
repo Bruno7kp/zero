@@ -13,6 +13,17 @@ import { store } from '../store';
 const theme = createTheme({
     defaultRadius: 'lg',
     fontFamily: 'Inter, Greycliff CF, sans-serif',
+    components: {
+        Modal: {
+            defaultProps: {
+                centered: true,
+                overlayProps: {
+                    blur: 5,
+                    backgroundOpacity: 0.5,
+                },
+            },
+        },
+    },
 });
 
 interface AppProvidersProps {

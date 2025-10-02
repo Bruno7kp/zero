@@ -3,10 +3,12 @@ import { IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { spotifyImagesDb } from '../db/spotifyImagesDb';
+import { useTranslation } from 'react-i18next';
 
 export function ClearSpotifyImagesButton() {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   async function handleClear() {
     setLoading(true);
@@ -16,7 +18,7 @@ export function ClearSpotifyImagesButton() {
 
   return (
     <>
-      <Tooltip label="Limpar cache de imagens do Spotify">
+      <Tooltip label={t('spotifyImage.clearSpotifyImagesTooltip')}>
         <Button
           color="red"
           size="xs"
@@ -25,17 +27,17 @@ export function ClearSpotifyImagesButton() {
           loading={loading}
           variant="outline"
         >
-          Limpar imagens
+          {t('spotifyImage.clearSpotifyImagesButton')}
         </Button>
       </Tooltip>
       <ConfirmModal
         opened={modalOpen}
         onClose={() => setModalOpen(false)}
         onConfirm={handleClear}
-        title="Limpar imagens do Spotify"
-        message="Tem certeza que deseja apagar todas as imagens em cache?"
-        confirmLabel="Limpar"
-        cancelLabel="Cancelar"
+        title={t('spotifyImage.clearSpotifyImagesTitle')}
+        message={t('spotifyImage.clearSpotifyImagesMessage')}
+        confirmLabel={t('common.clear')}
+        cancelLabel={t('common.cancel')}
       />
     </>
   );

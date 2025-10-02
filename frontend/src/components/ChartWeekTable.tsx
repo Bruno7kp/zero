@@ -4,100 +4,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { DataTable, type DataTableColumnTextAlign } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
-import { Paper, Text, Checkbox, Menu, ActionIcon, Badge, Flex } from '@mantine/core';
+import { Paper, Text, Badge, Flex } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp, IconSettings } from '@tabler/icons-react';
+import { IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
-import { defaultColumns } from '../store/columnsSlice';
+// defaultColumns removido daqui (agora usado no modal de colunas)
 
-// Permite configurações de colunas separadas para cada tipo de visualização (table/list/grid)
-export function ChartWeekTableColumnsMenu({ viewType, onColumnsChange }: { viewType: 'table' | 'list' | 'grid', onColumnsChange?: (cols: any[]) => void }) {
-    const [opened, setOpened] = useState(false);
-    const { t } = useTranslation();
-    const dispatch = useDispatch<AppDispatch>();
-    const columns = useSelector((state: RootState) => state.columns.columns);
-    const mandatory = ['rank', 'name'];
-
-    // Chave de storage por tipo de visualização
-    const storageKey = `chart_columns_${viewType}`;
-
-    // Carrega do localStorage ao trocar viewType
-    useEffect(() => {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                if (Array.isArray(parsed)) {
-                    parsed.forEach((col: any) => {
-                        dispatch(updateColumn({ key: col.key, visible: col.visible }));
-                    });
-                    if (onColumnsChange) onColumnsChange(parsed);
-                }
-            } catch {}
-        } else {
-            // Se não houver, salva o default atual
-            localStorage.setItem(storageKey, JSON.stringify(columns));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [viewType]);
-
-    // Sempre que columns mudar, salva no localStorage para o tipo atual
-    useEffect(() => {
-        localStorage.setItem(storageKey, JSON.stringify(columns));
-        if (onColumnsChange) onColumnsChange(columns);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [columns]);
-
-    // Garante que a coluna altVariation está presente no Redux
-    useEffect(() => {
-        if (!columns.find((c: any) => c.key === 'altVariation')) {
-            dispatch(updateColumn({ key: 'altVariation', visible: false }));
-        }
-    }, [columns, dispatch]);
-
-    // Mapeia visibilidade do Redux para a ordem e labels do defaultColumns
-    const columnsWithVisibility = defaultColumns.map((col: { key: string; label: string; labelComplete?: string; visible: boolean }) => {
-        const reduxCol = columns.find((c: any) => c.key === col.key);
-        return { ...col, visible: reduxCol ? reduxCol.visible : col.visible };
-    });
-
-    const handleToggle = (key: string) => {
-        if (mandatory.includes(key)) return; // não permite desmarcar colunas obrigatórias
-        const col = columns.find((c: any) => c.key === key);
-        if (col) {
-            dispatch(updateColumn({ key, visible: !col.visible }));
-        }
-    };
-    return (
-        <Menu shadow="md" width={250} opened={opened} onChange={setOpened} closeOnItemClick={false}>
-            <Menu.Target>
-                <ActionIcon size="lg" variant="subtle" onClick={() => setOpened((o) => !o)}>
-                    <IconSettings size={18} />
-                </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-                {columnsWithVisibility.map((col: any) => {
-                    const isMandatory = mandatory.includes(col.key);
-                    return (
-                        <Menu.Item key={col.key}>
-                            <Checkbox
-                                checked={isMandatory ? true : col.visible}
-                                disabled={isMandatory}
-                                onChange={() => handleToggle(col.key)}
-                                label={(col.labelComplete ? t(col.labelComplete) : t(col.label)) || col.key}
-                            />
-                        </Menu.Item>
-                    );
-                })}
-            </Menu.Dropdown>
-        </Menu>
-    );
-}
+// (ChartWeekTableColumnsMenu foi movido para ChartWeekColumnsModal.tsx)
 
 interface ChartWeekTableProps {
     chart: any;
