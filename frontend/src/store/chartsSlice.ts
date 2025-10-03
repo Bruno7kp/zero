@@ -634,8 +634,8 @@ const chartsSlice = createSlice({
     }
   },
   extraReducers: builder => {
-    builder.addCase(fetchChartData.pending, s => { s.loadingData = true; })
-      .addCase(fetchChartData.fulfilled, (s, a) => {
+    builder.addCase(fetchChartData.pending, s => { s.loadingData = true; });
+    builder.addCase(fetchChartData.fulfilled, (s, a) => {
         if (!s.statsCache || typeof s.statsCache !== 'object') s.statsCache = {};
         s.data = a.payload as ChartData[]; s.loadingData = false;
         if (s.data.length) {
@@ -661,12 +661,12 @@ const chartsSlice = createSlice({
             s.statsMap = { ...s.statsMap, ...partial };
           }
         }
-      })
-      .addCase(computeWeekDeltas.fulfilled, () => { /* no-op, data já atualizada pelo reducer */ })
-      .addCase(fetchCharts.pending, s => { s.loadingData = true; })
-      .addCase(fetchCharts.fulfilled, (s, a) => { s.charts = a.payload; s.loadingData = false; })
-      .addCase(deleteChart.fulfilled, (s, a) => { s.charts = s.charts.filter(c => c.id !== a.payload); for (const k of Object.keys(s.statsCache || {})) if (k.startsWith(String(a.payload) + '_')) delete s.statsCache[k]; })
-      .addCase(clearChartLocalData.fulfilled, (s, a) => { if (s.activeChartId === a.payload) { s.data = []; s.statsMap = {}; } for (const k of Object.keys(s.statsCache || {})) if (k.startsWith(String(a.payload) + '_')) delete s.statsCache[k]; });
+      });
+    builder.addCase(computeWeekDeltas.fulfilled, () => { /* no-op, data já atualizada pelo reducer */ });
+    builder.addCase(fetchCharts.pending, s => { s.loadingData = true; });
+    builder.addCase(fetchCharts.fulfilled, (s, a) => { s.charts = a.payload; s.loadingData = false; });
+    builder.addCase(deleteChart.fulfilled, (s, a) => { s.charts = s.charts.filter(c => c.id !== a.payload); for (const k of Object.keys(s.statsCache || {})) if (k.startsWith(String(a.payload) + '_')) delete s.statsCache[k]; });
+    builder.addCase(clearChartLocalData.fulfilled, (s, a) => { if (s.activeChartId === a.payload) { s.data = []; s.statsMap = {}; } for (const k of Object.keys(s.statsCache || {})) if (k.startsWith(String(a.payload) + '_')) delete s.statsCache[k]; });
     // Purga caches em memória também fora do builder após os cases (não temos acesso a 'a' dentro dos callbacks acima para runCache purging sem replicar código)
   }
 });
