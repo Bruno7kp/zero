@@ -3,8 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { Card, Flex, Text, Badge, Collapse, ActionIcon, Box, Divider, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled, IconChevronDown, IconChevronUp, IconStarFilled } from '@tabler/icons-react';
+import { Card, Flex, Text, Collapse, ActionIcon, Box, Divider, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { DeltaBadge } from './DeltaBadge';
+import { selectResolvedBadge } from '../store/badgeStylesSlice';
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
@@ -18,50 +20,6 @@ interface ChartWeekListProps {
   clientSecret: string;
 }
 
-// Utilitário fora do componente principal para não recriar a cada render
-function getDeltaBadgeProps(delta: any, showPercent: boolean = false, currentValue: number = 0) {
-  // Rules:
-  //  - number > 0 => +N green
-  //  - number < 0 => -N red
-  //  - number === 0 => '=' gray
-  //  - 'NEW' => blue
-  //  - 'RE'  => yellow
-  //  - anything else / '-' => gray
-  let color = 'gray';
-  let label: string | number = delta;
-  if (typeof delta === 'number') {
-    if (delta > 0) {
-      color = 'green';
-      if (showPercent && currentValue - delta > 0) {
-        const percent = ((delta / (currentValue - delta)) * 100);
-        label = `+${percent.toFixed(0)}%`;
-      } else {
-        label = `+${delta}`;
-      }
-    } else if (delta < 0) {
-      color = 'red';
-      if (showPercent && currentValue - delta > 0) {
-        const percent = ((delta / (currentValue - delta)) * 100);
-        label = `${percent.toFixed(0)}%`;
-      } else {
-        label = `${delta}`;
-      }
-    } else {
-      color = 'gray';
-      label = '=';
-    }
-  } else if (delta === 'NEW') {
-    color = 'blue';
-    label = 'NEW';
-  } else if (delta === 'RE') {
-    color = 'yellow';
-    label = 'RE';
-  } else if (delta === '-' || delta == null) {
-    color = 'gray';
-    label = '-';
-  }
-  return { color, label };
-}
 
 // Componente de linha memoizado para minimizar rerenders quando statsMap parcial é atualizado
 const ChartWeekListRow: React.FC<{
@@ -83,6 +41,8 @@ const ChartWeekListRow: React.FC<{
 }> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
+  const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
+  const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'list'));
   const [expanded, setExpanded] = useState(false);
   const [imageForceUpdate, setImageForceUpdate] = useState<number>(0);
   const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
@@ -99,11 +59,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
                   <Text fw={700} size="xl" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
-                  {showDeltaBadge && (
-                    <Badge variant="light" color={getDeltaBadgeProps(row.deltaRank).color} size="xs">
-                      {getDeltaBadgeProps(row.deltaRank).label}
-                    </Badge>
-                  )}
+                  {showDeltaBadge && <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext />}
                 </Flex>
               );
             }
@@ -111,11 +67,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
                   <Text fw={700} size="xl">{row.plays}</Text>
-                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && (
-                    <Badge variant="light" color={getDeltaBadgeProps(row.deltaPlays).color} size="xs">
-                      {getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays).label}
-                    </Badge>
-                  )}
+                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext />}
                 </Flex>
               );
             }
@@ -170,29 +122,17 @@ const ChartWeekListRow: React.FC<{
             }
             if (col.key === 'altVariation' && showAltVariationRedux) {
               const value: any = altVariation ? altVariation(row, idx) : false;
-              let color = 'gray', label = '', icon = null;
-              if (value === 'NEW') { color = 'blue'; label = 'NEW'; icon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />; }
-              else if (value === 'RE') { color = 'yellow'; label = 'RE'; icon = <IconArrowBackUp stroke={3} size={14} style={{ verticalAlign: 'middle', transform: 'scaleX(-1)' }} />; }
-              else if (typeof value === 'number' && value < 0) { color = 'red'; label = String(value); icon = <IconCaretDownFilled size={18} style={{ verticalAlign: 'middle' }} />; }
-              else if (typeof value === 'number' && value > 0) { color = 'green'; label = `+${value}`; icon = <IconCaretUpFilled size={18} style={{ verticalAlign: 'middle' }} />; }
-              else if (value === 0 || value === '=') { color = 'gray'; label = '='; }
-              else if (!value || value === '-') { color = 'gray'; label = ''; }
-              else { label = String(value); }
-              return label ? (
-                <Badge
-                  key={col.key}
-                  color={color}
-                  variant={color === 'gray' ? 'light' : 'filled'}
-                  px={0}
-                  mx={0}
-                  style={{ borderRadius: 0, width: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {icon}
-                    <span style={{ fontWeight: 700, fontSize: 12 }}>{label}</span>
-                  </span>
-                </Badge>
-              ) : null;
+              if (!value && value !== 0) return null;
+              let cfg: any = badgeStylesRank;
+              if (badgeStylesRank.iconPosition === 'split') {
+                cfg = { ...badgeStylesRank, iconPosition: 'split', splitTall: badgeStylesRank.splitTall !== false };
+              } else if (badgeStylesRank.iconPosition === 'hidden') {
+                cfg = { ...badgeStylesRank, iconPosition: 'hidden', splitTall: false };
+              } else {
+                cfg = { ...badgeStylesRank, splitTall: false };
+              }
+              // Alt variation as its own column-like block -> use larger font size
+              return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding />;
             }
             return null;
           })}
@@ -214,6 +154,8 @@ const ChartWeekListRow: React.FC<{
   </Card>
   )
 });
+
+// renderStyledBadge removed (use DeltaBadge)
 
 export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
   const dispatch = useDispatch<AppDispatch>();

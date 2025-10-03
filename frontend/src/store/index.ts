@@ -1,6 +1,7 @@
 
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import chartsReducer from './chartsSlice';
+import badgeStylesReducer from './badgeStylesSlice';
 import langReducer from './langSlice';
 import themeReducer from './themeSlice';
 import i18nReducer from './i18nSlice';
@@ -13,7 +14,7 @@ import storage from 'redux-persist/lib/storage';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync'],
+  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync', 'badgeStyles'],
 };
 
 const rootReducer = combineReducers({
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   i18n: i18nReducer,
   auth: authReducer,
   columns: columnsReducer,
+  badgeStyles: badgeStylesReducer,
   sync: syncReducer,
 });
 

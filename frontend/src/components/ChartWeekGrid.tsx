@@ -5,7 +5,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { IconPlus, IconStarFilled, IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
+import { DeltaBadge } from './DeltaBadge';
+import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
@@ -39,53 +41,29 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   // Memorize the last image for each entityId, and only update when a new image is loaded
   // This ensures the image only changes when the new one is ready
   // Função para renderizar o ícone de variação
-  function renderAltVariation(row: ChartData, idx: number) {
-    // In grid mode we rely on deltaRankBadge visibility (mapped by rankVariationLocation) not altVariation column
+  // hook must be at top-level (was incorrectly inside renderAltVariation causing hook order issues)
+  const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'grid'));
+
+  function renderAltVariation(row: ChartData, idx: number, rankCfg: any) {
     const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
     if (!showDelta) return null;
-  const value: any = altVariation ? altVariation(row, idx) : false;
-  let color = 'gray', label = '', icon = null;
-    if (value === 'NEW') {
-      color = 'blue'; label = 'NEW'; icon = <IconStarFilled size={14} style={{ verticalAlign: 'middle' }} />;
-    } else if (value === 'RE') {
-      color = 'yellow'; label = 'RE'; icon = <IconArrowBackUp stroke={3} size={14} style={{ verticalAlign: 'middle', transform: "scaleX(-1)" }} />;
-    } else if (typeof value === 'number' && value < 0) {
-      color = 'red'; label = String(value); icon = <IconCaretDownFilled size={16} style={{ verticalAlign: 'middle' }} />;
-    } else if (typeof value === 'number' && value > 0) {
-      color = 'green'; label = `+${value}`; icon = <IconCaretUpFilled size={16} style={{ verticalAlign: 'middle' }} />;
-    } else if (value === 0 || value === '=') {
-      color = 'gray'; label = '=';
-    } else if (!value || value === '-') {
-      color = 'gray'; label = '';
+    const value: any = altVariation ? altVariation(row, idx) : false;
+    if (!value && value !== 0) return null;
+    let cfg: any = rankCfg;
+    if (rankCfg.iconPosition === 'split') {
+      // In grid we keep compact inline look; disable tall split but allow split pair
+      cfg = { ...rankCfg, iconPosition: 'split', splitTall: false };
+    } else if (rankCfg.iconPosition === 'hidden') {
+      cfg = { ...rankCfg, iconPosition: 'hidden', splitTall: false };
     } else {
-      label = String(value);
+      cfg = { ...rankCfg, splitTall: false };
     }
-    return label ? (
-      <Badge
-        color={color}
-        variant="filled"
-        size="md"
-        px={4}
-        style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            zIndex: 2,
-            borderRadius: 4,
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '4px 6px',
-        }}
-        >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                {icon}
-                <span style={{ fontWeight: 700, fontSize: 12 }}>{label}</span>
-            </span>
-        </Badge>
-
-    ) : null;
+    return (
+      <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+        {/* Grid corner badge -> medium font size for readability without overpowering */}
+  <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" />
+      </Box>
+    );
   }
   const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
@@ -181,7 +159,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
               <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
                 <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
                   {/* Variação canto superior direito */}
-                  {renderAltVariation(row, idx)}
+                  {renderAltVariation(row, idx, badgeStylesRank)}
                   {/* Botão modal canto superior esquerdo */}
                   <ActionIcon
                     size="sm"

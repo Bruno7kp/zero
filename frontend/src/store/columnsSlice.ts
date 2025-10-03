@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { REHYDRATE } from 'redux-persist';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 // Configuração de uma coluna individual
@@ -43,26 +42,12 @@ const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
   table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent' },
-  list: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent' },
+  // Lista: pedido para default ser coluna (variação em coluna)
+  list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationDisplay: 'percent' },
   grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationDisplay: 'hidden' },
 };
 
-// Alinha uma lista de colunas existente ao default (mantém ordem do default e visibilidades quando existir)
-function alignColumns(existing: any): ColumnConfig[] {
-  return defaultColumns.map(dc => {
-    const found = Array.isArray(existing) ? existing.find((c: any) => c.key === dc.key) : undefined;
-    return found ? { ...dc, visible: !!found.visible } : { ...dc };
-  });
-}
-
-// Infer a location from legacy boolean columns
-function inferRankVariationLocation(cols: ColumnConfig[]): 'under' | 'column' | 'hidden' {
-  const deltaBadge = cols.find(c => c.key === 'deltaRankBadge');
-  const altVar = cols.find(c => c.key === 'altVariation');
-  if (altVar?.visible) return 'column';
-  if (deltaBadge?.visible) return 'under';
-  return 'hidden';
-}
+// (helpers legacy removidos – lógica agora fica apenas nos reducers diretos)
 
 function applyRankVariationMapping(cols: ColumnConfig[], location: 'under' | 'column' | 'hidden', view: 'table' | 'list' | 'grid'): ColumnConfig[] {
   return cols.map(c => {
@@ -100,109 +85,9 @@ function defaultState(): ColumnsState {
   };
 }
 
-// Faz merge preenchendo campos faltantes (deep-ish merge controlado)
-function mergeWithDefaults(partial: any): ColumnsState {
-  const base = defaultState();
-  if (!partial || typeof partial !== 'object') return base;
-  (['table','list','grid'] as const).forEach(view => {
-    const incomingView = partial.views?.[view];
-    if (incomingView) {
-      // Columns first
-      let aligned = alignColumns(incomingView.columns);
-      const incSettings = incomingView.settings || {};
-      let location = incSettings.rankVariationLocation;
-      if (!(location === 'under' || location === 'column' || location === 'hidden')) {
-        location = inferRankVariationLocation(aligned);
-      }
-      if (view === 'grid') location = location === 'hidden' ? 'hidden' : 'under';
-      aligned = applyRankVariationMapping(aligned, location, view);
-      // plays variation (migração de formato antigo se existir)
-      let display: 'hidden' | 'absolute' | 'percent' = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
-      if (incomingView.settings) {
-        const s = incomingView.settings as any;
-        if (s.playsVariationDisplay === 'hidden' || s.playsVariationDisplay === 'absolute' || s.playsVariationDisplay === 'percent') {
-          display = s.playsVariationDisplay;
-        } else if (s.playsVariationLocation || s.playsVariationMode) {
-          // converter antigo (location + mode)
-          if (s.playsVariationLocation === 'hidden') display = 'hidden';
-          else if (s.playsVariationMode === 'absolute') display = 'absolute';
-          else if (s.playsVariationMode === 'percent') display = 'percent';
-        }
-      }
-      aligned = applyPlaysVariationDisplay(aligned, display, view);
-      base.views[view].columns = aligned;
-      base.views[view].settings = {
-        containerSize: ['md','lg','xl','100%'].includes(incSettings.containerSize) ? incSettings.containerSize : DEFAULT_VIEW_SETTINGS[view].containerSize,
-        rankVariationLocation: location,
-        playsVariationDisplay: display,
-      };
-    }
-  });
-  return base;
-}
-
-// Migração / carga inicial simples: tenta cada chave e faz merge
+// Estado inicial simples (sem suporte a formatos legados)
 function buildInitialState(): ColumnsState {
-  const legacySingle = (() => {
-    try {
-      const stored = localStorage.getItem('chartWeekColumns');
-      if (!stored) return null;
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : null;
-    } catch { return null; }
-  })();
-
-  const initial = defaultState();
-
-  // Se havia formato legado simples, aplica a TODAS as views como ponto de partida
-  if (legacySingle) {
-    (['table','list','grid'] as const).forEach(v => {
-      let aligned = alignColumns(legacySingle);
-      const loc = inferRankVariationLocation(aligned);
-      if (v === 'grid' && loc === 'column') {
-        // grid não tem coluna - converte para under
-        aligned = applyRankVariationMapping(aligned, 'under', v);
-        initial.views[v].settings.rankVariationLocation = 'under';
-      } else {
-        aligned = applyRankVariationMapping(aligned, loc, v);
-        initial.views[v].settings.rankVariationLocation = loc;
-      }
-      aligned = applyPlaysVariationDisplay(aligned, DEFAULT_VIEW_SETTINGS[v].playsVariationDisplay || 'percent', v);
-      initial.views[v].settings.playsVariationDisplay = DEFAULT_VIEW_SETTINGS[v].playsVariationDisplay;
-      initial.views[v].columns = aligned;
-    });
-  }
-
-  (['table','list','grid'] as const).forEach(view => {
-    try {
-      const raw = localStorage.getItem(`chart_columns_config_${view}`);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      let aligned = alignColumns(parsed?.columns);
-      let loc: any = inferRankVariationLocation(aligned);
-      const storedLoc = parsed?.settings?.rankVariationLocation;
-      if (storedLoc === 'under' || storedLoc === 'column' || storedLoc === 'hidden') loc = storedLoc;
-      if (view === 'grid' && loc === 'column') loc = 'under';
-      aligned = applyRankVariationMapping(aligned, loc, view);
-      // migra plays variation antiga se existir
-      let display: 'hidden' | 'absolute' | 'percent' = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
-      const s = (parsed?.settings || {}) as any;
-      if (s.playsVariationDisplay === 'hidden' || s.playsVariationDisplay === 'absolute' || s.playsVariationDisplay === 'percent') display = s.playsVariationDisplay;
-      else if (s.playsVariationLocation || s.playsVariationMode) {
-        if (s.playsVariationLocation === 'hidden') display = 'hidden';
-        else if (s.playsVariationMode === 'absolute') display = 'absolute';
-        else if (s.playsVariationMode === 'percent') display = 'percent';
-      }
-      aligned = applyPlaysVariationDisplay(aligned, display, view);
-      initial.views[view].columns = aligned;
-      initial.views[view].settings.rankVariationLocation = loc;
-      initial.views[view].settings.playsVariationDisplay = display;
-      const size = parsed?.settings?.containerSize;
-      if (['md','lg','xl','100%'].includes(size)) initial.views[view].settings.containerSize = size;
-    } catch { /* noop */ }
-  });
-
-  return initial;
+  return defaultState();
 }
 
 const persistView = (view: 'table' | 'list' | 'grid', cfg: ViewConfig) => {
@@ -264,19 +149,8 @@ const columnsSlice = createSlice({
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, view);
       persistView(view, state.views[view]);
     },
-    // (migrateLegacy removido - merge automático cobre casos)
   },
-  extraReducers: builder => {
-    // Rehydrate: sempre faz merge com defaults para campo faltante
-    builder.addCase(REHYDRATE as any, (state, action: any) => {
-      const inbound = action.payload?.columns;
-      if (!inbound) return;
-      const merged = mergeWithDefaults(inbound);
-      state.views = merged.views; // substitui tudo por versão saneada
-      // Persiste de volta (garante normalização)
-      (['table','list','grid'] as const).forEach(view => persistView(view, state.views[view]));
-    });
-  }
+  extraReducers: () => {}
 });
 
 export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay } = columnsSlice.actions;

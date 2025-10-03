@@ -4,12 +4,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { DataTable, type DataTableColumnTextAlign } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
-import { Paper, Text, Badge, Flex } from '@mantine/core';
+import { Paper, Text, Flex } from '@mantine/core';
+import { DeltaBadge } from './DeltaBadge';
+import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { IconArrowsDownUp, IconCaretDownFilled, IconCaretUpFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
+import { IconArrowsDownUp } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
@@ -114,6 +116,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
     const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
     const showImage = columns.find((c: any) => c.key === 'image')?.visible;
+    const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
+    const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'table'));
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
 
@@ -130,98 +134,56 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
 
     // Monta colunas para o DataTable
     // Função utilitária para cor/label do badge
-    function getDeltaBadgeProps(delta: any, showPercent: boolean = false, currentValue: number = 0) {
-        // Rules:
-        //  - number > 0 => +N green
-        //  - number < 0 => -N red
-        //  - number === 0 => '=' gray
-        //  - 'NEW' => blue
-        //  - 'RE'  => yellow
-        //  - anything else / '-' => gray
-        let color = 'gray';
-        let label: string | number = delta;
-        if (typeof delta === 'number') {
-            if (delta > 0) { 
-                color = 'green';
-                if (showPercent && currentValue - delta > 0) { 
-                    const percent = ((delta / (currentValue - delta)) * 100);
-                    label = `+${percent.toFixed(0)}%`; 
-                } else {
-                    label = `+${delta}`; 
-                }
-            }
-            else if (delta < 0) {
-                color = 'red';
-                if (showPercent && currentValue - delta > 0) {
-                    const percent = ((delta / (currentValue - delta)) * 100);
-                    label = `${percent.toFixed(0)}%`;
-                } else {
-                    label = `${delta}`;
-                }
-            }
-            else { color = 'gray'; label = '='; }
-        } else if (delta === 'NEW') {
-            color = 'blue'; label = 'NEW';
-        } else if (delta === 'RE') {
-            color = 'yellow'; label = 'RE';
-        } else if (delta === '-' || delta == null) {
-            color = 'gray'; label = '-';
-        }
-        return { color, label };
-    }
+    // getDeltaBadgeProps removed (logic centralized in DeltaBadge)
     // Mapeamento das colunas para o DataTable
-    let dtColumns: DataTableColumn<ChartData>[] = useMemo(() => filteredColumns.map((col: any): DataTableColumn<ChartData> => {
-        const base = {
-            accessor: col.key,
-            title: (col.label ?? t(col.label)) || col.key,
-            textAlign: col.key === 'name' ? 'left' : ('center' as const) as DataTableColumnTextAlign,
-            width: col.key === 'name' ? undefined : 80,
-        };
-        if (col.key === 'rank') {
-            return {
-                ...base,
-                render: (row: ChartData, _index: number) => {
-                    let badge = null;
-                    if (showDeltaBadge) {
-                        const { color, label } = getDeltaBadgeProps(row.deltaRank);
-                        badge = (
-                            <Badge variant="light" color={color} size="xs">{label}</Badge>
+    const dtColumns: DataTableColumn<ChartData>[] = useMemo(() => {
+        const built = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
+            const base = {
+                accessor: col.key,
+                title: (col.label ?? t(col.label)) || col.key,
+                textAlign: col.key === 'name' ? 'left' : ('center' as const) as DataTableColumnTextAlign,
+                width: col.key === 'name' ? undefined : 80,
+            };
+            if (col.key === 'rank') {
+                return {
+                    ...base,
+                    render: (row: ChartData) => {
+                        let badge = null;
+                        if (showDeltaBadge) {
+                            // Under-number badge context -> compact font size xs
+                            badge = <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext />;
+                        }
+                        return (
+                            <Flex direction="column" align="center">
+                                <Text fw={700} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
+                                {badge}
+                            </Flex>
                         );
                     }
-                    return (
-                        <Flex direction="column" align="center">
-                            <Text fw={700} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
-                            {badge}
-                        </Flex>
-                    );
-                }
-            };
-        }
-        if (col.key === 'plays') {
-            return {
-                ...base,
-                render: (row: ChartData, _index: number) => {
-                    let badge = null;
-                    if (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) {
-                        const { color, label } = getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays);
-                        badge = (
-                            <Badge variant="light" color={color} size="xs">{label}</Badge>
+                };
+            }
+            if (col.key === 'plays') {
+                return {
+                    ...base,
+                    render: (row: ChartData) => {
+                        let badge = null;
+                        if (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) {
+                            // Under-number badge context -> compact font size xs
+                            badge = <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext />;
+                        }
+                        return (
+                            <Flex direction="column" align="center">
+                                <Text fw={700}>{row.plays}</Text>
+                                {badge}
+                            </Flex>
                         );
                     }
-                    return (
-                        <Flex direction="column" align="center">
-                            <Text fw={700}>{row.plays}</Text>
-                            {badge}
-                        </Flex>
-                    );
-                }
-            };
-        }
-        if (col.key === 'name') {
-            return {
-                ...base,
-                render: (row: ChartData, _index: number) => {
-                    return (
+                };
+            }
+            if (col.key === 'name') {
+                return {
+                    ...base,
+                    render: (row: ChartData) => (
                         <Flex>
                             {showImage && (
                                 <Flex
@@ -246,10 +208,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                                         lastImageUrl={lastImageUrlByEntityId[row.entityId]}
                                         onImageChange={() => {
                                             setImageForceUpdate(f => ({ ...f, [row.entityId]: Date.now() }));
-                                            // Não troca a imagem imediatamente, só quando a nova carregar
                                         }}
                                         onImageLoad={(url: string) => {
-                                            // Só troca a imagem quando a nova já está pronta
                                             if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
                                                 setLastImageUrlByEntityId(prev => ({ ...prev, [row.entityId]: url }));
                                             }
@@ -262,127 +222,82 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                                 {row.artistName && <Text size="sm">{row.artistName}</Text>}
                             </Flex>
                         </Flex>
-                    );
-                },
-            };
-        }
-        if (col.key === 'peak') {
-            return {
-                ...base,
-                render: (row: ChartData, _index: number) => {
-                    const stats = statsMap[row.entityId];
-                    const peakVal = stats?.peak?.position ?? '-';
-                    return (
-                        <Flex direction="column" align="center">
-                            <Text fw={700} c={peakVal === 1 ? 'blue' : undefined}>{stats ? peakVal : (loadingStats ? '…' : '-')}</Text>
-                        </Flex>
-                    );
-                },
-            };
-        }
-        if (col.key === 'totalWeeks') {
-            return {
-                ...base,
-                render: (row: ChartData, _index: number) => {
-                    const stats = statsMap[row.entityId];
-                    const totalWeeks = stats?.totals?.withinCutoff ?? '-';
-                    return (
-                        <Flex direction="column" align="center">
-                            <Text fw={700}>{stats ? totalWeeks : (loadingStats ? '…' : '-')}</Text>
-                        </Flex>
-                    );
-                },
-            };
-        }
-        return {
-            ...base,
-            render: (row: ChartData, _index: number) => {
-                return <Text>{row.id}</Text>;
+                    ),
+                };
             }
-        };
-    }), [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type]);
-    // Adiciona coluna de variação visual se ativada (agora controlada pelo Redux)
-    if (showAltVariationRedux) {
-        // Remove qualquer coluna Δ já existente
-        dtColumns = dtColumns.filter(col => col.accessor !== 'altVariation');
-        // Cria a coluna Δ
-        const altVariationCol: DataTableColumn<ChartData> = {
-            accessor: 'altVariation',
-            title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />, 
-            textAlign: 'center',
-            width: 70,
-            cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
-            render: (row: ChartData, index: number) => {
-                const value: any = altVariation ? altVariation(row, index) : false;
-                let color = 'gray', label = '', rightIcon = null;
-                if (value === 'NEW') {
-                    color = 'blue'; label = 'NEW'; rightIcon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />;
-                } else if (value === 'RE') {
-                    color = 'yellow'; label = 'RE'; rightIcon = <IconArrowBackUp stroke={3} size={16} style={{ verticalAlign: 'middle', transform: "scaleX(-1)" }} />;
-                } else if (typeof value === 'number' && value < 0) {
-                    color = 'red'; label = String(value); rightIcon = <IconCaretDownFilled size={16} style={{ verticalAlign: 'middle' }} />;
-                } else if (typeof value === 'number' && value > 0) {
-                    color = 'green'; label = `+${value}`; rightIcon = <IconCaretUpFilled size={16} style={{ verticalAlign: 'middle' }} />;
-                } else if (value === 0 || value === '=') {
-                    color = 'gray'; label = '=';  rightIcon = ' ';
-                } else if (!value || value === '-') {
-                    color = 'gray'; label = '';
-                } else {
-                    label = String(value);
-                }
-                return label ? (
-                    <Flex direction="row" gap="sm" align="center" style={{ height: 40 }}>
-                        <Badge 
-                            color={color} 
-                            variant="light" 
-                            size="md" 
-                            style={{
-                                borderRadius: 0,
-                                width: 40,
-                                padding: 0,
-                                fontWeight: 700,
-                                fontSize: 12,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            {label}
-                        </Badge>
-                        <Badge 
-                            color={color} 
-                            variant={color === 'gray' ? 'light' : 'filled'}
-                            size="md" 
-                            style={{
-                                borderRadius: 0,
-                                width: 15,
-                                height: '100%',
-                                minHeight: 32,
-                                padding: 0,
-                                display: 'flex',
-                                alignItems: 'stretch',
-                            }}
-                        >
-                            <Flex align="center" justify="center" style={{height: '100%', width: '100%'}}>
-                                {rightIcon}
+            if (col.key === 'peak') {
+                return {
+                    ...base,
+                    render: (row: ChartData) => {
+                        const stats = statsMap[row.entityId];
+                        const peakVal = stats?.peak?.position ?? '-';
+                        return (
+                            <Flex direction="column" align="center">
+                                <Text fw={700} c={peakVal === 1 ? 'blue' : undefined}>{stats ? peakVal : (loadingStats ? '…' : '-')}</Text>
                             </Flex>
-                        </Badge>
-                    </Flex>
-                ) : null;
+                        );
+                    },
+                };
             }
-        };
-        // Encontra o índice da coluna rank
-        const rankIdx = dtColumns.findIndex(col => col.accessor === 'rank');
-        if (rankIdx !== -1) {
-            dtColumns = [
-                ...dtColumns.slice(0, rankIdx + 1),
-                altVariationCol,
-                ...dtColumns.slice(rankIdx + 1)
-            ];
-        } else {
-            dtColumns = [altVariationCol, ...dtColumns];
+            if (col.key === 'totalWeeks') {
+                return {
+                    ...base,
+                    render: (row: ChartData) => {
+                        const stats = statsMap[row.entityId];
+                        const totalWeeks = stats?.totals?.withinCutoff ?? '-';
+                        return (
+                            <Flex direction="column" align="center">
+                                <Text fw={700}>{stats ? totalWeeks : (loadingStats ? '…' : '-')}</Text>
+                            </Flex>
+                        );
+                    },
+                };
+            }
+            return {
+                ...base,
+                render: (row: ChartData) => <Text>{row.id}</Text>
+            };
+        });
+        if (showAltVariationRedux) {
+            // Build proper altVariation column definition
+            const altVariationCol: DataTableColumn<ChartData> = {
+                accessor: 'altVariation',
+                title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
+                textAlign: 'center',
+                width: 65,
+                cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
+                render: (row: ChartData, index: number) => {
+                    const value: any = altVariation ? altVariation(row, index) : false;
+                    if (!value && value !== 0) return null;
+                    // Only use splitTall if current preset actually uses split (maximalist). Otherwise follow current style.
+                    let cfg: any = badgeStylesRank;
+                    if (badgeStylesRank.iconPosition === 'split') {
+                        cfg = { ...badgeStylesRank, iconPosition: 'split', splitTall: badgeStylesRank.splitTall !== false };
+                    } else if (badgeStylesRank.iconPosition === 'hidden') {
+                        // ensure some icon visibility for altVariation? Keep hidden to mirror style.
+                        cfg = { ...badgeStylesRank, iconPosition: 'hidden', splitTall: false };
+                    } else {
+                        cfg = { ...badgeStylesRank, splitTall: false };
+                    }
+                    // Alt variation shown in its own column -> emphasized font size lg
+                    return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding />;
+                }
+            };
+            const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altVariation');
+            if (existingIdx !== -1) {
+                built[existingIdx] = altVariationCol;
+                return built;
+            }
+            const rankIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'rank');
+            if (rankIdx !== -1) {
+                return [...built.slice(0, rankIdx + 1), altVariationCol, ...built.slice(rankIdx + 1)];
+            }
+            return [altVariationCol, ...built];
         }
-    }
+        return built;        
+    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation]);
+
+    // legacy helper removed (logic centralized in DeltaBadge)
 
     const useProgressive = data.length > 120; // desativa para listas pequenas
     const progressiveAll = useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 });
