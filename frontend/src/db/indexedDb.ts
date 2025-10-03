@@ -26,6 +26,18 @@ export interface ChartStats {
   totals?: any;
   sequences?: any;
   chartRun?: Array<{ week: string; position: number; plays: number }>;
+  // Incremental runtime metadata (versão 2+)
+  _running?: {
+    lastWeek: string | null;
+    lastRank: number | null;
+    weeksProcessed: number;
+    version: number;
+    seqPeak: number;
+    seqRank1: number;
+    seqTop5: number;
+    seqTop10: number;
+    seqWithinCutoff: number;
+  };
 }
 
 export interface ChartWeekRow {
@@ -42,8 +54,8 @@ export class ZeroChartsDB extends Dexie {
 
   constructor() {
     super('ZeroChartsDB');
-    // Consolidated final schema (bumped to v15 to force a one-time idempotent upgrade for any lingering data)
-    this.version(15).stores({
+    // Schema v16: adds _running incremental metadata (no index change needed)
+    this.version(16).stores({
       charts_data: `++id, chartId, chartType, entityId, week, rank, plays, name, artistName, [chartId+chartType], [chartId+chartType+week], [chartId+chartType+entityId], &[chartId+chartType+entityId+week], [artistName+chartType]`,
       charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`,
       playcount_cache: `key, expires`,
@@ -58,6 +70,27 @@ export class ZeroChartsDB extends Dexie {
           delete row.completed;
         });
       } catch {/* ignore */}
+      // Add _running metadata to existing stats if missing
+      try {
+        const statsTable: any = tx.table('charts_stats');
+        await statsTable.toCollection().modify((row: any) => {
+          if (!row._running) {
+            // Best-effort infer lastWeek from chartRun
+            const lastWeek = Array.isArray(row.chartRun) && row.chartRun.length ? row.chartRun[row.chartRun.length - 1].week : null;
+            row._running = {
+              lastWeek,
+              lastRank: null,
+              weeksProcessed: Array.isArray(row.chartRun) ? row.chartRun.length : 0,
+              version: 2,
+              seqPeak: 0,
+              seqRank1: 0,
+              seqTop5: 0,
+              seqTop10: 0,
+              seqWithinCutoff: 0,
+            };
+          }
+        });
+      } catch {/* ignore stats upgrade */}
     });
   }
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text } from '@mantine/core';
 import { ChartItemStats } from './ChartItemStats';
-import { calculateStatsForEntity } from '../utils/calculateStatsForEntity';
+// Incremental full stats (peak/sequences/aggregate) updater
+import { rebuildFullStats, applyWeekToFullStats } from '../utils/incrementalFullStats';
 import { db } from '../db/indexedDb';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
@@ -26,15 +27,34 @@ export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { c
     let mounted = true;
     setLoading(true);
     // Recalcula sempre que cutoff mudar para manter sequences corretas.
-    calculateStatsForEntity(chartId, chartType, entityId, cutoff)
-      .then(async () => {
-        const stats = await db.charts_stats.get([chartId, chartType, entityId]);
-        const one = await db.charts_data.where(['chartId','chartType','entityId']).equals([chartId, chartType, entityId]).first();
-        if (mounted) {
-          setGeralStats(stats);
-          setEntityMeta({ name: one?.name || '', artistName: one?.artistName || '' });
+    (async () => {
+      // Verifica se já existem stats incrementais
+      let stats: any = await db.charts_stats.get([chartId, chartType, entityId]);
+      const needsVersionUpgrade = stats && stats._running && stats._running.version !== 3;
+      const missingChartRun = stats && !Array.isArray(stats.chartRun);
+      if (!stats || stats?._needsRebuild || needsVersionUpgrade || missingChartRun) {
+        await rebuildFullStats(chartId, chartType, entityId, cutoff);
+        stats = await db.charts_stats.get([chartId, chartType, entityId]);
+      } else {
+        const lastWeek = stats?._running?.lastWeek;
+        if (lastWeek) {
+          const newer = await db.charts_data
+            .where(['chartId','chartType','entityId'])
+            .equals([chartId, chartType, entityId])
+            .filter(r => r.week > lastWeek)
+            .sortBy('week');
+          for (const row of newer) {
+            await applyWeekToFullStats(row, { cutoff });
+          }
+          if (newer.length) stats = await db.charts_stats.get([chartId, chartType, entityId]);
         }
-      })
+      }
+      const one = await db.charts_data.where(['chartId','chartType','entityId']).equals([chartId, chartType, entityId]).first();
+      if (mounted) {
+        setGeralStats(stats);
+        setEntityMeta({ name: one?.name || '', artistName: one?.artistName || '' });
+      }
+    })()
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
   }, [chartId, chartType, entityId, cutoff]);

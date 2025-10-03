@@ -127,7 +127,7 @@ const LivePage = () => {
         },
         {
             accessor: 'name',
-            title: t(`charts.${chartType}`),
+            title: 'Title',
             render: (item) => (
                 <Flex direction="column">
                     <Text fw={700}>{item.name}</Text>
@@ -138,7 +138,7 @@ const LivePage = () => {
         },
         {
             accessor: 'playcount',
-            title: t('charts.plays'),
+            title: 'Plays',
             width: rem(80),
             textAlign: 'center',
         }

@@ -27,6 +27,8 @@
       "artistsTop": "Top {{cutoff}} Artistas",
       "albumsTop": "Top {{cutoff}} Álbuns",
       "tracksTop": "Top {{cutoff}} Músicas",
+      "columns": "Colunas",
+      "columnsConfig": "Configuração visual",
       "sales": "vendas",
       "salesExample": "Ex: 'Control' de Janet Jackson alcançou a marca de 100.000 *vendas / cópias / unidades / pontos / streams* conquistando o certificado de Disco de Platina.",
       "lastWeek": "Última semana",
@@ -47,8 +49,74 @@
       "playsLabel": "Plays: Reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
       "deltaPercentPlaysLabel": "Variação % de reproduções",
+      "playsVariationLocationLabel": "Variação de reproduções",
+      "playsVariationShow": "Mostrar",
+      "playsVariationHide": "Ocultar",
+      "playsVariationModeLabel": "Modo da variação",
+      "playsVariationModeAbsolute": "Absoluta",
+      "playsVariationModePercent": "Percentual",
+      "playsVariationDisplayLabel": "Variação de reproduções",
+      "playsVariationDisplay_hidden": "Ocultar",
+      "playsVariationDisplay_absolute": "Absoluta",
+      "playsVariationDisplay_percent": "Porcentagem",
       "peakLabel": "Peak: Pico",
       "weeksLabel": "Weeks: Semanas",
+      "rankVariationLocationLabel": "Exibição da variação de rank",
+      "rankVariationUnder": "Abaixo do rank",
+      "rankVariationColumn": "Coluna própria",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "size": "Tamanho",
+      "tableView": "Tabela",
+      "listView": "Lista",
+      "gridView": "Grid",
+      "badgeStyles": {
+        "title": "Customização de badges",
+        "section": "Badges",
+        "kindRank": "Rank",
+        "kindPlays": "Reproduções",
+        "modePreset": "Presets",
+        "modeCustom": "Avançado",
+        "preset_transparent": "Transparente",
+        "preset_transparentIcon": "Transparente + Ícone",
+        "preset_light": "Claro",
+        "preset_lightIcon": "Claro + Ícone",
+        "preset_solid": "Sólido",
+        "preset_solidIcon": "Sólido + Ícone",
+        "preset_maximalist": "Maximalista",
+        "preset_maximalistLight": "Maximalista Leve",
+        "presetsTitle": "Presets",
+        "field_variant": "Variante",
+        "field_iconPosition": "Ícone",
+        "field_radius": "Raio",
+        "field_size": "Tamanho",
+        "field_preview": "Pré-visualização",
+        "field_splitIconVariant": "Badge do ícone (split)",
+        "variant_inherit": "Herdar",
+        "variant_light": "Claro",
+        "variant_filled": "Preenchido",
+        "variant_outline": "Contorno",
+        "variant_transparent": "Ghost",
+        "icon_inherit": "Herdar",
+        "icon_before": "Antes",
+        "icon_after": "Depois",
+        "icon_split": "Split",
+        "icon_hidden": "Oculto",
+        "radius_inherit": "Herdar",
+        "radius_0": "Quadrado",
+        "radius_xs": "XS",
+        "radius_sm": "SM",
+        "radius_md": "MD",
+        "radius_lg": "LG",
+        "radius_pill": "Pílula",
+        "size_inherit": "Herdar",
+        "size_xs": "XS",
+        "size_sm": "SM",
+        "size_md": "MD",
+        "splitIconFilled": "Ícone Filled",
+        "splitIconGhost": "Ícone Ghost",
+        "splitIconInherit": "Herdar"
+      },
       "stats": {
         "title": "Estatísticas",
         "weeksOnChart": "Semanas no chart",
@@ -71,11 +139,12 @@
         "remainingToHigher": "Faltam {{value}} para {{level}}",
         "week": "Semana {{n}}",
         "playsLabel": "reproduções",
+        "outOfChart": "Fora do chart por {{n}} semana(s)",
         "showWeek": "Ver esta semana",
         "needOnlineForCert": "Conecte-se para atualizar certificação",
         "noData": "Sem dados",
-        "reload": "Recarregar playcount"
-        ,"periodWeeks": "{{count}} semana(s)"
+        "reload": "Recarregar playcount",
+        "periodWeeks": "{{count}} semana(s)"
       }
     },
     "library": {
@@ -104,10 +173,18 @@
       "syncNow": "Sincronizar agora",
       "needOnline": "Requer conexão",
       "sync": "Sync",
-      "clearChartData": "Limpar dados locais",
+      "clearChartData": "Apagar semanas salvas no navegador",
       "chartsCount": "Charts",
       "reindexingWeeks": "Reindexando semanas...",
-      "reindexedWeeks": "Semanas reindexadas: {{count}}"
+      "reindexedWeeks": "Semanas reindexadas: {{count}}",
+      "rebuildStats": "Reprocessar estatísticas gerais",
+      "rebuild": "Reprocessar",
+      "rebuildStatsConfirm": "Isto irá apagar e recalcular todas as estatísticas gerais para {{chart}}. Continuar?",
+      "rebuildStatsDone": "Estatísticas gerais reconstruídas para {{chart}}",
+      "rebuildStatsFailed": "Falha ao reconstruir estatísticas gerais",
+      "rebuildStatsFor": "Rebuild: {{chart}}",
+      "rebuildStatsProgress": "Reprocessando {{chart}} ({{current}} / {{total}})",
+      "clearChartProgress": "Limpando dados locais de {{chart}}"
     },
     "forms": {
       "createChart": {
@@ -150,7 +227,10 @@
       },
       "editChart": {
         "title": "Editar chart",
-        "saveButton": "Salvar"
+        "saveButton": "Salvar",
+        "keyFieldsChangeTitle": "Configurações centrais alteradas",
+        "keyFieldsChangeMessage": "Você alterou campos centrais que mudam como as semanas são geradas: {{fields}}. Isso vai invalidar semanas e stats já armazenados localmente. Aplicar mudanças e limpar dados locais?",
+        "applyAndReload": "Aplicar e Limpar Dados"
       },
       "deleteChart": {
         "title": "Excluir chart",
@@ -195,10 +275,10 @@
           "success": "O chart {{chart}} foi removido.",
           "error": "Falha ao remover o chart."
         }
+      },
+      "cache": {
+        "chartCleared": "Dados locais limpos para {{chart}}"
       }
-    ,"cache": {
-      "chartCleared": "Dados locais limpos para {{chart}}"
-    }
     },
     "values": {
       "gold": "Ouro",
@@ -242,14 +322,29 @@
         "title": "Última atualização",
         "button": "Ver todas as atualizações"
       }
+    },
+    "imageEditModal": {
+      "title": "Imagem",
+      "squareWarning": "A imagem deve ser quadrada!",
+      "domainNotice": "Por segurança, só é possível usar imagens de sites confiáveis como Last.fm, Spotify, Imgur, Unsplash, etc. Caso queira usar uma imagem própria, faça upload em um serviço como Imgur ou Cloudinary e cole o link aqui.",
+      "urlPlaceholder": "URL da imagem",
+      "save": "Salvar",
+      "fetchSpotify": "Buscar do Spotify"
+    },
+    "common": {
+      "reset": "Redefinir",
+      "close": "Fechar",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "clear": "Limpar",
+      "confirmationTitle": "Confirmação",
+      "confirmationMessage": "Tem certeza que deseja prosseguir?"
+    },
+    "spotifyImage": {
+      "clearSpotifyImagesTooltip": "Limpar cache de imagens do Spotify",
+      "clearSpotifyImagesButton": "Limpar imagens Spotify",
+      "clearSpotifyImagesTitle": "Limpar imagens do Spotify",
+      "clearSpotifyImagesMessage": "Isto irá apagar todas as imagens salvas do Spotify no cache local. Continuar?"
     }
-  },
-  "imageEditModal": {
-    "title": "Imagem",
-    "squareWarning": "A imagem deve ser quadrada!",
-    "domainNotice": "Por segurança, só é possível usar imagens de sites confiáveis como Last.fm, Spotify, Imgur, Unsplash, etc. Caso queira usar uma imagem própria, faça upload em um serviço como Imgur ou Cloudinary e cole o link aqui.",
-    "urlPlaceholder": "URL da imagem",
-    "save": "Salvar",
-    "fetchSpotify": "Buscar do Spotify"
   }
 }

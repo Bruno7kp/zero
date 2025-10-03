@@ -74,7 +74,7 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
   const nextPct = nextTarget ? Math.min(100, (totalFormula / nextTarget) * 100) : 100;
 
   return (
-    <Card p="sm" withBorder>
+    <Card p="sm" style={{ backgroundColor: 'transparent' }} shadow="none">
       <Group wrap="nowrap" align="center" gap="sm">
         <ThemeIcon size={46} radius="xl" color={color} variant="filled"><IconDisc size={28} /></ThemeIcon>
         <Stack gap={2} style={{ flex: 1 }}>

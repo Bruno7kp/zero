@@ -1,10 +1,12 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
-import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { Card, Flex, Text, Badge, Collapse, ActionIcon, Box, Divider, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled, IconChevronDown, IconChevronUp, IconStarFilled } from '@tabler/icons-react';
+import { Card, Flex, Text, Collapse, ActionIcon, Box, Divider, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { DeltaBadge } from './DeltaBadge';
+import { selectResolvedBadge } from '../store/badgeStylesSlice';
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
@@ -18,50 +20,6 @@ interface ChartWeekListProps {
   clientSecret: string;
 }
 
-// Utilitário fora do componente principal para não recriar a cada render
-function getDeltaBadgeProps(delta: any, showPercent: boolean = false, currentValue: number = 0) {
-  // Rules:
-  //  - number > 0 => +N green
-  //  - number < 0 => -N red
-  //  - number === 0 => '=' gray
-  //  - 'NEW' => blue
-  //  - 'RE'  => yellow
-  //  - anything else / '-' => gray
-  let color = 'gray';
-  let label: string | number = delta;
-  if (typeof delta === 'number') {
-    if (delta > 0) {
-      color = 'green';
-      if (showPercent && currentValue - delta > 0) {
-        const percent = ((delta / (currentValue - delta)) * 100);
-        label = `+${percent.toFixed(0)}%`;
-      } else {
-        label = `+${delta}`;
-      }
-    } else if (delta < 0) {
-      color = 'red';
-      if (showPercent && currentValue - delta > 0) {
-        const percent = ((delta / (currentValue - delta)) * 100);
-        label = `${percent.toFixed(0)}%`;
-      } else {
-        label = `${delta}`;
-      }
-    } else {
-      color = 'gray';
-      label = '=';
-    }
-  } else if (delta === 'NEW') {
-    color = 'blue';
-    label = 'NEW';
-  } else if (delta === 'RE') {
-    color = 'yellow';
-    label = 'RE';
-  } else if (delta === '-' || delta == null) {
-    color = 'gray';
-    label = '-';
-  }
-  return { color, label };
-}
 
 // Componente de linha memoizado para minimizar rerenders quando statsMap parcial é atualizado
 const ChartWeekListRow: React.FC<{
@@ -83,6 +41,8 @@ const ChartWeekListRow: React.FC<{
 }> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
+  const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
+  const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'list'));
   const [expanded, setExpanded] = useState(false);
   const [imageForceUpdate, setImageForceUpdate] = useState<number>(0);
   const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
@@ -99,11 +59,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
                   <Text fw={700} size="xl" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
-                  {showDeltaBadge && (
-                    <Badge variant="light" color={getDeltaBadgeProps(row.deltaRank).color} size="xs">
-                      {getDeltaBadgeProps(row.deltaRank).label}
-                    </Badge>
-                  )}
+                  {showDeltaBadge && <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext />}
                 </Flex>
               );
             }
@@ -111,11 +67,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
                   <Text fw={700} size="xl">{row.plays}</Text>
-                  {showDeltaPlaysBadge && (
-                    <Badge variant="light" color={getDeltaBadgeProps(row.deltaPlays).color} size="xs">
-                      {getDeltaBadgeProps(row.deltaPlays, showDeltaPercentPlaysBadge, row.plays).label}
-                    </Badge>
-                  )}
+                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext />}
                 </Flex>
               );
             }
@@ -170,29 +122,17 @@ const ChartWeekListRow: React.FC<{
             }
             if (col.key === 'altVariation' && showAltVariationRedux) {
               const value: any = altVariation ? altVariation(row, idx) : false;
-              let color = 'gray', label = '', icon = null;
-              if (value === 'NEW') { color = 'blue'; label = 'NEW'; icon = <IconStarFilled size={10} style={{ verticalAlign: 'middle' }} />; }
-              else if (value === 'RE') { color = 'yellow'; label = 'RE'; icon = <IconArrowBackUp stroke={3} size={14} style={{ verticalAlign: 'middle', transform: 'scaleX(-1)' }} />; }
-              else if (typeof value === 'number' && value < 0) { color = 'red'; label = String(value); icon = <IconCaretDownFilled size={18} style={{ verticalAlign: 'middle' }} />; }
-              else if (typeof value === 'number' && value > 0) { color = 'green'; label = `+${value}`; icon = <IconCaretUpFilled size={18} style={{ verticalAlign: 'middle' }} />; }
-              else if (value === 0 || value === '=') { color = 'gray'; label = '='; }
-              else if (!value || value === '-') { color = 'gray'; label = ''; }
-              else { label = String(value); }
-              return label ? (
-                <Badge
-                  key={col.key}
-                  color={color}
-                  variant={color === 'gray' ? 'light' : 'filled'}
-                  px={0}
-                  mx={0}
-                  style={{ borderRadius: 0, width: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {icon}
-                    <span style={{ fontWeight: 700, fontSize: 12 }}>{label}</span>
-                  </span>
-                </Badge>
-              ) : null;
+              if (!value && value !== 0) return null;
+              let cfg: any = badgeStylesRank;
+              if (badgeStylesRank.iconPosition === 'split') {
+                cfg = { ...badgeStylesRank, iconPosition: 'split', splitTall: badgeStylesRank.splitTall !== false };
+              } else if (badgeStylesRank.iconPosition === 'hidden') {
+                cfg = { ...badgeStylesRank, iconPosition: 'hidden', splitTall: false };
+              } else {
+                cfg = { ...badgeStylesRank, splitTall: false };
+              }
+              // Alt variation as its own column-like block -> use larger font size
+              return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding />;
             }
             return null;
           })}
@@ -211,14 +151,16 @@ const ChartWeekListRow: React.FC<{
           </>
         )}
       </Collapse>
-    </Card>
-  );
+  </Card>
+  )
 });
+
+// renderStyledBadge removed (use DeltaBadge)
 
 export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
   const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
-  const columns = useSelector((state: any) => state.columns.columns);
+  const columns = useSelector((state: any) => (state.columns?.views?.list?.columns) || state.columns?.columns || []);
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
 
@@ -228,12 +170,55 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     dispatch(fetchChartData({ chartId: `${chart.id}`, chartType: type, week }));
   }, [chart?.id, week, type, dispatch]);
 
-  // Buscar stats ao trocar dados/semana
   useEffect(() => {
     if (!data.length || !week || !chart?.id) return;
-    const cutoff = 100;
-    dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
-  }, [data, chart?.id, type, week, dispatch]);
+    dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
+  }, [data, week, chart?.id, type, dispatch]);
+
+  // Stats diferidos: só agenda se colunas que dependem de stats estiverem visíveis (peak/totalWeeks)
+  useEffect(() => {
+    if (!data.length || !week || !chart?.id) return;
+    const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+    if (!wantsStats) return;
+    let cancelled = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const id = setTimeout(() => {
+        if (cancelled) return;
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+      }, 900);
+      (window as any).__listStatsTimer = id;
+    }));
+    return () => {
+      cancelled = true;
+      if ((window as any).__listStatsTimer) clearTimeout((window as any).__listStatsTimer);
+    };
+  }, [data, chart?.id, type, week, dispatch, columns]);
+
+  // Refetch incremental quando usuário habilita colunas de stats depois
+  const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible), [columns]);
+  const [statsColsPrev, setStatsColsPrev] = useState(statsColumnsVisible);
+  useEffect(() => {
+    if (statsColumnsVisible && !statsColsPrev && data.length && week && chart?.id) {
+      dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+    }
+    if (statsColsPrev !== statsColumnsVisible) setStatsColsPrev(statsColumnsVisible);
+  }, [statsColumnsVisible, statsColsPrev, data, week, chart?.id, type, dispatch]);
+
+  // Fallback de reforço se stats não chegarem
+  useEffect(() => {
+    if (!statsColumnsVisible || !data.length || !week || !chart?.id) return;
+    const state: any = (window as any).__reduxStateCache; // opcional se existir caching global
+  const hasAny = data.some((r: any) => {
+      const s = (state?.charts?.statsMap || ({} as any))[r.entityId];
+      return s && s.totals && s.totals.withinCutoff != null;
+    });
+    // Se não temos acesso a state global via hack, fazemos checagem via dispatch indireta (omitido). Simplesmente agenda fallback:
+    if (hasAny) return;
+    const id = setTimeout(() => {
+      dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+    }, 1300);
+    return () => clearTimeout(id);
+  }, [statsColumnsVisible, data, week, chart?.id, type, dispatch]);
 
   const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
   const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
@@ -241,7 +226,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
   const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
-  const filteredColumns = visibleColumns.filter((c: any) => c.key !== 'deltaRankBadge' && c.key !== 'deltaPlaysBadge' && c.key !== 'deltaPercentPlaysBadge' && c.key !== 'image');
+  const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
 
   // Badge util agora está fora
 
@@ -279,6 +264,6 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
       </Flex>
     )}
     {/* Modal agora é controlado pelo SpotifyImageWithModal */}
-  </Flex>
+      </Flex>
   );
 };

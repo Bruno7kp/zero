@@ -18,8 +18,9 @@ import { IconSettings, IconCloudOff, IconCloudCheck, IconRefresh } from '@tabler
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
-import { fetchCharts, setActiveChartId, deleteChart, clearChartLocalData } from '../store/chartsSlice';
+import { fetchCharts, setActiveChartId, deleteChart } from '../store/chartsSlice';
 import { db } from '../db/indexedDb';
+import { useChartMaintenance } from '../hooks/useChartMaintenance';
 import { syncCharts } from '../store/syncSlice';
 import { useTranslation } from 'react-i18next';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
@@ -131,31 +132,8 @@ function SettingsPage() {
     });
   };
 
-  // Listener para ação de limpar dados locais de um chart
-  useEffect(() => {
-    const handler = ({ detail }: any) => {
-  const { chartId, chartName } = detail || {};
-      if (!chartId) return;
-      modals.openConfirmModal({
-        title: t('settings.clearChartData') + ': ' + chartName,
-  children: <Text size="sm">{t('settings.clearChartData')}? ({chartName})</Text>,
-        labels: { confirm: t('settings.clearChartData'), cancel: t('forms.deleteChart.cancelButton') },
-        confirmProps: { color: 'grape' },
-        onConfirm: async () => {
-          try {
-            await dispatch(clearChartLocalData(chartId) as any).unwrap();
-            notifications.show({ message: t('notifications.cache.chartCleared', { chart: chartName }), color: 'green', icon: <IconCheck /> });
-          } catch {
-              notifications.show({ message: 'Failed', color: 'red', icon: <IconX /> });
-          }
-        }
-      });
-    };
-    document.addEventListener('zero:clearChartData', handler as any);
-    return () => document.removeEventListener('zero:clearChartData', handler as any);
-  }, [dispatch, t]);
+  const { clearChartDataWithConfirm, rebuildStatsWithConfirm, processing } = useChartMaintenance(t);
 
-  const chartsCount = syncState.chartsCount || charts.length || 0;
 
   if (isLoading) {
     return (
@@ -183,7 +161,6 @@ function SettingsPage() {
                 <Badge variant="light" color="blue">{t('settings.lastSync')}: {new Date(syncState.lastFullChartsSync).toLocaleString()}</Badge>
               </Tooltip>
             )}
-            <Badge variant="light" color="grape">{t('settings.chartsCount')}: {chartsCount}</Badge>
             {reindexing && (
               <Badge variant="dot" color="indigo">{t('settings.reindexingWeeks')}</Badge>
             )}
@@ -192,10 +169,10 @@ function SettingsPage() {
             )}
           </Group>
           <Group gap="xs">
+            <ClearSpotifyImagesButton />
             <Tooltip label={isOnline ? t('settings.syncNow') : t('settings.needOnline')}>
               <Button leftSection={<IconRefresh size={16} />} size="xs" onClick={handleSync} disabled={!isOnline || syncState.syncing} loading={syncState.syncing}>{t('settings.sync')}</Button>
             </Tooltip>
-            <ClearSpotifyImagesButton />
           </Group>
         </Group>
         
@@ -207,7 +184,15 @@ function SettingsPage() {
           chartOptions={charts.map((chart: any) => ({ value: String(chart.id), label: chart.name }))}
         />
         {charts.length > 0 && (
-          <ChartsListCard charts={charts} t={t} openDeleteModal={openDeleteModal} isOnline={isOnline} />
+          <ChartsListCard
+            charts={charts}
+            t={t}
+            openDeleteModal={openDeleteModal}
+            isOnline={isOnline}
+            onClearChartData={(id, name) => clearChartDataWithConfirm(id, name)}
+            onRebuildStats={(id, name) => rebuildStatsWithConfirm(id, name)}
+            processingState={processing}
+          />
         )}
       </Flex>
     </Container>

@@ -27,6 +27,8 @@
       "artistsTop": "Top {{cutoff}} Artists",
       "albumsTop": "Top {{cutoff}} Albums",
       "tracksTop": "Top {{cutoff}} Tracks",
+      "columns": "Columns",
+      "columnsConfig": "Visual Configuration",
       "sales": "sales",
       "salesExample": "E.g.: 'Control' by Janet Jackson reached 100,000 *sales / copies / units / points / streams* achieving a Platinum certification.",
       "lastWeek": "Last week",
@@ -34,8 +36,8 @@
       "toSync": "To sync",
       "synced": "Synced",
       "syncStatus": "{{loadedWeeks}} of {{weeks}} weeks loaded",
-  "complete": "Complete",
-  "partial": "Partial",
+      "complete": "Complete",
+      "partial": "Partial",
       "view": "View chart",
       "viewAll": "View all charts",
       "viewLive": "View current week preview",
@@ -47,8 +49,74 @@
       "playsLabel": "Plays",
       "deltaPlaysLabel": "Plays change",
       "deltaPercentPlaysLabel": "Plays % change",
+      "playsVariationLocationLabel": "Plays variation",
+      "playsVariationShow": "Show",
+      "playsVariationHide": "Hide",
+      "playsVariationModeLabel": "Variation mode",
+      "playsVariationModeAbsolute": "Absolute",
+      "playsVariationModePercent": "Percent",
+      "playsVariationDisplayLabel": "Plays variation",
+      "playsVariationDisplay_hidden": "Hide",
+      "playsVariationDisplay_absolute": "Absolute",
+      "playsVariationDisplay_percent": "Percent",
       "peakLabel": "Peak",
       "weeksLabel": "Weeks",
+      "rankVariationLocationLabel": "Rank variation display",
+      "rankVariationUnder": "Below rank",
+      "rankVariationColumn": "Own column",
+      "show": "Show",
+      "hide": "Hide",
+      "size": "Size",
+      "tableView": "Table",
+      "listView": "List",
+      "gridView": "Grid",
+      "badgeStyles": {
+        "title": "Badge Customization",
+        "section": "Badges",
+        "kindRank": "Rank",
+        "kindPlays": "Plays",
+        "modePreset": "Presets",
+        "modeCustom": "Custom",
+        "preset_transparent": "Transparent",
+        "preset_transparentIcon": "Transparent + Icon",
+        "preset_light": "Light",
+        "preset_lightIcon": "Light + Icon",
+        "preset_solid": "Solid",
+        "preset_solidIcon": "Solid + Icon",
+        "preset_maximalist": "Maximalist",
+        "preset_maximalistLight": "Maximalist Light",
+        "presetsTitle": "Presets",
+        "field_variant": "Variant",
+        "field_iconPosition": "Icon position",
+        "field_radius": "Radius",
+        "field_size": "Size",
+        "field_preview": "Preview",
+        "field_splitIconVariant": "Split icon badge",
+        "variant_inherit": "Inherit",
+        "variant_light": "Light",
+        "variant_filled": "Filled",
+        "variant_outline": "Outline",
+        "variant_transparent": "Ghost",
+        "icon_inherit": "Inherit",
+        "icon_before": "Before",
+        "icon_after": "After",
+        "icon_split": "Split",
+        "icon_hidden": "Hidden",
+        "radius_inherit": "Inherit",
+        "radius_0": "Square",
+        "radius_xs": "XS",
+        "radius_sm": "SM",
+        "radius_md": "MD",
+        "radius_lg": "LG",
+        "radius_pill": "Pill",
+        "size_inherit": "Inherit",
+        "size_xs": "XS",
+        "size_sm": "SM",
+        "size_md": "MD",
+        "splitIconFilled": "Icon Filled",
+        "splitIconGhost": "Icon Ghost",
+        "splitIconInherit": "Inherit"
+      },
       "stats": {
         "title": "Stats",
         "weeksOnChart": "Weeks on chart",
@@ -71,11 +139,12 @@
         "remainingToHigher": "Remaining {{value}} to {{level}}",
         "week": "Week {{n}}",
         "playsLabel": "plays",
+        "outOfChart": "Out of chart for {{n}} week(s)",
         "showWeek": "Show this week",
         "needOnlineForCert": "Go online to update certification",
         "noData": "No data",
-        "reload": "Reload playcount"
-        ,"periodWeeks": "{{count}} week(s)"
+        "reload": "Reload playcount",
+        "periodWeeks": "{{count}} week(s)"
       }
     },
     "library": {
@@ -104,10 +173,18 @@
       "syncNow": "Sync now",
       "needOnline": "Needs connection",
       "sync": "Sync",
-      "clearChartData": "Clear local data",
+      "clearChartData": "Clear weeks saved in your browser",
       "chartsCount": "Charts",
       "reindexingWeeks": "Reindexing weeks...",
-      "reindexedWeeks": "Weeks reindexed: {{count}}"
+      "reindexedWeeks": "Weeks reindexed: {{count}}",
+      "rebuildStats": "Rebuild general stats",
+      "rebuild": "Rebuild",
+      "rebuildStatsConfirm": "This will delete and recompute all general stats for {{chart}}. Continue?",
+      "rebuildStatsDone": "General stats rebuilt for {{chart}}",
+      "rebuildStatsFailed": "Failed to rebuild general stats",
+      "rebuildStatsFor": "Rebuild: {{chart}}",
+      "rebuildStatsProgress": "Rebuilding {{chart}} ({{current}} / {{total}})",
+      "clearChartProgress": "Clearing local data for {{chart}}"
     },
     "forms": {
       "createChart": {
@@ -150,7 +227,10 @@
       },
       "editChart": {
         "title": "Edit chart",
-        "saveButton": "Save"
+        "saveButton": "Save",
+        "keyFieldsChangeTitle": "Core settings changed",
+        "keyFieldsChangeMessage": "You changed core fields that alter how weeks are generated: {{fields}}. This will invalidate existing cached weeks and stats. Apply changes and clear local data?",
+        "applyAndReload": "Apply & Clear Local Data"
       },
       "deleteChart": {
         "title": "Delete chart",
@@ -242,14 +322,29 @@
         "title": "Latest update",
         "button": "View all updates"
       }
+    },
+    "imageEditModal": {
+      "title": "Image",
+      "squareWarning": "The image must be square!",
+      "domainNotice": "For security, you can only use images from trusted sites like Last.fm, Spotify, Imgur, Unsplash, etc. If you want to use your own image, upload it to a service like Imgur or Cloudinary and paste the link here.",
+      "urlPlaceholder": "Image URL",
+      "save": "Save",
+      "fetchSpotify": "Fetch from Spotify"
+    },
+    "common": {
+      "reset": "Reset",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "confirmationTitle": "Confirmation",
+      "confirmationMessage": "Are you sure you want to proceed?"
+    },
+    "spotifyImage": {
+      "clearSpotifyImagesTooltip": "Clear cached Spotify images",
+      "clearSpotifyImagesButton": "Clear Spotify Images",
+      "clearSpotifyImagesTitle": "Clear Spotify Images",
+      "clearSpotifyImagesMessage": "This will delete all cached Spotify images locally. Continue?"
     }
-  },
-  "imageEditModal": {
-    "title": "Image",
-    "squareWarning": "The image must be square!",
-    "domainNotice": "For security, you can only use images from trusted sites like Last.fm, Spotify, Imgur, Unsplash, etc. If you want to use your own image, upload it to a service like Imgur or Cloudinary and paste the link here.",
-    "urlPlaceholder": "Image URL",
-    "save": "Save",
-    "fetchSpotify": "Fetch from Spotify"
   }
 }

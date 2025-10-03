@@ -4,6 +4,9 @@
 import { SpotifyTokenManager } from './SpotifyTokenManager';
 import type { SpotifyTokenConfig } from './SpotifyTokenManager';
 
+export const SPOTIFY_TOKEN = 'd686abb030b34dc2b3446b06507ded9b';
+export const SPOTIFY_SECRET = '7611153438b2440fa4a7e22c3311f2d6';
+
 export interface SpotifySearchOptions {
   q: string;
   type: string; // e.g. 'track', 'artist', 'album', 'playlist'

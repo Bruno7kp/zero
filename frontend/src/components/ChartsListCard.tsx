@@ -1,6 +1,6 @@
 // import React from 'react';
-import { Card, Group, ThemeIcon, Text, Divider, Table, ActionIcon, Tooltip, ScrollArea } from '@mantine/core';
-import { IconListNumbers, IconEdit, IconTrash, IconEraser } from '@tabler/icons-react';
+import { Card, Group, ThemeIcon, Text, Divider, Table, ActionIcon, ScrollArea, Menu, Tooltip } from '@mantine/core';
+import { IconListNumbers, IconEdit, IconTrash, IconEraser, IconRefresh, IconDotsVertical } from '@tabler/icons-react';
 // import { DataTable } from 'mantine-datatable';
 import { Link, generatePath } from 'react-router-dom';
 
@@ -11,9 +11,12 @@ interface ChartsListCardProps {
   t: TFunction;
   openDeleteModal: (id: number, name: string) => void;
   isOnline: boolean;
+  onRebuildStats: (id: number, name: string) => void;
+  onClearChartData: (id: number, name: string) => void;
+  processingState?: Record<string, { clearing?: boolean; rebuilding?: boolean; progress?: number; total?: number }>; // opcional
 }
 
-const ChartsListCard = ({ charts, t, openDeleteModal, isOnline }: ChartsListCardProps) => {
+const ChartsListCard = ({ charts, t, openDeleteModal, isOnline, onRebuildStats, onClearChartData, processingState }: ChartsListCardProps) => {
   const hasCharts = charts && charts.length > 0;
   return (
     <Card shadow="md" p="md">
@@ -35,8 +38,14 @@ const ChartsListCard = ({ charts, t, openDeleteModal, isOnline }: ChartsListCard
           </Table.Thead>
           <Table.Tbody>
             {hasCharts ? (
-              charts.map((chart: any) => (
-                <Table.Tr key={chart.id}>
+              charts.map((chart: any) => {
+                const proc = processingState?.[String(chart.id)];
+                const rebuilding = proc?.rebuilding;
+                const clearing = proc?.clearing;
+                const disabled = clearing || rebuilding;
+                const progressPct = rebuilding && proc?.total ? Math.min(100, Math.round(((proc.progress || 0) / (proc.total || 1)) * 100)) : null;
+                return (
+                <Table.Tr key={chart.id} opacity={disabled ? 0.6 : 1}>
                   <Table.Td>
                     <Text fw={600} size="sm">{chart.name}</Text>
                   </Table.Td>
@@ -45,46 +54,56 @@ const ChartsListCard = ({ charts, t, openDeleteModal, isOnline }: ChartsListCard
                   </Table.Td>
                   <Table.Td>
                     <Group gap={4} justify="flex-end" wrap="nowrap">
-                      <Tooltip label={t('settings.clearChartData') + ' (' + t('charts.title') + ')'}>
+                      <Tooltip label={t('forms.editChart.title')} withArrow>
                         <ActionIcon
                           size="sm"
-                          variant="subtle"
-                          color="grape"
-                          onClick={() => document.dispatchEvent(new CustomEvent('zero:clearChartData', { detail: { chartId: chart.id, chartName: chart.name } }))}
-                          aria-label={t('settings.clearChartData')}
-                        >
-                          <IconEraser size={16} />
-                        </ActionIcon>
-                      </Tooltip>
-                      <Tooltip label={isOnline ? t('forms.editChart.title') : t('settings.needOnline')}>
-                        <ActionIcon
-                          component={Link}
-                          size="sm"
-                          variant="subtle"
+                          variant="light"
                           color="blue"
-                          disabled={!isOnline}
+                          component={Link as any}
                           to={generatePath('/settings/charts/:id', { id: chart.id.toString() })}
+                          disabled={!isOnline || disabled}
                           aria-label={t('forms.editChart.title')}
                         >
                           <IconEdit size={16} />
                         </ActionIcon>
                       </Tooltip>
-                      <Tooltip label={isOnline ? t('forms.deleteChart.title') : t('settings.needOnline')}>
-                        <ActionIcon
-                          size="sm"
-                          variant="subtle"
-                          color="red"
-                          onClick={() => isOnline && openDeleteModal(chart.id, chart.name)}
-                          disabled={!isOnline}
-                          aria-label={t('forms.deleteChart.title')}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      </Tooltip>
+                      <Menu withinPortal shadow="md" position="bottom-end">
+                        <Menu.Target>
+                          <ActionIcon size="sm" variant="subtle" aria-label={t('charts.actions')} disabled={disabled}>
+                            <IconDotsVertical size={16} />
+                          </ActionIcon>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                          <Menu.Label>{t('charts.actions')}</Menu.Label>
+                          <Menu.Item
+                            leftSection={<IconEraser size={14} />}
+                            disabled={disabled}
+                            onClick={() => !disabled && onClearChartData(chart.id, chart.name)}
+                          >
+                            {t('settings.clearChartData')}
+                          </Menu.Item>
+                          <Menu.Item
+                            leftSection={<IconRefresh size={14} />}
+                            disabled={disabled}
+                            onClick={() => !disabled && onRebuildStats(chart.id, chart.name)}
+                          >
+                            {rebuilding && progressPct != null ? `${t('settings.rebuildStats')} (${progressPct}%)` : t('settings.rebuildStats')}
+                          </Menu.Item>
+                          <Menu.Divider />
+                          <Menu.Item
+                            leftSection={<IconTrash size={14} />}
+                            color="red"
+                            disabled={!isOnline || disabled}
+                            onClick={() => isOnline && !disabled && openDeleteModal(chart.id, chart.name)}
+                          >
+                            {t('forms.deleteChart.title')}
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
                     </Group>
                   </Table.Td>
                 </Table.Tr>
-              ))
+              );})
             ) : (
               <Table.Tr>
                 <Table.Td colSpan={3}>

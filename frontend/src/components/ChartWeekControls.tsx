@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -8,8 +9,8 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import { getPrevNextWeek } from '../utils/chartWeekNav';
-import { Button, SegmentedControl, Flex, Center, VisuallyHidden, Text, Title } from '@mantine/core';
-import { ChartWeekTableColumnsMenu } from './ChartWeekTable';
+import { Button, SegmentedControl, Flex, Center, VisuallyHidden, Text, Title, Grid } from '@mantine/core';
+import { ChartWeekColumnsDrawer } from './ChartWeekColumnsDrawer';
 import { Calendar } from '@mantine/dates';
 import { Popover, ActionIcon } from '@mantine/core';
 import { IconCalendar } from '@tabler/icons-react';
@@ -84,11 +85,33 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	// Semanas válidas para navegação
 	const weeks = getClosedChartWeeks(chart.start_date, chart.day_of_week, chart.timezone);
 	const { prev, next } = getPrevNextWeek(weeks, week);
+	// Bloqueio simplificado: sempre trava 2000ms após clique de navegação/tipo
+	const [locked, setLocked] = React.useState(false);
+	const navLockRef = React.useRef(false);
+	const timerRef = React.useRef<number | null>(null);
+	const FIXED_LOCK_MS = 1500; // 1.5s conforme solicitado
+	const isBusy = locked || navLockRef.current;
+	const clearLock = () => {
+		if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+		navLockRef.current = false;
+		setLocked(false);
+	};
+	React.useEffect(() => () => clearLock(), []);
+	const triggerChange = (nextWeek: string, nextType: string) => {
+		if (navLockRef.current || locked) return;
+		flushSync(() => { navLockRef.current = true; setLocked(true); });
+		if (timerRef.current) clearTimeout(timerRef.current);
+		timerRef.current = window.setTimeout(() => { clearLock(); }, FIXED_LOCK_MS);
+		requestAnimationFrame(() => onChange(nextWeek, nextType));
+	};
+
 	const handlePrev = () => {
-		if (prev) onChange(prev, type);
+		if (!prev || isBusy) return;
+		triggerChange(prev, type);
 	};
 	const handleNext = () => {
-		if (next) onChange(next, type);
+		if (!next || isBusy) return;
+		triggerChange(next, type);
 	};
 
 	// Valor do input: sempre o início da semana selecionada no timezone do chart
@@ -98,13 +121,13 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
 	const topType = `charts.${type}sTop`;
 
-		return (
-			<Flex gap="md" align="center" wrap="wrap" mb="md" justify="space-between" direction={{ base: 'column', sm: 'row' }}>
+	return (
+		<Grid>
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
-				<Flex direction="column" justify="center" align="center" style={{ width: '100%' }}>
-                    <Title order={2}>{t(topType, {cutoff})}</Title>
-                    <Title order={5}>{chart.name}</Title>
+				<Grid.Col span={12} ta="center">
+					<Title order={2}>{t(topType, { cutoff })}</Title>
+					<Title order={5}>{chart.name}</Title>
 					<Text fw={600} size="sm">
 						{(() => {
 							const start = dayjs(inputValue);
@@ -114,19 +137,29 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 							return `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')} (Semana ${weekNum})`;
 						})()}
 					</Text>
-				</Flex>
+				</Grid.Col>
 			)}
 			{/* Esquerda: seleção de tipo */}
-			<SegmentedControl
-				value={type}
-				onChange={v => v && onChange(week || '', v)}
-				data={chartTypes.map(({ value, icon }) => ({ label: icon, value }))}
-				size="sm"
-				withItemsBorders={false}
-			/>
+			<Grid.Col span={{ base: 12, sm: 4 }}>
+				<Flex
+					align="center"
+					justify={{ base: 'center', sm: 'flex-start' }} // 👈 aqui fica responsivo
+					w="100%"
+				>
+					<SegmentedControl
+						value={type}
+						onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
+						data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
+						size="sm"
+						my="xs"
+						withItemsBorders={false}
+						disabled={isBusy}
+					/>
+				</Flex>
+			</Grid.Col>
 			{/* Centro: navegação de semana */}
-			<Flex gap="xs" align="center">
-				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev}><IconArrowLeft size={18} /></Button>
+			<Grid.Col span={{ base:12, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<Popover
 					position="bottom"
 					shadow="md"
@@ -140,7 +173,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 							variant={inputValue ? 'filled' : 'default'}
 							color="blue"
 							size="lg"
-							onClick={() => setPopoverOpened((o) => !o)}
+							m="xs"
+							onClick={() => { setPopoverOpened((o) => !o); }}
 						>
 							<IconCalendar size={20} />
 						</ActionIcon>
@@ -167,25 +201,32 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 						/>
 					</Popover.Dropdown>
 				</Popover>
-				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next}><IconArrowRight size={18} /></Button>
-			</Flex>
+				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next || isBusy}><IconArrowRight size={18} /></Button>
+			</Grid.Col>
 
 			{/* Direita: seleção de visualização + botão de colunas */}
-			<Flex gap="xs" align="center">
-				{/* Botão de colunas, só mostra se for tabela */}
-				<ChartWeekTableColumnsMenu />
-				<SegmentedControl
-					value={view}
-					onChange={v => handleSetView(v as 'table' | 'grid' | 'list')}
-					data={[
-						{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
-						{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
-						{ label: (<Center><IconList size={18} /></Center>), value: 'list' },
-					]}
-					size="sm"
-					withItemsBorders={false}
-				/>
-			</Flex>
-		</Flex>
+			<Grid.Col span={{ base: 12, sm: 4 }}>
+				<Flex
+					align="center"
+					justify={{ base: 'center', sm: 'flex-end' }} // 👈 aqui fica responsivo
+					w="100%"
+				>
+					{/* Botão de colunas, agora respeita viewType */}
+					<ChartWeekColumnsDrawer viewType={view} />
+					<SegmentedControl
+						value={view}
+						onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}
+						data={[
+							{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
+							{ label: (<Center><IconList size={18} /></Center>), value: 'list' },
+							{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
+						]}
+						size="sm"
+						my="xs"
+						withItemsBorders={false}
+					/>
+				</Flex>
+			</Grid.Col>
+		</Grid>
 	);
 };

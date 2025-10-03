@@ -2,10 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ImageEditModal } from './ImageEditModal';
 import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchChartData, fetchStatsMapIncremental } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { IconPlus, IconStarFilled, IconArrowBackUp, IconCaretDownFilled, IconCaretUpFilled } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
+import { DeltaBadge } from './DeltaBadge';
+import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
@@ -20,57 +22,52 @@ interface ChartWeekGridProps {
 }
 
 export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type, clientId, clientSecret, altVariation }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  // Sincroniza colunas do grid com localStorage
+  useEffect(() => {
+    const storageKey = 'chart_columns_grid';
+    const stored = localStorage.getItem(storageKey);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((col: any) => {
+            dispatch({ type: 'columns/updateColumn', payload: { view: 'grid', key: col.key, visible: col.visible } });
+          });
+        }
+      } catch {
+        // Ignora JSON inválido no localStorage
+      }
+    }
+  }, [dispatch]);
   const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
   // Memorize the last image for each entityId, and only update when a new image is loaded
   // This ensures the image only changes when the new one is ready
   // Função para renderizar o ícone de variação
-  function renderAltVariation(row: ChartData, idx: number) {
-    if (!showAltVariationRedux) return null;
-  const value: any = altVariation ? altVariation(row, idx) : false;
-  let color = 'gray', label = '', icon = null;
-    if (value === 'NEW') {
-      color = 'blue'; label = 'NEW'; icon = <IconStarFilled size={14} style={{ verticalAlign: 'middle' }} />;
-    } else if (value === 'RE') {
-      color = 'yellow'; label = 'RE'; icon = <IconArrowBackUp stroke={3} size={14} style={{ verticalAlign: 'middle', transform: "scaleX(-1)" }} />;
-    } else if (typeof value === 'number' && value < 0) {
-      color = 'red'; label = String(value); icon = <IconCaretDownFilled size={16} style={{ verticalAlign: 'middle' }} />;
-    } else if (typeof value === 'number' && value > 0) {
-      color = 'green'; label = `+${value}`; icon = <IconCaretUpFilled size={16} style={{ verticalAlign: 'middle' }} />;
-    } else if (value === 0 || value === '=') {
-      color = 'gray'; label = '=';
-    } else if (!value || value === '-') {
-      color = 'gray'; label = '';
-    } else {
-      label = String(value);
-    }
-    return label ? (
-      <Badge
-        color={color}
-        variant="filled"
-        size="md"
-        px={4}
-        style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            zIndex: 2,
-            borderRadius: 4,
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '4px 6px',
-        }}
-        >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                {icon}
-                <span style={{ fontWeight: 700, fontSize: 12 }}>{label}</span>
-            </span>
-        </Badge>
+  // hook must be at top-level (was incorrectly inside renderAltVariation causing hook order issues)
+  const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'grid'));
 
-    ) : null;
+  function renderAltVariation(row: ChartData, idx: number, rankCfg: any) {
+    const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
+    if (!showDelta) return null;
+    const value: any = altVariation ? altVariation(row, idx) : false;
+    if (!value && value !== 0) return null;
+    let cfg: any = rankCfg;
+    if (rankCfg.iconPosition === 'split') {
+      // In grid we keep compact inline look; disable tall split but allow split pair
+      cfg = { ...rankCfg, iconPosition: 'split', splitTall: false };
+    } else if (rankCfg.iconPosition === 'hidden') {
+      cfg = { ...rankCfg, iconPosition: 'hidden', splitTall: false };
+    } else {
+      cfg = { ...rankCfg, splitTall: false };
+    }
+    return (
+      <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+        {/* Grid corner badge -> medium font size for readability without overpowering */}
+  <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" />
+      </Box>
+    );
   }
-  const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
   // Persist previous data while new data is loading to prevent flicker
   const [displayedData, setDisplayedData] = useState<any[]>(data);
@@ -89,12 +86,12 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
   const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
   const statsMap = useSelector((state: any) => state.charts.statsMap);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
-  const columns = useSelector((state: any) => state.columns.columns);
+  const columns = useSelector((state: any) => (state.columns?.views?.grid?.columns) || state.columns?.columns || []);
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
   const showPeak = columns.find((c: any) => c.key === 'peak')?.visible;
   const showPlays = columns.find((c: any) => c.key === 'plays')?.visible;
   const showTotalWeeks = columns.find((c: any) => c.key === 'totalWeeks')?.visible;
-  const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
+  // altVariation column is never used in grid (mapping forces it off); badge visibility controls variation
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
 
@@ -115,9 +112,27 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
 
   useEffect(() => {
     if (!data.length || !week || !chart?.id) return;
-    const cutoff = 100;
-    dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, cutoff, week }));
-  }, [data, chart?.id, type, week, dispatch]);
+    dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
+  }, [data, week, chart?.id, type, dispatch]);
+
+  // Stats diferidos somente se peak ou totalWeeks estiverem visíveis
+  useEffect(() => {
+    if (!data.length || !week || !chart?.id) return;
+    const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+    if (!wantsStats) return;
+    let cancelled = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const id = setTimeout(() => {
+        if (cancelled) return;
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+      }, 900);
+      (window as any).__gridStatsTimer = id;
+    }));
+    return () => {
+      cancelled = true;
+      if ((window as any).__gridStatsTimer) clearTimeout((window as any).__gridStatsTimer);
+    };
+  }, [data, chart?.id, type, week, dispatch, columns]);
 
   // Progressive reveal dos cards (melhora percepção de velocidade em listas grandes)
   const useProgressive = safeDisplayedData.length > 120;
@@ -146,7 +161,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
               <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
                 <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
                   {/* Variação canto superior direito */}
-                  {renderAltVariation(row, idx)}
+                  {renderAltVariation(row, idx, badgeStylesRank)}
                   {/* Botão modal canto superior esquerdo */}
                   <ActionIcon
                     size="sm"
@@ -159,7 +174,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   </ActionIcon>
                   {/* Posição (rank) canto inferior esquerdo */}
                   <Badge
-                    color={row.rank === 1 ? 'red' : 'red'}
+                    color={row.rank === 1 ? 'blue' : 'red'}
                     size="xl"
                     variant="filled"
                     py="xl"
@@ -232,7 +247,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                   {showPeak && (
                     <Box style={{ textAlign: 'center', flex: 1 }}>
                       <Text size="xs" c="dimmed">Peak</Text>
-                      <Text fw={700} size="sm">{stats?.peak?.position ?? (loadingStats ? '…' : '-')}</Text>
+                      <Text fw={700} size="sm" c={stats?.peak?.position === 1 ? 'blue' : undefined}>{stats?.peak?.position ?? (loadingStats ? '…' : '-')}</Text>
                     </Box>
                   )}
                   {showTotalWeeks && (

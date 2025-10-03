@@ -1,5 +1,5 @@
 // src/pages/CreateChartPage.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Button,
     TextInput,
@@ -21,7 +21,7 @@ import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCharts, createChart, updateChart } from '../store/chartsSlice';
+import { fetchCharts, createChart, updateChart, clearChartLocalData } from '../store/chartsSlice';
 import { useNavigate, NavLink, useParams } from 'react-router-dom';
 import '@mantine/dates/styles.css';
 import dayjs from 'dayjs';
@@ -36,6 +36,7 @@ import {
     IconX
 } from '@tabler/icons-react';
 import { Alert } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 // import { useSelector } from 'react-redux';
 
@@ -55,6 +56,8 @@ const CreateChartPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isFormInitialized, setIsFormInitialized] = useState(false);
+    // Guarda snapshot dos campos chave para detectar mudanças
+    const originalKeyValuesRef = useRef<any | null>(null);
     const { isOnline } = useOfflineStatus();
 
     const dayOfWeekOptions = [
@@ -166,6 +169,17 @@ const CreateChartPage = () => {
                     album_platinum_value: chartToEdit.album_platinum_value,
                     album_diamond_value: chartToEdit.album_diamond_value,
                 });
+                // Snapshot dos campos chave
+                originalKeyValuesRef.current = {
+                  source: chartToEdit.source,
+                  lastfm_username: chartToEdit.lastfm_username,
+                  timezone: chartToEdit.timezone,
+                  day_of_week: String(chartToEdit.day_of_week),
+                  start_date: dayjs(chartToEdit.start_date).format('YYYY-MM-DD'),
+                  music_cutoff: chartToEdit.music_cutoff,
+                  album_cutoff: chartToEdit.album_cutoff,
+                  artist_cutoff: chartToEdit.artist_cutoff,
+                };
                 setIsFormInitialized(true);
             } else {
                 notifications.show({
@@ -179,6 +193,39 @@ const CreateChartPage = () => {
         }
     }, [id, charts, form, navigate, t, isLoading, isFormInitialized, dispatch]);
 
+
+    const doPersist = async (values: typeof form.values, clearAfterUpdate: boolean) => {
+        const chartData = {
+            ...values,
+            start_date: dayjs(values.start_date!).format('YYYY-MM-DD'),
+            day_of_week: parseInt(values.day_of_week),
+        };
+        try {
+            if (id) {
+                await dispatch<any>(updateChart({ chartId: Number(id), chartData })).unwrap();
+                if (clearAfterUpdate) {
+                    // Limpa caches locais para forçar recálculo com nova configuração
+                    await dispatch<any>(clearChartLocalData(Number(id))).unwrap();
+                }
+            } else {
+                await dispatch<any>(createChart(chartData)).unwrap();
+            }
+            notifications.show({
+                message: t(`notifications.charts.${id ? 'update' : 'save'}.success`, { chart: chartData.name }),
+                color: 'green',
+                icon: <IconCheck />,
+            });
+            navigate('/settings');
+        } catch {
+            notifications.show({
+                message: t(`notifications.charts.${id ? 'update' : 'save'}.error`, { chart: chartData.name }),
+                color: 'red',
+                icon: <IconX />,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const handleSubmit = async (values: typeof form.values) => {
         if (!form.validate()) {
@@ -199,37 +246,50 @@ const CreateChartPage = () => {
         setIsSubmitting(true);
         setError(null);
 
-        if (!values.start_date) {
-            return;
-        }
+        if (!values.start_date) return;
 
-        const chartData = {
-            ...values,
-            start_date: dayjs(values.start_date).format('YYYY-MM-DD'),
-            day_of_week: parseInt(values.day_of_week),
-        };
-
-    // let success = false;
-        try {
-            if (id) {
-                await dispatch<any>(updateChart({ chartId: Number(id), chartData })).unwrap();
-            } else {
-                await dispatch<any>(createChart(chartData)).unwrap();
+        // Detecta mudanças em campos chave (apenas modo edição)
+        if (id && originalKeyValuesRef.current) {
+            const kv = originalKeyValuesRef.current;
+            const current = {
+              source: values.source,
+              lastfm_username: values.lastfm_username,
+              timezone: values.timezone,
+              day_of_week: values.day_of_week,
+              start_date: dayjs(values.start_date).format('YYYY-MM-DD'),
+              music_cutoff: values.music_cutoff,
+              album_cutoff: values.album_cutoff,
+              artist_cutoff: values.artist_cutoff,
+            };
+            const changed: string[] = [];
+            const fieldMap: Record<string, string> = {
+              source: 'forms.createChart.sourceLabel',
+              lastfm_username: 'forms.createChart.lastfmUsernameLabel',
+              timezone: 'forms.createChart.timezoneLabel',
+              day_of_week: 'forms.createChart.dayOfWeekLabel',
+              start_date: 'forms.createChart.startDateLabel',
+              music_cutoff: 'forms.createChart.musicCutoffLabel',
+              album_cutoff: 'forms.createChart.albumCutoffLabel',
+              artist_cutoff: 'forms.createChart.artistCutoffLabel',
+            };
+                        for (const k of Object.keys(current) as Array<keyof typeof current>) {
+                            if ((current as any)[k] !== (kv as any)[k]) changed.push(t(fieldMap[k as string]));
+                        }
+            if (changed.length) {
+              const fieldsStr = changed.join(', ');
+              modals.openConfirmModal({
+                title: t('forms.editChart.keyFieldsChangeTitle'),
+                children: <Text size="sm">{t('forms.editChart.keyFieldsChangeMessage', { fields: fieldsStr })}</Text>,
+                labels: { confirm: t('forms.editChart.applyAndReload'), cancel: t('forms.deleteChart.cancelButton') },
+                confirmProps: { color: 'red' },
+                onConfirm: () => doPersist(values, true),
+                onCancel: () => setIsSubmitting(false),
+              });
+              return; // aguarda confirmação
             }
-            notifications.show({
-                message: t(`notifications.charts.${id ? 'update' : 'save'}.success`, { chart: chartData.name }),
-                color: 'green',
-                icon: <IconCheck />,
-            });
-            navigate('/settings');
-        } catch {
-            notifications.show({
-                message: t(`notifications.charts.${id ? 'update' : 'save'}.error`, { chart: chartData.name }),
-                color: 'red',
-                icon: <IconX />,
-            });
         }
-        setIsSubmitting(false);
+        // Caso sem alterações chave ou criação
+        await doPersist(values, false);
     };
 
     const pageTitle = id ? t('forms.editChart.title') : t('forms.createChart.title');
