@@ -634,8 +634,7 @@ const chartsSlice = createSlice({
     }
   },
   extraReducers: builder => {
-    builder
-      .addCase(fetchChartData.pending, s => { s.loadingData = true; })
+    builder.addCase(fetchChartData.pending, s => { s.loadingData = true; })
       .addCase(fetchChartData.fulfilled, (s, a) => {
         if (!s.statsCache || typeof s.statsCache !== 'object') s.statsCache = {};
         s.data = a.payload as ChartData[]; s.loadingData = false;
