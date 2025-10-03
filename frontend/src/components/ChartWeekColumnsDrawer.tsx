@@ -261,6 +261,18 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                         data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
                                     />
                                 </Box>
+                                {(viewType === 'table' || viewType === 'list') && (
+                                    <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                        <Divider my={4} variant="dashed" label={t('charts.certLabel')} />
+                                        <SegmentedControl
+                                            fullWidth
+                                            size="xs"
+                                            value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'}
+                                            onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))}
+                                            data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                                        />
+                                    </Box>
+                                )}
                             </Flex>
                         </Flex>
                         <Divider my={4} size="xl" label={t('charts.badgeStyles.section')} />

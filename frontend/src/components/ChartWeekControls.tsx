@@ -181,7 +181,10 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 					</Popover.Target>
 					<Popover.Dropdown p={0} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 						<Calendar
+							// Força o calendário a montar no mês da semana selecionada
+							key={inputValue ? dayjs(inputValue).format('YYYY-MM') : 'no-week'}
 							locale={locale}
+							defaultDate={inputValue || undefined}
 							withCellSpacing={false}
 							getDayProps={(date) => {
 								const dateStr = dayjs(date).format('YYYY-MM-DD');

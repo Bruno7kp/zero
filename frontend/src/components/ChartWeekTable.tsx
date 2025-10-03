@@ -15,6 +15,7 @@ import { IconArrowsDownUp } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
+import { CertificationIcon } from './CertificationIcon';
 
 interface ChartWeekTableProps {
     chart: any;
@@ -62,7 +63,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // Agendamento diferido dos stats (carrega só depois de um pequeno atraso para não impactar troca de semana)
     useEffect(() => {
         if (!data.length || !week) return;
-        const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+        const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks' || c.key === 'cert') && c.visible);
         if (!wantsStats) return;
         let cancelled = false;
         requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -79,7 +80,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     }, [data, chart.id, type, week, dispatch, columns]);
 
     // Refetch incremental quando usuário habilita colunas de stats após já ter carregado dados
-    const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible), [columns]);
+    const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks' || c.key === 'cert') && c.visible), [columns]);
     const [statsColumnsPrev, setStatsColumnsPrev] = useState(statsColumnsVisible);
     useEffect(() => {
         if (statsColumnsVisible && !statsColumnsPrev && data.length && week) {
@@ -119,7 +120,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
     const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'table'));
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
-    const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
+    const filteredColumns = useMemo(() => {
+        const base = visibleColumns.filter((c: any) => c.isColumn);
+        // Hide certification column entirely for artist charts
+        return type === 'artist' ? base.filter((c: any) => c.key !== 'cert') : base;
+    }, [visibleColumns, type]);
 
     // Row expansion
     // Exibe stats gerais (todas as semanas) ao expandir
@@ -155,7 +160,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         }
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={row.rank === 1 ? 700 : 500} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
+                                <Text fw={row.rank === 1 ? 700 : 600} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
                                 {badge}
                             </Flex>
                         );
@@ -173,7 +178,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         }
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={500}>{row.plays}</Text>
+                                <Text fw={600}>{row.plays}</Text>
                                 {badge}
                             </Flex>
                         );
@@ -253,6 +258,33 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     },
                 };
             }
+            if (col.key === 'cert') {
+                return {
+                    ...base,
+                    title: 'Cert.',
+                    render: (row: ChartData) => {
+                        if (!(type === 'album' || type === 'track')) return null;
+                        const stats = statsMap[row.entityId];
+                        const totals = stats?.totals as any;
+                        return (
+                            <Flex direction="column" align="center">
+                                {stats
+                                    ? <CertificationIcon
+                                        chart={chart}
+                                        chartType={type as 'album' | 'track'}
+                                        totals={totals}
+                                        entity={{ name: row.name, artistName: row.artistName || '' }}
+                                        username={chart?.lastfm_username}
+                                        dayOfWeek={chart?.day_of_week}
+                                        size={24}
+                                        deferMs={300}
+                                      />
+                                    : (loadingStats ? <Text fw={500}>…</Text> : <Text fw={500}>-</Text>)}
+                            </Flex>
+                        );
+                    },
+                };
+            }
             return {
                 ...base,
                 render: (row: ChartData) => <Text>{row.id}</Text>
@@ -295,7 +327,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             return [altVariationCol, ...built];
         }
         return built;        
-    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation]);
+    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation, chart]);
 
     // legacy helper removed (logic centralized in DeltaBadge)
 
