@@ -675,7 +675,9 @@ const chartsSlice = createSlice({
 // (alternativa simples sem reestruturar slice): intercept original reducers
 const origDeleteChartFulfilled = (chartsSlice as any).caseReducers[deleteChart.fulfilled.type];
 (chartsSlice as any).caseReducers[deleteChart.fulfilled.type] = function(state: any, action: any) {
-  origDeleteChartFulfilled && origDeleteChartFulfilled(state, action);
+  if (origDeleteChartFulfilled) {
+    origDeleteChartFulfilled(state, action);
+  }
   const chartId = String(action.payload);
   try {
     // Purga runCache
@@ -690,7 +692,9 @@ const origDeleteChartFulfilled = (chartsSlice as any).caseReducers[deleteChart.f
 };
 const origClearChartFulfilled = (chartsSlice as any).caseReducers[clearChartLocalData.fulfilled.type];
 (chartsSlice as any).caseReducers[clearChartLocalData.fulfilled.type] = function(state: any, action: any) {
-  origClearChartFulfilled && origClearChartFulfilled(state, action);
+  if (origClearChartFulfilled) {
+    origClearChartFulfilled(state, action);
+  }
   const chartId = String(action.payload);
   try {
     for (const key of Array.from(runCache.keys())) {
