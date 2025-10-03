@@ -35,7 +35,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             dispatch({ type: 'columns/updateColumn', payload: { view: 'grid', key: col.key, visible: col.visible } });
           });
         }
-      } catch (e) {
+      } catch {
         // Ignora JSON inválido no localStorage
       }
     }

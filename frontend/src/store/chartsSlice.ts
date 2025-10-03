@@ -663,7 +663,7 @@ const chartsSlice = createSlice({
           }
         }
       })
-  .addCase(computeWeekDeltas.fulfilled, () => { /* no-op, data já atualizada pelo reducer */ })
+      .addCase(computeWeekDeltas.fulfilled, () => { /* no-op, data já atualizada pelo reducer */ })
       .addCase(fetchCharts.pending, s => { s.loadingData = true; })
       .addCase(fetchCharts.fulfilled, (s, a) => { s.charts = a.payload; s.loadingData = false; })
       .addCase(deleteChart.fulfilled, (s, a) => { s.charts = s.charts.filter(c => c.id !== a.payload); for (const k of Object.keys(s.statsCache || {})) if (k.startsWith(String(a.payload) + '_')) delete s.statsCache[k]; })
