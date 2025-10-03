@@ -75,12 +75,83 @@ function applyPlaysVariationDisplay(cols: ColumnConfig[], display: 'hidden' | 'a
 }
 
 // Gera estado default puro
+function hydrateView(view: 'table' | 'list' | 'grid'): ViewConfig {
+  // tenta carregar config persistida
+  try {
+    const raw = localStorage.getItem(`chart_columns_config_${view}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const savedCols: Array<{ key: string; visible: boolean }> = Array.isArray(parsed?.columns)
+        ? parsed.columns
+        : (parsed?.columns && typeof parsed.columns === 'object')
+          ? Object.keys(parsed.columns).map(k => ({ key: k, visible: !!parsed.columns[k] }))
+          : [];
+      const settings: ViewSettings = {
+        ...DEFAULT_VIEW_SETTINGS[view],
+        ...(parsed?.settings || {})
+      } as ViewSettings;
+      // reconstrói colunas completas com base no defaultColumns preservando ordem/labels e visibilidade salva
+      let cols = defaultColumns.map(dc => {
+        const found = savedCols.find(c => c.key === dc.key);
+        return { ...dc, visible: found != null ? found.visible : dc.visible };
+      });
+      // aplica mappings derivados (rank/plays) para garantir consistência com settings
+      if (settings.rankVariationLocation) {
+        cols = applyRankVariationMapping(cols, settings.rankVariationLocation, view);
+      }
+      if (settings.playsVariationDisplay) {
+        cols = applyPlaysVariationDisplay(cols, settings.playsVariationDisplay, view);
+      }
+      return { columns: cols, settings };
+    }
+  } catch { /* ignore parse errors */ }
+  return { columns: cloneDefaults(), settings: { ...DEFAULT_VIEW_SETTINGS[view] } };
+}
+
+function migrateLegacyLocalStorage(): Partial<ColumnsState> | null {
+  // Antigo formato: chave única 'chart_columns_config' compartilhada entre as views.
+  // Estruturas possíveis:
+  // 1) { columns: { key: boolean, ... }, settings?: {...} }
+  // 2) { columns: [ { key, visible }, ... ], settings?: {...} }
+  try {
+    const raw = localStorage.getItem('chart_columns_config');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    let savedCols: Array<{ key: string; visible: boolean }> = [];
+    if (Array.isArray(parsed?.columns)) savedCols = parsed.columns;
+    else if (parsed?.columns && typeof parsed.columns === 'object') {
+      savedCols = Object.keys(parsed.columns).map(k => ({ key: k, visible: !!parsed.columns[k] }));
+    }
+    const tableCols = defaultColumns.map(dc => {
+      const found = savedCols.find(c => c.key === dc.key);
+      return { ...dc, visible: found != null ? found.visible : dc.visible };
+    });
+    const legacySettings = parsed?.settings || {};
+    const tableSettings: ViewSettings = { ...DEFAULT_VIEW_SETTINGS.table, ...legacySettings } as ViewSettings;
+    // Aplica mappings (caso antigo salvasse flags que mudam delta/alt variation)
+    let adjusted = tableCols;
+    if (tableSettings.rankVariationLocation) adjusted = applyRankVariationMapping(adjusted, tableSettings.rankVariationLocation, 'table');
+    if (tableSettings.playsVariationDisplay) adjusted = applyPlaysVariationDisplay(adjusted, tableSettings.playsVariationDisplay, 'table');
+    // Remove chave antiga para evitar reprocessar no futuro
+    try { localStorage.removeItem('chart_columns_config'); } catch { /* ignore */ }
+    return {
+      views: {
+        table: { columns: adjusted, settings: tableSettings },
+        list: hydrateView('list'),
+        grid: hydrateView('grid'),
+      }
+    } as ColumnsState;
+  } catch { return null; }
+}
+
 function defaultState(): ColumnsState {
+  const legacy = migrateLegacyLocalStorage();
+  if (legacy && legacy.views) return legacy as ColumnsState;
   return {
     views: {
-      table: { columns: cloneDefaults(), settings: { ...DEFAULT_VIEW_SETTINGS.table } },
-      list: { columns: cloneDefaults(), settings: { ...DEFAULT_VIEW_SETTINGS.list } },
-      grid: { columns: cloneDefaults(), settings: { ...DEFAULT_VIEW_SETTINGS.grid } },
+      table: hydrateView('table'),
+      list: hydrateView('list'),
+      grid: hydrateView('grid'),
     }
   };
 }
@@ -100,11 +171,43 @@ const persistView = (view: 'table' | 'list' | 'grid', cfg: ViewConfig) => {
   } catch { /* noop */ }
 };
 
+// Garante em runtime (ex: rehydration via persist) que state tenha formato novo
+function ensureViews(state: any): asserts state is ColumnsState {
+  if (state.views) return;
+  // Tenta migrar se detectar shape legado (columns/settings na raiz)
+  if (Array.isArray(state.columns) || typeof state.columns === 'object') {
+    const legacyCols = Array.isArray(state.columns)
+      ? state.columns
+      : Object.keys(state.columns || {}).map(k => ({ key: k, visible: !!state.columns[k] }));
+    const rebuilt = defaultColumns.map(dc => {
+      const found = legacyCols.find((c: any) => c.key === dc.key);
+      return { ...dc, visible: found != null ? !!found.visible : dc.visible };
+    });
+    const legacySettings = state.settings || {};
+    let adjusted = rebuilt;
+    if (legacySettings.rankVariationLocation) adjusted = applyRankVariationMapping(adjusted, legacySettings.rankVariationLocation, 'table');
+    if (legacySettings.playsVariationDisplay) adjusted = applyPlaysVariationDisplay(adjusted, legacySettings.playsVariationDisplay, 'table');
+    state.views = {
+      table: { columns: adjusted, settings: { ...DEFAULT_VIEW_SETTINGS.table, ...legacySettings } },
+      list: hydrateView('list'),
+      grid: hydrateView('grid'),
+    };
+    return;
+  }
+  // Fallback: simply build defaults
+  state.views = {
+    table: hydrateView('table'),
+    list: hydrateView('list'),
+    grid: hydrateView('grid'),
+  };
+}
+
 const columnsSlice = createSlice({
   name: 'columns',
   initialState: buildInitialState(),
   reducers: {
     updateColumn(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; key: string; visible: boolean }>) {
+      ensureViews(state as any);
       const { view, key, visible } = action.payload;
       const viewConfig = state.views[view];
       // Mantém ordem e labels do defaultColumns
@@ -118,6 +221,7 @@ const columnsSlice = createSlice({
       persistView(view, viewConfig);
     },
     resetColumns(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid' }>) {
+      ensureViews(state as any);
       const { view } = action.payload;
       state.views[view].columns = cloneDefaults();
       // Reseta também o tamanho do container para o default da view
@@ -129,11 +233,13 @@ const columnsSlice = createSlice({
       persistView(view, state.views[view]);
     },
     setContainerSize(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; size: 'md' | 'lg' | 'xl' | '100%' }>) {
+      ensureViews(state as any);
       const { view, size } = action.payload;
       state.views[view].settings.containerSize = size;
       persistView(view, state.views[view]);
     },
     setRankVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; location: 'under' | 'column' | 'hidden' }>) {
+      ensureViews(state as any);
       const { view } = action.payload;
       let { location } = action.payload;
       if (view === 'grid') location = location === 'hidden' ? 'hidden' : 'under';
@@ -145,6 +251,7 @@ const columnsSlice = createSlice({
       persistView(view, state.views[view]);
     },
     setPlaysVariationDisplay(state, action: PayloadAction<{ view: 'table' | 'list'; display: 'hidden' | 'absolute' | 'percent' }>) {
+      ensureViews(state as any);
       const { view, display } = action.payload;
       state.views[view].settings.playsVariationDisplay = display;
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, view);
