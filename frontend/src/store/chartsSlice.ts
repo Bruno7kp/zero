@@ -134,7 +134,7 @@ export const computeWeekDeltas = createAsyncThunk(
           .reverse()
           .limit(2)
           .toArray();
-        let current = recent.find(x => x.week === week) || r; // se a semana atual ainda não estiver em DB, usa row em memória
+  const current = recent.find(x => x.week === week) || r; // se a semana atual ainda não estiver em DB, usa row em memória
         const prev = recent.find(x => x.week !== week && x.rank != null);
         // Calcula deltaRank / deltaPlays
         let deltaRank: string | number = 'NEW';

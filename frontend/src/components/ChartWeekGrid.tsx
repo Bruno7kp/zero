@@ -22,6 +22,7 @@ interface ChartWeekGridProps {
 }
 
 export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type, clientId, clientSecret, altVariation }) => {
+  const dispatch = useDispatch<AppDispatch>();
   // Sincroniza colunas do grid com localStorage
   useEffect(() => {
     const storageKey = 'chart_columns_grid';
@@ -34,9 +35,11 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             dispatch({ type: 'columns/updateColumn', payload: { view: 'grid', key: col.key, visible: col.visible } });
           });
         }
-      } catch {}
+      } catch (e) {
+        // Ignora JSON inválido no localStorage
+      }
     }
-  }, []);
+  }, [dispatch]);
   const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
   // Memorize the last image for each entityId, and only update when a new image is loaded
   // This ensures the image only changes when the new one is ready
@@ -65,7 +68,6 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
       </Box>
     );
   }
-  const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
   // Persist previous data while new data is loading to prevent flicker
   const [displayedData, setDisplayedData] = useState<any[]>(data);

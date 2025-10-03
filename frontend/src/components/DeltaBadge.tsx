@@ -15,13 +15,13 @@ export interface DeltaBadgeProps {
   noSidePadding?: boolean; // remove padding lateral (usado em coluna dedicada)
 }
 
-export function computeDefaultPercent(delta: number, currentValue: number): string | null {
+function computeDefaultPercent(delta: number, currentValue: number): string | null {
   if (!currentValue || currentValue - delta <= 0) return null;
   const percent = (delta / (currentValue - delta)) * 100;
   return `${percent > 0 ? '+' : ''}${percent.toFixed(0)}%`;
 }
 
-export function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, computePercentFn = computeDefaultPercent) {
+function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, computePercentFn = computeDefaultPercent) {
   let color = 'gray';
   let label: string | number = delta;
   if (typeof delta === 'number') {
