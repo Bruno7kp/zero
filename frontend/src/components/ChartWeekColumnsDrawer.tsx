@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { selectPresetList, setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
+import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 // Removed expand/collapse icons (no longer used)
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +21,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const dispatch = useDispatch<AppDispatch>();
     const isMobile = useIsMobile();
     const { colorScheme } = useMantineColorScheme();
+    const theme = useMantineTheme();
     // Centralized transient UI state (replaces per-item useState inside loops to satisfy Rules of Hooks)
     const [hoveredPreset, setHoveredPreset] = useState<string | null>(null);
     const [focusedPreset, setFocusedPreset] = useState<string | null>(null);
@@ -123,13 +124,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         'solid','solidIconOnly','solidIcon',
         'maximalist','maximalistLight'
     ];
-    let presetList = selectPresetList()
-        .filter(p => allowSpecials ? true : (!p.key.startsWith('maximalist'))) // filtra qualquer maximalist* se não permitido
-        .sort((a,b) => order.indexOf(a.key) - order.indexOf(b.key));
-    // Grid: limitar rank a apenas 'solid' (outros fundos não aparecem bem sobre a imagem)
-    if (viewType === 'grid' && badgeKind === 'rank') {
-        presetList = presetList.filter(p => p.key === 'solid' || p.key === 'solidIcon');
-    }
+    // (presetList removido - UI usa grupos diretos; validações permanecem via efeitos)
     const currentEntry = badgeStyles?.views?.[viewType]?.[viewType === 'grid' ? 'rank' : badgeKind] || { preset: 'light' };
     // Saneamento de preset inválido e ajuste para grid / regras de especiais
     useEffect(() => {
@@ -327,7 +322,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             )}
                             {/* Presets agrupados: single seleção global (custom buttons) */}
                             {(() => {
-                                const theme = useMantineTheme();
                                 const selected = currentEntry.preset;
                                 const groups: string[][] = [
                                     ['transparent','transparentIconOnly','transparentIcon'],
