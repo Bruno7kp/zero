@@ -12,6 +12,7 @@ export interface BadgeStyleConfig {
   emphasizeZero?: boolean; // se '=' ganha fundo diferenciado
   splitIconVariant?: 'filled' | 'transparent'; // variant para o badge do ícone quando split
   splitTall?: boolean; // se true, usa layout alto (estilo altVariation) para split
+  hideLabel?: boolean; // novo: mostra apenas ícone (label oculto)
 }
 
 export interface ViewBadgeState { rank: { preset: string }; plays: { preset: string }; }
@@ -33,11 +34,17 @@ const PRESETS: Record<string, BadgeStyleConfig> = {
   transparentIcon: {
     variant: 'transparent', radius: 0, iconPosition: 'before', size: 'xs', condensed: true, colorStrategy: 'direction', emphasizeZero: false
   },
+  transparentIconOnly: {
+    variant: 'transparent', radius: 0, iconPosition: 'before', size: 'xs', condensed: true, colorStrategy: 'direction', emphasizeZero: false, hideLabel: true
+  },
   light: {
     variant: 'light', radius: 'pill', iconPosition: 'hidden', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
   },
   lightIcon: {
     variant: 'light', radius: 'pill', iconPosition: 'before', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
+  },
+  lightIconOnly: {
+    variant: 'light', radius: 'pill', iconPosition: 'before', size: 'sm', condensed: true, colorStrategy: 'direction', emphasizeZero: true, hideLabel: true
   },
   solid: {
     variant: 'filled', radius: 'sm', iconPosition: 'hidden', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
@@ -45,12 +52,22 @@ const PRESETS: Record<string, BadgeStyleConfig> = {
   solidIcon: {
     variant: 'filled', radius: 'sm', iconPosition: 'before', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
   },
+  solidIconOnly: {
+    variant: 'filled', radius: 'sm', iconPosition: 'before', size: 'sm', condensed: true, colorStrategy: 'direction', emphasizeZero: true, hideLabel: true
+  },
   maximalist: {
     variant: 'light', radius: 0, iconPosition: 'split', size: 'xs', condensed: true, colorStrategy: 'static', staticColor: 'gray', emphasizeZero: false, splitIconVariant: 'filled', splitTall: true
   },
   maximalistLight: {
     variant: 'light', radius: 0, iconPosition: 'split', size: 'xs', condensed: true, colorStrategy: 'static', staticColor: 'gray', emphasizeZero: false, splitIconVariant: 'transparent', splitTall: true
-  }
+  },
+  // (Removidos presets "iconOnly" para maximalista conforme solicitação)
+};
+
+// Aliases para presets removidos que possam existir em storage legado
+const PRESET_ALIASES: Record<string, string> = {
+  maximalistIconOnly: 'maximalist',
+  maximalistLightIconOnly: 'maximalistLight'
 };
 
 // Initial defaults aligned to requested view defaults (table):
@@ -65,6 +82,7 @@ const initialState: BadgeStylesState = {
 };
 
 function resolve(preset: string): BadgeStyleConfig {
+  if (PRESET_ALIASES[preset]) preset = PRESET_ALIASES[preset];
   return PRESETS[preset] || PRESETS.light;
 }
 

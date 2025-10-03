@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box } from '@mantine/core';
+import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { selectPresetList, setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 // Removed expand/collapse icons (no longer used)
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
 import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay } from '../store/columnsSlice';
-import { IconSettings } from '@tabler/icons-react';
+import { IconSettings, IconCaretUpFilled } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
 
@@ -20,6 +20,10 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const { t } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const isMobile = useIsMobile();
+    const { colorScheme } = useMantineColorScheme();
+    // Centralized transient UI state (replaces per-item useState inside loops to satisfy Rules of Hooks)
+    const [hoveredPreset, setHoveredPreset] = useState<string | null>(null);
+    const [focusedPreset, setFocusedPreset] = useState<string | null>(null);
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
     const columns = viewConfig?.columns || defaultColumns;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
@@ -113,9 +117,14 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const [badgeKind, setBadgeKind] = useState<'rank' | 'plays'>('rank');
     const allowSpecials = (badgeKind === 'rank') && viewType !== 'grid' && currentRankLocation === 'column';
     // Ordenação customizada para mostrar estilos básicos antes dos especiais
-    const order = ['transparent','transparentIcon','light','lightIcon','solid','solidIcon','maximalist','maximalistLight'];
+    const order = [
+        'transparent','transparentIconOnly','transparentIcon',
+        'light','lightIconOnly','lightIcon',
+        'solid','solidIconOnly','solidIcon',
+        'maximalist','maximalistLight'
+    ];
     let presetList = selectPresetList()
-        .filter(p => allowSpecials ? true : (p.key !== 'maximalist' && p.key !== 'maximalistLight'))
+        .filter(p => allowSpecials ? true : (!p.key.startsWith('maximalist'))) // filtra qualquer maximalist* se não permitido
         .sort((a,b) => order.indexOf(a.key) - order.indexOf(b.key));
     // Grid: limitar rank a apenas 'solid' (outros fundos não aparecem bem sobre a imagem)
     if (viewType === 'grid' && badgeKind === 'rank') {
@@ -124,7 +133,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const currentEntry = badgeStyles?.views?.[viewType]?.[viewType === 'grid' ? 'rank' : badgeKind] || { preset: 'light' };
     // Saneamento de preset inválido e ajuste para grid / regras de especiais
     useEffect(() => {
-        const allValid = ['transparent','transparentIcon','light','lightIcon','solid','solidIcon','maximalist','maximalistLight'];
+    const allValid = order;
         const migrateKind = (kind: 'rank'|'plays') => {
             const preset = badgeStyles?.views?.[viewType]?.[kind]?.preset;
             if (!preset) return;
@@ -212,52 +221,53 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             </Stack>
                         )}
                         <Divider my={4} size="xl" label={t('charts.columns')} />
-                        {/* Imagem: no grid não permite esconder */}
-                        {viewType !== 'grid' && (
-                            <Stack gap={2}>
-                                <Divider my={4} variant="dashed" label={t('charts.imageLabel')} />
-                                <SegmentedControl
-                                    fullWidth
-                                    size="xs"
-                                    value={columnsWithVisibility.find(c => c.key === 'image')?.visible ? 'show' : 'hide'}
-                                    onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'image', visible: v === 'show' }))}
-                                    data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                                />
-                            </Stack>
-                        )}
-                        {/* Plays */}
-                        <Stack gap={2}>
-                            <Divider my={4} variant="dashed" label={t('charts.playsLabel')} />
-                            <SegmentedControl
-                                fullWidth
-                                size="xs"
-                                value={columnsWithVisibility.find(c => c.key === 'plays')?.visible ? 'show' : 'hide'}
-                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'plays', visible: v === 'show' }))}
-                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                            />
-                        </Stack>
-                        {/* Peak */}
-                        <Stack gap={2}>
-                            <Divider my={4} variant="dashed" label={t('charts.peakLabel')} />
-                            <SegmentedControl
-                                fullWidth
-                                size="xs"
-                                value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'}
-                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))}
-                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                            />
-                        </Stack>
-                        {/* Weeks */}
-                        <Stack gap={2}>
-                            <Divider my={4} variant="dashed" label={t('charts.weeksLabel')} />
-                            <SegmentedControl
-                                fullWidth
-                                size="xs"
-                                value={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ? 'show' : 'hide'}
-                                onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'totalWeeks', visible: v === 'show' }))}
-                                data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                            />
-                        </Stack>
+                        {/* Controles de colunas em grid 2 por linha */}
+                        <Flex direction="column" gap={4}>
+                            <Flex wrap="wrap" gap={8}>
+                                {viewType !== 'grid' && (
+                                    <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                        <Divider my={4} variant="dashed" label={t('charts.imageLabel')} />
+                                        <SegmentedControl
+                                            fullWidth
+                                            size="xs"
+                                            value={columnsWithVisibility.find(c => c.key === 'image')?.visible ? 'show' : 'hide'}
+                                            onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'image', visible: v === 'show' }))}
+                                            data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                                        />
+                                    </Box>
+                                )}
+                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                    <Divider my={4} variant="dashed" label={t('charts.playsLabel')} />
+                                    <SegmentedControl
+                                        fullWidth
+                                        size="xs"
+                                        value={columnsWithVisibility.find(c => c.key === 'plays')?.visible ? 'show' : 'hide'}
+                                        onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'plays', visible: v === 'show' }))}
+                                        data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                                    />
+                                </Box>
+                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                    <Divider my={4} variant="dashed" label={t('charts.peakLabel')} />
+                                    <SegmentedControl
+                                        fullWidth
+                                        size="xs"
+                                        value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'}
+                                        onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))}
+                                        data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                                    />
+                                </Box>
+                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                    <Divider my={4} variant="dashed" label={t('charts.weeksLabel')} />
+                                    <SegmentedControl
+                                        fullWidth
+                                        size="xs"
+                                        value={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ? 'show' : 'hide'}
+                                        onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'totalWeeks', visible: v === 'show' }))}
+                                        data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
+                                    />
+                                </Box>
+                            </Flex>
+                        </Flex>
                         <Divider my={4} size="xl" label={t('charts.badgeStyles.section')} />
                         {/* Exibição da variação de rank (sempre visível) */}
                         <Stack gap={2}>
@@ -315,29 +325,99 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                     data={[{ label: t('charts.badgeStyles.kindRank'), value: 'rank' }, { label: t('charts.badgeStyles.kindPlays'), value: 'plays' }]} 
                                 />
                             )}
-                            {/* Presets divididos em duas linhas para caber */}
+                            {/* Presets agrupados: single seleção global (custom buttons) */}
                             {(() => {
-                                const value = currentEntry.preset;
-                                const row1 = presetList.filter(p => ['transparent','transparentIcon','light','lightIcon'].includes(p.key));
-                                const row2 = presetList.filter(p => !['transparent','transparentIcon','light','lightIcon'].includes(p.key));
+                                const theme = useMantineTheme();
+                                const selected = currentEntry.preset;
+                                const groups: string[][] = [
+                                    ['transparent','transparentIconOnly','transparentIcon'],
+                                    ['light','lightIconOnly','lightIcon'],
+                                    ['solid','solidIconOnly','solidIcon'],
+                                    allowSpecials ? ['maximalist','maximalistLight'] : []
+                                ].filter(g => g.length);
+                                const presetVisualLabel = (k: string) => {
+                                    const baseKey = k.startsWith('transparent') ? 'transparent' : k.startsWith('light') ? 'light' : k.startsWith('solid') ? 'solid' : k;
+                                    const rawText = t(`charts.badgeStyles.preset_${baseKey}` as any);
+                                    const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+                                    const baseText = cap(rawText);
+                                    if (baseKey === 'maximalist') {
+                                        return <Flex align="center" justify="center" style={{ width: '100%' }}>{cap(rawText)}</Flex>;
+                                    }
+                                    if (k.endsWith('IconOnly')) {
+                                        return <Flex align="center" justify="center" style={{ width: '100%' }}><IconCaretUpFilled size={12} /></Flex>;
+                                    }
+                                    if (k.endsWith('Icon')) {
+                                        return <Flex align="center" gap={4} justify="center" style={{ width: '100%' }}><IconCaretUpFilled size={12} /> <span>{baseText}</span></Flex>;
+                                    }
+                                    return <Flex align="center" justify="center" style={{ width: '100%' }}>{baseText}</Flex>;
+                                };
+                                // Segmented-like styling
+                                // Theme-specific palette adjustments:
+                                // Dark: track more dark, hover equals active (as requested), active stands out but still subtle.
+                                // Light: track just a slightly lighter tone than surrounding, hover one step higher, active white.
+                                const trackBg = colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[1];
+                                const activeBg = colorScheme === 'dark' ? theme.colors.dark[4] : theme.white;
+                                const activeColor = colorScheme === 'dark' ? theme.white : theme.black;
+                                const inactiveColor = colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.dark[6];
+                                const hoverInactiveBg = colorScheme === 'dark' ? activeBg : theme.colors.gray[2];
+                                const focusRing = theme.colors.blue[5];
+                                const segmentStyle = (active: boolean, hovered: boolean, focused: boolean): React.CSSProperties => ({
+                                    flex: 1,
+                                    cursor: 'pointer',
+                                    padding: '4px 10px',
+                                    fontSize: 11,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 4,
+                                    fontWeight: 600,
+                                    background: active ? activeBg : (hovered ? hoverInactiveBg : 'transparent'),
+                                    color: active ? activeColor : inactiveColor,
+                                    borderRadius: 999,
+                                    userSelect: 'none',
+                                    transition: 'background .12s ease, color .12s ease, box-shadow .12s ease',
+                                    minWidth: 0,
+                                    outline: 'none',
+                                    boxShadow: focused ? `0 0 0 2px ${focusRing}` : 'none'
+                                });
                                 return (
-                                    <Stack gap={4}>
-                                        <SegmentedControl
-                                            fullWidth
-                                            size="xs"
-                                            value={value}
-                                            onChange={(v) => dispatch(setPreset({ view: viewType, kind: viewType === 'grid' ? 'rank' : badgeKind, preset: v }))}
-                                            data={row1.map(p => ({ label: t(`charts.badgeStyles.preset_${p.key}` as any), value: p.key }))}
-                                        />
-                                        {row2.length > 0 && (
-                                            <SegmentedControl
-                                                fullWidth
-                                                size="xs"
-                                                value={value}
-                                                onChange={(v) => dispatch(setPreset({ view: viewType, kind: viewType === 'grid' ? 'rank' : badgeKind, preset: v }))}
-                                                data={row2.map(p => ({ label: t(`charts.badgeStyles.preset_${p.key}` as any), value: p.key }))}
-                                            />
-                                        )}
+                                    <Stack gap={8}>
+                                        {groups.map((g,i) => (
+                                            <Flex key={i} direction="column" style={{ width: '100%' }}>
+                                                <Flex
+                                                    style={{
+                                                        width: '100%',
+                                                        background: trackBg,
+                                                        borderRadius: 999,
+                                                        padding: 2,
+                                                        gap: 2
+                                                    }}
+                                                >
+                                                    {g.map((k) => {
+                                                        const active = k === selected;
+                                                        const hovered = hoveredPreset === k;
+                                                        const focused = focusedPreset === k;
+                                                        return (
+                                                            <Box
+                                                                key={k}
+                                                                style={segmentStyle(active, hovered, focused)}
+                                                                onClick={() => dispatch(setPreset({ view: viewType, kind: viewType === 'grid' ? 'rank' : badgeKind, preset: k }))}
+                                                                onMouseEnter={() => setHoveredPreset(k)}
+                                                                onMouseLeave={() => setHoveredPreset(prev => prev === k ? null : prev)}
+                                                                onFocus={() => setFocusedPreset(k)}
+                                                                onBlur={() => setFocusedPreset(prev => prev === k ? null : prev)}
+                                                                role="button"
+                                                                aria-pressed={active}
+                                                                tabIndex={0}
+                                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch(setPreset({ view: viewType, kind: viewType === 'grid' ? 'rank' : badgeKind, preset: k })); } }}
+                                                            >
+                                                                {presetVisualLabel(k)}
+                                                            </Box>
+                                                        );
+                                                    })}
+                                                </Flex>
+                                            </Flex>
+                                        ))}
                                     </Stack>
                                 );
                             })()}

@@ -25,6 +25,7 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
     const totals = stats.totals || {};
     const sequences = stats.sequences || {};
     const peak = stats.peak || {};
+    const peakPosNum = peak?.position != null ? parseInt(peak.position) : undefined;
     // Try to get chartRun from stats.chartRun or stats.run or stats.chart_run
     const chartRun = stats.chartRun || stats.run || stats.chart_run || [];
     let cutoff: number | undefined;
@@ -55,7 +56,12 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
                         <Text fw={800} mb={2} size="xs" ta="center" tt="uppercase">{t('charts.stats.title')}</Text>
                     </Group>
                 </Grid.Col>
-                <StatBox label={t('charts.stats.peak')} value={peak.position ?? '-'} sub={peak.position !== undefined ? `(${peak.weeksAtPeak ?? 0}x)` : undefined} />
+                <StatBox
+                    label={t('charts.stats.peak')}
+                    value={peak.position ?? '-'}
+                    sub={peak.position !== undefined ? `(${peak.weeksAtPeak ?? 0}x)` : undefined}
+                    color={peakPosNum === 1 ? 'teal' : undefined}
+                />
                 <StatBox label={t('charts.stats.points')} value={totals.totalPoints ?? '-'} />
                 {['album', 'track'].includes(chartType) && (() => {
                     const gold = chartType === 'track' ? (chart?.music_gold_value || 0) : (chart?.album_gold_value || 0);
@@ -114,15 +120,16 @@ interface StatBoxProps {
     label: string;
     value: number;
     sub?: string;
+    color?: string; // optional accent color for value (defaults to blue)
 }
 
-const StatBox: React.FC<StatBoxProps> = ({ label, value, sub }) => (
+const StatBox: React.FC<StatBoxProps> = ({ label, value, sub, color }) => (
     <Grid.Col span={{ base: 4, sm: 2 }}>
         <Card p="sm" withBorder style={{ textAlign: 'center' }}>
             <Text fw={700} tt="uppercase" size="xs" ta="center">{label}</Text>
             <Divider my="xs" variant="dashed" size="sm" />
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 4 }}>
-                <Text fw={700} size="xl" c="blue" style={{ lineHeight: 1 }}>{value}</Text>
+                <Text fw={700} size="xl" c={color || 'blue'} style={{ lineHeight: 1 }}>{value}</Text>
                 {sub && <Text size="xs" c="dimmed" style={{ lineHeight: 1 }}>{sub}</Text>}
             </div>
         </Card>
