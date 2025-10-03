@@ -161,7 +161,7 @@ export const ImageEditModal: React.FC<ImageEditModalProps> = ({
         <Modal
             opened={opened}
             onClose={onClose}
-            title={name || t('imageEditModal.title', 'Imagem')}
+            title={t('imageEditModal.titleWithName', { name: name || t('imageEditModal.title', 'Imagem') })}
             size="lg"
             onMouseDown={e => e.stopPropagation()}
             onClick={e => e.stopPropagation()}

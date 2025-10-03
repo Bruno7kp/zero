@@ -59,7 +59,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
                   <Text fw={700} size="xl" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
-                  {showDeltaBadge && <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext />}
+                  {showDeltaBadge && <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext contextView="list" />}
                 </Flex>
               );
             }
@@ -67,7 +67,7 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
                   <Text fw={700} size="xl">{row.plays}</Text>
-                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext />}
+                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="list" />}
                 </Flex>
               );
             }
@@ -132,7 +132,7 @@ const ChartWeekListRow: React.FC<{
                 cfg = { ...badgeStylesRank, splitTall: false };
               }
               // Alt variation as its own column-like block -> use larger font size
-              return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding />;
+              return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="list" />;
             }
             return null;
           })}

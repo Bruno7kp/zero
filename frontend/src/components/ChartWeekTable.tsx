@@ -151,11 +151,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         let badge = null;
                         if (showDeltaBadge) {
                             // Under-number badge context -> compact font size xs
-                            badge = <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext />;
+                            badge = <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext contextView="table" />;
                         }
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={700} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
+                                <Text fw={row.rank === 1 ? 700 : 500} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
                                 {badge}
                             </Flex>
                         );
@@ -169,11 +169,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         let badge = null;
                         if (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) {
                             // Under-number badge context -> compact font size xs
-                            badge = <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext />;
+                            badge = <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="table" />;
                         }
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={700}>{row.plays}</Text>
+                                <Text fw={500}>{row.plays}</Text>
                                 {badge}
                             </Flex>
                         );
@@ -233,7 +233,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const peakVal = stats?.peak?.position ?? '-';
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={700} c={peakVal === 1 ? 'blue' : undefined}>{stats ? peakVal : (loadingStats ? '…' : '-')}</Text>
+                                <Text fw={peakVal === 1 ? 700 : 500} c={peakVal === 1 ? 'blue' : undefined}>{stats ? peakVal : (loadingStats ? '…' : '-')}</Text>
                             </Flex>
                         );
                     },
@@ -247,7 +247,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const totalWeeks = stats?.totals?.withinCutoff ?? '-';
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={700}>{stats ? totalWeeks : (loadingStats ? '…' : '-')}</Text>
+                                <Text fw={500}>{stats ? totalWeeks : (loadingStats ? '…' : '-')}</Text>
                             </Flex>
                         );
                     },
@@ -280,7 +280,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         cfg = { ...badgeStylesRank, splitTall: false };
                     }
                     // Alt variation shown in its own column -> emphasized font size lg
-                    return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding />;
+                    return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="table" />;
                 }
             };
             const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altVariation');
