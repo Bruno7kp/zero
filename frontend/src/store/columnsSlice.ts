@@ -30,6 +30,7 @@ export const defaultColumns: ColumnConfig[] = [
   { key: 'altVariation', label: 'charts.altVariationLabel', visible: false, isColumn: true },
   { key: 'image', label: 'charts.imageLabel', visible: true, isColumn: false },
   { key: 'name', label: 'Title', labelComplete: 'charts.titleLabel', visible: true, isColumn: true },
+  { key: 'cert', label: 'Cert', labelComplete: 'charts.certLabel', visible: false, isColumn: true },
   { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true, isColumn: true },
   { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: false, isColumn: false },
   { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true, isColumn: false },

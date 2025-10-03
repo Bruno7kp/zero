@@ -10,6 +10,7 @@ import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
+import { CertificationIcon } from './CertificationIcon';
 
 interface ChartWeekListProps {
   chart: any;
@@ -26,6 +27,7 @@ const ChartWeekListRow: React.FC<{
   row: ChartData;
   idx: number;
   filteredColumns: any[];
+  chart: any;
   showDeltaBadge: boolean;
   showDeltaPlaysBadge: boolean;
   showDeltaPercentPlaysBadge: boolean;
@@ -38,7 +40,7 @@ const ChartWeekListRow: React.FC<{
   colorScheme: string;
   theme: any;
   week?: string;
-}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
+}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
@@ -112,6 +114,24 @@ const ChartWeekListRow: React.FC<{
                 </Flex>
               );
             }
+            if (col.key === 'cert' && type !== 'artist') {
+              return (
+                <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
+                  {(type === 'album' || type === 'track') && (stats
+                    ? <CertificationIcon
+                        chart={chart}
+                        chartType={type as 'album' | 'track'}
+                        totals={stats?.totals}
+                        entity={{ name: row.name, artistName: row.artistName || '' }}
+                        username={chart?.lastfm_username}
+                        dayOfWeek={chart?.day_of_week}
+                        size={24}
+                        deferMs={450}
+                      />
+                    : (loadingStats ? <Text fw={700} size="xl">…</Text> : <Text fw={700} size="xl">-</Text>))}
+                </Flex>
+              );
+            }
             if (col.key === 'totalWeeks') {
               const totalWeeks = stats?.totals?.withinCutoff ?? '-';
               return (
@@ -175,10 +195,12 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
   }, [data, week, chart?.id, type, dispatch]);
 
-  // Stats diferidos: só agenda se colunas que dependem de stats estiverem visíveis (peak/totalWeeks)
+  // Stats diferidos: só agenda se colunas que dependem de stats estiverem visíveis (peak/totalWeeks/cert; ignore cert for artist charts)
   useEffect(() => {
     if (!data.length || !week || !chart?.id) return;
-    const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+    const wantsStats = columns.some((c: any) => (
+      (c.key === 'peak' || c.key === 'totalWeeks' || (c.key === 'cert' && type !== 'artist')) && c.visible
+    ));
     if (!wantsStats) return;
     let cancelled = false;
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -195,7 +217,9 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   }, [data, chart?.id, type, week, dispatch, columns]);
 
   // Refetch incremental quando usuário habilita colunas de stats depois
-  const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible), [columns]);
+  const statsColumnsVisible = useMemo(() => columns.some((c: any) => (
+    (c.key === 'peak' || c.key === 'totalWeeks' || (c.key === 'cert' && type !== 'artist')) && c.visible
+  )), [columns, type]);
   const [statsColsPrev, setStatsColsPrev] = useState(statsColumnsVisible);
   useEffect(() => {
     if (statsColumnsVisible && !statsColsPrev && data.length && week && chart?.id) {
@@ -244,6 +268,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           row={row}
           idx={idx}
           filteredColumns={filteredColumns}
+          chart={chart}
           showDeltaBadge={showDeltaBadge}
           showDeltaPlaysBadge={showDeltaPlaysBadge}
           showDeltaPercentPlaysBadge={showDeltaPercentPlaysBadge}

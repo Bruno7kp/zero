@@ -10,3 +10,8 @@
 .masonry-column > div {
     margin-bottom: 1rem;
 }
+
+/* Override Mantine dark theme default text color to pure white */
+:root[data-mantine-color-scheme='dark'] {
+  --mantine-color-text: #ffffff;
+}
