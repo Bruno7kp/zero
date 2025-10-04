@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Group, Text, ThemeIcon, Stack, Tooltip, Progress, ActionIcon } from '@mantine/core';
-import { IconDisc, IconRefresh } from '@tabler/icons-react';
+import { IconRefresh } from '@tabler/icons-react';
+import MetalVinylDisc from './MetalVinylDisc';
 import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
@@ -40,8 +41,8 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
   const colorMap: Record<string, string> = {
     none: 'gray',
     gold: 'yellow',
-    platinum: 'cyan',
-    diamond: 'grape'
+    platinum: 'gray',
+    diamond: 'cyan'
   };
 
   if (!result) {
@@ -76,7 +77,10 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
   return (
     <Card p="sm" style={{ backgroundColor: 'transparent' }} shadow="none">
       <Group wrap="nowrap" align="center" gap="sm">
-        <ThemeIcon size={46} radius="xl" color={color} variant="filled"><IconDisc size={28} /></ThemeIcon>
+        <ThemeIcon size={52} radius="xl" variant="transparent">
+          {/* Always show a vinyl disc; use neutral black when there's no certification */}
+          <MetalVinylDisc level={(level as any) || 'none'} size={50} />
+        </ThemeIcon>
         <Stack gap={2} style={{ flex: 1 }}>
           <Text fw={700} size="sm" tt="uppercase">
             {level !== 'none' ? `${multiplier > 1 ? multiplier + 'x ' : ''}${t('values.' + level)}` : t('charts.stats.noCert')}

@@ -71,6 +71,9 @@
       "tableView": "Tabela",
       "listView": "Lista",
       "gridView": "Grid",
+  "tableBackgroundLabel": "Fundo da tabela",
+  "tableBackground_default": "Padrão",
+  "tableBackground_transparent": "Transparente",
       "badgeStyles": {
         "title": "Customização de badges",
         "section": "Badges",
@@ -133,6 +136,7 @@
         "topX": "Top {{x}}",
         "topCutoff": "Top (limite)",
         "peak": "Pico",
+        "plays": "Reproduções",
         "run": "Chart Run",
         "loading": "Carregando estatísticas...",
         "highlightsTitle": "Destaques",

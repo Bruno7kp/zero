@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -28,6 +28,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
     const columns = viewConfig?.columns || defaultColumns;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
+    const tableBackground = viewConfig?.settings?.tableBackground || 'default';
     // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const [opened, setOpened] = useState(false);
@@ -116,7 +117,8 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     // Regra: especiais (maximalist / maximalistLight) só aparecem se for rank E em coluna
     const currentRankLocation = (viewConfig?.settings?.rankVariationLocation || 'under');
     const [badgeKind, setBadgeKind] = useState<'rank' | 'plays'>('rank');
-    const allowSpecials = (badgeKind === 'rank') && viewType !== 'grid' && currentRankLocation === 'column';
+    // Especiais (maximalist) somente na Tabela (rank na coluna); nunca na Lista nem no Grid
+    const allowSpecials = (badgeKind === 'rank') && viewType === 'table' && currentRankLocation === 'column';
     // Ordenação customizada para mostrar estilos básicos antes dos especiais
     const order = [
         'transparent','transparentIconOnly','transparentIcon',
@@ -136,13 +138,15 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPreset({ view: viewType, kind, preset: kind === 'rank' && viewType === 'grid' ? 'solidIcon' : (kind === 'rank' ? 'light' : 'transparent') }));
                 return;
             }
-            if (viewType === 'grid' && kind === 'rank' && !['solid','solidIcon'].includes(preset)) {
-                dispatch(setPreset({ view: viewType, kind, preset: 'solidIcon' }));
+            // Grid aceita presets sólidos, incluindo "apenas ícone"
+            if (viewType === 'grid' && kind === 'rank' && !['solid','solidIcon','solidIconOnly'].includes(preset)) {
+                dispatch(setPreset({ view: viewType, kind, preset: 'solidIconOnly' }));
             }
             // Invalida especiais fora da condição (badgeKind rank, location column, not grid)
             if (kind === 'rank' && (preset === 'maximalist' || preset === 'maximalistLight')) {
                 const loc = currentRankLocation;
-                if (!(viewType !== 'grid' && loc === 'column')) {
+                // Só permitido em Tabela com variação na coluna
+                if (!(viewType === 'table' && loc === 'column')) {
                     dispatch(setPreset({ view: viewType, kind, preset: 'light' }));
                 }
             }
@@ -213,6 +217,21 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                         { label: '100%', value: '100%' }
                                     ]}
                                 />
+                                                                {viewType === 'table' && (
+                                                                    <>
+                                                                        <Divider my={4} variant="dashed" label={t('charts.tableBackgroundLabel')} />
+                                                                        <SegmentedControl
+                                                                            fullWidth
+                                                                            size="xs"
+                                                                            value={tableBackground}
+                                                                            onChange={(v) => dispatch(setTableBackground({ background: v as 'default' | 'transparent' }))}
+                                                                            data={[
+                                                                                { label: t('charts.tableBackground_default'), value: 'default' },
+                                                                                { label: t('charts.tableBackground_transparent'), value: 'transparent' }
+                                                                            ]}
+                                                                        />
+                                                                    </>
+                                                                )}
                             </Stack>
                         )}
                         <Divider my={4} size="xl" label={t('charts.columns')} />
@@ -335,12 +354,16 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             {/* Presets agrupados: single seleção global (custom buttons) */}
                             {(() => {
                                 const selected = currentEntry.preset;
-                                const groups: string[][] = [
-                                    ['transparent','transparentIconOnly','transparentIcon'],
-                                    ['light','lightIconOnly','lightIcon'],
-                                    ['solid','solidIconOnly','solidIcon'],
-                                    allowSpecials ? ['maximalist','maximalistLight'] : []
-                                ].filter(g => g.length);
+                                const groups: string[][] = (
+                                    viewType === 'grid'
+                                        ? [['solid','solidIconOnly','solidIcon']]
+                                        : [
+                                            ['transparent','transparentIconOnly','transparentIcon'],
+                                            ['light','lightIconOnly','lightIcon'],
+                                            ['solid','solidIconOnly','solidIcon'],
+                                            allowSpecials ? ['maximalist','maximalistLight'] : []
+                                        ].filter(g => g.length)
+                                );
                                 const presetVisualLabel = (k: string) => {
                                     const baseKey = k.startsWith('transparent') ? 'transparent' : k.startsWith('light') ? 'light' : k.startsWith('solid') ? 'solid' : k;
                                     const rawText = t(`charts.badgeStyles.preset_${baseKey}` as any);
@@ -407,7 +430,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                             <Box
                                                                 key={k}
                                                                 style={segmentStyle(active, hovered, focused)}
-                                                                onClick={() => dispatch(setPreset({ view: viewType, kind: viewType === 'grid' ? 'rank' : badgeKind, preset: k }))}
+                                                                onClick={() => dispatch(setPreset({ view: viewType, kind: (viewType === 'grid' ? 'rank' : badgeKind), preset: k }))}
                                                                 onMouseEnter={() => setHoveredPreset(k)}
                                                                 onMouseLeave={() => setHoveredPreset(prev => prev === k ? null : prev)}
                                                                 onFocus={() => setFocusedPreset(k)}
@@ -415,7 +438,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                                 role="button"
                                                                 aria-pressed={active}
                                                                 tabIndex={0}
-                                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch(setPreset({ view: viewType, kind: viewType === 'grid' ? 'rank' : badgeKind, preset: k })); } }}
+                                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch(setPreset({ view: viewType, kind: (viewType === 'grid' ? 'rank' : badgeKind), preset: k })); } }}
                                                             >
                                                                 {presetVisualLabel(k)}
                                                             </Box>
@@ -427,7 +450,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                     </Stack>
                                 );
                             })()}
-                            <Flex justify="center">
+                            <Flex justify="center" mb="lg">
                                 <BadgeStylePreview kind={viewType === 'grid' ? 'rank' : badgeKind} rankCfg={resolvedRank} playsCfg={resolvedPlays} />
                             </Flex>
                         </Stack>

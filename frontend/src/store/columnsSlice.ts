@@ -15,6 +15,7 @@ export interface ViewSettings {
   containerSize: 'md' | 'lg' | 'xl' | '100%';
   rankVariationLocation?: 'under' | 'column' | 'hidden';
   playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista
+  tableBackground?: 'default' | 'transparent'; // only for table view
 }
 
 export interface ViewConfig {
@@ -42,7 +43,7 @@ export const defaultColumns: ColumnConfig[] = [
 const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
-  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent' },
+  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent', tableBackground: 'default' },
   // Lista: pedido para default ser coluna (variação em coluna)
   list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationDisplay: 'percent' },
   grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationDisplay: 'hidden' },
@@ -229,6 +230,7 @@ const columnsSlice = createSlice({
       state.views[view].settings.containerSize = DEFAULT_VIEW_SETTINGS[view].containerSize;
       state.views[view].settings.rankVariationLocation = DEFAULT_VIEW_SETTINGS[view].rankVariationLocation;
       state.views[view].settings.playsVariationDisplay = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay;
+      state.views[view].settings.tableBackground = DEFAULT_VIEW_SETTINGS[view].tableBackground;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', view);
       persistView(view, state.views[view]);
@@ -258,9 +260,14 @@ const columnsSlice = createSlice({
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, view);
       persistView(view, state.views[view]);
     },
+    setTableBackground(state, action: PayloadAction<{ background: 'default' | 'transparent' }>) {
+      ensureViews(state as any);
+      state.views.table.settings.tableBackground = action.payload.background;
+      persistView('table', state.views.table);
+    },
   },
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground } = columnsSlice.actions;
 export default columnsSlice.reducer;

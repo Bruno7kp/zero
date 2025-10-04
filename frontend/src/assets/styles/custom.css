@@ -15,3 +15,14 @@
 :root[data-mantine-color-scheme='dark'] {
   --mantine-color-text: #ffffff;
 }
+
+/* Utility: make mantine-datatable fully transparent */
+.datatable-transparent,
+.datatable-transparent table,
+.datatable-transparent thead,
+.datatable-transparent tbody,
+.datatable-transparent tr,
+.datatable-transparent td,
+.datatable-transparent th {
+  background-color: transparent !important;
+}

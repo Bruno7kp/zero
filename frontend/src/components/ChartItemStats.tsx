@@ -1,6 +1,8 @@
 import React from 'react';
 import { Paper, Grid, Text, Card, Divider, Group, ThemeIcon, rem } from '@mantine/core';
 import { CertificationBadge } from './CertificationBadge';
+import { getUserPlaycountCached } from '../utils/certification';
+import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { ChartRun } from './ChartRun';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -25,7 +27,6 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
     const totals = stats.totals || {};
     const sequences = stats.sequences || {};
     const peak = stats.peak || {};
-    const peakPosNum = peak?.position != null ? parseInt(peak.position) : undefined;
     // Try to get chartRun from stats.chartRun or stats.run or stats.chart_run
     const chartRun = stats.chartRun || stats.run || stats.chart_run || [];
     let cutoff: number | undefined;
@@ -56,12 +57,14 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
                         <Text fw={800} mb={2} size="xs" ta="center" tt="uppercase">{t('charts.stats.title')}</Text>
                     </Group>
                 </Grid.Col>
-                <StatBox
-                    label={t('charts.stats.peak')}
-                    value={peak.position ?? '-'}
-                    sub={peak.position !== undefined ? `(${peak.weeksAtPeak ?? 0}x)` : undefined}
-                    color={peakPosNum === 1 ? 'teal' : undefined}
-                />
+                {['artist','album','track'].includes(chartType) && (
+                    <LastfmPlaysBox
+                        chart={chart}
+                        chartType={chartType as 'artist'|'album'|'track'}
+                        entityName={chartType === 'artist' ? '' : (entityName || stats.name || stats.entityName || '')}
+                        artistName={chartType === 'artist' ? (entityName || stats.name || stats.entityName || '') : (entityArtistName || stats.artistName || stats.artist || '')}
+                    />
+                )}
                 <StatBox label={t('charts.stats.points')} value={totals.totalPoints ?? '-'} />
                 {['album', 'track'].includes(chartType) && (() => {
                     const gold = chartType === 'track' ? (chart?.music_gold_value || 0) : (chart?.album_gold_value || 0);
@@ -135,3 +138,36 @@ const StatBox: React.FC<StatBoxProps> = ({ label, value, sub, color }) => (
         </Card>
     </Grid.Col>
 );
+
+// Lazy Last.fm plays box: fetches user playcount on expand/modal only, de-duplicated and cached
+function LastfmPlaysBox({ chart, chartType, artistName, entityName }: { chart: any; chartType: 'artist'|'album'|'track'; artistName: string; entityName: string }) {
+    const { isOnline } = useOfflineStatus();
+    const [plays, setPlays] = React.useState<number | null>(null);
+    const { t } = useTranslation();
+
+    React.useEffect(() => {
+        const username = chart?.lastfm_username as string | undefined;
+        let canceled = false;
+        // Fetch immediately; StrictMode will call effect twice (mount->cleanup->mount), but this is safe
+        getUserPlaycountCached({
+            username,
+            artistName,
+            entityName,
+            chartType,
+            offline: !isOnline,
+            nextWeekDay: chart?.day_of_week,
+        })
+            .then(v => { if (!canceled) setPlays(v); })
+            .catch(() => { if (!canceled) setPlays(0); });
+        return () => { canceled = true; };
+    }, [chart?.lastfm_username, chart?.day_of_week, artistName, entityName, chartType, isOnline]);
+
+    return (
+        <StatBox
+            label={t('charts.stats.plays', { defaultValue: 'Plays' })}
+            value={plays == null ? ('…' as any) : plays}
+            sub={plays == null ? undefined : undefined}
+            color={undefined}
+        />
+    );
+}

@@ -337,10 +337,14 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const displayedRecords = progressive.items as ChartData[];
     const showLoadingTail = useProgressive && !progressive.done;
 
+    const tableBgSetting = (useSelector((state: RootState) => (state as any).columns?.views?.table?.settings?.tableBackground) || 'default') as 'default' | 'transparent';
+    const paperProps = tableBgSetting === 'transparent' ? { shadow: 'none' as const, bg: 'transparent' as const } : { shadow: 'xs' as const };
+
     return (
         <>
-            <Paper shadow="xs" p="md" withBorder>
+            <Paper {...paperProps} p="md">
                 <DataTable
+                    className="datatable-transparent"
                     columns={dtColumns}
                     records={displayedRecords}
                     rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}

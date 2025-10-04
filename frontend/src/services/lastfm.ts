@@ -38,6 +38,7 @@ interface LastFmResponse {
     };
     track?: any;
     album?: any;
+    artist?: any;
 }
 
 // Generic fetch. For methods that need 'username' (track.getInfo / album.getInfo) we pass a flag.
@@ -156,4 +157,15 @@ export const getAlbumInfo = async (user: string, artist: string, album: string) 
         } catch {/* ignore */}
     }
     return data?.album;
+};
+
+export const getArtistInfo = async (user: string, artist: string) => {
+    // Try without autocorrect first; fallback with autocorrect=1 if missing userplaycount
+    let data = await fetchLastFmApi('artist.getInfo', user, undefined, undefined, { artist, autocorrect: '0' }, true);
+    if (!data?.artist?.stats?.userplaycount) {
+        try {
+            data = await fetchLastFmApi('artist.getInfo', user, undefined, undefined, { artist, autocorrect: '1' }, true);
+        } catch { /* ignore */ }
+    }
+    return (data as any)?.artist;
 };

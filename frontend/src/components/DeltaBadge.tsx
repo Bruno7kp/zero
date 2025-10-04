@@ -22,32 +22,33 @@ function computeDefaultPercent(delta: number, currentValue: number): string | nu
     return `${percent > 0 ? '+' : ''}${percent.toFixed(0)}%`;
 }
 
-function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, computePercentFn = computeDefaultPercent) {
+function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, darker?: boolean, computePercentFn = computeDefaultPercent) {
     let color = 'gray';
     let label: string | number = delta;
     if (typeof delta === 'number') {
         if (delta > 0) {
-            color = 'green';
+            color = darker ? 'forest' : 'green';
             if (showPercent && currentValue) {
                 const p = computePercentFn(delta, currentValue);
                 label = p || `+${delta}`;
             } else label = `+${delta}`;
         } else if (delta < 0) {
-            color = 'red';
+            color = darker ? 'ruby' : 'red';
             if (showPercent && currentValue) {
                 const p = computePercentFn(delta, currentValue);
                 label = p || `${delta}`;
             } else label = `${delta}`;
         } else { color = 'gray'; label = '='; }
-    } else if (delta === 'NEW') { color = 'blue'; label = 'NEW'; }
-    else if (delta === 'RE') { color = 'yellow'; label = 'RE'; }
+    } else if (delta === 'NEW') { color = darker ? 'cobalt' : 'blue'; label = 'NEW'; }
+    else if (delta === 'RE') { color = darker ? 'honey' : 'yellow'; label = 'RE'; }
     else if (delta === '-' || delta == null) { color = 'gray'; label = '-'; }
     return { color, label };
 }
 
 export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView }) => {
-    const { color, label } = resolveDelta(delta, showPercent, currentValue, computePercent || computeDefaultPercent);
-    let variant = cfg.variant === 'transparent' ? 'light' : cfg.variant;
+    const darker = true;//cfg.variant !== 'filled';
+    const { color, label } = resolveDelta(delta, showPercent, currentValue, darker, computePercent || computeDefaultPercent);
+    let variant = cfg.variant;
     // Regra: se variante for sólida e a cor for gray, usar variante light para suavizar SOMENTE em tabela/lista (grid mantém filled)
     if (variant === 'filled' && color === 'gray' && (contextView === 'table' || contextView === 'list' || (!contextView))) variant = 'light';
     const isTransparent = cfg.variant === 'transparent';
@@ -84,8 +85,16 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
         if (delta === '=' && cfg.iconPosition === 'split') return <IconSquareFilled size={8} />;
         return null;
     })();
-    // Em presets "apenas ícone" ocultamos label, EXCETO o '=' que nunca deve ser suprimido
-    const displayLabel = (cfg.hideLabel && label !== '=') ? '' : label;
+    // Em presets "apenas ícone" ocultamos label; no grid, ocultamos até o '=' para ficar 100% ícone
+    let displayLabel = cfg.hideLabel
+        ? (contextView === 'grid' ? '' : (label !== '=' ? '' : label))
+        : label;
+    // Se o modo é texto + ícone (não split, ícone visível), remover textos 'NEW' e 'RE' e deixar só o ícone
+    if (!cfg.hideLabel && cfg.iconPosition !== 'hidden' && cfg.iconPosition !== 'split') {
+        if (delta === 'NEW' || delta === 'RE') {
+            displayLabel = '';
+        }
+    }
     const fontSizeMap: Record<string, number> = { xs: 10, sm: 11, md: 12, lg: 14, xl: 16 };
     const effectiveFontSize = fontSizeMap[textSize || (cfg.size as any) || 'xs'];
     if (cfg.iconPosition === 'split' && icon) {
@@ -146,6 +155,9 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     // Treat icon-only (hideLabel) same as text-only for width purposes
     const treatAsHiddenForWidth = cfg.hideLabel && cfg.iconPosition === 'before';
     const fixedWidth = applyFixed ? ((cfg.iconPosition === 'hidden' || treatAsHiddenForWidth) ? 40 : 55) : undefined;
+    // Altura fixa em contexto de coluna para normalizar posição vertical entre texto/ícone/text+ícone
+    const heightMap: Record<string, number> = { xs: 14, sm: 18, md: 20, lg: 24, xl: 28 };
+    const fixedHeight = applyFixed ? heightMap[(size as string) || 'xs'] : undefined;
     // When fixed width applies we remove horizontal padding entirely
     const finalPaddingStyle = applyFixed ? { paddingInline: 0 } : paddingStyle;
     return (
@@ -160,8 +172,12 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
                 fontSize: effectiveFontSize,
                 width: fixedWidth,
                 minWidth: fixedWidth,
+                height: fixedHeight,
+                minHeight: fixedHeight,
                 textAlign: 'center',
                 justifyContent: 'center',
+                display: 'flex',
+                alignItems: 'center',
                 ...finalPaddingStyle,
                 ...(isTransparent ? { background: 'transparent', backgroundColor: 'transparent' } : {})
             }}

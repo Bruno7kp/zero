@@ -1,9 +1,11 @@
 import dayjs from 'dayjs';
 import { db } from '../db/indexedDb';
-import { getTrackInfo, getAlbumInfo } from '../services/lastfm';
+import { getTrackInfo, getAlbumInfo, getArtistInfo } from '../services/lastfm';
 
 // Memory layer to avoid hitting IndexedDB repeatedly within same session
 const memCache: Record<string, { value: number; expires: number }> = {};
+// In-flight requests de-duplication to avoid concurrent duplicate fetches
+const inflight: Record<string, Promise<number>> = {};
 
 export interface CertificationResult {
   totalFormula: number; // weighted total
@@ -51,13 +53,15 @@ async function fetchPlaycount({ username, artist, album, track, enabled, cacheUn
 
   try {
     let data: any = null;
-  if (track) data = await getTrackInfo(username, artist, track);
-  else if (album) data = await getAlbumInfo(username, artist, album);
+    if (track) data = await getTrackInfo(username, artist, track);
+    else if (album) data = await getAlbumInfo(username, artist, album);
+    else data = await getArtistInfo(username, artist);
     if (!data) return 0;
     let pc = 0;
-    const userPcRaw = data?.userplaycount;
+    const userPcRaw = track || album ? data?.userplaycount : data?.stats?.userplaycount;
     if (track && userPcRaw !== undefined) pc = parseInt(userPcRaw, 10) || 0;
     if (album && userPcRaw !== undefined) pc = parseInt(userPcRaw, 10) || 0;
+    if (!track && !album && userPcRaw !== undefined) pc = parseInt(userPcRaw, 10) || 0;
     // Só cacheia se a API retornou userplaycount (evita travar em 0 quando faltou username param ou dado ausente)
     if (userPcRaw !== undefined) {
       const exp = dayjs(cacheUntil).toDate().getTime();
@@ -177,4 +181,41 @@ export async function computeCertification(params: ComputeCertificationParams & 
   }
 
   return { totalFormula, level, multiplier, nextTarget, remainingToNext, playcountUsed: userPlaycount, nextType, nextLevel, nextMultiple };
+}
+
+// Lightweight public helper to get user playcount with the same cache/expiry used by certification
+export async function getUserPlaycountCached(args: {
+  username?: string;
+  artistName: string;
+  entityName: string;
+  chartType: 'artist' | 'album' | 'track';
+  offline?: boolean;
+  nextWeekDay?: number;
+}): Promise<number> {
+  const { username, artistName, entityName, chartType, offline, nextWeekDay } = args;
+  if (!username || offline) return 0;
+
+  // Determine cache expiry (next configured day_of_week or +7 days fallback)
+  let cacheUntil = dayjs().add(7, 'day');
+  if (typeof nextWeekDay === 'number') {
+    let d = dayjs();
+    while (d.day() !== nextWeekDay) d = d.add(1, 'day');
+    cacheUntil = d.endOf('day');
+  }
+
+  const key = `pc:${username}:${artistName}:${chartType === 'album' ? entityName : ''}:${chartType === 'track' ? entityName : ''}`;
+  const cached = await getCached(key);
+  if (cached !== null) return cached;
+
+  if (Object.prototype.hasOwnProperty.call(inflight, key)) return inflight[key];
+  const p = fetchPlaycount({
+    username,
+    artist: artistName,
+    album: chartType === 'album' ? entityName : undefined,
+    track: chartType === 'track' ? entityName : undefined,
+    enabled: true,
+    cacheUntil: cacheUntil.toISOString(),
+  }).finally(() => { delete inflight[key]; });
+  inflight[key] = p;
+  return p;
 }

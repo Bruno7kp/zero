@@ -1,6 +1,6 @@
 import React from 'react';
 import { ThemeIcon, Tooltip } from '@mantine/core';
-import { IconDiscFilled } from '@tabler/icons-react';
+import MetalVinylDisc from './MetalVinylDisc';
 import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
@@ -16,12 +16,6 @@ export interface CertificationIconProps {
   deferMs?: number; // lazy start delay
 }
 
-const colorMap: Record<string, string> = {
-  none: 'gray',
-  gold: 'yellow',
-  platinum: 'cyan',
-  diamond: 'grape'
-};
 
 export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, chartType, totals, entity, username, dayOfWeek, size = 24, deferMs = 600 }) => {
   const { t } = useTranslation();
@@ -64,13 +58,12 @@ export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, cha
   // Do not render when there is no certification
   if (result.level === 'none') return null;
 
-  const color = colorMap[result.level];
   const label = `${result.multiplier > 1 ? result.multiplier + 'x ' : ''}${t('values.' + result.level)}`;
 
   return (
     <Tooltip label={label} withArrow>
-      <ThemeIcon size={size} radius="xl" color={color} variant="transparent">
-        <IconDiscFilled size={Math.max(14, size - 6)} />
+      <ThemeIcon size={size} radius="xl" variant="transparent">
+        <MetalVinylDisc level={result.level} size={Math.max(14, size - 6)} />
       </ThemeIcon>
     </Tooltip>
   );
