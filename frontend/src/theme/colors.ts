@@ -4,7 +4,7 @@ export const forest: MantineColorsTuple = [
   '#eafbee',
   '#dcf0e1',
   '#bcdec3',
-  '#98cca3', // texto no tema escuro
+  '#bceba7', // texto no tema escuro
   '#7abc87',
   '#66b276',
   '#458957', // texto no tema branco // bg badge claro nos dois temas
@@ -56,7 +56,7 @@ export const cobalt: MantineColorsTuple = [
   '#e6f0ff',
   '#b3ccff',
   '#80aaff',
-  '#4d94ff', // texto no tema escuro
+  '#98bff6', // texto no tema escuro
   '#1a75ff',
   '#0066e6',
   '#3363d6', // texto no tema branco // bg badge claro nos dois temas
@@ -82,7 +82,7 @@ export const honey: MantineColorsTuple = [
   '#fff5e6',
   '#ffebc2',
   '#ffd39c',
-  '#ffbc80', // texto no tema escuro
+  '#ffca64', // texto no tema escuro
   '#ff9952',
   '#ff8a1a',
   '#e37700', // texto no tema branco // bg badge claro nos dois temas

@@ -116,9 +116,14 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 	// Valor do input: sempre o início da semana selecionada no timezone do chart
 	const inputValue = week ? dayjs(week).toDate() : null;
+	// Calcula o número da semana se inputValue existir
+	let weekNum: number | null = null;
+	if (inputValue) {
+		const start = dayjs(inputValue);
+		const chartStart = dayjs(chart.start_date);
+		weekNum = Math.floor(start.diff(chartStart, 'day') / 7) + 1;
+	}
 	const [popoverOpened, setPopoverOpened] = useState(false);
-	const cutoffType = type === 'track' ? 'music_cutoff' : `${type}_cutoff`;
-	const cutoff = (chart as any)[cutoffType] !== undefined ? (chart as any)[cutoffType] : 100;
 	const topType = `charts.${type}sTop`;
 
 	return (
@@ -126,15 +131,14 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
 				<Grid.Col span={12} ta="center">
-					<Title order={2}>{t(topType, { cutoff })}</Title>
-					<Title order={5}>{chart.name}</Title>
+					<Title order={2}>
+						{t(topType, { week: weekNum })}
+					</Title>
 					<Text fw={600} size="sm">
 						{(() => {
 							const start = dayjs(inputValue);
 							const end = start.add(6, 'day');
-							const chartStart = dayjs(chart.start_date);
-							const weekNum = Math.floor(start.diff(chartStart, 'day') / 7) + 1;
-							return `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')} (Semana ${weekNum})`;
+							return `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}`;
 						})()}
 					</Text>
 				</Grid.Col>
@@ -158,7 +162,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				</Flex>
 			</Grid.Col>
 			{/* Centro: navegação de semana */}
-			<Grid.Col span={{ base:12, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			<Grid.Col span={{ base: 12, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<Popover
 					position="bottom"

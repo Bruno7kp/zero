@@ -40,10 +40,10 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
   }, [chart, chartType, totals, entity, username, online, forceReloadToken]);
 
   const colorMap: Record<string, string> = {
-    none: 'gray',
+    none: 'gray.4',
     gold: 'yellow',
-    platinum: 'gray',
-    diamond: 'cyan'
+    platinum: 'gray.4',
+    diamond: 'blue'
   };
 
   if (!result) {
@@ -86,7 +86,7 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
           <Text fw={700} size="sm" tt="uppercase">
             {level !== 'none' ? `${multiplier > 1 ? multiplier + 'x ' : ''}${t('values.' + level)}` : t('charts.stats.noCert')}
           </Text>
-          <Text size="xs" c="dimmed">{t('charts.stats.currentValue', { value: formatNumber(Math.floor(totalFormula)), unit: formulaName })}</Text>
+          <Text size="xs">{t('charts.stats.currentValue', { value: formatNumber(Math.floor(totalFormula)), unit: formulaName })}</Text>
           {remainingToNext !== null && nextTarget !== null && (
             <Tooltip label={
               nextType === 'same' && nextMultiple && nextLevel
@@ -97,7 +97,7 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
             }>
               <div>
                 <Progress value={nextPct} size="xs" color={color} radius="xl" />
-                <Text size="10px" ta="left" c="dimmed">
+                <Text size="10px" mt={3}>
                   {nextType === 'same' && nextMultiple && nextLevel
                     ? t('charts.stats.remainingToSame', { value: formatNumber(Math.max(0, Math.ceil(remainingToNext))), multiple: nextMultiple, level: t('values.' + nextLevel) })
                     : nextLevel
