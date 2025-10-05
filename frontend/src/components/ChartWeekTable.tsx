@@ -298,8 +298,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 width: 65,
                 cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
                 render: (row: ChartData, index: number) => {
-                    const value: any = altVariation ? altVariation(row, index) : false;
-                    if (!value && value !== 0) return null;
+                    const rawVal: any = altVariation ? altVariation(row, index) : false;
+                    const value: any = (rawVal || rawVal === 0) ? rawVal : '-';
                     // Only use splitTall if current preset actually uses split (maximalist). Otherwise follow current style.
                     let cfg: any = badgeStylesRank;
                     if (badgeStylesRank.iconPosition === 'split') {

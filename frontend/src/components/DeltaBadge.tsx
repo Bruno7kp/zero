@@ -27,26 +27,26 @@ function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, 
     let label: string | number = delta;
     if (typeof delta === 'number') {
         if (delta > 0) {
-            color = darker ? 'forest' : 'green';
+            color = darker ? 'forest' : 'grass';
             if (showPercent && currentValue) {
                 const p = computePercentFn(delta, currentValue);
                 label = p || `+${delta}`;
             } else label = `+${delta}`;
         } else if (delta < 0) {
-            color = darker ? 'ruby' : 'red';
+            color = darker ? 'ruby' : 'cherry';
             if (showPercent && currentValue) {
                 const p = computePercentFn(delta, currentValue);
                 label = p || `${delta}`;
             } else label = `${delta}`;
         } else { color = 'gray'; label = '='; }
-    } else if (delta === 'NEW') { color = darker ? 'cobalt' : 'blue'; label = 'NEW'; }
-    else if (delta === 'RE') { color = darker ? 'honey' : 'yellow'; label = 'RE'; }
+    } else if (delta === 'NEW') { color = darker ? 'cobalt' : 'lazuli'; label = 'NEW'; }
+    else if (delta === 'RE') { color = darker ? 'honey' : 'bee'; label = 'RE'; }
     else if (delta === '-' || delta == null) { color = 'gray'; label = '-'; }
     return { color, label };
 }
 
 export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView }) => {
-    const darker = true;//cfg.variant !== 'filled';
+    const darker = cfg.variant !== 'filled';
     const { color, label } = resolveDelta(delta, showPercent, currentValue, darker, computePercent || computeDefaultPercent);
     let variant = cfg.variant;
     // Regra: se variante for sólida e a cor for gray, usar variante light para suavizar SOMENTE em tabela/lista (grid mantém filled)
@@ -87,7 +87,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     })();
     // Em presets "apenas ícone" ocultamos label; no grid, ocultamos até o '=' para ficar 100% ícone
     let displayLabel = cfg.hideLabel
-        ? (contextView === 'grid' ? '' : (label !== '=' ? '' : label))
+        ? (contextView === 'grid' ? (label === '=' ? label : '') : (label === '=' ? label : ''))
         : label;
     // Se o modo é texto + ícone (não split, ícone visível), remover textos 'NEW' e 'RE' e deixar só o ícone
     if (!cfg.hideLabel && cfg.iconPosition !== 'hidden' && cfg.iconPosition !== 'split') {
@@ -97,6 +97,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     }
     const fontSizeMap: Record<string, number> = { xs: 10, sm: 11, md: 12, lg: 14, xl: 16 };
     const effectiveFontSize = fontSizeMap[textSize || (cfg.size as any) || 'xs'];
+    const splitVariant = resolveDelta(delta, showPercent, currentValue, false, computePercent || computeDefaultPercent);
     if (cfg.iconPosition === 'split' && icon) {
         if (cfg.splitTall) {
             return (
@@ -120,7 +121,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
                         {displayLabel}
                     </Badge>
                     <Badge
-                        color={color}
+                        color={splitVariant.color}
                         variant={(cfg.splitIconVariant || 'filled') as any}
                         size={size}
                         style={{

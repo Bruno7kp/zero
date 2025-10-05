@@ -5,7 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
 import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
+import { formatNumber } from '../utils/format';
+import { IconPlus, IconCaretUpFilled, IconCaretDownFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
 import { DeltaBadge } from './DeltaBadge';
 import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
@@ -46,6 +47,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     // Função para renderizar o ícone de variação
     // hook must be at top-level (was incorrectly inside renderAltVariation causing hook order issues)
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'grid'));
+    const rankVariationLocation = useSelector((state: any) => (state.columns?.views?.grid?.settings?.rankVariationLocation) || 'under');
 
     function renderAltVariation(row: ChartData, idx: number, rankCfg: any) {
         const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
@@ -141,9 +143,20 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const visibleCards = progressive.items;
     const showLoadingTail = useProgressive && !progressive.done;
 
+    const modalTitle = modalRow ? `${modalRow.name}${modalRow.artistName ? ' — ' + modalRow.artistName : ''}` : 'Detalhes';
     return (
         <>
-            <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title={modalRow?.name || 'Detalhes'} size="xl">
+            <Modal
+                opened={modalOpen}
+                onClose={() => setModalOpen(false)}
+                title={modalTitle}
+                size="xl"
+                styles={{
+                    header: { justifyContent: 'center', position: 'relative' },
+                    title: { width: '100%', textAlign: 'center', fontWeight: 700 },
+                    close: { position: 'absolute', right: 8 }
+                }}
+            >
                 {modalRow && (
                     <ChartItemStatsLoader
                         chartId={modalRow.chartId}
@@ -156,12 +169,26 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             <Grid gutter="md" columns={30}>
                 {visibleCards.map((row: ChartData, idx: number) => {
                     const stats = statsMap[row.entityId];
+                    const deltaValue: any = altVariation ? altVariation(row, idx) : false;
+                    const deltaColor = (() => {
+                        if (deltaValue === 'NEW') return 'lazuli';
+                        if (deltaValue === 'RE') return 'bee';
+                        if (typeof deltaValue === 'number') {
+                            if (deltaValue > 0) return 'grass';
+                            if (deltaValue < 0) return 'cherry';
+                            return 'gray'; // '=' / 0 mantém cinza
+                        }
+                        return 'gray';
+                    })();
                     return (
                         <Grid.Col key={row.id} span={{ base: 15, md: 10, lg: 6 }}>
                             <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
                                 <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
-                                    {/* Variação canto superior direito */}
-                                    {renderAltVariation(row, idx, badgeStylesRank)}
+                                                                        {/* Variação (grid):
+                                                                            - 'hidden': sem overlay nem ícone
+                                                                            - 'under': sem overlay (ícone aparece sob o rank)
+                                                                            - 'corner': overlay no canto superior direito */}
+                                                                        {rankVariationLocation === 'corner' && renderAltVariation(row, idx, badgeStylesRank)}
                                     {/* Botão modal canto superior esquerdo */}
                                     <ActionIcon
                                         size="sm"
@@ -174,7 +201,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                     </ActionIcon>
                                     {/* Posição (rank) canto inferior esquerdo */}
                                     <Badge
-                                        color={row.rank === 1 ? 'blue' : 'gray'}
+                                        color={row.rank === 1 ? 'lazuli' : deltaColor}
                                         size="xl"
                                         variant="filled"
                                         py="xl"
@@ -193,7 +220,27 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                             borderBottomLeftRadius: 0,
                                         }}
                                     >
-                                        {row.rank}
+                                        {/* Número da posição + (opcional) ícone abaixo em branco quando localização = 'under' */}
+                                        <Box component="span" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
+                                            <span>{row.rank}</span>
+                                            {(() => {
+                                                if (rankVariationLocation !== 'under') return null;
+                                                const value: any = deltaValue;
+                                                if (!value && value !== 0) return null;
+                                                // Ícones brancos sem fundo; +2 no tamanho para setas e RE, estrela mantém o tamanho base
+                                                const baseSize = 12;
+                                                const boostedReSize = baseSize + 2; // RE +2
+                                                const boostedUpDownSize = baseSize + 4; // Up/Down +4
+                                                if (value === 'NEW') return <IconStarFilled size={baseSize} color={theme.white} style={{ marginTop: 2 }} />;
+                                                if (value === 'RE') return <IconArrowBackUp size={boostedReSize} stroke={3} color={theme.white} style={{ marginTop: 2, transform: 'scaleX(-1)' }} />;
+                                                if (value === '=' || value === 0) return <span style={{ marginTop: 2, fontSize: baseSize, lineHeight: 1, color: theme.white }}>=</span>;
+                                                if (typeof value === 'number') {
+                                                    if (value > 0) return <IconCaretUpFilled size={boostedUpDownSize} color={theme.white} style={{ marginTop: 2 }} />;
+                                                    if (value < 0) return <IconCaretDownFilled size={boostedUpDownSize} color={theme.white} style={{ marginTop: 2 }} />;
+                                                }
+                                                return null;
+                                            })()}
+                                        </Box>
                                     </Badge>
                                     {/* Imagem do Spotify ou placeholder */}
                                     {showImage && (
@@ -241,7 +288,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                         {showPlays && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
                                                 <Text size="xs" c="dimmed">Plays</Text>
-                                                <Text fw={700} size="sm">{row.plays}</Text>
+                                                <Text fw={700} size="sm">{formatNumber(row.plays as any)}</Text>
                                             </Box>
                                         )}
                                         {showPeak && (

@@ -4,6 +4,7 @@ import { IconRefresh } from '@tabler/icons-react';
 import MetalVinylDisc from './MetalVinylDisc';
 import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
+import { formatNumber } from '../utils/format';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 
 interface Props {
@@ -85,23 +86,23 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
           <Text fw={700} size="sm" tt="uppercase">
             {level !== 'none' ? `${multiplier > 1 ? multiplier + 'x ' : ''}${t('values.' + level)}` : t('charts.stats.noCert')}
           </Text>
-          <Text size="xs" c="dimmed">{t('charts.stats.currentValue', { value: Math.floor(totalFormula), unit: formulaName })}</Text>
+          <Text size="xs" c="dimmed">{t('charts.stats.currentValue', { value: formatNumber(Math.floor(totalFormula)), unit: formulaName })}</Text>
           {remainingToNext !== null && nextTarget !== null && (
             <Tooltip label={
               nextType === 'same' && nextMultiple && nextLevel
                 ? t('charts.stats.nextAt', { value: `${nextMultiple}x ${t('values.' + nextLevel)}` })
                 : nextLevel
                   ? t('charts.stats.nextAt', { value: t('values.' + nextLevel) })
-                  : t('charts.stats.nextAt', { value: Math.floor(nextTarget) })
+      : t('charts.stats.nextAt', { value: formatNumber(Math.floor(nextTarget)) })
             }>
               <div>
                 <Progress value={nextPct} size="xs" color={color} radius="xl" />
                 <Text size="10px" ta="left" c="dimmed">
                   {nextType === 'same' && nextMultiple && nextLevel
-                    ? t('charts.stats.remainingToSame', { value: Math.max(0, Math.ceil(remainingToNext)), multiple: nextMultiple, level: t('values.' + nextLevel) })
+                    ? t('charts.stats.remainingToSame', { value: formatNumber(Math.max(0, Math.ceil(remainingToNext))), multiple: nextMultiple, level: t('values.' + nextLevel) })
                     : nextLevel
-                      ? t('charts.stats.remainingToHigher', { value: Math.max(0, Math.ceil(remainingToNext)), level: t('values.' + nextLevel) })
-                      : t('charts.stats.remaining', { value: Math.max(0, Math.ceil(remainingToNext)) })}
+                      ? t('charts.stats.remainingToHigher', { value: formatNumber(Math.max(0, Math.ceil(remainingToNext))), level: t('values.' + nextLevel) })
+                      : t('charts.stats.remaining', { value: formatNumber(Math.max(0, Math.ceil(remainingToNext))) })}
                 </Text>
               </div>
             </Tooltip>

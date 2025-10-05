@@ -13,7 +13,7 @@ export interface ColumnConfig {
 // Configurações adicionais por view que não são booleanas
 export interface ViewSettings {
   containerSize: 'md' | 'lg' | 'xl' | '100%';
-  rankVariationLocation?: 'under' | 'column' | 'hidden';
+  rankVariationLocation?: 'under' | 'column' | 'hidden' | 'corner';
   playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista
   tableBackground?: 'default' | 'transparent'; // only for table view
   listBackground?: 'default' | 'transparent'; // only for list view
@@ -52,10 +52,10 @@ const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
 
 // (helpers legacy removidos – lógica agora fica apenas nos reducers diretos)
 
-function applyRankVariationMapping(cols: ColumnConfig[], location: 'under' | 'column' | 'hidden', view: 'table' | 'list' | 'grid'): ColumnConfig[] {
+function applyRankVariationMapping(cols: ColumnConfig[], location: 'under' | 'column' | 'hidden' | 'corner', view: 'table' | 'list' | 'grid'): ColumnConfig[] {
   return cols.map(c => {
     if (c.key === 'deltaRankBadge') {
-      if (view === 'grid') return { ...c, visible: location !== 'hidden' }; // grid: only show/hide badge overlay
+      if (view === 'grid') return { ...c, visible: location === 'corner' }; // grid: overlay só no canto superior
       return { ...c, visible: location === 'under' };
     }
     if (c.key === 'altVariation') {
@@ -243,11 +243,10 @@ const columnsSlice = createSlice({
       state.views[view].settings.containerSize = size;
       persistView(view, state.views[view]);
     },
-    setRankVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; location: 'under' | 'column' | 'hidden' }>) {
+    setRankVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; location: 'under' | 'column' | 'hidden' | 'corner' }>) {
       ensureViews(state as any);
       const { view } = action.payload;
-      let { location } = action.payload;
-      if (view === 'grid') location = location === 'hidden' ? 'hidden' : 'under';
+      const { location } = action.payload;
       state.views[view].settings.rankVariationLocation = location;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, location, view);
       // reaplicar plays mapping
