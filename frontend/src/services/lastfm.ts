@@ -61,37 +61,32 @@ const fetchLastFmApi = async (
     extra: Record<string, string> = {},
     useUsernameParam: boolean = false
 ): Promise<LastFmResponse> => {
-    try {
-        const base: Record<string, string> = {
-            method,
-            api_key: LASTFM_API_KEY,
-            format: 'json',
-            ...(from ? { from } : {}),
-            ...(to ? { to } : {}),
-            ...extra,
-        };
-        if (user) {
-            if (useUsernameParam) base.username = user;
-            else base.user = user;
-        }
-        const params = new URLSearchParams(base);
-        const lurl = `${LASTFM_API_URL}?${params.toString()}`;
-        const response = await fetch(lurl);
-        if (!response.ok) {
-            throw new LastFmApiError(`[LASTFM][HTTP:${response.status}] ${response.statusText}`, { httpStatus: response.status });
-        }
-        const json = await response.json();
-        if ((json as any)?.error) {
-            // Last.fm error codes (e.g., 6 user not found, 29 rate limit, etc.)
-            const code = (json as any).error;
-            const msg = (json as any).message || 'Error';
-            throw new LastFmApiError(`[LASTFM][CODE:${code}] ${msg}`, { code });
-        }
-        return json;
-    } catch (error) {
-        // rethrow without console noise
-        throw error;
+    const base: Record<string, string> = {
+        method,
+        api_key: LASTFM_API_KEY,
+        format: 'json',
+        ...(from ? { from } : {}),
+        ...(to ? { to } : {}),
+        ...extra,
+    };
+    if (user) {
+        if (useUsernameParam) base.username = user;
+        else base.user = user;
     }
+    const params = new URLSearchParams(base);
+    const lurl = `${LASTFM_API_URL}?${params.toString()}`;
+    const response = await fetch(lurl);
+    if (!response.ok) {
+        throw new LastFmApiError(`[LASTFM][HTTP:${response.status}] ${response.statusText}`, { httpStatus: response.status });
+    }
+    const json = await response.json();
+    if ((json as any)?.error) {
+        // Last.fm error codes (e.g., 6 user not found, 29 rate limit, etc.)
+        const code = (json as any).error;
+        const msg = (json as any).message || 'Error';
+        throw new LastFmApiError(`[LASTFM][CODE:${code}] ${msg}`, { code });
+    }
+    return json;
 };
 
 

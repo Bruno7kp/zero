@@ -38,10 +38,6 @@ export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, cha
     if (requirePoints && !hasPoints) {
       const chartIdStr = String(chart?.id || '');
       const sigDb = ['db', chartIdStr, chartType, entityId, username || ''].join('|');
-      // If we already computed a result for this same signature, skip re-fetching
-      if (result && sigRef.current === sigDb) {
-        return () => { mounted = false; };
-      }
       sigRef.current = sigDb;
       (async () => {
         try {

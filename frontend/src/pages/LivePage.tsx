@@ -102,7 +102,7 @@ const LivePage = () => {
                 }
 
                 setChartData(data);
-            } catch (err) {
+            } catch {
                 setError(t("errors.dataError"));
             } finally {
                 setLoading(false);
