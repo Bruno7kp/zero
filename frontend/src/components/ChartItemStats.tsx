@@ -1,5 +1,6 @@
 import React from 'react';
 import { Paper, Grid, Text, Card, Divider, Group, ThemeIcon, rem } from '@mantine/core';
+import { formatNumber } from '../utils/format';
 import { CertificationBadge } from './CertificationBadge';
 import { getUserPlaycountCached } from '../utils/certification';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
@@ -65,7 +66,7 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
                         artistName={chartType === 'artist' ? (entityName || stats.name || stats.entityName || '') : (entityArtistName || stats.artistName || stats.artist || '')}
                     />
                 )}
-                <StatBox label={t('charts.stats.points')} value={totals.totalPoints ?? '-'} />
+                <StatBox label={t('charts.stats.points')} value={totals.totalPoints ?? 0} />
                 {['album', 'track'].includes(chartType) && (() => {
                     const gold = chartType === 'track' ? (chart?.music_gold_value || 0) : (chart?.album_gold_value || 0);
                     const platinum = chartType === 'track' ? (chart?.music_platinum_value || 0) : (chart?.album_platinum_value || 0);
@@ -132,7 +133,7 @@ const StatBox: React.FC<StatBoxProps> = ({ label, value, sub, color }) => (
             <Text fw={700} tt="uppercase" size="xs" ta="center">{label}</Text>
             <Divider my="xs" variant="dashed" size="sm" />
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 4 }}>
-                <Text fw={700} size="xl" c={color || 'blue'} style={{ lineHeight: 1 }}>{value}</Text>
+                <Text fw={700} size="xl" c={color || 'blue'} style={{ lineHeight: 1 }}>{formatNumber(value)}</Text>
                 {sub && <Text size="xs" c="dimmed" style={{ lineHeight: 1 }}>{sub}</Text>}
             </div>
         </Card>
@@ -165,8 +166,8 @@ function LastfmPlaysBox({ chart, chartType, artistName, entityName }: { chart: a
     return (
         <StatBox
             label={t('charts.stats.plays', { defaultValue: 'Plays' })}
-            value={plays == null ? ('…' as any) : plays}
-            sub={plays == null ? undefined : undefined}
+            value={plays == null ? 0 : plays}
+            sub={plays == null ? '…' : undefined}
             color={undefined}
         />
     );

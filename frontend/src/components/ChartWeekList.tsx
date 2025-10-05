@@ -144,8 +144,9 @@ const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'altVariation' && showAltVariationRedux) {
-              const value: any = altVariation ? altVariation(row, idx) : false;
-              if (!value && value !== 0) return null;
+              // Always render a placeholder to avoid layout shift while computing deltas when switching week/type
+              const rawVal: any = altVariation ? altVariation(row, idx) : false;
+              const value: any = (rawVal || rawVal === 0) ? rawVal : '-';
               let cfg: any = badgeStylesRank;
               if (badgeStylesRank.iconPosition === 'split') {
                 cfg = { ...badgeStylesRank, iconPosition: 'split', splitTall: badgeStylesRank.splitTall !== false };
@@ -183,6 +184,17 @@ const ChartWeekListRow: React.FC<{
 export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
   const dispatch = useDispatch<AppDispatch>();
   const data = useSelector((state: any) => state.charts.data);
+  // Persist previous non-empty data to avoid flicker/shifting while switching week/type
+  const [displayedData, setDisplayedData] = useState<any[]>(data);
+  const prevDataRef = React.useRef<any[]>(data);
+  useEffect(() => {
+    if (Array.isArray(data) && data.length > 0) {
+      setDisplayedData(data);
+      prevDataRef.current = data;
+    }
+    // If data becomes empty during transition, keep previous displayedData (do not clear)
+  }, [data]);
+  const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
   const columns = useSelector((state: any) => (state.columns?.views?.list?.columns) || state.columns?.columns || []);
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -258,9 +270,9 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
 
   // Badge util agora está fora
 
-  const useProgressive = data.length > 120;
-  const progressiveAll = useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 18, adaptive: true, disableBelow: 260, targetDurationMs: 260 });
-  const progressive = useProgressive ? progressiveAll : { items: data, done: true, total: data.length } as any;
+  const useProgressive = safeDisplayedData.length > 120;
+  const progressiveAll = useProgressiveReveal(safeDisplayedData, { initial: 40, step: 50, intervalMs: 18, adaptive: true, disableBelow: 260, targetDurationMs: 260 });
+  const progressive = useProgressive ? progressiveAll : { items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any;
   const visibleRows = progressive.items as ChartData[];
   const showLoadingTail = useProgressive && !progressive.done;
 

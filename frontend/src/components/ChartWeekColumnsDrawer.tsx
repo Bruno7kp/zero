@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme, Accordion, Text } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 // Removed expand/collapse icons (no longer used)
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
 import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground } from '../store/columnsSlice';
-import { IconSettings, IconCaretUpFilled } from '@tabler/icons-react';
+import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
 
@@ -36,7 +36,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     // Colunas obrigatórias (rank, name) exibidas como sempre visíveis (badge), sem toggle
 
     const storageKey = `chart_columns_${viewType}`; // legado (ainda lido para migração leve se necessário)
-
     // Carrega config persistida
     useEffect(() => {
         const stored = localStorage.getItem(storageKey);
@@ -75,8 +74,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         return { ...col, visible: reduxCol ? reduxCol.visible : col.visible };
     });
 
-    // Toggles agora são feitos inline em cada SegmentedControl
-
     const handleReset = () => {
         if (viewConfig) dispatch(resetColumns({ view: viewType }));
         // Reseta estilos globais e então aplica defaults específicos por view conforme solicitação
@@ -108,8 +105,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         if (viewConfig) dispatch(setContainerSize({ view: viewType, size }));
     };
 
-    // Ordem agora definida diretamente na renderização das seções abaixo
-
     const viewTypeLabel = viewType === 'table' ? 'charts.tableView' : viewType === 'list' ? 'charts.listView' : 'charts.gridView';
     // Badge styles (fase inicial de UI - presets)
     const badgeStyles = useSelector((s: any) => s.badgeStyles);
@@ -119,7 +114,9 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const currentRankLocation = (viewConfig?.settings?.rankVariationLocation || 'under');
     const [badgeKind, setBadgeKind] = useState<'rank' | 'plays'>('rank');
     // Especiais (maximalist) somente na Tabela (rank na coluna); nunca na Lista nem no Grid
-    const allowSpecials = (badgeKind === 'rank') && viewType === 'table' && currentRankLocation === 'column';
+    // Separar visibilidade na UI de validade no estado para não resetar quando alternar para 'plays'
+    const specialsAllowedForRank = (viewType === 'table' && currentRankLocation === 'column');
+    const allowSpecialsUI = (badgeKind === 'rank') && specialsAllowedForRank;
     // Ordenação customizada para mostrar estilos básicos antes dos especiais
     const order = [
         'transparent','transparentIconOnly','transparentIcon',
@@ -127,11 +124,10 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         'solid','solidIconOnly','solidIcon',
         'maximalist','maximalistLight'
     ];
-    // (presetList removido - UI usa grupos diretos; validações permanecem via efeitos)
     const currentEntry = badgeStyles?.views?.[viewType]?.[viewType === 'grid' ? 'rank' : badgeKind] || { preset: 'light' };
     // Saneamento de preset inválido e ajuste para grid / regras de especiais
     useEffect(() => {
-    const allValid = order;
+        const allValid = order;
         const migrateKind = (kind: 'rank'|'plays') => {
             const preset = badgeStyles?.views?.[viewType]?.[kind]?.preset;
             if (!preset) return;
@@ -160,214 +156,170 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     // Se o usuário mudar a localização de variação para algo que invalida especiais, força fallback imediato
     useEffect(() => {
         const rankPreset = badgeStyles?.views?.[viewType]?.rank?.preset;
-        if ((rankPreset === 'maximalist' || rankPreset === 'maximalistLight') && !allowSpecials) {
+        if ((rankPreset === 'maximalist' || rankPreset === 'maximalistLight') && !specialsAllowedForRank) {
             dispatch(setPreset({ view: viewType, kind: 'rank', preset: 'light' }));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [allowSpecials, currentRankLocation, viewType]);
-
-    // Avançado agora expande junto com a seção principal; removido segundo toggle
-    // showAdvanced removido (sempre visível em modo custom)
-    // Removido collapse: sempre visível
+    }, [specialsAllowedForRank, currentRankLocation, viewType]);
 
     return (
         <>
             <Button variant="subtle" size="xs" onClick={() => setOpened(true)}>
                 <IconSettings size={16} />
             </Button>
-                        <Drawer
-                            opened={opened}
-                            onClose={() => setOpened(false)}
-                            position="right"
-                            size="md"
-                            withCloseButton={false}
-                            overlayProps={{ opacity: 0 }}
-                            title={`${t('charts.columnsConfig')}: ${t(viewTypeLabel)}`}
-                            styles={{
-                                content: {
-                                    boxShadow: '0 0 16px 0 rgba(0,0,0,0.15)',
-                                    padding: 0,
-                                    display: 'flex',
-                                    flexDirection: 'column'
-                                },
-                                body: {
-                                    padding: 0,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    flex: 1,
-                                    minHeight: 0
-                                }
-                            }}
-                        >
-                                <Paper p="sm" radius={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-                                    <Box style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
-                                            <Stack gap={6}>
-                        {/* Seletor de tamanho do container (desktop apenas) */}
-                        {!isMobile && (
-                            <Stack gap={2}>
-                                <Divider my={4} size="xl" label={t('charts.size')} />
-                                <SegmentedControl
-                                    fullWidth
-                                    size="xs"
-                                    value={containerSize}
-                                    onChange={(v) => handleContainerSize(v as 'md' | 'lg' | 'xl' | '100%')}
-                                    data={[
-                                        { label: 'MD', value: 'md' },
-                                        { label: 'LG', value: 'lg' },
-                                        { label: 'XL', value: 'xl' },
-                                        { label: '100%', value: '100%' }
-                                    ]}
-                                />
-                                                                {viewType === 'table' && (
-                                                                    <>
-                                                                        <Divider my={4} variant="dashed" label={t('charts.tableBackgroundLabel')} />
-                                                                        <SegmentedControl
-                                                                            fullWidth
-                                                                            size="xs"
-                                                                            value={tableBackground}
-                                                                            onChange={(v) => dispatch(setTableBackground({ background: v as 'default' | 'transparent' }))}
-                                                                            data={[
-                                                                                { label: t('charts.tableBackground_default'), value: 'default' },
-                                                                                { label: t('charts.tableBackground_transparent'), value: 'transparent' }
-                                                                            ]}
-                                                                        />
-                                                                    </>
-                                                                )}
-                                                                {viewType === 'list' && (
-                                                                    <>
-                                                                        <Divider my={4} variant="dashed" label={t('charts.listBackgroundLabel')} />
-                                                                        <SegmentedControl
-                                                                            fullWidth
-                                                                            size="xs"
-                                                                            value={listBackground}
-                                                                            onChange={(v) => dispatch(setListBackground({ background: v as 'default' | 'transparent' }))}
-                                                                            data={[
-                                                                                { label: t('charts.listBackground_default'), value: 'default' },
-                                                                                { label: t('charts.listBackground_transparent'), value: 'transparent' }
-                                                                            ]}
-                                                                        />
-                                                                    </>
-                                                                )}
-                            </Stack>
-                        )}
-                        <Divider my={4} size="xl" label={t('charts.columns')} />
-                        {/* Controles de colunas em grid 2 por linha */}
-                        <Flex direction="column" gap={4}>
-                            <Flex wrap="wrap" gap={8}>
-                                {viewType !== 'grid' && (
-                                    <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
-                                        <Divider my={4} variant="dashed" label={t('charts.imageLabel')} />
-                                        <SegmentedControl
-                                            fullWidth
-                                            size="xs"
-                                            value={columnsWithVisibility.find(c => c.key === 'image')?.visible ? 'show' : 'hide'}
-                                            onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'image', visible: v === 'show' }))}
-                                            data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                                        />
-                                    </Box>
-                                )}
-                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
-                                    <Divider my={4} variant="dashed" label={t('charts.playsLabel')} />
-                                    <SegmentedControl
-                                        fullWidth
-                                        size="xs"
-                                        value={columnsWithVisibility.find(c => c.key === 'plays')?.visible ? 'show' : 'hide'}
-                                        onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'plays', visible: v === 'show' }))}
-                                        data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                                    />
-                                </Box>
-                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
-                                    <Divider my={4} variant="dashed" label={t('charts.peakLabel')} />
-                                    <SegmentedControl
-                                        fullWidth
-                                        size="xs"
-                                        value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'}
-                                        onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))}
-                                        data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                                    />
-                                </Box>
-                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
-                                    <Divider my={4} variant="dashed" label={t('charts.weeksLabel')} />
-                                    <SegmentedControl
-                                        fullWidth
-                                        size="xs"
-                                        value={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ? 'show' : 'hide'}
-                                        onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'totalWeeks', visible: v === 'show' }))}
-                                        data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                                    />
-                                </Box>
-                                {(viewType === 'table' || viewType === 'list') && (
-                                    <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
-                                        <Divider my={4} variant="dashed" label={t('charts.certLabel')} />
-                                        <SegmentedControl
-                                            fullWidth
-                                            size="xs"
-                                            value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'}
-                                            onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))}
-                                            data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]}
-                                        />
-                                    </Box>
-                                )}
-                            </Flex>
-                        </Flex>
-                        <Divider my={4} size="xl" label={t('charts.badgeStyles.section')} />
-                        {/* Exibição da variação de rank (sempre visível) */}
-                        <Stack gap={2}>
-                            <Divider my={4} variant="dashed" label={t('charts.rankVariationLocationLabel')} />
-                            {viewType === 'grid' ? (
-                                <SegmentedControl
-                                    fullWidth
-                                    size="xs"
-                                    value={rankVariationLocation === 'hidden' ? 'hidden' : 'under'}
-                                    onChange={(v) => dispatch(setRankVariationLocation({ view: viewType, location: (v === 'hidden' ? 'hidden' : 'under') }))}
-                                    data={[
-                                        { label: t('charts.show'), value: 'under' },
-                                        { label: t('charts.hide'), value: 'hidden' }
-                                    ]}
-                                />
-                            ) : (
-                                <SegmentedControl
-                                    fullWidth
-                                    size="xs"
-                                    value={rankVariationLocation}
-                                    onChange={(v) => dispatch(setRankVariationLocation({ view: viewType, location: v as 'under' | 'column' | 'hidden' }))}
-                                    data={[
-                                        { label: t('charts.hide'), value: 'hidden' },
-                                        { label: t('charts.rankVariationUnder'), value: 'under' },
-                                        { label: t('charts.rankVariationColumn'), value: 'column' }
-                                    ]}
-                                />
+            <Drawer
+                opened={opened}
+                onClose={() => setOpened(false)}
+                position="right"
+                size="md"
+                withCloseButton={false}
+                overlayProps={{ opacity: 0 }}
+                title={`${t('charts.columnsConfig')}: ${t(viewTypeLabel)}`}
+                styles={{
+                    content: {
+                        boxShadow: '0 0 16px 0 rgba(0,0,0,0.15)',
+                        padding: 0,
+                        display: 'flex',
+                        flexDirection: 'column'
+                    },
+                    header: {
+                        justifyContent: 'center'
+                    },
+                    title: {
+                        width: '100%',
+                        textAlign: 'center'
+                    },
+                    body: {
+                        padding: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        minHeight: 0
+                    }
+                }}
+            >
+                <Paper p="sm" radius={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+                    <Box style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
+                        <Accordion multiple variant="separated" radius="md">
+                            {/* Layout */}
+                            {!isMobile && (
+                                <Accordion.Item value="layout">
+                                    <Accordion.Control>
+                                        <Flex direction="column" gap={2}>
+                                            <Flex align="center" gap={8}><IconLayoutGrid size={16} /><Text fw={700}>{t('charts.general')}</Text></Flex>
+                                            <Text size="xs" c="dimmed">{t('charts.drawer.generalDescription')}</Text>
+                                        </Flex>
+                                    </Accordion.Control>
+                                    <Accordion.Panel>
+                                        <Stack gap={6}>
+                                            <Stack gap={2}>
+                                                <Text size="xs" c="dimmed">{t('charts.containerSizeLabel')}</Text>
+                                                <SegmentedControl fullWidth size="xs" value={containerSize} onChange={(v) => handleContainerSize(v as 'md' | 'lg' | 'xl' | '100%')} data={[{ label: 'MD', value: 'md' },{ label: 'LG', value: 'lg' },{ label: 'XL', value: 'xl' },{ label: '100%', value: '100%' }]} />
+                                            </Stack>
+                                            {viewType === 'table' && (
+                                                <Stack gap={2}>
+                                                    <Text size="xs" c="dimmed">{t('charts.tableBackgroundLabel')}</Text>
+                                                    <SegmentedControl fullWidth size="xs" value={tableBackground} onChange={(v) => dispatch(setTableBackground({ background: v as 'default' | 'transparent' }))} data={[{ label: t('charts.tableBackground_default'), value: 'default' },{ label: t('charts.tableBackground_transparent'), value: 'transparent' }]} />
+                                                </Stack>
+                                            )}
+                                            {viewType === 'list' && (
+                                                <Stack gap={2}>
+                                                    <Text size="xs" c="dimmed">{t('charts.listBackgroundLabel')}</Text>
+                                                    <SegmentedControl fullWidth size="xs" value={listBackground} onChange={(v) => dispatch(setListBackground({ background: v as 'default' | 'transparent' }))} data={[{ label: t('charts.listBackground_default'), value: 'default' },{ label: t('charts.listBackground_transparent'), value: 'transparent' }]} />
+                                                </Stack>
+                                            )}
+                                        </Stack>
+                                    </Accordion.Panel>
+                                </Accordion.Item>
                             )}
-                        </Stack>
-                        {/* Variação de reproduções (sempre visível quando não grid) */}
-                        {viewType !== 'grid' && (
-                            <Stack gap={2}>
-                                <Divider my={4} variant="dashed" label={t('charts.playsVariationDisplayLabel')} />
-                                <SegmentedControl
-                                    size="xs"
-                                    fullWidth
-                                    value={(viewConfig?.settings as any)?.playsVariationDisplay || 'percent'}
-                                    onChange={(value) => dispatch(setPlaysVariationDisplay({ view: viewType, display: value as 'hidden' | 'absolute' | 'percent' }))}
-                                    data={[
-                                        { label: t('charts.playsVariationDisplay_hidden'), value: 'hidden' },
-                                        { label: t('charts.playsVariationDisplay_absolute'), value: 'absolute' },
-                                        { label: t('charts.playsVariationDisplay_percent'), value: 'percent' },
-                                    ]}
-                                />
-                            </Stack>
-                        )}
-                        <Divider my={4} size="xl" label={t('charts.badgeStyles.title')} />
-                        <Stack gap={6}>
+                            {/* Colunas */}
+                            <Accordion.Item value="columns">
+                                <Accordion.Control>
+                                    <Flex direction="column" gap={2}>
+                                        <Flex align="center" gap={8}><IconColumns size={16} /><Text fw={700}>{t('charts.columns')}</Text></Flex>
+                                        <Text size="xs" c="dimmed">{t('charts.drawer.columnsDescription')}</Text>
+                                    </Flex>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <Flex direction="column" gap={4}>
+                                        <Flex wrap="wrap" gap={8}>
+                                            {viewType !== 'grid' && (
+                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                    <Text size="xs" c="dimmed">{t('charts.imageLabel')}</Text>
+                                                    <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'image')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'image', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                                </Box>
+                                            )}
+                                            <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                <Text size="xs" c="dimmed">{t('charts.playsLabel')}</Text>
+                                                <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'plays')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'plays', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                            </Box>
+                                            <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                <Text size="xs" c="dimmed">{t('charts.peakLabel')}</Text>
+                                                <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                            </Box>
+                                            <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                <Text size="xs" c="dimmed">{t('charts.weeksLabel')}</Text>
+                                                <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'totalWeeks', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                            </Box>
+                                            {(viewType === 'table' || viewType === 'list') && (
+                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                    <Text size="xs" c="dimmed">{t('charts.certLabel')}</Text>
+                                                    <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                                </Box>
+                                            )}
+                                        </Flex>
+                                    </Flex>
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                            {/* Variações (rank + reproduções) */}
+                            <Accordion.Item value="variations">
+                                <Accordion.Control>
+                                    <Flex direction="column" gap={2}>
+                                        <Flex align="center" gap={8}><IconArrowsUpDown size={16} /><Text fw={700}>{t('charts.variations')}</Text></Flex>
+                                        <Text size="xs" c="dimmed">{t('charts.drawer.variationDescription')}</Text>
+                                    </Flex>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <Stack gap={8}>
+                                        <Text size="xs" c="dimmed">{t('charts.rankVariationLocationLabel')}</Text>
+                                        {viewType === 'grid' ? (
+                                            <SegmentedControl fullWidth size="xs" value={rankVariationLocation} onChange={(v) => dispatch(setRankVariationLocation({ view: viewType, location: v as any }))} data={[{ label: t('charts.hide'), value: 'hidden' },{ label: t('charts.rankVariationUnder'), value: 'under' },{ label: t('charts.rankVariationCorner'), value: 'corner' }]} />
+                                        ) : (
+                                            <SegmentedControl fullWidth size="xs" value={rankVariationLocation} onChange={(v) => dispatch(setRankVariationLocation({ view: viewType, location: v as 'under' | 'column' | 'hidden' }))} data={[{ label: t('charts.hide'), value: 'hidden' },{ label: t('charts.rankVariationUnder'), value: 'under' },{ label: t('charts.rankVariationColumn'), value: 'column' }]} />
+                                        )}
+                                        {viewType !== 'grid' && (
+                                            <>
+                                                <Text size="xs" c="dimmed">{t('charts.playsVariationDisplayLabel')}</Text>
+                                                <SegmentedControl size="xs" fullWidth value={(viewConfig?.settings as any)?.playsVariationDisplay || 'percent'} onChange={(value) => dispatch(setPlaysVariationDisplay({ view: viewType, display: value as 'hidden' | 'absolute' | 'percent' }))} data={[{ label: t('charts.playsVariationDisplay_hidden'), value: 'hidden' },{ label: t('charts.playsVariationDisplay_absolute'), value: 'absolute' },{ label: t('charts.playsVariationDisplay_percent'), value: 'percent' }]} />
+                                            </>
+                                        )}
+                                    </Stack>
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                            {/* Badges */}
+                            <Accordion.Item value="badges">
+                                <Accordion.Control>
+                                    <Flex direction="column" gap={2}>
+                                        <Flex align="center" gap={8}><IconAdjustments size={16} /><Text fw={700}>{t('charts.badgeStyles.title')}</Text></Flex>
+                                        <Text size="xs" c="dimmed">{t('charts.drawer.badgesDescription')}</Text>
+                                    </Flex>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <Stack gap={6}>
                             {viewType !== 'grid' && (
-                                <SegmentedControl
-                                    fullWidth
-                                    size="xs"
-                                    value={badgeKind}
-                                    onChange={(v) => setBadgeKind(v as 'rank' | 'plays')}
-                                    data={[{ label: t('charts.badgeStyles.kindRank'), value: 'rank' }, { label: t('charts.badgeStyles.kindPlays'), value: 'plays' }]} 
-                                />
+                                <>
+                                    <Text size="xs" c="dimmed">{t('charts.badgeStyles.kindSelectLabel')}</Text>
+                                    <SegmentedControl
+                                        fullWidth
+                                        size="xs"
+                                        value={badgeKind}
+                                        onChange={(v) => setBadgeKind(v as 'rank' | 'plays')}
+                                        data={[{ label: t('charts.badgeStyles.kindRank'), value: 'rank' }, { label: t('charts.badgeStyles.kindPlays'), value: 'plays' }]} 
+                                    />
+                                </>
                             )}
                             {/* Presets agrupados: single seleção global (custom buttons) */}
+                            <Text size="xs" c="dimmed">{t('charts.badgeStyles.presetsTitle')}</Text>
                             {(() => {
                                 const selected = currentEntry.preset;
                                 const groups: string[][] = (
@@ -377,7 +329,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                             ['transparent','transparentIconOnly','transparentIcon'],
                                             ['light','lightIconOnly','lightIcon'],
                                             ['solid','solidIconOnly','solidIcon'],
-                                            allowSpecials ? ['maximalist','maximalistLight'] : []
+                                            allowSpecialsUI ? ['maximalist','maximalistLight'] : []
                                         ].filter(g => g.length)
                                 );
                                 const presetVisualLabel = (k: string) => {
@@ -469,8 +421,10 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             <Flex justify="center" mb="lg">
                                 <BadgeStylePreview kind={viewType === 'grid' ? 'rank' : badgeKind} rankCfg={resolvedRank} playsCfg={resolvedPlays} />
                             </Flex>
-                        </Stack>
-                      </Stack>
+                                    </Stack>
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                        </Accordion>
                     </Box>
                     <Divider my={6} />
                     <Group justify="space-between" px={4} pb={4} mt={4} style={{ flexShrink: 0 }}>

@@ -87,7 +87,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     })();
     // Em presets "apenas ícone" ocultamos label; no grid, ocultamos até o '=' para ficar 100% ícone
     let displayLabel = cfg.hideLabel
-        ? (contextView === 'grid' ? '' : (label !== '=' ? '' : label))
+        ? (contextView === 'grid' ? (label === '=' ? label : '') : (label === '=' ? label : ''))
         : label;
     // Se o modo é texto + ícone (não split, ícone visível), remover textos 'NEW' e 'RE' e deixar só o ícone
     if (!cfg.hideLabel && cfg.iconPosition !== 'hidden' && cfg.iconPosition !== 'split') {

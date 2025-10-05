@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
 import { db } from '../db/indexedDb';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
+import { formatNumber } from '../utils/format';
 
 export interface CertificationIconProps {
   chart: any;
@@ -105,10 +106,24 @@ const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartT
 
   // Hide entirely when there is no certification in the column/icon
   if (result.level === 'none') return null;
-  const label = `${result.multiplier > 1 ? result.multiplier + 'x ' : ''}${t('values.' + result.level)}`;
+  const formulaName = chart?.formula_name || 'Sales';
+  const baseThreshold = (() => {
+    if (chartType === 'track') {
+      if (result.level === 'gold') return chart?.music_gold_value || 0;
+      if (result.level === 'platinum') return chart?.music_platinum_value || 0;
+      if (result.level === 'diamond') return chart?.music_diamond_value || 0;
+    } else if (chartType === 'album') {
+      if (result.level === 'gold') return chart?.album_gold_value || 0;
+      if (result.level === 'platinum') return chart?.album_platinum_value || 0;
+      if (result.level === 'diamond') return chart?.album_diamond_value || 0;
+    }
+    return 0;
+  })();
+  const requiredForThisCert = Math.max(0, (baseThreshold || 0) * Math.max(1, result.multiplier || 1));
+  const label = `${result.multiplier > 1 ? result.multiplier + 'x ' : ''}${t('values.' + result.level)} — ${formatNumber(requiredForThisCert)} ${formulaName}`;
 
   return (
-    <Tooltip label={label} withArrow>
+    <Tooltip label={label} color="dark" withArrow>
       <ThemeIcon size={size} radius="xl" variant="transparent">
         <MetalVinylDisc level={result.level} size={Math.max(14, size - 6)} />
       </ThemeIcon>
