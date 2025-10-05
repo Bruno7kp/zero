@@ -246,7 +246,7 @@ const columnsSlice = createSlice({
     setRankVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; location: 'under' | 'column' | 'hidden' | 'corner' }>) {
       ensureViews(state as any);
       const { view } = action.payload;
-      let { location } = action.payload;
+      const { location } = action.payload;
       state.views[view].settings.rankVariationLocation = location;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, location, view);
       // reaplicar plays mapping
