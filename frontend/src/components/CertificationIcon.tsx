@@ -18,7 +18,7 @@ export interface CertificationIconProps {
 }
 
 
-export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, chartType, totals, entity, entityId, username, size = 24, deferMs = 600 }) => {
+const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartType, totals, entity, entityId, username, size = 24, deferMs = 600 }) => {
   const { t } = useTranslation();
   const { isOnline: online } = useOfflineStatus();
   const [result, setResult] = React.useState<CertificationResult | null>(null);
@@ -116,4 +116,34 @@ export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, cha
   );
 };
 
+function propsAreEqual(prev: CertificationIconProps, next: CertificationIconProps) {
+  const getWeights = (p: CertificationIconProps) => ({
+    points: p.chartType === 'track' ? (p.chart?.music_points_weight || 0) : (p.chart?.album_points_weight || 0),
+    plays: p.chartType === 'track' ? (p.chart?.music_plays_weight || 0) : (p.chart?.album_plays_weight || 0),
+    gold: p.chartType === 'track' ? (p.chart?.music_gold_value || 0) : (p.chart?.album_gold_value || 0),
+    platinum: p.chartType === 'track' ? (p.chart?.music_platinum_value || 0) : (p.chart?.album_platinum_value || 0),
+    diamond: p.chartType === 'track' ? (p.chart?.music_diamond_value || 0) : (p.chart?.album_diamond_value || 0),
+  });
+  const wa = getWeights(prev);
+  const wb = getWeights(next);
+  return (
+    prev.chartType === next.chartType &&
+    String(prev.chart?.id || '') === String(next.chart?.id || '') &&
+    wa.points === wb.points &&
+    wa.plays === wb.plays &&
+    wa.gold === wb.gold &&
+    wa.platinum === wb.platinum &&
+    wa.diamond === wb.diamond &&
+    (prev.totals?.totalPoints ?? undefined) === (next.totals?.totalPoints ?? undefined) &&
+    (prev.totals?.totalPlays ?? undefined) === (next.totals?.totalPlays ?? undefined) &&
+    prev.entityId === next.entityId &&
+    prev.entity.name === next.entity.name &&
+    prev.entity.artistName === next.entity.artistName &&
+    (prev.username || '') === (next.username || '') &&
+    prev.size === next.size &&
+    prev.deferMs === next.deferMs
+  );
+}
+
+export const CertificationIcon = React.memo(CertificationIconBase, propsAreEqual);
 export default CertificationIcon;

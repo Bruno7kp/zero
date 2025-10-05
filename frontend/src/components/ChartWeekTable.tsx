@@ -268,19 +268,17 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const totals = stats?.totals as any;
                         return (
                             <Flex direction="column" align="center">
-                                {stats
-                                    ? <CertificationIcon
-                                        key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
-                                        chart={chart}
-                                        chartType={type as 'album' | 'track'}
-                                        totals={totals}
-                                        entity={{ name: row.name, artistName: row.artistName || '' }}
-                                                                                entityId={row.entityId}
-                                        username={chart?.lastfm_username}
-                                        size={24}
-                                        deferMs={300}
-                                      />
-                                    : (loadingStats ? <Text fw={500}>…</Text> : <Text fw={500}>-</Text>)}
+                                <CertificationIcon
+                                  key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
+                                  chart={chart}
+                                  chartType={type as 'album' | 'track'}
+                                  totals={totals}
+                                  entity={{ name: row.name, artistName: row.artistName || '' }}
+                                  entityId={row.entityId}
+                                  username={chart?.lastfm_username}
+                                  size={24}
+                                  deferMs={300}
+                                />
                             </Flex>
                         );
                     },
