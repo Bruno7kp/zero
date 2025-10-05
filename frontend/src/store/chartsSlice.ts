@@ -172,7 +172,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
     if (!data || !data.length) return;
     const requestId = `${chartId}_${chartType}_${week}_${Date.now()}`;
     const cacheKey = `${chartId}_${chartType}_${week}`;
-    const tGlobal = performance.now();
+  // const tGlobal = performance.now(); // debug only
     const state0: any = getState();
     if (!state0.charts.statsCache || typeof state0.charts.statsCache !== 'object') state0.charts.statsCache = {};
     const cached = state0.charts.statsCache[cacheKey];
@@ -222,7 +222,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
       const HARD_ABS_LIMIT = 120_000; // segurança para bases gigantes
       let mode: 'global' | 'range' = 'range';
       // Decisão prévia: se poucas entidades (<=GLOBAL_LIMIT) testamos possibilidade global
-      const tPreflight = performance.now();
+  // const tPreflight = performance.now(); // debug only
       let estimatedRows = 0;
       if (entities.length <= GLOBAL_LIMIT) {
         estimatedRows = await db.charts_data
@@ -237,23 +237,21 @@ export const fetchStatsMapIncremental = createAsyncThunk(
         } else {
           mode = 'range';
         }
-        if (import.meta.env.MODE !== 'production') {
-          console.log(`[stats] fast-path preflight rows=${estimatedRows} avgPerEntity=${rowPerEntityAvg.toFixed(1)} pressure=${rowPressure.toFixed(2)} decision=${mode}`);
-        }
+        // dev-only preflight log removed
       } else {
         // Muitas entidades: range direto (cada entidade já tem cache incremental de rows)
         mode = 'range';
       }
 
-      const tQueryStart = performance.now();
+  // const tQueryStart = performance.now(); // debug only
       let perEntity: Array<readonly [string, ChartData[]]> = [];
-      let globalRowsCount = 0;
+  // removed: globalRowsCount (only used for debug logs)
       if (mode === 'global') {
         const globalRows = await db.charts_data
           .where('[chartId+chartType+week]')
           .belowOrEqual([chartId, chartType, week])
           .toArray();
-        globalRowsCount = globalRows.length;
+        // const globalRowsCount = globalRows.length; // debug only
         const map: Record<string, ChartData[]> = {};
         for (const r of globalRows) {
           if (!entitySet.has(r.entityId)) continue;
@@ -333,7 +331,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
               (async () => {
                 const key = `${chartId}|${chartType}|${id}`;
                 let rows = entityRowsCache.get(key);
-                const tEntityStart = performance.now();
+                // const tEntityStart = performance.now(); // debug only
                 try {
                   if (rows) {
                     const lastWeek = rows.length ? rows[rows.length - 1].week : null;
@@ -394,10 +392,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
                       dispatch(partialStatsLoaded({ requestId, partial: { [id]: { chartId, chartType, entityId: id, ...minimal, _status: 'minimal' } } }));
                     }
                   }
-                  if (import.meta.env.MODE !== 'production') {
-                    const dur = performance.now() - tEntityStart;
-                    if (dur > 120) console.log(`[stats] entidade lenta id=${id} ${dur.toFixed(1)}ms range-query`);
-                  }
+                  // dev-only per-entity slow log removed
                 } finally {
                   active--;
                   // Após as primeiras 2 entidades, aumenta gradualmente a concorrência para acelerar o restante
@@ -414,9 +409,9 @@ export const fetchStatsMapIncremental = createAsyncThunk(
         });
         perEntity = results;
       }
-      const queryMs = performance.now() - tQueryStart + (performance.now() - tPreflight); // inclui preflight
+  // const queryMs = performance.now() - tQueryStart + (performance.now() - tPreflight); // debug only
       const snapshot: Record<string, any> = {};
-      const tComputeStart = performance.now();
+  // const tComputeStart = performance.now(); // debug only
       const halfway = Math.ceil(perEntity.length / 2);
       for (let i = 0; i < perEntity.length; i++) {
         const [id, rows] = perEntity[i];
@@ -443,23 +438,20 @@ export const fetchStatsMapIncremental = createAsyncThunk(
         }
         if (i === halfway) await new Promise(r => setTimeout(r, 0)); // micro-yield
       }
-      const computeMs = performance.now() - tComputeStart;
+  // const computeMs = performance.now() - tComputeStart; // debug only
       const st: any = getState();
       if (st.charts.statsRequestId === requestId) {
         dispatch(partialStatsLoaded({ requestId, partial: snapshot }));
         dispatch(finishStatsIncremental(requestId));
         dispatch(cacheStatsSnapshot({ cacheKey, snapshot, now: Date.now() }));
       }
-      const total = performance.now() - tGlobal;
-      if (import.meta.env.MODE !== 'production') {
-        console.log(`[stats] fast-path ${entities.length} entidades total=${total.toFixed(1)}ms (query=${queryMs.toFixed(1)} compute=${computeMs.toFixed(1)}) modo=${mode}${mode==='global'?` rows=${globalRowsCount}`:''}`);
-        if (total > 400) console.warn('[stats] fast-path lento; considerar worker ou estratégias adicionais (race/range)');
-      }
+  // const total = performance.now() - tGlobal; // debug only
+      // dev-only summary logs removed
       return;
     }
 
     // CAMINHO INCREMENTAL (muitas entidades)
-    const tQueryAll = performance.now();
+  // const tQueryAll = performance.now(); // debug only
     const allRows = await db.charts_data
       .where('[chartId+chartType+week]')
       .belowOrEqual([chartId, chartType, week])
@@ -484,7 +476,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
     for (const k of Object.keys(rowsBy)) rowsBy[k].sort((a, b) => a.week.localeCompare(b.week));
   // Atualiza run cache uma vez (já limitado por untilWeek)
   for (const [entityId, rows] of Object.entries(rowsBy)) upsertRunCache(chartId, chartType, entityId, rows);
-    const queryAllMs = performance.now() - tQueryAll;
+  // const queryAllMs = performance.now() - tQueryAll; // debug only
 
     const entities = Object.keys(rowsBy);
     let dyn = batchSize;
@@ -522,9 +514,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
     dispatch(finishStatsIncremental(requestId));
     const finalState: any = getState();
     dispatch(cacheStatsSnapshot({ cacheKey, snapshot: finalState.charts.statsMap, now: Date.now() }));
-    if (import.meta.env.MODE !== 'production') {
-      console.log(`[stats] incremental concluído ${(performance.now() - tGlobal).toFixed(1)}ms (queryAll=${queryAllMs.toFixed(1)}ms) cacheKey=${cacheKey}`);
-    }
+    // dev-only incremental summary log removed
   }
 );
 

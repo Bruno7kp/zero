@@ -17,7 +17,9 @@ export class RouteErrorBoundary extends React.Component<React.PropsWithChildren,
 
   componentDidCatch(error: Error, info: any) {
     // Log detalhado no console para diagnóstico (pode integrar com serviço externo depois)
-    console.error('[RouteErrorBoundary] Caught error:', error, info);
+    if (import.meta.env.MODE !== 'production') {
+      console.error('[RouteErrorBoundary] Caught error:', error, info);
+    }
     this.setState({ info });
   }
 

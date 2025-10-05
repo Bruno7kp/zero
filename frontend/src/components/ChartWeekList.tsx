@@ -40,7 +40,8 @@ const ChartWeekListRow: React.FC<{
   colorScheme: string;
   theme: any;
   week?: string;
-}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week }) => {
+  listBackground?: 'default' | 'transparent';
+}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week, listBackground = 'default' }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
@@ -52,8 +53,9 @@ const ChartWeekListRow: React.FC<{
   const toggle = useCallback(() => setExpanded(e => !e), []);
   const rowId = String(row.id);
 
+  const isTransparent = listBackground === 'transparent';
   return (
-    <Card key={rowId} shadow="md" p={0} radius="md" style={{ background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
+    <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : (colorScheme === 'dark' ? theme.colors.dark[7] : 'white') }}>
       <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: 72 }}>
         <Flex align="center" gap="md" wrap="wrap" style={{ flex: 1 }}>
           {filteredColumns.map((col: any) => {
@@ -118,13 +120,14 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
                   {(type === 'album' || type === 'track') && (stats
-                    ? <CertificationIcon
+          ? <CertificationIcon
+            key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
                         chart={chart}
                         chartType={type as 'album' | 'track'}
                         totals={stats?.totals}
                         entity={{ name: row.name, artistName: row.artistName || '' }}
+                        entityId={row.entityId}
                         username={chart?.lastfm_username}
-                        dayOfWeek={chart?.day_of_week}
                         size={24}
                         deferMs={450}
                       />
@@ -183,6 +186,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const columns = useSelector((state: any) => (state.columns?.views?.list?.columns) || state.columns?.columns || []);
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
+  const listBackground = useSelector((state: any) => (state.columns?.views?.list?.settings?.listBackground) || 'default');
 
   // Buscar dados ao trocar semana/tipo/chart
   useEffect(() => {
@@ -281,6 +285,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           colorScheme={colorScheme}
           theme={theme}
           week={week}
+          listBackground={listBackground}
         />
       ))}
     {showLoadingTail && (

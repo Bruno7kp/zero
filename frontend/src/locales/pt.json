@@ -74,6 +74,9 @@
   "tableBackgroundLabel": "Fundo da tabela",
   "tableBackground_default": "Padrão",
   "tableBackground_transparent": "Transparente",
+  "listBackgroundLabel": "Fundo da lista",
+  "listBackground_default": "Padrão",
+  "listBackground_transparent": "Transparente",
       "badgeStyles": {
         "title": "Customização de badges",
         "section": "Badges",

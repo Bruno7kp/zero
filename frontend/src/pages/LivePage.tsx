@@ -103,7 +103,6 @@ const LivePage = () => {
 
                 setChartData(data);
             } catch (err) {
-                console.error("Falha ao buscar o live chart:", err);
                 setError(t("errors.dataError"));
             } finally {
                 setLoading(false);

@@ -3,6 +3,7 @@ import { ThemeIcon, Tooltip } from '@mantine/core';
 import MetalVinylDisc from './MetalVinylDisc';
 import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
+import { db } from '../db/indexedDb';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 
 export interface CertificationIconProps {
@@ -10,24 +11,75 @@ export interface CertificationIconProps {
   chartType: 'album' | 'track';
   totals: { totalPoints?: number; totalPlays?: number } | undefined;
   entity: { name: string; artistName: string };
+  entityId: string;
   username?: string;
-  dayOfWeek?: number;
   size?: number; // icon size
   deferMs?: number; // lazy start delay
 }
 
 
-export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, chartType, totals, entity, username, dayOfWeek, size = 24, deferMs = 600 }) => {
+export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, chartType, totals, entity, entityId, username, size = 24, deferMs = 600 }) => {
   const { t } = useTranslation();
   const { isOnline: online } = useOfflineStatus();
   const [result, setResult] = React.useState<CertificationResult | null>(null);
-  const [loading, setLoading] = React.useState(false);
+  const sigRef = React.useRef<string>("");
+
+  const pointsWeight = chartType === 'track' ? (chart?.music_points_weight || 0) : (chart?.album_points_weight || 0);
+  const playsWeight = chartType === 'track' ? (chart?.music_plays_weight || 0) : (chart?.album_plays_weight || 0);
+  const requirePoints = pointsWeight > 0;
+  const totalPointsVal = (totals && typeof (totals as any).totalPoints === 'number') ? (totals as any).totalPoints as number : undefined;
+  const hasPoints = typeof totalPointsVal === 'number';
 
   React.useEffect(() => {
     let mounted = true;
     if (!totals) return;
-    setLoading(true);
-    // start after small delay to avoid impacting initial paint
+
+    // If certification depends on points but points are not loaded yet (minimal stats), try fallback to IndexedDB enriched totals
+    if (requirePoints && !hasPoints) {
+      const chartIdStr = String(chart?.id || '');
+      const sigDb = ['db', chartIdStr, chartType, entityId, username || ''].join('|');
+      // If we already computed a result for this same signature, skip re-fetching
+      if (result && sigRef.current === sigDb) {
+        return () => { mounted = false; };
+      }
+      sigRef.current = sigDb;
+      (async () => {
+        try {
+          const s: any = await db.charts_stats.get([chartIdStr, chartType, entityId]);
+          if (!mounted || sigRef.current !== sigDb) return;
+          const enrichedTotals = s?.totals;
+          if (enrichedTotals && typeof enrichedTotals.totalPoints === 'number') {
+            const r = await computeCertification({
+              chart,
+              chartType,
+              totals: enrichedTotals,
+              entity,
+              username,
+              offline: !online,
+              nextWeekDay: chart?.day_of_week,
+            });
+            if (mounted && sigRef.current === sigDb) setResult(r);
+          }
+        } catch { /* ignore */ }
+      })();
+      return () => { mounted = false; };
+    }
+
+    // mark loading implicitly via null result; we don't render a placeholder
+    setResult(null);
+    // Build a signature for the current inputs to avoid stale updates
+    const sig = [
+      entityId,
+      chart?.id,
+      chartType,
+      entity.name,
+      entity.artistName,
+      username || '',
+      pointsWeight,
+      playsWeight,
+      hasPoints ? totalPointsVal : 'nopoints',
+    ].join('|');
+    sigRef.current = sig;
     const timer = window.setTimeout(() => {
       computeCertification({
         chart,
@@ -36,13 +88,13 @@ export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, cha
         entity,
         username,
         offline: !online,
-        nextWeekDay: dayOfWeek,
+        nextWeekDay: chart?.day_of_week,
       })
-        .then(r => { if (mounted) setResult(r); })
-        .finally(() => { if (mounted) setLoading(false); });
+        .then(r => { if (mounted && sigRef.current === sig) setResult(r); })
+        .finally(() => { /* noop */ });
     }, deferMs);
     return () => { mounted = false; clearTimeout(timer); };
-  }, [chart, chartType, totals, entity, username, online, dayOfWeek, deferMs]);
+  }, [chart, chartType, totals, totalPointsVal, entity, entityId, username, online, deferMs, requirePoints, hasPoints, pointsWeight, playsWeight]);
 
   // Hide entirely when chart thresholds are not configured (handled in CertificationBadge too)
   const gold = chartType === 'track' ? (chart?.music_gold_value || 0) : (chart?.album_gold_value || 0);
@@ -51,13 +103,12 @@ export const CertificationIcon: React.FC<CertificationIconProps> = ({ chart, cha
   if (gold === 0 && platinum === 0 && diamond === 0) return null;
 
   if (!result) {
-    // keep cell subtle during loading
-    return <span style={{ fontSize: 12, color: 'var(--mantine-color-dimmed)' }}>{loading ? '…' : '-'}</span>;
+    // During loading or initial compute, render nothing to avoid flicker in table cells
+    return null;
   }
 
-  // Do not render when there is no certification
+  // Hide entirely when there is no certification in the column/icon
   if (result.level === 'none') return null;
-
   const label = `${result.multiplier > 1 ? result.multiplier + 'x ' : ''}${t('values.' + result.level)}`;
 
   return (

@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -29,6 +29,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const columns = viewConfig?.columns || defaultColumns;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
+    const listBackground = viewConfig?.settings?.listBackground || 'default';
     // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const [opened, setOpened] = useState(false);
@@ -228,6 +229,21 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                                             data={[
                                                                                 { label: t('charts.tableBackground_default'), value: 'default' },
                                                                                 { label: t('charts.tableBackground_transparent'), value: 'transparent' }
+                                                                            ]}
+                                                                        />
+                                                                    </>
+                                                                )}
+                                                                {viewType === 'list' && (
+                                                                    <>
+                                                                        <Divider my={4} variant="dashed" label={t('charts.listBackgroundLabel')} />
+                                                                        <SegmentedControl
+                                                                            fullWidth
+                                                                            size="xs"
+                                                                            value={listBackground}
+                                                                            onChange={(v) => dispatch(setListBackground({ background: v as 'default' | 'transparent' }))}
+                                                                            data={[
+                                                                                { label: t('charts.listBackground_default'), value: 'default' },
+                                                                                { label: t('charts.listBackground_transparent'), value: 'transparent' }
                                                                             ]}
                                                                         />
                                                                     </>

@@ -89,7 +89,7 @@ const fetchLastFmApi = async (
         }
         return json;
     } catch (error) {
-        console.error(`Erro ao buscar ${method}:`, error);
+        // rethrow without console noise
         throw error;
     }
 };

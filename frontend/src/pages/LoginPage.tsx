@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
     };
 
     const handleGoogleFailure = () => {
-        console.log("Login with Google failed");
+        // optional: surface a user-visible toast in future
     };
 
     return (

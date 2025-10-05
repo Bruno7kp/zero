@@ -270,12 +270,13 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                             <Flex direction="column" align="center">
                                 {stats
                                     ? <CertificationIcon
+                                        key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
                                         chart={chart}
                                         chartType={type as 'album' | 'track'}
                                         totals={totals}
                                         entity={{ name: row.name, artistName: row.artistName || '' }}
+                                                                                entityId={row.entityId}
                                         username={chart?.lastfm_username}
-                                        dayOfWeek={chart?.day_of_week}
                                         size={24}
                                         deferMs={300}
                                       />
@@ -311,8 +312,12 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     } else {
                         cfg = { ...badgeStylesRank, splitTall: false };
                     }
-                    // Alt variation shown in its own column -> emphasized font size lg
-                    return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="table" />;
+                    // Alt variation shown in its own column -> emphasized font size md, centered horizontally
+                    return (
+                        <Flex justify="center" align="center" style={{ width: '100%' }}>
+                            <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="table" />
+                        </Flex>
+                    );
                 }
             };
             const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altVariation');

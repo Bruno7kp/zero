@@ -101,11 +101,15 @@ export const dbReady: Promise<void> = db.open()
   .then(() => {})
   .catch(async (e) => {
     if (/UpgradeError/i.test(e?.name || '') && /primary key/i.test(e?.message || '')) {
-      console.warn('[Dexie] PK upgrade conflict (unexpected) – recreating DB', e);
+      if (import.meta.env.MODE !== 'production') {
+        console.warn('[Dexie] PK upgrade conflict (unexpected) – recreating DB', e);
+      }
       await db.delete();
       await db.open();
     } else {
-      console.error('[Dexie] Failed to open DB', e);
+      if (import.meta.env.MODE !== 'production') {
+        console.error('[Dexie] Failed to open DB', e);
+      }
     }
   });
 
