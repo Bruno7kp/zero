@@ -25,12 +25,16 @@ import {
     IconFlame,
     IconMessageCircle,
     IconInfoCircle,
+    IconDroplet,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout as reduxLogout } from '../store/authSlice';
 import { setTheme } from '../store/themeSlice';
+import { getNextThemeMode, toMantineColorScheme } from '../theme/modes';
+import { getThemeAssets } from '../theme/assets';
+import type { ThemeMode } from '../theme/modes';
 import { setLanguage } from '../store/i18nSlice';
 
 export const Header: React.FC = () => {
@@ -47,10 +51,11 @@ export const Header: React.FC = () => {
         dispatch(reduxLogout() as any).unwrap();
     };
 
-    // Sincroniza Redux -> Mantine
+    // Sincroniza Redux -> Mantine (blue usa esquema dark internamente)
     React.useEffect(() => {
-        if (reduxTheme !== colorScheme) {
-            setColorScheme(reduxTheme);
+        const target = toMantineColorScheme(reduxTheme as ThemeMode);
+        if (target !== colorScheme) {
+            setColorScheme(target);
         }
     }, [reduxTheme, colorScheme, setColorScheme]);
 
@@ -63,9 +68,9 @@ export const Header: React.FC = () => {
 
     // Ao trocar tema pelo botão
     const handleToggleTheme = () => {
-        const nextTheme = colorScheme === 'dark' ? 'light' : 'dark';
-        dispatch(setTheme(nextTheme));
-        setColorScheme(nextTheme);
+        const next = getNextThemeMode(reduxTheme as ThemeMode);
+        dispatch(setTheme(next));
+        setColorScheme(toMantineColorScheme(next));
     };
 
     // Ao trocar idioma pelo menu
@@ -81,11 +86,12 @@ export const Header: React.FC = () => {
                 size="lg"
                 aria-label={t('theme.toggle')}
             >
-                {computedColorScheme === 'dark' ? (
-                    <IconSun style={{ width: rem(20), height: rem(20) }} />
-                ) : (
-                    <IconMoonStars style={{ width: rem(20), height: rem(20) }} />
-                )}
+                {(() => {
+                    const { toggleIconId: id } = getThemeAssets(reduxTheme as any, computedColorScheme);
+                    if (id === 'droplet') return <IconDroplet style={{ width: rem(20), height: rem(20) }} />;
+                    if (id === 'sun') return <IconSun style={{ width: rem(20), height: rem(20) }} />;
+                    return <IconMoonStars style={{ width: rem(20), height: rem(20) }} />;
+                })()}
             </ActionIcon>
 
             <Menu shadow="md" width={150}>
@@ -191,7 +197,7 @@ export const Header: React.FC = () => {
                     component={Link}
                     to="/">
                     <Image
-                        src={ colorScheme !== 'dark' ? "/zero-black.png" : "/zero-white.png" }
+                        src={ getThemeAssets(reduxTheme as any, computedColorScheme).logoSrc }
                         radius="md"
                         h={40}
                         w="auto"

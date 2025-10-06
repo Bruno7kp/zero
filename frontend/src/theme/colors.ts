@@ -4,7 +4,7 @@ export const forest: MantineColorsTuple = [
   '#eafbee',
   '#dcf0e1',
   '#bcdec3',
-  '#98cca3', // texto no tema escuro
+  '#bceba7', // texto no tema escuro
   '#7abc87',
   '#66b276',
   '#458957', // texto no tema branco // bg badge claro nos dois temas
@@ -56,7 +56,7 @@ export const cobalt: MantineColorsTuple = [
   '#e6f0ff',
   '#b3ccff',
   '#80aaff',
-  '#4d94ff', // texto no tema escuro
+  '#98bff6', // texto no tema escuro
   '#1a75ff',
   '#0066e6',
   '#3363d6', // texto no tema branco // bg badge claro nos dois temas
@@ -82,7 +82,7 @@ export const honey: MantineColorsTuple = [
   '#fff5e6',
   '#ffebc2',
   '#ffd39c',
-  '#ffbc80', // texto no tema escuro
+  '#ffca64', // texto no tema escuro
   '#ff9952',
   '#ff8a1a',
   '#e37700', // texto no tema branco // bg badge claro nos dois temas
@@ -107,3 +107,36 @@ export const bee: MantineColorsTuple = [
 export const palettes = { forest, ruby, cobalt, honey, bee, cherry, lazuli, grass };
 
 export type AppPaletteKeys = keyof typeof palettes;
+
+// Dark blue palette to override Mantine 'dark' when using blue mode (index 9 darkest)
+export const darkblue: MantineColorsTuple = [
+  '#e7edf2', // 0
+  '#cdd8e3', // 1
+  '#b0c8dc', // 2
+  '#b0c8dc', // 3
+  '#2b4861', // 4
+  '#253e54', // 5
+  '#1f3446', // 6 popovers/menus (slightly lighter than app)
+  '#192a39', // 7 app shell background (requested)
+  '#13202b', // 8 base surfaces (cards/papers/menus/modals)
+  '#0d161d', // 9 darker hover/active
+];
+
+export const denim: MantineColorsTuple = [
+  '#e8eef3', // 0
+  '#d4e0ea', // 1
+  '#b8c9d8', // 2
+  '#9eb3c7', // 3
+  '#7f9bb3', // 4
+  '#6587a3', // 5
+  '#4e6f8b', // 6 primary
+  '#39576f', // 7
+  '#263e52', // 8
+  '#13202b', // 9
+];
+
+// Subtle borders for blue mode
+export const BLUE_BORDER_06 = 'rgba(255,255,255,0.06)';
+export const BLUE_BORDER_08 = 'rgba(255,255,255,0.08)';
+export const BLUE_BORDER_12 = 'rgba(255,255,255,0.12)';
+export const BLUE_BORDER_18 = 'rgba(255,255,255,0.18)';

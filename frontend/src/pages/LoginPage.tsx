@@ -2,11 +2,12 @@
 import React from 'react';
 import {
     Container,
-    Group, Card, Text, Divider, Image, Anchor, useMantineColorScheme,
+    Group, Card, Text, Divider, Image, Anchor,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { GoogleLogin } from '@react-oauth/google';
 import { useSelector, useDispatch } from 'react-redux';
+import { getThemeAssets } from '../theme/assets';
 import { loginWithGoogle } from '../store/authSlice';
 import {Link, useNavigate} from 'react-router-dom';
 
@@ -15,7 +16,7 @@ const LoginPage: React.FC = () => {
     const dispatch = useDispatch();
     const isAuthenticated = useSelector((state: any) => state.auth.user !== null);
     const navigate = useNavigate();
-    const { colorScheme } = useMantineColorScheme();
+    const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
     const currentYear = new Date().getFullYear();
 
     // Redirecionar para a home se o usuário já estiver autenticado
@@ -42,7 +43,7 @@ const LoginPage: React.FC = () => {
                     mb="lg"
                     to="/">
                     <Image
-                        src={ colorScheme !== 'dark' ? "/zero-black.png" : "/zero-white.png" }
+                        src={ getThemeAssets(themeMode).logoSrc }
                         radius="md"
                         h={40}
                         w="auto"

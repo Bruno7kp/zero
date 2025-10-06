@@ -13,11 +13,13 @@ import {
     ActionIcon
 } from '@mantine/core';
 import { Header } from '../components/Header';
+import { appShellDarkIndex, appShellHeaderDarkIndex } from '../theme/modes';
 import { useTranslation } from 'react-i18next';
 import {
     IconBrandGithub
 } from "@tabler/icons-react";
 import { useSelector } from 'react-redux';
+// Backgrounds are derived from theme colors; no direct color import needed
 
 const MainLayout: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -31,13 +33,21 @@ const MainLayout: React.FC = () => {
     const currentYear = new Date().getFullYear();
     const { colorScheme } = useMantineColorScheme();
     const theme = useMantineTheme();
+    const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
 
     return (
         <AppShell
             header={{ height: 60 }}
             padding="md"
         >
-            <AppShell.Header>
+            <AppShell.Header withBorder={false}
+                style={{
+                    backgroundColor:
+                        colorScheme === 'dark'
+                            ? theme.colors.dark[appShellHeaderDarkIndex(themeMode)]
+                            : undefined,
+                }}
+            >
                 <Header/>
             </AppShell.Header>
 
@@ -45,7 +55,7 @@ const MainLayout: React.FC = () => {
                 style={{
                     backgroundColor:
                         colorScheme === 'dark'
-                            ? theme.colors.dark[8]
+                            ? theme.colors.dark[appShellDarkIndex(themeMode)]
                             : theme.colors.gray[1],
                 }}
             >

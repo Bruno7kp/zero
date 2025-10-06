@@ -165,9 +165,7 @@ const HomePage: React.FC = () => {
             {/* Seção Última Atualização */}
             <Box py="xl" style={{
                 backgroundColor:
-                    colorScheme === 'dark'
-                        ? theme.colors.dark[7]
-                        : 'white',
+                    colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
             }}>
                 <Container>
                     <Title order={3} ta="center" mb="lg">
