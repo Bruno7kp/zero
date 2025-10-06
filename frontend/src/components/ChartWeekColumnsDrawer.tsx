@@ -14,9 +14,14 @@ import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 interface ChartWeekColumnsDrawerProps {
     viewType: 'table' | 'list' | 'grid';
     onColumnsChange?: (cols: any[]) => void;
+    // When provided, component becomes controlled. Useful to trigger the drawer from an external menu.
+    opened?: boolean;
+    onOpenedChange?: (opened: boolean) => void;
+    // Hide the internal trigger ActionIcon (settings button)
+    hideTrigger?: boolean;
 }
 
-export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ viewType, onColumnsChange }) => {
+export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ viewType, onColumnsChange, opened, onOpenedChange, hideTrigger }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const isMobile = useIsMobile();
@@ -32,7 +37,14 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const listBackground = viewConfig?.settings?.listBackground || 'default';
     // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
-    const [opened, setOpened] = useState(false);
+    const [internalOpened, setInternalOpened] = useState(false);
+    const isOpen = typeof opened === 'boolean' ? opened : internalOpened;
+    const open = () => {
+        if (onOpenedChange) onOpenedChange(true); else setInternalOpened(true);
+    };
+    const close = () => {
+        if (onOpenedChange) onOpenedChange(false); else setInternalOpened(false);
+    };
     // Colunas obrigatórias (rank, name) exibidas como sempre visíveis (badge), sem toggle
 
     const storageKey = `chart_columns_${viewType}`; // legado (ainda lido para migração leve se necessário)
@@ -164,14 +176,16 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
 
     return (
         <>
-            <Tooltip label={t('charts.columnsConfig')}>
-                <ActionIcon variant="subtle" onClick={() => setOpened(true)} aria-label={t('charts.columnsConfig')}>
-                    <IconSettings size={18} />
-                </ActionIcon>
-            </Tooltip>
+            {!hideTrigger && (
+                <Tooltip label={t('charts.columnsConfig')}>
+                    <ActionIcon variant="subtle" onClick={open} aria-label={t('charts.columnsConfig')}>
+                        <IconSettings size={18} />
+                    </ActionIcon>
+                </Tooltip>
+            )}
             <Drawer
-                opened={opened}
-                onClose={() => setOpened(false)}
+                opened={isOpen}
+                onClose={close}
                 position="right"
                 size="md"
                 withCloseButton={false}
@@ -431,7 +445,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                     <Divider my={6} />
                     <Group justify="space-between" px={4} pb={4} mt={4} style={{ flexShrink: 0 }}>
                         <Button variant="light" size="xs" onClick={handleReset}>{t('common.reset')}</Button>
-                        <Button size="xs" onClick={() => setOpened(false)}>{t('common.close')}</Button>
+                        <Button size="xs" onClick={close}>{t('common.close')}</Button>
                     </Group>
                 </Paper>
             </Drawer>

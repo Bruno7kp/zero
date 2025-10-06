@@ -359,6 +359,7 @@
     "common": {
       "reset": "Redefinir",
       "close": "Fechar",
+      "edit": "Editar",
       "confirm": "Confirmar",
       "cancel": "Cancelar",
       "clear": "Limpar",

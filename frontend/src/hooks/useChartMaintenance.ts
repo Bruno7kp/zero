@@ -39,7 +39,7 @@ export function useChartMaintenance(t: any) {
           notifications.update({ id: notifId, message: e?.message || 'Failed', loading: false, color: 'red', autoClose: 4000 });
         } finally {
           updateState(idStr, { clearing: false });
-          setTimeout(() => updateState(idStr, null), 1500);
+          setTimeout(() => updateState(idStr, null), 1000);
         }
       }
     });

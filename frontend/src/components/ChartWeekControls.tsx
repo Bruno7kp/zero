@@ -9,14 +9,15 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import { getPrevNextWeek } from '../utils/chartWeekNav';
-import { Button, SegmentedControl, Flex, Center, VisuallyHidden, Text, Title, Grid } from '@mantine/core';
+import { Button, SegmentedControl, Flex, Center, VisuallyHidden, Text, Title, Grid, Menu, ActionIcon } from '@mantine/core';
 import { ChartWeekColumnsDrawer } from './ChartWeekColumnsDrawer';
 import { Calendar } from '@mantine/dates';
-import { Popover, ActionIcon } from '@mantine/core';
+import { Popover } from '@mantine/core';
 import { IconCalendar } from '@tabler/icons-react';
-import { IconMicrophone, IconDisc, IconMusic, IconTable, IconLayoutGrid, IconList, IconArrowLeft, IconArrowRight, IconEdit } from '@tabler/icons-react';
+import { IconMicrophone, IconDisc, IconMusic, IconTable, IconLayoutGrid, IconList, IconArrowLeft, IconArrowRight, IconSettings, IconPencil } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { ChartWeekEditModal } from './ChartWeekEditModal';
+import { useMediaQuery } from '@mantine/hooks';
 
 const chartTypes = [
 	{
@@ -127,6 +128,9 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const [popoverOpened, setPopoverOpened] = useState(false);
 	const topType = `charts.${type}sTop`;
 	const [editOpened, setEditOpened] = React.useState(false);
+	// Control drawer open from dropdown menu
+	const [drawerOpened, setDrawerOpened] = React.useState(false);
+	const isMobile = useMediaQuery('(max-width: 36em)');
 
 	return (
 		<>
@@ -147,7 +151,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				</Grid.Col>
 			)}
 			{/* Esquerda: seleção de tipo */}
-			<Grid.Col span={{ base: 4, sm: 4 }}>
+			<Grid.Col span={{ base: 6, xs: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-start' }}
@@ -162,19 +166,43 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 							withItemsBorders={false}
 							disabled={isBusy}
 						/>
-						{/* Botão de edição da semana do chart */}
-						<ActionIcon
-							variant="subtle"
-							title="Editar semana do chart"
-							disabled={!week || isBusy}
-							onClick={() => setEditOpened(true)}
-						>
-							<IconEdit size={18} />
-						</ActionIcon>
+					{/* Drawer control hidden trigger, controlled open */}
+					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
+					{/* Dropdown menu: replaces settings button; holds visual settings, edit, and on mobile, view options */}
+					<Menu withinPortal position="bottom" shadow="md" withArrow>
+						<Menu.Target>
+							<ActionIcon variant="subtle" aria-label="Opções" ml={0} my="xs">
+								<IconSettings size={18} />
+							</ActionIcon>
+						</Menu.Target>
+						<Menu.Dropdown>
+							<Menu.Item leftSection={<IconSettings size={16} />} onClick={() => setDrawerOpened(true)}>
+								{t('charts.columnsConfig')}
+							</Menu.Item>
+							<Menu.Item leftSection={<IconPencil size={16} />} disabled={!week || isBusy} onClick={() => setEditOpened(true)}>
+								{t('common.edit')}
+							</Menu.Item>
+							{isMobile && (
+								<>
+									<Menu.Divider />
+									<Menu.Label>{t('charts.view')}</Menu.Label>
+									<Menu.Item leftSection={<IconTable size={16} />} onClick={() => handleSetView('table')}>
+										{t('charts.tableView')}
+									</Menu.Item>
+									<Menu.Item leftSection={<IconList size={16} />} onClick={() => handleSetView('list')}>
+										{t('charts.listView')}
+									</Menu.Item>
+									<Menu.Item leftSection={<IconLayoutGrid size={16} />} onClick={() => handleSetView('grid')}>
+										{t('charts.gridView')}
+									</Menu.Item>
+								</>
+							)}
+						</Menu.Dropdown>
+					</Menu>
 				</Flex>
 			</Grid.Col>
 			{/* Centro: navegação de semana */}
-			<Grid.Col span={{ base: 4, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			<Grid.Col span={{ base: 6, xs: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<Popover
 					position="bottom"
@@ -223,29 +251,30 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next || isBusy}><IconArrowRight size={18} /></Button>
 			</Grid.Col>
 
-			{/* Direita: seleção de visualização + botão de colunas */}
-			<Grid.Col span={{ base: 4, sm: 4 }}>
+			{/* Direita: seleção de visualização (desktop) */}
+			{!isMobile && (
+			<Grid.Col span={{ base: 4, xs: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-end' }}
 					w="100%"
+					style={{ minHeight: 40 }}
 				>
-					{/* Botão de colunas, agora respeita viewType */}
-					<ChartWeekColumnsDrawer viewType={view} />
 					<SegmentedControl
-						value={view}
-						onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}
-						data={[
-							{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
-							{ label: (<Center><IconList size={18} /></Center>), value: 'list' },
-							{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
-						]}
-						size="sm"
-						my="xs"
-						withItemsBorders={false}
-					/>
+							value={view}
+							onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}
+							data={[
+								{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
+								{ label: (<Center><IconList size={18} /></Center>), value: 'list' },
+								{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
+							]}
+							size="sm"
+							my="xs"
+							withItemsBorders={false}
+						/>
 				</Flex>
 			</Grid.Col>
+			)}
 		</Grid>
 		<ChartWeekEditModal opened={editOpened} onClose={() => setEditOpened(false)} chart={chart} week={week} type={type as any} />
 		</>
