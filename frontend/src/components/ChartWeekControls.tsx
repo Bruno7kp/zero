@@ -14,8 +14,9 @@ import { ChartWeekColumnsDrawer } from './ChartWeekColumnsDrawer';
 import { Calendar } from '@mantine/dates';
 import { Popover, ActionIcon } from '@mantine/core';
 import { IconCalendar } from '@tabler/icons-react';
-import { IconMicrophone, IconDisc, IconMusic, IconTable, IconLayoutGrid, IconList, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
+import { IconMicrophone, IconDisc, IconMusic, IconTable, IconLayoutGrid, IconList, IconArrowLeft, IconArrowRight, IconEdit } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
+import { ChartWeekEditModal } from './ChartWeekEditModal';
 
 const chartTypes = [
 	{
@@ -125,8 +126,10 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	}
 	const [popoverOpened, setPopoverOpened] = useState(false);
 	const topType = `charts.${type}sTop`;
+	const [editOpened, setEditOpened] = React.useState(false);
 
 	return (
+		<>
 		<Grid>
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
@@ -147,18 +150,27 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			<Grid.Col span={{ base: 12, sm: 4 }}>
 				<Flex
 					align="center"
-					justify={{ base: 'center', sm: 'flex-start' }} // 👈 aqui fica responsivo
+					justify={{ base: 'center', sm: 'flex-start' }}
 					w="100%"
 				>
 					<SegmentedControl
-						value={type}
-						onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
-						data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
-						size="sm"
-						my="xs"
-						withItemsBorders={false}
-						disabled={isBusy}
-					/>
+							value={type}
+							onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
+							data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
+							size="sm"
+							my="xs"
+							withItemsBorders={false}
+							disabled={isBusy}
+						/>
+						{/* Botão de edição da semana do chart */}
+						<ActionIcon
+							variant="subtle"
+							title="Editar semana do chart"
+							disabled={!week || isBusy}
+							onClick={() => setEditOpened(true)}
+						>
+							<IconEdit size={18} />
+						</ActionIcon>
 				</Flex>
 			</Grid.Col>
 			{/* Centro: navegação de semana */}
@@ -215,7 +227,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			<Grid.Col span={{ base: 12, sm: 4 }}>
 				<Flex
 					align="center"
-					justify={{ base: 'center', sm: 'flex-end' }} // 👈 aqui fica responsivo
+					justify={{ base: 'center', sm: 'flex-end' }}
 					w="100%"
 				>
 					{/* Botão de colunas, agora respeita viewType */}
@@ -235,5 +247,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				</Flex>
 			</Grid.Col>
 		</Grid>
+		<ChartWeekEditModal opened={editOpened} onClose={() => setEditOpened(false)} chart={chart} week={week} type={type as any} />
+		</>
 	);
 };

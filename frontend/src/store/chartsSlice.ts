@@ -14,6 +14,7 @@ export interface ChartsState {
   activeChartId: number | null;
   statsRequestId: string | null;
   statsCache: Record<string, { data: Record<string, any>; createdAt: number }>;
+  statsBump: number; // monotonic bump to force UI loaders to re-run
 }
 
 const STATS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 min fresco
@@ -29,6 +30,7 @@ const initialState: ChartsState = {
   activeChartId: null,
   statsRequestId: null,
   statsCache: {},
+  statsBump: 0,
 };
 
 
@@ -596,6 +598,7 @@ const chartsSlice = createSlice({
       const prev = state.statsCache[cacheKey]?.data || {};
       state.statsCache[cacheKey] = { data: { ...prev, ...snapshot }, createdAt: now };
     },
+    bumpStats(state) { state.statsBump++; },
     clearStatsCache(state) { state.statsCache = {}; },
     removeStatsCacheEntry(state, action: PayloadAction<string>) { delete state.statsCache[action.payload]; },
     invalidateStatsForChart(state, action: PayloadAction<{ chartId: string | number; chartType?: string; fromWeek?: string }>) {
@@ -696,5 +699,5 @@ const origClearChartFulfilled = (chartsSlice as any).caseReducers[clearChartLoca
   } catch { /* ignore */ }
 };
 
-export const { setActiveChartId, setCharts, startStatsIncremental, beginStatsRevalidation, partialStatsLoaded, finishStatsIncremental, replaceStatsSnapshot, cacheStatsSnapshot, clearStatsCache, removeStatsCacheEntry, invalidateStatsForChart, updateRowDeltas } = chartsSlice.actions;
+export const { setActiveChartId, setCharts, startStatsIncremental, beginStatsRevalidation, partialStatsLoaded, finishStatsIncremental, replaceStatsSnapshot, cacheStatsSnapshot, bumpStats, clearStatsCache, removeStatsCacheEntry, invalidateStatsForChart, updateRowDeltas } = chartsSlice.actions;
 export default chartsSlice.reducer;

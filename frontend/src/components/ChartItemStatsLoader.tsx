@@ -14,6 +14,9 @@ export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { c
   const [entityMeta, setEntityMeta] = React.useState<{ name: string; artistName: string }>({ name: '', artistName: '' });
   const { t } = useTranslation();
   const charts = useSelector((s: RootState) => s.charts.charts);
+  // When stats revalidation/incremental requests run, re-run this loader
+  const statsRequestId = useSelector((s: RootState) => s.charts.statsRequestId);
+  const statsBump = useSelector((s: RootState) => s.charts.statsBump);
   const chart = charts.find((c: any) => String(c.id) === String(chartId));
   const cutoff = React.useMemo(() => {
     if (!chart) return 100; // fallback
@@ -57,7 +60,8 @@ export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { c
     })()
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
-  }, [chartId, chartType, entityId, cutoff]);
+  // Also rerun whenever a new stats incremental request is triggered (after edits/save)
+  }, [chartId, chartType, entityId, cutoff, statsRequestId, statsBump]);
 
   if (loading || !geralStats) return <Text size="sm">{t('charts.stats.loading')}</Text>;
   return <ChartItemStats stats={geralStats} highlightWeek={week} chartId={chartId} chartType={chartType} entityName={entityMeta.name} entityArtistName={entityMeta.artistName} />;

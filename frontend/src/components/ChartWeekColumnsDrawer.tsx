@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme, Accordion, Text } from '@mantine/core';
+import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme, Accordion, Text, ActionIcon, Tooltip } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 // Removed expand/collapse icons (no longer used)
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -164,9 +164,11 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
 
     return (
         <>
-            <Button variant="subtle" size="xs" onClick={() => setOpened(true)}>
-                <IconSettings size={16} />
-            </Button>
+            <Tooltip label={t('charts.columnsConfig')}>
+                <ActionIcon variant="subtle" onClick={() => setOpened(true)} aria-label={t('charts.columnsConfig')}>
+                    <IconSettings size={18} />
+                </ActionIcon>
+            </Tooltip>
             <Drawer
                 opened={opened}
                 onClose={() => setOpened(false)}
