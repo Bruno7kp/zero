@@ -46,8 +46,16 @@ function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, 
 }
 
 export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView }) => {
+    // Preserve last stable (defined) delta to avoid flashing '-' during quick transitions
+    const lastStableRef = React.useRef<any>(delta);
+    const isDefined = !(delta === undefined || delta === null);
+    if (isDefined) {
+        lastStableRef.current = delta;
+    }
+    const hasStable = !(lastStableRef.current === undefined || lastStableRef.current === null);
+    const effectiveDelta = isDefined ? delta : (hasStable ? lastStableRef.current : undefined);
     const darker = cfg.variant !== 'filled';
-    const { color, label } = resolveDelta(delta, showPercent, currentValue, darker, computePercent || computeDefaultPercent);
+    const { color, label } = resolveDelta(effectiveDelta, showPercent, currentValue, darker, computePercent || computeDefaultPercent);
     let variant = cfg.variant;
     // Regra: se variante for sólida e a cor for gray, usar variante light para suavizar SOMENTE em tabela/lista (grid mantém filled)
     if (variant === 'filled' && color === 'gray' && (contextView === 'table' || contextView === 'list' || (!contextView))) variant = 'light';
@@ -61,28 +69,28 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
         // Base icon size by badge size
         const baseIconSize = size === 'xs' ? 12 : size === 'sm' ? 14 : size === 'md' ? 16 : size === 'lg' ? 18 : 20;
         const isIconOnly = (cfg.hideLabel && cfg.iconPosition !== 'split' && label !== '=');
-        if (delta === 'NEW') {
+        if (effectiveDelta === 'NEW') {
             // Keep subtle boost only +2 when icon-only
             const eff = baseIconSize + (isIconOnly ? 2 : 0) - 2; // star a bit smaller
             return <IconStarFilled size={eff} />;
         }
-        if (delta === 'RE') {
+        if (effectiveDelta === 'RE') {
             const eff = baseIconSize + (isIconOnly ? 2 : 0);
             return <IconArrowBackUp stroke={3} size={eff} style={{ transform: 'scaleX(-1)' }} />;
         }
-        if (typeof delta === 'number') {
-            if (delta > 0) {
+        if (typeof effectiveDelta === 'number') {
+            if (effectiveDelta > 0) {
                 const eff = baseIconSize + (isIconOnly ? 4 : 0); // +4 boost for up arrow when icon-only
                 return <IconCaretUpFilled size={eff} />;
             }
-            if (delta < 0) {
+            if (effectiveDelta < 0) {
                 const eff = baseIconSize + (isIconOnly ? 4 : 0); // +4 boost for down arrow when icon-only
                 return <IconCaretDownFilled size={eff} />;
             }
             if (cfg.iconPosition === 'split') return <IconSquareFilled size={8} />;
             return null;
         }
-        if (delta === '=' && cfg.iconPosition === 'split') return <IconSquareFilled size={8} />;
+        if (effectiveDelta === '=' && cfg.iconPosition === 'split') return <IconSquareFilled size={8} />;
         return null;
     })();
     // Em presets "apenas ícone" ocultamos label; no grid, ocultamos até o '=' para ficar 100% ícone
@@ -91,13 +99,13 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
         : label;
     // Se o modo é texto + ícone (não split, ícone visível), remover textos 'NEW' e 'RE' e deixar só o ícone
     if (!cfg.hideLabel && cfg.iconPosition !== 'hidden' && cfg.iconPosition !== 'split') {
-        if (delta === 'NEW' || delta === 'RE') {
+        if (effectiveDelta === 'NEW' || effectiveDelta === 'RE') {
             displayLabel = '';
         }
     }
     const fontSizeMap: Record<string, number> = { xs: 10, sm: 11, md: 12, lg: 14, xl: 16 };
     const effectiveFontSize = fontSizeMap[textSize || (cfg.size as any) || 'xs'];
-    const splitVariant = resolveDelta(delta, showPercent, currentValue, false, computePercent || computeDefaultPercent);
+    const splitVariant = resolveDelta(effectiveDelta, showPercent, currentValue, false, computePercent || computeDefaultPercent);
     if (cfg.iconPosition === 'split' && icon) {
         if (cfg.splitTall) {
             return (
@@ -190,6 +198,34 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
             </Flex>
         </Badge>
     );
+
+    // If we still don't have a stable value to show, render a transparent placeholder with fixed dimensions to avoid flicker
+    if (!hasStable && !isDefined) {
+        return (
+            <Badge
+                key={`${kind}-delta-placeholder`}
+                variant="transparent"
+                color={color as any}
+                radius={radius as any}
+                size={size}
+                style={{
+                    width: fixedWidth,
+                    minWidth: fixedWidth,
+                    height: fixedHeight,
+                    minHeight: fixedHeight,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    ...finalPaddingStyle,
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                }}
+                aria-busy
+            >
+                {/* empty placeholder to keep layout */}
+            </Badge>
+        );
+    }
 };
 
 export default DeltaBadge;

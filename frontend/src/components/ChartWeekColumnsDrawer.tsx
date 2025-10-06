@@ -285,7 +285,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                 </Box>
                                             )}
                                             {viewType === 'table' && (
-                                                <Box style={{ flex: '1 1 100%', minWidth: 180 }}>
+                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                     <Text size="xs" c="dimmed">{t('charts.artistDisplayModeLabel')}</Text>
                                                     <SegmentedControl
                                                         fullWidth
@@ -293,8 +293,8 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                         value={artistDisplayMode}
                                                         onChange={(v) => dispatch(setArtistDisplayMode({ view: 'table', mode: v as 'under' | 'column' }))}
                                                         data={[
-                                                            { label: t('charts.artistDisplay_underTitle'), value: 'under' },
                                                             { label: t('charts.artistDisplay_separateColumn'), value: 'column' },
+                                                            { label: t('charts.artistDisplay_underTitle'), value: 'under' },
                                                         ]}
                                                     />
                                                 </Box>

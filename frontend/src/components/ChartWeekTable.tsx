@@ -33,6 +33,59 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
     const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
     const data = useSelector((state: RootState) => state.charts.data);
+    // Preserve previous non-empty data to avoid flicker/shifting during week/type/view transitions
+    const [displayedData, setDisplayedData] = useState<any[]>(data);
+    const prevDataRef = React.useRef<any[]>(data);
+    const [displayedKey, setDisplayedKey] = useState<string | null>(null);
+    const [switchHoldUntil, setSwitchHoldUntil] = useState<number | null>(null);
+    const currentKey = `${chart?.id || 'x'}|${type}|${week || 'n/a'}`;
+    const isDeltasReady = React.useCallback((rows: any[], targetWeek?: string) => {
+        if (!Array.isArray(rows) || !rows.length || !targetWeek) return false;
+        const cur = rows.filter((r: any) => r.week === targetWeek);
+        if (!cur.length) return false;
+        let ready = 0;
+        for (const r of cur) {
+            const d = (r as any).deltaRank;
+            if (d !== undefined && d !== null && d !== '-') ready++;
+        }
+        return ready >= Math.ceil(cur.length * 0.9);
+    }, []);
+    useEffect(() => {
+        if (!Array.isArray(data) || data.length === 0) return; // keep previous
+        const sameKey = displayedKey === currentKey;
+        const ready = isDeltasReady(data as any[], week);
+        if (!sameKey) {
+            if (ready) {
+                setDisplayedData(data);
+                prevDataRef.current = data;
+                setDisplayedKey(currentKey);
+                setSwitchHoldUntil(null);
+            } else {
+                if (!switchHoldUntil) setSwitchHoldUntil(Date.now() + 450);
+            }
+        } else {
+            if (ready) {
+                setDisplayedData(data);
+                prevDataRef.current = data;
+            }
+        }
+    }, [data, week, type, chart?.id, displayedKey, currentKey, isDeltasReady, switchHoldUntil]);
+    useEffect(() => {
+        if (!switchHoldUntil) return;
+        const id = setInterval(() => {
+            const ready = isDeltasReady(data as any[], week);
+            if (ready || Date.now() >= switchHoldUntil) {
+                if (Array.isArray(data) && data.length) {
+                    setDisplayedData(data);
+                    prevDataRef.current = data;
+                    setDisplayedKey(currentKey);
+                }
+                setSwitchHoldUntil(null);
+            }
+        }, 60);
+        return () => clearInterval(id);
+    }, [switchHoldUntil, data, week, isDeltasReady, currentKey]);
+    const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     const loadingStats = useSelector((state: RootState) => state.charts.loadingStats);
     const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
@@ -126,6 +179,25 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         // Hide certification and artist columns entirely for artist charts
         return type === 'artist' ? base.filter((c: any) => c.key !== 'cert' && c.key !== 'artist') : base;
     }, [visibleColumns, type]);
+
+    // Stable caches for Peak/Weeks to avoid flicker
+    const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
+    const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
+    useEffect(() => {
+        try {
+            const nextPeak = { ...lastPeakById };
+            const nextWeeks = { ...lastWeeksById };
+            let changed = false;
+            for (const [entityId, s] of Object.entries(statsMap || {})) {
+                const peak = (s as any)?.peak?.position;
+                if (peak != null && nextPeak[entityId] !== peak) { nextPeak[entityId] = peak; changed = true; }
+                const weeks = (s as any)?.totals?.withinCutoff;
+                if (weeks != null && nextWeeks[entityId] !== weeks) { nextWeeks[entityId] = weeks; changed = true; }
+            }
+            if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); }
+        } catch { /* noop */ }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [statsMap]);
 
     // Row expansion
     // Exibe stats gerais (todas as semanas) ao expandir
@@ -257,10 +329,14 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     ...base,
                     render: (row: ChartData) => {
                         const stats = statsMap[row.entityId];
-                        const peakVal = stats?.peak?.position ?? '-';
+                        const current = stats?.peak?.position;
+                        const stable = lastPeakById[row.entityId];
+                        const display = (current != null) ? current : (stable != null ? stable : undefined);
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={peakVal === 1 ? 700 : 500} c={peakVal === 1 ? 'blue' : undefined}>{stats ? peakVal : (loadingStats ? '…' : '-')}</Text>
+                                <Text fw={display === 1 ? 700 : 500} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
+                                    {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                                </Text>
                             </Flex>
                         );
                     },
@@ -271,10 +347,14 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     ...base,
                     render: (row: ChartData) => {
                         const stats = statsMap[row.entityId];
-                        const totalWeeks = stats?.totals?.withinCutoff ?? '-';
+                        const current = stats?.totals?.withinCutoff;
+                        const stable = lastWeeksById[row.entityId];
+                        const display = (current != null) ? current : (stable != null ? stable : undefined);
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={500}>{stats ? totalWeeks : (loadingStats ? '…' : '-')}</Text>
+                                <Text fw={500} style={{ transition: 'color 120ms ease' }}>
+                                    {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                                </Text>
                             </Flex>
                         );
                     },
@@ -291,15 +371,15 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         return (
                             <Flex direction="column" align="center">
                                 <CertificationIcon
-                                  key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
-                                  chart={chart}
-                                  chartType={type as 'album' | 'track'}
-                                  totals={totals}
-                                  entity={{ name: row.name, artistName: row.artistName || '' }}
-                                  entityId={row.entityId}
-                                  username={chart?.lastfm_username}
-                                  size={24}
-                                  deferMs={300}
+                                    key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
+                                    chart={chart}
+                                    chartType={type as 'album' | 'track'}
+                                    totals={totals}
+                                    entity={{ name: row.name, artistName: row.artistName || '' }}
+                                    entityId={row.entityId}
+                                    username={chart?.lastfm_username}
+                                    size={24}
+                                    deferMs={300}
                                 />
                             </Flex>
                         );
@@ -336,8 +416,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 width: 65,
                 cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
                 render: (row: ChartData, index: number) => {
-                    const rawVal: any = altVariation ? altVariation(row, index) : false;
-                    const value: any = (rawVal || rawVal === 0) ? rawVal : '-';
+                    const rawVal: any = altVariation ? altVariation(row, index) : undefined;
+                    const value: any = (rawVal || rawVal === 0) ? (rawVal === '-' ? undefined : rawVal) : undefined;
                     // Only use splitTall if current preset actually uses split (maximalist). Otherwise follow current style.
                     let cfg: any = badgeStylesRank;
                     if (badgeStylesRank.iconPosition === 'split') {
@@ -367,14 +447,14 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             }
             return [altVariationCol, ...built];
         }
-        return built;        
+        return built;
     }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation, chart, viewConfig?.settings]);
 
     // legacy helper removed (logic centralized in DeltaBadge)
 
-    const useProgressive = data.length > 120; // desativa para listas pequenas
-    const progressiveAll = useProgressiveReveal(data, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 });
-    const progressive = useProgressive ? progressiveAll : { items: data, done: true, total: data.length } as any;
+    const useProgressive = safeDisplayedData.length > 120; // desativa para listas pequenas
+    const progressiveAll = useProgressiveReveal(safeDisplayedData, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 });
+    const progressive = useProgressive ? progressiveAll : { items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any;
     const displayedRecords = progressive.items as ChartData[];
     const showLoadingTail = useProgressive && !progressive.done;
 

@@ -88,9 +88,9 @@
       "listBackground_default": "Default",
       "listBackground_transparent": "Transparent",
       "containerSizeLabel": "Container size",
-  "artistDisplayModeLabel": "Artist column (table only)",
-  "artistDisplay_underTitle": "Under title",
-  "artistDisplay_separateColumn": "Separate column",
+      "artistDisplayModeLabel": "Artist column",
+      "artistDisplay_underTitle": "Hide",
+      "artistDisplay_separateColumn": "Show",
       "badgeStyles": {
         "title": "Badge Customization",
         "section": "Badges",
