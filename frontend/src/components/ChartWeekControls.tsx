@@ -141,13 +141,13 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 						{(() => {
 							const start = dayjs(inputValue);
 							const end = start.add(6, 'day');
-							return `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}`;
+							return `${start.format('YYYY.MM.DD')} - ${end.format('YYYY.MM.DD')}`;
 						})()}
 					</Text>
 				</Grid.Col>
 			)}
 			{/* Esquerda: seleção de tipo */}
-			<Grid.Col span={{ base: 12, sm: 4 }}>
+			<Grid.Col span={{ base: 4, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-start' }}
@@ -174,7 +174,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				</Flex>
 			</Grid.Col>
 			{/* Centro: navegação de semana */}
-			<Grid.Col span={{ base: 12, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			<Grid.Col span={{ base: 4, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<Popover
 					position="bottom"
@@ -224,7 +224,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			</Grid.Col>
 
 			{/* Direita: seleção de visualização + botão de colunas */}
-			<Grid.Col span={{ base: 12, sm: 4 }}>
+			<Grid.Col span={{ base: 4, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-end' }}
