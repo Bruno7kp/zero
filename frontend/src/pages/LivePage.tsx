@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-    Divider, Flex, rem, ThemeIcon, Title, Loader, Alert, Anchor, Text, SegmentedControl, Center, Card, Group,
-    Container, useMantineTheme, useMantineColorScheme
+    Divider, Flex, rem, ThemeIcon, Title, Loader, Alert, Anchor, Text, SegmentedControl, Center, Group,
+    Container, Paper
 } from '@mantine/core';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import {IconFlame, IconInfoCircle, IconMicrophone, IconMusic, IconDisc} from '@tabler/icons-react';
+import {IconFlame, IconInfoCircle, IconMicrophone, IconMusic, IconDisc, IconArrowsDownUp} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getWeeklyArtistChart, getWeeklyTrackChart, getWeeklyAlbumChart, type FormattedChartItem } from '../services/lastfm.ts';
@@ -14,6 +14,11 @@ import utc from 'dayjs/plugin/utc';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import 'dayjs/locale/pt-br';
 import { Link } from 'react-router-dom';
+import { db } from '../db/indexedDb';
+import { DeltaBadge } from '../components/DeltaBadge';
+import { selectResolvedBadge } from '../store/badgeStylesSlice';
+import { SpotifyImageWithModal } from '../components/SpotifyImageWithModal';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
 
 // Adiciona os plugins para dayjs
 dayjs.extend(utc);
@@ -31,15 +36,21 @@ const LivePage = () => {
 
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
-    const [chartData, setChartData] = useState<FormattedChartItem[]>([]);
+    type LiveRow = FormattedChartItem & { deltaRank?: number | string };
+    const [chartData, setChartData] = useState<LiveRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [chartType, setChartType] = useState<string>('artist');
     const [chartName, setChartName] = useState<string>('');
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
+    const [lastSavedWeek, setLastSavedWeek] = useState<string | null>(null);
+    
+    const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
+    const tableBgSetting = (useSelector((state: any) => state.columns?.views?.table?.settings?.tableBackground) || 'default') as 'default' | 'transparent';
+    const paperProps = tableBgSetting === 'transparent' ? { shadow: 'none' as const, bg: 'transparent' as const } : { shadow: 'xs' as const };
+    const artistMode: 'under' | 'column' = (useSelector((state: any) => state.columns?.views?.table?.settings?.artistDisplayMode) || 'under') as any;
+    const showInlineImage = !!useSelector((state: any) => state.columns?.views?.table?.columns?.find((c: any) => c.key === 'image')?.visible);
 
     useEffect(() => {
         const fetchLiveChart = async () => {
@@ -83,8 +94,8 @@ const LivePage = () => {
 
                 // Pega o limite de corte
                 const cutoffKey = chartType === 'track' ? 'music_cutoff' : `${chartType}_cutoff`;
-                const cutoff = (activeChart as any)[cutoffKey] !== undefined ? (activeChart as any)[cutoffKey] : 100;
-                const limit = cutoff + 10;
+                const cutoffVal = (activeChart as any)[cutoffKey] !== undefined ? (activeChart as any)[cutoffKey] : 100;
+                const limit = cutoffVal + 10;
 
                 let data: FormattedChartItem[];
                 switch (chartType) {
@@ -101,7 +112,46 @@ const LivePage = () => {
                         throw new Error("Tipo de chart desconhecido.");
                 }
 
-                setChartData(data);
+                // Após obter os dados live, computa variação de rank com base na última semana salva (se houver)
+                // Obter última semana salva no IndexedDB para este chart/tipo
+                const chartIdStr = String(activeChartId);
+                let liveWithDelta: LiveRow[] = data;
+                try {
+                    const lastRow = await db.charts_data
+                        .where('[chartId+chartType+week]')
+                        .between([chartIdStr, chartType, '0000'], [chartIdStr, chartType, '9999'])
+                        .reverse()
+                        .first();
+                    const prevWeek = lastRow?.week;
+                    setLastSavedWeek(prevWeek || null);
+                    if (prevWeek) {
+                        const prevRows = await db.charts_data
+                            .where(['chartId','chartType','week'])
+                            .equals([chartIdStr, chartType, prevWeek])
+                            .toArray();
+                        const norm = (s: string) => s.normalize('NFKC').toLowerCase().trim();
+                        const keyOf = (name?: string, artist?: string) => `${norm(name || '')}|${norm(artist || '')}`;
+                        const prevMap = new Map<string, number>();
+                        for (const r of prevRows) prevMap.set(keyOf(r.name, r.artistName), r.rank);
+                        liveWithDelta = data.map((it) => {
+                            const prevRank = prevMap.get(keyOf(it.name, it.artist));
+                            let delta: any = '-';
+                            if (typeof prevRank === 'number' && typeof it.rank === 'number') {
+                                delta = (prevRank - it.rank);
+                            }
+                            // Não mostrar variação para quem está fora do cutoff atual
+                            if (typeof it.rank === 'number' && cutoffVal && it.rank > cutoffVal) {
+                                delta = '-';
+                            }
+                            return { ...it, deltaRank: delta };
+                        });
+                    } else {
+                        liveWithDelta = data.map(it => ({ ...it, deltaRank: '-' }));
+                    }
+                } catch {
+                    liveWithDelta = data.map(it => ({ ...it, deltaRank: '-' }));
+                }
+                setChartData(liveWithDelta);
             } catch {
                 setError(t("errors.dataError"));
             } finally {
@@ -113,28 +163,137 @@ const LivePage = () => {
         fetchLiveChart();
     }, [activeChartId, charts, chartType, t]);
 
+    // Lazy enrichment: determine NEW/RE per row based on last saved week in IndexedDB
+    useEffect(() => {
+        const enrichNewRe = async () => {
+            if (!lastSavedWeek || !activeChartId || !chartData.length) return;
+            const chartIdStr = String(activeChartId);
+            const cutoffKey = chartType === 'track' ? 'music_cutoff' : `${chartType}_cutoff`;
+            const activeChart = charts.find((c: any) => c.id === activeChartId);
+            const cutoffVal = (activeChart as any)?.[cutoffKey] ?? 100;
+            const norm = (s: string) => s.normalize('NFKC').toLowerCase().trim();
+            const keyOf = (name?: string, artist?: string) => `${norm(name || '')}|${norm(artist || '')}`;
+            // Build set of items present in lastSavedWeek for quick membership check
+            let prevSet = new Set<string>();
+            let prevAnySet = new Set<string>();
+            try {
+                const prevRows = await db.charts_data
+                    .where(['chartId','chartType','week'])
+                    .equals([chartIdStr, chartType, lastSavedWeek])
+                    .toArray();
+                prevSet = new Set(prevRows.map(r => keyOf(r.name, r.artistName)));
+                const allPrevRows = await db.charts_data
+                    .where('[chartId+chartType+week]')
+                    .below([chartIdStr, chartType, lastSavedWeek])
+                    .toArray();
+                prevAnySet = new Set(allPrevRows.map(r => keyOf(r.name, r.artistName)));
+            } catch { /* ignore */ }
+            const updates: Array<{ idx: number; value: 'NEW' | 'RE' } > = [];
+            for (let i = 0; i < chartData.length; i++) {
+                const row = chartData[i];
+                const rankNum = typeof row.rank === 'number' ? row.rank : Number(row.rank);
+                if (!rankNum || rankNum > cutoffVal) continue; // outside cutoff or invalid rank
+                if (typeof row.deltaRank === 'number') continue; // already has numeric variation
+                if (row.deltaRank === 'RE' || row.deltaRank === 'NEW') continue; // already enriched
+                const rowKey = keyOf(row.name, row.artist);
+                // If it existed in the last saved week, do nothing (delta stays '-' or numeric logic handled earlier)
+                if (prevSet.has(rowKey)) continue;
+                // Check any prior appearance
+                if (prevAnySet.has(rowKey)) updates.push({ idx: i, value: 'RE' }); else updates.push({ idx: i, value: 'NEW' });
+            }
+            if (updates.length) {
+                setChartData(prev => prev.map((r, idx) => {
+                    const up = updates.find(u => u.idx === idx);
+                    return up ? { ...r, deltaRank: up.value } : r;
+                }));
+            }
+        };
+        const id = setTimeout(() => { enrichNewRe(); }, 0);
+        return () => clearTimeout(id);
+    }, [lastSavedWeek, activeChartId, chartData, chartType, charts]);
+
     // Define as colunas do Mantine DataTable
-    const columns: DataTableColumn<FormattedChartItem>[] = [
+    const columns: DataTableColumn<LiveRow>[] = useMemo(() => {
+        const norm = (s: string) => s.normalize('NFKC').toLowerCase().trim();
+        const keyOf = (name?: string, artist?: string) => `${norm(name || '')}|${norm(artist || '')}`;
+        const cols: DataTableColumn<LiveRow>[] = [
         {
             accessor: 'rank',
-            title: '#',
-            width: rem(40),
+            title: 'Rank',
+            width: 80,
             textAlign: 'center',
             render: ({ rank }) => (
                 <Text fw={700}>{rank}</Text>
             ),
         },
         {
+            accessor: 'deltaRank',
+            title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
+            width: rem(65),
+            textAlign: 'center',
+            cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
+            render: ({ deltaRank }) => {
+                // Replicar estilo da coluna de variação alternativa da tabela
+                let cfg: any = badgeStylesRank;
+                if (badgeStylesRank.iconPosition === 'split') {
+                    cfg = { ...badgeStylesRank, iconPosition: 'split', splitTall: badgeStylesRank.splitTall !== false };
+                } else if (badgeStylesRank.iconPosition === 'hidden') {
+                    cfg = { ...badgeStylesRank, iconPosition: 'hidden', splitTall: false };
+                } else {
+                    cfg = { ...badgeStylesRank, splitTall: false };
+                }
+                return (
+                    <Flex justify="center" align="center" style={{ width: '100%' }}>
+                        <DeltaBadge delta={deltaRank ?? '-'} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="table" />
+                    </Flex>
+                );
+            },
+        },
+        {
             accessor: 'name',
-            title: 'Title',
+            title: t('charts.titleLabel'),
             render: (item) => (
-                <Flex direction="column">
-                    <Text fw={700}>{item.name}</Text>
-                    {item.artist && <Text fz="sm">{item.artist}</Text>}
+                <Flex>
+                    {showInlineImage && (
+                        <Flex
+                            mr="sm"
+                            justify="center"
+                            align="center"
+                            onClick={e => e.stopPropagation()}
+                            onMouseDown={e => e.stopPropagation()}
+                        >
+                            <SpotifyImageWithModal
+                                entityId={`${chartType}:${keyOf(item.name, item.artist)}`}
+                                name={item.name}
+                                artistName={item.artist}
+                                type={chartType as 'artist' | 'album' | 'track'}
+                                clientId={SPOTIFY_TOKEN}
+                                clientSecret={SPOTIFY_SECRET}
+                                width={40}
+                                height={40}
+                                style={{ minWidth: 40, maxWidth: 40 }}
+                            />
+                        </Flex>
+                    )}
+                    <Flex direction="column" justify="center" align="flex-start">
+                        <Text fw={700}>{item.name}</Text>
+                        {artistMode === 'under' && chartType !== 'artist' && !!item.artist && (
+                            <Text size="sm">{item.artist}</Text>
+                        )}
+                    </Flex>
                 </Flex>
             ),
             width: 'auto',
         },
+        // Coluna de artista separada somente se configurado como 'column' e não for chartType 'artist'
+        ...((chartType === 'artist' || artistMode !== 'column') ? [] : ([{
+            accessor: 'artist',
+            title: t('charts.artistLabel'),
+            render: (item: LiveRow) => (
+                <Text>{item.artist || '-'}</Text>
+            ),
+            width: 'auto',
+        }] as DataTableColumn<LiveRow>[])),
         {
             accessor: 'playcount',
             title: 'Plays',
@@ -142,6 +301,8 @@ const LivePage = () => {
             textAlign: 'center',
         }
     ];
+        return cols;
+    }, [badgeStylesRank, chartType, t, artistMode, showInlineImage]);
 
     const renderTable = () => {
         if (loading) {
@@ -176,19 +337,15 @@ const LivePage = () => {
         }
 
         return (
-            <Card>
+            <Paper {...paperProps} p="md">
                 <DataTable
                     columns={columns}
                     records={chartData}
-                    styles={{
-                        table: {
-                            background: colorScheme === 'dark'
-                                ? theme.colors.dark[6]
-                                : 'white',
-                        },
-                    }}
+                    highlightOnHover
+                    withTableBorder={false}
+                    className="datatable-transparent"
                 />
-            </Card>
+            </Paper>
         );
     };
 

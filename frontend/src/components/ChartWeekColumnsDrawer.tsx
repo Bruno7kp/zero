@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -85,6 +85,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         const reduxCol = columns.find((c: any) => c.key === col.key);
         return { ...col, visible: reduxCol ? reduxCol.visible : col.visible };
     });
+    const artistDisplayMode = (viewConfig?.settings as any)?.artistDisplayMode || 'under';
 
     const handleReset = () => {
         if (viewConfig) dispatch(resetColumns({ view: viewType }));
@@ -281,6 +282,21 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                 <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                     <Text size="xs" c="dimmed">{t('charts.certLabel')}</Text>
                                                     <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                                </Box>
+                                            )}
+                                            {viewType === 'table' && (
+                                                <Box style={{ flex: '1 1 100%', minWidth: 180 }}>
+                                                    <Text size="xs" c="dimmed">{t('charts.artistDisplayModeLabel')}</Text>
+                                                    <SegmentedControl
+                                                        fullWidth
+                                                        size="xs"
+                                                        value={artistDisplayMode}
+                                                        onChange={(v) => dispatch(setArtistDisplayMode({ view: 'table', mode: v as 'under' | 'column' }))}
+                                                        data={[
+                                                            { label: t('charts.artistDisplay_underTitle'), value: 'under' },
+                                                            { label: t('charts.artistDisplay_separateColumn'), value: 'column' },
+                                                        ]}
+                                                    />
                                                 </Box>
                                             )}
                                         </Flex>

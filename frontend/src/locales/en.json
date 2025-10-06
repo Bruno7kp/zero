@@ -46,6 +46,7 @@
       "altVariationLabel": "Rank change (column)",
       "imageLabel": "Image",
       "titleLabel": "Title",
+      "artistLabel": "Artist",
       "playsLabel": "Plays",
       "deltaPlaysLabel": "Plays change",
       "deltaPercentPlaysLabel": "Plays % change",
@@ -87,6 +88,9 @@
       "listBackground_default": "Default",
       "listBackground_transparent": "Transparent",
       "containerSizeLabel": "Container size",
+  "artistDisplayModeLabel": "Artist column (table only)",
+  "artistDisplay_underTitle": "Under title",
+  "artistDisplay_separateColumn": "Separate column",
       "badgeStyles": {
         "title": "Badge Customization",
         "section": "Badges",

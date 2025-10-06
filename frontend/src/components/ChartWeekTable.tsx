@@ -35,7 +35,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const data = useSelector((state: RootState) => state.charts.data);
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     const loadingStats = useSelector((state: RootState) => state.charts.loadingStats);
-    const columns = useSelector((state: RootState) => (state as any).columns?.views?.table?.columns || (state as any).columns?.columns || []);
+    const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
+    const columns = viewConfig?.columns || [];
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
     useEffect(() => {
@@ -122,8 +123,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = useMemo(() => {
         const base = visibleColumns.filter((c: any) => c.isColumn);
-        // Hide certification column entirely for artist charts
-        return type === 'artist' ? base.filter((c: any) => c.key !== 'cert') : base;
+        // Hide certification and artist columns entirely for artist charts
+        return type === 'artist' ? base.filter((c: any) => c.key !== 'cert' && c.key !== 'artist') : base;
     }, [visibleColumns, type]);
 
     // Row expansion
@@ -142,10 +143,19 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // getDeltaBadgeProps removed (logic centralized in DeltaBadge)
     // Mapeamento das colunas para o DataTable
     const dtColumns: DataTableColumn<ChartData>[] = useMemo(() => {
+        const artistMode: 'under' | 'column' = (viewConfig?.settings as any)?.artistDisplayMode || 'under';
         const built = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
+            const resolvedTitle =
+                col.label != null
+                    ? (typeof col.label === 'string'
+                        ? (col.label.startsWith('charts.') ? t(col.label as any) : col.label)
+                        : col.label)
+                    : (col.labelComplete
+                        ? t(col.labelComplete)
+                        : col.key);
             const base = {
                 accessor: col.key,
-                title: (col.label ?? t(col.label)) || col.key,
+                title: resolvedTitle,
                 textAlign: col.key === 'name' ? 'left' : ('center' as const) as DataTableColumnTextAlign,
                 width: col.key === 'name' ? undefined : 80,
             };
@@ -224,11 +234,23 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                             )}
                             <Flex direction="column" justify="center" align="flex-start">
                                 <Text fw={700}>{row.name}</Text>
-                                {row.artistName && <Text size="sm">{row.artistName}</Text>}
+                                {artistMode === 'under' && row.artistName && <Text size="sm">{row.artistName}</Text>}
                             </Flex>
                         </Flex>
                     ),
                 };
+            }
+            if (col.key === 'artist') {
+                return {
+                    ...base,
+                    title: t('charts.artistLabel') as any,
+                    accessor: 'artist',
+                    textAlign: 'left' as const,
+                    width: undefined,
+                    render: (row: ChartData) => (
+                        <Text fw={500} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName || '-'}</Text>
+                    ),
+                } as DataTableColumn<ChartData>;
             }
             if (col.key === 'peak') {
                 return {
@@ -289,6 +311,22 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 render: (row: ChartData) => <Text>{row.id}</Text>
             };
         });
+        // Ensure artist column appears if artistMode is 'column' and it's not already present (defensive fallback)
+        if (artistMode === 'column' && type !== 'artist') {
+            const hasArtist = built.some((c: any) => c.accessor === 'artist');
+            if (!hasArtist) {
+                const artistCol: DataTableColumn<ChartData> = {
+                    accessor: 'artist',
+                    title: t('charts.artistLabel') as any,
+                    textAlign: 'left' as const,
+                    render: (row: ChartData) => (
+                        <Text fw={500} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName || '-'}</Text>
+                    ),
+                };
+                const nameIdx = built.findIndex((c: any) => c.accessor === 'name');
+                if (nameIdx !== -1) built.splice(nameIdx + 1, 0, artistCol); else built.push(artistCol);
+            }
+        }
         if (showAltVariationRedux) {
             // Build proper altVariation column definition
             const altVariationCol: DataTableColumn<ChartData> = {
@@ -330,7 +368,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             return [altVariationCol, ...built];
         }
         return built;        
-    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation, chart]);
+    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation, chart, viewConfig?.settings]);
 
     // legacy helper removed (logic centralized in DeltaBadge)
 
