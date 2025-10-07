@@ -3,7 +3,6 @@ import { Box, Text, Button, Stack, Badge, Popover } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-// removed duplicate imports
 
 export interface ChartRunProps {
     run: Array<{ week: string; position: number; plays: number }>;

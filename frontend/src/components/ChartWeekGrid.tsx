@@ -412,12 +412,6 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 </Box>
                                 {(showPlays || showPeak || showTotalWeeks) && (
                                     <Group px="sm" pb="sm" style={{ minHeight: 36, width: '100%', justifyContent: 'space-between', gap: 4, display: 'flex' }}>
-                                        {showPlays && (
-                                            <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size={scaleSize('xs')} c="dimmed">Plays</Text>
-                                                <Text fw={700} size={scaleSize('sm')}>{formatNumber(row.plays as any)}</Text>
-                                            </Box>
-                                        )}
                                         {showPeak && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
                                                 <Text size={scaleSize('xs')} c="dimmed">Peak</Text>
@@ -451,6 +445,12 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                                         </Text>
                                                     );
                                                 })()}
+                                            </Box>
+                                        )}
+                                        {showPlays && (
+                                            <Box style={{ textAlign: 'center', flex: 1 }}>
+                                                <Text size={scaleSize('xs')} c="dimmed">Plays</Text>
+                                                <Text fw={700} size={scaleSize('sm')}>{formatNumber(row.plays as any)}</Text>
                                             </Box>
                                         )}
                                         {showTotalWeeks && (

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Stack, Group, Button, Paper, Drawer, SegmentedControl, Divider, Flex, Box, useMantineTheme, useMantineColorScheme, Accordion, Text, ActionIcon, Tooltip } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
-// Removed expand/collapse icons (no longer used)
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
@@ -9,15 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
-// Advanced controls removed (only presets retained)
 
 interface ChartWeekColumnsDrawerProps {
     viewType: 'table' | 'list' | 'grid';
     onColumnsChange?: (cols: any[]) => void;
-    // When provided, component becomes controlled. Useful to trigger the drawer from an external menu.
     opened?: boolean;
     onOpenedChange?: (opened: boolean) => void;
-    // Hide the internal trigger ActionIcon (settings button)
     hideTrigger?: boolean;
 }
 
@@ -27,7 +23,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const isMobile = useIsMobile();
     const { colorScheme } = useMantineColorScheme();
     const theme = useMantineTheme();
-    // Centralized transient UI state (replaces per-item useState inside loops to satisfy Rules of Hooks)
     const [hoveredPreset, setHoveredPreset] = useState<string | null>(null);
     const [focusedPreset, setFocusedPreset] = useState<string | null>(null);
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
@@ -37,7 +32,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
     const listBackground = viewConfig?.settings?.listBackground || 'default';
     const listPeakWeeksCombined = (viewConfig?.settings as any)?.listPeakWeeksCombined || false;
-    // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const playsVariationLocation = (viewConfig?.settings as any)?.playsVariationLocation || 'under';
     const [internalOpened, setInternalOpened] = useState(false);
