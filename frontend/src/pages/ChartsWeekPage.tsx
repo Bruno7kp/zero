@@ -67,7 +67,7 @@ export const ChartsWeekPage: React.FC = () => {
     }, [isSync, loadingData, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
-            <Container size={isMobile ? '100%' : "md"} px="xs">
+            <Container size={isMobile ? '100%' : currentContainerSize} px="xs">
                 {!noChart && (
                     <ChartWeekControls
                         chart={chart}

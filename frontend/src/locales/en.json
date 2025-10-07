@@ -360,6 +360,8 @@
     },
     "common": {
       "reset": "Reset",
+      "resetToDefault": "Reset to default",
+      "closeAndSave": "Close & save",
       "close": "Close",
       "edit": "Edit",
       "confirm": "Confirm",

@@ -314,18 +314,50 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                                     );
                                                 }
                                                 if (!value && value !== 0) return null;
-                                                // Ícones brancos sem fundo; +2 no tamanho para setas e RE, estrela mantém o tamanho base
+                                                // Respeita a customização do badge: ícone/texto/ambos
+                                                let cfg = badgeStylesRank as any;
+                                                // No grid under-rank não suportamos 'split'; converte para inline antes
+                                                if (cfg.iconPosition === 'split') cfg = { ...cfg, iconPosition: 'before' };
+                                                const showIcon = cfg.iconPosition !== 'hidden';
+                                                const hideLabel = !!cfg.hideLabel;
+                                                const color = theme.white;
                                                 const baseSize = 12;
-                                                const boostedReSize = baseSize + 2; // RE +2
-                                                const boostedUpDownSize = baseSize + 4; // Up/Down +4
-                                                if (value === 'NEW') return <IconStarFilled size={baseSize} color={theme.white} style={{ marginTop: 2 }} />;
-                                                if (value === 'RE') return <IconArrowBackUp size={boostedReSize} stroke={3} color={theme.white} style={{ marginTop: 2, transform: 'scaleX(-1)' }} />;
-                                                if (value === '=' || value === 0) return <span style={{ marginTop: 2, fontSize: baseSize, lineHeight: 1, color: theme.white }}>=</span>;
-                                                if (typeof value === 'number') {
-                                                    if (value > 0) return <IconCaretUpFilled size={boostedUpDownSize} color={theme.white} style={{ marginTop: 2 }} />;
-                                                    if (value < 0) return <IconCaretDownFilled size={boostedUpDownSize} color={theme.white} style={{ marginTop: 2 }} />;
+                                                const label = (() => {
+                                                    if (typeof value === 'number') {
+                                                        if (value > 0) return `+${value}`;
+                                                        if (value < 0) return `${value}`;
+                                                        return '=';
+                                                    }
+                                                    if (value === 'NEW' || value === 'RE' || value === '=') return value as string;
+                                                    return '';
+                                                })();
+                                                const isIconOnly = showIcon && hideLabel && label !== '=';
+                                                const iconEl = (() => {
+                                                    const upDownSize = baseSize + (isIconOnly ? 4 : 0);
+                                                    const reSize = baseSize + (isIconOnly ? 2 : 0);
+                                                    if (value === 'NEW') return <IconStarFilled size={baseSize} color={color} style={{ marginTop: 2 }} />;
+                                                    if (value === 'RE') return <IconArrowBackUp size={reSize} stroke={3} color={color} style={{ marginTop: 2, transform: 'scaleX(-1)' }} />;
+                                                    if (typeof value === 'number') {
+                                                        if (value > 0) return <IconCaretUpFilled size={upDownSize} color={color} style={{ marginTop: 2 }} />;
+                                                        if (value < 0) return <IconCaretDownFilled size={upDownSize} color={color} style={{ marginTop: 2 }} />;
+                                                    }
+                                                    if ((value === '=' || value === 0)) return null;
+                                                    return null;
+                                                })();
+                                                // Label a exibir considerando hideLabel; mantém '=' mesmo em modo ícone
+                                                let displayLabel = hideLabel ? (label === '=' ? label : '') : label;
+                                                // Em modo texto+ícone, não mostrar texto para NEW/RE (somente ícone)
+                                                if (!hideLabel && showIcon && (value === 'NEW' || value === 'RE')) {
+                                                    displayLabel = '';
                                                 }
-                                                return null;
+                                                if (!showIcon && !displayLabel) return null;
+                                                return (
+                                                    <span style={{ marginTop: 2, display: 'inline-flex', alignItems: 'center', gap: 4, color }}>
+                                                        {showIcon && cfg.iconPosition === 'before' && iconEl}
+                                                        {displayLabel && <span style={{ fontSize: baseSize, lineHeight: 1 }}>{displayLabel}</span>}
+                                                        {showIcon && cfg.iconPosition === 'after' && iconEl}
+                                                    </span>
+                                                );
                                             })()}
                                         </Box>
                                     </Badge>

@@ -359,7 +359,9 @@
       "fetchSpotify": "Buscar do Spotify"
     },
     "common": {
-      "reset": "Redefinir",
+  "reset": "Redefinir",
+  "resetToDefault": "Redefinir para padrão",
+  "closeAndSave": "Fechar e salvar",
       "close": "Fechar",
       "edit": "Editar",
       "confirm": "Confirmar",

@@ -115,8 +115,8 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPlaysVariationLocation({ view: 'list', location: 'under' }));
                 dispatch(setPlaysVariationDisplay({ view: 'list', display: 'percent' }));
             } else if (viewType === 'grid') {
-                // grid: rank solidIcon, plays hidden (but keep preset consistent)
-                dispatch(setPreset({ view: 'grid', kind: 'rank', preset: 'solidIcon' }));
+                // grid: rank icon-only (default), plays light; variação sob o rank
+                dispatch(setPreset({ view: 'grid', kind: 'rank', preset: 'solidIconOnly' }));
                 dispatch(setPreset({ view: 'grid', kind: 'plays', preset: 'light' }));
                 dispatch(setRankVariationLocation({ view: 'grid', location: 'under' }));
             }
@@ -154,7 +154,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
             const preset = badgeStyles?.views?.[viewType]?.[kind]?.preset;
             if (!preset) return;
             if (!allValid.includes(preset)) {
-                dispatch(setPreset({ view: viewType, kind, preset: kind === 'rank' && viewType === 'grid' ? 'solidIcon' : (kind === 'rank' ? 'light' : 'transparent') }));
+                dispatch(setPreset({ view: viewType, kind, preset: kind === 'rank' && viewType === 'grid' ? 'solidIconOnly' : (kind === 'rank' ? 'light' : 'transparent') }));
                 return;
             }
             // Grid aceita presets sólidos, incluindo "apenas ícone"
@@ -513,8 +513,8 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                     </Box>
                     <Divider my={6} />
                     <Group justify="space-between" px={4} pb={4} mt={4} style={{ flexShrink: 0 }}>
-                        <Button variant="light" size="xs" onClick={handleReset}>{t('common.reset')}</Button>
-                        <Button size="xs" onClick={close}>{t('common.close')}</Button>
+                        <Button variant="light" size="xs" onClick={handleReset}>{t('common.resetToDefault')}</Button>
+                        <Button size="xs" onClick={close}>{isMobile ? t('common.closeAndSave') : t('common.close')}</Button>
                     </Group>
                 </Paper>
             </Drawer>
