@@ -13,6 +13,8 @@ export interface ColumnConfig {
 // Configurações adicionais por view que não são booleanas
 export interface ViewSettings {
   containerSize: 'md' | 'lg' | 'xl' | '100%';
+  // Base font scale adjustment per view. 0 = default, -1 smaller, +1 larger
+  fontScale?: -2 | -1 | 0 | 1 | 2;
   rankVariationLocation?: 'under' | 'column' | 'hidden' | 'corner';
   // Controls which type of plays delta to use (absolute or percent). Visibility is controlled by playsVariationLocation.
   playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista (hidden kept for legacy; UI now controls visibility via playsVariationLocation)
@@ -55,10 +57,10 @@ export const defaultColumns: ColumnConfig[] = [
 const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
-  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', tableBackground: 'default', artistDisplayMode: 'under' },
+  table: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', tableBackground: 'default', artistDisplayMode: 'under' },
   // Lista: pedido para default ser coluna (variação em coluna) para rank; plays fica embaixo por padrão
-  list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default' },
-  grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden', peakCountStyle: 'noCount' },
+  list: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default' },
+  grid: { containerSize: 'xl', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden', peakCountStyle: 'noCount' },
 };
 
 // (helpers legacy removidos – lógica agora fica apenas nos reducers diretos)
@@ -258,6 +260,7 @@ const columnsSlice = createSlice({
       state.views[view].columns = cloneDefaults();
       // Reseta também o tamanho do container para o default da view
       state.views[view].settings.containerSize = DEFAULT_VIEW_SETTINGS[view].containerSize;
+  state.views[view].settings.fontScale = DEFAULT_VIEW_SETTINGS[view].fontScale;
       state.views[view].settings.rankVariationLocation = DEFAULT_VIEW_SETTINGS[view].rankVariationLocation;
       state.views[view].settings.playsVariationDisplay = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay;
       state.views[view].settings.playsVariationLocation = DEFAULT_VIEW_SETTINGS[view].playsVariationLocation;
@@ -332,9 +335,15 @@ const columnsSlice = createSlice({
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, mode, view);
       persistView(view, state.views[view]);
     },
+    setFontScale(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; scale: -2 | -1 | 0 | 1 | 2 }>) {
+      ensureViews(state as any);
+      const { view, scale } = action.payload;
+      state.views[view].settings.fontScale = scale;
+      persistView(view, state.views[view]);
+    },
   },
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale } = columnsSlice.actions;
 export default columnsSlice.reducer;

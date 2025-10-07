@@ -86,6 +86,7 @@
       "listBackground_default": "Padrão",
       "listBackground_transparent": "Transparente",
       "containerSizeLabel": "Tamanho do container",
+  "fontScaleLabel": "Tamanho da fonte (base)",
       "artistDisplayModeLabel": "Coluna de artista",
       "artistDisplay_underTitle": "Ocultar",
       "artistDisplay_separateColumn": "Mostrar",

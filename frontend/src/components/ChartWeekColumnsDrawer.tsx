@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -33,6 +33,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
     const columns = viewConfig?.columns || defaultColumns;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
+    const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
     const listBackground = viewConfig?.settings?.listBackground || 'default';
     // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
@@ -241,6 +242,20 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                             <Stack gap={2}>
                                                 <Text size="xs" c="dimmed">{t('charts.containerSizeLabel')}</Text>
                                                 <SegmentedControl fullWidth size="xs" value={containerSize} onChange={(v) => handleContainerSize(v as 'md' | 'lg' | 'xl' | '100%')} data={[{ label: 'MD', value: 'md' },{ label: 'LG', value: 'lg' },{ label: 'XL', value: 'xl' },{ label: '100%', value: '100%' }]} />
+                                            </Stack>
+                                            <Stack gap={2}>
+                                                <Text size="xs" c="dimmed">{t('charts.fontScaleLabel') || 'Font size'}</Text>
+                                                <SegmentedControl
+                                                    fullWidth
+                                                    size="xs"
+                                                    value={String(fontScale)}
+                                                    onChange={(v) => dispatch(setFontScale({ view: viewType, scale: Number(v) as any }))}
+                                                    data={[
+                                                        { label: 'A-', value: '-1' },
+                                                        { label: 'A', value: '0' },
+                                                        { label: 'A+', value: '1' }
+                                                    ]}
+                                                />
                                             </Stack>
                                             {viewType === 'table' && (
                                                 <Stack gap={2}>

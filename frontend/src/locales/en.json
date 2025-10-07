@@ -86,6 +86,7 @@
       "listBackground_default": "Default",
       "listBackground_transparent": "Transparent",
       "containerSizeLabel": "Container size",
+  "fontScaleLabel": "Base font size",
       "artistDisplayModeLabel": "Artist column",
       "artistDisplay_underTitle": "Hide",
       "artistDisplay_separateColumn": "Show",

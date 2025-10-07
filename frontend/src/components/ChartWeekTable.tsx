@@ -89,6 +89,13 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
     // const loadingStats = useSelector((state: RootState) => state.charts.loadingStats); // no longer needed in table columns
     const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
+    const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
+    const sizeOrder = ['xs','sm','md','lg','xl'] as const;
+    const scaleSize = (s: typeof sizeOrder[number]): typeof sizeOrder[number] => {
+        const idx = sizeOrder.indexOf(s);
+        const next = Math.max(0, Math.min(sizeOrder.length - 1, idx + fontScale));
+        return sizeOrder[next];
+    };
     const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
@@ -254,7 +261,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         }
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={row.rank === 1 ? 700 : 600} size="lg" c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
+                                <Text fw={row.rank === 1 ? 700 : 600} size={scaleSize('lg')} c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
                                 {badge}
                             </Flex>
                         );
@@ -272,7 +279,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         }
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={600}>{row.plays}</Text>
+                                <Text fw={600} size={scaleSize('md')}>{row.plays}</Text>
                                 {badge}
                             </Flex>
                         );
@@ -317,8 +324,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                                 </Flex>
                             )}
                             <Flex direction="column" justify="center" align="flex-start">
-                                <Text fw={700}>{row.name}</Text>
-                                {artistMode === 'under' && row.artistName && <Text size="sm">{row.artistName}</Text>}
+                                <Text fw={700} size={scaleSize('md')}>{row.name}</Text>
+                                {artistMode === 'under' && row.artistName && <Text size={scaleSize('sm')}>{row.artistName}</Text>}
                             </Flex>
                         </Flex>
                     ),
@@ -332,7 +339,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     textAlign: 'left' as const,
                     width: undefined,
                     render: (row: ChartData) => (
-                        <Text fw={500} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName || '-'}</Text>
+                        <Text fw={500} size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName || '-'}</Text>
                     ),
                 } as DataTableColumn<ChartData>;
             }
@@ -352,11 +359,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const renderedCountAtOne = display === 1 ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1) : null;
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={display === 1 ? 700 : 500} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
+                                <Text fw={display === 1 ? 700 : 500} size={scaleSize('md')} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
                                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                                 </Text>
                                 {showCount && display === 1 && renderedCountAtOne != null && (
-                                    <Text  c="dimmed" style={{ lineHeight: 1, marginTop: 2, fontSize: '0.75em' }}>{`${renderedCountAtOne}x`}</Text>
+                                    <Text  c="dimmed" style={{ lineHeight: 1, marginTop: 2, fontSize: '0.8em' }}>{`${renderedCountAtOne}x`}</Text>
                                 )}
                             </Flex>
                         );
@@ -373,7 +380,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const display = (current != null) ? current : (stable != null ? stable : undefined);
                         return (
                             <Flex direction="column" align="center">
-                                <Text fw={500} style={{ transition: 'color 120ms ease' }}>
+                                <Text fw={500} size={scaleSize('md')} style={{ transition: 'color 120ms ease' }}>
                                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                                 </Text>
                             </Flex>
@@ -404,7 +411,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                                         deferMs={300}
                                     />
                                 ) : (
-                                    <Text fw={700} size="xl">-</Text>
+                                    <Text fw={700} size={scaleSize('xl')}>-</Text>
                                 )}
                             </Flex>
                         );

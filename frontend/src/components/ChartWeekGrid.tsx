@@ -137,6 +137,14 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     // altVariation column is never used in grid (mapping forces it off); badge visibility controls variation
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
+    const gridView = useSelector((state: any) => (state as any).columns?.views?.grid);
+    const fontScale = (gridView?.settings as any)?.fontScale ?? 0;
+    const sizeOrder = ['xs','sm','md','lg','xl'] as const;
+    const scaleSize = (s: typeof sizeOrder[number]): typeof sizeOrder[number] => {
+        const idx = sizeOrder.indexOf(s);
+        const next = Math.max(0, Math.min(sizeOrder.length - 1, idx + fontScale));
+        return sizeOrder[next];
+    };
 
     // Modal de detalhes
     const [modalOpen, setModalOpen] = useState(false);
@@ -399,20 +407,20 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                     )}
                                 </Box>
                                 <Box px="sm" py={8} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 64 }}>
-                                    <Text fw={700} size="md" lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
-                                    {row.artistName && <Text size="sm" c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
+                                    <Text fw={700} size={scaleSize('md')} lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
+                                    {row.artistName && <Text size={scaleSize('sm')} c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
                                 </Box>
                                 {(showPlays || showPeak || showTotalWeeks) && (
                                     <Group px="sm" pb="sm" style={{ minHeight: 36, width: '100%', justifyContent: 'space-between', gap: 4, display: 'flex' }}>
                                         {showPlays && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size="xs" c="dimmed">Plays</Text>
-                                                <Text fw={700} size="sm">{formatNumber(row.plays as any)}</Text>
+                                                <Text size={scaleSize('xs')} c="dimmed">Plays</Text>
+                                                <Text fw={700} size={scaleSize('sm')}>{formatNumber(row.plays as any)}</Text>
                                             </Box>
                                         )}
                                         {showPeak && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size="xs" c="dimmed">Peak</Text>
+                                                <Text size={scaleSize('xs')} c="dimmed">Peak</Text>
                                                 {(() => {
                                                     const current = stats?.peak?.position;
                                                     const stable = lastPeakById[row.entityId];
@@ -426,12 +434,13 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                                         ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1)
                                                         : null;
                                                     return (
-                                                        <Text fw={700} size="sm" c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
+                                                        <Text fw={700} size={scaleSize('sm')} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
                                                             {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                                                             {showCount && display === 1 && renderedCountAtOne != null && (
                                                                 <span
                                                                     style={{
                                                                         marginLeft: 6,
+                                                                        fontWeight: 500,
                                                                         fontSize: '0.75em',
                                                                         color: colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[6]
                                                                     }}
@@ -446,13 +455,13 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                         )}
                                         {showTotalWeeks && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size="xs" c="dimmed">Weeks</Text>
+                                                <Text size={scaleSize('xs')} c="dimmed">Weeks</Text>
                                                 {(() => {
                                                     const current = stats?.totals?.withinCutoff;
                                                     const stable = lastWeeksById[row.entityId];
                                                     const display = (current != null) ? current : (stable != null ? stable : undefined);
                                                     return (
-                                                        <Text fw={700} size="sm" style={{ transition: 'color 120ms ease' }}>
+                                                        <Text fw={700} size={scaleSize('sm')} style={{ transition: 'color 120ms ease' }}>
                                                             {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                                                         </Text>
                                                     );
