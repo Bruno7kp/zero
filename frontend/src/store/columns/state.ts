@@ -78,11 +78,22 @@ export const defaultState = (): ColumnsState => {
       table: hydrateView('table'),
       list: hydrateView('list'),
       grid: hydrateView('grid'),
-    }
+    },
+    showCarousel: false,
   };
 };
 
-export const buildInitialState = (): ColumnsState => defaultState();
+export const buildInitialState = (): ColumnsState => {
+  const base = defaultState();
+  try {
+    const raw = localStorage.getItem('columns.global');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.showCarousel === 'boolean') base.showCarousel = parsed.showCarousel;
+    }
+  } catch { /* ignore */ }
+  return base;
+};
 
 export const persistView = (view: 'table' | 'list' | 'grid', cfg: ViewConfig) => {
   try {
@@ -91,6 +102,12 @@ export const persistView = (view: 'table' | 'list' | 'grid', cfg: ViewConfig) =>
       settings: cfg.settings,
     };
     localStorage.setItem(`chart_columns_config_${view}`, JSON.stringify(toSave));
+  } catch { /* noop */ }
+};
+
+export const persistGlobal = (state: ColumnsState) => {
+  try {
+    localStorage.setItem('columns.global', JSON.stringify({ showCarousel: !!state.showCarousel }));
   } catch { /* noop */ }
 };
 

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip } from '@mantine/core';
+import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip, SegmentedControl, Stack } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, COLUMNS_DEFAULT_COLUMNS as defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined } from '../store/columnsSlice';
+import { updateColumn, COLUMNS_DEFAULT_COLUMNS as defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel } from '../store/columnsSlice';
 import { IconSettings, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { LayoutSection } from './chartDrawer/LayoutSection';
 import { ColumnsSection } from './chartDrawer/ColumnsSection';
@@ -27,6 +27,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     // theme hooks not needed in parent after refactor
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
     const columns = viewConfig?.columns || defaultColumns;
+    const showCarousel = useSelector((state: RootState) => (state as any)?.columns?.showCarousel) as boolean | undefined;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
@@ -245,6 +246,20 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                             onTableBackgroundChange={(v) => dispatch(setTableBackground({ background: v }))}
                                             onListBackgroundChange={(v) => dispatch(setListBackground({ background: v }))}
                                         />
+                                        <Divider my="sm" />
+                                        <Stack gap={2}>
+                                            <Text size="xs" c="dimmed">{t('charts.settings.showCarousel')}</Text>
+                                            <SegmentedControl
+                                                fullWidth
+                                                size="xs"
+                                                value={showCarousel ? 'on' : 'off'}
+                                                onChange={(v) => dispatch(setShowCarousel(v === 'on'))}
+                                                data={[
+                                                    { label: t('charts.hide'), value: 'off' },
+                                                    { label: t('charts.show'), value: 'on' },
+                                                ]}
+                                            />
+                                        </Stack>
                                     </Accordion.Panel>
                                 </Accordion.Item>
                             )}

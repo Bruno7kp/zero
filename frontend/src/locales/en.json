@@ -76,6 +76,9 @@
         "variationDescription": "Where and how to display rank and plays variations.",
         "badgesDescription": "Choose a badge preset or fine-tune the style."
       },
+      "settings": {
+        "showCarousel": "Highlights carousel"
+      },
       "tableView": "Table",
       "listView": "List",
       "gridView": "Grid",
@@ -174,7 +177,17 @@
         "needOnlineForCert": "Go online to update certification",
         "noData": "No data",
         "reload": "Reload playcount",
-        "periodWeeks": "{{count}} week(s)"
+        "periodWeeks": "{{count}} week(s)",
+        "highlights": {
+          "top1": "#1 this week",
+          "debut": "Biggest debut",
+          "climb": "Biggest climb",
+          "reentry": "Biggest re-entry",
+          "weeks": "Most weeks on chart",
+          "climbDetail": "+{{delta}} positions (#{{rank}})",
+          "debutDetail": "Debut at #{{rank}}",
+          "reentryDetail": "Re-entry at #{{rank}}"
+        }
       }
     },
     "library": {

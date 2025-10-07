@@ -28,4 +28,6 @@ export interface ViewConfig {
 
 export interface ColumnsState {
   views: Record<'table' | 'list' | 'grid', ViewConfig>;
+  // Global UI settings
+  showCarousel?: boolean;
 }

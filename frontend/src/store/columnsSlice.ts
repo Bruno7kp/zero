@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_VIEW_SETTINGS, defaultColumns, cloneDefaults } from './columns/defaults';
 import { applyArtistDisplayMode, applyPlaysVariationDisplay, applyRankVariationMapping } from './columns/mappings';
-import { buildInitialState, ensureViews, persistView } from './columns/state';
+import { buildInitialState, ensureViews, persistView, persistGlobal } from './columns/state';
 export type { ColumnsState, ColumnConfig, ViewConfig, ViewSettings } from './columns/types';
 export { DEFAULT_VIEW_SETTINGS as COLUMNS_DEFAULT_VIEW_SETTINGS, defaultColumns as COLUMNS_DEFAULT_COLUMNS } from './columns/defaults';
 
@@ -117,9 +117,13 @@ const columnsSlice = createSlice({
       state.views.list.settings.listPeakWeeksCombined = action.payload.combined;
       persistView('list', state.views.list);
     },
+    setShowCarousel(state, action: PayloadAction<boolean>) {
+      state.showCarousel = action.payload;
+      persistGlobal(state as any);
+    },
   },
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale, setListPeakWeeksCombined } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel } = columnsSlice.actions;
 export default columnsSlice.reducer;

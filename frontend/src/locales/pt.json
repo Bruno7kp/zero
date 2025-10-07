@@ -76,6 +76,9 @@
         "variationDescription": "Onde e como exibir as variações de posição e reproduções.",
         "badgesDescription": "Escolha um preset de badge ou ajuste conforme o estilo."
       },
+      "settings": {
+        "showCarousel": "Carousel de destaques"
+      },
       "tableView": "Tabela",
       "listView": "Lista",
       "gridView": "Grid",
@@ -174,7 +177,17 @@
         "needOnlineForCert": "Conecte-se para atualizar certificação",
         "noData": "Sem dados",
         "reload": "Recarregar playcount",
-        "periodWeeks": "{{count}} semana(s)"
+        "periodWeeks": "{{count}} semana(s)",
+        "highlights": {
+          "top1": "#1 na semana",
+          "debut": "Maior debut",
+          "climb": "Maior subida",
+          "reentry": "Maior reentrada",
+          "weeks": "Mais semanas no chart",
+          "climbDetail": "+{{delta}} posições (#{{rank}})",
+          "debutDetail": "Estreia em #{{rank}}",
+          "reentryDetail": "Reentrada em #{{rank}}"
+        }
       }
     },
     "library": {
