@@ -32,6 +32,7 @@ const ChartWeekListRow: React.FC<{
   showDeltaPlaysBadge: boolean;
   showDeltaPercentPlaysBadge: boolean;
   showAltVariationRedux: boolean;
+  showAltPlaysVariationRedux: boolean;
   showImage: boolean;
   altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
   type: string;
@@ -41,11 +42,13 @@ const ChartWeekListRow: React.FC<{
   theme: any;
   week?: string;
   listBackground?: 'default' | 'transparent';
-}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week, listBackground = 'default' }) => {
+}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week, listBackground = 'default' }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
   const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'list'));
+  const playsVariationLocation = (useSelector((state: any) => state.columns?.views?.list?.settings?.playsVariationLocation) || 'under') as 'hidden' | 'under' | 'column';
+  const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.list?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
   const [expanded, setExpanded] = useState(false);
   const [imageForceUpdate, setImageForceUpdate] = useState<number>(0);
   const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
@@ -89,7 +92,9 @@ const ChartWeekListRow: React.FC<{
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
                   <Text fw={700} size="xl">{row.plays}</Text>
-                  {(showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="list" />}
+                  {playsVariationLocation === 'under' && (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && (
+                    <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="list" />
+                  )}
                 </Flex>
               );
             }
@@ -193,6 +198,25 @@ const ChartWeekListRow: React.FC<{
               }
               // Alt variation as its own column-like block -> use larger font size
               return <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="list" />;
+            }
+            if (col.key === 'altPlaysVariation' && showAltPlaysVariationRedux) {
+              const treatAsHiddenForWidth = badgeStylesPlays.hideLabel && badgeStylesPlays.iconPosition === 'before';
+              const isCompact = badgeStylesPlays.iconPosition === 'hidden' || treatAsHiddenForWidth; // only icon or only text
+              const widthOverride = isCompact ? 50 : 65; // plays: 50 (compact) / 65 (icon+text)
+              return (
+                <DeltaBadge
+                  delta={row.deltaPlays}
+                  cfg={badgeStylesPlays}
+                  kind="plays"
+                  textSize="sm"
+                  columnContext
+                  noSidePadding
+                  contextView="list"
+                  showPercent={playsVariationDisplay === 'percent'}
+                  currentValue={row.plays}
+                  fixedWidthOverride={widthOverride}
+                />
+              );
             }
             return null;
           })}
@@ -343,6 +367,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
   const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
   const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
+  const showAltPlaysVariationRedux = columns.find((c: any) => c.key === 'altPlaysVariation')?.visible;
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
   const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
 
@@ -368,6 +393,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           showDeltaPercentPlaysBadge={showDeltaPercentPlaysBadge}
           showAltVariationRedux={showAltVariationRedux}
           showImage={showImage}
+          showAltPlaysVariationRedux={showAltPlaysVariationRedux}
           altVariation={altVariation}
           type={type}
           clientId={clientId}

@@ -14,6 +14,7 @@ export interface DeltaBadgeProps {
     columnContext?: boolean; // quando true (badge dentro da coluna rank/plays), aplica largura fixa
     noSidePadding?: boolean; // remove padding lateral (usado em coluna dedicada)
     contextView?: 'table' | 'list' | 'grid'; // para regras visuais específicas por view
+    fixedWidthOverride?: number; // largura fixa opcional (ex.: coluna dedicada)
 }
 
 function computeDefaultPercent(delta: number, currentValue: number): string | null {
@@ -45,7 +46,7 @@ function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, 
     return { color, label };
 }
 
-export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView }) => {
+export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView, fixedWidthOverride }) => {
     // Preserve last stable (defined) delta to avoid flashing '-' during quick transitions
     const lastStableRef = React.useRef<any>(delta);
     const isDefined = !(delta === undefined || delta === null);
@@ -163,14 +164,15 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     const applyFixed = !!columnContext && cfg.iconPosition !== 'split';
     // Treat icon-only (hideLabel) same as text-only for width purposes
     const treatAsHiddenForWidth = cfg.hideLabel && cfg.iconPosition === 'before';
-    const fixedWidth = applyFixed ? ((cfg.iconPosition === 'hidden' || treatAsHiddenForWidth) ? 40 : 55) : undefined;
+    const fixedWidthBase = applyFixed ? ((cfg.iconPosition === 'hidden' || treatAsHiddenForWidth) ? 40 : 55) : undefined;
+    const fixedWidth = fixedWidthOverride ?? fixedWidthBase;
     // Altura fixa em contexto de coluna para normalizar posição vertical entre texto/ícone/text+ícone
     const heightMap: Record<string, number> = { xs: 14, sm: 18, md: 20, lg: 24, xl: 28 };
     const fixedHeight = applyFixed ? heightMap[(size as string) || 'xs'] : undefined;
     // When fixed width applies we remove horizontal padding entirely
     const finalPaddingStyle = applyFixed ? { paddingInline: 0 } : paddingStyle;
     return (
-        <Badge
+            <Badge
             key={`${kind}-delta`}
             variant={variant as any}
             color={color}

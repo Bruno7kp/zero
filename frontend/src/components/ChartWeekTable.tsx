@@ -170,9 +170,12 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
     const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
     const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
+    const showAltPlaysVariationRedux = columns.find((c: any) => c.key === 'altPlaysVariation')?.visible;
+    const playsVariationLocation = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationLocation) || 'under') as 'hidden' | 'under' | 'column';
     const showImage = columns.find((c: any) => c.key === 'image')?.visible;
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
     const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'table'));
+    const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = useMemo(() => {
         const base = visibleColumns.filter((c: any) => c.isColumn);
@@ -216,7 +219,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // Mapeamento das colunas para o DataTable
     const dtColumns: DataTableColumn<ChartData>[] = useMemo(() => {
         const artistMode: 'under' | 'column' = (viewConfig?.settings as any)?.artistDisplayMode || 'under';
-        const built = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
+        let built = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
             const resolvedTitle =
                 col.label != null
                     ? (typeof col.label === 'string'
@@ -254,7 +257,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     ...base,
                     render: (row: ChartData) => {
                         let badge = null;
-                        if (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) {
+                        if (playsVariationLocation === 'under' && (showDeltaPlaysBadge || showDeltaPercentPlaysBadge)) {
                             // Under-number badge context -> compact font size xs
                             badge = <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="table" />;
                         }
@@ -439,16 +442,55 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altVariation');
             if (existingIdx !== -1) {
                 built[existingIdx] = altVariationCol;
-                return built;
+            } else {
+                const rankIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'rank');
+                if (rankIdx !== -1) built = [...built.slice(0, rankIdx + 1), altVariationCol, ...built.slice(rankIdx + 1)];
+                else built = [altVariationCol, ...built];
             }
-            const rankIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'rank');
-            if (rankIdx !== -1) {
-                return [...built.slice(0, rankIdx + 1), altVariationCol, ...built.slice(rankIdx + 1)];
+        }
+        // Plays variation in its own column
+        if (showAltPlaysVariationRedux) {
+            const altPlaysCol: DataTableColumn<ChartData> = {
+                accessor: 'altPlaysVariation',
+                title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
+                textAlign: 'center',
+                width: 84,
+                cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
+                render: (row: ChartData) => {
+                    // mirror badge style but for plays and set dynamic width like rank: compact vs icon+text
+                    const cfg: any = { ...badgeStylesPlays };
+                    const treatAsHiddenForWidth = cfg.hideLabel && cfg.iconPosition === 'before';
+                    const isCompact = cfg.iconPosition === 'hidden' || treatAsHiddenForWidth; // only icon or only text
+                    const widthOverride = isCompact ? 50 : 65; // plays: 50 (compact) / 65 (icon+text)
+                    return (
+                        <Flex justify="center" align="center" style={{ width: '100%' }}>
+                            <DeltaBadge
+                                delta={row.deltaPlays}
+                                cfg={cfg}
+                                kind="plays"
+                                textSize="md"
+                                columnContext
+                                noSidePadding
+                                contextView="table"
+                                showPercent={playsVariationDisplay === 'percent'}
+                                currentValue={row.plays}
+                                fixedWidthOverride={widthOverride}
+                            />
+                        </Flex>
+                    );
+                }
+            };
+            const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altPlaysVariation');
+            if (existingIdx !== -1) {
+                built[existingIdx] = altPlaysCol;
+            } else {
+                const playsIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'plays');
+                if (playsIdx !== -1) built = [...built.slice(0, playsIdx + 1), altPlaysCol, ...built.slice(playsIdx + 1)];
+                else built = [altPlaysCol, ...built];
             }
-            return [altVariationCol, ...built];
         }
         return built;
-    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, altVariation, chart, viewConfig?.settings]);
+    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux, playsVariationLocation, altVariation, chart, viewConfig?.settings]);
 
     // legacy helper removed (logic centralized in DeltaBadge)
 

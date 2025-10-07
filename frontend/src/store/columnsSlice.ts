@@ -14,7 +14,10 @@ export interface ColumnConfig {
 export interface ViewSettings {
   containerSize: 'md' | 'lg' | 'xl' | '100%';
   rankVariationLocation?: 'under' | 'column' | 'hidden' | 'corner';
-  playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista
+  // Controls which type of plays delta to use (absolute or percent). Visibility is controlled by playsVariationLocation.
+  playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista (hidden kept for legacy; UI now controls visibility via playsVariationLocation)
+  // New: plays variation placement for table/list
+  playsVariationLocation?: 'hidden' | 'under' | 'column';
   tableBackground?: 'default' | 'transparent'; // only for table view
   listBackground?: 'default' | 'transparent'; // only for list view
   // Table-only: artist display mode
@@ -38,6 +41,8 @@ export const defaultColumns: ColumnConfig[] = [
   { key: 'artist', label: 'charts.artistLabel', labelComplete: 'charts.artistLabel', visible: false, isColumn: true },
   { key: 'cert', label: 'Cert', labelComplete: 'charts.certLabel', visible: false, isColumn: true },
   { key: 'plays', label: 'Plays', labelComplete: 'charts.playsLabel', visible: true, isColumn: true },
+  // New: plays variation in its own column when playsVariationLocation === 'column'
+  { key: 'altPlaysVariation', label: 'charts.altPlaysVariationLabel', visible: false, isColumn: true },
   { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: false, isColumn: false },
   { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true, isColumn: false },
   { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true, isColumn: true },
@@ -48,10 +53,10 @@ export const defaultColumns: ColumnConfig[] = [
 const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
-  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationDisplay: 'percent', tableBackground: 'default', artistDisplayMode: 'under' },
-  // Lista: pedido para default ser coluna (variação em coluna)
-  list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationDisplay: 'percent', listBackground: 'default' },
-  grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationDisplay: 'hidden' },
+  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', tableBackground: 'default', artistDisplayMode: 'under' },
+  // Lista: pedido para default ser coluna (variação em coluna) para rank; plays fica embaixo por padrão
+  list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', listBackground: 'default' },
+  grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden' },
 };
 
 // (helpers legacy removidos – lógica agora fica apenas nos reducers diretos)
@@ -70,13 +75,21 @@ function applyRankVariationMapping(cols: ColumnConfig[], location: 'under' | 'co
   });
 }
 
-function applyPlaysVariationDisplay(cols: ColumnConfig[], display: 'hidden' | 'absolute' | 'percent', view: 'table' | 'list' | 'grid'): ColumnConfig[] {
+function applyPlaysVariationDisplay(
+  cols: ColumnConfig[],
+  display: 'hidden' | 'absolute' | 'percent',
+  location: 'hidden' | 'under' | 'column' | undefined,
+  view: 'table' | 'list' | 'grid'
+): ColumnConfig[] {
+  // Grid does not show plays variation
   if (view === 'grid') {
-    return cols.map(c => (c.key === 'deltaPlaysBadge' || c.key === 'deltaPercentPlaysBadge') ? { ...c, visible: false } : c);
+    return cols.map(c => (c.key === 'deltaPlaysBadge' || c.key === 'deltaPercentPlaysBadge' || c.key === 'altPlaysVariation') ? { ...c, visible: false } : c);
   }
+  const loc = location || 'under';
   return cols.map(c => {
-    if (c.key === 'deltaPlaysBadge') return { ...c, visible: display === 'absolute' };
-    if (c.key === 'deltaPercentPlaysBadge') return { ...c, visible: display === 'percent' };
+    if (c.key === 'altPlaysVariation') return { ...c, visible: loc === 'column' };
+    if (c.key === 'deltaPlaysBadge') return { ...c, visible: loc === 'under' && display === 'absolute' };
+    if (c.key === 'deltaPercentPlaysBadge') return { ...c, visible: loc === 'under' && display === 'percent' };
     return c;
   });
 }
@@ -112,9 +125,8 @@ function hydrateView(view: 'table' | 'list' | 'grid'): ViewConfig {
       if (settings.rankVariationLocation) {
         cols = applyRankVariationMapping(cols, settings.rankVariationLocation, view);
       }
-      if (settings.playsVariationDisplay) {
-        cols = applyPlaysVariationDisplay(cols, settings.playsVariationDisplay, view);
-      }
+      // Apply plays variation: location + display
+      cols = applyPlaysVariationDisplay(cols, settings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent', settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       if (settings.artistDisplayMode) {
         cols = applyArtistDisplayMode(cols, settings.artistDisplayMode, view);
       }
@@ -147,7 +159,7 @@ function migrateLegacyLocalStorage(): Partial<ColumnsState> | null {
     // Aplica mappings (caso antigo salvasse flags que mudam delta/alt variation)
     let adjusted = tableCols;
     if (tableSettings.rankVariationLocation) adjusted = applyRankVariationMapping(adjusted, tableSettings.rankVariationLocation, 'table');
-    if (tableSettings.playsVariationDisplay) adjusted = applyPlaysVariationDisplay(adjusted, tableSettings.playsVariationDisplay, 'table');
+    adjusted = applyPlaysVariationDisplay(adjusted, tableSettings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS.table.playsVariationDisplay!, tableSettings.playsVariationLocation || DEFAULT_VIEW_SETTINGS.table.playsVariationLocation, 'table');
   if (tableSettings.artistDisplayMode) adjusted = applyArtistDisplayMode(adjusted, tableSettings.artistDisplayMode, 'table');
     // Remove chave antiga para evitar reprocessar no futuro
     try { localStorage.removeItem('chart_columns_config'); } catch { /* ignore */ }
@@ -202,8 +214,8 @@ function ensureViews(state: any): asserts state is ColumnsState {
     });
     const legacySettings = state.settings || {};
     let adjusted = rebuilt;
-    if (legacySettings.rankVariationLocation) adjusted = applyRankVariationMapping(adjusted, legacySettings.rankVariationLocation, 'table');
-    if (legacySettings.playsVariationDisplay) adjusted = applyPlaysVariationDisplay(adjusted, legacySettings.playsVariationDisplay, 'table');
+  if (legacySettings.rankVariationLocation) adjusted = applyRankVariationMapping(adjusted, legacySettings.rankVariationLocation, 'table');
+  adjusted = applyPlaysVariationDisplay(adjusted, legacySettings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS.table.playsVariationDisplay!, legacySettings.playsVariationLocation || DEFAULT_VIEW_SETTINGS.table.playsVariationLocation, 'table');
     if (legacySettings.artistDisplayMode) adjusted = applyArtistDisplayMode(adjusted, legacySettings.artistDisplayMode, 'table');
     state.views = {
       table: { columns: adjusted, settings: { ...DEFAULT_VIEW_SETTINGS.table, ...legacySettings } },
@@ -246,11 +258,12 @@ const columnsSlice = createSlice({
       state.views[view].settings.containerSize = DEFAULT_VIEW_SETTINGS[view].containerSize;
       state.views[view].settings.rankVariationLocation = DEFAULT_VIEW_SETTINGS[view].rankVariationLocation;
       state.views[view].settings.playsVariationDisplay = DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay;
+      state.views[view].settings.playsVariationLocation = DEFAULT_VIEW_SETTINGS[view].playsVariationLocation;
       state.views[view].settings.tableBackground = DEFAULT_VIEW_SETTINGS[view].tableBackground;
       state.views[view].settings.listBackground = DEFAULT_VIEW_SETTINGS[view].listBackground;
       state.views[view].settings.artistDisplayMode = DEFAULT_VIEW_SETTINGS[view].artistDisplayMode;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
-      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', view);
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, state.views[view].settings.artistDisplayMode || 'under', view);
       persistView(view, state.views[view]);
     },
@@ -268,7 +281,8 @@ const columnsSlice = createSlice({
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, location, view);
       // reaplicar plays mapping
       const disp = state.views[view].settings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
-      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, disp, view);
+      const playsLoc = state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation || 'under';
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, disp, playsLoc, view);
       // keep artist mapping consistent
       const artistMode = state.views[view].settings.artistDisplayMode || DEFAULT_VIEW_SETTINGS[view].artistDisplayMode || 'under';
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, artistMode, view);
@@ -278,7 +292,18 @@ const columnsSlice = createSlice({
       ensureViews(state as any);
       const { view, display } = action.payload;
       state.views[view].settings.playsVariationDisplay = display;
-      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, view);
+      const playsLoc = state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation || 'under';
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, playsLoc, view);
+      persistView(view, state.views[view]);
+    },
+    // New: control plays variation visibility/placement for table/list
+    setPlaysVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list'; location: 'hidden' | 'under' | 'column' }>) {
+      ensureViews(state as any);
+      const { view, location } = action.payload;
+      state.views[view].settings.playsVariationLocation = location;
+      // Re-apply with current display option
+      const disp = state.views[view].settings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
+      state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, disp, location, view);
       persistView(view, state.views[view]);
     },
     setTableBackground(state, action: PayloadAction<{ background: 'default' | 'transparent' }>) {
@@ -302,5 +327,5 @@ const columnsSlice = createSlice({
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode } = columnsSlice.actions;
 export default columnsSlice.reducer;
