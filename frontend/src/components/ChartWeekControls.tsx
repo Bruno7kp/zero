@@ -17,7 +17,7 @@ import { IconCalendar } from '@tabler/icons-react';
 import { IconMicrophone, IconDisc, IconMusic, IconTable, IconLayoutGrid, IconList, IconArrowLeft, IconArrowRight, IconSettings, IconPencil } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { ChartWeekEditModal } from './ChartWeekEditModal';
-import { useMediaQuery } from '@mantine/hooks';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const chartTypes = [
 	{
@@ -130,7 +130,41 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const [editOpened, setEditOpened] = React.useState(false);
 	// Control drawer open from dropdown menu
 	const [drawerOpened, setDrawerOpened] = React.useState(false);
-	const isMobile = useMediaQuery('(max-width: 36em)');
+	const isMobile = useIsMobile();
+
+	// Shared settings menu (opens the columns drawer; on mobile also offers view switching)
+	const settingsMenu = (
+		<Menu withinPortal position="bottom" shadow="md" withArrow>
+			<Menu.Target>
+				<ActionIcon variant="subtle" aria-label="Opções" ml={0} my="xs">
+					<IconSettings size={18} />
+				</ActionIcon>
+			</Menu.Target>
+			<Menu.Dropdown>
+				<Menu.Item leftSection={<IconSettings size={16} />} onClick={() => setDrawerOpened(true)}>
+					{t('charts.columnsConfig')}
+				</Menu.Item>
+				<Menu.Item leftSection={<IconPencil size={16} />} disabled={!week || isBusy} onClick={() => setEditOpened(true)}>
+					{t('common.edit')}
+				</Menu.Item>
+				{isMobile && (
+					<>
+						<Menu.Divider />
+						<Menu.Label>{t('charts.view')}</Menu.Label>
+						<Menu.Item leftSection={<IconTable size={16} />} onClick={() => handleSetView('table')}>
+							{t('charts.tableView')}
+						</Menu.Item>
+						<Menu.Item leftSection={<IconList size={16} />} onClick={() => handleSetView('list')}>
+							{t('charts.listView')}
+						</Menu.Item>
+						<Menu.Item leftSection={<IconLayoutGrid size={16} />} onClick={() => handleSetView('grid')}>
+							{t('charts.gridView')}
+						</Menu.Item>
+					</>
+				)}
+			</Menu.Dropdown>
+		</Menu>
+	);
 
 	return (
 		<>
@@ -151,58 +185,29 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				</Grid.Col>
 			)}
 			{/* Esquerda: seleção de tipo */}
-			<Grid.Col span={{ base: 6, xs: 4 }}>
+			<Grid.Col span={{ base: 6, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-start' }}
 					w="100%"
 				>
+					{/* Mobile: show settings menu before the type segmented control */}
+					{isMobile && settingsMenu}
 					<SegmentedControl
-							value={type}
-							onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
-							data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
-							size="sm"
-							my="xs"
-							withItemsBorders={false}
-							disabled={isBusy}
-						/>
+						value={type}
+						onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
+						data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
+						size="sm"
+						my="xs"
+						withItemsBorders={false}
+						disabled={isBusy}
+					/>
 					{/* Drawer control hidden trigger, controlled open */}
 					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
-					{/* Dropdown menu: replaces settings button; holds visual settings, edit, and on mobile, view options */}
-					<Menu withinPortal position="bottom" shadow="md" withArrow>
-						<Menu.Target>
-							<ActionIcon variant="subtle" aria-label="Opções" ml={0} my="xs">
-								<IconSettings size={18} />
-							</ActionIcon>
-						</Menu.Target>
-						<Menu.Dropdown>
-							<Menu.Item leftSection={<IconSettings size={16} />} onClick={() => setDrawerOpened(true)}>
-								{t('charts.columnsConfig')}
-							</Menu.Item>
-							<Menu.Item leftSection={<IconPencil size={16} />} disabled={!week || isBusy} onClick={() => setEditOpened(true)}>
-								{t('common.edit')}
-							</Menu.Item>
-							{isMobile && (
-								<>
-									<Menu.Divider />
-									<Menu.Label>{t('charts.view')}</Menu.Label>
-									<Menu.Item leftSection={<IconTable size={16} />} onClick={() => handleSetView('table')}>
-										{t('charts.tableView')}
-									</Menu.Item>
-									<Menu.Item leftSection={<IconList size={16} />} onClick={() => handleSetView('list')}>
-										{t('charts.listView')}
-									</Menu.Item>
-									<Menu.Item leftSection={<IconLayoutGrid size={16} />} onClick={() => handleSetView('grid')}>
-										{t('charts.gridView')}
-									</Menu.Item>
-								</>
-							)}
-						</Menu.Dropdown>
-					</Menu>
 				</Flex>
 			</Grid.Col>
 			{/* Centro: navegação de semana */}
-			<Grid.Col span={{ base: 6, xs: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			<Grid.Col span={{ base: 6, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<Popover
 					position="bottom"
@@ -253,7 +258,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 			{/* Direita: seleção de visualização (desktop) */}
 			{!isMobile && (
-			<Grid.Col span={{ base: 4, xs: 4 }}>
+			<Grid.Col span={{ base: 4, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-end' }}
@@ -272,6 +277,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 							my="xs"
 							withItemsBorders={false}
 						/>
+					{/* Desktop: show settings menu at the end, after the view segmented control */}
+					{!isMobile && settingsMenu}
 				</Flex>
 			</Grid.Col>
 			)}

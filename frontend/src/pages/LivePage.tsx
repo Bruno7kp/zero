@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     Divider, Flex, rem, ThemeIcon, Title, Loader, Alert, Anchor, Text, SegmentedControl, Center, Group,
-    Container, Paper
+    Container, Paper, ActionIcon
 } from '@mantine/core';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import {IconFlame, IconInfoCircle, IconMicrophone, IconMusic, IconDisc, IconArrowsDownUp} from '@tabler/icons-react';
@@ -45,6 +45,19 @@ const LivePage = () => {
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
     const [lastSavedWeek, setLastSavedWeek] = useState<string | null>(null);
+    // Live-only toggle to show/hide variation (delta). Persist locally.
+    const LIVE_VARIATION_KEY = 'live_showVariation';
+    const [showVariation, setShowVariation] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem(LIVE_VARIATION_KEY);
+            if (saved === '0') return false;
+            if (saved === '1') return true;
+        } catch {}
+        return true; // default: show
+    });
+    useEffect(() => {
+        try { localStorage.setItem(LIVE_VARIATION_KEY, showVariation ? '1' : '0'); } catch {}
+    }, [showVariation]);
     
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
     const tableBgSetting = (useSelector((state: any) => state.columns?.views?.table?.settings?.tableBackground) || 'default') as 'default' | 'transparent';
@@ -226,7 +239,8 @@ const LivePage = () => {
                 <Text fw={700}>{rank}</Text>
             ),
         },
-        {
+        // Conditionally include variation column if enabled
+        ...(showVariation ? ([{
             accessor: 'deltaRank',
             title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
             width: rem(65),
@@ -248,7 +262,7 @@ const LivePage = () => {
                     </Flex>
                 );
             },
-        },
+        }] as DataTableColumn<LiveRow>[]) : ([] as DataTableColumn<LiveRow>[])),
         {
             accessor: 'name',
             title: t('charts.titleLabel'),
@@ -302,7 +316,7 @@ const LivePage = () => {
         }
     ];
         return cols;
-    }, [badgeStylesRank, chartType, t, artistMode, showInlineImage]);
+    }, [badgeStylesRank, chartType, t, artistMode, showInlineImage, showVariation]);
 
     const renderTable = () => {
         if (loading) {
@@ -402,7 +416,22 @@ const LivePage = () => {
                     </Flex>
                     <Group justify="center">
                         {chartName && (
-                            <Text size="sm" c="dimmed">{t('charts.live_chart_period', { from: startDate, to: endDate })}</Text>
+                            <Flex align="center" gap="xs">
+                                <Text size="sm" c="dimmed">
+                                    {t('charts.live_chart_period', { from: startDate, to: endDate })}
+                                </Text>
+                                <ActionIcon
+                                    variant={showVariation ? 'filled' : 'subtle'}
+                                    color={showVariation ? 'blue' : 'gray'}
+                                    size="sm"
+                                    aria-pressed={showVariation}
+                                    aria-label={t('charts.deltaRankLabel')}
+                                    title={`${t('charts.deltaRankLabel')} — ${showVariation ? t('charts.show') : t('charts.hide')}`}
+                                    onClick={() => setShowVariation(v => !v)}
+                                >
+                                    <IconArrowsDownUp size={16} />
+                                </ActionIcon>
+                            </Flex>
                         )}
                     </Group>
                     {renderTable()}
