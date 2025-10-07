@@ -48,12 +48,14 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     // hook must be at top-level (was incorrectly inside renderAltVariation causing hook order issues)
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'grid'));
     const rankVariationLocation = useSelector((state: any) => (state.columns?.views?.grid?.settings?.rankVariationLocation) || 'under');
+    const peakCountStyle = useSelector((state: any) => state.columns?.views?.grid?.settings?.peakCountStyle) || 'noCount';
+    const showPeakCount = peakCountStyle === 'withCount';
 
     function renderAltVariation(row: ChartData, idx: number, rankCfg: any) {
         const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
         if (!showDelta) return null;
-        const value: any = altVariation ? altVariation(row, idx) : false;
-        if (!value && value !== 0) return null;
+        const raw: any = altVariation ? altVariation(row, idx) : undefined;
+        const value: any = (raw || raw === 0) ? (raw === '-' ? undefined : raw) : undefined;
         let cfg: any = rankCfg;
         if (rankCfg.iconPosition === 'split') {
             // In grid we keep compact inline look; disable tall split but allow split pair
@@ -74,20 +76,59 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     // Persist previous data while new data is loading to prevent flicker
     const [displayedData, setDisplayedData] = useState<any[]>(data);
     const prevDataRef = useRef<any[]>(data);
-    useEffect(() => {
-        // Só troca displayedData quando data realmente muda para não-vazio
-        if (Array.isArray(data) && data.length > 0) {
-            setDisplayedData(data);
-            prevDataRef.current = data;
+    const [displayedKey, setDisplayedKey] = useState<string | null>(null);
+    const [switchHoldUntil, setSwitchHoldUntil] = useState<number | null>(null);
+    const currentKey = `${chart?.id || 'x'}|${type}|${week || 'n/a'}`;
+    const isDeltasReady = React.useCallback((rows: any[], targetWeek?: string) => {
+        if (!Array.isArray(rows) || !rows.length || !targetWeek) return false;
+        const cur = rows.filter((r: any) => r.week === targetWeek);
+        if (!cur.length) return false;
+        let ready = 0;
+        for (const r of cur) {
+            const d = (r as any).deltaRank;
+            if (d !== undefined && d !== null && d !== '-') ready++;
         }
-        // Se data ficou vazio, mantém o anterior (NÃO limpa displayedData)
-        // Isso evita flicker total
-    }, [data]);
+        return ready >= Math.ceil(cur.length * 0.9); // 90% prontos
+    }, []);
+    useEffect(() => {
+        if (!Array.isArray(data) || data.length === 0) return; // mantém anterior
+        const sameKey = displayedKey === currentKey;
+        const ready = isDeltasReady(data as any[], week);
+        if (!sameKey) {
+            if (ready) {
+                setDisplayedData(data);
+                prevDataRef.current = data;
+                setDisplayedKey(currentKey);
+                setSwitchHoldUntil(null);
+            } else {
+                if (!switchHoldUntil) setSwitchHoldUntil(Date.now() + 450);
+            }
+        } else {
+            if (ready) {
+                setDisplayedData(data);
+                prevDataRef.current = data;
+            }
+        }
+    }, [data, week, type, chart?.id, displayedKey, currentKey, isDeltasReady, switchHoldUntil]);
+    useEffect(() => {
+        if (!switchHoldUntil) return;
+        const id = setInterval(() => {
+            const ready = isDeltasReady(data as any[], week);
+            if (ready || Date.now() >= switchHoldUntil) {
+                if (Array.isArray(data) && data.length) {
+                    setDisplayedData(data);
+                    prevDataRef.current = data;
+                    setDisplayedKey(currentKey);
+                }
+                setSwitchHoldUntil(null);
+            }
+        }, 60);
+        return () => clearInterval(id);
+    }, [switchHoldUntil, data, week, isDeltasReady, currentKey]);
 
     // Garante que displayedData nunca fique vazio
     const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
     const statsMap = useSelector((state: any) => state.charts.statsMap);
-    const loadingStats = useSelector((state: any) => state.charts.loadingStats);
     const columns = useSelector((state: any) => (state.columns?.views?.grid?.columns) || state.columns?.columns || []);
     const showImage = columns.find((c: any) => c.key === 'image')?.visible;
     const showPeak = columns.find((c: any) => c.key === 'peak')?.visible;
@@ -106,6 +147,34 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
     // Forçar atualização da imagem ao salvar
     const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
+
+    // Últimos valores estáveis para Peak/Weeks para evitar flicker
+    const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
+    const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
+    const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
+    useEffect(() => {
+        // Atualiza caches com valores definitivos presentes no statsMap
+        try {
+            const nextPeak = { ...lastPeakById };
+            const nextWeeks = { ...lastWeeksById };
+            const nextWeeksAtPeak = { ...lastWeeksAtPeakById };
+            let changed = false;
+            for (const [entityId, s] of Object.entries(statsMap || {})) {
+                const peak = (s as any)?.peak?.position;
+                if (peak != null && nextPeak[entityId] !== peak) { nextPeak[entityId] = peak; changed = true; }
+                const weeks = (s as any)?.totals?.withinCutoff;
+                if (weeks != null && nextWeeks[entityId] !== weeks) { nextWeeks[entityId] = weeks; changed = true; }
+                const weeksAtPeak = (s as any)?.peak?.weeksAtPeak;
+                if (weeksAtPeak != null && nextWeeksAtPeak[entityId] !== weeksAtPeak) { nextWeeksAtPeak[entityId] = weeksAtPeak; changed = true; }
+            }
+            if (changed) {
+                setLastPeakById(nextPeak);
+                setLastWeeksById(nextWeeks);
+                setLastWeeksAtPeakById(nextWeeksAtPeak);
+            }
+        } catch { /* noop */ }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [statsMap]);
 
     useEffect(() => {
         if (!week || !chart?.id) return;
@@ -169,7 +238,8 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             <Grid gutter="md" columns={30}>
                 {visibleCards.map((row: ChartData, idx: number) => {
                     const stats = statsMap[row.entityId];
-                    const deltaValue: any = altVariation ? altVariation(row, idx) : false;
+                    let deltaValue: any = altVariation ? altVariation(row, idx) : undefined;
+                    if (deltaValue === '-') deltaValue = undefined;
                     const deltaColor = (() => {
                         if (deltaValue === 'NEW') return 'lazuli';
                         if (deltaValue === 'RE') return 'bee';
@@ -184,11 +254,11 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                         <Grid.Col key={row.id} span={{ base: 15, md: 10, lg: 6 }}>
                             <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
                                 <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
-                                                                        {/* Variação (grid):
+                                    {/* Variação (grid):
                                                                             - 'hidden': sem overlay nem ícone
                                                                             - 'under': sem overlay (ícone aparece sob o rank)
                                                                             - 'corner': overlay no canto superior direito */}
-                                                                        {rankVariationLocation === 'corner' && renderAltVariation(row, idx, badgeStylesRank)}
+                                    {rankVariationLocation === 'corner' && renderAltVariation(row, idx, badgeStylesRank)}
                                     {/* Botão modal canto superior esquerdo */}
                                     <ActionIcon
                                         size="sm"
@@ -226,6 +296,23 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                             {(() => {
                                                 if (rankVariationLocation !== 'under') return null;
                                                 const value: any = deltaValue;
+                                                // Placeholder enquanto carrega a variação (ex.: computeWeekDeltas ainda não preencheu)
+                                                if (value === undefined || value === null) {
+                                                    return (
+                                                        <span
+                                                            aria-label="loading-delta"
+                                                            style={{
+                                                                marginTop: 4,
+                                                                width: 8,
+                                                                height: 8,
+                                                                borderRadius: 8,
+                                                                backgroundColor: theme.white,
+                                                                opacity: 0.7,
+                                                                display: 'inline-block',
+                                                            }}
+                                                        />
+                                                    );
+                                                }
                                                 if (!value && value !== 0) return null;
                                                 // Ícones brancos sem fundo; +2 no tamanho para setas e RE, estrela mantém o tamanho base
                                                 const baseSize = 12;
@@ -294,13 +381,50 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                         {showPeak && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
                                                 <Text size="xs" c="dimmed">Peak</Text>
-                                                <Text fw={700} size="sm" c={stats?.peak?.position === 1 ? 'blue' : undefined}>{stats?.peak?.position ?? (loadingStats ? '…' : '-')}</Text>
+                                                {(() => {
+                                                    const current = stats?.peak?.position;
+                                                    const stable = lastPeakById[row.entityId];
+                                                    const display = (current != null) ? current : (stable != null ? stable : undefined);
+                                                    const showCount = showPeakCount;
+                                                    const hasStats = !!stats;
+                                                    const liveCount = stats?.peak?.weeksAtPeak;
+                                                    const stableWeeksAtPeak = lastWeeksAtPeakById[row.entityId];
+                                                    const rawCountAtOne = (liveCount != null ? liveCount : stableWeeksAtPeak);
+                                                    const renderedCountAtOne = display === 1
+                                                        ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1)
+                                                        : null;
+                                                    return (
+                                                        <Text fw={700} size="sm" c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
+                                                            {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                                                            {showCount && display === 1 && renderedCountAtOne != null && (
+                                                                <span
+                                                                    style={{
+                                                                        marginLeft: 6,
+                                                                        fontSize: '0.75em',
+                                                                        color: colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[6]
+                                                                    }}
+                                                                >
+                                                                    {`${renderedCountAtOne}`}x
+                                                                </span>
+                                                            )}
+                                                        </Text>
+                                                    );
+                                                })()}
                                             </Box>
                                         )}
                                         {showTotalWeeks && (
                                             <Box style={{ textAlign: 'center', flex: 1 }}>
                                                 <Text size="xs" c="dimmed">Weeks</Text>
-                                                <Text fw={700} size="sm">{stats?.totals?.withinCutoff ?? (loadingStats ? '…' : '-')}</Text>
+                                                {(() => {
+                                                    const current = stats?.totals?.withinCutoff;
+                                                    const stable = lastWeeksById[row.entityId];
+                                                    const display = (current != null) ? current : (stable != null ? stable : undefined);
+                                                    return (
+                                                        <Text fw={700} size="sm" style={{ transition: 'color 120ms ease' }}>
+                                                            {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                                                        </Text>
+                                                    );
+                                                })()}
                                             </Box>
                                         )}
                                     </Group>

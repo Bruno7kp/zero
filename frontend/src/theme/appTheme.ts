@@ -48,7 +48,7 @@ export type ThemeMode = 'dark' | 'light' | 'blue';
 export function buildTheme(themeMode: ThemeMode) {
   return createTheme({
     ...baseTheme,
-    primaryColor: themeMode === 'blue' ? 'denim' : 'blue',
+    primaryColor: 'blue',
     colors: themeMode === 'blue'
       ? { ...(baseTheme as any).colors, dark: darkblue, denim }
       : (baseTheme as any).colors,

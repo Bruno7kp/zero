@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -14,9 +14,14 @@ import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 interface ChartWeekColumnsDrawerProps {
     viewType: 'table' | 'list' | 'grid';
     onColumnsChange?: (cols: any[]) => void;
+    // When provided, component becomes controlled. Useful to trigger the drawer from an external menu.
+    opened?: boolean;
+    onOpenedChange?: (opened: boolean) => void;
+    // Hide the internal trigger ActionIcon (settings button)
+    hideTrigger?: boolean;
 }
 
-export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ viewType, onColumnsChange }) => {
+export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ viewType, onColumnsChange, opened, onOpenedChange, hideTrigger }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const isMobile = useIsMobile();
@@ -32,7 +37,15 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const listBackground = viewConfig?.settings?.listBackground || 'default';
     // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
-    const [opened, setOpened] = useState(false);
+    const playsVariationLocation = (viewConfig?.settings as any)?.playsVariationLocation || 'under';
+    const [internalOpened, setInternalOpened] = useState(false);
+    const isOpen = typeof opened === 'boolean' ? opened : internalOpened;
+    const open = () => {
+        if (onOpenedChange) onOpenedChange(true); else setInternalOpened(true);
+    };
+    const close = () => {
+        if (onOpenedChange) onOpenedChange(false); else setInternalOpened(false);
+    };
     // Colunas obrigatórias (rank, name) exibidas como sempre visíveis (badge), sem toggle
 
     const storageKey = `chart_columns_${viewType}`; // legado (ainda lido para migração leve se necessário)
@@ -62,10 +75,16 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [columns]);
 
-    // Garante altVariation registrada
+    // Garante altVariation registrada (legado)
     useEffect(() => {
         if (viewConfig && !columns.find((c: any) => c.key === 'altVariation')) {
             dispatch(updateColumn({ view: viewType, key: 'altVariation', visible: false }));
+        }
+    }, [columns, dispatch, viewConfig, viewType]);
+    // Garante altPlaysVariation registrada (legado)
+    useEffect(() => {
+        if (viewConfig && !columns.find((c: any) => c.key === 'altPlaysVariation')) {
+            dispatch(updateColumn({ view: viewType, key: 'altPlaysVariation', visible: false }));
         }
     }, [columns, dispatch, viewConfig, viewType]);
 
@@ -73,6 +92,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
         const reduxCol = columns.find((c: any) => c.key === col.key);
         return { ...col, visible: reduxCol ? reduxCol.visible : col.visible };
     });
+    const artistDisplayMode = (viewConfig?.settings as any)?.artistDisplayMode || 'under';
 
     const handleReset = () => {
         if (viewConfig) dispatch(resetColumns({ view: viewType }));
@@ -85,12 +105,14 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPreset({ view: 'table', kind: 'rank', preset: 'light' }));
                 dispatch(setPreset({ view: 'table', kind: 'plays', preset: 'transparent' }));
                 dispatch(setRankVariationLocation({ view: 'table', location: 'under' }));
+                dispatch(setPlaysVariationLocation({ view: 'table', location: 'under' }));
                 dispatch(setPlaysVariationDisplay({ view: 'table', display: 'percent' }));
             } else if (viewType === 'list') {
                 // list defaults: rank solidIcon, plays light
                 dispatch(setPreset({ view: 'list', kind: 'rank', preset: 'solidIcon' }));
                 dispatch(setPreset({ view: 'list', kind: 'plays', preset: 'light' }));
                 dispatch(setRankVariationLocation({ view: 'list', location: 'column' }));
+                dispatch(setPlaysVariationLocation({ view: 'list', location: 'under' }));
                 dispatch(setPlaysVariationDisplay({ view: 'list', display: 'percent' }));
             } else if (viewType === 'grid') {
                 // grid: rank solidIcon, plays hidden (but keep preset consistent)
@@ -164,14 +186,16 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
 
     return (
         <>
-            <Tooltip label={t('charts.columnsConfig')}>
-                <ActionIcon variant="subtle" onClick={() => setOpened(true)} aria-label={t('charts.columnsConfig')}>
-                    <IconSettings size={18} />
-                </ActionIcon>
-            </Tooltip>
+            {!hideTrigger && (
+                <Tooltip label={t('charts.columnsConfig')}>
+                    <ActionIcon variant="subtle" onClick={open} aria-label={t('charts.columnsConfig')}>
+                        <IconSettings size={18} />
+                    </ActionIcon>
+                </Tooltip>
+            )}
             <Drawer
-                opened={opened}
-                onClose={() => setOpened(false)}
+                opened={isOpen}
+                onClose={close}
                 position="right"
                 size="md"
                 withCloseButton={false}
@@ -257,7 +281,24 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                             </Box>
                                             <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                 <Text size="xs" c="dimmed">{t('charts.peakLabel')}</Text>
-                                                <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                                <SegmentedControl
+                                                    fullWidth
+                                                    size="xs"
+                                                    value={(columnsWithVisibility.find(c => c.key === 'peak')?.visible ? ((viewConfig?.settings?.peakCountStyle || 'noCount') === 'withCount' ? 'showWithCount' : 'show') : 'hide') as any}
+                                                    onChange={(v) => {
+                                                        if (v === 'hide') {
+                                                            dispatch(updateColumn({ view: viewType, key: 'peak', visible: false }));
+                                                        } else {
+                                                            dispatch(updateColumn({ view: viewType, key: 'peak', visible: true }));
+                                                            dispatch(setPeakCountStyle({ view: viewType, mode: v === 'showWithCount' ? 'withCount' : 'noCount' }));
+                                                        }
+                                                    }}
+                                                    data={[
+                                                        { label: t('charts.peakShowWithCount'), value: 'showWithCount' },
+                                                        { label: t('charts.show'), value: 'show' },
+                                                        { label: t('charts.hide'), value: 'hide' }
+                                                    ]}
+                                                />
                                             </Box>
                                             <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                 <Text size="xs" c="dimmed">{t('charts.weeksLabel')}</Text>
@@ -267,6 +308,21 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                 <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                     <Text size="xs" c="dimmed">{t('charts.certLabel')}</Text>
                                                     <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                                </Box>
+                                            )}
+                                            {viewType === 'table' && (
+                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                    <Text size="xs" c="dimmed">{t('charts.artistDisplayModeLabel')}</Text>
+                                                    <SegmentedControl
+                                                        fullWidth
+                                                        size="xs"
+                                                        value={artistDisplayMode}
+                                                        onChange={(v) => dispatch(setArtistDisplayMode({ view: 'table', mode: v as 'under' | 'column' }))}
+                                                        data={[
+                                                            { label: t('charts.artistDisplay_separateColumn'), value: 'column' },
+                                                            { label: t('charts.artistDisplay_underTitle'), value: 'under' },
+                                                        ]}
+                                                    />
                                                 </Box>
                                             )}
                                         </Flex>
@@ -291,8 +347,35 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                         )}
                                         {viewType !== 'grid' && (
                                             <>
+                                                {/* Nova opção: localização da variação de reproduções */}
+                                                <Text size="xs" c="dimmed">{t('charts.playsVariationLocationLabel')}</Text>
+                                                <SegmentedControl
+                                                    fullWidth
+                                                    size="xs"
+                                                    value={playsVariationLocation}
+                                                    onChange={(v) => dispatch(setPlaysVariationLocation({ view: viewType as any, location: v as 'hidden' | 'under' | 'column' }))}
+                                                    data={[
+                                                        { label: t('charts.hide'), value: 'hidden' },
+                                                        { label: t('charts.playsVariationUnder'), value: 'under' },
+                                                        { label: t('charts.playsVariationColumn'), value: 'column' },
+                                                    ]}
+                                                />
                                                 <Text size="xs" c="dimmed">{t('charts.playsVariationDisplayLabel')}</Text>
-                                                <SegmentedControl size="xs" fullWidth value={(viewConfig?.settings as any)?.playsVariationDisplay || 'percent'} onChange={(value) => dispatch(setPlaysVariationDisplay({ view: viewType, display: value as 'hidden' | 'absolute' | 'percent' }))} data={[{ label: t('charts.playsVariationDisplay_hidden'), value: 'hidden' },{ label: t('charts.playsVariationDisplay_absolute'), value: 'absolute' },{ label: t('charts.playsVariationDisplay_percent'), value: 'percent' }]} />
+                                                {playsVariationLocation !== 'hidden' && (
+                                                    <SegmentedControl
+                                                        size="xs"
+                                                        fullWidth
+                                                        value={(() => {
+                                                            const disp = (viewConfig?.settings as any)?.playsVariationDisplay || 'percent';
+                                                            return disp === 'hidden' ? 'percent' : disp;
+                                                        })()}
+                                                        onChange={(value) => dispatch(setPlaysVariationDisplay({ view: viewType as any, display: value as 'absolute' | 'percent' }))}
+                                                        data={[
+                                                            { label: t('charts.playsVariationDisplay_absolute'), value: 'absolute' },
+                                                            { label: t('charts.playsVariationDisplay_percent'), value: 'percent' },
+                                                        ]}
+                                                    />
+                                                )}
                                             </>
                                         )}
                                     </Stack>
@@ -431,7 +514,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                     <Divider my={6} />
                     <Group justify="space-between" px={4} pb={4} mt={4} style={{ flexShrink: 0 }}>
                         <Button variant="light" size="xs" onClick={handleReset}>{t('common.reset')}</Button>
-                        <Button size="xs" onClick={() => setOpened(false)}>{t('common.close')}</Button>
+                        <Button size="xs" onClick={close}>{t('common.close')}</Button>
                     </Group>
                 </Paper>
             </Drawer>
