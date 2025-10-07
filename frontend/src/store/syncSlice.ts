@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchCharts } from './chartsSlice';
+import { fetchCharts } from './charts';
 
 interface SyncState {
   lastFullChartsSync: string | null;

@@ -1,43 +1,25 @@
 // src/pages/CreateChartPage.tsx
 import { useState, useEffect, useRef } from 'react';
-import {
-    Button,
-    TextInput,
-    Flex,
-    Text,
-    Title,
-    Select,
-    NumberInput,
-    Grid,
-    Card,
-    ThemeIcon,
-    rem,
-    Divider,
-    Group,
-    Code, Container
-} from '@mantine/core';
+import { Flex, Text, Grid, Container } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { DatePickerInput } from '@mantine/dates';
+// date picker handled inside SourceSection
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCharts, createChart, updateChart, clearChartLocalData } from '../store/chartsSlice';
-import { useNavigate, NavLink, useParams } from 'react-router-dom';
+import { fetchCharts, createChart, updateChart, clearChartLocalData } from '../store/charts';
+import { useNavigate, useParams } from 'react-router-dom';
 import '@mantine/dates/styles.css';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import {
-    IconCalculator,
-    IconCheck,
-    IconDisc,
-    IconListNumbers,
-    IconSettings,
-    IconUserCog,
-    IconX
-} from '@tabler/icons-react';
-import { Alert } from '@mantine/core';
+import { IconCheck, IconX } from '@tabler/icons-react';
+// alerts moved to FormFooter
 import { modals } from '@mantine/modals';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
+import CreateHeader from '../components/createChart/CreateHeader';
+import SourceSection from '../components/createChart/SourceSection';
+import FormulaSection from '../components/createChart/FormulaSection';
+import CertSection from '../components/createChart/CertSection';
+import FormFooter from '../components/createChart/FormFooter';
 // import { useSelector } from 'react-redux';
 
 const CreateChartPage = () => {
@@ -298,201 +280,19 @@ const CreateChartPage = () => {
     return (
         <Container>
             <Flex direction="column" p="xs" gap="sm">
-                <Flex justify="center" align="center" gap="sm">
-                    <NavLink to="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                            <ThemeIcon variant="light" color="blue" size="md">
-                                <IconSettings style={{ width: rem(20), height: rem(20) }} />
-                            </ThemeIcon>
-                            {t('settings.title')}
-                        </Title>
-                    </NavLink>
-
-                    <Divider size="sm" orientation="vertical" />
-
-                    <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                        <ThemeIcon variant="light" color="blue" size="md">
-                            <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
-                        </ThemeIcon>
-                        {pageTitle}
-                    </Title>
-                </Flex>
-                <Divider variant="solid" size="sm" my="md"/>
+                <CreateHeader pageTitle={pageTitle} />
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Grid>
                         <Grid.Col span={{ base: 12 }}>
-                            <Card shadow="md" p="md">
-                                <Group>
-                                    <ThemeIcon variant="light" size="md">
-                                        <IconUserCog style={{ width: rem(20), height: rem(20) }} />
-                                    </ThemeIcon>
-                                    <Text fw={600} size="lg">{t('forms.createChart.sourceTitle')}</Text>
-                                </Group>
-                                <Divider variant="dashed" size="sm" my="xs"/>
-                                <Grid>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <TextInput
-                                            label={t('forms.createChart.nameLabel')}
-                                            placeholder={t('forms.createChart.namePlaceholder')}
-                                            {...form.getInputProps('name')}
-                                        />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <Select
-                                            label={t('forms.createChart.sourceLabel')}
-                                            placeholder={t('forms.createChart.sourcePlaceholder')}
-                                            data={[
-                                                { value: 'lastfm', label: 'Last.fm' },
-                                            ]}
-                                            {...form.getInputProps('source')}
-                                        />
-                                    </Grid.Col>
-                                    {form.values.source === 'lastfm' && (
-                                        <Grid.Col span={{ base: 12, md: 4 }}>
-                                            <TextInput
-                                                label={t('forms.createChart.lastfmUsernameLabel')}
-                                                placeholder={t('forms.createChart.lastfmUsernamePlaceholder')}
-                                                {...form.getInputProps('lastfm_username')}
-                                            />
-                                        </Grid.Col>
-                                    )}
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <Select
-                                            label={t('forms.createChart.timezoneLabel')}
-                                            placeholder={t('forms.createChart.timezonePlaceholder')}
-                                            data={allTimezones}
-                                            searchable
-                                            {...form.getInputProps('timezone')}
-                                        />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <Select
-                                            label={t('forms.createChart.dayOfWeekLabel')}
-                                            data={dayOfWeekOptions.map(day => ({...day, label: t(`days.${day.value}`) }))}
-                                            {...form.getInputProps('day_of_week')}
-                                        />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <DatePickerInput
-                                            label={t('forms.createChart.startDateLabel')}
-                                            placeholder={t('forms.createChart.startDatePlaceholder')}
-                                            valueFormat="YYYY-MM-DD"
-                                            locale={locale}
-                                            {...form.getInputProps('start_date')}
-                                        />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={5} max={100} label={t('forms.createChart.musicCutoffLabel')} {...form.getInputProps('music_cutoff')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={5} max={100} label={t('forms.createChart.albumCutoffLabel')} {...form.getInputProps('album_cutoff')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={5} max={100} label={t('forms.createChart.artistCutoffLabel')} {...form.getInputProps('artist_cutoff')} />
-                                    </Grid.Col>
-                                </Grid>
-                            </Card>
+                            <SourceSection form={form} dayOfWeekOptions={dayOfWeekOptions} allTimezones={allTimezones} locale={locale} />
                         </Grid.Col>
                         <Grid.Col span={{ base: 12 }}>
-                            <Card shadow="md" p="md">
-                                <Group>
-                                    <ThemeIcon variant="light" size="md">
-                                        <IconCalculator style={{ width: rem(20), height: rem(20) }} />
-                                    </ThemeIcon>
-                                    <Text fw={600} size="lg">{t('forms.createChart.formulaTitle')}</Text>
-                                </Group>
-                                <Divider variant="dashed" size="sm" my="xs"/>
-                                <Group justify="space-between">
-                                    <Text size="sm">{t('forms.createChart.formulaDescription')}</Text>
-                                </Group>
-                                <Divider variant="dashed" size="sm" my="xs"/>
-                                <Grid>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <Grid>
-                                            <Grid.Col span={12}>
-                                                <TextInput label={t('forms.createChart.formulaNameLabel')} {...form.getInputProps('formula_name')} />
-                                            </Grid.Col>
-                                            <Grid.Col span={12}>
-                                                <Text size="xs">{t('charts.salesExample')}</Text>
-                                            </Grid.Col>
-                                        </Grid>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <Grid>
-                                            <Grid.Col span={12}>
-                                                <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.musicPlaysWeightLabel')} {...form.getInputProps('music_plays_weight')} />
-                                            </Grid.Col>
-                                            <Grid.Col span={12}>
-                                                <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.musicPointsWeightLabel')} {...form.getInputProps('music_points_weight')} />
-                                            </Grid.Col>
-                                            <Grid.Col span={12}>
-                                                <Code color="var(--mantine-color-blue-light)">({t('charts.plays')}*{form.values.music_plays_weight}) + ({t('charts.stability')}*{form.values.music_points_weight})</Code>
-                                            </Grid.Col>
-                                        </Grid>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <Grid>
-                                            <Grid.Col span={12}>
-                                                <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.albumPlaysWeightLabel')} {...form.getInputProps('album_plays_weight')} />
-                                            </Grid.Col>
-                                            <Grid.Col span={12}>
-                                                <NumberInput min={0} max={10000} decimalScale={2} label={t('forms.createChart.albumPointsWeightLabel')} {...form.getInputProps('album_points_weight')} />
-                                            </Grid.Col>
-                                            <Grid.Col span={12}>
-                                                <Code color="var(--mantine-color-blue-light)">({t('charts.plays')}*{form.values.album_plays_weight}) + ({t('charts.stability')}*{form.values.album_points_weight})</Code>
-                                            </Grid.Col>
-                                        </Grid>
-                                    </Grid.Col>
-                                </Grid>
-                            </Card>
+                            <FormulaSection form={form} />
                         </Grid.Col>
                         <Grid.Col span={{ base: 12 }}>
-                            <Card shadow="md" p="md">
-                                <Group>
-                                    <ThemeIcon variant="light" size="md">
-                                        <IconDisc style={{ width: rem(20), height: rem(20) }} />
-                                    </ThemeIcon>
-                                    <Text fw={600} size="lg">{t('forms.createChart.certificationTitle')}</Text>
-                                </Group>
-                                <Divider variant="dashed" size="sm" my="xs"/>
-                                <Grid>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.musicGoldLabel')} {...form.getInputProps('music_gold_value')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.musicPlatinumLabel')} {...form.getInputProps('music_platinum_value')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.musicDiamondLabel')} {...form.getInputProps('music_diamond_value')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.albumGoldLabel')} {...form.getInputProps('album_gold_value')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.albumPlatinumLabel')} {...form.getInputProps('album_platinum_value')} />
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 4 }}>
-                                        <NumberInput min={0} allowDecimal={false} label={t('forms.createChart.albumDiamondLabel')} {...form.getInputProps('album_diamond_value')} />
-                                    </Grid.Col>
-                                </Grid>
-                            </Card>
+                            <CertSection form={form} />
                         </Grid.Col>
-
-                        <Grid.Col span={12}>
-                            {(!isOnline) && (
-                                <Alert color="yellow" title={t('errors.warning')} mb="sm" variant="light">
-                                    {t('errors.offlineAction')}
-                                </Alert>
-                            )}
-                            {error && (
-                                <Text c="red" size="sm" mb="sm">
-                                    {error}
-                                </Text>
-                            )}
-                            <Button type="submit" loading={isSubmitting} disabled={!isOnline}>
-                                {buttonLabel}
-                            </Button>
-                        </Grid.Col>
+                        <FormFooter isOnline={isOnline} error={error} isSubmitting={isSubmitting} buttonLabel={buttonLabel} />
                     </Grid>
                 </form>
             </Flex>

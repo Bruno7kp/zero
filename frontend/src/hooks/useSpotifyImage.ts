@@ -1,5 +1,5 @@
 // src/hooks/useSpotifyImage.ts
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { spotifyImagesDb } from '../db/spotifyImagesDb';
 import { SpotifyApiManager } from '../services/SpotifyApi';
 
@@ -16,8 +16,8 @@ interface UseSpotifyImageOptions {
 export function useSpotifyImage({ entityId, name, artist, type, clientId, clientSecret }: UseSpotifyImageOptions) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // Mantém a última imagem válida até a nova ser carregada
-  const lastValidImage = useRef<string | null>(null);
+  // Mantém a última imagem válida até a nova ser carregada (em estado, para não acessar refs no render)
+  const [lastValidImageUrl, setLastValidImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +29,7 @@ export function useSpotifyImage({ entityId, name, artist, type, clientId, client
       if (cancelled) return;
       if (cached && cached.imageUrl) {
         setImageUrl(cached.imageUrl);
-        lastValidImage.current = cached.imageUrl;
+        setLastValidImageUrl(cached.imageUrl);
         setLoading(false);
         return;
       }
@@ -53,7 +53,7 @@ export function useSpotifyImage({ entityId, name, artist, type, clientId, client
         }
         if (url) {
           setImageUrl(url);
-          lastValidImage.current = url;
+          setLastValidImageUrl(url);
           await spotifyImagesDb.images.put({ entityId, imageUrl: url, updatedAt: Date.now() });
         } else {
           setImageUrl(null);
@@ -67,6 +67,7 @@ export function useSpotifyImage({ entityId, name, artist, type, clientId, client
     return () => { cancelled = true; };
   }, [entityId, name, artist, type, clientId, clientSecret]);
 
-  // Retorna a última imagem válida enquanto está carregando
-  return { imageUrl: imageUrl || lastValidImage.current, loading };
+  // Retorna a última imagem válida enquanto está carregando (evita flicker)
+  const effectiveUrl = loading ? (imageUrl ?? lastValidImageUrl) : imageUrl;
+  return { imageUrl: effectiveUrl, loading };
 }

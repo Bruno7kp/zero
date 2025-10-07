@@ -19,24 +19,17 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Masonry from 'react-masonry-css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 
 const ChartsPage = () => {
-    const [chartName, setChartName] = useState<string>('');
     const [refreshKey, setRefreshKey] = useState(0);
     const { t } = useTranslation();
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
     const activeChart = charts.find((c: any) => c.id === activeChartId) || null;
-    // Sincroniza nome do chart ativo sem disparar setState durante render
-    useEffect(() => {
-        if (activeChart) {
-            setChartName(activeChart.name);
-        } else {
-            setChartName('');
-        }
-    }, [activeChart]);
+    // Derive chart name directly from activeChart to avoid effect-driven state
+    const chartName = activeChart?.name || '';
     const breakpointColumns = {
         default: 2, // desktop
         1100: 2,    // tablet landscape

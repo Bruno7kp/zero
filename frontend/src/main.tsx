@@ -6,6 +6,7 @@ import { ensureDbReady } from './db/indexedDb';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/carousel/styles.css';
 import 'mantine-datatable/styles.css';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/600.css';

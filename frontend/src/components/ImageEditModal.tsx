@@ -97,16 +97,16 @@ export const ImageEditModal: React.FC<ImageEditModalProps> = ({
         try {
             const res = await fetch(inputUrl, { method: 'HEAD' });
             const contentType = res.headers.get('content-type') || '';
+            // Validate domain first regardless of content type
+            if (!isAllowedImageDomain(inputUrl)) {
+                setDomainError('Apenas imagens de sites populares de música são permitidas.');
+            } else {
+                setDomainError(null);
+            }
             if (!contentType.startsWith('image/')) {
                 setError('URL não é uma imagem válida.');
                 setLoading(false);
                 return;
-                setDomainError(null);
-                if (!isAllowedImageDomain(inputUrl)) {
-                    setDomainError('Apenas imagens de sites populares de música são permitidas.');
-                } else {
-                    setDomainError(null);
-                }
             }
             await spotifyImagesDb.images.put({ entityId, imageUrl: inputUrl, updatedAt: Date.now() });
             setImgPreview(inputUrl);
