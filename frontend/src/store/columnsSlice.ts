@@ -18,6 +18,8 @@ export interface ViewSettings {
   playsVariationDisplay?: 'hidden' | 'absolute' | 'percent'; // tabela/lista (hidden kept for legacy; UI now controls visibility via playsVariationLocation)
   // New: plays variation placement for table/list
   playsVariationLocation?: 'hidden' | 'under' | 'column';
+  // Peak: whether to show count of #1 weeks under/next to peak
+  peakCountStyle?: 'withCount' | 'noCount';
   tableBackground?: 'default' | 'transparent'; // only for table view
   listBackground?: 'default' | 'transparent'; // only for list view
   // Table-only: artist display mode
@@ -53,10 +55,10 @@ export const defaultColumns: ColumnConfig[] = [
 const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
-  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', tableBackground: 'default', artistDisplayMode: 'under' },
+  table: { containerSize: 'md', rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', tableBackground: 'default', artistDisplayMode: 'under' },
   // Lista: pedido para default ser coluna (variação em coluna) para rank; plays fica embaixo por padrão
-  list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', listBackground: 'default' },
-  grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden' },
+  list: { containerSize: 'md', rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default' },
+  grid: { containerSize: 'xl', rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden', peakCountStyle: 'noCount' },
 };
 
 // (helpers legacy removidos – lógica agora fica apenas nos reducers diretos)
@@ -261,10 +263,17 @@ const columnsSlice = createSlice({
       state.views[view].settings.playsVariationLocation = DEFAULT_VIEW_SETTINGS[view].playsVariationLocation;
       state.views[view].settings.tableBackground = DEFAULT_VIEW_SETTINGS[view].tableBackground;
       state.views[view].settings.listBackground = DEFAULT_VIEW_SETTINGS[view].listBackground;
+  state.views[view].settings.peakCountStyle = DEFAULT_VIEW_SETTINGS[view].peakCountStyle;
       state.views[view].settings.artistDisplayMode = DEFAULT_VIEW_SETTINGS[view].artistDisplayMode;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, state.views[view].settings.artistDisplayMode || 'under', view);
+      persistView(view, state.views[view]);
+    },
+    setPeakCountStyle(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; mode: 'withCount' | 'noCount' }>) {
+      ensureViews(state as any);
+      const { view, mode } = action.payload;
+      state.views[view].settings.peakCountStyle = mode;
       persistView(view, state.views[view]);
     },
     setContainerSize(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; size: 'md' | 'lg' | 'xl' | '100%' }>) {
@@ -327,5 +336,5 @@ const columnsSlice = createSlice({
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle } = columnsSlice.actions;
 export default columnsSlice.reducer;

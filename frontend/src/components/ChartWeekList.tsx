@@ -55,6 +55,9 @@ const ChartWeekListRow: React.FC<{
   const globalStatsMap = useSelector((state: any) => state.charts.statsMap);
   const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
   const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
+  const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
+  const peakCountStyle = useSelector((state: any) => state.columns?.views?.list?.settings?.peakCountStyle) || 'noCount';
+  const showPeakCount = peakCountStyle === 'withCount';
   useEffect(() => {
     try {
       const nextPeak = { ...lastPeakById };
@@ -65,8 +68,10 @@ const ChartWeekListRow: React.FC<{
         if (peak != null && nextPeak[entityId] !== peak) { nextPeak[entityId] = peak; changed = true; }
         const weeks = (s as any)?.totals?.withinCutoff;
         if (weeks != null && nextWeeks[entityId] !== weeks) { nextWeeks[entityId] = weeks; changed = true; }
+        const weeksAtPeak = (s as any)?.peak?.weeksAtPeak;
+        if (weeksAtPeak != null && lastWeeksAtPeakById[entityId] !== weeksAtPeak) { lastWeeksAtPeakById[entityId] = weeksAtPeak; changed = true; }
       }
-      if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); }
+      if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); setLastWeeksAtPeakById({ ...lastWeeksAtPeakById }); }
     } catch { /* noop */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalStatsMap]);
@@ -135,12 +140,20 @@ const ChartWeekListRow: React.FC<{
               const current = stats?.peak?.position;
               const stable = lastPeakById[row.entityId];
               const display = (current != null) ? current : (stable != null ? stable : undefined);
+              const showCount = showPeakCount;
+              const hasStats = !!stats;
+              const liveCount = stats?.peak?.weeksAtPeak;
+              const stableWeeksAtPeak = lastWeeksAtPeakById[row.entityId];
+              const rawCountAtOne = (liveCount != null ? liveCount : stableWeeksAtPeak);
+              const renderedCountAtOne = display === 1 ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1) : null;
               return (
                 <Flex key={col.key} direction="column" align="center" mr="sm" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
                   <Text fw={700} size="xl" c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                   </Text>
-                  {row.rank === 1 && (
+                  {showCount && display === 1 && renderedCountAtOne != null ? (
+                    <Text c="dimmed" mt={2} style={{ lineHeight: 1, fontSize: '0.6em', letterSpacing: 0.5 }}>{`${renderedCountAtOne}x`}</Text>
+                  ) : row.rank === 1 && (
                     <Text c="dimmed" mt={2} style={{ lineHeight: 1, fontSize: '0.6em', letterSpacing: 0.5 }}>
                       PEAK
                     </Text>

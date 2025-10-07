@@ -58,6 +58,7 @@
       "playsVariationDisplay_absolute": "Absolute",
       "playsVariationDisplay_percent": "Percent",
       "peakLabel": "Peak",
+  "peakShowWithCount": "Show (x1)",
       "weeksLabel": "Weeks",
       "certLabel": "Certification",
       "rankVariationLocationLabel": "Rank variation display",

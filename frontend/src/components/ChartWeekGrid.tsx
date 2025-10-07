@@ -48,6 +48,8 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     // hook must be at top-level (was incorrectly inside renderAltVariation causing hook order issues)
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'grid'));
     const rankVariationLocation = useSelector((state: any) => (state.columns?.views?.grid?.settings?.rankVariationLocation) || 'under');
+    const peakCountStyle = useSelector((state: any) => state.columns?.views?.grid?.settings?.peakCountStyle) || 'noCount';
+    const showPeakCount = peakCountStyle === 'withCount';
 
     function renderAltVariation(row: ChartData, idx: number, rankCfg: any) {
         const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
@@ -149,19 +151,27 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     // Últimos valores estáveis para Peak/Weeks para evitar flicker
     const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
     const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
+    const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
     useEffect(() => {
         // Atualiza caches com valores definitivos presentes no statsMap
         try {
             const nextPeak = { ...lastPeakById };
             const nextWeeks = { ...lastWeeksById };
+            const nextWeeksAtPeak = { ...lastWeeksAtPeakById };
             let changed = false;
             for (const [entityId, s] of Object.entries(statsMap || {})) {
                 const peak = (s as any)?.peak?.position;
                 if (peak != null && nextPeak[entityId] !== peak) { nextPeak[entityId] = peak; changed = true; }
                 const weeks = (s as any)?.totals?.withinCutoff;
                 if (weeks != null && nextWeeks[entityId] !== weeks) { nextWeeks[entityId] = weeks; changed = true; }
+                const weeksAtPeak = (s as any)?.peak?.weeksAtPeak;
+                if (weeksAtPeak != null && nextWeeksAtPeak[entityId] !== weeksAtPeak) { nextWeeksAtPeak[entityId] = weeksAtPeak; changed = true; }
             }
-            if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); }
+            if (changed) {
+                setLastPeakById(nextPeak);
+                setLastWeeksById(nextWeeks);
+                setLastWeeksAtPeakById(nextWeeksAtPeak);
+            }
         } catch { /* noop */ }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [statsMap]);
@@ -375,14 +385,28 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                                     const current = stats?.peak?.position;
                                                     const stable = lastPeakById[row.entityId];
                                                     const display = (current != null) ? current : (stable != null ? stable : undefined);
+                                                    const showCount = showPeakCount;
+                                                    const hasStats = !!stats;
+                                                    const liveCount = stats?.peak?.weeksAtPeak;
+                                                    const stableWeeksAtPeak = lastWeeksAtPeakById[row.entityId];
+                                                    const rawCountAtOne = (liveCount != null ? liveCount : stableWeeksAtPeak);
+                                                    const renderedCountAtOne = display === 1
+                                                        ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1)
+                                                        : null;
                                                     return (
-                                                        <Text
-                                                            fw={700}
-                                                            size="sm"
-                                                            c={display === 1 ? 'blue' : undefined}
-                                                            style={{ transition: 'color 120ms ease' }}
-                                                        >
+                                                        <Text fw={700} size="sm" c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
                                                             {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                                                            {showCount && display === 1 && renderedCountAtOne != null && (
+                                                                <span
+                                                                    style={{
+                                                                        marginLeft: 6,
+                                                                        fontSize: '0.75em',
+                                                                        color: colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[6]
+                                                                    }}
+                                                                >
+                                                                    {`${renderedCountAtOne}`}x
+                                                                </span>
+                                                            )}
                                                         </Text>
                                                     );
                                                 })()}

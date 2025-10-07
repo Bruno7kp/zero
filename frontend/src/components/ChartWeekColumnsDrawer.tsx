@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -281,7 +281,24 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                             </Box>
                                             <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                 <Text size="xs" c="dimmed">{t('charts.peakLabel')}</Text>
-                                                <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'peak')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'peak', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
+                                                <SegmentedControl
+                                                    fullWidth
+                                                    size="xs"
+                                                    value={(columnsWithVisibility.find(c => c.key === 'peak')?.visible ? ((viewConfig?.settings?.peakCountStyle || 'noCount') === 'withCount' ? 'showWithCount' : 'show') : 'hide') as any}
+                                                    onChange={(v) => {
+                                                        if (v === 'hide') {
+                                                            dispatch(updateColumn({ view: viewType, key: 'peak', visible: false }));
+                                                        } else {
+                                                            dispatch(updateColumn({ view: viewType, key: 'peak', visible: true }));
+                                                            dispatch(setPeakCountStyle({ view: viewType, mode: v === 'showWithCount' ? 'withCount' : 'noCount' }));
+                                                        }
+                                                    }}
+                                                    data={[
+                                                        { label: t('charts.peakShowWithCount'), value: 'showWithCount' },
+                                                        { label: t('charts.show'), value: 'show' },
+                                                        { label: t('charts.hide'), value: 'hide' }
+                                                    ]}
+                                                />
                                             </Box>
                                             <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                 <Text size="xs" c="dimmed">{t('charts.weeksLabel')}</Text>

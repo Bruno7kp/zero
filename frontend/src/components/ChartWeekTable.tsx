@@ -87,9 +87,9 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     }, [switchHoldUntil, data, week, isDeltasReady, currentKey]);
     const safeDisplayedData = displayedData && displayedData.length > 0 ? displayedData : prevDataRef.current;
     const statsMap = useSelector((state: RootState) => state.charts.statsMap);
-    const loadingStats = useSelector((state: RootState) => state.charts.loadingStats);
+    // const loadingStats = useSelector((state: RootState) => state.charts.loadingStats); // no longer needed in table columns
     const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
-    const columns = viewConfig?.columns || [];
+    const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
     useEffect(() => {
@@ -134,7 +134,10 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     }, [data, chart.id, type, week, dispatch, columns]);
 
     // Refetch incremental quando usuário habilita colunas de stats após já ter carregado dados
-    const statsColumnsVisible = useMemo(() => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks' || c.key === 'cert') && c.visible), [columns]);
+    const statsColumnsVisible = useMemo(
+        () => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks' || c.key === 'cert') && c.visible),
+        [columns]
+    );
     const [statsColumnsPrev, setStatsColumnsPrev] = useState(statsColumnsVisible);
     useEffect(() => {
         if (statsColumnsVisible && !statsColumnsPrev && data.length && week) {
@@ -176,6 +179,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
     const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'table'));
     const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
+    const peakCountStyle = (useSelector((state: any) => state.columns?.views?.table?.settings?.peakCountStyle) || 'noCount') as 'withCount' | 'noCount';
+    const showPeakCount = peakCountStyle === 'withCount';
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = useMemo(() => {
         const base = visibleColumns.filter((c: any) => c.isColumn);
@@ -186,18 +191,22 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     // Stable caches for Peak/Weeks to avoid flicker
     const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
     const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
+    const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
     useEffect(() => {
         try {
             const nextPeak = { ...lastPeakById };
             const nextWeeks = { ...lastWeeksById };
+            const nextWeeksAtPeak = { ...lastWeeksAtPeakById };
             let changed = false;
             for (const [entityId, s] of Object.entries(statsMap || {})) {
                 const peak = (s as any)?.peak?.position;
                 if (peak != null && nextPeak[entityId] !== peak) { nextPeak[entityId] = peak; changed = true; }
                 const weeks = (s as any)?.totals?.withinCutoff;
                 if (weeks != null && nextWeeks[entityId] !== weeks) { nextWeeks[entityId] = weeks; changed = true; }
+                const weeksAtPeak = (s as any)?.peak?.weeksAtPeak;
+                if (weeksAtPeak != null && nextWeeksAtPeak[entityId] !== weeksAtPeak) { nextWeeksAtPeak[entityId] = weeksAtPeak; changed = true; }
             }
-            if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); }
+            if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); setLastWeeksAtPeakById(nextWeeksAtPeak); }
         } catch { /* noop */ }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [statsMap]);
@@ -335,11 +344,20 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const current = stats?.peak?.position;
                         const stable = lastPeakById[row.entityId];
                         const display = (current != null) ? current : (stable != null ? stable : undefined);
+                        const showCount = showPeakCount;
+                        const hasStats = !!stats;
+                        const liveCount = stats?.peak?.weeksAtPeak;
+                        const stableWeeksAtPeak = lastWeeksAtPeakById[row.entityId];
+                        const rawCountAtOne = (liveCount != null ? liveCount : stableWeeksAtPeak);
+                        const renderedCountAtOne = display === 1 ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1) : null;
                         return (
                             <Flex direction="column" align="center">
                                 <Text fw={display === 1 ? 700 : 500} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
                                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                                 </Text>
+                                {showCount && display === 1 && renderedCountAtOne != null && (
+                                    <Text  c="dimmed" style={{ lineHeight: 1, marginTop: 2, fontSize: '0.75em' }}>{`${renderedCountAtOne}x`}</Text>
+                                )}
                             </Flex>
                         );
                     },
@@ -373,17 +391,21 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                         const totals = stats?.totals as any;
                         return (
                             <Flex direction="column" align="center">
-                                <CertificationIcon
-                                    key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
-                                    chart={chart}
-                                    chartType={type as 'album' | 'track'}
-                                    totals={totals}
-                                    entity={{ name: row.name, artistName: row.artistName || '' }}
-                                    entityId={row.entityId}
-                                    username={chart?.lastfm_username}
-                                    size={24}
-                                    deferMs={300}
-                                />
+                                {stats ? (
+                                    <CertificationIcon
+                                        key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
+                                        chart={chart}
+                                        chartType={type as 'album' | 'track'}
+                                        totals={totals}
+                                        entity={{ name: row.name, artistName: row.artistName || '' }}
+                                        entityId={row.entityId}
+                                        username={chart?.lastfm_username}
+                                        size={24}
+                                        deferMs={300}
+                                    />
+                                ) : (
+                                    <Text fw={700} size="xl">-</Text>
+                                )}
                             </Flex>
                         );
                     },
@@ -490,7 +512,33 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             }
         }
         return built;
-    }, [filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showImage, statsMap, loadingStats, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId, type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux, playsVariationLocation, altVariation, chart, viewConfig?.settings]);
+    }, [
+        filteredColumns,
+        t,
+        showDeltaBadge,
+        showDeltaPlaysBadge,
+        showDeltaPercentPlaysBadge,
+        showImage,
+        statsMap,
+        clientId,
+        clientSecret,
+        imageForceUpdate,
+        lastImageUrlByEntityId,
+        type,
+        badgeStylesRank,
+        badgeStylesPlays,
+        showAltVariationRedux,
+        showAltPlaysVariationRedux,
+        playsVariationLocation,
+        playsVariationDisplay,
+        showPeakCount,
+        lastPeakById,
+        lastWeeksById,
+        lastWeeksAtPeakById,
+        altVariation,
+        chart,
+        viewConfig?.settings
+    ]);
 
     // legacy helper removed (logic centralized in DeltaBadge)
 

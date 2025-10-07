@@ -70,6 +70,7 @@ function computeMinimalStatsUntilWeek(chartId: string, chartType: string, entity
   if (!run || !run.length) return null;
   let peak = Infinity;
   let weeksWithin = 0;
+  let weeksAtOne = 0;
   for (const r of run) {
     if (r.week > untilWeek) break; // já passou
     // Conta qualquer aparição no chart (rank != null) para total de semanas
@@ -77,10 +78,12 @@ function computeMinimalStatsUntilWeek(chartId: string, chartType: string, entity
       weeksWithin++;
       // Peak: menor posição atingida (independente de cutoff); se quiser limitar ao cutoff, reintroduzir checagem
       if (typeof r.rank === 'number' && r.rank < peak) peak = r.rank;
+      if (r.rank === 1) weeksAtOne++;
     }
   }
+  const peakPos = peak === Infinity ? null : peak;
   return {
-    peak: { position: peak === Infinity ? null : peak },
+    peak: { position: peakPos, weeksAtPeak: peakPos === 1 ? weeksAtOne : undefined },
     totals: { withinCutoff: weeksWithin },
     sequences: null,
     _minimal: true,
