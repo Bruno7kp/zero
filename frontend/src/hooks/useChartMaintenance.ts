@@ -3,7 +3,7 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../store';
-import { clearChartLocalData } from '../store/chartsSlice';
+import { clearChartLocalData } from '../store/charts';
 import { db } from '../db/indexedDb';
 
 interface ProcessingState { clearing?: boolean; rebuilding?: boolean; progress?: number; total?: number }
@@ -23,8 +23,8 @@ export function useChartMaintenance(t: any) {
 
   const clearChartDataWithConfirm = useCallback((chartId: number, chartName: string) => {
     modals.openConfirmModal({
-      title: t('settings.clearChartData') + ': ' + chartName,
-      children: t('settings.clearChartData') + '? (' + chartName + ')',
+      title: t('settings.clearChartData') + '? (' + chartName + ')',
+      size: 'lg',
       labels: { confirm: t('settings.clearChartData'), cancel: t('forms.deleteChart.cancelButton') },
       confirmProps: { color: 'grape' },
       onConfirm: async () => {

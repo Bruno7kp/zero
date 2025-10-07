@@ -50,15 +50,15 @@
       "playsLabel": "Plays: Reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
       "deltaPercentPlaysLabel": "Variação % de reproduções",
-  "altPlaysVariationLabel": "Variação de reproduções (coluna)",
-  "playsVariationLocationLabel": "Variação de reproduções (local)",
-  "playsVariationUnder": "Abaixo das reproduções",
-  "playsVariationColumn": "Coluna própria",
-  "playsVariationDisplayLabel": "Variação de reproduções (formato)",
+      "altPlaysVariationLabel": "Variação de reproduções (coluna)",
+      "playsVariationLocationLabel": "Variação de reproduções (local)",
+      "playsVariationUnder": "Abaixo das reproduções",
+      "playsVariationColumn": "Coluna própria",
+      "playsVariationDisplayLabel": "Variação de reproduções (formato)",
       "playsVariationDisplay_absolute": "Absoluta",
       "playsVariationDisplay_percent": "Porcentagem",
       "peakLabel": "Peak: Pico",
-  "peakShowWithCount": "Mostrar (1x)",
+      "peakShowWithCount": "Mostrar (1x)",
       "weeksLabel": "Weeks: Semanas",
       "certLabel": "Certificado",
       "rankVariationLocationLabel": "Exibição da variação de rank",
@@ -76,6 +76,9 @@
         "variationDescription": "Onde e como exibir as variações de posição e reproduções.",
         "badgesDescription": "Escolha um preset de badge ou ajuste conforme o estilo."
       },
+      "settings": {
+        "showCarousel": "Carousel de destaques"
+      },
       "tableView": "Tabela",
       "listView": "Lista",
       "gridView": "Grid",
@@ -85,7 +88,11 @@
       "listBackgroundLabel": "Fundo da lista",
       "listBackground_default": "Padrão",
       "listBackground_transparent": "Transparente",
+      "listPeakWeeksCombinedLabel": "Coluna de Pico e Semanas",
+      "listPeakWeeksCombined_separate": "Separados",
+      "listPeakWeeksCombined_combined": "Combinados",
       "containerSizeLabel": "Tamanho do container",
+      "fontScaleLabel": "Tamanho da fonte (base)",
       "artistDisplayModeLabel": "Coluna de artista",
       "artistDisplay_underTitle": "Ocultar",
       "artistDisplay_separateColumn": "Mostrar",
@@ -170,7 +177,17 @@
         "needOnlineForCert": "Conecte-se para atualizar certificação",
         "noData": "Sem dados",
         "reload": "Recarregar playcount",
-        "periodWeeks": "{{count}} semana(s)"
+        "periodWeeks": "{{count}} semana(s)",
+        "highlights": {
+          "top1": "#1 na semana",
+          "debut": "Maior debut",
+          "climb": "Maior subida",
+          "reentry": "Maior reentrada",
+          "weeks": "Mais semanas no chart",
+          "climbDetail": "+{{delta}} posições (#{{rank}})",
+          "debutDetail": "Estreia em #{{rank}}",
+          "reentryDetail": "Reentrada em #{{rank}}"
+        }
       }
     },
     "library": {
@@ -360,6 +377,8 @@
     },
     "common": {
       "reset": "Redefinir",
+      "resetToDefault": "Redefinir para padrão",
+      "closeAndSave": "Fechar e salvar",
       "close": "Fechar",
       "edit": "Editar",
       "confirm": "Confirmar",

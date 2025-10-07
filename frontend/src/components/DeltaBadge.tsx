@@ -47,14 +47,14 @@ function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, 
 }
 
 export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView, fixedWidthOverride }) => {
-    // Preserve last stable (defined) delta to avoid flashing '-' during quick transitions
-    const lastStableRef = React.useRef<any>(delta);
+    // Preserve last stable (defined) delta to avoid flashing '-' during quick transitions (without reading refs during render)
+    const [stableDelta, setStableDelta] = React.useState<any>(delta);
     const isDefined = !(delta === undefined || delta === null);
-    if (isDefined) {
-        lastStableRef.current = delta;
-    }
-    const hasStable = !(lastStableRef.current === undefined || lastStableRef.current === null);
-    const effectiveDelta = isDefined ? delta : (hasStable ? lastStableRef.current : undefined);
+    React.useEffect(() => {
+        if (isDefined) setStableDelta(delta);
+    }, [isDefined, delta]);
+    const hasStable = !(stableDelta === undefined || stableDelta === null);
+    const effectiveDelta = isDefined ? delta : (hasStable ? stableDelta : undefined);
     const darker = cfg.variant !== 'filled';
     const { color, label } = resolveDelta(effectiveDelta, showPercent, currentValue, darker, computePercent || computeDefaultPercent);
     let variant = cfg.variant;
@@ -106,7 +106,8 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     }
     const fontSizeMap: Record<string, number> = { xs: 10, sm: 11, md: 12, lg: 14, xl: 16 };
     const effectiveFontSize = fontSizeMap[textSize || (cfg.size as any) || 'xs'];
-    const splitVariant = resolveDelta(effectiveDelta, showPercent, currentValue, false, computePercent || computeDefaultPercent);
+    const isFilledVariant = cfg.splitIconVariant === 'filled';
+    const splitVariant = resolveDelta(effectiveDelta, showPercent, currentValue, !isFilledVariant, computePercent || computeDefaultPercent);
     if (cfg.iconPosition === 'split' && icon) {
         if (cfg.splitTall) {
             return (
@@ -171,6 +172,33 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     const fixedHeight = applyFixed ? heightMap[(size as string) || 'xs'] : undefined;
     // When fixed width applies we remove horizontal padding entirely
     const finalPaddingStyle = applyFixed ? { paddingInline: 0 } : paddingStyle;
+    // If we still don't have a stable value to show, render a transparent placeholder with fixed dimensions to avoid flicker
+    if (!hasStable && !isDefined) {
+        return (
+            <Badge
+                key={`${kind}-delta-placeholder`}
+                variant="transparent"
+                color={color as any}
+                radius={radius as any}
+                size={size}
+                style={{
+                    width: fixedWidth,
+                    minWidth: fixedWidth,
+                    height: fixedHeight,
+                    minHeight: fixedHeight,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    ...finalPaddingStyle,
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                }}
+                aria-busy
+            >
+                {/* empty placeholder to keep layout */}
+            </Badge>
+        );
+    }
     return (
             <Badge
             key={`${kind}-delta`}
@@ -200,34 +228,6 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
             </Flex>
         </Badge>
     );
-
-    // If we still don't have a stable value to show, render a transparent placeholder with fixed dimensions to avoid flicker
-    if (!hasStable && !isDefined) {
-        return (
-            <Badge
-                key={`${kind}-delta-placeholder`}
-                variant="transparent"
-                color={color as any}
-                radius={radius as any}
-                size={size}
-                style={{
-                    width: fixedWidth,
-                    minWidth: fixedWidth,
-                    height: fixedHeight,
-                    minHeight: fixedHeight,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    ...finalPaddingStyle,
-                    background: 'transparent',
-                    backgroundColor: 'transparent',
-                }}
-                aria-busy
-            >
-                {/* empty placeholder to keep layout */}
-            </Badge>
-        );
-    }
 };
 
 export default DeltaBadge;

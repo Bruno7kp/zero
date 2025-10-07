@@ -19,7 +19,8 @@ import { IconSettings, IconCloudOff, IconCloudCheck, IconRefresh } from '@tabler
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
-import { fetchCharts, setActiveChartId, deleteChart } from '../store/chartsSlice';
+import { fetchCharts, deleteChart } from '../store/charts';
+import { setActiveChartId } from '../store/chartsSlice';
 import { db } from '../db/indexedDb';
 import { useChartMaintenance } from '../hooks/useChartMaintenance';
 import { syncCharts } from '../store/syncSlice';

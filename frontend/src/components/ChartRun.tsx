@@ -3,7 +3,6 @@ import { Box, Text, Button, Stack, Badge, Popover } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-// removed duplicate imports
 
 export interface ChartRunProps {
     run: Array<{ week: string; position: number; plays: number }>;
@@ -156,7 +155,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                         size="xl"
                                         p={0}
                                         variant={point.position === peak || point.week === highlightWeek ? 'outline' : 'default'}
-                                        color={point.position === peak && point.week !== highlightWeek ? 'teal' : 'blue'}
+                                        color={point.position === peak && point.week !== highlightWeek ? 'teal' : 'mediumblue'}
                                         data-week={point.week}
                                         style={{ borderRadius: 6, minWidth: 32, cursor: 'pointer' }}
                                     >

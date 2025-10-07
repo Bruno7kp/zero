@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Modal, Button, Group, Table, Text, Badge, ScrollArea, ActionIcon, Tooltip, Divider, Loader, Alert } from '@mantine/core';
-import { IconRefresh, IconAlertTriangle, IconDownload, IconDeviceFloppy, IconArrowsUpDown } from '@tabler/icons-react';
+import { Modal, Button, Group, Text, Loader, Alert } from '@mantine/core';
+import { IconAlertTriangle, IconDownload, IconDeviceFloppy } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -8,24 +8,20 @@ import { db, type ChartData } from '../db/indexedDb';
 import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
 import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import { useDispatch } from 'react-redux';
-import { fetchChartData, fetchStatsMapIncremental, invalidateStatsForChart, bumpStats } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental } from '../store/charts';
+import { invalidateStatsForChart, bumpStats } from '../store/chartsSlice';
 import { applyWeekToFullStats } from '../utils/incrementalFullStats';
 import { useTranslation } from 'react-i18next';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+// DnD sensors handled inside EditTable
+import { arrayMove } from '@dnd-kit/sortable';
+import EditHeader from './chartEdit/EditHeader';
+import EditTable from './chartEdit/EditTable';
+import type { EditRow } from './chartEdit/SortableRow';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-type EditRow = {
-    entityId: string;
-    name: string;
-    artistName: string;
-    plays: number;
-    rank: number;
-    inside: boolean; // whether rank <= cutoff
-};
+// EditRow type moved to chartEdit/SortableRow
 
 type Props = {
     opened: boolean;
@@ -38,7 +34,7 @@ type Props = {
 export const ChartWeekEditModal: React.FC<Props> = ({ opened, onClose, chart, week, type }) => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
-    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+    // sensors moved inside EditTable
     const [rows, setRows] = useState<EditRow[]>([]);
     const [originalRows, setOriginalRows] = useState<EditRow[]>([]);
     const [loading, setLoading] = useState(false);
@@ -255,39 +251,7 @@ export const ChartWeekEditModal: React.FC<Props> = ({ opened, onClose, chart, we
         } finally { setLoading(false); }
     }, [rows, week, chartIdStr, chartType, cutoff, originalRows, dispatch, chart, onClose]);
 
-    // Sortable row component for dnd-kit with arrows-up-down handle
-    const SortableRow: React.FC<{ r: EditRow; cutoff: number; loading: boolean }> = ({ r, cutoff, loading }) => {
-        const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: r.entityId });
-        const style: React.CSSProperties = {
-            transform: CSS.Transform.toString(transform),
-            transition,
-            opacity: isDragging ? 0.6 : (r.rank <= cutoff ? 1 : 0.85),
-            background: r.rank <= cutoff ? undefined : 'var(--mantine-color-dark-5)'
-        };
-        return (
-            <Table.Tr key={r.entityId} ref={setNodeRef} style={style}>
-                <Table.Td style={{ textAlign: 'center' }}>
-                    <Text fw={700} size="sm" c={r.rank === 1 ? 'blue' : undefined}>{r.rank}</Text>
-                </Table.Td>
-                <Table.Td>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Text fw={700} size="sm">{r.name}</Text>
-                        {r.artistName && <Text size="xs" c="dimmed">{r.artistName}</Text>}
-                    </div>
-                </Table.Td>
-                <Table.Td style={{ textAlign: 'center' }}>
-                    <Text fw={600} size="sm">{r.plays}</Text>
-                </Table.Td>
-                <Table.Td>
-                    <Group justify="center" gap={4}>
-                        <ActionIcon size="sm" variant="light" disabled={loading} aria-label={t('chartEdit.adjust', 'Ajustar')} {...attributes} {...listeners}>
-                            <IconArrowsUpDown size={14} />
-                        </ActionIcon>
-                    </Group>
-                </Table.Td>
-            </Table.Tr>
-        );
-    };
+    // SortableRow moved to separate component
 
     function onDragEnd(event: any) {
         const { active, over } = event;
@@ -313,55 +277,33 @@ export const ChartWeekEditModal: React.FC<Props> = ({ opened, onClose, chart, we
 
     return (
         <Modal opened={opened} onClose={onClose} title={<Group gap="xs"><IconDownload size={16} /><Text fw={700} size="sm">{t('chartEdit.title', 'Editar semana do chart')}</Text></Group>} size="90%" centered>
-            <Group justify="space-between" mb={6} gap="xs">
-                <Group gap="xs">
-                    <Badge color="blue" variant="light" size="xs">{String(type).toUpperCase()}</Badge>
-                    <Badge variant="light" size="xs">{t('chartEdit.week', 'Semana')}: {week || '-'}</Badge>
-                    <Badge variant="light" size="xs">{t('chartEdit.cutoff', 'Cutoff')}: {cutoff}</Badge>
-                </Group>
-                <Group gap="xs">
-                    <Tooltip label={t('chartEdit.refreshTip', 'Atualizar desta semana no Last.fm (inclui empates fora do cutoff)')}>
-                        <Button size="xs" variant="default" leftSection={<IconRefresh size={14} />} onClick={fetchFromLastfm} disabled={loading || !chart?.lastfm_username || !week}>{t('chartEdit.refresh', 'Atualizar da fonte')}</Button>
-                    </Tooltip>
-                </Group>
-            </Group>
-            <Divider my={4} />
+            <EditHeader
+                type={type}
+                week={week}
+                cutoff={cutoff}
+                loading={loading}
+                canRefresh={!!chart?.lastfm_username && !!week}
+                t={t as any}
+                onRefresh={fetchFromLastfm}
+            />
+            <div style={{ height: 4 }} />
             {error && (
                 <Alert color="red" icon={<IconAlertTriangle size={14} />} mb="xs" radius="sm" variant="light">
                     <Text size="sm">{error}</Text>
                 </Alert>
             )}
-            <ScrollArea h={520} offsetScrollbars>
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                    <Table striped highlightOnHover withTableBorder withColumnBorders verticalSpacing={4} horizontalSpacing={8}>
-                        <Table.Thead>
-                            <Table.Tr>
-                                <Table.Th style={{ width: 60, textAlign: 'center' }}>{t('chartEdit.pos', 'Pos')}</Table.Th>
-                                <Table.Th>{t('chartEdit.nameArtist', 'Nome / Artista')}</Table.Th>
-                                <Table.Th style={{ width: 90, textAlign: 'center' }}>{t('chartEdit.plays', 'Plays')}</Table.Th>
-                                <Table.Th style={{ width: 84, textAlign: 'center' }}>{t('chartEdit.adjust', 'Ajustar')}</Table.Th>
-                            </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                            {groupedByPlays.map(({ plays, items }) => (
-                                <React.Fragment key={`grp-${plays}`}>
-                                    <SortableContext items={items.map(i => i.entityId)} strategy={verticalListSortingStrategy}>
-                                        {items.map((r) => (
-                                            <SortableRow key={r.entityId} r={r} cutoff={cutoff} loading={loading} />
-                                        ))}
-                                    </SortableContext>
-                                    {/* group separator */}
-                                    <Table.Tr>
-                                        <Table.Td colSpan={4}>
-                                            <Divider my={2} label={<Badge size="xs" variant="light">{plays} {t('chartEdit.plays', 'Plays')}</Badge>} labelPosition="center" />
-                                        </Table.Td>
-                                    </Table.Tr>
-                                </React.Fragment>
-                            ))}
-                        </Table.Tbody>
-                    </Table>
-                </DndContext>
-            </ScrollArea>
+            <EditTable
+                groupedByPlays={groupedByPlays as any}
+                cutoff={cutoff}
+                loading={loading}
+                labels={{
+                    pos: t('chartEdit.pos', 'Pos'),
+                    nameArtist: t('chartEdit.nameArtist', 'Nome / Artista'),
+                    plays: t('chartEdit.plays', 'Plays'),
+                    adjust: t('chartEdit.adjust', 'Ajustar'),
+                }}
+                onDragEnd={onDragEnd}
+            />
             <Group justify="space-between" mt={8} gap="xs">
                 <Text size="xs" c="dimmed">{t('chartEdit.hint', 'Só é possível ajustar posições entre itens com a mesma quantidade de plays. Você pode trocar dentro/fora do cutoff se os plays forem idênticos.')}</Text>
                 <Group gap="xs">

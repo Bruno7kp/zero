@@ -1,4 +1,6 @@
-
+export { default as chartsReducer } from './chartsSlice';
+export * from './chartsSlice';
+export * from './charts';
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import chartsReducer from './chartsSlice';
 import badgeStylesReducer from './badgeStylesSlice';

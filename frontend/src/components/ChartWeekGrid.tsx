@@ -2,16 +2,16 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ImageEditModal } from './ImageEditModal';
 import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/chartsSlice';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { Card, Text, Badge, Box, ActionIcon, Grid, Group, Modal, useMantineTheme, useMantineColorScheme } from '@mantine/core';
-import { formatNumber } from '../utils/format';
-import { IconPlus, IconCaretUpFilled, IconCaretDownFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
-import { DeltaBadge } from './DeltaBadge';
+import { Text, Box, Grid, Modal } from '@mantine/core';
 import { selectResolvedBadge } from '../store/badgeStylesSlice';
-import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
+import { makeScaleSize } from '../hooks/useFontScale';
+import GridCard from './chartGrid/GridCard';
+import GridAltVariationCorner from './chartGrid/GridAltVariationCorner';
+import GridUnderRankVariation from './chartGrid/GridUnderRankVariation';
 
 interface ChartWeekGridProps {
     chart: any;
@@ -42,36 +42,14 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
         }
     }, [dispatch]);
     const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
-    // Memorize the last image for each entityId, and only update when a new image is loaded
-    // This ensures the image only changes when the new one is ready
-    // Função para renderizar o ícone de variação
-    // hook must be at top-level (was incorrectly inside renderAltVariation causing hook order issues)
     const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'grid'));
     const rankVariationLocation = useSelector((state: any) => (state.columns?.views?.grid?.settings?.rankVariationLocation) || 'under');
     const peakCountStyle = useSelector((state: any) => state.columns?.views?.grid?.settings?.peakCountStyle) || 'noCount';
     const showPeakCount = peakCountStyle === 'withCount';
 
-    function renderAltVariation(row: ChartData, idx: number, rankCfg: any) {
-        const showDelta = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
-        if (!showDelta) return null;
-        const raw: any = altVariation ? altVariation(row, idx) : undefined;
-        const value: any = (raw || raw === 0) ? (raw === '-' ? undefined : raw) : undefined;
-        let cfg: any = rankCfg;
-        if (rankCfg.iconPosition === 'split') {
-            // In grid we keep compact inline look; disable tall split but allow split pair
-            cfg = { ...rankCfg, iconPosition: 'split', splitTall: false };
-        } else if (rankCfg.iconPosition === 'hidden') {
-            cfg = { ...rankCfg, iconPosition: 'hidden', splitTall: false };
-        } else {
-            cfg = { ...rankCfg, splitTall: false };
-        }
-        return (
-            <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
-                {/* Grid corner badge -> medium font size for readability without overpowering */}
-                <DeltaBadge delta={value} cfg={cfg} kind="rank" textSize="md" contextView="grid" />
-            </Box>
-        );
-    }
+    const renderUnderRankVariation = (value: any) => (
+        <GridUnderRankVariation value={value} badgeStylesRank={badgeStylesRank} />
+    );
     const data = useSelector((state: any) => state.charts.data);
     // Persist previous data while new data is loading to prevent flicker
     const [displayedData, setDisplayedData] = useState<any[]>(data);
@@ -135,8 +113,9 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const showPlays = columns.find((c: any) => c.key === 'plays')?.visible;
     const showTotalWeeks = columns.find((c: any) => c.key === 'totalWeeks')?.visible;
     // altVariation column is never used in grid (mapping forces it off); badge visibility controls variation
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
+    const gridView = useSelector((state: any) => (state as any).columns?.views?.grid);
+    const fontScale = (gridView?.settings as any)?.fontScale ?? 0;
+    const scaleSize = makeScaleSize(fontScale);
 
     // Modal de detalhes
     const [modalOpen, setModalOpen] = useState(false);
@@ -153,7 +132,6 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
     const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
     useEffect(() => {
-        // Atualiza caches com valores definitivos presentes no statsMap
         try {
             const nextPeak = { ...lastPeakById };
             const nextWeeks = { ...lastWeeksById };
@@ -238,198 +216,52 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             <Grid gutter="md" columns={30}>
                 {visibleCards.map((row: ChartData, idx: number) => {
                     const stats = statsMap[row.entityId];
-                    let deltaValue: any = altVariation ? altVariation(row, idx) : undefined;
-                    if (deltaValue === '-') deltaValue = undefined;
-                    const deltaColor = (() => {
-                        if (deltaValue === 'NEW') return 'lazuli';
-                        if (deltaValue === 'RE') return 'bee';
-                        if (typeof deltaValue === 'number') {
-                            if (deltaValue > 0) return 'grass';
-                            if (deltaValue < 0) return 'cherry';
-                            return 'gray'; // '=' / 0 mantém cinza
-                        }
-                        return 'gray';
-                    })();
                     return (
                         <Grid.Col key={row.id} span={{ base: 15, md: 10, lg: 6 }}>
-                            <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
-                                <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
-                                    {/* Variação (grid):
-                                                                            - 'hidden': sem overlay nem ícone
-                                                                            - 'under': sem overlay (ícone aparece sob o rank)
-                                                                            - 'corner': overlay no canto superior direito */}
-                                    {rankVariationLocation === 'corner' && renderAltVariation(row, idx, badgeStylesRank)}
-                                    {/* Botão modal canto superior esquerdo */}
-                                    <ActionIcon
-                                        size="sm"
-                                        variant="filled"
-                                        color="gray"
-                                        style={{ position: 'absolute', top: 8, left: 8, zIndex: 2 }}
-                                        onClick={() => { setModalRow(row); setModalOpen(true); }}
-                                    >
-                                        <IconPlus size={16} />
-                                    </ActionIcon>
-                                    {/* Posição (rank) canto inferior esquerdo */}
-                                    <Badge
-                                        color={row.rank === 1 ? 'lazuli' : deltaColor}
-                                        size="xl"
-                                        variant="filled"
-                                        py="xl"
-                                        px="xs"
-                                        style={{
-                                            position: 'absolute',
-                                            left: 0,
-                                            bottom: 0,
-                                            zIndex: 2,
-                                            fontWeight: 800,
-                                            fontSize: 32,
-                                            minWidth: 40,
-                                            borderTopRightRadius: 12,
-                                            borderTopLeftRadius: 0,
-                                            borderBottomRightRadius: 0,
-                                            borderBottomLeftRadius: 0,
-                                        }}
-                                    >
-                                        {/* Número da posição + (opcional) ícone abaixo em branco quando localização = 'under' */}
-                                        <Box component="span" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
-                                            <span>{row.rank}</span>
-                                            {(() => {
-                                                if (rankVariationLocation !== 'under') return null;
-                                                const value: any = deltaValue;
-                                                // Placeholder enquanto carrega a variação (ex.: computeWeekDeltas ainda não preencheu)
-                                                if (value === undefined || value === null) {
-                                                    return (
-                                                        <span
-                                                            aria-label="loading-delta"
-                                                            style={{
-                                                                marginTop: 4,
-                                                                width: 8,
-                                                                height: 8,
-                                                                borderRadius: 8,
-                                                                backgroundColor: theme.white,
-                                                                opacity: 0.7,
-                                                                display: 'inline-block',
-                                                            }}
-                                                        />
-                                                    );
+                            <GridCard
+                                row={row}
+                                type={(type === 'artist' || type === 'album' || type === 'track') ? type : 'artist'}
+                                clientId={clientId}
+                                clientSecret={clientSecret}
+                                rankVariationLocation={rankVariationLocation}
+                                showImage={!!showImage}
+                                showPeak={!!showPeak}
+                                showPlays={!!showPlays}
+                                showTotalWeeks={!!showTotalWeeks}
+                                scaleSize={scaleSize as any}
+                                onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
+                                imageForceUpdate={imageForceUpdate[row.entityId]}
+                                lastImageUrl={lastImageUrlByEntityId[row.entityId]}
+                                onImageChange={() => {
+                                    if (row.entityId) {
+                                        setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
+                                    }
+                                }}
+                                onImageLoad={(url: string) => {
+                                    if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
+                                        setTimeout(() => {
+                                            setLastImageUrlByEntityId(prev => {
+                                                if (prev[row.entityId] !== url) {
+                                                    return { ...prev, [row.entityId]: url };
                                                 }
-                                                if (!value && value !== 0) return null;
-                                                // Ícones brancos sem fundo; +2 no tamanho para setas e RE, estrela mantém o tamanho base
-                                                const baseSize = 12;
-                                                const boostedReSize = baseSize + 2; // RE +2
-                                                const boostedUpDownSize = baseSize + 4; // Up/Down +4
-                                                if (value === 'NEW') return <IconStarFilled size={baseSize} color={theme.white} style={{ marginTop: 2 }} />;
-                                                if (value === 'RE') return <IconArrowBackUp size={boostedReSize} stroke={3} color={theme.white} style={{ marginTop: 2, transform: 'scaleX(-1)' }} />;
-                                                if (value === '=' || value === 0) return <span style={{ marginTop: 2, fontSize: baseSize, lineHeight: 1, color: theme.white }}>=</span>;
-                                                if (typeof value === 'number') {
-                                                    if (value > 0) return <IconCaretUpFilled size={boostedUpDownSize} color={theme.white} style={{ marginTop: 2 }} />;
-                                                    if (value < 0) return <IconCaretDownFilled size={boostedUpDownSize} color={theme.white} style={{ marginTop: 2 }} />;
-                                                }
-                                                return null;
-                                            })()}
-                                        </Box>
-                                    </Badge>
-                                    {/* Imagem do Spotify ou placeholder */}
-                                    {showImage && (
-                                        <SpotifyImageWithModal
-                                            entityId={row.entityId}
-                                            name={row.name}
-                                            artistName={row.artistName}
-                                            type={type === 'artist' || type === 'album' || type === 'track' ? type : 'artist'}
-                                            clientId={clientId}
-                                            clientSecret={clientSecret}
-                                            forceUpdate={imageForceUpdate[row.entityId]}
-                                            width={'100%'}
-                                            height={'100%'}
-                                            style={{ aspectRatio: '1/1', minHeight: 0, minWidth: 0 }}
-                                            lastImageUrl={lastImageUrlByEntityId[row.entityId]}
-                                            onImageChange={() => {
-                                                if (row.entityId) {
-                                                    setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
-                                                    // Não atualiza a imagem imediatamente, só quando a nova carregar
-                                                }
-                                            }}
-                                            onImageLoad={(url: string) => {
-                                                // Só troca a imagem quando a nova já está pronta, com delay para suavizar
-                                                if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
-                                                    setTimeout(() => {
-                                                        setLastImageUrlByEntityId(prev => {
-                                                            // Garante que não mudou de entityId durante o delay
-                                                            if (prev[row.entityId] !== url) {
-                                                                return { ...prev, [row.entityId]: url };
-                                                            }
-                                                            return prev;
-                                                        });
-                                                    }, 1000);
-                                                }
-                                            }}
-                                        />
-                                    )}
-                                </Box>
-                                <Box px="sm" py={8} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 64 }}>
-                                    <Text fw={700} size="md" lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
-                                    {row.artistName && <Text size="sm" c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
-                                </Box>
-                                {(showPlays || showPeak || showTotalWeeks) && (
-                                    <Group px="sm" pb="sm" style={{ minHeight: 36, width: '100%', justifyContent: 'space-between', gap: 4, display: 'flex' }}>
-                                        {showPlays && (
-                                            <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size="xs" c="dimmed">Plays</Text>
-                                                <Text fw={700} size="sm">{formatNumber(row.plays as any)}</Text>
-                                            </Box>
-                                        )}
-                                        {showPeak && (
-                                            <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size="xs" c="dimmed">Peak</Text>
-                                                {(() => {
-                                                    const current = stats?.peak?.position;
-                                                    const stable = lastPeakById[row.entityId];
-                                                    const display = (current != null) ? current : (stable != null ? stable : undefined);
-                                                    const showCount = showPeakCount;
-                                                    const hasStats = !!stats;
-                                                    const liveCount = stats?.peak?.weeksAtPeak;
-                                                    const stableWeeksAtPeak = lastWeeksAtPeakById[row.entityId];
-                                                    const rawCountAtOne = (liveCount != null ? liveCount : stableWeeksAtPeak);
-                                                    const renderedCountAtOne = display === 1
-                                                        ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1)
-                                                        : null;
-                                                    return (
-                                                        <Text fw={700} size="sm" c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
-                                                            {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
-                                                            {showCount && display === 1 && renderedCountAtOne != null && (
-                                                                <span
-                                                                    style={{
-                                                                        marginLeft: 6,
-                                                                        fontSize: '0.75em',
-                                                                        color: colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[6]
-                                                                    }}
-                                                                >
-                                                                    {`${renderedCountAtOne}`}x
-                                                                </span>
-                                                            )}
-                                                        </Text>
-                                                    );
-                                                })()}
-                                            </Box>
-                                        )}
-                                        {showTotalWeeks && (
-                                            <Box style={{ textAlign: 'center', flex: 1 }}>
-                                                <Text size="xs" c="dimmed">Weeks</Text>
-                                                {(() => {
-                                                    const current = stats?.totals?.withinCutoff;
-                                                    const stable = lastWeeksById[row.entityId];
-                                                    const display = (current != null) ? current : (stable != null ? stable : undefined);
-                                                    return (
-                                                        <Text fw={700} size="sm" style={{ transition: 'color 120ms ease' }}>
-                                                            {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
-                                                        </Text>
-                                                    );
-                                                })()}
-                                            </Box>
-                                        )}
-                                    </Group>
-                                )}
-                            </Card>
+                                                return prev;
+                                            });
+                                        }, 1000);
+                                    }
+                                }}
+                                renderUnderRankVariation={(val) => renderUnderRankVariation(val)}
+                                cornerOverlay={rankVariationLocation === 'corner' ? (
+                                    <GridAltVariationCorner row={row} idx={idx} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
+                                ) : undefined}
+                                stats={{
+                                    peak: {
+                                        position: (stats?.peak?.position != null ? stats?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
+                                        weeksAtPeak: (stats?.peak?.weeksAtPeak != null ? stats?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                                    },
+                                    totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
+                                }}
+                                showPeakCount={showPeakCount}
+                            />
                         </Grid.Col>
                     );
                 })}

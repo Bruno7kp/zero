@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ChartWeekControls } from '../components/ChartWeekControls';
 import { ChartWeekTable } from '../components/ChartWeekTable';
 import { ChartWeekGrid } from '../components/ChartWeekGrid';
 import { ChartWeekList } from '../components/ChartWeekList';
-import { Container, Loader, Center, Box } from '@mantine/core';
+import { Container, Loader, Center, Box, Skeleton } from '@mantine/core';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
+const ChartCarousel = lazy(() => import('../components/chartPage/ChartCarousel'));
 
 const DEFAULT_TYPE = 'artist';
 
@@ -35,6 +36,7 @@ export const ChartsWeekPage: React.FC = () => {
     const navigate = useNavigate();
     const columnsState = useSelector((state: any) => state.columns);
     const currentContainerSize = columnsState?.views?.[view]?.settings?.containerSize || (view === 'grid' ? 'xl' : 'md');
+    const showCarousel = !!columnsState?.showCarousel;
 
     // Sincroniza quando rota muda externamente (ex: clique em ChartRun)
     React.useEffect(() => {
@@ -67,7 +69,24 @@ export const ChartsWeekPage: React.FC = () => {
     }, [isSync, loadingData, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
-            <Container size={isMobile ? '100%' : "md"} px="xs">
+            <Container size={isMobile ? '100%' : currentContainerSize} px="xs">
+                {chart && showCarousel && (
+                    <Suspense
+                        fallback={
+                            <Box style={{ height: 200, width: '100%' }}>
+                                <Skeleton height="100%" radius="md" />
+                            </Box>
+                        }
+                    >
+                        <ChartCarousel
+                            chart={chart}
+                            week={displayedWeek}
+                            type={displayedType as any}
+                            clientId={SPOTIFY_TOKEN}
+                            clientSecret={SPOTIFY_SECRET}
+                        />
+                    </Suspense>
+                )}
                 {!noChart && (
                     <ChartWeekControls
                         chart={chart}

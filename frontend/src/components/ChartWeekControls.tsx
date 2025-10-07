@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -9,42 +9,19 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 import { getClosedChartWeeks } from '../utils/chartWeekUtils';
 import { getPrevNextWeek } from '../utils/chartWeekNav';
-import { Button, SegmentedControl, Flex, Center, VisuallyHidden, Text, Title, Grid, Menu, ActionIcon } from '@mantine/core';
+import { Button, Flex, Grid } from '@mantine/core';
 import { ChartWeekColumnsDrawer } from './ChartWeekColumnsDrawer';
-import { Calendar } from '@mantine/dates';
-import { Popover } from '@mantine/core';
-import { IconCalendar } from '@tabler/icons-react';
-import { IconMicrophone, IconDisc, IconMusic, IconTable, IconLayoutGrid, IconList, IconArrowLeft, IconArrowRight, IconSettings, IconPencil } from '@tabler/icons-react';
+// calendar moved into WeekPicker component
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { ChartWeekEditModal } from './ChartWeekEditModal';
-import { useMediaQuery } from '@mantine/hooks';
+import { useIsMobile } from '../hooks/useIsMobile';
+import SettingsMenu from './chartControls/SettingsMenu';
+import WeekHeader from './chartControls/WeekHeader';
+import { TypeControl, ViewControl } from './chartControls/TypeAndViewControls';
+import WeekPicker from './chartControls/WeekPicker';
 
-const chartTypes = [
-	{
-		value: 'artist', icon: (
-			<Center>
-				<IconMicrophone size={18} />
-				<VisuallyHidden>Artist</VisuallyHidden>
-			</Center>
-		)
-	},
-	{
-		value: 'album', icon: (
-			<Center>
-				<IconDisc size={18} />
-				<VisuallyHidden>Album</VisuallyHidden>
-			</Center>
-		)
-	},
-	{
-		value: 'track', icon: (
-			<Center>
-				<IconMusic size={18} />
-				<VisuallyHidden>Track</VisuallyHidden>
-			</Center>
-		)
-	},
-];
+// chartTypes moved into TypeControl
 
 
 type ChartWeekControlsProps = {
@@ -74,7 +51,9 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 	// Se receber props controladas, sincroniza o estado local
 	useEffect(() => {
-		if (propView && propView !== view) setView(propView);
+		if (propView && propView !== view) {
+			requestAnimationFrame(() => setView(propView));
+		}
 	}, [propView, view]);
 
 	const handleSetView = (v: 'table' | 'grid' | 'list') => {
@@ -92,7 +71,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	const navLockRef = React.useRef(false);
 	const timerRef = React.useRef<number | null>(null);
 	const FIXED_LOCK_MS = 1500; // 1.5s conforme solicitado
-	const isBusy = locked || navLockRef.current;
+	// Avoid reading refs during render; locked mirrors the nav lock state
+	const isBusy = locked;
 	const clearLock = () => {
 		if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
 		navLockRef.current = false;
@@ -125,153 +105,71 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 		const chartStart = dayjs(chart.start_date);
 		weekNum = Math.floor(start.diff(chartStart, 'day') / 7) + 1;
 	}
-	const [popoverOpened, setPopoverOpened] = useState(false);
 	const topType = `charts.${type}sTop`;
 	const [editOpened, setEditOpened] = React.useState(false);
 	// Control drawer open from dropdown menu
 	const [drawerOpened, setDrawerOpened] = React.useState(false);
-	const isMobile = useMediaQuery('(max-width: 36em)');
+	const isMobile = useIsMobile();
+
+	// Shared settings menu (opens the columns drawer; on mobile also offers view switching)
+	const settingsMenu = (
+		<SettingsMenu
+			t={t as any}
+			week={week}
+			isBusy={isBusy}
+			isMobile={isMobile}
+			onOpenDrawer={() => setDrawerOpened(true)}
+			onOpenEdit={() => setEditOpened(true)}
+			onSetView={handleSetView}
+		/>
+	);
 
 	return (
 		<>
 		<Grid>
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
-				<Grid.Col span={12} ta="center">
-					<Title order={2}>
-						{t(topType, { week: weekNum })}
-					</Title>
-					<Text fw={600} size="sm">
-						{(() => {
-							const start = dayjs(inputValue);
-							const end = start.add(6, 'day');
-							return `${start.format('YYYY.MM.DD')} - ${end.format('YYYY.MM.DD')}`;
-						})()}
-					</Text>
-				</Grid.Col>
+				<WeekHeader inputValue={inputValue} topLabel={t(topType, { week: weekNum })} />
 			)}
 			{/* Esquerda: seleção de tipo */}
-			<Grid.Col span={{ base: 6, xs: 4 }}>
+			<Grid.Col span={{ base: 6, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-start' }}
 					w="100%"
 				>
-					<SegmentedControl
-							value={type}
-							onChange={v => { if (!v || isBusy) return; triggerChange(week || '', v); }}
-							data={chartTypes.map(({ value, icon }) => ({ label: icon, value, disabled: isBusy }))}
-							size="sm"
-							my="xs"
-							withItemsBorders={false}
-							disabled={isBusy}
-						/>
+					{/* Mobile: show settings menu before the type segmented control */}
+					{isMobile && settingsMenu}
+					<TypeControl type={type} isBusy={isBusy} onChangeType={(v) => triggerChange(week || '', v)} />
 					{/* Drawer control hidden trigger, controlled open */}
 					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
-					{/* Dropdown menu: replaces settings button; holds visual settings, edit, and on mobile, view options */}
-					<Menu withinPortal position="bottom" shadow="md" withArrow>
-						<Menu.Target>
-							<ActionIcon variant="subtle" aria-label="Opções" ml={0} my="xs">
-								<IconSettings size={18} />
-							</ActionIcon>
-						</Menu.Target>
-						<Menu.Dropdown>
-							<Menu.Item leftSection={<IconSettings size={16} />} onClick={() => setDrawerOpened(true)}>
-								{t('charts.columnsConfig')}
-							</Menu.Item>
-							<Menu.Item leftSection={<IconPencil size={16} />} disabled={!week || isBusy} onClick={() => setEditOpened(true)}>
-								{t('common.edit')}
-							</Menu.Item>
-							{isMobile && (
-								<>
-									<Menu.Divider />
-									<Menu.Label>{t('charts.view')}</Menu.Label>
-									<Menu.Item leftSection={<IconTable size={16} />} onClick={() => handleSetView('table')}>
-										{t('charts.tableView')}
-									</Menu.Item>
-									<Menu.Item leftSection={<IconList size={16} />} onClick={() => handleSetView('list')}>
-										{t('charts.listView')}
-									</Menu.Item>
-									<Menu.Item leftSection={<IconLayoutGrid size={16} />} onClick={() => handleSetView('grid')}>
-										{t('charts.gridView')}
-									</Menu.Item>
-								</>
-							)}
-						</Menu.Dropdown>
-					</Menu>
 				</Flex>
 			</Grid.Col>
 			{/* Centro: navegação de semana */}
-			<Grid.Col span={{ base: 6, xs: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			<Grid.Col span={{ base: 6, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
-				<Popover
-					position="bottom"
-					shadow="md"
-					withArrow
-					middlewares={{ flip: true, shift: true }}
-					opened={popoverOpened}
-					onChange={setPopoverOpened}
-				>
-					<Popover.Target>
-						<ActionIcon
-							variant={inputValue ? 'filled' : 'default'}
-							color="blue"
-							size="lg"
-							m="xs"
-							onClick={() => { setPopoverOpened((o) => !o); }}
-						>
-							<IconCalendar size={20} />
-						</ActionIcon>
-					</Popover.Target>
-					<Popover.Dropdown p={0} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-						<Calendar
-							// Força o calendário a montar no mês da semana selecionada
-							key={inputValue ? dayjs(inputValue).format('YYYY-MM') : 'no-week'}
-							locale={locale}
-							defaultDate={inputValue || undefined}
-							withCellSpacing={false}
-							getDayProps={(date) => {
-								const dateStr = dayjs(date).format('YYYY-MM-DD');
-								const isEnabled = weeks.includes(dateStr);
-								const isSelected = !!inputValue && dayjs(inputValue).isSame(date, 'day');
-								return {
-									disabled: !isEnabled,
-									selected: isSelected,
-									onClick: isEnabled
-										? () => {
-											onChange(dateStr, type);
-											setPopoverOpened(false);
-										}
-										: undefined,
-								};
-							}}
-						/>
-					</Popover.Dropdown>
-				</Popover>
+				<WeekPicker
+					inputValue={inputValue}
+					locale={locale}
+					weeks={weeks}
+					onSelect={(dateStr) => onChange(dateStr, type)}
+					disabled={isBusy}
+				/>
 				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next || isBusy}><IconArrowRight size={18} /></Button>
 			</Grid.Col>
 
 			{/* Direita: seleção de visualização (desktop) */}
 			{!isMobile && (
-			<Grid.Col span={{ base: 4, xs: 4 }}>
+			<Grid.Col span={{ base: 4, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'center', sm: 'flex-end' }}
 					w="100%"
 					style={{ minHeight: 40 }}
 				>
-					<SegmentedControl
-							value={view}
-							onChange={v => { handleSetView(v as 'table' | 'grid' | 'list'); }}
-							data={[
-								{ label: (<Center><IconTable size={18} /></Center>), value: 'table' },
-								{ label: (<Center><IconList size={18} /></Center>), value: 'list' },
-								{ label: (<Center><IconLayoutGrid size={18} /></Center>), value: 'grid' },
-							]}
-							size="sm"
-							my="xs"
-							withItemsBorders={false}
-						/>
+					<ViewControl view={view} onSetView={handleSetView} />
+					{/* Desktop: show settings menu at the end, after the view segmented control */}
+					{!isMobile && settingsMenu}
 				</Flex>
 			</Grid.Col>
 			)}
