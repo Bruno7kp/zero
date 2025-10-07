@@ -23,8 +23,8 @@ export function useChartMaintenance(t: any) {
 
   const clearChartDataWithConfirm = useCallback((chartId: number, chartName: string) => {
     modals.openConfirmModal({
-      title: t('settings.clearChartData') + ': ' + chartName,
-      children: t('settings.clearChartData') + '? (' + chartName + ')',
+      title: t('settings.clearChartData') + '? (' + chartName + ')',
+      size: 'lg',
       labels: { confirm: t('settings.clearChartData'), cancel: t('forms.deleteChart.cancelButton') },
       confirmProps: { color: 'grape' },
       onConfirm: async () => {

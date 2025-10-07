@@ -41,7 +41,8 @@ const ChartWeekListRow: React.FC<{
   week?: string;
   listBackground?: 'default' | 'transparent';
   fontScale: -2 | -1 | 0 | 1 | 2;
-}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week, listBackground = 'default', fontScale }) => {
+  listPeakWeeksCombined: boolean;
+}> = React.memo(({ row, idx, filteredColumns, chart, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
@@ -144,6 +145,54 @@ const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'peak') {
+              const alsoHasWeeks = filteredColumns.some((c: any) => c.key === 'totalWeeks');
+              if (listPeakWeeksCombined && alsoHasWeeks) {
+                // Combined block: labels (right-aligned) + values (right-aligned)
+                const currentPeak = stats?.peak?.position;
+                const stablePeak = lastPeakById[row.entityId];
+                const displayPeak = (currentPeak != null) ? currentPeak : (stablePeak != null ? stablePeak : undefined);
+                const currentWeeks = stats?.totals?.withinCutoff;
+                const stableWeeks = lastWeeksById[row.entityId];
+                const displayWeeks = (currentWeeks != null) ? currentWeeks : (stableWeeks != null ? stableWeeks : undefined);
+                // Compute #1 weeks count for peak when enabled
+                const hasStats = !!stats;
+                const liveWeeksAtOne = stats?.peak?.weeksAtPeak;
+                const stableWeeksAtOne = lastWeeksAtPeakById[row.entityId];
+                const rawCountAtOne = (liveWeeksAtOne != null ? liveWeeksAtOne : stableWeeksAtOne);
+                const renderedCountAtOne = displayPeak === 1 ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1) : null;
+                return (
+                  <Box
+                    key="peakWeeksCombined"
+                    mr="sm"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gridAutoRows: 'min-content',
+                      columnGap: 6,
+                      rowGap: 0,
+                      alignItems: 'center',
+                      minWidth: 96,
+                      maxWidth: 96,
+                      flex: '0 0 96px',
+                      fontSize: theme.fontSizes[scaleSize('xl')]
+                    }}
+                  >
+                    <Text size={scaleSize('xs')} style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>PEAK</Text>
+                    <Flex align="center" gap={6} style={{ justifySelf: 'start' }}>
+                      <Text fw={700} size={scaleSize('xl')} c={displayPeak === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
+                        {displayPeak != null ? displayPeak : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                      </Text>
+                      {showPeakCount && displayPeak === 1 && renderedCountAtOne != null && (
+                        <Text c="dimmed" size={scaleSize('xs')} style={{ lineHeight: 1 }}>{`${renderedCountAtOne}x`}</Text>
+                      )}
+                    </Flex>
+                    <Text size={scaleSize('xs')} style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>WEEKS</Text>
+                    <Text fw={700} size={scaleSize('xl')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
+                      {displayWeeks != null ? displayWeeks : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                    </Text>
+                  </Box>
+                );
+              }
               const current = stats?.peak?.position;
               const stable = lastPeakById[row.entityId];
               const display = (current != null) ? current : (stable != null ? stable : undefined);
@@ -188,6 +237,8 @@ const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'totalWeeks') {
+              const alsoHasPeak = filteredColumns.some((c: any) => c.key === 'peak');
+              if (listPeakWeeksCombined && alsoHasPeak) return null;
               const current = stats?.totals?.withinCutoff;
               const stable = lastWeeksById[row.entityId];
               const display = (current != null) ? current : (stable != null ? stable : undefined);
@@ -318,6 +369,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const listBackground = useSelector((state: any) => (state.columns?.views?.list?.settings?.listBackground) || 'default');
   const viewConfig = useSelector((state: any) => (state as any).columns?.views?.list);
   const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
+  const listPeakWeeksCombined = (viewConfig?.settings as any)?.listPeakWeeksCombined || false;
   const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
   const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
   const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
@@ -403,6 +455,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           week={week}
           listBackground={listBackground}
           fontScale={fontScale}
+          listPeakWeeksCombined={listPeakWeeksCombined}
         />
       ))}
       {showLoadingTail && (

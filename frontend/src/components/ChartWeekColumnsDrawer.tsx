@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale } from '../store/columnsSlice';
+import { updateColumn, defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined } from '../store/columnsSlice';
 import { IconSettings, IconCaretUpFilled, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { BadgeStylePreview } from './badgeStyles/BadgeStylePreview';
 // Advanced controls removed (only presets retained)
@@ -36,6 +36,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
     const listBackground = viewConfig?.settings?.listBackground || 'default';
+    const listPeakWeeksCombined = (viewConfig?.settings as any)?.listPeakWeeksCombined || false;
     // Default: 'under' for all view types (grid uses show/hide UI but mapped to 'under' internally when shown)
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const playsVariationLocation = (viewConfig?.settings as any)?.playsVariationLocation || 'under';
@@ -290,6 +291,21 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                     <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'image')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'image', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
                                                 </Box>
                                             )}
+                                            {viewType === 'list' && (
+                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                    <Text size="xs" c="dimmed">{t('charts.listPeakWeeksCombinedLabel') || 'Peak + Weeks layout (list only)'}</Text>
+                                                    <SegmentedControl
+                                                        fullWidth
+                                                        size="xs"
+                                                        value={listPeakWeeksCombined ? 'combined' : 'separate'}
+                                                        onChange={(v) => dispatch(setListPeakWeeksCombined({ combined: v === 'combined' }))}
+                                                        data={[
+                                                            { label: t('charts.listPeakWeeksCombined_separate') || 'Separate', value: 'separate' },
+                                                            { label: t('charts.listPeakWeeksCombined_combined') || 'Combined', value: 'combined' }
+                                                        ]}
+                                                    />
+                                                </Box>
+                                            )}
                                             <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                 <Text size="xs" c="dimmed">{t('charts.playsLabel')}</Text>
                                                 <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'plays')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'plays', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
@@ -319,12 +335,6 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                 <Text size="xs" c="dimmed">{t('charts.weeksLabel')}</Text>
                                                 <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'totalWeeks', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
                                             </Box>
-                                            {(viewType === 'table' || viewType === 'list') && (
-                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
-                                                    <Text size="xs" c="dimmed">{t('charts.certLabel')}</Text>
-                                                    <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
-                                                </Box>
-                                            )}
                                             {viewType === 'table' && (
                                                 <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
                                                     <Text size="xs" c="dimmed">{t('charts.artistDisplayModeLabel')}</Text>
@@ -338,6 +348,12 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                             { label: t('charts.artistDisplay_underTitle'), value: 'under' },
                                                         ]}
                                                     />
+                                                </Box>
+                                            )}
+                                            {(viewType === 'table' || viewType === 'list') && (
+                                                <Box style={{ flex: '1 1 calc(50% - 8px)', minWidth: 140 }}>
+                                                    <Text size="xs" c="dimmed">{t('charts.certLabel')}</Text>
+                                                    <SegmentedControl fullWidth size="xs" value={columnsWithVisibility.find(c => c.key === 'cert')?.visible ? 'show' : 'hide'} onChange={(v) => dispatch(updateColumn({ view: viewType, key: 'cert', visible: v === 'show' }))} data={[{ label: t('charts.show'), value: 'show' }, { label: t('charts.hide'), value: 'hide' }]} />
                                                 </Box>
                                             )}
                                         </Flex>

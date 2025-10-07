@@ -26,6 +26,8 @@ export interface ViewSettings {
   listBackground?: 'default' | 'transparent'; // only for list view
   // Table-only: artist display mode
   artistDisplayMode?: 'under' | 'column';
+  // List-only: option to combine Peak + Weeks in a single combined block
+  listPeakWeeksCombined?: boolean;
 }
 
 export interface ViewConfig {
@@ -59,7 +61,7 @@ const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
   table: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', tableBackground: 'default', artistDisplayMode: 'under' },
   // Lista: pedido para default ser coluna (variação em coluna) para rank; plays fica embaixo por padrão
-  list: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default' },
+  list: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default', listPeakWeeksCombined: false },
   grid: { containerSize: 'xl', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden', peakCountStyle: 'noCount' },
 };
 
@@ -268,6 +270,7 @@ const columnsSlice = createSlice({
       state.views[view].settings.listBackground = DEFAULT_VIEW_SETTINGS[view].listBackground;
   state.views[view].settings.peakCountStyle = DEFAULT_VIEW_SETTINGS[view].peakCountStyle;
       state.views[view].settings.artistDisplayMode = DEFAULT_VIEW_SETTINGS[view].artistDisplayMode;
+      state.views[view].settings.listPeakWeeksCombined = DEFAULT_VIEW_SETTINGS[view].listPeakWeeksCombined;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, state.views[view].settings.artistDisplayMode || 'under', view);
@@ -341,9 +344,14 @@ const columnsSlice = createSlice({
       state.views[view].settings.fontScale = scale;
       persistView(view, state.views[view]);
     },
+    setListPeakWeeksCombined(state, action: PayloadAction<{ combined: boolean }>) {
+      ensureViews(state as any);
+      state.views.list.settings.listPeakWeeksCombined = action.payload.combined;
+      persistView('list', state.views.list);
+    },
   },
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale, setListPeakWeeksCombined } = columnsSlice.actions;
 export default columnsSlice.reducer;
