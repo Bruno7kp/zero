@@ -106,7 +106,8 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     }
     const fontSizeMap: Record<string, number> = { xs: 10, sm: 11, md: 12, lg: 14, xl: 16 };
     const effectiveFontSize = fontSizeMap[textSize || (cfg.size as any) || 'xs'];
-    const splitVariant = resolveDelta(effectiveDelta, showPercent, currentValue, false, computePercent || computeDefaultPercent);
+    const isFilledVariant = cfg.splitIconVariant === 'filled';
+    const splitVariant = resolveDelta(effectiveDelta, showPercent, currentValue, !isFilledVariant, computePercent || computeDefaultPercent);
     if (cfg.iconPosition === 'split' && icon) {
         if (cfg.splitTall) {
             return (

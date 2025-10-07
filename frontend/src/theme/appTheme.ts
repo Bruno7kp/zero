@@ -1,5 +1,5 @@
 import { createTheme } from '@mantine/core';
-import { forest, ruby, cobalt, honey, cherry, lazuli, grass, bee, darkblue, denim } from './colors';
+import { forest, ruby, cobalt, honey, cherry, lazuli, grass, bee, darkblue, denim, mediumblue } from './colors';
 
 // Base theme shared across all modes
 const baseTheme = createTheme({
@@ -14,6 +14,7 @@ const baseTheme = createTheme({
     lazuli,
     grass,
     bee,
+    mediumblue,
   },
   components: {
     // No borders by default

@@ -56,7 +56,7 @@ export const cobalt: MantineColorsTuple = [
   '#e6f0ff',
   '#b3ccff',
   '#80aaff',
-  '#98bff6', // texto no tema escuro
+  '#B3EBF2', // texto no tema escuro
   '#1a75ff',
   '#0066e6',
   '#3363d6', // texto no tema branco // bg badge claro nos dois temas
@@ -104,7 +104,20 @@ export const bee: MantineColorsTuple = [
   '#ff7a00',
 ];
 
-export const palettes = { forest, ruby, cobalt, honey, bee, cherry, lazuli, grass };
+export const mediumblue: MantineColorsTuple = [
+  "#e3f7ff",
+  "#ceeaff",
+  "#9ed2fc",
+  "#7ecbfa",
+  "#65b6f8",
+  "#2896f4",
+  "#1490f4",
+  "#007cda",
+  "#006ec4",
+  "#005fae"
+];
+
+export const palettes = { forest, ruby, cobalt, honey, bee, cherry, lazuli, grass, mediumblue };
 
 export type AppPaletteKeys = keyof typeof palettes;
 
