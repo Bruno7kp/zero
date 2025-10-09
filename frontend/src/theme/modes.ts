@@ -1,10 +1,10 @@
 import type { MantineTheme } from '@mantine/core';
 // Central helpers for theme modes so we can add new ones in one place
 
-export type ThemeMode = 'dark' | 'light' | 'blue';
+export type ThemeMode = 'dark' | 'light' | 'blue' | 'black';
 
 // Single source of truth for supported modes (order controls toggle sequence)
-export const THEME_MODES: readonly ThemeMode[] = ['dark', 'light', 'blue'] as const;
+export const THEME_MODES: readonly ThemeMode[] = ['dark', 'light', 'blue', 'black'] as const;
 
 // Map app modes to Mantine color scheme
 export function toMantineColorScheme(mode: ThemeMode): 'light' | 'dark' {
@@ -18,28 +18,27 @@ export function getNextThemeMode(current: ThemeMode): ThemeMode {
   return THEME_MODES[nextIdx % THEME_MODES.length];
 }
 
-// For dark schemes, different modes may prefer different background depths
-// Default dark uses index 8 as main background; blue uses 7 for a slightly lighter app shell
 export function appShellDarkIndex(mode: ThemeMode): number {
   switch (mode) {
     case 'blue':
       return 8;
+    case 'black':
+      return 9;
+    case 'dark':
     default:
       return 7;
   }
 }
 
-// Header background depth for dark schemes. Keep the same pattern used in dark
-// (header tracks the app shell background), while allowing blue to pick a
-// slightly different, standardized depth without per-component overrides.
 export function appShellHeaderDarkIndex(mode: ThemeMode): number {
   switch (mode) {
     case 'blue':
       return 7;
+    case 'black':
+      return 7;
     case 'dark':
-      return 8;
     default:
-      return appShellDarkIndex(mode);
+      return 8;
   }
 }
 
@@ -50,29 +49,25 @@ export function getLogoSrcByMode(mode: ThemeMode): string {
   switch (mode) {
     case 'light':
       return '/zero-black.png';
-    case 'dark':
-    case 'blue':
     default:
       return '/zero-white.png';
   }
 }
 
-// Export a small icon contract so components can render the right toggle icon without
-// hardcoding per-mode checks. We return a string identifier to keep this layer UI-agnostic.
-export type ThemeToggleIconId = 'sun' | 'moon' | 'droplet';
+export type ThemeToggleIconId = 'sun' | 'moon' | 'droplet' | 'moonAlt';
 
 export function themeIconByMode(mode: ThemeMode, scheme: 'light' | 'dark'): ThemeToggleIconId {
-  // For custom modes (not light/dark), use a neutral droplet icon by default.
-  if (mode !== 'light' && mode !== 'dark') return 'moon';
-  // For native light/dark modes, keep the historical behavior based on computed scheme.
+  if (mode === 'black') return 'moon';
+  if (mode === 'blue') return 'moonAlt';
   return scheme === 'dark' ? 'sun' : 'droplet';
 }
 
-// Card background per theme mode, centralized like other helpers
 export function getCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): string {
   switch (mode) {
     case 'light':
       return (theme as any).white || '#ffffff';
+    case 'black':
+      return ((theme as any).colors?.dark?.[7]) ?? '#000000';
     case 'blue':
       return ((theme as any).colors?.dark?.[7]) ?? '#1A1B1E';
     case 'dark':

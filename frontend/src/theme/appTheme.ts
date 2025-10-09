@@ -1,5 +1,5 @@
 import { createTheme } from '@mantine/core';
-import { forest, ruby, cobalt, honey, cherry, lazuli, grass, bee, darkblue, denim, mediumblue } from './colors';
+import { forest, ruby, cobalt, honey, cherry, lazuli, grass, bee, darkblue, denim, mediumblue, blackdark } from './colors';
 
 // Base theme shared across all modes
 const baseTheme = createTheme({
@@ -44,14 +44,17 @@ const baseTheme = createTheme({
   },
 });
 
-export type ThemeMode = 'dark' | 'light' | 'blue';
+export type ThemeMode = 'dark' | 'light' | 'blue' | 'black';
 
 export function buildTheme(themeMode: ThemeMode) {
   return createTheme({
     ...baseTheme,
     primaryColor: 'blue',
-    colors: themeMode === 'blue'
-      ? { ...(baseTheme as any).colors, dark: darkblue, denim }
-      : (baseTheme as any).colors,
+    colors:
+      themeMode === 'blue'
+        ? { ...(baseTheme as any).colors, dark: darkblue, denim }
+        : themeMode === 'black'
+          ? { ...(baseTheme as any).colors, dark: blackdark }
+          : (baseTheme as any).colors,
   });
 }

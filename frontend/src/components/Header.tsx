@@ -26,6 +26,7 @@ import {
     IconMessageCircle,
     IconInfoCircle,
     IconDroplet,
+    IconMoon,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
@@ -88,6 +89,7 @@ export const Header: React.FC = () => {
                     const { toggleIconId: id } = getThemeAssets(reduxTheme as any, computedColorScheme);
                     if (id === 'droplet') return <IconDroplet style={{ width: rem(20), height: rem(20) }} />;
                     if (id === 'sun') return <IconSun style={{ width: rem(20), height: rem(20) }} />;
+                    if (id === 'moonAlt') return <IconMoon style={{ width: rem(20), height: rem(20) }} />;
                     return <IconMoonStars style={{ width: rem(20), height: rem(20) }} />;
                 })()}
             </ActionIcon>
