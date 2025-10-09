@@ -6,6 +6,23 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#181c2a" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function() {
+      try {
+        var persisted = localStorage.getItem('persist:root');
+        if (!persisted) return;
+        var root = JSON.parse(persisted);
+        if (!root || !root.theme) return;
+        var themeSlice = JSON.parse(root.theme);
+        var mode = themeSlice && themeSlice.value;
+        var scheme = (mode === 'light') ? 'light' : 'dark';
+        var el = document.documentElement;
+        if (el.getAttribute('data-mantine-color-scheme') !== scheme) {
+          el.setAttribute('data-mantine-color-scheme', scheme);
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
   <title>ZeroCharts</title>
   </head>
   <body>

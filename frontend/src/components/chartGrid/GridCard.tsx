@@ -4,6 +4,7 @@ import { IconPlus } from '@tabler/icons-react';
 import type { ChartData } from '../../db/indexedDb';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import { formatNumber } from '../../utils/format';
+import { t } from 'i18next';
 
 export interface GridCardProps {
   row: ChartData;
@@ -132,7 +133,7 @@ export const GridCard: React.FC<GridCardProps> = ({
         <Group px="sm" pb="sm" style={{ minHeight: 36, width: '100%', justifyContent: 'space-between', gap: 4, display: 'flex' }}>
           {showPeak && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={scaleSize('xs')} c="dimmed">Peak</Text>
+              <Text size={scaleSize('xs')} c="dimmed">{t('charts.peak')}</Text>
               {(() => {
                 const display = stats?.peak?.position ?? undefined;
                 const hasStats = !!stats;
@@ -167,7 +168,7 @@ export const GridCard: React.FC<GridCardProps> = ({
           )}
           {showTotalWeeks && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={scaleSize('xs')} c="dimmed">Weeks</Text>
+              <Text size={scaleSize('xs')} c="dimmed">{t('charts.weeks')}</Text>
               {(() => {
                 const display = stats?.totals?.withinCutoff ?? undefined;
                 return (

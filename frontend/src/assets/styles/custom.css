@@ -26,6 +26,18 @@
 .datatable-transparent th {
   background-color: transparent !important;
 }
+:root:not([data-mantine-color-scheme="dark"])
+  .datatable-transparent
+  tbody
+  tr:has(.mantine-datatable-row-expansion-cell):hover {
+  background-color: transparent !important;
+}
+:root[data-mantine-color-scheme="dark"]
+  .datatable-transparent
+  tbody
+  tr:has(.mantine-datatable-row-expansion-cell):hover {
+  background-color: transparent !important;
+}
 
 /* Bring back row hover highlight when using transparent tables */
 :root:not([data-mantine-color-scheme='dark']) .datatable-transparent tbody tr:hover {

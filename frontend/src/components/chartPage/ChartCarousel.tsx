@@ -96,7 +96,7 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
     if (slides.length === 0) return null;
 
     return (
-        <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden', marginBottom: 32 }}>
+        <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
             <Carousel
                 withIndicators
                 height="100%"

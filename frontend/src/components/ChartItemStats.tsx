@@ -37,7 +37,7 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({ stats, highlight
         else if (chartType === 'track') cutoff = chart.music_cutoff;
     }
     return (
-        <Paper p="md" radius={0}>
+        <Paper p="md" radius={0} style={{ backgroundColor: 'transparent' }}>
             <Grid justify="center" mb="md">
                 <Grid.Col span={{ base: 12 }}>
                     <Group justify="center" gap={10} mb="md">

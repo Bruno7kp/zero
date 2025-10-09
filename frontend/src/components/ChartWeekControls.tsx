@@ -126,7 +126,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 	return (
 		<>
-		<Grid>
+		<Grid mt="md">
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
 				<WeekHeader inputValue={inputValue} topLabel={t(topType, { week: weekNum })} />

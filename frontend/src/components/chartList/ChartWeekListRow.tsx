@@ -84,7 +84,7 @@ export const ChartWeekListRow: React.FC<{
   return (
     <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : (colorScheme === 'dark' ? theme.colors.dark[7] : 'white') }}>
       <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: 72 }}>
-        <Flex align="center" gap="md" wrap="wrap" style={{ flex: 1 }}>
+        <Flex align="center" gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
           {filteredColumns.map((col: any) => {
             if (col.key === 'rank') {
               return (
@@ -106,7 +106,7 @@ export const ChartWeekListRow: React.FC<{
             }
             if (col.key === 'name') {
               return (
-                <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0 }}>
+                <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   {showImage && (
                     <SpotifyImageWithModal
                       entityId={row.entityId}
@@ -129,9 +129,9 @@ export const ChartWeekListRow: React.FC<{
                       }}
                     />
                   )}
-                  <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0 }}>
-                    <Text fw={700} size={scaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.name}</Text>
-                    {row.artistName && <Text size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName}</Text>}
+                  <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    <Text fw={700} size={scaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.name}</Text>
+                    {row.artistName && <Text size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.artistName}</Text>}
                   </Flex>
                 </Flex>
               );

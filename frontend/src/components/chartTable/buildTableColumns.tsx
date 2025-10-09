@@ -84,7 +84,7 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       accessor: col.key,
       title: resolvedTitle as any,
       textAlign: col.key === 'name' ? 'left' : 'center',
-      width: col.key === 'name' ? undefined : 80,
+      width: col.key === 'name' ? undefined : 85,
     } as any;
     if (col.key === 'rank') {
       return {
