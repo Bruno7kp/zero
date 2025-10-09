@@ -66,16 +66,52 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
         const isForce = forceReloadToken !== lastForceTokenRef.current;
         lastForceTokenRef.current = forceReloadToken;
         setLoading(true);
+        // Use memoized primitive snapshot to avoid effect loops and satisfy exhaustive-deps
+        const {
+            chartType: ct,
+            username: uname,
+            online: isOnline,
+            dayOfWeek,
+            pointsWeight,
+            playsWeight,
+            gold,
+            platinum,
+            diamond,
+            totalPoints,
+            totalPlays,
+            entityName,
+            artistName,
+        } = computeDeps;
+
+        const chartForCert: any = {
+            // weights
+            music_points_weight: ct === 'track' ? pointsWeight : undefined,
+            album_points_weight: ct === 'album' ? pointsWeight : undefined,
+            music_plays_weight: ct === 'track' ? playsWeight : undefined,
+            album_plays_weight: ct === 'album' ? playsWeight : undefined,
+            // thresholds
+            music_gold_value: ct === 'track' ? gold : undefined,
+            album_gold_value: ct === 'album' ? gold : undefined,
+            music_platinum_value: ct === 'track' ? platinum : undefined,
+            album_platinum_value: ct === 'album' ? platinum : undefined,
+            music_diamond_value: ct === 'track' ? diamond : undefined,
+            album_diamond_value: ct === 'album' ? diamond : undefined,
+            // for cache expiry calculation (optional)
+            day_of_week: dayOfWeek,
+        };
+
         computeCertification({
-            chart,
-            chartType,
-            totals,
-            entity,
-            username,
-            offline: !online,
-            nextWeekDay: chart.day_of_week,
+            chart: chartForCert,
+            chartType: ct as any,
+            totals: { totalPoints, totalPlays },
+            entity: { name: entityName, artistName },
+            username: uname,
+            offline: !isOnline,
+            nextWeekDay: dayOfWeek ?? undefined,
             force: isForce,
-        }).then(r => { if (mounted) setResult(r); }).finally(() => { if (mounted) setLoading(false); });
+        })
+            .then(r => { if (mounted) setResult(r); })
+            .finally(() => { if (mounted) setLoading(false); });
         return () => { mounted = false; };
     }, [computeDeps, forceReloadToken]);
 
