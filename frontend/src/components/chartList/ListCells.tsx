@@ -3,6 +3,7 @@ import { Box, Flex, Text } from '@mantine/core';
 import type { ChartData } from '../../db/indexedDb';
 import { DeltaBadge } from '../DeltaBadge';
 import { CertificationIcon } from '../CertificationIcon';
+import { t } from 'i18next';
 
 export const RankCellList: React.FC<{
   row: ChartData;
@@ -57,7 +58,7 @@ export const CombinedPeakWeeksBlock: React.FC<{
       fontSize: theme.fontSizes[scaleSize('xl')]
     }}
   >
-    <Text size={scaleSize('xs')} style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>PEAK</Text>
+    <Text size={scaleSize('xs')} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>{t('charts.peak')}</Text>
     <Flex align="center" gap={6} style={{ justifySelf: 'start' }}>
       <Text fw={700} size={scaleSize('xl')} c={displayPeak === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
         {displayPeak != null ? displayPeak : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
@@ -66,8 +67,8 @@ export const CombinedPeakWeeksBlock: React.FC<{
         <Text c="dimmed" size={scaleSize('xs')} style={{ lineHeight: 1 }}>{`${renderedCountAtOne}x`}</Text>
       )}
     </Flex>
-    <Text size={scaleSize('xs')} style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>WEEKS</Text>
-    <Text fw={700} size={scaleSize('xl')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
+    <Text size={scaleSize('xs')} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>{t('charts.weeks')}</Text>
+    <Text fw={700} size={scaleSize('sm')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
       {displayWeeks != null ? displayWeeks : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
     </Text>
   </Box>
@@ -87,7 +88,7 @@ export const PeakCellList: React.FC<{
     {showPeakCount && display === 1 && renderedCountAtOne != null ? (
       <Text c="dimmed" mt={2} style={{ lineHeight: 1, letterSpacing: 0.5, fontSize: '0.6em' }}>{`${renderedCountAtOne}x`}</Text>
     ) : (rank === 1 ? (
-      <Text c="dimmed" mt={2} style={{ lineHeight: 1, letterSpacing: 0.5, fontSize: '0.6em' }}>PEAK</Text>
+      <Text c="dimmed" mt={2} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, fontSize: '0.6em' }}>{t('charts.peak')}</Text>
     ) : null)}
   </Flex>
 );
@@ -102,8 +103,8 @@ export const WeeksCellList: React.FC<{
       {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
     </Text>
     {rank === 1 && (
-      <Text c="dimmed" mt={2} style={{ lineHeight: 1, letterSpacing: 0.5, fontSize: '0.6em' }}>
-        WEEKS
+      <Text c="dimmed" mt={2} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, fontSize: '0.6em' }}>
+        {t('charts.weeks')}
       </Text>
     )}
   </Flex>

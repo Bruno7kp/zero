@@ -126,27 +126,13 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
 	return (
 		<>
-		<Grid>
+		<Grid mt="md">
 			{/* Texto do período da semana selecionada, centralizado, em linha separada, abaixo dos controles */}
 			{inputValue && (
 				<WeekHeader inputValue={inputValue} topLabel={t(topType, { week: weekNum })} />
 			)}
-			{/* Esquerda: seleção de tipo */}
-			<Grid.Col span={{ base: 6, sm: 4 }}>
-				<Flex
-					align="center"
-					justify={{ base: 'center', sm: 'flex-start' }}
-					w="100%"
-				>
-					{/* Mobile: show settings menu before the type segmented control */}
-					{isMobile && settingsMenu}
-					<TypeControl type={type} isBusy={isBusy} onChangeType={(v) => triggerChange(week || '', v)} />
-					{/* Drawer control hidden trigger, controlled open */}
-					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
-				</Flex>
-			</Grid.Col>
-			{/* Centro: navegação de semana */}
-			<Grid.Col span={{ base: 6, sm: 4 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			{/* Esquerda: navegação de semana */}
+			<Grid.Col span={{ base: 6, sm: 4 }} style={{ display: 'flex', alignItems: 'center'}}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<WeekPicker
 					inputValue={inputValue}
@@ -157,6 +143,22 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				/>
 				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next || isBusy}><IconArrowRight size={18} /></Button>
 			</Grid.Col>
+			{/* Centro: seleção de tipo */}
+			<Grid.Col span={{ base: 6, sm: 4 }}>
+				<Flex
+					align="center"
+					justify={{ base: 'flex-end', sm: 'center' }}
+					w="100%"
+					gap="xs"
+				>
+					{/* Mobile: show settings menu to the RIGHT of the type segmented control */}
+					<TypeControl type={type} isBusy={isBusy} onChangeType={(v) => triggerChange(week || '', v)} />
+					{/* Drawer control hidden trigger, controlled open */}
+					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
+					{isMobile && settingsMenu}
+				</Flex>
+			</Grid.Col>
+			
 
 			{/* Direita: seleção de visualização (desktop) */}
 			{!isMobile && (

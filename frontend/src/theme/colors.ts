@@ -153,3 +153,17 @@ export const BLUE_BORDER_06 = 'rgba(255,255,255,0.06)';
 export const BLUE_BORDER_08 = 'rgba(255,255,255,0.08)';
 export const BLUE_BORDER_12 = 'rgba(255,255,255,0.12)';
 export const BLUE_BORDER_18 = 'rgba(255,255,255,0.18)';
+
+// Ultra dark palette for "black" mode, with index 9 as pure black
+export const blackdark: MantineColorsTuple = [
+  '#bfbfbf', // 0 — cinza muito escuro
+  '#999999', // 1
+  '#7a7a7a', // 2
+  '#5c5c5c', // 3
+  '#404040', // 4
+  '#2c2c2c', // 5
+  '#1f1f1f', // 6
+  '#141414', // 7
+  '#0a0a0a', // 8
+  '#000000', // 9
+];

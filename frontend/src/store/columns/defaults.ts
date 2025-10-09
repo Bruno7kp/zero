@@ -12,8 +12,8 @@ export const defaultColumns: ColumnConfig[] = [
   { key: 'altPlaysVariation', label: 'charts.altPlaysVariationLabel', visible: false, isColumn: true },
   { key: 'deltaPlaysBadge', label: 'charts.deltaPlaysLabel', visible: false, isColumn: false },
   { key: 'deltaPercentPlaysBadge', label: 'charts.deltaPercentPlaysLabel', visible: true, isColumn: false },
-  { key: 'peak', label: 'Peak', labelComplete: 'charts.peakLabel', visible: true, isColumn: true },
-  { key: 'totalWeeks', label: 'Weeks', labelComplete: 'charts.weeksLabel', visible: true, isColumn: true },
+  { key: 'peak', label: 'charts.peak', labelComplete: 'charts.peakLabel', visible: true, isColumn: true },
+  { key: 'totalWeeks', label: 'charts.weeks', labelComplete: 'charts.weeksLabel', visible: true, isColumn: true },
 ];
 
 export const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));

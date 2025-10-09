@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Paper, Box, Flex, Title, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { ChartData } from '../../db/indexedDb';
@@ -34,23 +34,6 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret }: Slid
   const spotifyType = (chartType === 'artist' || chartType === 'album' || chartType === 'track') ? chartType : 'artist';
   const { imageUrl } = useSpotifyImage({ entityId: row.entityId, name: row.name, artist, type: spotifyType as any, clientId, clientSecret });
 
-  // Subtle background pan animation (respects reduced-motion)
-  useEffect(() => {
-    if (!imageUrl) return;
-    const prefersReduced = typeof window !== 'undefined' && 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
-    const el = bgRef.current;
-    if (!el || !('animate' in el)) return;
-    const anim = (el as any).animate(
-      [
-        { backgroundPosition: 'center 10%' },
-        { backgroundPosition: 'center 50%' },
-      ],
-      { duration: 8000, easing: 'ease-in-out', direction: 'alternate', iterations: Infinity }
-    );
-    return () => { try { anim?.cancel?.(); } catch { /* ignore */ } };
-  }, [imageUrl]);
-
   return (
     <Paper withBorder radius="md" shadow="md" h="100%" style={{ overflow: 'hidden', position: 'relative' }}>
       <Box
@@ -58,7 +41,7 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret }: Slid
         style={{
           position: 'absolute', inset: 0,
           backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
-          backgroundSize: 'cover', backgroundPosition: 'center 10%', filter: imageUrl ? 'none' : 'none', willChange: 'background-position',
+          backgroundSize: 'cover', backgroundPosition: 'center', filter: imageUrl ? 'none' : 'none', willChange: 'background-position',
         }}
       />
       <Box
@@ -66,8 +49,8 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret }: Slid
           position: 'absolute',
           inset: 0,
           background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.05) 100%)',
-          backdropFilter: 'blur(0)',
-          WebkitBackdropFilter: 'blur(0)'
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)'
         }}
       />
   <Flex align="center" justify="space-between" h="100%" px="xl" style={{ position: 'relative', zIndex: 1, gap: 16 }}>

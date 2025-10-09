@@ -12,7 +12,6 @@ import {
     Card,
     ThemeIcon,
     Divider,
-    useMantineColorScheme,
     useMantineTheme, Image,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +25,7 @@ import {
     IconStar,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 
 const HomePage: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -39,8 +39,8 @@ const HomePage: React.FC = () => {
     const user = useSelector((state: any) => state.auth.user);
     const token = useSelector((state: any) => state.auth.token);
     const isAuthenticated = !!user && !!token;
-    const { colorScheme } = useMantineColorScheme();
     const theme = useMantineTheme();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
 
     // Dados para a seção "Última Atualização"
     const latestUpdate = {
@@ -105,7 +105,7 @@ const HomePage: React.FC = () => {
                     verticalSpacing="lg"
                     mt="xl"
                 >
-                    <Card shadow="sm" padding="lg" radius="md">
+                    <Card shadow="sm" padding="lg" radius="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                         <ThemeIcon color="blue" size="xl" radius="xl">
                             <IconPlayerPlay style={{ width: rem(24), height: rem(24) }} />
                         </ThemeIcon>
@@ -116,7 +116,7 @@ const HomePage: React.FC = () => {
                             {t('home.about.feature1Description')}
                         </Text>
                     </Card>
-                    <Card shadow="sm" padding="lg" radius="md">
+                    <Card shadow="sm" padding="lg" radius="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                         <ThemeIcon color="red" size="xl" radius="xl">
                             <IconSettings style={{ width: rem(24), height: rem(24) }} />
                         </ThemeIcon>
@@ -127,7 +127,7 @@ const HomePage: React.FC = () => {
                             {t('home.about.feature2Description')}
                         </Text>
                     </Card>
-                    <Card shadow="sm" padding="lg" radius="md">
+                    <Card shadow="sm" padding="lg" radius="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                         <ThemeIcon color="green" size="xl" radius="xl">
                             <IconStar style={{ width: rem(24), height: rem(24) }} />
                         </ThemeIcon>
@@ -163,15 +163,12 @@ const HomePage: React.FC = () => {
             </Container>
 
             {/* Seção Última Atualização */}
-            <Box py="xl" style={{
-                backgroundColor:
-                    colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-            }}>
+            <Box py="xl">
                 <Container>
                     <Title order={3} ta="center" mb="lg">
                         {t('home.latestUpdate.title')}
                     </Title>
-                    <Card shadow="sm" padding="lg" radius="md">
+                    <Card shadow="sm" padding="lg" radius="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                         <Title order={4}>{latestUpdate.title}</Title>
                         <Text size="sm" c="dimmed" mb="md">
                             {latestUpdate.date}

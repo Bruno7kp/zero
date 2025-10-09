@@ -7,6 +7,7 @@ import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import type { ChartData } from '../../db/indexedDb';
 import { ChartItemStatsLoader } from '../ChartItemStatsLoader';
 import { makeScaleSize } from '../../hooks/useFontScale';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import {
   RankCellList,
   PlaysCellList,
@@ -32,13 +33,12 @@ export const ChartWeekListRow: React.FC<{
   type: string;
   clientId: string;
   clientSecret: string;
-  colorScheme: string;
   theme: any;
   week?: string;
   listBackground?: 'default' | 'transparent';
   fontScale: -2 | -1 | 0 | 1 | 2;
   listPeakWeeksCombined: boolean;
-}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, colorScheme, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined }) => {
+}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
@@ -81,10 +81,11 @@ export const ChartWeekListRow: React.FC<{
   const rowId = String(row.id);
 
   const isTransparent = listBackground === 'transparent';
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   return (
-    <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : (colorScheme === 'dark' ? theme.colors.dark[7] : 'white') }}>
+  <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode) }}>
       <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: 72 }}>
-        <Flex align="center" gap="md" wrap="wrap" style={{ flex: 1 }}>
+        <Flex align="center" gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
           {filteredColumns.map((col: any) => {
             if (col.key === 'rank') {
               return (
@@ -106,7 +107,7 @@ export const ChartWeekListRow: React.FC<{
             }
             if (col.key === 'name') {
               return (
-                <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0 }}>
+                <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   {showImage && (
                     <SpotifyImageWithModal
                       entityId={row.entityId}
@@ -129,9 +130,9 @@ export const ChartWeekListRow: React.FC<{
                       }}
                     />
                   )}
-                  <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0 }}>
-                    <Text fw={700} size={scaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.name}</Text>
-                    {row.artistName && <Text size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName}</Text>}
+                  <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    <Text fw={700} size={scaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.name}</Text>
+                    {row.artistName && <Text size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.artistName}</Text>}
                   </Flex>
                 </Flex>
               );

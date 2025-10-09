@@ -90,13 +90,22 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
         return arr;
     }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks]);
 
-    if (!chart || !week || !type) return null;
+    const renderPlaceholder = () => (
+        <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+            <Box style={{ height: '100%', width: '100%' }}>
+                <Skeleton height="100%" radius="md" />
+            </Box>
+        </div>
+    );
 
-    // Hide completely if there are no highlights
-    if (slides.length === 0) return null;
+    // Keep reserved height to avoid layout jumping when week changes
+    if (!chart || !week || !type) return renderPlaceholder();
+
+    // If there are no highlights for the selected week yet, show a skeleton with the same height
+    if (slides.length === 0) return renderPlaceholder();
 
     return (
-        <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden', marginBottom: 32 }}>
+        <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
             <Carousel
                 withIndicators
                 height="100%"

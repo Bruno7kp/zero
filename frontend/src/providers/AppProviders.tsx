@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react';
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter } from 'react-router-dom';
 import { DatesProvider } from '@mantine/dates';
@@ -21,17 +21,43 @@ const ThemedProviders: React.FC<AppProvidersProps> = ({ children }) => {
     const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
     const langKey = i18n.language.split('-')[0];
 
-    const theme = buildTheme(themeMode);
+    const theme = React.useMemo(() => buildTheme(themeMode), [themeMode]);
+
+    // Cross-tab sync: when another tab updates persisted Redux (persist:root),
+    // mirror theme changes into this tab's store to keep Mantine and Redux aligned.
+    React.useEffect(() => {
+        function onStorage(e: StorageEvent) {
+            if (e.key !== 'persist:root' || !e.newValue) return;
+            try {
+                const root = JSON.parse(e.newValue);
+                if (!root?.theme) return;
+                const incoming = JSON.parse(root.theme);
+                const incomingValue = incoming?.value as ThemeMode | undefined;
+                if (incomingValue && incomingValue !== themeMode) {
+                    // Simpler strategy: reload this tab to apply the new theme cleanly
+                    // and avoid any intermediate flicker/loops.
+                    window.location.reload();
+                }
+            } catch {
+                // ignore malformed values
+            }
+        }
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
+    }, [themeMode]);
 
     return (
-        <MantineProvider theme={theme} defaultColorScheme="dark">
+        <>
+            <ColorSchemeScript defaultColorScheme="dark" />
+            <MantineProvider theme={theme} defaultColorScheme="dark">
             <DatesProvider settings={{ locale: langKey || 'en' }}>
                 <ModalsProvider>
                     <Notifications position="top-left" />
                     <BrowserRouter>{children}</BrowserRouter>
                 </ModalsProvider>
             </DatesProvider>
-        </MantineProvider>
+            </MantineProvider>
+        </>
     );
 };
 

@@ -26,6 +26,7 @@ import {
     IconMessageCircle,
     IconInfoCircle,
     IconDroplet,
+    IconMoon,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
@@ -43,7 +44,7 @@ export const Header: React.FC = () => {
     const isAuthenticated = useSelector((state: any) => state.auth.user !== null);
     const reduxTheme = useSelector((state: any) => state.theme.value);
     const reduxLanguage = useSelector((state: any) => state.i18n.language);
-    const { colorScheme, setColorScheme } = useMantineColorScheme();
+    const { setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
     const { i18n, t } = useTranslation();
 
@@ -54,10 +55,8 @@ export const Header: React.FC = () => {
     // Sincroniza Redux -> Mantine (blue usa esquema dark internamente)
     React.useEffect(() => {
         const target = toMantineColorScheme(reduxTheme as ThemeMode);
-        if (target !== colorScheme) {
-            setColorScheme(target);
-        }
-    }, [reduxTheme, colorScheme, setColorScheme]);
+        setColorScheme(target);
+    }, [reduxTheme, setColorScheme]);
 
     // Sincroniza Redux -> i18next
     React.useEffect(() => {
@@ -70,7 +69,7 @@ export const Header: React.FC = () => {
     const handleToggleTheme = () => {
         const next = getNextThemeMode(reduxTheme as ThemeMode);
         dispatch(setTheme(next));
-        setColorScheme(toMantineColorScheme(next));
+        // setColorScheme will be updated by the effect above
     };
 
     // Ao trocar idioma pelo menu
@@ -90,6 +89,7 @@ export const Header: React.FC = () => {
                     const { toggleIconId: id } = getThemeAssets(reduxTheme as any, computedColorScheme);
                     if (id === 'droplet') return <IconDroplet style={{ width: rem(20), height: rem(20) }} />;
                     if (id === 'sun') return <IconSun style={{ width: rem(20), height: rem(20) }} />;
+                    if (id === 'moonAlt') return <IconMoon style={{ width: rem(20), height: rem(20) }} />;
                     return <IconMoonStars style={{ width: rem(20), height: rem(20) }} />;
                 })()}
             </ActionIcon>

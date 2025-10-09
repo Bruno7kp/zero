@@ -1,8 +1,10 @@
 // import React from 'react';
-import { Card, Group, ThemeIcon, Text, Divider, Grid, Select, Flex, Button, rem } from '@mantine/core';
+import { Card, Group, ThemeIcon, Text, Divider, Grid, Select, Flex, Button, rem, useMantineTheme } from '@mantine/core';
 import { IconStar } from '@tabler/icons-react';
 import { NavLink } from 'react-router-dom';
 import type { TFunction } from 'i18next';
+import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 
 interface ActiveChartOption {
     value: string;
@@ -23,8 +25,11 @@ const ActiveChartCard: React.FC<ActiveChartCardProps> = ({
     setActiveChartId,
     t,
     chartOptions
-}) => (
-    <Card shadow="md" p="md">
+}) => {
+    const theme = useMantineTheme();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+    return (
+    <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
         <Group>
             <ThemeIcon variant="light" size="md">
                 <IconStar style={{ width: rem(20), height: rem(20) }} />
@@ -60,6 +65,7 @@ const ActiveChartCard: React.FC<ActiveChartCardProps> = ({
             </Button>
         </Flex>
     </Card>
-);
+    );
+};
 
 export default ActiveChartCard;
