@@ -1,3 +1,4 @@
+import type { MantineTheme } from '@mantine/core';
 // Central helpers for theme modes so we can add new ones in one place
 
 export type ThemeMode = 'dark' | 'light' | 'blue';
@@ -24,7 +25,7 @@ export function appShellDarkIndex(mode: ThemeMode): number {
     case 'blue':
       return 8;
     default:
-      return 8;
+      return 7;
   }
 }
 
@@ -34,8 +35,9 @@ export function appShellDarkIndex(mode: ThemeMode): number {
 export function appShellHeaderDarkIndex(mode: ThemeMode): number {
   switch (mode) {
     case 'blue':
-    case 'dark':
       return 7;
+    case 'dark':
+      return 8;
     default:
       return appShellDarkIndex(mode);
   }
@@ -64,4 +66,17 @@ export function themeIconByMode(mode: ThemeMode, scheme: 'light' | 'dark'): Them
   if (mode !== 'light' && mode !== 'dark') return 'moon';
   // For native light/dark modes, keep the historical behavior based on computed scheme.
   return scheme === 'dark' ? 'sun' : 'droplet';
+}
+
+// Card background per theme mode, centralized like other helpers
+export function getCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): string {
+  switch (mode) {
+    case 'light':
+      return (theme as any).white || '#ffffff';
+    case 'blue':
+      return ((theme as any).colors?.dark?.[7]) ?? '#1A1B1E';
+    case 'dark':
+    default:
+      return ((theme as any).colors?.dark?.[8]) ?? '#1A1B1E';
+  }
 }

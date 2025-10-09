@@ -1,10 +1,12 @@
 // import React from 'react';
-import { Card, Group, ThemeIcon, Text, Divider, Table, ActionIcon, ScrollArea, Menu, Tooltip } from '@mantine/core';
+import { Card, Group, ThemeIcon, Text, Divider, Table, ActionIcon, ScrollArea, Menu, Tooltip, useMantineTheme } from '@mantine/core';
 import { IconListNumbers, IconEdit, IconTrash, IconEraser, IconRefresh, IconDotsVertical } from '@tabler/icons-react';
 // import { DataTable } from 'mantine-datatable';
 import { Link, generatePath } from 'react-router-dom';
 
 import type { TFunction } from 'i18next';
+import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 
 interface ChartsListCardProps {
     charts: any[];
@@ -18,8 +20,10 @@ interface ChartsListCardProps {
 
 const ChartsListCard = ({ charts, t, openDeleteModal, isOnline, onRebuildStats, onClearChartData, processingState }: ChartsListCardProps) => {
     const hasCharts = charts && charts.length > 0;
+    const theme = useMantineTheme();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
     return (
-        <Card shadow="md" p="md">
+        <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
             <Group>
                 <ThemeIcon variant="light" size="md">
                     <IconListNumbers style={{ width: 20, height: 20 }} />
@@ -28,7 +32,7 @@ const ChartsListCard = ({ charts, t, openDeleteModal, isOnline, onRebuildStats, 
             </Group>
             <Divider variant="dashed" size="sm" my="xs" />
             <ScrollArea.Autosize mah={300} offsetScrollbars>
-                <Table verticalSpacing="xs" highlightOnHover striped withRowBorders>
+                <Table verticalSpacing="xs" highlightOnHover withRowBorders>
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th style={{ width: '40%' }}>{t('charts.title')}</Table.Th>

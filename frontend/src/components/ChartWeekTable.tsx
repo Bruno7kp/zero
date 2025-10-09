@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { DataTable } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
-import { Paper, Text, Flex } from '@mantine/core';
+import { Paper, Text, Flex, useMantineTheme } from '@mantine/core';
 import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
@@ -20,6 +20,7 @@ import RowExpansionStats from './chartTable/RowExpansionStats';
 import { useStableDisplayedData } from './chartTable/hooks/useStableDisplayedData';
 import { useDeferredStats } from './chartTable/hooks/useDeferredStats';
 import { useStatsEmptyFallback } from './chartTable/hooks/useStatsEmptyFallback';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 
 interface ChartWeekTableProps {
     chart: any;
@@ -210,7 +211,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const showLoadingTail = useProgressive && !progressive.done;
 
     const tableBgSetting = (useSelector((state: RootState) => (state as any).columns?.views?.table?.settings?.tableBackground) || 'default') as 'default' | 'transparent';
-    const paperProps = tableBgSetting === 'transparent' ? { shadow: 'none' as const, bg: 'transparent' as const } : { shadow: 'xs' as const };
+    const theme = useMantineTheme();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+    const paperProps = tableBgSetting === 'transparent'
+        ? { shadow: 'none' as const, bg: 'transparent' as const, style: { background: 'transparent' } }
+        : { shadow: 'xs' as const, style: { background: getCardBackgroundByMode(theme, themeMode) } };
 
     return (
         <>

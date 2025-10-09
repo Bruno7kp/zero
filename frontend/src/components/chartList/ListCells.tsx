@@ -68,7 +68,7 @@ export const CombinedPeakWeeksBlock: React.FC<{
       )}
     </Flex>
     <Text size={scaleSize('xs')} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>{t('charts.weeks')}</Text>
-    <Text fw={700} size={scaleSize('md')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
+    <Text fw={700} size={scaleSize('sm')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
       {displayWeeks != null ? displayWeeks : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
     </Text>
   </Box>

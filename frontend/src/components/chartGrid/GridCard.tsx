@@ -1,5 +1,7 @@
 import React from 'react';
-import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme } from '@mantine/core';
+import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { IconPlus } from '@tabler/icons-react';
 import type { ChartData } from '../../db/indexedDb';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
@@ -56,7 +58,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   showPeakCount,
 }) => {
   const theme = useMantineTheme();
-  const { colorScheme } = useMantineColorScheme();
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   const deltaValue = (row as any).deltaRank;
   const deltaColor = (() => {
     if (deltaValue === 'NEW') return 'lazuli';
@@ -70,7 +72,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   })();
 
   return (
-    <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colorScheme === 'dark' ? theme.colors.dark[7] : 'white' }}>
+  <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: getCardBackgroundByMode(theme, themeMode) }}>
       <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
         {rankVariationLocation === 'corner' && cornerOverlay}
         <ActionIcon

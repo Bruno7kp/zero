@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../db/indexedDb';
-import { Button, Card, Group, Text, Flex, Divider, Grid, rem, ThemeIcon } from '@mantine/core';
+import { Button, Card, Group, Text, Flex, Divider, Grid, rem, ThemeIcon, useMantineTheme } from '@mantine/core';
 import { SpotifyImageWithModal } from './SpotifyImageWithModal';
 import {
     IconMicrophone,
@@ -12,6 +12,8 @@ import {
 import { Link } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
+import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 
 
 interface ChartWeekTop1SummaryProps {
@@ -32,6 +34,8 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ char
     const [top1, setTop1] = useState<Top1Item[]>([]);
     const [weekStr, setWeekStr] = useState<string | undefined>(week);
     const { t } = useTranslation();
+    const theme = useMantineTheme();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
 
     useEffect(() => {
         let cancelled = false;
@@ -78,7 +82,7 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ char
 
     if (!weekStr || !top1 || top1.length === 0) {
         return (
-            <Card shadow="md" p="md">
+            <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                 <Group>
                     <ThemeIcon variant="light" size="md">
                         <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
@@ -96,7 +100,7 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ char
     }
 
     return (
-        <Card shadow="md" p="md">
+        <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
             <Group>
                 <ThemeIcon variant="light" size="md">
                     <IconListNumbers style={{ width: rem(20), height: rem(20) }} />

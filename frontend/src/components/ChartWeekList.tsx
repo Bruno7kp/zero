@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { Flex, Text, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { Flex, Text, useMantineTheme } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
 import { ChartWeekListRow } from './chartList/ChartWeekListRow.tsx';
 
@@ -81,7 +81,6 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const safeDisplayedData = (displayedData && displayedData.length > 0) ? displayedData : lastNonEmptyDisplayedData;
   const columns = useSelector((state: any) => (state.columns?.views?.list?.columns) || state.columns?.columns || []);
   const theme = useMantineTheme();
-  const { colorScheme } = useMantineColorScheme();
   const listBackground = useSelector((state: any) => (state.columns?.views?.list?.settings?.listBackground) || 'default');
   const viewConfig = useSelector((state: any) => (state as any).columns?.views?.list);
   const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
@@ -165,7 +164,6 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           type={type}
           clientId={clientId}
           clientSecret={clientSecret}
-          colorScheme={colorScheme}
           theme={theme}
           week={week}
           listBackground={listBackground}

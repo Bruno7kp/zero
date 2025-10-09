@@ -1,6 +1,6 @@
 // src/components/ChartSyncProgress.tsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, Group, Button, Card, Divider, rem, ThemeIcon, Alert, Tooltip, Badge } from '@mantine/core';
+import { Text, Group, Button, Card, Divider, rem, ThemeIcon, Alert, Tooltip, Badge, useMantineTheme } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useChartDb } from '../hooks/useChartDb';
 import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
@@ -12,6 +12,8 @@ import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
 import { IconRefresh, IconSettings } from "@tabler/icons-react";
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
+import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -45,6 +47,8 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
     const { isOnline } = useOfflineStatus();
+    const theme = useMantineTheme();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
 
     // Calcula as semanas a carregar
     useEffect(() => {
@@ -208,7 +212,7 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
     };
 
     return (
-        <Card shadow="md" p="md">
+        <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
             <Group justify="space-between" align="center">
                 <Group>
                     <ThemeIcon variant="light" size="md">
