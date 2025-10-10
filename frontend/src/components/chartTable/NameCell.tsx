@@ -15,6 +15,7 @@ interface NameCellProps {
   onImageChange: () => void;
   onImageLoad: (url: string) => void;
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
+  imageSize?: number;
 }
 
 export const NameCell: React.FC<NameCellProps> = ({
@@ -29,6 +30,7 @@ export const NameCell: React.FC<NameCellProps> = ({
   onImageChange,
   onImageLoad,
   scaleSize,
+  imageSize = 40,
 }) => {
   return (
     <Flex>
@@ -48,10 +50,10 @@ export const NameCell: React.FC<NameCellProps> = ({
             clientId={clientId}
             clientSecret={clientSecret}
             forceUpdate={imageForceUpdate}
-            width={40}
-            height={40}
+            width={imageSize}
+            height={imageSize}
             borderRadius={0}
-            style={{ minWidth: 40, maxWidth: 40 }}
+            style={{ minWidth: imageSize, maxWidth: imageSize }}
             lastImageUrl={lastImageUrl}
             onImageChange={onImageChange}
             onImageLoad={onImageLoad}

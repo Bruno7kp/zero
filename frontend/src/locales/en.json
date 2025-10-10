@@ -110,9 +110,15 @@
         "noData": "No data available",
         "position": "Position",
         "nameArtist": "Name | Artist",
+    "artistColumn": "Artist",
         "plays": "Plays",
         "peak": "Peak",
-        "weeks": "Weeks"
+    "weeks": "Weeks",
+    "topArtistsHeader": "Top Artists",
+    "topAlbumsHeader": "Top Albums",
+    "topTracksHeader": "Top Tracks",
+    "weekNumberLabel": "Week {{num}}",
+    "weekLabelFallback": "{{week}}"
       },
       "badgeStyles": {
         "title": "Badge Customization",

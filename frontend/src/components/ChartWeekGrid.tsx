@@ -288,6 +288,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
                             }}
                             showPeakCount={showPeakCount}
+                            badgeStylesRank={badgeStylesRank}
                         />
                     );
                 })}
@@ -320,6 +321,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
                                 imageForceUpdate={imageForceUpdate[row.entityId]}
                                 lastImageUrl={lastImageUrlByEntityId[row.entityId]}
+                                colSpan={{ base: 10, md: 7.5, lg: 5 }}
                                 onImageChange={() => {
                                     if (row.entityId) {
                                         setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
@@ -350,6 +352,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 }}
                                 showPeakCount={showPeakCount}
                                 isDropped={true}
+                                badgeStylesRank={badgeStylesRank}
                             />
                         ))}
                     </Grid>

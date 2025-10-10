@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid } from '@mantine/core';
 import type { ChartData } from '../../db/indexedDb';
 import GridCard from './GridCard';
+import type { BadgeStyleConfig } from '../../store/badgeStylesSlice';
 
 interface GridItemRendererProps {
   row: ChartData;
@@ -29,6 +30,7 @@ interface GridItemRendererProps {
   showPeakCount: boolean;
   colSpan?: { base: number; xs?: number; sm?: number; md?: number; lg?: number };
   isDropped?: boolean;
+  badgeStylesRank: BadgeStyleConfig;
 }
 
 export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
@@ -53,6 +55,7 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
   showPeakCount,
   colSpan = { base: 15, md: 10, lg: 6 },
   isDropped = false,
+  badgeStylesRank,
 }) => {
   return (
     <Grid.Col key={row.id} span={colSpan}>
@@ -77,6 +80,7 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
         stats={stats}
         showPeakCount={showPeakCount}
         isDropped={isDropped}
+        badgeStylesRank={badgeStylesRank}
       />
     </Grid.Col>
   );

@@ -110,9 +110,15 @@
         "noData": "Sem dados disponíveis",
         "position": "Posição",
         "nameArtist": "Nome | Artista",
+    "artistColumn": "Artista",
         "plays": "Reproduções",
         "peak": "Pico",
-        "weeks": "Semanas"
+    "weeks": "Semanas",
+    "topArtistsHeader": "Top Artistas",
+    "topAlbumsHeader": "Top Álbuns",
+    "topTracksHeader": "Top Músicas",
+    "weekNumberLabel": "Semana {{num}}",
+    "weekLabelFallback": "{{week}}"
       },
       "badgeStyles": {
         "title": "Customização de badges",

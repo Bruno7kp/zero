@@ -137,6 +137,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			chartName={chartName}
 			week={week}
 			weekNumber={weekNum}
+			chartType={type as 'artist' | 'album' | 'track'}
 			disabled={!week || isBusy || !chartData || chartData.length === 0}
 		/>
 	);
@@ -149,7 +150,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				<WeekHeader inputValue={inputValue} topLabel={t(topType, { week: weekNum })} />
 			)}
 			{/* Esquerda: navegação de semana */}
-			<Grid.Col span={{ base: 6, sm: 4 }} style={{ display: 'flex', alignItems: 'center'}}>
+			<Grid.Col span={{ base: 5, sm: 4 }} style={{ display: 'flex', alignItems: 'center'}}>
 				<Button onClick={handlePrev} size="xs" variant="subtle" px={6} disabled={!prev || isBusy}><IconArrowLeft size={18} /></Button>
 				<WeekPicker
 					inputValue={inputValue}
@@ -161,7 +162,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				<Button onClick={handleNext} size="xs" variant="subtle" px={6} disabled={!next || isBusy}><IconArrowRight size={18} /></Button>
 			</Grid.Col>
 			{/* Centro: seleção de tipo */}
-			<Grid.Col span={{ base: 6, sm: 4 }}>
+			<Grid.Col span={{ base: 7, sm: 4 }}>
 				<Flex
 					align="center"
 					justify={{ base: 'flex-end', sm: 'center' }}
@@ -172,8 +173,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 					<TypeControl type={type} isBusy={isBusy} onChangeType={(v) => triggerChange(week || '', v)} />
 					{/* Drawer control hidden trigger, controlled open */}
 					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
-					{isMobile && shareMenu}
 					{isMobile && settingsMenu}
+					{isMobile && shareMenu}
 				</Flex>
 			</Grid.Col>
 			
@@ -189,8 +190,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 				>
 					<ViewControl view={view} onSetView={handleSetView} />
 					{/* Desktop: show share and settings menu at the end, after the view segmented control */}
-					{!isMobile && shareMenu}
 					{!isMobile && settingsMenu}
+					{!isMobile && shareMenu}
 				</Flex>
 			</Grid.Col>
 			)}

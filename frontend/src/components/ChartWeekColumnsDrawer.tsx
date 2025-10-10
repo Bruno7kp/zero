@@ -155,9 +155,16 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPreset({ view: viewType, kind, preset: kind === 'rank' && viewType === 'grid' ? 'solidIconOnly' : (kind === 'rank' ? 'light' : 'transparent') }));
                 return;
             }
-            // Grid aceita presets sólidos, incluindo "apenas ícone"
-            if (viewType === 'grid' && kind === 'rank' && !['solid','solidIcon','solidIconOnly'].includes(preset)) {
-                dispatch(setPreset({ view: viewType, kind, preset: 'solidIconOnly' }));
+            // Grid agora aceita transparent/light/solid variações; apenas especiais continuam restritas
+            if (viewType === 'grid' && kind === 'rank') {
+                const allowedGridRankPresets = [
+                    'transparent','transparentIcon','transparentIconOnly',
+                    'light','lightIcon','lightIconOnly',
+                    'solid','solidIcon','solidIconOnly'
+                ];
+                if (!allowedGridRankPresets.includes(preset)) {
+                    dispatch(setPreset({ view: viewType, kind, preset: 'transparentIconOnly' }));
+                }
             }
             // Invalida especiais fora da condição (badgeKind rank, location column, not grid)
             if (kind === 'rank' && (preset === 'maximalist' || preset === 'maximalistLight')) {

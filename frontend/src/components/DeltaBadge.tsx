@@ -60,7 +60,20 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     let variant = cfg.variant;
     // Regra: se variante for sólida e a cor for gray, usar variante light para suavizar SOMENTE em tabela/lista (grid mantém filled)
     if (variant === 'filled' && color === 'gray' && (contextView === 'table' || contextView === 'list' || (!contextView))) variant = 'light';
-    const isTransparent = cfg.variant === 'transparent';
+        const isTransparent = cfg.variant === 'transparent';
+        const applyGridFrosted = contextView === 'grid' && isTransparent;
+            const frostedStyles = applyGridFrosted
+                    ? {
+                            background: 'rgba(0, 0, 0, 0.35)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.35)',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            color: '#fff',
+                        }
+                    : {
+                            background: 'transparent',
+                            backgroundColor: 'transparent',
+                        };
     const radius = cfg.radius === 'pill' ? 'xl' : cfg.radius;
     const size = (cfg.size as any) || 'xs';
     // Padding base (may be overridden for fixed-width column context)
@@ -125,7 +138,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            ...(isTransparent ? { background: 'transparent', backgroundColor: 'transparent' } : {})
+                            ...(isTransparent ? frostedStyles : {})
                         }}
                     >
                         {displayLabel}
@@ -142,7 +155,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
                             padding: 0,
                             display: 'flex',
                             alignItems: 'stretch',
-                            ...(isTransparent && (cfg.splitIconVariant === 'transparent' || cfg.splitIconVariant === 'filled') ? { background: 'transparent', backgroundColor: 'transparent' } : {})
+                            ...(isTransparent && (cfg.splitIconVariant === 'transparent' || cfg.splitIconVariant === 'filled') ? frostedStyles : {})
                         }}
                     >
                         <Flex align="center" justify="center" style={{ height: '100%', width: '100%' }}>
@@ -154,8 +167,8 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
         }
         return (
             <Flex direction="row" gap={2} align="center">
-                <Badge variant={variant as any} color={color} radius={radius as any} size={size} style={{ fontWeight: 700, fontSize: effectiveFontSize, ...paddingStyle, ...(isTransparent ? { background: 'transparent', backgroundColor: 'transparent' } : {}) }}>{displayLabel}</Badge>
-                <Badge variant={cfg.splitIconVariant || 'filled'} color={color} radius={radius as any} size={size} style={{ fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingInline: 4, ...(isTransparent && (cfg.splitIconVariant === 'transparent') ? { background: 'transparent', backgroundColor: 'transparent' } : {}) }}>
+                <Badge variant={variant as any} color={color} radius={radius as any} size={size} style={{ fontWeight: 700, fontSize: effectiveFontSize, ...paddingStyle, ...(isTransparent ? frostedStyles : {}) }}>{displayLabel}</Badge>
+                <Badge variant={cfg.splitIconVariant || 'filled'} color={color} radius={radius as any} size={size} style={{ fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingInline: 4, ...(isTransparent && (cfg.splitIconVariant === 'transparent') ? frostedStyles : {}) }}>
                     {icon}
                 </Badge>
             </Flex>
@@ -190,8 +203,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
                     alignItems: 'center',
                     justifyContent: 'center',
                     ...finalPaddingStyle,
-                    background: 'transparent',
-                    backgroundColor: 'transparent',
+                    ...(isTransparent ? frostedStyles : {}),
                 }}
                 aria-busy
             >
@@ -218,7 +230,7 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
                 display: 'flex',
                 alignItems: 'center',
                 ...finalPaddingStyle,
-                ...(isTransparent ? { background: 'transparent', backgroundColor: 'transparent' } : {})
+                ...(isTransparent ? frostedStyles : {}),
             }}
         >
             <Flex align="center" gap={4} justify="center" style={{ lineHeight: 1, width: '100%', justifyContent: 'center', whiteSpace: 'nowrap', overflow: 'hidden' }}>

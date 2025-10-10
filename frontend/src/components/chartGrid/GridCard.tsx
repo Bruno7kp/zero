@@ -7,6 +7,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import { formatNumber } from '../../utils/format';
 import { t } from 'i18next';
+import type { BadgeStyleConfig } from '../../store/badgeStylesSlice';
 
 export interface GridCardProps {
   row: ChartData;
@@ -35,6 +36,7 @@ export interface GridCardProps {
   } | undefined;
   showPeakCount: boolean;
   isDropped?: boolean;
+  badgeStylesRank: BadgeStyleConfig;
 }
 
 export const GridCard: React.FC<GridCardProps> = ({
@@ -58,6 +60,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   stats,
   showPeakCount,
   isDropped = false,
+  badgeStylesRank,
 }) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -96,6 +99,10 @@ export const GridCard: React.FC<GridCardProps> = ({
   const rankBadgeSize = isDropped ? 'lg' : 'xl';
   const rankBadgeFontSize = isDropped ? 24 : 32;
   const rankBadgeMinWidth = isDropped ? 32 : 40;
+  const isTransparentRankBadge = badgeStylesRank.variant === 'transparent';
+  const rankBadgeVariant = isTransparentRankBadge ? 'filled' : (badgeStylesRank.variant === 'outline' ? 'outline' : badgeStylesRank.variant);
+  const frostedBackground = getFrostedBackground();
+  const rankBadgeColor = row.rank === 1 ? 'lazuli' : deltaColor;
 
 
   return (
@@ -112,9 +119,9 @@ export const GridCard: React.FC<GridCardProps> = ({
           <IconPlus size={16} />
         </ActionIcon>
         <Badge
-          color={row.rank === 1 ? 'lazuli' : deltaColor}
+          color={rankBadgeColor}
           size={rankBadgeSize}
-          variant="filled"
+          variant={rankBadgeVariant as any}
           py="xl"
           px="xs"
           style={{
@@ -129,14 +136,18 @@ export const GridCard: React.FC<GridCardProps> = ({
             borderTopLeftRadius: 0,
             borderBottomRightRadius: 0,
             borderBottomLeftRadius: 0,
-            // Frosted glass effect
-            background: getFrostedBackground(),
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)', // Safari support
-            // Fallback for browsers without backdrop-filter support
-            '@supports not (backdrop-filter: blur(8px))': {
-              background: getFrostedBackground().replace(/0\.\d+\)$/, '0.95)'), // More opaque fallback
-            }
+            ...(isTransparentRankBadge ? {
+              background: frostedBackground,
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              color: theme.white,
+              '@supports not (backdrop-filter: blur(8px))': {
+                background: frostedBackground.replace(/0\.\d+\)$/, '0.95)')
+              }
+            } : {
+              backdropFilter: undefined,
+              WebkitBackdropFilter: undefined,
+            })
           }}
         >
           <Box component="span" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>

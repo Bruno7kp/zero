@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu, ActionIcon, Modal, Text, Button, Box, Textarea, Group } from '@mantine/core';
 import { IconShare, IconCopy, IconCheck } from '@tabler/icons-react';
 import { useClipboard } from '@mantine/hooks';
+import { useSelector } from 'react-redux';
 
 interface ShareMenuProps {
   t: (k: any, options?: any) => string;
@@ -9,12 +10,28 @@ interface ShareMenuProps {
   chartName: string;
   week: string | undefined;
   weekNumber: number | null;
+  chartType: 'artist' | 'album' | 'track';
   disabled?: boolean;
 }
 
-export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, week, disabled }) => {
+export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, week, weekNumber, chartType, disabled }) => {
   const [modalOpened, setModalOpened] = useState(false);
   const clipboard = useClipboard({ timeout: 2000 });
+  const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
+
+  const formatInteger = (value: number | null | undefined) => {
+    if (typeof value !== 'number' || Number.isNaN(value)) return '0';
+    return value.toLocaleString();
+  };
+
+  const parseNumeric = (value: unknown): number | null => {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+    return null;
+  };
 
   const generatePlainTextChart = () => {
     if (!chartData || chartData.length === 0 || !week) {
@@ -23,13 +40,37 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
 
     const lines: string[] = [];
     
-    // Header - format: "ChartName :: Type - Week N"
-    lines.push(`${chartName}`);
+    const typeLabel = (() => {
+      if (chartType === 'artist') {
+        return t('charts.share.topArtistsHeader', 'Top Artists');
+      }
+      if (chartType === 'album') {
+        return t('charts.share.topAlbumsHeader', 'Top Albums');
+      }
+      if (chartType === 'track') {
+        return t('charts.share.topTracksHeader', 'Top Tracks');
+      }
+      return '';
+    })();
+
+    const headerWeek = weekNumber
+      ? t('charts.share.weekNumberLabel', { defaultValue: 'Week {{num}}', num: weekNumber })
+      : (week ? t('charts.share.weekLabelFallback', { defaultValue: week, week }) : '');
+
+    const header = typeLabel
+      ? `${chartName} :: ${typeLabel}${headerWeek ? ` - ${headerWeek}` : ''}`
+      : `${chartName}${headerWeek ? ` - ${headerWeek}` : ''}`;
+
+    lines.push(header);
     
     // Column headers with separator
+    const nameColumnLabel = chartType === 'artist'
+      ? t('charts.share.artistColumn', 'Artista')
+      : t('charts.share.nameArtist', 'Nome | Artista');
+
     const headers = [
       t('charts.share.position', 'Posição'),
-      t('charts.share.nameArtist', 'Nome | Artista'),
+      nameColumnLabel,
       t('charts.share.plays', 'Reproduções'),
       t('charts.share.peak', 'Pico'),
       t('charts.share.weeks', 'Semanas')
@@ -55,12 +96,24 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
         }
       }
       
-      const deltaPlays = row.deltaPlays;
-      let playsStr = `${row.plays || 0}`;
-      if (typeof deltaPlays === 'number' && deltaPlays !== 0) {
-        const percent = row.previousPlays ? ((deltaPlays / row.previousPlays) * 100).toFixed(2) : '0';
-        playsStr += ` (${deltaPlays > 0 ? '+' : ''}${percent}%)`;
+      const deltaPlaysRaw = parseNumeric(row.deltaPlays) || 0;
+      const playsValue = parseNumeric(row.plays) ?? 0;
+      const previousPlays = playsValue - deltaPlaysRaw;
+      const percentChange = previousPlays > 0 && deltaPlaysRaw !== 0
+        ? (deltaPlaysRaw / previousPlays) * 100
+        : null;
+      const playsParts: string[] = [formatInteger(playsValue)];
+      if (deltaPlaysRaw !== 0) {
+        const percentLabel = percentChange !== null
+          ? `${deltaPlaysRaw > 0 ? '+' : ''}${percentChange.toFixed(0)}%`
+          : `${deltaPlaysRaw > 0 ? '+' : '-'}${formatInteger(Math.abs(deltaPlaysRaw))}`;
+        playsParts.push(`(${percentLabel})`);
       }
+      const playsStr = playsParts.join(' ');
+
+      const stats = statsMap?.[row.entityId] || row.stats || {};
+      const peakValue = stats?.peak?.position ?? row.peak ?? '';
+      const weeksValue = stats?.totals?.withinCutoff ?? row.totalWeeks ?? '';
       
       // Format: rank (delta) | name - artist | plays (change) | peak | weeks
       const nameArtist = row.artistName ? `${row.name} - ${row.artistName}` : row.name || '';
@@ -69,8 +122,8 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
         `${row.rank}${deltaStr}`,
         nameArtist,
         playsStr,
-        row.peak || '',
-        row.totalWeeks || ''
+        peakValue !== null && peakValue !== undefined ? `${peakValue}` : '',
+        weeksValue !== null && weeksValue !== undefined ? `${weeksValue}` : ''
       ];
       
       lines.push(rowData.join(' | '));
@@ -116,8 +169,8 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
           <Textarea
             value={generatePlainTextChart()}
             readOnly
-            minRows={10}
-            maxRows={20}
+            rows={22}
+            maxRows={22}
             styles={{
               input: {
                 fontFamily: 'monospace',
