@@ -50,7 +50,7 @@ services:
       - ./backend:/var/www/html
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "8081:80"
+      - "8088:80"
     depends_on:
       - app
       - frontend
