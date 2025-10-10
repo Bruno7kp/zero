@@ -39,7 +39,8 @@ export const ChartWeekListRow: React.FC<{
   fontScale: -2 | -1 | 0 | 1 | 2;
   listPeakWeeksCombined: boolean;
   chart: any;
-}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined, chart }) => {
+  isDropped?: boolean;
+}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined, chart, isDropped = false }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
@@ -55,9 +56,6 @@ export const ChartWeekListRow: React.FC<{
   const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
   const peakCountStyle = useSelector((state: any) => state.columns?.views?.list?.settings?.peakCountStyle) || 'noCount';
   const showPeakCount = peakCountStyle === 'withCount';
-
-  // Mantine token shifter for font scale
-  const scaleSize = useMemo(() => makeScaleSize(fontScale), [fontScale]);
 
   useEffect(() => {
     try {
@@ -80,16 +78,21 @@ export const ChartWeekListRow: React.FC<{
   const toggle = useCallback(() => setExpanded(e => !e), []);
   const rowId = String(row.id);
 
-  const isTransparent = listBackground === 'transparent';
+  const isTransparent = listBackground === 'transparent' || isDropped;
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+  
+  // Dropped items styling: smaller font scale
+  const effectiveFontScale = isDropped ? Math.max(-2, fontScale - 1) as -2 | -1 | 0 | 1 | 2 : fontScale;
+  const effectiveScaleSize = useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
+  
   return (
   <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode) }}>
-      <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: 72 }}>
+      <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: isDropped ? 60 : 72 }}>
         <Flex align="center" gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
           {filteredColumns.map((col: any) => {
             if (col.key === 'rank') {
               return (
-                <RankCellList key={col.key} row={row} showDeltaBadge={showDeltaBadge} badgeStylesRank={badgeStylesRank} scaleSize={scaleSize as any} />
+                <RankCellList key={col.key} row={row} showDeltaBadge={showDeltaBadge} badgeStylesRank={badgeStylesRank} scaleSize={effectiveScaleSize as any} />
               );
             }
             if (col.key === 'plays') {
@@ -101,11 +104,12 @@ export const ChartWeekListRow: React.FC<{
                   showDeltaPlaysBadge={showDeltaPlaysBadge}
                   showDeltaPercentPlaysBadge={showDeltaPercentPlaysBadge}
                   badgeStylesPlays={badgeStylesPlays}
-                  scaleSize={scaleSize as any}
+                  scaleSize={effectiveScaleSize as any}
                 />
               );
             }
             if (col.key === 'name') {
+              const imageSize = isDropped ? 56 : 72;
               return (
                 <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   {showImage && (
@@ -117,10 +121,10 @@ export const ChartWeekListRow: React.FC<{
                       clientId={clientId}
                       clientSecret={clientSecret}
                       forceUpdate={imageForceUpdate}
-                      width={72}
-                      height={72}
+                      width={imageSize}
+                      height={imageSize}
                       borderRadius={0}
-                      style={{ minWidth: 72, maxWidth: 72 }}
+                      style={{ minWidth: imageSize, maxWidth: imageSize }}
                       lastImageUrl={lastImageUrl}
                       onImageChange={() => {
                         setImageForceUpdate(f => f + 1);
@@ -131,8 +135,8 @@ export const ChartWeekListRow: React.FC<{
                     />
                   )}
                   <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <Text fw={700} size={scaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.name}</Text>
-                    {row.artistName && <Text size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.artistName}</Text>}
+                    <Text fw={700} size={effectiveScaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.name}</Text>
+                    {row.artistName && <Text size={effectiveScaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.artistName}</Text>}
                   </Flex>
                 </Flex>
               );
@@ -158,7 +162,7 @@ export const ChartWeekListRow: React.FC<{
                     displayWeeks={displayWeeks}
                     renderedCountAtOne={renderedCountAtOne}
                     showPeakCount={showPeakCount}
-                    scaleSize={scaleSize as any}
+                    scaleSize={effectiveScaleSize as any}
                     theme={theme}
                   />
                 );
@@ -173,7 +177,7 @@ export const ChartWeekListRow: React.FC<{
               const rawCountAtOne = (liveCount != null ? liveCount : stableWeeksAtPeak);
               const renderedCountAtOne = display === 1 ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1) : null;
               return (
-                <PeakCellList key={col.key} display={display} renderedCountAtOne={renderedCountAtOne} showPeakCount={showCount} scaleSize={scaleSize as any} rank={row.rank} />
+                <PeakCellList key={col.key} display={display} renderedCountAtOne={renderedCountAtOne} showPeakCount={showCount} scaleSize={effectiveScaleSize as any} rank={row.rank} />
               );
             }
             if (col.key === 'cert' && type !== 'artist') {
@@ -184,7 +188,7 @@ export const ChartWeekListRow: React.FC<{
                   chart={chart}
                   type={type as 'album' | 'track'}
                   stats={stats}
-                  fontSize={String(theme.fontSizes[scaleSize('xl')])}
+                  fontSize={String(theme.fontSizes[effectiveScaleSize('xl')])}
                   loading={loadingStats}
                 />
               );
@@ -196,7 +200,7 @@ export const ChartWeekListRow: React.FC<{
               const stable = lastWeeksById[row.entityId];
               const display = (current != null) ? current : (stable != null ? stable : undefined);
               return (
-                <WeeksCellList key={col.key} display={display} rank={row.rank} scaleSize={scaleSize as any} />
+                <WeeksCellList key={col.key} display={display} rank={row.rank} scaleSize={effectiveScaleSize as any} />
               );
             }
             if (col.key === 'altVariation' && showAltVariationRedux) {
