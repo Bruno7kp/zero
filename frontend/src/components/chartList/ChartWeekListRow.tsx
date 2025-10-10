@@ -38,14 +38,14 @@ export const ChartWeekListRow: React.FC<{
   listBackground?: 'default' | 'transparent';
   fontScale: -2 | -1 | 0 | 1 | 2;
   listPeakWeeksCombined: boolean;
-}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined }) => {
+  chart: any;
+}> = React.memo(({ row, idx, filteredColumns, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, showAltVariationRedux, showAltPlaysVariationRedux, showImage, altVariation, type, clientId, clientSecret, theme, week, listBackground = 'default', fontScale, listPeakWeeksCombined, chart }) => {
   const stats = useSelector((state: any) => state.charts.statsMap[row.entityId]);
   const loadingStats = useSelector((state: any) => state.charts.loadingStats);
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'list'));
   const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'list'));
   const playsVariationLocation = (useSelector((state: any) => state.columns?.views?.list?.settings?.playsVariationLocation) || 'under') as 'hidden' | 'under' | 'column';
   const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.list?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
-  const chartFromStore = useSelector((s: any) => s.charts.chart);
   const [expanded, setExpanded] = useState(false);
   const [imageForceUpdate, setImageForceUpdate] = useState<number>(0);
   const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
@@ -181,7 +181,7 @@ export const ChartWeekListRow: React.FC<{
                 <CertCellList
                   key={col.key}
                   row={row}
-                  chart={chartFromStore}
+                  chart={chart}
                   type={type as 'album' | 'track'}
                   stats={stats}
                   fontSize={String(theme.fontSizes[scaleSize('xl')])}

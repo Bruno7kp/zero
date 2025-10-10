@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, SegmentedControl, Text, Switch, Stack } from '@mantine/core';
+import { Box, SegmentedControl, Text, Switch, Stack, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 export interface ColumnVisibility {
@@ -34,53 +34,6 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
 
   return (
     <Stack gap={6}>
-      {viewType !== 'grid' && (
-        <Switch
-          label={t('charts.imageLabel')}
-          checked={columnsWithVisibility.find(c => c.key === 'image')?.visible ?? false}
-          onChange={(e) => onToggleColumn('image', e.currentTarget.checked)}
-          size="sm"
-        />
-      )}
-
-      <Switch
-        label={t('charts.playsLabel')}
-        checked={columnsWithVisibility.find(c => c.key === 'plays')?.visible ?? false}
-        onChange={(e) => onToggleColumn('plays', e.currentTarget.checked)}
-        size="sm"
-      />
-
-      <Box>
-        <Text size="xs" c="dimmed" mb={4}>{t('charts.peakLabel')}</Text>
-        <SegmentedControl
-          fullWidth
-          size="xs"
-          value={peakMode}
-          onChange={(v) => onPeakModeChange(v as 'hide' | 'show' | 'showWithCount')}
-          data={[
-            { label: t('charts.peakShowWithCount'), value: 'showWithCount' },
-            { label: t('charts.show'), value: 'show' },
-            { label: t('charts.hide'), value: 'hide' },
-          ]}
-        />
-      </Box>
-
-      <Switch
-        label={t('charts.weeksLabel')}
-        checked={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ?? false}
-        onChange={(e) => onToggleColumn('totalWeeks', e.currentTarget.checked)}
-        size="sm"
-      />
-
-      {(viewType === 'table' || viewType === 'list') && (
-        <Switch
-          label={t('charts.certLabel')}
-          checked={columnsWithVisibility.find(c => c.key === 'cert')?.visible ?? false}
-          onChange={(e) => onToggleColumn('cert', e.currentTarget.checked)}
-          size="sm"
-        />
-      )}
-
       {viewType === 'list' && (
         <Box>
           <Text size="xs" c="dimmed" mb={4}>{t('charts.listPeakWeeksCombinedLabel') || 'Peak + Weeks layout (list only)'}</Text>
@@ -111,6 +64,55 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
             ]}
           />
         </Box>
+      )}
+
+      <Box>
+        <Text size="xs" c="dimmed" mb={4}>{t('charts.peakLabel')}</Text>
+        <SegmentedControl
+          fullWidth
+          size="xs"
+          value={peakMode}
+          onChange={(v) => onPeakModeChange(v as 'hide' | 'show' | 'showWithCount')}
+          data={[
+            { label: t('charts.peakShowWithCount'), value: 'showWithCount' },
+            { label: t('charts.show'), value: 'show' },
+            { label: t('charts.hide'), value: 'hide' },
+          ]}
+        />
+      </Box>
+
+      <Divider my="xs" label={t('charts.columns')} />
+
+      {viewType !== 'grid' && (
+        <Switch
+          label={t('charts.imageLabel')}
+          checked={columnsWithVisibility.find(c => c.key === 'image')?.visible ?? false}
+          onChange={(e) => onToggleColumn('image', e.currentTarget.checked)}
+          size="sm"
+        />
+      )}
+
+      <Switch
+        label={t('charts.playsLabel')}
+        checked={columnsWithVisibility.find(c => c.key === 'plays')?.visible ?? false}
+        onChange={(e) => onToggleColumn('plays', e.currentTarget.checked)}
+        size="sm"
+      />
+
+      <Switch
+        label={t('charts.weeksLabel')}
+        checked={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ?? false}
+        onChange={(e) => onToggleColumn('totalWeeks', e.currentTarget.checked)}
+        size="sm"
+      />
+
+      {(viewType === 'table' || viewType === 'list') && (
+        <Switch
+          label={t('charts.certLabel')}
+          checked={columnsWithVisibility.find(c => c.key === 'cert')?.visible ?? false}
+          onChange={(e) => onToggleColumn('cert', e.currentTarget.checked)}
+          size="sm"
+        />
       )}
     </Stack>
   );

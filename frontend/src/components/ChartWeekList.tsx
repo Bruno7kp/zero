@@ -194,6 +194,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           listBackground={listBackground}
           fontScale={fontScale}
           listPeakWeeksCombined={listPeakWeeksCombined}
+          chart={chart}
         />
       ))}
       {showLoadingTail && (
@@ -227,6 +228,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
               listBackground={listBackground}
               fontScale={fontScale}
               listPeakWeeksCombined={listPeakWeeksCombined}
+              chart={chart}
             />
           ))}
         </>

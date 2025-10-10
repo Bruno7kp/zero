@@ -63,9 +63,9 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
         clientSecret={clientSecret}
         rankVariationLocation={isDropped ? 'hidden' : rankVariationLocation}
         showImage={showImage}
-        showPeak={isDropped ? false : showPeak}
-        showPlays={isDropped ? false : showPlays}
-        showTotalWeeks={isDropped ? false : showTotalWeeks}
+        showPeak={showPeak}
+        showPlays={showPlays}
+        showTotalWeeks={showTotalWeeks}
         scaleSize={scaleSize}
         onOpenModal={onOpenModal}
         imageForceUpdate={imageForceUpdate}
@@ -73,9 +73,9 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
         onImageChange={onImageChange}
         onImageLoad={onImageLoad}
         renderUnderRankVariation={isDropped ? () => null : renderUnderRankVariation}
-        cornerOverlay={isDropped ? undefined : cornerOverlay}
-        stats={isDropped ? undefined : stats}
-        showPeakCount={isDropped ? false : showPeakCount}
+        cornerOverlay={cornerOverlay}
+        stats={stats}
+        showPeakCount={showPeakCount}
       />
     </Grid.Col>
   );

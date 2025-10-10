@@ -302,7 +302,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             {showDroppedItems && droppedItems.length > 0 && (
                 <>
                     <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
-                    <Grid gutter="sm">
+                    <Grid gutter="sm" columns={30}>
                         {droppedItems.map((row: ChartData, idx: number) => (
                             <GridItemRenderer
                                 key={row.id}
@@ -341,9 +341,14 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 cornerOverlay={rankVariationLocation === 'corner' ? (
                                     <GridAltVariationCorner row={row} idx={idx} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
                                 ) : undefined}
-                                stats={undefined}
+                                stats={{
+                                    peak: {
+                                        position: (statsMap[row.entityId]?.peak?.position != null ? statsMap[row.entityId]?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
+                                        weeksAtPeak: (statsMap[row.entityId]?.peak?.weeksAtPeak != null ? statsMap[row.entityId]?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                                    },
+                                    totals: { withinCutoff: (statsMap[row.entityId]?.totals?.withinCutoff != null ? statsMap[row.entityId]?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
+                                }}
                                 showPeakCount={showPeakCount}
-                                colSpan={{ base: 6, xs: 4, sm: 3, md: 3, lg: 2 }}
                                 isDropped={true}
                             />
                         ))}

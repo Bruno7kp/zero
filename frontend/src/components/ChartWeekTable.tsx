@@ -3,7 +3,7 @@ import { ImageEditModal } from './ImageEditModal';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { DataTable } from 'mantine-datatable';
-import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
+import type { DataTableRowExpansionProps } from 'mantine-datatable';
 import { Paper, Text, Flex, useMantineTheme, Divider } from '@mantine/core';
 import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import type { ChartData } from '../db/indexedDb';
@@ -136,17 +136,22 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         <RowExpansionStats chartId={record.chartId} chartType={record.chartType} entityId={record.entityId} week={week} />
     );
 
-    // Monta colunas para o DataTable
-    // Função utilitária para cor/label do badge
-    // getDeltaBadgeProps removed (logic centralized in DeltaBadge)
-    // Mapeamento das colunas para o DataTable
-    const dtColumns: DataTableColumn<ChartData>[] = useMemo(() => {
+    // Função utilitária para montar colunas, reduz duplicação
+    const getTableColumns = useCallback((isDropped: boolean) => { // <-- Wrapped in useCallback
+        const filtered = isDropped
+            ? filteredColumns.filter((c: any) =>
+                c.key !== 'deltaRankBadge' &&
+                c.key !== 'deltaPlaysBadge' &&
+                c.key !== 'deltaPercentPlaysBadge' &&
+                c.key !== 'altVariation' &&
+                c.key !== 'altPlaysVariation')
+            : filteredColumns;
         return buildTableColumns({
-            filteredColumns,
+            filteredColumns: filtered,
             t,
-            showDeltaBadge: !!showDeltaBadge,
-            showDeltaPlaysBadge: !!showDeltaPlaysBadge,
-            showDeltaPercentPlaysBadge: !!showDeltaPercentPlaysBadge,
+            showDeltaBadge: !isDropped && !!showDeltaBadge,
+            showDeltaPlaysBadge: !isDropped && !!showDeltaPlaysBadge,
+            showDeltaPercentPlaysBadge: !isDropped && !!showDeltaPercentPlaysBadge,
             showImage: !!showImage,
             statsMap,
             clientId,
@@ -156,8 +161,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             type,
             badgeStylesRank,
             badgeStylesPlays,
-            showAltVariationRedux: !!showAltVariationRedux,
-            showAltPlaysVariationRedux: !!showAltPlaysVariationRedux,
+            showAltVariationRedux: !isDropped && !!showAltVariationRedux,
+            showAltPlaysVariationRedux: !isDropped && !!showAltPlaysVariationRedux,
             playsVariationLocation,
             playsVariationDisplay,
             showPeakCount,
@@ -178,33 +183,16 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             },
         });
     }, [
-        filteredColumns,
-        t,
-        showDeltaBadge,
-        showDeltaPlaysBadge,
-        showDeltaPercentPlaysBadge,
-        showImage,
-        statsMap,
-        clientId,
-        clientSecret,
-        imageForceUpdate,
-        lastImageUrlByEntityId,
-        type,
-        badgeStylesRank,
-        badgeStylesPlays,
-        showAltVariationRedux,
-        showAltPlaysVariationRedux,
-        playsVariationLocation,
-        playsVariationDisplay,
-        showPeakCount,
-        lastPeakById,
-        lastWeeksById,
-        lastWeeksAtPeakById,
-        altVariation,
-        chart,
-        viewConfig?.settings,
+        filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge,
+        showImage, statsMap, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId,
+        type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux,
+        playsVariationLocation, playsVariationDisplay, showPeakCount, lastPeakById,
+        lastWeeksById, lastWeeksAtPeakById, altVariation, chart, viewConfig?.settings,
         scaleSize,
-        
+    ]);
+
+    const dtColumns = useMemo(() => getTableColumns(false), [
+        getTableColumns, // <-- Now only depends on getTableColumns
     ]);
 
     // legacy helper removed (logic centralized in DeltaBadge)
@@ -247,8 +235,17 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     <Paper {...paperProps} p="md">
                         <DataTable
                             className="datatable-transparent"
-                            columns={dtColumns}
-                            records={droppedItems}
+                            columns={getTableColumns(true)}
+                            records={droppedItems.map(row => ({
+                                ...row,
+                                stats: {
+                                    peak: {
+                                        position: (statsMap[row.entityId]?.peak?.position != null ? statsMap[row.entityId]?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
+                                        weeksAtPeak: (statsMap[row.entityId]?.peak?.weeksAtPeak != null ? statsMap[row.entityId]?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                                    },
+                                    totals: { withinCutoff: (statsMap[row.entityId]?.totals?.withinCutoff != null ? statsMap[row.entityId]?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
+                                }
+                            }))}
                             rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
                             highlightOnHover
                             minHeight={100}
