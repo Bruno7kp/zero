@@ -39,6 +39,7 @@ const columnsSlice = createSlice({
   state.views[view].settings.peakCountStyle = DEFAULT_VIEW_SETTINGS[view].peakCountStyle;
       state.views[view].settings.artistDisplayMode = DEFAULT_VIEW_SETTINGS[view].artistDisplayMode;
       state.views[view].settings.listPeakWeeksCombined = DEFAULT_VIEW_SETTINGS[view].listPeakWeeksCombined;
+      state.views[view].settings.showDroppedItems = DEFAULT_VIEW_SETTINGS[view].showDroppedItems;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, state.views[view].settings.artistDisplayMode || 'under', view);
@@ -117,6 +118,12 @@ const columnsSlice = createSlice({
       state.views.list.settings.listPeakWeeksCombined = action.payload.combined;
       persistView('list', state.views.list);
     },
+    setShowDroppedItems(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; show: boolean }>) {
+      ensureViews(state as any);
+      const { view, show } = action.payload;
+      state.views[view].settings.showDroppedItems = show;
+      persistView(view, state.views[view]);
+    },
     setShowCarousel(state, action: PayloadAction<boolean>) {
       state.showCarousel = action.payload;
       persistGlobal(state as any);
@@ -125,5 +132,5 @@ const columnsSlice = createSlice({
   extraReducers: () => {}
 });
 
-export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel } = columnsSlice.actions;
+export const { updateColumn, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setPlaysVariationLocation, setTableBackground, setListBackground, setArtistDisplayMode, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowDroppedItems, setShowCarousel } = columnsSlice.actions;
 export default columnsSlice.reducer;

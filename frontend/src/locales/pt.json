@@ -99,6 +99,8 @@
       "artistDisplayModeLabel": "Coluna de artista",
       "artistDisplay_underTitle": "Ocultar",
       "artistDisplay_separateColumn": "Mostrar",
+      "showDroppedItemsLabel": "Mostrar itens que saíram",
+      "showDroppedItems_description": "Exibe artistas/álbuns/músicas que estavam na semana anterior mas saíram na atual",
       "badgeStyles": {
         "title": "Customização de badges",
         "section": "Badges",

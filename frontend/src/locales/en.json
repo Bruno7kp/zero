@@ -99,6 +99,8 @@
       "artistDisplayModeLabel": "Artist column",
       "artistDisplay_underTitle": "Hide",
       "artistDisplay_separateColumn": "Show",
+      "showDroppedItemsLabel": "Show dropped items",
+      "showDroppedItems_description": "Display artists/albums/tracks that were in previous week but dropped out",
       "badgeStyles": {
         "title": "Badge Customization",
         "section": "Badges",
