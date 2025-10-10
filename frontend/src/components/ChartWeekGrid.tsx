@@ -290,9 +290,13 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 <Grid.Col span={{ base: 6, xs: 4, sm: 3, md: 3, lg: 2 }} key={row.id}>
                                     <GridCard
                                         row={row}
-                                        idx={idx}
-                                        showDeltaBadge={!!showDeltaBadge}
+                                        type={(type === 'artist' || type === 'album' || type === 'track') ? type : 'artist'}
+                                        clientId={clientId}
+                                        clientSecret={clientSecret}
+                                        rankVariationLocation={rankVariationLocation}
+                                        showImage={!!showImage}
                                         showPeak={!!showPeak}
+                                        showPlays={!!showPlays}
                                         showTotalWeeks={!!showTotalWeeks}
                                         scaleSize={scaleSize as any}
                                         onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
