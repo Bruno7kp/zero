@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { DataTable } from 'mantine-datatable';
 import type { DataTableColumn, DataTableRowExpansionProps } from 'mantine-datatable';
-import { Paper, Text, Flex, useMantineTheme } from '@mantine/core';
+import { Paper, Text, Flex, useMantineTheme, Divider } from '@mantine/core';
 import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import type { ChartData } from '../db/indexedDb';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
+import { useDroppedItems } from '../hooks/useDroppedItems';
 // removed inline column builders for arrows and image; handled in builder/NameCell
 import { useTranslation } from 'react-i18next';
 import { updateColumn } from '../store/columnsSlice';
@@ -45,8 +46,12 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const scaleSize = makeScaleSize(fontScale);
     const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
+    const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
+    
+    // Fetch dropped items
+    const droppedItems = useDroppedItems(`${chart?.id}`, type, week, safeDisplayedData, showDroppedItems);
     useEffect(() => {
         const mandatory = ['rank', 'name'];
         mandatory.forEach(key => {
@@ -234,6 +239,24 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     </Flex>
                 )}
             </Paper>
+            
+            {/* Dropped items section */}
+            {showDroppedItems && droppedItems.length > 0 && (
+                <>
+                    <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
+                    <Paper {...paperProps} p="md">
+                        <DataTable
+                            className="datatable-transparent"
+                            columns={dtColumns}
+                            records={droppedItems}
+                            rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
+                            highlightOnHover
+                            minHeight={100}
+                        />
+                    </Paper>
+                </>
+            )}
+            
             <ImageEditModal
                 opened={!!imageModalRow}
                 onClose={() => setImageModalRow(null)}

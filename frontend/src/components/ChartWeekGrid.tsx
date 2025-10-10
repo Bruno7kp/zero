@@ -4,7 +4,8 @@ import type { AppDispatch } from '../store/index';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { Text, Box, Grid, Modal } from '@mantine/core';
+import { useDroppedItems } from '../hooks/useDroppedItems';
+import { Text, Box, Grid, Modal, Divider } from '@mantine/core';
 import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
@@ -12,6 +13,7 @@ import { makeScaleSize } from '../hooks/useFontScale';
 import GridCard from './chartGrid/GridCard';
 import GridAltVariationCorner from './chartGrid/GridAltVariationCorner';
 import GridUnderRankVariation from './chartGrid/GridUnderRankVariation';
+import { useTranslation } from 'react-i18next';
 
 interface ChartWeekGridProps {
     chart: any;
@@ -46,6 +48,8 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const rankVariationLocation = useSelector((state: any) => (state.columns?.views?.grid?.settings?.rankVariationLocation) || 'under');
     const peakCountStyle = useSelector((state: any) => state.columns?.views?.grid?.settings?.peakCountStyle) || 'noCount';
     const showPeakCount = peakCountStyle === 'withCount';
+    const showDroppedItems = useSelector((state: any) => state.columns?.views?.grid?.settings?.showDroppedItems) || false;
+    const { t } = useTranslation();
 
     const renderUnderRankVariation = (value: any) => (
         <GridUnderRankVariation value={value} badgeStylesRank={badgeStylesRank} />
@@ -153,6 +157,9 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
         } catch { /* noop */ }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [statsMap]);
+
+    // Fetch dropped items
+    const droppedItems = useDroppedItems(`${chart?.id}`, type, week, safeDisplayedData, showDroppedItems);
 
     useEffect(() => {
         if (!week || !chart?.id) return;
@@ -271,6 +278,63 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                     <Text size="xs" c="dimmed">Carregando {visibleCards.length}/{progressive.total}…</Text>
                 </Box>
             )}
+            
+            {/* Dropped items section */}
+            {showDroppedItems && droppedItems.length > 0 && (
+                <>
+                    <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
+                    <Grid gutter="sm">
+                        {droppedItems.map((row: ChartData, idx: number) => {
+                            const stats = (row && row.entityId) ? statsMap[row.entityId] : null;
+                            return (
+                                <Grid.Col span={{ base: 6, xs: 4, sm: 3, md: 3, lg: 2 }} key={row.id}>
+                                    <GridCard
+                                        row={row}
+                                        idx={idx}
+                                        showDeltaBadge={!!showDeltaBadge}
+                                        showPeak={!!showPeak}
+                                        showTotalWeeks={!!showTotalWeeks}
+                                        scaleSize={scaleSize as any}
+                                        onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
+                                        imageForceUpdate={imageForceUpdate[row.entityId]}
+                                        lastImageUrl={lastImageUrlByEntityId[row.entityId]}
+                                        onImageChange={() => {
+                                            if (row.entityId) {
+                                                setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
+                                            }
+                                        }}
+                                        onImageLoad={(url: string) => {
+                                            if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
+                                                setTimeout(() => {
+                                                    setLastImageUrlByEntityId(prev => {
+                                                        if (prev[row.entityId] !== url) {
+                                                            return { ...prev, [row.entityId]: url };
+                                                        }
+                                                        return prev;
+                                                    });
+                                                }, 1000);
+                                            }
+                                        }}
+                                        renderUnderRankVariation={(val) => renderUnderRankVariation(val)}
+                                        cornerOverlay={rankVariationLocation === 'corner' ? (
+                                            <GridAltVariationCorner row={row} idx={idx} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
+                                        ) : undefined}
+                                        stats={{
+                                            peak: {
+                                                position: (stats?.peak?.position != null ? stats?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
+                                                weeksAtPeak: (stats?.peak?.weeksAtPeak != null ? stats?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                                            },
+                                            totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
+                                        }}
+                                        showPeakCount={showPeakCount}
+                                    />
+                                </Grid.Col>
+                            );
+                        })}
+                    </Grid>
+                </>
+            )}
+            
             {/* Modal de imagem grande e edição */}
             <ImageEditModal
                 opened={imageModalOpen}
