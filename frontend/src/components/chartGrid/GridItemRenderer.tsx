@@ -76,6 +76,7 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
         cornerOverlay={cornerOverlay}
         stats={stats}
         showPeakCount={showPeakCount}
+        isDropped={isDropped}
       />
     </Grid.Col>
   );

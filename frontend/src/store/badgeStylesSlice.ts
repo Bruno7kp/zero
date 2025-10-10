@@ -77,7 +77,7 @@ const initialState: BadgeStylesState = {
   views: {
     table: { rank: { preset: 'light' }, plays: { preset: 'transparent' } },
     list: { rank: { preset: 'solidIcon' }, plays: { preset: 'light' } },
-    grid: { rank: { preset: 'solidIconOnly' }, plays: { preset: 'light' } },
+    grid: { rank: { preset: 'transparentIconOnly' }, plays: { preset: 'light' } },
   }
 };
 

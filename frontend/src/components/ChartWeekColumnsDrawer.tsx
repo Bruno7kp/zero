@@ -114,7 +114,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPlaysVariationDisplay({ view: 'list', display: 'percent' }));
             } else if (viewType === 'grid') {
                 // grid: rank icon-only (default), plays light; variação sob o rank
-                dispatch(setPreset({ view: 'grid', kind: 'rank', preset: 'solidIconOnly' }));
+                dispatch(setPreset({ view: 'grid', kind: 'rank', preset: 'transparentIconOnly' }));
                 dispatch(setPreset({ view: 'grid', kind: 'plays', preset: 'light' }));
                 dispatch(setRankVariationLocation({ view: 'grid', location: 'under' }));
             }

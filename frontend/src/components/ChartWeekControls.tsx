@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import { ChartWeekEditModal } from './ChartWeekEditModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import SettingsMenu from './chartControls/SettingsMenu';
+import ShareMenu from './chartControls/ShareMenu';
 import WeekHeader from './chartControls/WeekHeader';
 import { TypeControl, ViewControl } from './chartControls/TypeAndViewControls';
 import WeekPicker from './chartControls/WeekPicker';
@@ -110,6 +111,10 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	// Control drawer open from dropdown menu
 	const [drawerOpened, setDrawerOpened] = React.useState(false);
 	const isMobile = useIsMobile();
+	
+	// Get chart data for sharing
+	const chartData = useSelector((state: any) => state.charts.data);
+	const chartName = chart?.name || t(topType, { week: weekNum });
 
 	// Shared settings menu (opens the columns drawer; on mobile also offers view switching)
 	const settingsMenu = (
@@ -121,6 +126,18 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 			onOpenDrawer={() => setDrawerOpened(true)}
 			onOpenEdit={() => setEditOpened(true)}
 			onSetView={handleSetView}
+		/>
+	);
+	
+	// Share menu
+	const shareMenu = (
+		<ShareMenu
+			t={t as any}
+			chartData={chartData}
+			chartName={chartName}
+			week={week}
+			weekNumber={weekNum}
+			disabled={!week || isBusy || !chartData || chartData.length === 0}
 		/>
 	);
 
@@ -155,6 +172,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 					<TypeControl type={type} isBusy={isBusy} onChangeType={(v) => triggerChange(week || '', v)} />
 					{/* Drawer control hidden trigger, controlled open */}
 					<ChartWeekColumnsDrawer viewType={view} opened={drawerOpened} onOpenedChange={setDrawerOpened} hideTrigger />
+					{isMobile && shareMenu}
 					{isMobile && settingsMenu}
 				</Flex>
 			</Grid.Col>
@@ -170,7 +188,8 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 					style={{ minHeight: 40 }}
 				>
 					<ViewControl view={view} onSetView={handleSetView} />
-					{/* Desktop: show settings menu at the end, after the view segmented control */}
+					{/* Desktop: show share and settings menu at the end, after the view segmented control */}
+					{!isMobile && shareMenu}
 					{!isMobile && settingsMenu}
 				</Flex>
 			</Grid.Col>

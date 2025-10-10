@@ -35,7 +35,10 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
 
   const groups: string[][] = useMemo(() => (
     viewType === 'grid'
-      ? [['solid','solidIconOnly','solidIcon']]
+      ? [
+          ['transparent','transparentIconOnly','transparentIcon'],
+          ['solid','solidIconOnly','solidIcon']
+        ]
       : [
           ['transparent','transparentIconOnly','transparentIcon'],
           ['light','lightIconOnly','lightIcon'],

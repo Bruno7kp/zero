@@ -229,6 +229,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
               fontScale={fontScale}
               listPeakWeeksCombined={listPeakWeeksCombined}
               chart={chart}
+              isDropped={true}
             />
           ))}
         </>
