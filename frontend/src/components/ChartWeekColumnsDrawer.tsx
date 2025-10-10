@@ -114,7 +114,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPlaysVariationDisplay({ view: 'list', display: 'percent' }));
             } else if (viewType === 'grid') {
                 // grid: rank icon-only (default), plays light; variação sob o rank
-                dispatch(setPreset({ view: 'grid', kind: 'rank', preset: 'solidIconOnly' }));
+                dispatch(setPreset({ view: 'grid', kind: 'rank', preset: 'transparentIconOnly' }));
                 dispatch(setPreset({ view: 'grid', kind: 'plays', preset: 'light' }));
                 dispatch(setRankVariationLocation({ view: 'grid', location: 'under' }));
             }
@@ -155,9 +155,16 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                 dispatch(setPreset({ view: viewType, kind, preset: kind === 'rank' && viewType === 'grid' ? 'solidIconOnly' : (kind === 'rank' ? 'light' : 'transparent') }));
                 return;
             }
-            // Grid aceita presets sólidos, incluindo "apenas ícone"
-            if (viewType === 'grid' && kind === 'rank' && !['solid','solidIcon','solidIconOnly'].includes(preset)) {
-                dispatch(setPreset({ view: viewType, kind, preset: 'solidIconOnly' }));
+            // Grid agora aceita transparent/light/solid variações; apenas especiais continuam restritas
+            if (viewType === 'grid' && kind === 'rank') {
+                const allowedGridRankPresets = [
+                    'transparent','transparentIcon','transparentIconOnly',
+                    'light','lightIcon','lightIconOnly',
+                    'solid','solidIcon','solidIconOnly'
+                ];
+                if (!allowedGridRankPresets.includes(preset)) {
+                    dispatch(setPreset({ view: viewType, kind, preset: 'transparentIconOnly' }));
+                }
             }
             // Invalida especiais fora da condição (badgeKind rank, location column, not grid)
             if (kind === 'rank' && (preset === 'maximalist' || preset === 'maximalistLight')) {

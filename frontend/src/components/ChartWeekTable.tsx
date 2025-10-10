@@ -45,6 +45,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const scaleSize = makeScaleSize(fontScale);
+    const compactScaleSize = useMemo(() => {
+        const base = Number(fontScale) || 0;
+        const compact = Math.max(-2, Math.min(2, base - 1));
+        return makeScaleSize(compact);
+    }, [fontScale]);
     const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
     const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
     const dispatch = useDispatch<AppDispatch>();
@@ -146,6 +151,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 c.key !== 'altVariation' &&
                 c.key !== 'altPlaysVariation')
             : filteredColumns;
+        const appliedScaleSize = isDropped ? compactScaleSize : scaleSize;
+        const nameImageSize = isDropped ? 32 : 40;
         return buildTableColumns({
             filteredColumns: filtered,
             t,
@@ -172,7 +179,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             altVariation,
             chart,
             viewSettings: viewConfig?.settings,
-            scaleSize: scaleSize as any,
+            scaleSize: appliedScaleSize as any,
+            nameImageSize,
             onNameImageChange: (row) => {
                 setImageForceUpdate(f => ({ ...f, [row.entityId]: Date.now() }));
             },
@@ -188,7 +196,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux,
         playsVariationLocation, playsVariationDisplay, showPeakCount, lastPeakById,
         lastWeeksById, lastWeeksAtPeakById, altVariation, chart, viewConfig?.settings,
-        scaleSize,
+        scaleSize, compactScaleSize,
     ]);
 
     const dtColumns = useMemo(() => getTableColumns(false), [
@@ -231,10 +239,11 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
             {/* Dropped items section */}
             {showDroppedItems && droppedItems.length > 0 && (
                 <>
-                    <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
-                    <Paper {...paperProps} p="md">
+                    <Divider mt="xl" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
+                    <Paper shadow="none" bg="transparent" style={{ background: 'transparent' }} p="md">
                         <DataTable
                             className="datatable-transparent"
+                            style={{ background: 'transparent' }}
                             columns={getTableColumns(true)}
                             records={droppedItems.map(row => ({
                                 ...row,

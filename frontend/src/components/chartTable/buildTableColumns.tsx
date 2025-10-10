@@ -35,6 +35,7 @@ export interface BuildTableColumnsArgs {
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
   onNameImageChange?: (row: ChartData) => void;
   onNameImageLoad?: (row: ChartData, url: string) => void;
+  nameImageSize?: number;
 }
 
 export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<ChartData>[] {
@@ -67,6 +68,7 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
     scaleSize,
     onNameImageChange,
     onNameImageLoad,
+    nameImageSize,
   } = args;
 
   const artistMode: 'under' | 'column' = (viewSettings || {}).artistDisplayMode || 'under';
@@ -125,6 +127,7 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
             onImageChange={() => onNameImageChange && onNameImageChange(row)}
             onImageLoad={(url) => onNameImageLoad && onNameImageLoad(row, url)}
             scaleSize={scaleSize as any}
+            imageSize={nameImageSize}
           />
         ),
       } as DataTableColumn<ChartData>;
