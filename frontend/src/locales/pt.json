@@ -102,6 +102,19 @@
       "showDroppedItemsLabel": "Mostrar saídas",
       "showDroppedItems_description": "Exibe artistas/álbuns/músicas que estavam na semana anterior mas saíram na atual",
       "droppedItemsLabel": "Saídas ({{count}})",
+      "share": {
+        "title": "Compartilhar",
+        "copyChart": "Copiar o chart",
+        "copyChartTitle": "Copiar chart como texto",
+        "copyChartDescription": "Copie o chart abaixo para compartilhar como texto simples.",
+        "noData": "Sem dados disponíveis",
+        "position": "Posição",
+        "name": "Nome",
+        "artist": "Artista",
+        "plays": "Reproduções",
+        "peak": "Pico",
+        "weeks": "Semanas"
+      },
       "badgeStyles": {
         "title": "Customização de badges",
         "section": "Badges",
@@ -393,7 +406,10 @@
       "save": "Salvar",
       "revert": "Reverter alterações",
       "confirmationTitle": "Confirmação",
-      "confirmationMessage": "Tem certeza que deseja prosseguir?"
+      "confirmationMessage": "Tem certeza que deseja prosseguir?",
+      "copy": "Copiar",
+      "copied": "Copiado!",
+      "week": "Semana"
     },
     "chartEdit": {
       "title": "Editar semana do chart",
