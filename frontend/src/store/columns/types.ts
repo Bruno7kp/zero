@@ -19,6 +19,7 @@ export interface ViewSettings {
   listBackground?: 'default' | 'transparent';
   artistDisplayMode?: 'under' | 'column';
   listPeakWeeksCombined?: boolean;
+  showDroppedItems?: boolean;
 }
 
 export interface ViewConfig {

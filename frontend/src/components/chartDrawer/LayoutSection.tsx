@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, SegmentedControl, Text } from '@mantine/core';
+import { Stack, SegmentedControl, Text, Switch, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 export type ContainerSize = 'md' | 'lg' | 'xl' | '100%';
@@ -11,11 +11,16 @@ interface LayoutSectionProps {
   fontScale: -1 | 0 | 1 | number;
   tableBackground: 'default' | 'transparent';
   listBackground: 'default' | 'transparent';
+  showDroppedItems: boolean;
+  showCarousel: boolean;
   onContainerSizeChange: (size: ContainerSize) => void;
   onFontScaleChange: (scale: -1 | 0 | 1 | number) => void;
   onTableBackgroundChange: (bg: 'default' | 'transparent') => void;
   onListBackgroundChange: (bg: 'default' | 'transparent') => void;
+  onShowDroppedItemsChange: (show: boolean) => void;
+  onShowCarouselChange: (show: boolean) => void;
 }
+
 
 export const LayoutSection: React.FC<LayoutSectionProps> = ({
   isMobile,
@@ -24,32 +29,36 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   fontScale,
   tableBackground,
   listBackground,
+  showDroppedItems,
+  showCarousel,
   onContainerSizeChange,
   onFontScaleChange,
   onTableBackgroundChange,
   onListBackgroundChange,
+  onShowDroppedItemsChange,
+  onShowCarouselChange,
 }) => {
   const { t } = useTranslation();
 
-  if (isMobile) return null;
-
   return (
     <Stack gap={6}>
-      <Stack gap={2}>
-        <Text size="xs" c="dimmed">{t('charts.containerSizeLabel')}</Text>
-        <SegmentedControl
-          fullWidth
-          size="xs"
-          value={containerSize}
-          onChange={(v) => onContainerSizeChange(v as ContainerSize)}
-          data={[
-            { label: 'MD', value: 'md' },
-            { label: 'LG', value: 'lg' },
-            { label: 'XL', value: 'xl' },
-            { label: '100%', value: '100%' },
-          ]}
-        />
-      </Stack>
+      {!isMobile && (
+        <Stack gap={2}>
+          <Text size="xs" c="dimmed">{t('charts.containerSizeLabel')}</Text>
+          <SegmentedControl
+            fullWidth
+            size="xs"
+            value={containerSize}
+            onChange={(v) => onContainerSizeChange(v as ContainerSize)}
+            data={[
+              { label: 'MD', value: 'md' },
+              { label: 'LG', value: 'lg' },
+              { label: 'XL', value: 'xl' },
+              { label: '100%', value: '100%' },
+            ]}
+          />
+        </Stack>
+      )}
 
       <Stack gap={2}>
         <Text size="xs" c="dimmed">{t('charts.fontScaleLabel') || 'Font size'}</Text>
@@ -97,6 +106,27 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           />
         </Stack>
       )}
+
+      <Divider my="xs" label={t('charts.title')} />
+
+      <Stack gap={2}>
+        <Switch
+          label={t('charts.showDroppedItemsLabel')}
+          description={t('charts.showDroppedItems_description')}
+          checked={showDroppedItems}
+          onChange={(e) => onShowDroppedItemsChange(e.currentTarget.checked)}
+          size="sm"
+        />
+      </Stack>
+
+      <Stack gap={2}>
+        <Switch
+          label={t('charts.settings.showCarousel')}
+          checked={showCarousel}
+          onChange={(e) => onShowCarouselChange(e.currentTarget.checked)}
+          size="sm"
+        />
+      </Stack>
     </Stack>
   );
 };

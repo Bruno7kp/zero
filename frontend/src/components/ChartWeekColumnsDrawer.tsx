@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip, SegmentedControl, Stack } from '@mantine/core';
+import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, COLUMNS_DEFAULT_COLUMNS as defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel } from '../store/columnsSlice';
+import { updateColumn, COLUMNS_DEFAULT_COLUMNS as defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel, setShowDroppedItems } from '../store/columnsSlice';
 import { IconSettings, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { LayoutSection } from './chartDrawer/LayoutSection';
 import { ColumnsSection } from './chartDrawer/ColumnsSection';
@@ -33,6 +33,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
     const listBackground = viewConfig?.settings?.listBackground || 'default';
     const listPeakWeeksCombined = (viewConfig?.settings as any)?.listPeakWeeksCombined || false;
+    const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const playsVariationLocation = (viewConfig?.settings as any)?.playsVariationLocation || 'under';
     const [internalOpened, setInternalOpened] = useState(false);
@@ -225,44 +226,32 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                     <Box style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
                         <Accordion multiple variant="separated" radius="md">
                             {/* Layout */}
-                            {!isMobile && (
-                                <Accordion.Item value="layout">
-                                    <Accordion.Control>
-                                        <Flex direction="column" gap={2}>
-                                            <Flex align="center" gap={8}><IconLayoutGrid size={16} /><Text fw={700}>{t('charts.general')}</Text></Flex>
-                                            <Text size="xs" c="dimmed">{t('charts.drawer.generalDescription')}</Text>
-                                        </Flex>
-                                    </Accordion.Control>
-                                    <Accordion.Panel>
-                                        <LayoutSection
-                                            isMobile={isMobile}
-                                            viewType={viewType}
-                                            containerSize={containerSize as any}
-                                            fontScale={fontScale as any}
-                                            tableBackground={tableBackground as any}
-                                            listBackground={listBackground as any}
-                                            onContainerSizeChange={(v) => handleContainerSize(v as any)}
-                                            onFontScaleChange={(v) => dispatch(setFontScale({ view: viewType, scale: v as any }))}
-                                            onTableBackgroundChange={(v) => dispatch(setTableBackground({ background: v }))}
-                                            onListBackgroundChange={(v) => dispatch(setListBackground({ background: v }))}
-                                        />
-                                        <Divider my="sm" />
-                                        <Stack gap={2}>
-                                            <Text size="xs" c="dimmed">{t('charts.settings.showCarousel')}</Text>
-                                            <SegmentedControl
-                                                fullWidth
-                                                size="xs"
-                                                value={showCarousel ? 'on' : 'off'}
-                                                onChange={(v) => dispatch(setShowCarousel(v === 'on'))}
-                                                data={[
-                                                    { label: t('charts.hide'), value: 'off' },
-                                                    { label: t('charts.show'), value: 'on' },
-                                                ]}
-                                            />
-                                        </Stack>
-                                    </Accordion.Panel>
-                                </Accordion.Item>
-                            )}
+                            <Accordion.Item value="layout">
+                                <Accordion.Control>
+                                    <Flex direction="column" gap={2}>
+                                        <Flex align="center" gap={8}><IconLayoutGrid size={16} /><Text fw={700}>{t('charts.general')}</Text></Flex>
+                                        <Text size="xs" c="dimmed">{t('charts.drawer.generalDescription')}</Text>
+                                    </Flex>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <LayoutSection
+                                        isMobile={isMobile}
+                                        viewType={viewType}
+                                        containerSize={containerSize as any}
+                                        fontScale={fontScale as any}
+                                        tableBackground={tableBackground as any}
+                                        listBackground={listBackground as any}
+                                        showDroppedItems={showDroppedItems}
+                                        showCarousel={showCarousel ?? true}
+                                        onContainerSizeChange={(v) => handleContainerSize(v as any)}
+                                        onFontScaleChange={(v) => dispatch(setFontScale({ view: viewType, scale: v as any }))}
+                                        onTableBackgroundChange={(v) => dispatch(setTableBackground({ background: v }))}
+                                        onListBackgroundChange={(v) => dispatch(setListBackground({ background: v }))}
+                                        onShowDroppedItemsChange={(v) => dispatch(setShowDroppedItems({ view: viewType, show: v }))}
+                                        onShowCarouselChange={(v) => dispatch(setShowCarousel(v))}
+                                    />
+                                </Accordion.Panel>
+                            </Accordion.Item>
                             {/* Colunas */}
                             <Accordion.Item value="columns">
                                 <Accordion.Control>

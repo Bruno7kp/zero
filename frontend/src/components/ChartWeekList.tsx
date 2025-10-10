@@ -3,9 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store';
 import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
 import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { Flex, Text, useMantineTheme } from '@mantine/core';
+import { useDroppedItems } from '../hooks/useDroppedItems';
+import { Flex, Text, useMantineTheme, Divider } from '@mantine/core';
 import type { ChartData } from '../db/indexedDb';
 import { ChartWeekListRow } from './chartList/ChartWeekListRow.tsx';
+import { useTranslation } from 'react-i18next';
 
 interface ChartWeekListProps {
   chart: any;
@@ -85,6 +87,7 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const viewConfig = useSelector((state: any) => (state as any).columns?.views?.list);
   const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
   const listPeakWeeksCombined = (viewConfig?.settings as any)?.listPeakWeeksCombined || false;
+  const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
   const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
   const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
   const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
@@ -93,6 +96,10 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
   const showAltPlaysVariationRedux = columns.find((c: any) => c.key === 'altPlaysVariation')?.visible;
   const showImage = columns.find((c: any) => c.key === 'image')?.visible;
   const filteredColumns = visibleColumns.filter((c: any) => c.isColumn);
+  const { t } = useTranslation();
+
+  // Fetch dropped items
+  const droppedItems = useDroppedItems(`${chart?.id}`, type, week, safeDisplayedData, showDroppedItems);
 
   const useProgressive = safeDisplayedData.length > 120;
   const progressiveAll = useProgressiveReveal(safeDisplayedData, { initial: 40, step: 50, intervalMs: 18, adaptive: true, disableBelow: 260, targetDurationMs: 260 });
@@ -146,6 +153,24 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     return () => clearTimeout(id);
   }, [statsColumnsVisible, data, week, chart?.id, type, dispatch]);
 
+  // Stats for dropped items
+  useEffect(() => {
+    if (!droppedItems.length || !week || !chart?.id || !showDroppedItems) return;
+    if (!statsColumnsVisible) return;
+    let cancelled = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const id = setTimeout(() => {
+        if (cancelled) return;
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data: droppedItems, week }));
+      }, 1500);
+      (window as any).__listStatsDroppedTimer = id;
+    }));
+    return () => {
+      cancelled = true;
+      if ((window as any).__listStatsDroppedTimer) clearTimeout((window as any).__listStatsDroppedTimer);
+    };
+  }, [droppedItems, chart?.id, type, week, dispatch, showDroppedItems, statsColumnsVisible]);
+
   return (
     <Flex direction="column" gap="sm">
       {visibleRows.map((row: ChartData, idx: number) => (
@@ -169,12 +194,44 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
           listBackground={listBackground}
           fontScale={fontScale}
           listPeakWeeksCombined={listPeakWeeksCombined}
+          chart={chart}
         />
       ))}
       {showLoadingTail && (
         <Flex justify="center" py="sm">
           <Text size="xs" c="dimmed">Carregando {visibleRows.length}/{progressive.total}…</Text>
         </Flex>
+      )}
+      
+      {/* Dropped items section */}
+      {showDroppedItems && droppedItems.length > 0 && (
+        <>
+          <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
+          {droppedItems.map((row: ChartData, idx: number) => (
+            <ChartWeekListRow
+              key={row.id}
+              row={row}
+              idx={idx}
+              filteredColumns={filteredColumns}
+              showDeltaBadge={false}
+              showDeltaPlaysBadge={false}
+              showDeltaPercentPlaysBadge={false}
+              showAltVariationRedux={false}
+              showImage={showImage}
+              showAltPlaysVariationRedux={showAltPlaysVariationRedux}
+              altVariation={altVariation}
+              type={type}
+              clientId={clientId}
+              clientSecret={clientSecret}
+              theme={theme}
+              week={week}
+              listBackground={listBackground}
+              fontScale={fontScale}
+              listPeakWeeksCombined={listPeakWeeksCombined}
+              chart={chart}
+            />
+          ))}
+        </>
       )}
     </Flex>
   );

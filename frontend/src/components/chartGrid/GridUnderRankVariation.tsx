@@ -36,7 +36,7 @@ export const GridUnderRankVariation: React.FC<GridUnderRankVariationProps> = ({ 
   if (cfg.iconPosition === 'split') cfg = { ...cfg, iconPosition: 'before' };
   const showIcon = cfg.iconPosition !== 'hidden';
   const hideLabel = !!cfg.hideLabel;
-  const color = theme.white;
+  const color = undefined;
   const baseSize = 12;
 
   const label = (() => {

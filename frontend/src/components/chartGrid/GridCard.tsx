@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme } from '@mantine/core';
+import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { IconPlus } from '@tabler/icons-react';
@@ -58,6 +58,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   showPeakCount,
 }) => {
   const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   const deltaValue = (row as any).deltaRank;
   const deltaColor = (() => {
@@ -70,6 +71,12 @@ export const GridCard: React.FC<GridCardProps> = ({
     }
     return 'gray';
   })();
+
+  const getFrostedBackground = () => {
+    const isDark = colorScheme === 'dark';
+    return isDark ? 'rgba(0, 0, 0, 0.18)' : 'rgba(0, 0, 0, 0.18)';
+  };
+
 
   return (
   <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: getCardBackgroundByMode(theme, themeMode) }}>
@@ -102,6 +109,14 @@ export const GridCard: React.FC<GridCardProps> = ({
             borderTopLeftRadius: 0,
             borderBottomRightRadius: 0,
             borderBottomLeftRadius: 0,
+            // Frosted glass effect
+            background: getFrostedBackground(),
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)', // Safari support
+            // Fallback for browsers without backdrop-filter support
+            '@supports not (backdrop-filter: blur(8px))': {
+              background: getFrostedBackground().replace(/0\.\d+\)$/, '0.95)'), // More opaque fallback
+            }
           }}
         >
           <Box component="span" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>

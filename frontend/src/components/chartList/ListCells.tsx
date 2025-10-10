@@ -164,7 +164,7 @@ export const CertCellList: React.FC<{
     {(type === 'album' || type === 'track') && (stats
       ? <CertificationIcon
           key={`cert-${row.entityId}-${chart?.lastfm_username || 'nouser'}`}
-          chart={chart}
+          chart={chart || {}}
           chartType={type}
           totals={stats?.totals}
           entity={{ name: row.name, artistName: row.artistName || '' }}
