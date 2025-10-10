@@ -10,9 +10,9 @@ import { selectResolvedBadge } from '../store/badgeStylesSlice';
 import type { ChartData } from '../db/indexedDb';
 import { ChartItemStatsLoader } from './ChartItemStatsLoader';
 import { makeScaleSize } from '../hooks/useFontScale';
-import GridCard from './chartGrid/GridCard';
 import GridAltVariationCorner from './chartGrid/GridAltVariationCorner';
 import GridUnderRankVariation from './chartGrid/GridUnderRankVariation';
+import GridItemRenderer from './chartGrid/GridItemRenderer';
 import { useTranslation } from 'react-i18next';
 
 interface ChartWeekGridProps {
@@ -190,6 +190,25 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
         };
     }, [data, chart?.id, type, week, dispatch, columns]);
 
+    // Stats for dropped items
+    useEffect(() => {
+        if (!droppedItems.length || !week || !chart?.id) return;
+        const wantsStats = columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks') && c.visible);
+        if (!wantsStats || !showDroppedItems) return;
+        let cancelled = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            const id = setTimeout(() => {
+                if (cancelled) return;
+                dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data: droppedItems, week }));
+            }, 1200);
+            (window as any).__gridStatsDroppedTimer = id;
+        }));
+        return () => {
+            cancelled = true;
+            if ((window as any).__gridStatsDroppedTimer) clearTimeout((window as any).__gridStatsDroppedTimer);
+        };
+    }, [droppedItems, chart?.id, type, week, dispatch, columns, showDroppedItems]);
+
     // Progressive reveal dos cards (melhora percepção de velocidade em listas grandes)
     const useProgressive = safeDisplayedData.length > 120;
     const progressiveAll = useProgressiveReveal(safeDisplayedData, { initial: 30, step: 36, intervalMs: 24, adaptive: true, disableBelow: 180, targetDurationMs: 240 });
@@ -224,9 +243,71 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                 {visibleCards.map((row: ChartData, idx: number) => {
                     const stats = statsMap[row.entityId];
                     return (
-                        <Grid.Col key={row.id} span={{ base: 15, md: 10, lg: 6 }}>
-                            <GridCard
+                        <GridItemRenderer
+                            key={row.id}
+                            row={row}
+                            idx={idx}
+                            type={(type === 'artist' || type === 'album' || type === 'track') ? type : 'artist'}
+                            clientId={clientId}
+                            clientSecret={clientSecret}
+                            rankVariationLocation={rankVariationLocation}
+                            showImage={!!showImage}
+                            showPeak={!!showPeak}
+                            showPlays={!!showPlays}
+                            showTotalWeeks={!!showTotalWeeks}
+                            scaleSize={scaleSize as any}
+                            onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
+                            imageForceUpdate={imageForceUpdate[row.entityId]}
+                            lastImageUrl={lastImageUrlByEntityId[row.entityId]}
+                            onImageChange={() => {
+                                if (row.entityId) {
+                                    setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
+                                }
+                            }}
+                            onImageLoad={(url: string) => {
+                                if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
+                                    setTimeout(() => {
+                                        setLastImageUrlByEntityId(prev => {
+                                            if (prev[row.entityId] !== url) {
+                                                return { ...prev, [row.entityId]: url };
+                                            }
+                                            return prev;
+                                        });
+                                    }, 1000);
+                                }
+                            }}
+                            renderUnderRankVariation={(val) => renderUnderRankVariation(val)}
+                            cornerOverlay={rankVariationLocation === 'corner' ? (
+                                <GridAltVariationCorner row={row} idx={idx} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
+                            ) : undefined}
+                            stats={{
+                                peak: {
+                                    position: (stats?.peak?.position != null ? stats?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
+                                    weeksAtPeak: (stats?.peak?.weeksAtPeak != null ? stats?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                                },
+                                totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
+                            }}
+                            showPeakCount={showPeakCount}
+                        />
+                    );
+                })}
+            </Grid>
+            {showLoadingTail && (
+                <Box py="sm" style={{ textAlign: 'center' }}>
+                    <Text size="xs" c="dimmed">Carregando {visibleCards.length}/{progressive.total}…</Text>
+                </Box>
+            )}
+            
+            {/* Dropped items section */}
+            {showDroppedItems && droppedItems.length > 0 && (
+                <>
+                    <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
+                    <Grid gutter="sm">
+                        {droppedItems.map((row: ChartData, idx: number) => (
+                            <GridItemRenderer
+                                key={row.id}
                                 row={row}
+                                idx={idx}
                                 type={(type === 'artist' || type === 'album' || type === 'track') ? type : 'artist'}
                                 clientId={clientId}
                                 clientSecret={clientSecret}
@@ -260,81 +341,12 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 cornerOverlay={rankVariationLocation === 'corner' ? (
                                     <GridAltVariationCorner row={row} idx={idx} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
                                 ) : undefined}
-                                stats={{
-                                    peak: {
-                                        position: (stats?.peak?.position != null ? stats?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
-                                        weeksAtPeak: (stats?.peak?.weeksAtPeak != null ? stats?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
-                                    },
-                                    totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
-                                }}
+                                stats={undefined}
                                 showPeakCount={showPeakCount}
+                                colSpan={{ base: 6, xs: 4, sm: 3, md: 3, lg: 2 }}
+                                isDropped={true}
                             />
-                        </Grid.Col>
-                    );
-                })}
-            </Grid>
-            {showLoadingTail && (
-                <Box py="sm" style={{ textAlign: 'center' }}>
-                    <Text size="xs" c="dimmed">Carregando {visibleCards.length}/{progressive.total}…</Text>
-                </Box>
-            )}
-            
-            {/* Dropped items section */}
-            {showDroppedItems && droppedItems.length > 0 && (
-                <>
-                    <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
-                    <Grid gutter="sm">
-                        {droppedItems.map((row: ChartData, idx: number) => {
-                            const stats = (row && row.entityId) ? statsMap[row.entityId] : null;
-                            return (
-                                <Grid.Col span={{ base: 6, xs: 4, sm: 3, md: 3, lg: 2 }} key={row.id}>
-                                    <GridCard
-                                        row={row}
-                                        type={(type === 'artist' || type === 'album' || type === 'track') ? type : 'artist'}
-                                        clientId={clientId}
-                                        clientSecret={clientSecret}
-                                        rankVariationLocation={rankVariationLocation}
-                                        showImage={!!showImage}
-                                        showPeak={!!showPeak}
-                                        showPlays={!!showPlays}
-                                        showTotalWeeks={!!showTotalWeeks}
-                                        scaleSize={scaleSize as any}
-                                        onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
-                                        imageForceUpdate={imageForceUpdate[row.entityId]}
-                                        lastImageUrl={lastImageUrlByEntityId[row.entityId]}
-                                        onImageChange={() => {
-                                            if (row.entityId) {
-                                                setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
-                                            }
-                                        }}
-                                        onImageLoad={(url: string) => {
-                                            if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
-                                                setTimeout(() => {
-                                                    setLastImageUrlByEntityId(prev => {
-                                                        if (prev[row.entityId] !== url) {
-                                                            return { ...prev, [row.entityId]: url };
-                                                        }
-                                                        return prev;
-                                                    });
-                                                }, 1000);
-                                            }
-                                        }}
-                                        renderUnderRankVariation={(val) => renderUnderRankVariation(val)}
-                                        cornerOverlay={rankVariationLocation === 'corner' ? (
-                                            <GridAltVariationCorner row={row} idx={idx} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
-                                        ) : undefined}
-                                        stats={{
-                                            peak: {
-                                                position: (stats?.peak?.position != null ? stats?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
-                                                weeksAtPeak: (stats?.peak?.weeksAtPeak != null ? stats?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
-                                            },
-                                            totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
-                                        }}
-                                        showPeakCount={showPeakCount}
-                                    />
-                                </Grid.Col>
-                            );
-                        })}
+                        ))}
                     </Grid>
                 </>
             )}

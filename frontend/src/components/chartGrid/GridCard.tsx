@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme } from '@mantine/core';
+import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { IconPlus } from '@tabler/icons-react';
@@ -58,6 +58,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   showPeakCount,
 }) => {
   const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   const deltaValue = (row as any).deltaRank;
   const deltaColor = (() => {
@@ -70,6 +71,31 @@ export const GridCard: React.FC<GridCardProps> = ({
     }
     return 'gray';
   })();
+
+  // Frosted glass background (translucent with blur)
+  const getFrostedBackground = () => {
+    const isDark = colorScheme === 'dark';
+    // Get the badge color from theme
+    const badgeThemeColor = row.rank === 1 ? theme.colors.lazuli : theme.colors[deltaColor as any];
+    const baseColor = badgeThemeColor ? badgeThemeColor[6] : (isDark ? '#444' : '#fff');
+    
+    // Create translucent version with alpha channel
+    const alpha = isDark ? 0.8 : 0.85;
+    return `rgba(${hexToRgb(baseColor)}, ${alpha})`;
+  };
+
+  // Helper to convert hex to rgb
+  const hexToRgb = (hex: string): string => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) return '0, 0, 0';
+    return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+  };
+
+  // Border color (subtle translucent)
+  const getBorderColor = () => {
+    const isDark = colorScheme === 'dark';
+    return isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
+  };
 
   return (
   <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: getCardBackgroundByMode(theme, themeMode) }}>
@@ -102,6 +128,15 @@ export const GridCard: React.FC<GridCardProps> = ({
             borderTopLeftRadius: 0,
             borderBottomRightRadius: 0,
             borderBottomLeftRadius: 0,
+            // Frosted glass effect
+            background: getFrostedBackground(),
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)', // Safari support
+            border: `1px solid ${getBorderColor()}`,
+            // Fallback for browsers without backdrop-filter support
+            '@supports not (backdrop-filter: blur(10px))': {
+              background: getFrostedBackground().replace(/0\.\d+\)$/, '0.95)'), // More opaque fallback
+            }
           }}
         >
           <Box component="span" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
