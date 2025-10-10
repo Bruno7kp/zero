@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip, SegmentedControl, Stack } from '@mantine/core';
+import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip, Switch } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
@@ -250,19 +250,12 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                             onShowDroppedItemsChange={(v) => dispatch(setShowDroppedItems({ view: viewType, show: v }))}
                                         />
                                         <Divider my="sm" />
-                                        <Stack gap={2}>
-                                            <Text size="xs" c="dimmed">{t('charts.settings.showCarousel')}</Text>
-                                            <SegmentedControl
-                                                fullWidth
-                                                size="xs"
-                                                value={showCarousel ? 'on' : 'off'}
-                                                onChange={(v) => dispatch(setShowCarousel(v === 'on'))}
-                                                data={[
-                                                    { label: t('charts.hide'), value: 'off' },
-                                                    { label: t('charts.show'), value: 'on' },
-                                                ]}
-                                            />
-                                        </Stack>
+                                        <Switch
+                                            label={t('charts.settings.showCarousel')}
+                                            checked={showCarousel ?? true}
+                                            onChange={(e) => dispatch(setShowCarousel(e.currentTarget.checked))}
+                                            size="sm"
+                                        />
                                     </Accordion.Panel>
                                 </Accordion.Item>
                             )}
