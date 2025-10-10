@@ -153,6 +153,24 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
     return () => clearTimeout(id);
   }, [statsColumnsVisible, data, week, chart?.id, type, dispatch]);
 
+  // Stats for dropped items
+  useEffect(() => {
+    if (!droppedItems.length || !week || !chart?.id || !showDroppedItems) return;
+    if (!statsColumnsVisible) return;
+    let cancelled = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const id = setTimeout(() => {
+        if (cancelled) return;
+        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data: droppedItems, week }));
+      }, 1500);
+      (window as any).__listStatsDroppedTimer = id;
+    }));
+    return () => {
+      cancelled = true;
+      if ((window as any).__listStatsDroppedTimer) clearTimeout((window as any).__listStatsDroppedTimer);
+    };
+  }, [droppedItems, chart?.id, type, week, dispatch, showDroppedItems, statsColumnsVisible]);
+
   return (
     <Flex direction="column" gap="sm">
       {visibleRows.map((row: ChartData, idx: number) => (
