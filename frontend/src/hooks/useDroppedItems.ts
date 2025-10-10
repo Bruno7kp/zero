@@ -15,12 +15,14 @@ export function useDroppedItems(
   const [droppedItems, setDroppedItems] = useState<ChartData[]>([]);
 
   useEffect(() => {
-    if (!enabled || !chartId || !currentWeek || !currentData.length) {
-      setDroppedItems([]);
-      return;
-    }
+    let cancelled = false;
 
     const fetchDroppedItems = async () => {
+      if (!enabled || !chartId || !currentWeek || !currentData.length) {
+        if (!cancelled) setDroppedItems([]);
+        return;
+      }
+
       try {
         // Get all weeks for this chart before current week
         const allWeeks = await db.charts_data
@@ -30,6 +32,8 @@ export function useDroppedItems(
             [chartId, chartType, currentWeek]
           )
           .toArray();
+
+        if (cancelled) return;
 
         // Group by week to find the most recent week before current
         const weekMap = new Map<string, ChartData[]>();
@@ -47,7 +51,7 @@ export function useDroppedItems(
         const previousWeek = weeks[weeks.length - 1];
 
         if (!previousWeek) {
-          setDroppedItems([]);
+          if (!cancelled) setDroppedItems([]);
           return;
         }
 
@@ -69,14 +73,18 @@ export function useDroppedItems(
           return rankA - rankB;
         });
 
-        setDroppedItems(sortedDropped);
+        if (!cancelled) setDroppedItems(sortedDropped);
       } catch (error) {
         console.error('Error fetching dropped items:', error);
-        setDroppedItems([]);
+        if (!cancelled) setDroppedItems([]);
       }
     };
 
     fetchDroppedItems();
+
+    return () => {
+      cancelled = true;
+    };
   }, [chartId, chartType, currentWeek, currentData, enabled]);
 
   return droppedItems;
