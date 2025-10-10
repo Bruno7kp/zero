@@ -109,8 +109,7 @@
         "copyChartDescription": "Copie o chart abaixo para compartilhar como texto simples.",
         "noData": "Sem dados disponíveis",
         "position": "Posição",
-        "name": "Nome",
-        "artist": "Artista",
+        "nameArtist": "Nome | Artista",
         "plays": "Reproduções",
         "peak": "Pico",
         "weeks": "Semanas"

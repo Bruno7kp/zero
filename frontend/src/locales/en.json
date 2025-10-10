@@ -109,8 +109,7 @@
         "copyChartDescription": "Copy the chart below to share it as plain text.",
         "noData": "No data available",
         "position": "Position",
-        "name": "Name",
-        "artist": "Artist",
+        "nameArtist": "Name | Artist",
         "plays": "Plays",
         "peak": "Peak",
         "weeks": "Weeks"

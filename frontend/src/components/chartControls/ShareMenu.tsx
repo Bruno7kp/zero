@@ -12,7 +12,7 @@ interface ShareMenuProps {
   disabled?: boolean;
 }
 
-export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, week, weekNumber, disabled }) => {
+export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, week, disabled }) => {
   const [modalOpened, setModalOpened] = useState(false);
   const clipboard = useClipboard({ timeout: 2000 });
 
@@ -23,18 +23,16 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
 
     const lines: string[] = [];
     
-    // Header
-    lines.push(`${chartName} - ${t('common.week', 'Week')} ${weekNumber || week}`);
-    lines.push('');
+    // Header - format: "ChartName :: Type - Week N"
+    lines.push(`${chartName}`);
     
-    // Column headers
+    // Column headers with separator
     const headers = [
-      t('charts.share.position', 'Position'),
-      t('charts.share.name', 'Name'),
-      t('charts.share.artist', 'Artist'),
-      t('charts.share.plays', 'Plays'),
-      t('charts.share.peak', 'Peak'),
-      t('charts.share.weeks', 'Weeks')
+      t('charts.share.position', 'Posição'),
+      t('charts.share.nameArtist', 'Nome | Artista'),
+      t('charts.share.plays', 'Reproduções'),
+      t('charts.share.peak', 'Pico'),
+      t('charts.share.weeks', 'Semanas')
     ];
     lines.push(headers.join(' | '));
     
@@ -64,10 +62,12 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
         playsStr += ` (${deltaPlays > 0 ? '+' : ''}${percent}%)`;
       }
       
+      // Format: rank (delta) | name - artist | plays (change) | peak | weeks
+      const nameArtist = row.artistName ? `${row.name} - ${row.artistName}` : row.name || '';
+      
       const rowData = [
         `${row.rank}${deltaStr}`,
-        row.name || '',
-        row.artistName || '',
+        nameArtist,
         playsStr,
         row.peak || '',
         row.totalWeeks || ''
