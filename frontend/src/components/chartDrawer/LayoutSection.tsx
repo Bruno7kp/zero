@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, SegmentedControl, Text } from '@mantine/core';
+import { Stack, SegmentedControl, Text, Switch } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 export type ContainerSize = 'md' | 'lg' | 'xl' | '100%';
@@ -11,10 +11,12 @@ interface LayoutSectionProps {
   fontScale: -1 | 0 | 1 | number;
   tableBackground: 'default' | 'transparent';
   listBackground: 'default' | 'transparent';
+  showDroppedItems: boolean;
   onContainerSizeChange: (size: ContainerSize) => void;
   onFontScaleChange: (scale: -1 | 0 | 1 | number) => void;
   onTableBackgroundChange: (bg: 'default' | 'transparent') => void;
   onListBackgroundChange: (bg: 'default' | 'transparent') => void;
+  onShowDroppedItemsChange: (show: boolean) => void;
 }
 
 export const LayoutSection: React.FC<LayoutSectionProps> = ({
@@ -24,10 +26,12 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   fontScale,
   tableBackground,
   listBackground,
+  showDroppedItems,
   onContainerSizeChange,
   onFontScaleChange,
   onTableBackgroundChange,
   onListBackgroundChange,
+  onShowDroppedItemsChange,
 }) => {
   const { t } = useTranslation();
 
@@ -97,6 +101,16 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           />
         </Stack>
       )}
+
+      <Stack gap={2}>
+        <Switch
+          label={t('charts.showDroppedItemsLabel')}
+          description={t('charts.showDroppedItems_description')}
+          checked={showDroppedItems}
+          onChange={(e) => onShowDroppedItemsChange(e.currentTarget.checked)}
+          size="sm"
+        />
+      </Stack>
     </Stack>
   );
 };

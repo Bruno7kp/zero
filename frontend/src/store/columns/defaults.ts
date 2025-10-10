@@ -19,7 +19,7 @@ export const defaultColumns: ColumnConfig[] = [
 export const cloneDefaults = () => defaultColumns.map(c => ({ ...c }));
 
 export const DEFAULT_VIEW_SETTINGS: Record<'table' | 'list' | 'grid', ViewSettings> = {
-  table: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', tableBackground: 'default', artistDisplayMode: 'under' },
-  list: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default', listPeakWeeksCombined: false },
-  grid: { containerSize: 'xl', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden', peakCountStyle: 'noCount' },
+  table: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', tableBackground: 'default', artistDisplayMode: 'under', showDroppedItems: false },
+  list: { containerSize: 'md', fontScale: 0, rankVariationLocation: 'column', playsVariationLocation: 'under', playsVariationDisplay: 'percent', peakCountStyle: 'noCount', listBackground: 'default', listPeakWeeksCombined: false, showDroppedItems: false },
+  grid: { containerSize: 'xl', fontScale: 0, rankVariationLocation: 'under', playsVariationLocation: 'hidden', playsVariationDisplay: 'hidden', peakCountStyle: 'noCount', showDroppedItems: false },
 };
