@@ -5,6 +5,7 @@ import { Text } from '@mantine/core';
 import { IconArrowsDownUp } from '@tabler/icons-react';
 import { RankCell, PlaysCell, PeakCell, WeeksCell, AltVariationCell, AltPlaysVariationCell, CertCell } from './TableCells';
 import NameCell from './NameCell';
+import { calculateFormulaValue } from '../../utils/certification';
 
 export interface BuildTableColumnsArgs {
   filteredColumns: any[];
@@ -36,6 +37,8 @@ export interface BuildTableColumnsArgs {
   onNameImageChange?: (row: ChartData) => void;
   onNameImageLoad?: (row: ChartData, url: string) => void;
   nameImageSize?: number;
+  showFormulaInsteadOfPlays?: boolean;
+  formulaName?: string;
 }
 
 export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<ChartData>[] {
@@ -69,6 +72,8 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
     onNameImageChange,
     onNameImageLoad,
     nameImageSize,
+    showFormulaInsteadOfPlays,
+    formulaName,
   } = args;
 
   const artistMode: 'under' | 'column' = (viewSettings || {}).artistDisplayMode || 'under';
@@ -97,18 +102,33 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       } as DataTableColumn<ChartData>;
     }
     if (col.key === 'plays') {
+      const columnTitle = showFormulaInsteadOfPlays && formulaName ? formulaName : resolvedTitle;
       return {
         ...base,
-        render: (row: ChartData) => (
-          <PlaysCell
-            row={row}
-            showDeltaPlaysBadge={!!showDeltaPlaysBadge}
-            showDeltaPercentPlaysBadge={!!showDeltaPercentPlaysBadge}
-            playsVariationLocation={playsVariationLocation}
-            badgeStylesPlays={badgeStylesPlays}
-            scaleSize={scaleSize as any}
-          />
-        ),
+        title: columnTitle as any,
+        render: (row: ChartData) => {
+          const stats = statsMap[row.entityId];
+          const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
+            ? calculateFormulaValue({
+                chart,
+                chartType: type as 'album' | 'track',
+                totalPoints: stats?.totals?.totalPoints || 0,
+                totalPlays: stats?.totals?.totalPlays || 0,
+              })
+            : undefined;
+          return (
+            <PlaysCell
+              row={row}
+              showDeltaPlaysBadge={!!showDeltaPlaysBadge}
+              showDeltaPercentPlaysBadge={!!showDeltaPercentPlaysBadge}
+              playsVariationLocation={playsVariationLocation}
+              badgeStylesPlays={badgeStylesPlays}
+              scaleSize={scaleSize as any}
+              showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+              formulaValue={formulaValue}
+            />
+          );
+        },
       } as DataTableColumn<ChartData>;
     }
     if (col.key === 'name') {

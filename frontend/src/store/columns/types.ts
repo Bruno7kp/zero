@@ -20,6 +20,7 @@ export interface ViewSettings {
   artistDisplayMode?: 'under' | 'column';
   listPeakWeeksCombined?: boolean;
   showDroppedItems?: boolean;
+  showFormulaInsteadOfPlays?: boolean;
 }
 
 export interface ViewConfig {

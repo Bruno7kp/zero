@@ -104,6 +104,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
     const peakCountStyle = (useSelector((state: any) => state.columns?.views?.table?.settings?.peakCountStyle) || 'noCount') as 'withCount' | 'noCount';
     const showPeakCount = peakCountStyle === 'withCount';
+    const showFormulaInsteadOfPlays = (useSelector((state: any) => state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays) || false) as boolean;
+    const formulaName = chart?.formula_name || t('charts.sales');
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = useMemo(() => {
         const base = visibleColumns.filter((c: any) => c.isColumn);
@@ -188,6 +190,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     setLastImageUrlByEntityId(prev => ({ ...prev, [row.entityId]: url }));
                 }
             },
+            showFormulaInsteadOfPlays,
+            formulaName,
         });
     }, [
         filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge,
@@ -195,7 +199,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux,
         playsVariationLocation, playsVariationDisplay, showPeakCount, lastPeakById,
         lastWeeksById, lastWeeksAtPeakById, altVariation, chart, viewConfig?.settings,
-        scaleSize, compactScaleSize,
+        scaleSize, compactScaleSize, showFormulaInsteadOfPlays, formulaName,
     ]);
 
     const dtColumns = useMemo(() => getTableColumns(false), [

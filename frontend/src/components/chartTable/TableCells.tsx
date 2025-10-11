@@ -25,11 +25,14 @@ export const PlaysCell: React.FC<{
   playsVariationLocation: 'hidden' | 'under' | 'column';
   badgeStylesPlays: any;
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
-}> = ({ row, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, playsVariationLocation, badgeStylesPlays, scaleSize }) => {
+  showFormulaInsteadOfPlays?: boolean;
+  formulaValue?: number;
+}> = ({ row, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, playsVariationLocation, badgeStylesPlays, scaleSize, showFormulaInsteadOfPlays, formulaValue }) => {
   const showUnder = playsVariationLocation === 'under' && (showDeltaPlaysBadge || showDeltaPercentPlaysBadge);
+  const displayValue = showFormulaInsteadOfPlays && formulaValue != null ? Math.floor(formulaValue) : row.plays;
   return (
     <Flex direction="column" align="center">
-      <Text fw={600} size={scaleSize('md')}>{row.plays}</Text>
+      <Text fw={600} size={scaleSize('md')}>{displayValue}</Text>
       {showUnder && (
         <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="table" />
       )}

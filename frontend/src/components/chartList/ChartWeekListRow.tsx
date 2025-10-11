@@ -8,6 +8,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { ChartItemStatsLoader } from '../ChartItemStatsLoader';
 import { makeScaleSize } from '../../hooks/useFontScale';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { calculateFormulaValue } from '../../utils/certification';
 import {
   RankCellList,
   PlaysCellList,
@@ -56,6 +57,7 @@ export const ChartWeekListRow: React.FC<{
   const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
   const peakCountStyle = useSelector((state: any) => state.columns?.views?.list?.settings?.peakCountStyle) || 'noCount';
   const showPeakCount = peakCountStyle === 'withCount';
+  const showFormulaInsteadOfPlays = (useSelector((state: any) => state.columns?.views?.list?.settings?.showFormulaInsteadOfPlays) || false) as boolean;
 
   useEffect(() => {
     try {
@@ -83,7 +85,9 @@ export const ChartWeekListRow: React.FC<{
   
   // Dropped items styling: smaller font scale
   const effectiveFontScale = isDropped ? Math.max(-2, fontScale - 1) as -2 | -1 | 0 | 1 | 2 : fontScale;
-  const effectiveScaleSize = isDropped ? useMemo(() => makeScaleSize(-2), []) : useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
+  const droppedScaleSize = useMemo(() => makeScaleSize(-2), []);
+  const normalScaleSize = useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
+  const effectiveScaleSize = isDropped ? droppedScaleSize : normalScaleSize;
   
   return (
   <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode) }}>
@@ -96,6 +100,14 @@ export const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'plays') {
+              const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
+                ? calculateFormulaValue({
+                    chart,
+                    chartType: type as 'album' | 'track',
+                    totalPoints: stats?.totals?.totalPoints || 0,
+                    totalPlays: stats?.totals?.totalPlays || 0,
+                  })
+                : undefined;
               return (
                 <PlaysCellList
                   key={col.key}
@@ -105,6 +117,8 @@ export const ChartWeekListRow: React.FC<{
                   showDeltaPercentPlaysBadge={showDeltaPercentPlaysBadge}
                   badgeStylesPlays={badgeStylesPlays}
                   scaleSize={effectiveScaleSize as any}
+                  showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                  formulaValue={formulaValue}
                 />
               );
             }
