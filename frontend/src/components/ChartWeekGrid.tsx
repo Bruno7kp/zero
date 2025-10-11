@@ -14,6 +14,7 @@ import GridAltVariationCorner from './chartGrid/GridAltVariationCorner';
 import GridUnderRankVariation from './chartGrid/GridUnderRankVariation';
 import GridItemRenderer from './chartGrid/GridItemRenderer';
 import { useTranslation } from 'react-i18next';
+import { calculateFormulaValue } from '../utils/certification';
 
 interface ChartWeekGridProps {
     chart: any;
@@ -49,6 +50,8 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const peakCountStyle = useSelector((state: any) => state.columns?.views?.grid?.settings?.peakCountStyle) || 'noCount';
     const showPeakCount = peakCountStyle === 'withCount';
     const showDroppedItems = useSelector((state: any) => state.columns?.views?.grid?.settings?.showDroppedItems) || false;
+    const showFormulaInsteadOfPlays = useSelector((state: any) => state.columns?.views?.grid?.settings?.showFormulaInsteadOfPlays) || false;
+    const formulaName = chart?.formula_name || t('charts.sales');
     const { t } = useTranslation();
 
     const renderUnderRankVariation = (value: any) => (
@@ -242,6 +245,14 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             <Grid gutter="md" columns={30}>
                 {visibleCards.map((row: ChartData, idx: number) => {
                     const stats = statsMap[row.entityId];
+                    const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
+                        ? calculateFormulaValue({
+                            chart,
+                            chartType: type as 'album' | 'track',
+                            totalPoints: stats?.totals?.totalPoints || 0,
+                            totalPlays: stats?.totals?.totalPlays || 0,
+                          })
+                        : undefined;
                     return (
                         <GridItemRenderer
                             key={row.id}
@@ -289,6 +300,9 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                             }}
                             showPeakCount={showPeakCount}
                             badgeStylesRank={badgeStylesRank}
+                            showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                            formulaValue={formulaValue}
+                            formulaName={formulaName}
                         />
                     );
                 })}
@@ -304,7 +318,17 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                 <>
                     <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
                     <Grid gutter="sm" columns={30}>
-                        {droppedItems.map((row: ChartData, idx: number) => (
+                        {droppedItems.map((row: ChartData, idx: number) => {
+                            const stats = statsMap[row.entityId];
+                            const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
+                                ? calculateFormulaValue({
+                                    chart,
+                                    chartType: type as 'album' | 'track',
+                                    totalPoints: stats?.totals?.totalPoints || 0,
+                                    totalPlays: stats?.totals?.totalPlays || 0,
+                                  })
+                                : undefined;
+                            return (
                             <GridItemRenderer
                                 key={row.id}
                                 row={row}
@@ -345,16 +369,20 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 ) : undefined}
                                 stats={{
                                     peak: {
-                                        position: (statsMap[row.entityId]?.peak?.position != null ? statsMap[row.entityId]?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
-                                        weeksAtPeak: (statsMap[row.entityId]?.peak?.weeksAtPeak != null ? statsMap[row.entityId]?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                                        position: (stats?.peak?.position != null ? stats?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
+                                        weeksAtPeak: (stats?.peak?.weeksAtPeak != null ? stats?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
                                     },
-                                    totals: { withinCutoff: (statsMap[row.entityId]?.totals?.withinCutoff != null ? statsMap[row.entityId]?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
+                                    totals: { withinCutoff: (stats?.totals?.withinCutoff != null ? stats?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
                                 }}
                                 showPeakCount={showPeakCount}
                                 isDropped={true}
                                 badgeStylesRank={badgeStylesRank}
+                                showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                                formulaValue={formulaValue}
+                                formulaName={formulaName}
                             />
-                        ))}
+                        );
+                        })}
                     </Grid>
                 </>
             )}

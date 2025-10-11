@@ -183,6 +183,24 @@ export async function computeCertification(params: ComputeCertificationParams & 
   return { totalFormula, level, multiplier, nextTarget, remainingToNext, playcountUsed: userPlaycount, nextType, nextLevel, nextMultiple };
 }
 
+/**
+ * Calculate formula value for a chart entity in the current week
+ * Formula: (plays * playsWeight) + (stabilityPoints * pointsWeight)
+ */
+export function calculateFormulaValue(params: {
+  chart: any;
+  chartType: 'album' | 'track';
+  totalPoints: number;
+  totalPlays: number;
+}): number {
+  const { chart, chartType, totalPoints, totalPlays } = params;
+  const pointsWeight = chartType === 'track' ? (chart.music_points_weight || 0) : (chart.album_points_weight || 0);
+  const playsWeight = chartType === 'track' ? (chart.music_plays_weight || 0) : (chart.album_plays_weight || 0);
+  const stabilityPoints = totalPoints || 0;
+  const plays = totalPlays || 0;
+  return stabilityPoints * pointsWeight + plays * playsWeight;
+}
+
 // Lightweight public helper to get user playcount with the same cache/expiry used by certification
 export async function getUserPlaycountCached(args: {
   username?: string;

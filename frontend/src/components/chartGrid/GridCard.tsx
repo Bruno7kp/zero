@@ -37,6 +37,9 @@ export interface GridCardProps {
   showPeakCount: boolean;
   isDropped?: boolean;
   badgeStylesRank: BadgeStyleConfig;
+  showFormulaInsteadOfPlays?: boolean;
+  formulaValue?: number;
+  formulaName?: string;
 }
 
 export const GridCard: React.FC<GridCardProps> = ({
@@ -61,6 +64,9 @@ export const GridCard: React.FC<GridCardProps> = ({
   showPeakCount,
   isDropped = false,
   badgeStylesRank,
+  showFormulaInsteadOfPlays,
+  formulaValue,
+  formulaName,
 }) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -211,8 +217,10 @@ export const GridCard: React.FC<GridCardProps> = ({
           )}
           {showPlays && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={droppedScaleSize('xs')} c="dimmed">Plays</Text>
-              <Text fw={700} size={droppedScaleSize('sm')}>{formatNumber(row.plays as any)}</Text>
+              <Text size={droppedScaleSize('xs')} c="dimmed">{showFormulaInsteadOfPlays && formulaName ? formulaName : 'Plays'}</Text>
+              <Text fw={700} size={droppedScaleSize('sm')}>
+                {formatNumber((showFormulaInsteadOfPlays && formulaValue != null ? Math.floor(formulaValue) : row.plays) as any)}
+              </Text>
             </Box>
           )}
           {showTotalWeeks && (

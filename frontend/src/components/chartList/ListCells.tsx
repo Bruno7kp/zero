@@ -26,9 +26,11 @@ export const PlaysCellList: React.FC<{
   showDeltaPercentPlaysBadge: boolean;
   badgeStylesPlays: any;
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
-}> = ({ row, playsVariationLocation, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, badgeStylesPlays, scaleSize }) => (
+  showFormulaInsteadOfPlays?: boolean;
+  formulaValue?: number;
+}> = ({ row, playsVariationLocation, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, badgeStylesPlays, scaleSize, showFormulaInsteadOfPlays, formulaValue }) => (
   <Flex direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
-    <Text fw={700} size={scaleSize('xl')}>{row.plays}</Text>
+    <Text fw={700} size={scaleSize('xl')}>{showFormulaInsteadOfPlays && formulaValue != null ? Math.floor(formulaValue) : row.plays}</Text>
     {playsVariationLocation === 'under' && (showDeltaPlaysBadge || showDeltaPercentPlaysBadge) && (
       <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="list" />
     )}

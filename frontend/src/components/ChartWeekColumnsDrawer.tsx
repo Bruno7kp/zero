@@ -5,7 +5,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
-import { updateColumn, COLUMNS_DEFAULT_COLUMNS as defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel, setShowDroppedItems } from '../store/columnsSlice';
+import { updateColumn, COLUMNS_DEFAULT_COLUMNS as defaultColumns, resetColumns, setContainerSize, setRankVariationLocation, setPlaysVariationDisplay, setTableBackground, setListBackground, setArtistDisplayMode, setPlaysVariationLocation, setPeakCountStyle, setFontScale, setListPeakWeeksCombined, setShowCarousel, setShowDroppedItems, setShowFormulaInsteadOfPlays } from '../store/columnsSlice';
 import { IconSettings, IconLayoutGrid, IconColumns, IconArrowsUpDown, IconAdjustments } from '@tabler/icons-react';
 import { LayoutSection } from './chartDrawer/LayoutSection';
 import { ColumnsSection } from './chartDrawer/ColumnsSection';
@@ -34,6 +34,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const listBackground = viewConfig?.settings?.listBackground || 'default';
     const listPeakWeeksCombined = (viewConfig?.settings as any)?.listPeakWeeksCombined || false;
     const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
+    const showFormulaInsteadOfPlays = (viewConfig?.settings as any)?.showFormulaInsteadOfPlays || false;
     const rankVariationLocation = viewConfig?.settings?.rankVariationLocation || 'under';
     const playsVariationLocation = (viewConfig?.settings as any)?.playsVariationLocation || 'under';
     const [internalOpened, setInternalOpened] = useState(false);
@@ -285,6 +286,8 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                                 dispatch(setPeakCountStyle({ view: viewType, mode: v === 'showWithCount' ? 'withCount' : 'noCount' }));
                                             }
                                         }}
+                                        showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                                        onToggleShowFormulaInsteadOfPlays={(show) => dispatch(setShowFormulaInsteadOfPlays({ view: viewType, show }))}
                                     />
                                 </Accordion.Panel>
                             </Accordion.Item>

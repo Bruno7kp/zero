@@ -17,6 +17,8 @@ interface ColumnsSectionProps {
   onArtistDisplayModeChange: (mode: 'under' | 'column') => void;
   peakMode: 'hide' | 'show' | 'showWithCount';
   onPeakModeChange: (mode: 'hide' | 'show' | 'showWithCount') => void;
+  showFormulaInsteadOfPlays?: boolean;
+  onToggleShowFormulaInsteadOfPlays?: (show: boolean) => void;
 }
 
 export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
@@ -29,6 +31,8 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
   onArtistDisplayModeChange,
   peakMode,
   onPeakModeChange,
+  showFormulaInsteadOfPlays = false,
+  onToggleShowFormulaInsteadOfPlays,
 }) => {
   const { t } = useTranslation();
 
@@ -98,6 +102,15 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
         onChange={(e) => onToggleColumn('plays', e.currentTarget.checked)}
         size="sm"
       />
+
+      {onToggleShowFormulaInsteadOfPlays && (
+        <Switch
+          label={t('charts.showFormulaInsteadOfPlays')}
+          checked={showFormulaInsteadOfPlays}
+          onChange={(e) => onToggleShowFormulaInsteadOfPlays(e.currentTarget.checked)}
+          size="sm"
+        />
+      )}
 
       <Switch
         label={t('charts.weeksLabel')}
