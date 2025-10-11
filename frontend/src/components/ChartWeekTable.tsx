@@ -46,10 +46,9 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const scaleSize = makeScaleSize(fontScale);
     const compactScaleSize = useMemo(() => {
-        const base = Number(fontScale) || 0;
-        const compact = Math.max(-2, Math.min(2, base - 1));
+        const compact = -2;
         return makeScaleSize(compact);
-    }, [fontScale]);
+    }, []);
     const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
     const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
     const dispatch = useDispatch<AppDispatch>();

@@ -109,6 +109,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                         title='OUT'
                                         style={{
                                             borderRadius: 6,
+                                            border: '1px solid rgba(125,125,125,0.3)',
                                             minWidth: 32,
                                             minHeight: 32,
                                             display: 'flex',

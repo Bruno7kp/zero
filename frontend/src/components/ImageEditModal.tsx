@@ -8,7 +8,7 @@ const ALLOWED_IMAGE_DOMAINS = [
     // Música
     'i.scdn.co', // Spotify
     'open.spotify.com',
-    'last.fm', 'lastfm-img2.akamaized.net',
+    'last.fm', 'lastfm-img2.akamaized.net', 'lastfm.freetls.fastly.net', // Last.fm
     'e-cdns-images.dzcdn.net', // Deezer
     'is5-ssl.mzstatic.com', 'is4-ssl.mzstatic.com', // Apple Music
     'img.discogs.com',

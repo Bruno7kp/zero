@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { getCardBackgroundByMode, getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { IconPlus } from '@tabler/icons-react';
 import type { ChartData } from '../../db/indexedDb';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
@@ -95,7 +95,7 @@ export const GridCard: React.FC<GridCardProps> = ({
     return sizeMap[scaleSize(s)];
   };
 
-  const cardBackground = isDropped ? 'transparent' : getCardBackgroundByMode(theme, themeMode);
+  const cardBackground = isDropped ? getSecondaryCardBackgroundByMode(theme, themeMode) : getCardBackgroundByMode(theme, themeMode);
   const rankBadgeSize = isDropped ? 'lg' : 'xl';
   const rankBadgeFontSize = isDropped ? 24 : 32;
   const rankBadgeMinWidth = isDropped ? 32 : 40;
@@ -103,7 +103,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   const rankBadgeVariant = isTransparentRankBadge ? 'filled' : (badgeStylesRank.variant === 'outline' ? 'outline' : badgeStylesRank.variant);
   const frostedBackground = getFrostedBackground();
   const rankBadgeColor = row.rank === 1 ? 'lazuli' : deltaColor;
-
+  const opacity = isDropped ? 0 : 1;
 
   return (
   <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: cardBackground }}>
@@ -170,6 +170,7 @@ export const GridCard: React.FC<GridCardProps> = ({
             lastImageUrl={lastImageUrl}
             onImageChange={onImageChange}
             onImageLoad={onImageLoad}
+            opacity={opacity}
           />
         )}
       </Box>

@@ -83,7 +83,7 @@ export const ChartWeekListRow: React.FC<{
   
   // Dropped items styling: smaller font scale
   const effectiveFontScale = isDropped ? Math.max(-2, fontScale - 1) as -2 | -1 | 0 | 1 | 2 : fontScale;
-  const effectiveScaleSize = useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
+  const effectiveScaleSize = isDropped ? useMemo(() => makeScaleSize(-2), []) : useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
   
   return (
   <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode) }}>
@@ -109,7 +109,7 @@ export const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'name') {
-              const imageSize = isDropped ? 56 : 72;
+              const imageSize = isDropped ? 36 : 72;
               return (
                 <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   {showImage && (

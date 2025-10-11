@@ -21,6 +21,7 @@ interface SpotifyImageWithModalProps {
   onImageChange?: (url: string) => void;
   lastImageUrl?: string | null;
   onImageLoad?: (url: string) => void;
+  opacity?: number;
 }
 
 export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
@@ -37,6 +38,7 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
   onImageChange,
   lastImageUrl,
   onImageLoad,
+  opacity = 1.0,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState<string | null>(null);
@@ -60,10 +62,12 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
       if (onImageLoad) onImageLoad(imageUrl);
     }
   }, [imageUrl, onImageLoad, baseEntityId]);
+  const classNames = opacity < 1 ? 'faded-image' : '';
 
   return (
     <>
       <div
+        className={`${classNames}`}
         style={{
           width,
           height,
