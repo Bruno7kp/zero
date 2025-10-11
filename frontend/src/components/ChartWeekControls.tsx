@@ -67,12 +67,10 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 	// Semanas válidas para navegação
 	const weeks = getClosedChartWeeks(chart.start_date, chart.day_of_week, chart.timezone);
 	const { prev, next } = getPrevNextWeek(weeks, week);
-	// Bloqueio simplificado: sempre trava 2000ms após clique de navegação/tipo
 	const [locked, setLocked] = React.useState(false);
 	const navLockRef = React.useRef(false);
 	const timerRef = React.useRef<number | null>(null);
-	const FIXED_LOCK_MS = 1500; // 1.5s conforme solicitado
-	// Avoid reading refs during render; locked mirrors the nav lock state
+	const FIXED_LOCK_MS = 500;
 	const isBusy = locked;
 	const clearLock = () => {
 		if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }

@@ -63,16 +63,13 @@
 :root[data-mantine-color-scheme='dark'] .mantine-datatable thead tr th {
   border-bottom-color: var(--mantine-color-dark-5) !important;
 }
-
-.faded-image {
-  position: relative;
-  display: inline-block;
+/** Grid dropouts **/
+.faded-image img {
+  filter: grayscale(100%);
 }
 
-.faded-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.3);
-  pointer-events: none;
+/** Badges **/
+:root[data-mantine-color-scheme="light"] .mantine-Badge-root.chart-run-badge {
+  background-color: var(--mantine-color-gray-2);
+  color: var(--mantine-color-black);
 }

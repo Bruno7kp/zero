@@ -104,12 +104,11 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                     <Badge
                                         onClick={() => handleToggle(key)}
                                         size="xl"
-                                        color="dimmed"
-                                        variant="light"
-                                        title='OUT'
+                                        variant="default"
+                                        title="OUT"
+                                        className="chart-run-badge"
                                         style={{
                                             borderRadius: 6,
-                                            border: '1px solid rgba(125,125,125,0.3)',
                                             minWidth: 32,
                                             minHeight: 32,
                                             display: 'flex',
@@ -133,6 +132,8 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                         const point = item.point;
                         const opened = openedKey === point.week;
                         const routeType = chartType || 'artist';
+                        const isPeak = point.position === peak;
+                        const isHighlighted = point.week === highlightWeek;
                         const handleNavigate = (e: React.MouseEvent) => {
                             e.stopPropagation();
                             navigate(`/charts/week/${point.week}/${routeType}`);
@@ -155,10 +156,10 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                         onClick={() => handleToggle(point.week)}
                                         size="xl"
                                         p={0}
-                                        variant={point.position === peak || point.week === highlightWeek ? 'outline' : 'default'}
-                                        color={point.position === peak && point.week !== highlightWeek ? 'teal' : 'mediumblue'}
+                                        variant={isPeak || isHighlighted ? 'outline' : 'outline'}
+                                        color={isHighlighted ? 'mediumblue' : isPeak ? 'teal' : 'secondary'}
                                         data-week={point.week}
-                                        style={{ borderRadius: 6, minWidth: 32, cursor: 'pointer' }}
+                                        style={{ borderRadius: 6, minWidth: 32, cursor: 'pointer', border: isPeak || isHighlighted ? undefined : '1px solid rgba(125,125,125,0.3)' }}
                                     >
                                         <Text size="xs" fw={700}>{point.position ?? '-'}</Text>
                                     </Badge>

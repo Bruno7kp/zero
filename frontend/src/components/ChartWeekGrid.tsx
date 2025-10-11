@@ -345,7 +345,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                                 onOpenModal={(r) => { setModalRow(r); setModalOpen(true); }}
                                 imageForceUpdate={imageForceUpdate[row.entityId]}
                                 lastImageUrl={lastImageUrlByEntityId[row.entityId]}
-                                colSpan={{ base: 10, md: 7.5, lg: 5 }}
+                                colSpan={{ base: 10, sm: 7.5, md: 5, lg: 4.28 }}
                                 onImageChange={() => {
                                     if (row.entityId) {
                                         setImageForceUpdate(fu => ({ ...fu, [row.entityId]: (fu[row.entityId] || 0) + 1 }));
