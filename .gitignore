@@ -1,4 +1,5 @@
 .env
 .env.production
 !frontend/.env.production  # permite versionar env do frontend (client_id público)
-.idea*.bak
+.idea
+*.bak
