@@ -342,6 +342,10 @@
       "chartOutdated": "Outdated chart",
       "chartOutdatedMessage": "The chart \"{{chartName}}\" has weeks pending synchronization"
     },
+    "notification": {
+      "chartOutdated": "Outdated chart",
+      "chartOutdatedMessage": "The chart \"{{chartName}}\" has weeks pending synchronization"
+    },
     "values": {
       "gold": "Gold",
       "platinum": "Platinum",

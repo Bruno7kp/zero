@@ -11,6 +11,7 @@ import {
     rem,
     useComputedColorScheme,
     Indicator,
+    Badge,
 } from '@mantine/core';
 import {
     IconSun,
@@ -50,6 +51,7 @@ export const Header: React.FC = () => {
     const computedColorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
     const { i18n, t } = useTranslation();
     const { unreadCount } = useNotifications();
+    const unreadBadgeLabel = unreadCount > 99 ? '99+' : `${unreadCount}`;
 
     const handleLogout = () => {
         dispatch(reduxLogout() as any).unwrap();
@@ -159,19 +161,25 @@ export const Header: React.FC = () => {
                         >
                             {t('user.friends')}
                         </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item
+                            component={NavLink}
+                            to="/notifications"
+                            leftSection={<IconBell style={{ width: rem(14), height: rem(14) }} />}
+                            rightSection={unreadCount > 0 ? (
+                                <Badge color="red" variant="filled" size="xs">
+                                    {unreadBadgeLabel}
+                                </Badge>
+                            ) : undefined}
+                        >
+                            {t('notifications.title')}
+                        </Menu.Item>
                         <Menu.Item
                             component={NavLink}
                             to="/settings"
                             leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
                         >
                             {t('settings.title')}
-                        </Menu.Item>
-                        <Menu.Item
-                            component={NavLink}
-                            to="/notifications"
-                            leftSection={<IconBell style={{ width: rem(14), height: rem(14) }} />}
-                        >
-                            {t('notifications.title')}
                         </Menu.Item>
                         <Menu.Divider />
                         <Menu.Item

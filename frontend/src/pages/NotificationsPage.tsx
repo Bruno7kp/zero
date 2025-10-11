@@ -19,6 +19,8 @@ import { IconBell, IconTrash, IconCheck } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/en';
+import 'dayjs/locale/pt';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import type { RootState } from '../store';
 
@@ -36,6 +38,8 @@ const NotificationsPage: React.FC = () => {
     if (i18n.language !== reduxLanguage) {
       i18n.changeLanguage(reduxLanguage);
     }
+    const safeLocale = (reduxLanguage || 'en').split('-')[0];
+    dayjs.locale(safeLocale);
   }, [reduxLanguage, i18n]);
 
   const handleMarkAsRead = (id: string) => {

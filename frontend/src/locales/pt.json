@@ -342,6 +342,10 @@
       "chartOutdated": "Chart desatualizado",
       "chartOutdatedMessage": "O chart \"{{chartName}}\" possui semanas para sincronizar"
     },
+    "notification": {
+      "chartOutdated": "Chart desatualizado",
+      "chartOutdatedMessage": "O chart \"{{chartName}}\" possui semanas para sincronizar"
+    },
     "values": {
       "gold": "Ouro",
       "platinum": "Platina",

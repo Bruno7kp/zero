@@ -262,9 +262,19 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
                 </Group>
             )}
             {weeks.length > 0 && loadedWeeks < weeks.length && (
-                <Alert icon={<IconAlertCircle size={16} />} title={t('charts.outdatedWarning')} color="orange" variant="light" mt="xs" radius="sm">
-                    {t('charts.outdatedWarningMessage', { missingWeeks: weeks.length - loadedWeeks })}
-                </Alert>
+                <Card withBorder padding="sm" mt="xs">
+                    <Group align="flex-start" gap="sm">
+                        <ThemeIcon size="sm" radius="xl" variant="light" color="orange">
+                            <IconAlertCircle size={14} />
+                        </ThemeIcon>
+                        <div>
+                            <Text size="sm" fw={600}>{t('charts.outdatedWarning')}</Text>
+                            <Text size="xs" c="dimmed">
+                                {t('charts.outdatedWarningMessage', { missingWeeks: weeks.length - loadedWeeks })}
+                            </Text>
+                        </div>
+                    </Group>
+                </Card>
             )}
             {!isOnline && (
                 <Alert title={t('errors.warning')} color="yellow" variant="light" mt="xs" radius="sm">

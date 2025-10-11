@@ -66,13 +66,13 @@ export function useNotifications() {
     }
   }, [charts, checkOutdatedChart]);
 
-  // Check for outdated charts periodically (every 5 minutes)
+  // Check for outdated charts periodically (every 15 minutes)
   useEffect(() => {
     checkAllCharts();
     
     const interval = setInterval(() => {
       checkAllCharts();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 15 * 60 * 1000); // 15 minutes
 
     return () => clearInterval(interval);
   }, [checkAllCharts]);
