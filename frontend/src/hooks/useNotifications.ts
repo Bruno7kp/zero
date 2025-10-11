@@ -12,7 +12,6 @@ import type { RootState } from '../store';
 export function useNotifications() {
   const dispatch = useDispatch();
   const charts = useSelector((s: RootState) => (s as any).charts.charts);
-  const activeChartId = useSelector((s: RootState) => (s as any).charts.activeChartId);
   const notifications = useSelector((s: RootState) => (s as any).notifications.notifications);
 
   const checkOutdatedChart = useCallback(async (chart: any) => {
