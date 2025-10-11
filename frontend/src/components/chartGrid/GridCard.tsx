@@ -141,7 +141,7 @@ export const GridCard: React.FC<GridCardProps> = ({
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               color: theme.white,
-              '@supports not (backdrop-filter: blur(8px))': {
+              '@supports not (backdropFilter: blur(8px))': {
                 background: frostedBackground.replace(/0\.\d+\)$/, '0.95)')
               }
             } : {

@@ -1,0 +1,85 @@
+.slidecardFlexResponsive {
+    /* Estilos Padrão (Telas Grandes) */
+    flex-direction: row; 
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media (max-width: 50em) { /* 800px (Breakpoint 'Médio' para Tablets/Mobile Landscape) */
+    .slidecardFlexResponsive {
+        /* Muda a direção para coluna (texto em cima, destaque em baixo) */
+        flex-direction: column;
+        /* Alinha os novos itens de coluna à esquerda */
+        align-items: flex-start; 
+        /* Adiciona padding e reduz o gap */
+        padding-top: var(--mantine-spacing-xl);
+        padding-bottom: var(--mantine-spacing-xl);
+        gap: var(--mantine-spacing-md);
+    }
+    
+    /* Container da Esquerda (Nome/Artista) */
+    .slidecardLeftResponsive {
+        /* Ocupa a largura total e alinha à esquerda */
+        max-width: 100% !important; 
+        width: 100%;
+        text-align: left !important; 
+    }
+
+    /* Container da Direita (Destaque) */
+    .slidecardRightResponsive {
+        /* Ocupa a largura total e alinha à esquerda */
+        width: 100%;
+        text-align: left !important; 
+    }
+
+    /* Redução de Tamanho da Fonte (para caber e não sumir) */
+    
+    /* Ajuste Título Principal (h2) */
+    .responsiveTitle {
+        font-size: 1.5rem !important;
+    }
+
+    /* Ajuste Título Destaque (h3) */
+    .responsiveTitleRight {
+        font-size: 1.25rem !important;
+    }
+
+    /* Ajuste Textos Secundários (size="sm") */
+    .responsiveText,
+    .responsiveTextRight {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Redução do Tamanho da Imagem dentro do slidecardLeftResponsive */
+    /* Usando seletores mais específicos para evitar o texto sumir: */
+    /* Target: <Box style={{ width: 56, height: 56, ... }}> */
+    .slidecardLeftResponsive > div > div:first-child { 
+        width: 48px !important; 
+        height: 48px !important;
+        /* Garante que o item de imagem não cresça, mas se mantenha em 48px */
+        flex: 0 0 48px !important; 
+    }
+}
+
+@media (max-width: 36em) { /* 576px (Breakpoint 'Pequeno' para Mobile Portrait) */
+    /* Redução de Tamanho da Fonte */
+    .responsiveTitle {
+        font-size: 1.2rem !important;
+    }
+    
+    .responsiveTitleRight {
+        font-size: 1rem !important;
+    }
+
+    .responsiveText,
+    .responsiveTextRight {
+        font-size: 0.65rem !important;
+    }
+    
+    /* Redução adicional do Tamanho da Imagem */
+    .slidecardLeftResponsive > div > div:first-child { 
+        width: 40px !important; 
+        height: 40px !important;
+        flex: 0 0 40px !important; 
+    }
+}
