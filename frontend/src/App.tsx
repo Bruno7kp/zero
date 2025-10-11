@@ -1,4 +1,3 @@
-// src/App.tsx
 import { type JSX } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
@@ -10,6 +9,7 @@ import ProfilePage from './pages/ProfilePage';
 import ChartsPage from './pages/ChartsPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
 import SettingsPage from './pages/SettingsPage';
+import NotificationsPage from './pages/NotificationsPage';
 import RouteErrorBoundary from './components/RouteErrorBoundary';
 import MainLayout from './layouts/MainLayout';
 import { useSelector } from 'react-redux';
@@ -131,6 +131,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <CreateChartPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="notifications"
+                    element={
+                        <ProtectedRoute>
+                            <NotificationsPage />
                         </ProtectedRoute>
                     }
                 />

@@ -51,6 +51,7 @@
       "titleLabel": "Título",
       "artistLabel": "Artista",
       "playsLabel": "Plays: Reproduções",
+      "showFormulaInsteadOfPlays": "Mostrar valor da fórmula no lugar das reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
       "deltaPercentPlaysLabel": "Variação % de reproduções",
       "altPlaysVariationLabel": "Variação de reproduções (coluna)",
@@ -110,15 +111,15 @@
         "noData": "Sem dados disponíveis",
         "position": "Posição",
         "nameArtist": "Nome | Artista",
-    "artistColumn": "Artista",
+        "artistColumn": "Artista",
         "plays": "Reproduções",
         "peak": "Pico",
-    "weeks": "Semanas",
-    "topArtistsHeader": "Top Artistas",
-    "topAlbumsHeader": "Top Álbuns",
-    "topTracksHeader": "Top Músicas",
-    "weekNumberLabel": "Semana {{num}}",
-    "weekLabelFallback": "{{week}}"
+        "weeks": "Semanas",
+        "topArtistsHeader": "Top Artistas",
+        "topAlbumsHeader": "Top Álbuns",
+        "topTracksHeader": "Top Músicas",
+        "weekNumberLabel": "Semana {{num}}",
+        "weekLabelFallback": "{{week}}"
       },
       "badgeStyles": {
         "title": "Customização de badges",
@@ -212,7 +213,9 @@
           "debutDetail": "Estreia em #{{rank}}",
           "reentryDetail": "Reentrada em #{{rank}}"
         }
-      }
+      },
+      "outdatedWarning": "Atenção: Semanas desatualizadas",
+      "outdatedWarningMessage": "Este chart possui {{missingWeeks}} semana(s) faltante(s) para sincronizar."
     },
     "library": {
       "title": "Biblioteca"
@@ -329,23 +332,19 @@
       }
     },
     "notifications": {
-      "charts": {
-        "save": {
-          "success": "O chart {{chart}} foi criado.",
-          "error": "Falha ao criar o chart."
-        },
-        "update": {
-          "success": "O chart {{chart}} foi atualizado.",
-          "error": "Falha ao atualizar o chart."
-        },
-        "delete": {
-          "success": "O chart {{chart}} foi removido.",
-          "error": "Falha ao remover o chart."
-        }
-      },
-      "cache": {
-        "chartCleared": "Dados locais limpos para {{chart}}"
-      }
+      "title": "Notificações",
+      "empty": "Você não tem notificações",
+      "new": "Nova",
+      "markAsRead": "Marcar como lida",
+      "markAllAsRead": "Marcar todas como lidas",
+      "delete": "Excluir",
+      "goToCharts": "Ir para Charts",
+      "chartOutdated": "Chart desatualizado",
+      "chartOutdatedMessage": "O chart \"{{chartName}}\" possui semanas para sincronizar"
+    },
+    "notification": {
+      "chartOutdated": "Chart desatualizado",
+      "chartOutdatedMessage": "O chart \"{{chartName}}\" possui semanas para sincronizar"
     },
     "values": {
       "gold": "Ouro",

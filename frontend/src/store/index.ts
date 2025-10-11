@@ -10,13 +10,14 @@ import i18nReducer from './i18nSlice';
 import authReducer from './authSlice';
 import columnsReducer from './columnsSlice';
 import syncReducer from './syncSlice';
+import notificationsReducer from './notificationsSlice';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync', 'badgeStyles'],
+  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync', 'badgeStyles', 'notifications'],
 };
 
 const rootReducer = combineReducers({
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   columns: columnsReducer,
   badgeStyles: badgeStylesReducer,
   sync: syncReducer,
+  notifications: notificationsReducer,
 });
 
 export const store = configureStore({

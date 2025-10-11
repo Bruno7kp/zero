@@ -1,4 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+// Função utilitária para capitalizar a primeira letra
+function capitalize(str: string) {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 import { ImageEditModal } from './ImageEditModal';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
@@ -46,10 +51,9 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const scaleSize = makeScaleSize(fontScale);
     const compactScaleSize = useMemo(() => {
-        const base = Number(fontScale) || 0;
-        const compact = Math.max(-2, Math.min(2, base - 1));
+        const compact = -2;
         return makeScaleSize(compact);
-    }, [fontScale]);
+    }, []);
     const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
     const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
     const dispatch = useDispatch<AppDispatch>();
@@ -105,6 +109,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
     const peakCountStyle = (useSelector((state: any) => state.columns?.views?.table?.settings?.peakCountStyle) || 'noCount') as 'withCount' | 'noCount';
     const showPeakCount = peakCountStyle === 'withCount';
+    const showFormulaInsteadOfPlays = (useSelector((state: any) => state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays) || false) as boolean;
+    const formulaName = capitalize(chart?.formula_name || t('charts.sales'));
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = useMemo(() => {
         const base = visibleColumns.filter((c: any) => c.isColumn);
@@ -189,6 +195,8 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                     setLastImageUrlByEntityId(prev => ({ ...prev, [row.entityId]: url }));
                 }
             },
+            showFormulaInsteadOfPlays,
+            formulaName,
         });
     }, [
         filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge,
@@ -196,7 +204,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
         type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux,
         playsVariationLocation, playsVariationDisplay, showPeakCount, lastPeakById,
         lastWeeksById, lastWeeksAtPeakById, altVariation, chart, viewConfig?.settings,
-        scaleSize, compactScaleSize,
+        scaleSize, compactScaleSize, showFormulaInsteadOfPlays, formulaName,
     ]);
 
     const dtColumns = useMemo(() => getTableColumns(false), [

@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 import React from 'react';
 import {
     Group,
@@ -11,6 +10,8 @@ import {
     useMantineColorScheme,
     rem,
     useComputedColorScheme,
+    Indicator,
+    Badge,
 } from '@mantine/core';
 import {
     IconSun,
@@ -27,6 +28,7 @@ import {
     IconInfoCircle,
     IconDroplet,
     IconMoon,
+    IconBell,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
@@ -37,6 +39,7 @@ import { getNextThemeMode, toMantineColorScheme } from '../theme/modes';
 import { getThemeAssets } from '../theme/assets';
 import type { ThemeMode } from '../theme/modes';
 import { setLanguage } from '../store/i18nSlice';
+import { useNotifications } from '../hooks/useNotifications';
 
 export const Header: React.FC = () => {
     const dispatch = useDispatch();
@@ -47,6 +50,8 @@ export const Header: React.FC = () => {
     const { setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
     const { i18n, t } = useTranslation();
+    const { unreadCount } = useNotifications();
+    const unreadBadgeLabel = unreadCount > 99 ? '99+' : `${unreadCount}`;
 
     const handleLogout = () => {
         dispatch(reduxLogout() as any).unwrap();
@@ -116,9 +121,11 @@ export const Header: React.FC = () => {
                 // Dropdown de Usuário para usuários autenticados
                 <Menu shadow="md" width={200} trigger="click-hover" openDelay={100} closeDelay={400}>
                     <Menu.Target>
-                        <ActionIcon variant="subtle" size="lg" aria-label={t('user.title')}>
-                            <IconUserCircle style={{ width: rem(24), height: rem(24) }} />
-                        </ActionIcon>
+                        <Indicator disabled={unreadCount === 0} color="red" size={10} offset={7}>
+                            <ActionIcon variant="subtle" size="lg" aria-label={t('user.title')}>
+                                <IconUserCircle style={{ width: rem(24), height: rem(24) }} />
+                            </ActionIcon>
+                        </Indicator>
                     </Menu.Target>
                     <Menu.Dropdown>
                         <Menu.Label>
@@ -153,6 +160,19 @@ export const Header: React.FC = () => {
                             leftSection={<IconUsers style={{ width: rem(14), height: rem(14) }} />}
                         >
                             {t('user.friends')}
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item
+                            component={NavLink}
+                            to="/notifications"
+                            leftSection={<IconBell style={{ width: rem(14), height: rem(14) }} />}
+                            rightSection={unreadCount > 0 ? (
+                                <Badge color="red" variant="filled" size="xs">
+                                    {unreadBadgeLabel}
+                                </Badge>
+                            ) : undefined}
+                        >
+                            {t('notifications.title')}
                         </Menu.Item>
                         <Menu.Item
                             component={NavLink}

@@ -31,6 +31,9 @@ interface GridItemRendererProps {
   colSpan?: { base: number; xs?: number; sm?: number; md?: number; lg?: number };
   isDropped?: boolean;
   badgeStylesRank: BadgeStyleConfig;
+  showFormulaInsteadOfPlays?: boolean;
+  formulaValue?: number;
+  formulaName?: string;
 }
 
 export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
@@ -56,6 +59,9 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
   colSpan = { base: 15, md: 10, lg: 6 },
   isDropped = false,
   badgeStylesRank,
+  showFormulaInsteadOfPlays,
+  formulaValue,
+  formulaName,
 }) => {
   return (
     <Grid.Col key={row.id} span={colSpan}>
@@ -81,6 +87,9 @@ export const GridItemRenderer: React.FC<GridItemRendererProps> = ({
         showPeakCount={showPeakCount}
         isDropped={isDropped}
         badgeStylesRank={badgeStylesRank}
+        showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+        formulaValue={formulaValue}
+        formulaName={formulaName}
       />
     </Grid.Col>
   );

@@ -56,6 +56,7 @@ export const ChartWeekListRow: React.FC<{
   const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
   const peakCountStyle = useSelector((state: any) => state.columns?.views?.list?.settings?.peakCountStyle) || 'noCount';
   const showPeakCount = peakCountStyle === 'withCount';
+  const showFormulaInsteadOfPlays = (useSelector((state: any) => state.columns?.views?.list?.settings?.showFormulaInsteadOfPlays) || false) as boolean;
 
   useEffect(() => {
     try {
@@ -83,7 +84,9 @@ export const ChartWeekListRow: React.FC<{
   
   // Dropped items styling: smaller font scale
   const effectiveFontScale = isDropped ? Math.max(-2, fontScale - 1) as -2 | -1 | 0 | 1 | 2 : fontScale;
-  const effectiveScaleSize = useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
+  const droppedScaleSize = useMemo(() => makeScaleSize(-2), []);
+  const normalScaleSize = useMemo(() => makeScaleSize(effectiveFontScale), [effectiveFontScale]);
+  const effectiveScaleSize = isDropped ? droppedScaleSize : normalScaleSize;
   
   return (
   <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode) }}>
@@ -105,11 +108,14 @@ export const ChartWeekListRow: React.FC<{
                   showDeltaPercentPlaysBadge={showDeltaPercentPlaysBadge}
                   badgeStylesPlays={badgeStylesPlays}
                   scaleSize={effectiveScaleSize as any}
+                  showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                  chart={chart}
+                  chartType={type}
                 />
               );
             }
             if (col.key === 'name') {
-              const imageSize = isDropped ? 56 : 72;
+              const imageSize = isDropped ? 36 : 72;
               return (
                 <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   {showImage && (
@@ -210,7 +216,15 @@ export const ChartWeekListRow: React.FC<{
             }
             if (col.key === 'altPlaysVariation' && showAltPlaysVariationRedux) {
               return (
-                <AltPlaysVariationCellList key={col.key} row={row} cfg={badgeStylesPlays} playsVariationDisplay={playsVariationDisplay} />
+                <AltPlaysVariationCellList
+                  key={col.key}
+                  row={row}
+                  cfg={badgeStylesPlays}
+                  playsVariationDisplay={playsVariationDisplay}
+                  showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                  chart={chart}
+                  chartType={type}
+                />
               );
             }
             return null;

@@ -183,6 +183,91 @@ export async function computeCertification(params: ComputeCertificationParams & 
   return { totalFormula, level, multiplier, nextTarget, remainingToNext, playcountUsed: userPlaycount, nextType, nextLevel, nextMultiple };
 }
 
+/**
+ * Calculate formula value for a chart entity in the current week
+ * Formula: (plays * playsWeight) + (stabilityPoints * pointsWeight)
+ */
+export type FormulaChartType = 'album' | 'track' | 'artist' | string;
+
+function resolveFormulaChartType(chartType: FormulaChartType): 'album' | 'track' {
+  return chartType === 'track' ? 'track' : 'album';
+}
+
+export function calculateWeekFormulaValue(params: {
+  chart: any;
+  chartType: FormulaChartType;
+  rank: number | null | undefined;
+  plays: number | null | undefined;
+}): number {
+  const { chart, chartType, rank, plays } = params;
+  if (!chart) return 0;
+  const effectiveType = resolveFormulaChartType(chartType);
+  const pointsWeight = effectiveType === 'track' ? Number(chart.music_points_weight || 0) : Number(chart.album_points_weight || 0);
+  const playsWeight = effectiveType === 'track' ? Number(chart.music_plays_weight || 0) : Number(chart.album_plays_weight || 0);
+  const rankNumber = typeof rank === 'number' ? rank : null;
+  const stabilityPoints = rankNumber != null && rankNumber > 0 ? Math.max(0, 101 - rankNumber) : 0;
+  const safePlays = typeof plays === 'number' ? plays : 0;
+  return stabilityPoints * pointsWeight + safePlays * playsWeight;
+}
+
+export interface WeeklyFormulaMetrics {
+  currentValue: number | null;
+  previousValue: number | null;
+  delta: number | string | null;
+}
+
+export function computeWeeklyFormulaMetrics(params: {
+  chart: any;
+  chartType: FormulaChartType;
+  rank: number | null | undefined;
+  plays: number | null | undefined;
+  deltaRank: any;
+  deltaPlays: any;
+}): WeeklyFormulaMetrics {
+  const { chart, chartType, rank, plays, deltaRank, deltaPlays } = params;
+  if (!chart) {
+    return { currentValue: null, previousValue: null, delta: null };
+  }
+  const effectiveType = resolveFormulaChartType(chartType);
+  const currentRaw = calculateWeekFormulaValue({ chart, chartType: effectiveType, rank, plays });
+  const currentValue = Number.isFinite(currentRaw) ? Math.round(currentRaw) : null;
+
+  if (deltaPlays === 'NEW' || deltaPlays === 'RE') {
+    return { currentValue, previousValue: null, delta: deltaPlays };
+  }
+
+  let previousValue: number | null = null;
+  let delta: number | string | null = null;
+
+  if (typeof deltaPlays === 'number') {
+    const numericRank = typeof rank === 'number' ? rank : null;
+    const derivedPreviousRank = numericRank != null
+      ? (typeof deltaRank === 'number' ? numericRank + deltaRank : numericRank)
+      : null;
+    const previousRank = derivedPreviousRank != null && derivedPreviousRank > 0 ? derivedPreviousRank : null;
+    const previousPlays = typeof plays === 'number' ? Math.max(0, plays - deltaPlays) : null;
+    if (previousRank != null && previousPlays != null) {
+      const prevRaw = calculateWeekFormulaValue({ chart, chartType: effectiveType, rank: previousRank, plays: previousPlays });
+      previousValue = Number.isFinite(prevRaw) ? Math.round(prevRaw) : null;
+    }
+    if (previousValue != null && currentValue != null) {
+      delta = currentValue - previousValue;
+    }
+    if (delta == null && typeof deltaPlays === 'number' && currentValue != null) {
+      const playsWeight = effectiveType === 'track' ? Number(chart.music_plays_weight || 0) : Number(chart.album_plays_weight || 0);
+      const approxDelta = Math.round(deltaPlays * playsWeight);
+      delta = approxDelta;
+      if (previousValue == null) previousValue = currentValue - approxDelta;
+    }
+    if (previousValue != null) previousValue = Math.max(0, previousValue);
+  } else if (deltaPlays != null) {
+    delta = deltaPlays;
+  }
+
+  if (delta == null) delta = null;
+  return { currentValue, previousValue, delta };
+}
+
 // Lightweight public helper to get user playcount with the same cache/expiry used by certification
 export async function getUserPlaycountCached(args: {
   username?: string;

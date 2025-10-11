@@ -94,6 +94,44 @@ export const fetchStatsMapIncremental = createAsyncThunk(
     }
     dispatch({ type: silentRevalidate ? 'charts/beginStatsRevalidation' : 'charts/startStatsIncremental', payload: requestId });
 
+    const entityIds = Array.from(new Set(data.map(d => d.entityId)));
+    let fullStatsById: Record<string, any> = {};
+    if (entityIds.length) {
+      try {
+        const compoundKeys = entityIds.map(id => [chartId, chartType, id] as [string, string, string]);
+        const fullRows = await db.charts_stats.bulkGet(compoundKeys);
+        fullRows.forEach((row, idx) => {
+          if (row) fullStatsById[entityIds[idx]] = row;
+        });
+      } catch {
+        fullStatsById = {};
+      }
+    }
+    const mergeWithFullStats = (partial: Record<string, any>) => {
+      if (!partial || !Object.keys(partial).length) return partial;
+      if (!fullStatsById || !Object.keys(fullStatsById).length) return partial;
+      const merged: Record<string, any> = {};
+      for (const [id, minimal] of Object.entries(partial)) {
+        const full = fullStatsById[id];
+        if (full) {
+          const combined = {
+            ...full,
+            ...minimal,
+            peak: { ...(full.peak || {}), ...(minimal.peak || {}) },
+            totals: { ...(full.totals || {}), ...(minimal.totals || {}) },
+            sequences: full.sequences ?? minimal.sequences ?? null,
+            _status: full._status || minimal._status || 'full',
+          };
+          merged[id] = combined;
+          fullStatsById[id] = combined;
+        } else {
+          merged[id] = minimal;
+          fullStatsById[id] = minimal;
+        }
+      }
+      return merged;
+    };
+
     if (data.length <= 60) {
       const entities = data.map(d => d.entityId);
       const entitySet = new Set(entities);
@@ -144,7 +182,13 @@ export const fetchStatsMapIncremental = createAsyncThunk(
               const newPeak = minimal?.peak?.position ?? null;
               if (newWeeks > oldWeeks || (newPeak != null && (oldPeak == null || newPeak < oldPeak))) shouldWrite = true;
             }
-            if (shouldWrite) dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: { [id]: { chartId, chartType, entityId: id, ...minimal, _status: 'minimal' } } } });
+            if (shouldWrite) {
+              const partialUpdate = { [id]: { chartId, chartType, entityId: id, ...minimal, _status: 'minimal' } };
+              const enriched = mergeWithFullStats(partialUpdate);
+              if (Object.keys(enriched || {}).length) {
+                dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: enriched } });
+              }
+            }
           }
         }
       } else {
@@ -158,7 +202,10 @@ export const fetchStatsMapIncremental = createAsyncThunk(
             stubPartial[id] = { chartId, chartType, entityId: id, peak: null, sequences: null, totals: null, _status: 'stub' };
           }
           if (Object.keys(stubPartial).length && stSilent.charts.statsRequestId === requestId) {
-            dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: stubPartial } });
+            const enrichedStub = mergeWithFullStats(stubPartial);
+            if (Object.keys(enrichedStub || {}).length) {
+              dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: enrichedStub } });
+            }
           }
         }
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -224,7 +271,11 @@ export const fetchStatsMapIncremental = createAsyncThunk(
                       if (newWeeks > oldWeeks || (newPeak != null && (oldPeak == null || newPeak < oldPeak))) shouldWrite = true;
                     }
                     if (shouldWrite && stNow.charts.statsRequestId === requestId) {
-                      dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: { [id]: { chartId, chartType, entityId: id, ...minimal, _status: 'minimal' } } } });
+                      const partialUpdate = { [id]: { chartId, chartType, entityId: id, ...minimal, _status: 'minimal' } };
+                      const enriched = mergeWithFullStats(partialUpdate);
+                      if (Object.keys(enriched || {}).length) {
+                        dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: enriched } });
+                      }
                     }
                   }
                 } finally {
@@ -264,9 +315,14 @@ export const fetchStatsMapIncremental = createAsyncThunk(
         }
         const st: any = getState();
         if (st.charts.statsRequestId === requestId) {
-          dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: snapshot } });
+          const enrichedSnapshot = mergeWithFullStats(snapshot);
+          if (Object.keys(enrichedSnapshot || {}).length) {
+            dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: enrichedSnapshot } });
+          }
           dispatch({ type: 'charts/finishStatsIncremental', payload: requestId });
-          dispatch({ type: 'charts/cacheStatsSnapshot', payload: { cacheKey, snapshot, now: Date.now() } });
+          if (Object.keys(enrichedSnapshot || {}).length) {
+            dispatch({ type: 'charts/cacheStatsSnapshot', payload: { cacheKey, snapshot: enrichedSnapshot, now: Date.now() } });
+          }
         }
         return;
       }
@@ -291,9 +347,14 @@ export const fetchStatsMapIncremental = createAsyncThunk(
       }
       const st: any = getState();
       if (st.charts.statsRequestId === requestId) {
-        dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: snapshot } });
+        const enrichedSnapshot = mergeWithFullStats(snapshot);
+        if (Object.keys(enrichedSnapshot || {}).length) {
+          dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: enrichedSnapshot } });
+        }
         dispatch({ type: 'charts/finishStatsIncremental', payload: requestId });
-        dispatch({ type: 'charts/cacheStatsSnapshot', payload: { cacheKey, snapshot, now: Date.now() } });
+        if (Object.keys(enrichedSnapshot || {}).length) {
+          dispatch({ type: 'charts/cacheStatsSnapshot', payload: { cacheKey, snapshot: enrichedSnapshot, now: Date.now() } });
+        }
       }
       return;
     }
@@ -338,7 +399,10 @@ export const fetchStatsMapIncremental = createAsyncThunk(
         }
       }
       const st: any = getState(); if (st.charts.statsRequestId !== requestId) return;
-      dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial } });
+      const enriched = mergeWithFullStats(partial);
+      if (Object.keys(enriched || {}).length) {
+        dispatch({ type: 'charts/partialStatsLoaded', payload: { requestId, partial: enriched } });
+      }
       i += slice.length;
       const dur = performance.now() - tBatch;
       if (dur > 50 && dyn > MIN) dyn = Math.max(MIN, Math.floor(dyn * 0.7));

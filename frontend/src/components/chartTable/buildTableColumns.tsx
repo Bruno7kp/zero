@@ -36,6 +36,8 @@ export interface BuildTableColumnsArgs {
   onNameImageChange?: (row: ChartData) => void;
   onNameImageLoad?: (row: ChartData, url: string) => void;
   nameImageSize?: number;
+  showFormulaInsteadOfPlays?: boolean;
+  formulaName?: string;
 }
 
 export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<ChartData>[] {
@@ -69,6 +71,8 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
     onNameImageChange,
     onNameImageLoad,
     nameImageSize,
+    showFormulaInsteadOfPlays,
+    formulaName,
   } = args;
 
   const artistMode: 'under' | 'column' = (viewSettings || {}).artistDisplayMode || 'under';
@@ -97,18 +101,25 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       } as DataTableColumn<ChartData>;
     }
     if (col.key === 'plays') {
+      const columnTitle = showFormulaInsteadOfPlays && formulaName ? formulaName : resolvedTitle;
       return {
         ...base,
-        render: (row: ChartData) => (
-          <PlaysCell
-            row={row}
-            showDeltaPlaysBadge={!!showDeltaPlaysBadge}
-            showDeltaPercentPlaysBadge={!!showDeltaPercentPlaysBadge}
-            playsVariationLocation={playsVariationLocation}
-            badgeStylesPlays={badgeStylesPlays}
-            scaleSize={scaleSize as any}
-          />
-        ),
+        title: columnTitle as any,
+        render: (row: ChartData) => {
+          return (
+            <PlaysCell
+              row={row}
+              showDeltaPlaysBadge={!!showDeltaPlaysBadge}
+              showDeltaPercentPlaysBadge={!!showDeltaPercentPlaysBadge}
+              playsVariationLocation={playsVariationLocation}
+              badgeStylesPlays={badgeStylesPlays}
+              scaleSize={scaleSize as any}
+              showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+              chart={chart}
+              chartType={type}
+            />
+          );
+        },
       } as DataTableColumn<ChartData>;
     }
     if (col.key === 'name') {
@@ -229,7 +240,14 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       width: 84,
       cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
       render: (row: ChartData) => (
-        <AltPlaysVariationCell row={row} badgeStylesPlays={badgeStylesPlays} playsVariationDisplay={playsVariationDisplay} />
+        <AltPlaysVariationCell
+          row={row}
+          badgeStylesPlays={badgeStylesPlays}
+          playsVariationDisplay={playsVariationDisplay}
+          showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+          chart={chart}
+          chartType={type}
+        />
       )
     };
     const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altPlaysVariation');

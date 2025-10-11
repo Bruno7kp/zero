@@ -3,6 +3,8 @@ import { Flex, Text } from '@mantine/core';
 import type { ChartData } from '../../db/indexedDb';
 import { DeltaBadge } from '../DeltaBadge';
 import { CertificationIcon } from '../CertificationIcon';
+import { formatNumber, formatCompactNumber } from '../../utils/format';
+import { computeWeeklyFormulaMetrics } from '../../utils/certification';
 
 export const RankCell: React.FC<{
   row: ChartData;
@@ -25,13 +27,56 @@ export const PlaysCell: React.FC<{
   playsVariationLocation: 'hidden' | 'under' | 'column';
   badgeStylesPlays: any;
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
-}> = ({ row, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, playsVariationLocation, badgeStylesPlays, scaleSize }) => {
+  showFormulaInsteadOfPlays?: boolean;
+  chart?: any;
+  chartType?: string;
+}> = ({ row, showDeltaPlaysBadge, showDeltaPercentPlaysBadge, playsVariationLocation, badgeStylesPlays, scaleSize, showFormulaInsteadOfPlays, chart, chartType }) => {
+  const metrics = showFormulaInsteadOfPlays && chart ? computeWeeklyFormulaMetrics({
+    chart,
+    chartType: chartType || 'album',
+    rank: row.rank,
+    plays: row.plays,
+    deltaRank: row.deltaRank,
+    deltaPlays: row.deltaPlays,
+  }) : null;
+  const numericDisplay = showFormulaInsteadOfPlays
+    ? (metrics && typeof metrics.currentValue === 'number' ? metrics.currentValue : null)
+    : (typeof row.plays === 'number' ? row.plays : null);
+  const formattedValue = formatNumber(numericDisplay);
+  const deltaValue = showFormulaInsteadOfPlays && metrics
+    ? (metrics.delta !== undefined && metrics.delta !== null ? metrics.delta : row.deltaPlays)
+    : row.deltaPlays;
+  const badgeCurrentValue = showFormulaInsteadOfPlays && metrics && typeof metrics.currentValue === 'number'
+    ? metrics.currentValue
+    : (typeof row.plays === 'number' ? row.plays : undefined);
   const showUnder = playsVariationLocation === 'under' && (showDeltaPlaysBadge || showDeltaPercentPlaysBadge);
+  const computePercentOverride = showFormulaInsteadOfPlays && metrics && metrics.previousValue
+    ? (deltaNumeric: number) => {
+        const prev = metrics.previousValue as number;
+        if (!prev) return null;
+        const percent = (deltaNumeric / prev) * 100;
+        return `${deltaNumeric > 0 ? '+' : ''}${percent.toFixed(0)}%`;
+      }
+    : undefined;
+  const labelOverride = showFormulaInsteadOfPlays && typeof deltaValue === 'number' && deltaValue !== 0 && !showDeltaPercentPlaysBadge
+    ? formatCompactNumber(deltaValue)
+    : undefined;
   return (
     <Flex direction="column" align="center">
-      <Text fw={600} size={scaleSize('md')}>{row.plays}</Text>
+      <Text fw={600} size={scaleSize('md')}>{formattedValue}</Text>
       {showUnder && (
-        <DeltaBadge delta={row.deltaPlays} cfg={badgeStylesPlays} kind="plays" showPercent={showDeltaPercentPlaysBadge} currentValue={row.plays} textSize="xs" columnContext contextView="table" />
+        <DeltaBadge
+          delta={deltaValue}
+          cfg={badgeStylesPlays}
+          kind="plays"
+          showPercent={showFormulaInsteadOfPlays ? showDeltaPercentPlaysBadge : showDeltaPercentPlaysBadge}
+          currentValue={typeof badgeCurrentValue === 'number' ? badgeCurrentValue : undefined}
+          textSize="xs"
+          columnContext
+          contextView="table"
+          computePercent={computePercentOverride}
+          labelOverride={labelOverride}
+        />
       )}
     </Flex>
   );
@@ -105,14 +150,42 @@ export const AltPlaysVariationCell: React.FC<{
   row: ChartData;
   badgeStylesPlays: any;
   playsVariationDisplay: 'absolute' | 'percent' | 'hidden';
-}> = ({ row, badgeStylesPlays, playsVariationDisplay }) => {
+  showFormulaInsteadOfPlays?: boolean;
+  chart?: any;
+  chartType?: string;
+}> = ({ row, badgeStylesPlays, playsVariationDisplay, showFormulaInsteadOfPlays, chart, chartType }) => {
+  const metrics = showFormulaInsteadOfPlays && chart ? computeWeeklyFormulaMetrics({
+    chart,
+    chartType: chartType || 'album',
+    rank: row.rank,
+    plays: row.plays,
+    deltaRank: row.deltaRank,
+    deltaPlays: row.deltaPlays,
+  }) : null;
+  const deltaValue = showFormulaInsteadOfPlays && metrics
+    ? (metrics.delta !== undefined && metrics.delta !== null ? metrics.delta : row.deltaPlays)
+    : row.deltaPlays;
+  const currentValue = showFormulaInsteadOfPlays && metrics && typeof metrics.currentValue === 'number'
+    ? metrics.currentValue
+    : (typeof row.plays === 'number' ? row.plays : undefined);
+  const computePercentOverride = showFormulaInsteadOfPlays && metrics && metrics.previousValue
+    ? (deltaNumeric: number) => {
+        const prev = metrics.previousValue as number;
+        if (!prev) return null;
+        const percent = (deltaNumeric / prev) * 100;
+        return `${deltaNumeric > 0 ? '+' : ''}${percent.toFixed(0)}%`;
+      }
+    : undefined;
+  const labelOverride = showFormulaInsteadOfPlays && typeof deltaValue === 'number' && deltaValue !== 0 && playsVariationDisplay !== 'percent'
+    ? formatCompactNumber(deltaValue)
+    : undefined;
   const treatAsHiddenForWidth = badgeStylesPlays.hideLabel && badgeStylesPlays.iconPosition === 'before';
   const isCompact = badgeStylesPlays.iconPosition === 'hidden' || treatAsHiddenForWidth;
   const widthOverride = isCompact ? 50 : 65;
   return (
     <Flex justify="center" align="center" style={{ width: '100%' }}>
       <DeltaBadge
-        delta={row.deltaPlays}
+        delta={deltaValue}
         cfg={badgeStylesPlays}
         kind="plays"
         textSize="md"
@@ -120,8 +193,10 @@ export const AltPlaysVariationCell: React.FC<{
         noSidePadding
         contextView="table"
         showPercent={playsVariationDisplay === 'percent'}
-        currentValue={row.plays}
+        currentValue={typeof currentValue === 'number' ? currentValue : undefined}
         fixedWidthOverride={widthOverride}
+        computePercent={computePercentOverride}
+        labelOverride={labelOverride}
       />
     </Flex>
   );

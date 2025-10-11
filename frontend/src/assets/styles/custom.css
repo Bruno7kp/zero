@@ -63,3 +63,16 @@
 :root[data-mantine-color-scheme='dark'] .mantine-datatable thead tr th {
   border-bottom-color: var(--mantine-color-dark-5) !important;
 }
+
+.faded-image {
+  position: relative;
+  display: inline-block;
+}
+
+.faded-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme, useMantineColorScheme } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { getCardBackgroundByMode, getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { IconPlus } from '@tabler/icons-react';
 import type { ChartData } from '../../db/indexedDb';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
@@ -37,6 +37,9 @@ export interface GridCardProps {
   showPeakCount: boolean;
   isDropped?: boolean;
   badgeStylesRank: BadgeStyleConfig;
+  showFormulaInsteadOfPlays?: boolean;
+  formulaValue?: number;
+  formulaName?: string;
 }
 
 export const GridCard: React.FC<GridCardProps> = ({
@@ -61,6 +64,9 @@ export const GridCard: React.FC<GridCardProps> = ({
   showPeakCount,
   isDropped = false,
   badgeStylesRank,
+  showFormulaInsteadOfPlays,
+  formulaValue,
+  formulaName,
 }) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -95,7 +101,7 @@ export const GridCard: React.FC<GridCardProps> = ({
     return sizeMap[scaleSize(s)];
   };
 
-  const cardBackground = isDropped ? 'transparent' : getCardBackgroundByMode(theme, themeMode);
+  const cardBackground = isDropped ? getSecondaryCardBackgroundByMode(theme, themeMode) : getCardBackgroundByMode(theme, themeMode);
   const rankBadgeSize = isDropped ? 'lg' : 'xl';
   const rankBadgeFontSize = isDropped ? 24 : 32;
   const rankBadgeMinWidth = isDropped ? 32 : 40;
@@ -103,7 +109,7 @@ export const GridCard: React.FC<GridCardProps> = ({
   const rankBadgeVariant = isTransparentRankBadge ? 'filled' : (badgeStylesRank.variant === 'outline' ? 'outline' : badgeStylesRank.variant);
   const frostedBackground = getFrostedBackground();
   const rankBadgeColor = row.rank === 1 ? 'lazuli' : deltaColor;
-
+  const opacity = isDropped ? 0 : 1;
 
   return (
   <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: cardBackground }}>
@@ -141,7 +147,7 @@ export const GridCard: React.FC<GridCardProps> = ({
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               color: theme.white,
-              '@supports not (backdrop-filter: blur(8px))': {
+              '@supports not (backdropFilter: blur(8px))': {
                 background: frostedBackground.replace(/0\.\d+\)$/, '0.95)')
               }
             } : {
@@ -170,6 +176,7 @@ export const GridCard: React.FC<GridCardProps> = ({
             lastImageUrl={lastImageUrl}
             onImageChange={onImageChange}
             onImageLoad={onImageLoad}
+            opacity={opacity}
           />
         )}
       </Box>
@@ -210,8 +217,10 @@ export const GridCard: React.FC<GridCardProps> = ({
           )}
           {showPlays && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={droppedScaleSize('xs')} c="dimmed">Plays</Text>
-              <Text fw={700} size={droppedScaleSize('sm')}>{formatNumber(row.plays as any)}</Text>
+              <Text size={droppedScaleSize('xs')} tt="capitalize" c="dimmed">{showFormulaInsteadOfPlays && formulaName ? formulaName : 'Plays'}</Text>
+              <Text fw={700} size={droppedScaleSize('sm')}>
+                {formatNumber((showFormulaInsteadOfPlays && formulaValue != null ? Math.floor(formulaValue) : row.plays) as any)}
+              </Text>
             </Box>
           )}
           {showTotalWeeks && (

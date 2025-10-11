@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
-import { IconRefresh, IconSettings } from "@tabler/icons-react";
+import { IconRefresh, IconSettings, IconAlertCircle } from "@tabler/icons-react";
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
@@ -260,6 +260,21 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
                     <Badge variant="light" color="yellow" size="xs">{t('charts.partial')}: {partialWeeks}</Badge>
                     <Badge variant="light" color="gray" size="xs">{t('charts.toSync')}: {Math.max(0, weeks.length - loadedWeeks - partialWeeks)}</Badge>
                 </Group>
+            )}
+            {weeks.length > 0 && loadedWeeks < weeks.length && (
+                <Card withBorder padding="sm" mt="xs">
+                    <Group align="flex-start" gap="sm">
+                        <ThemeIcon size="sm" radius="xl" variant="light" color="orange">
+                            <IconAlertCircle size={14} />
+                        </ThemeIcon>
+                        <div>
+                            <Text size="sm" fw={600}>{t('charts.outdatedWarning')}</Text>
+                            <Text size="xs" c="dimmed">
+                                {t('charts.outdatedWarningMessage', { missingWeeks: weeks.length - loadedWeeks })}
+                            </Text>
+                        </div>
+                    </Group>
+                </Card>
             )}
             {!isOnline && (
                 <Alert title={t('errors.warning')} color="yellow" variant="light" mt="xs" radius="sm">
