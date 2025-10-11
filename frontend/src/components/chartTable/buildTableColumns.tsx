@@ -5,7 +5,6 @@ import { Text } from '@mantine/core';
 import { IconArrowsDownUp } from '@tabler/icons-react';
 import { RankCell, PlaysCell, PeakCell, WeeksCell, AltVariationCell, AltPlaysVariationCell, CertCell } from './TableCells';
 import NameCell from './NameCell';
-import { calculateFormulaValue } from '../../utils/certification';
 
 export interface BuildTableColumnsArgs {
   filteredColumns: any[];
@@ -107,15 +106,6 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
         ...base,
         title: columnTitle as any,
         render: (row: ChartData) => {
-          const stats = statsMap[row.entityId];
-          const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
-            ? calculateFormulaValue({
-                chart,
-                chartType: type as 'album' | 'track',
-                totalPoints: stats?.totals?.totalPoints || 0,
-                totalPlays: stats?.totals?.totalPlays || 0,
-              })
-            : undefined;
           return (
             <PlaysCell
               row={row}
@@ -125,7 +115,8 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
               badgeStylesPlays={badgeStylesPlays}
               scaleSize={scaleSize as any}
               showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
-              formulaValue={formulaValue}
+              chart={chart}
+              chartType={type}
             />
           );
         },
@@ -249,7 +240,14 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       width: 84,
       cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
       render: (row: ChartData) => (
-        <AltPlaysVariationCell row={row} badgeStylesPlays={badgeStylesPlays} playsVariationDisplay={playsVariationDisplay} />
+        <AltPlaysVariationCell
+          row={row}
+          badgeStylesPlays={badgeStylesPlays}
+          playsVariationDisplay={playsVariationDisplay}
+          showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+          chart={chart}
+          chartType={type}
+        />
       )
     };
     const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altPlaysVariation');

@@ -14,7 +14,7 @@ import GridAltVariationCorner from './chartGrid/GridAltVariationCorner';
 import GridUnderRankVariation from './chartGrid/GridUnderRankVariation';
 import GridItemRenderer from './chartGrid/GridItemRenderer';
 import { useTranslation } from 'react-i18next';
-import { calculateFormulaValue } from '../utils/certification';
+import { calculateWeekFormulaValue } from '../utils/certification';
 
 interface ChartWeekGridProps {
     chart: any;
@@ -51,9 +51,9 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const showPeakCount = peakCountStyle === 'withCount';
     const showDroppedItems = useSelector((state: any) => state.columns?.views?.grid?.settings?.showDroppedItems) || false;
     const showFormulaInsteadOfPlays = useSelector((state: any) => state.columns?.views?.grid?.settings?.showFormulaInsteadOfPlays) || false;
-    const formulaName = chart?.formula_name || t('charts.sales');
     const { t } = useTranslation();
-
+    const formulaName = chart?.formula_name || t('charts.sales');
+    
     const renderUnderRankVariation = (value: any) => (
         <GridUnderRankVariation value={value} badgeStylesRank={badgeStylesRank} />
     );
@@ -245,13 +245,13 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
             <Grid gutter="md" columns={30}>
                 {visibleCards.map((row: ChartData, idx: number) => {
                     const stats = statsMap[row.entityId];
-                    const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
-                        ? calculateFormulaValue({
-                            chart,
-                            chartType: type as 'album' | 'track',
-                            totalPoints: stats?.totals?.totalPoints || 0,
-                            totalPlays: stats?.totals?.totalPlays || 0,
-                          })
+                                                            const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track' || type === 'artist')
+                                                                    ? calculateWeekFormulaValue({
+                                                                            chart,
+                                                                            chartType: (type === 'artist' ? 'artist' : type) as 'album' | 'track' | 'artist',
+                                                                            rank: row.rank,
+                                                                            plays: row.plays,
+                                                                        })
                         : undefined;
                     return (
                         <GridItemRenderer
@@ -320,13 +320,13 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                     <Grid gutter="sm" columns={30}>
                         {droppedItems.map((row: ChartData, idx: number) => {
                             const stats = statsMap[row.entityId];
-                            const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
-                                ? calculateFormulaValue({
-                                    chart,
-                                    chartType: type as 'album' | 'track',
-                                    totalPoints: stats?.totals?.totalPoints || 0,
-                                    totalPlays: stats?.totals?.totalPlays || 0,
-                                  })
+                                                                                    const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track' || type === 'artist')
+                                                                                            ? calculateWeekFormulaValue({
+                                                                                                    chart,
+                                                                                                    chartType: (type === 'artist' ? 'artist' : type) as 'album' | 'track' | 'artist',
+                                                                                                    rank: row.rank,
+                                                                                                    plays: row.plays,
+                                                                                                })
                                 : undefined;
                             return (
                             <GridItemRenderer

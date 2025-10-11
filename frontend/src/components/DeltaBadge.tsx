@@ -15,6 +15,7 @@ export interface DeltaBadgeProps {
     noSidePadding?: boolean; // remove padding lateral (usado em coluna dedicada)
     contextView?: 'table' | 'list' | 'grid'; // para regras visuais específicas por view
     fixedWidthOverride?: number; // largura fixa opcional (ex.: coluna dedicada)
+    labelOverride?: string | number;
 }
 
 function computeDefaultPercent(delta: number, currentValue: number): string | null {
@@ -46,7 +47,7 @@ function resolveDelta(delta: any, showPercent?: boolean, currentValue?: number, 
     return { color, label };
 }
 
-export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView, fixedWidthOverride }) => {
+export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPercent, currentValue, computePercent, textSize, columnContext, noSidePadding, contextView, fixedWidthOverride, labelOverride }) => {
     // Preserve last stable (defined) delta to avoid flashing '-' during quick transitions (without reading refs during render)
     const [stableDelta, setStableDelta] = React.useState<any>(delta);
     const isDefined = !(delta === undefined || delta === null);
@@ -111,6 +112,16 @@ export const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, cfg, kind, showPe
     let displayLabel = cfg.hideLabel
         ? (contextView === 'grid' ? (label === '=' ? label : '') : (label === '=' ? label : ''))
         : label;
+    if (labelOverride !== undefined && labelOverride !== null) {
+        if (typeof labelOverride === 'number' && Number.isNaN(labelOverride)) displayLabel = label;
+        else displayLabel = labelOverride as any;
+    }
+    if (typeof effectiveDelta === 'number' && effectiveDelta > 0 && displayLabel) {
+        const normalized = typeof displayLabel === 'number' ? displayLabel.toString() : displayLabel;
+        if (normalized && !normalized.startsWith('+') && !normalized.startsWith('-')) {
+            displayLabel = `+${normalized}`;
+        }
+    }
     // Se o modo é texto + ícone (não split, ícone visível), remover textos 'NEW' e 'RE' e deixar só o ícone
     if (!cfg.hideLabel && cfg.iconPosition !== 'hidden' && cfg.iconPosition !== 'split') {
         if (effectiveDelta === 'NEW' || effectiveDelta === 'RE') {

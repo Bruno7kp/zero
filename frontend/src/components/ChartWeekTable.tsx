@@ -1,4 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+// Função utilitária para capitalizar a primeira letra
+function capitalize(str: string) {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 import { ImageEditModal } from './ImageEditModal';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
@@ -105,7 +110,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
     const peakCountStyle = (useSelector((state: any) => state.columns?.views?.table?.settings?.peakCountStyle) || 'noCount') as 'withCount' | 'noCount';
     const showPeakCount = peakCountStyle === 'withCount';
     const showFormulaInsteadOfPlays = (useSelector((state: any) => state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays) || false) as boolean;
-    const formulaName = chart?.formula_name || t('charts.sales');
+    const formulaName = capitalize(chart?.formula_name || t('charts.sales'));
     // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
     const filteredColumns = useMemo(() => {
         const base = visibleColumns.filter((c: any) => c.isColumn);

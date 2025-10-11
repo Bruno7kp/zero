@@ -8,7 +8,6 @@ import type { ChartData } from '../../db/indexedDb';
 import { ChartItemStatsLoader } from '../ChartItemStatsLoader';
 import { makeScaleSize } from '../../hooks/useFontScale';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
-import { calculateFormulaValue } from '../../utils/certification';
 import {
   RankCellList,
   PlaysCellList,
@@ -100,14 +99,6 @@ export const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'plays') {
-              const formulaValue = showFormulaInsteadOfPlays && chart && (type === 'album' || type === 'track')
-                ? calculateFormulaValue({
-                    chart,
-                    chartType: type as 'album' | 'track',
-                    totalPoints: stats?.totals?.totalPoints || 0,
-                    totalPlays: stats?.totals?.totalPlays || 0,
-                  })
-                : undefined;
               return (
                 <PlaysCellList
                   key={col.key}
@@ -118,7 +109,8 @@ export const ChartWeekListRow: React.FC<{
                   badgeStylesPlays={badgeStylesPlays}
                   scaleSize={effectiveScaleSize as any}
                   showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
-                  formulaValue={formulaValue}
+                  chart={chart}
+                  chartType={type}
                 />
               );
             }
@@ -224,7 +216,15 @@ export const ChartWeekListRow: React.FC<{
             }
             if (col.key === 'altPlaysVariation' && showAltPlaysVariationRedux) {
               return (
-                <AltPlaysVariationCellList key={col.key} row={row} cfg={badgeStylesPlays} playsVariationDisplay={playsVariationDisplay} />
+                <AltPlaysVariationCellList
+                  key={col.key}
+                  row={row}
+                  cfg={badgeStylesPlays}
+                  playsVariationDisplay={playsVariationDisplay}
+                  showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
+                  chart={chart}
+                  chartType={type}
+                />
               );
             }
             return null;
