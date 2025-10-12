@@ -169,7 +169,7 @@ export const ChartsWeeksListPage: React.FC = () => {
     }
 
     return (
-        <Container className="noPaddingMobile">
+        <Container className="noPaddingMobile" size="sm">
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
