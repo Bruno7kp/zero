@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useIsMobile } from '../hooks/useIsMobile';
 import { useSelector } from 'react-redux';
 // ...existing code...
 import { db } from '../db/indexedDb';
@@ -18,17 +17,14 @@ import {
     Loader,
     Center,
     Divider,
-    useMantineTheme,
-    MultiSelect,
-    Timeline
+    useMantineTheme
 } from '@mantine/core';
 import { IconListNumbers, IconSearch, IconCalendar } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 // ...existing code...
-import { ChartWeekCard } from '../components/ChartWeekCard';
+import { ChartsWeeksTimeline } from '../components/ChartsWeeksTimeline';
 // ...existing code...
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
-import dayjs from 'dayjs';
 
 interface WeekTop1Data {
     week: string;
@@ -41,7 +37,6 @@ interface WeekTop1Data {
 
 
 export const ChartsWeeksListPage: React.FC = () => {
-    const isMobile = useIsMobile();
     const { t } = useTranslation();
     // ...existing code...
     const theme = useMantineTheme();
@@ -54,7 +49,6 @@ export const ChartsWeeksListPage: React.FC = () => {
     const [weeksData, setWeeksData] = useState<WeekTop1Data[]>([]);
     const [searchFilter, setSearchFilter] = useState('');
     const [yearFilter, setYearFilter] = useState<string | null>(null);
-    const [typeFilter, setTypeFilter] = useState<string[]>(isMobile ? ['artist'] : ['artist', 'album', 'track']);
 
 
     // Fetch all weeks and their #1s
@@ -126,16 +120,16 @@ export const ChartsWeeksListPage: React.FC = () => {
             filtered = filtered.filter(w => w.week.startsWith(yearFilter));
         }
 
-        // Filter by search text (artist/album/track name) - only in selected types
+        // Filter by search text (artist/album/track name)
         if (searchFilter.trim()) {
             const search = searchFilter.toLowerCase();
             filtered = filtered.filter(w => {
-                const artistMatch = typeFilter.includes('artist') && w.artistTop1?.name.toLowerCase().includes(search);
-                const albumMatch = typeFilter.includes('album') && (
+                const artistMatch = w.artistTop1?.name.toLowerCase().includes(search);
+                const albumMatch = (
                     w.albumTop1?.name.toLowerCase().includes(search) || 
                     w.albumTop1?.artistName.toLowerCase().includes(search)
                 );
-                const trackMatch = typeFilter.includes('track') && (
+                const trackMatch = (
                     w.trackTop1?.name.toLowerCase().includes(search) || 
                     w.trackTop1?.artistName.toLowerCase().includes(search)
                 );
@@ -144,16 +138,13 @@ export const ChartsWeeksListPage: React.FC = () => {
         }
 
         return filtered;
-    }, [searchFilter, yearFilter, typeFilter, weeksData]);
+    }, [searchFilter, yearFilter, weeksData]);
 
     // Get available years from data
     const availableYears = useMemo(() => {
         const years = Array.from(new Set(weeksData.map(w => w.week.substring(0, 4)))).sort((a, b) => b.localeCompare(a));
         return years;
     }, [weeksData]);
-
-    // Timeline data (no pagination)
-    const timelineData = filteredData;
 
     if (!chart) {
         return (
@@ -174,12 +165,6 @@ export const ChartsWeeksListPage: React.FC = () => {
             </Container>
         );
     }
-
-    const formatWeekDate = (weekStr: string) => {
-        const startDate = dayjs(weekStr);
-        const endDate = startDate.add(6, 'day');
-        return `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
-    };
 
     return (
         <Container>
@@ -219,18 +204,6 @@ export const ChartsWeeksListPage: React.FC = () => {
                                 }}
                                 clearable
                             />
-                            <MultiSelect
-                                placeholder={t('charts.selectTypes')}
-                                data={[
-                                    { value: 'artist', label: t('charts.artist') },
-                                    { value: 'album', label: t('charts.album') },
-                                    { value: 'track', label: t('charts.track') }
-                                ]}
-                                value={typeFilter}
-                                onChange={(value) => {
-                                    setTypeFilter(value);
-                                }}
-                            />
                         </Group>
                     </Flex>
                 </Card>
@@ -241,47 +214,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                 </Text>
 
                 {/* Timeline */}
-                <Timeline active={100} bulletSize={32} lineWidth={2}>
-                    {timelineData.map((weekData) => {
-                        // Prepare top1 array for ChartWeekCard
-                        const top1 = [];
-                        if (typeFilter.includes('artist') && weekData.artistTop1) {
-                            top1.push({
-                                type: 'artist' as 'artist',
-                                name: weekData.artistTop1.name,
-                                artistName: weekData.artistTop1.artistName,
-                                entityId: weekData.artistTop1.entityId
-                            });
-                        }
-                        if (typeFilter.includes('album') && weekData.albumTop1) {
-                            top1.push({
-                                type: 'album' as 'album',
-                                name: weekData.albumTop1.name,
-                                artistName: weekData.albumTop1.artistName,
-                                entityId: weekData.albumTop1.entityId
-                            });
-                        }
-                        if (typeFilter.includes('track') && weekData.trackTop1) {
-                            top1.push({
-                                type: 'track' as 'track',
-                                name: weekData.trackTop1.name,
-                                artistName: weekData.trackTop1.artistName,
-                                entityId: weekData.trackTop1.entityId
-                            });
-                        }
-                        return (
-                            <Timeline.Item key={weekData.week} bullet={<IconListNumbers size={20} />}>
-                                <ChartWeekCard
-                                    week={weekData.week}
-                                    weekNumber={weekData.weekNumber}
-                                    top1={top1}
-                                    themeMode={themeMode}
-                                    formatWeekDate={formatWeekDate}
-                                />
-                            </Timeline.Item>
-                        );
-                    })}
-                </Timeline>
+                <ChartsWeeksTimeline weeksData={filteredData} themeMode={themeMode} />
             </Flex>
         </Container>
     );
