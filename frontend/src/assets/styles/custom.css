@@ -11,6 +11,14 @@
     margin-bottom: 1rem;
 }
 
+@media (max-width: 48em) {
+  .noPaddingMobile {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+
 /* Override Mantine dark theme default text color to pure white */
 :root[data-mantine-color-scheme='dark'] {
   --mantine-color-text: #ffffff;

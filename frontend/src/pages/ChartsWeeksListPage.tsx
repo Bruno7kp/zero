@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useDebouncedValue } from '@mantine/hooks';
 import { useSelector } from 'react-redux';
 // ...existing code...
 import { db } from '../db/indexedDb';
@@ -49,6 +50,7 @@ export const ChartsWeeksListPage: React.FC = () => {
     const [weeksData, setWeeksData] = useState<WeekTop1Data[]>([]);
     const [searchFilter, setSearchFilter] = useState('');
     const [yearFilter, setYearFilter] = useState<string | null>(null);
+    const [debouncedSearch] = useDebouncedValue(searchFilter, 500);
 
 
     // Fetch all weeks and their #1s
@@ -121,24 +123,24 @@ export const ChartsWeeksListPage: React.FC = () => {
         }
 
         // Filter by search text (artist/album/track name)
-        if (searchFilter.trim()) {
-            const search = searchFilter.toLowerCase();
+        if (debouncedSearch.trim()) {
+            const search = debouncedSearch.toLowerCase();
             filtered = filtered.filter(w => {
-                const artistMatch = w.artistTop1?.name.toLowerCase().includes(search);
-                const albumMatch = (
-                    w.albumTop1?.name.toLowerCase().includes(search) || 
-                    w.albumTop1?.artistName.toLowerCase().includes(search)
-                );
-                const trackMatch = (
-                    w.trackTop1?.name.toLowerCase().includes(search) || 
-                    w.trackTop1?.artistName.toLowerCase().includes(search)
-                );
+                const artistName = w.artistTop1?.name?.toLowerCase() || '';
+                const albumName = w.albumTop1?.name?.toLowerCase() || '';
+                const albumArtist = w.albumTop1?.artistName?.toLowerCase() || '';
+                const trackName = w.trackTop1?.name?.toLowerCase() || '';
+                const trackArtist = w.trackTop1?.artistName?.toLowerCase() || '';
+
+                const artistMatch = artistName.includes(search);
+                const albumMatch = albumName.includes(search) || albumArtist.includes(search);
+                const trackMatch = trackName.includes(search) || trackArtist.includes(search);
                 return artistMatch || albumMatch || trackMatch;
             });
         }
 
         return filtered;
-    }, [searchFilter, yearFilter, weeksData]);
+    }, [debouncedSearch, yearFilter, weeksData]);
 
     // Get available years from data
     const availableYears = useMemo(() => {
@@ -167,7 +169,7 @@ export const ChartsWeeksListPage: React.FC = () => {
     }
 
     return (
-        <Container>
+        <Container className="noPaddingMobile">
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
@@ -214,7 +216,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                 </Text>
 
                 {/* Timeline */}
-                <ChartsWeeksTimeline weeksData={filteredData} themeMode={themeMode} />
+                <ChartsWeeksTimeline weeksData={filteredData} themeMode={themeMode} yearFilter={yearFilter} />
             </Flex>
         </Container>
     );

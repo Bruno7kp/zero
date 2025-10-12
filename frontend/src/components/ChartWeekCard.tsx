@@ -18,7 +18,7 @@ interface ChartWeekCardProps {
   top1: Top1Item[];
   themeMode: ThemeMode;
   formatWeekDate: (weekStr: string) => string;
-  hasAllKill?: boolean;
+  hasAllKill?: boolean | null;
 }
 
 export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, top1, themeMode, formatWeekDate, hasAllKill = false }) => {
@@ -43,7 +43,7 @@ export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, 
         <Text fw={700} size="md">{t('charts.weekNumber')}: {weekNumber}</Text>
         <Text size="xs" c="dimmed">{formatWeekDate(week)}</Text>
         {hasAllKill && (
-          <Badge color="gold" variant="filled" size="sm">All-Kill</Badge>
+          <Badge variant="filled" size="sm">All-Kill</Badge>
         )}
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />
@@ -56,9 +56,10 @@ export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, 
             artistName={item.artistName}
             entityId={item.entityId}
             week={week}
-            chartId={activeChartId}
+            chartId={String(activeChartId)}
             showFormulaInsteadOfPlays={showFormulaInsteadOfPlays}
             formulaLabel={formulaLabel}
+            chart={chart}
           />
         ))}
       </Flex>

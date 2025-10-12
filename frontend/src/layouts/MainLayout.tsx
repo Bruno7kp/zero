@@ -52,6 +52,7 @@ const MainLayout: React.FC = () => {
             </AppShell.Header>
 
             <AppShell.Main
+                className="noPaddingMobile"
                 style={{
                     backgroundColor:
                         colorScheme === 'dark'

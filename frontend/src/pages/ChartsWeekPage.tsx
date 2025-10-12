@@ -69,7 +69,7 @@ export const ChartsWeekPage: React.FC = () => {
     }, [isSync, loadingData, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
-            <Container size={isMobile ? '100%' : currentContainerSize} px="xs">
+            <Container className="noPaddingMobile" size={isMobile ? '100%' : currentContainerSize} px="xs">
                 {chart && showCarousel && (
                     <Suspense
                         fallback={

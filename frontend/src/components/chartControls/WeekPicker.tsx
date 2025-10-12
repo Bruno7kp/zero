@@ -72,7 +72,7 @@ export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, week
           variant="light"
           leftSection={<IconListNumbers size={16} />}
           onClick={handleViewAllWeeks}
-          style={{ borderRadius: 0, borderTop: '1px solid var(--mantine-color-gray-3)' }}
+          style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
         >
           {t('charts.viewAllWeeks')}
         </Button>

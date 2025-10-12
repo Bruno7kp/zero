@@ -62,7 +62,7 @@ const NotificationsPage: React.FC = () => {
     const unreadCount = notifications.filter(n => !n.read).length;
 
     return (
-        <Container>
+        <Container className="noPaddingMobile">
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
