@@ -5,6 +5,8 @@ import { ChartWeekCard } from './ChartWeekCard';
 import type { ThemeMode } from '../theme/modes';
 import type { ChartData } from '../db/indexedDb';
 import dayjs from 'dayjs';
+import { useSpotifyImage } from '../hooks/useSpotifyImage';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
 
 interface WeekTop1Data {
     week: string;
@@ -20,6 +22,32 @@ interface ChartsWeeksTimelineProps {
 }
 
 const ITEMS_PER_PAGE = 100;
+
+// Component for All-Kill bullet (artist photo)
+const AllKillBullet: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
+    const { imageUrl } = useSpotifyImage({
+        entityId,
+        type: 'artist',
+        clientId: SPOTIFY_TOKEN,
+        clientSecret: SPOTIFY_SECRET,
+    });
+
+    return (
+        <Box
+            style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: imageUrl ? 'transparent' : '#ccc',
+            }}
+            title={name}
+        />
+    );
+};
 
 export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = ({ weeksData, themeMode }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -79,17 +107,30 @@ export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = ({ weeksD
                         });
                     }
 
-                    // Check for All-Kill (artist #1 in all three charts in the same week)
+                    // Check for All-Kill (same artist is #1 in all three charts in the same week)
+                    // For artist chart: entityId is the artist's Spotify ID
+                    // For album/track: artistName contains the artist's name
+                    // We need to check if the artist from artist chart matches the artist of album and track
                     const hasAllKill = weekData.artistTop1 && weekData.albumTop1 && weekData.trackTop1 &&
-                        weekData.artistTop1.entityId === weekData.albumTop1.artistName && // album's artist
-                        weekData.artistTop1.entityId === weekData.trackTop1.artistName;  // track's artist
+                        weekData.artistTop1.name === weekData.albumTop1.artistName &&
+                        weekData.artistTop1.name === weekData.trackTop1.artistName;
 
                     const lineVariant = getLineVariant(index);
+
+                    // For All-Kill, show artist photo in bullet
+                    const bullet = hasAllKill && weekData.artistTop1 ? (
+                        <AllKillBullet 
+                            entityId={weekData.artistTop1.entityId}
+                            name={weekData.artistTop1.name}
+                        />
+                    ) : (
+                        <IconListNumbers size={20} />
+                    );
 
                     return (
                         <Timeline.Item 
                             key={weekData.week} 
-                            bullet={<IconListNumbers size={20} />}
+                            bullet={bullet}
                             lineVariant={lineVariant}
                         >
                             <ChartWeekCard
