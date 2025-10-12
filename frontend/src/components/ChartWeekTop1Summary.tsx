@@ -170,7 +170,7 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ char
             <Group justify="center" align="center">
                 <Button
                     component={Link}
-                    to={`/charts`}
+                    to={`/charts/weeks`}
                     size="sm"
                     fullWidth
                     variant="light"

@@ -215,7 +215,17 @@
         }
       },
       "outdatedWarning": "Warning: Outdated weeks",
-      "outdatedWarningMessage": "This chart has {{missingWeeks}} week(s) pending synchronization."
+      "outdatedWarningMessage": "This chart has {{missingWeeks}} week(s) pending synchronization.",
+      "allWeeks": "All Weeks",
+      "searchByName": "Search by artist/album/track",
+      "filterByYear": "Filter by year",
+      "allYears": "All years",
+      "weekNumber": "Week",
+      "weekDate": "Date",
+      "artistTop1": "#1 Artist",
+      "albumTop1": "#1 Album",
+      "trackTop1": "#1 Track",
+      "showingWeeks": "Showing {{count}} of {{total}} weeks"
     },
     "library": {
       "title": "Library"
