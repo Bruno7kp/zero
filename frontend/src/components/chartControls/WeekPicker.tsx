@@ -4,6 +4,7 @@ import { Calendar } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { IconCalendar, IconListNumbers } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface WeekPickerProps {
   inputValue: Date | null;
@@ -16,6 +17,7 @@ interface WeekPickerProps {
 export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, weeks, onSelect, disabled }) => {
   const [opened, setOpened] = React.useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const handleViewAllWeeks = () => {
     setOpened(false);
@@ -72,7 +74,7 @@ export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, week
           onClick={handleViewAllWeeks}
           style={{ borderRadius: 0, borderTop: '1px solid var(--mantine-color-gray-3)' }}
         >
-          Ver todas as semanas
+          {t('charts.viewAllWeeks')}
         </Button>
       </Popover.Dropdown>
     </Popover>

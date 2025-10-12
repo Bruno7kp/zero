@@ -217,6 +217,7 @@
       "outdatedWarning": "Atenção: Semanas desatualizadas",
       "outdatedWarningMessage": "Este chart possui {{missingWeeks}} semana(s) faltante(s) para sincronizar.",
       "allWeeks": "Todas as Semanas",
+      "viewAllWeeks": "Ver todas as semanas",
       "searchByName": "Buscar por artista/álbum/música",
       "filterByYear": "Filtrar por ano",
       "filterByType": "Filtrar por tipo",
