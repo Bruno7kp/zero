@@ -247,7 +247,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                         const top1 = [];
                         if (typeFilter.includes('artist') && weekData.artistTop1) {
                             top1.push({
-                                type: 'artist' as 'artist',
+                                type: 'artist' as const,
                                 name: weekData.artistTop1.name,
                                 artistName: weekData.artistTop1.artistName,
                                 entityId: weekData.artistTop1.entityId
@@ -255,7 +255,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                         }
                         if (typeFilter.includes('album') && weekData.albumTop1) {
                             top1.push({
-                                type: 'album' as 'album',
+                                type: 'album' as const,
                                 name: weekData.albumTop1.name,
                                 artistName: weekData.albumTop1.artistName,
                                 entityId: weekData.albumTop1.entityId
@@ -263,7 +263,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                         }
                         if (typeFilter.includes('track') && weekData.trackTop1) {
                             top1.push({
-                                type: 'track' as 'track',
+                                type: 'track' as const,
                                 name: weekData.trackTop1.name,
                                 artistName: weekData.trackTop1.artistName,
                                 entityId: weekData.trackTop1.entityId
