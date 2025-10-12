@@ -1,8 +1,9 @@
 import React from 'react';
-import { Popover, ActionIcon } from '@mantine/core';
+import { Popover, ActionIcon, Button } from '@mantine/core';
 import { Calendar } from '@mantine/dates';
 import dayjs from 'dayjs';
-import { IconCalendar } from '@tabler/icons-react';
+import { IconCalendar, IconListNumbers } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 
 interface WeekPickerProps {
   inputValue: Date | null;
@@ -14,6 +15,13 @@ interface WeekPickerProps {
 
 export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, weeks, onSelect, disabled }) => {
   const [opened, setOpened] = React.useState(false);
+  const navigate = useNavigate();
+  
+  const handleViewAllWeeks = () => {
+    setOpened(false);
+    navigate('/charts/weeks');
+  };
+
   return (
     <Popover
       position="bottom"
@@ -57,6 +65,15 @@ export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, week
             } as any;
           }}
         />
+        <Button
+          fullWidth
+          variant="light"
+          leftSection={<IconListNumbers size={16} />}
+          onClick={handleViewAllWeeks}
+          style={{ borderRadius: 0, borderTop: '1px solid var(--mantine-color-gray-3)' }}
+        >
+          Ver todas as semanas
+        </Button>
       </Popover.Dropdown>
     </Popover>
   );

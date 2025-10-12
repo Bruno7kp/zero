@@ -21,7 +21,8 @@ import {
     Center,
     Divider,
     Box,
-    useMantineTheme
+    useMantineTheme,
+    MultiSelect
 } from '@mantine/core';
 import { IconListNumbers, IconSearch, IconCalendar, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -53,6 +54,7 @@ export const ChartWeeksListPage: React.FC = () => {
     const [weeksData, setWeeksData] = useState<WeekTop1Data[]>([]);
     const [searchFilter, setSearchFilter] = useState('');
     const [yearFilter, setYearFilter] = useState<string | null>(null);
+    const [typeFilter, setTypeFilter] = useState<string[]>(['artist', 'album', 'track']);
     const [currentPage, setCurrentPage] = useState(1);
 
     // Fetch all weeks and their #1s
@@ -124,21 +126,25 @@ export const ChartWeeksListPage: React.FC = () => {
             filtered = filtered.filter(w => w.week.startsWith(yearFilter));
         }
 
-        // Filter by search text (artist/album/track name)
+        // Filter by search text (artist/album/track name) - only in selected types
         if (searchFilter.trim()) {
             const search = searchFilter.toLowerCase();
             filtered = filtered.filter(w => {
-                const artistMatch = w.artistTop1?.name.toLowerCase().includes(search);
-                const albumMatch = w.albumTop1?.name.toLowerCase().includes(search) || 
-                                  w.albumTop1?.artistName.toLowerCase().includes(search);
-                const trackMatch = w.trackTop1?.name.toLowerCase().includes(search) || 
-                                  w.trackTop1?.artistName.toLowerCase().includes(search);
+                const artistMatch = typeFilter.includes('artist') && w.artistTop1?.name.toLowerCase().includes(search);
+                const albumMatch = typeFilter.includes('album') && (
+                    w.albumTop1?.name.toLowerCase().includes(search) || 
+                    w.albumTop1?.artistName.toLowerCase().includes(search)
+                );
+                const trackMatch = typeFilter.includes('track') && (
+                    w.trackTop1?.name.toLowerCase().includes(search) || 
+                    w.trackTop1?.artistName.toLowerCase().includes(search)
+                );
                 return artistMatch || albumMatch || trackMatch;
             });
         }
 
         return filtered;
-    }, [searchFilter, yearFilter, weeksData]);
+    }, [searchFilter, yearFilter, typeFilter, weeksData]);
 
     // Get available years from data
     const availableYears = useMemo(() => {
@@ -176,7 +182,9 @@ export const ChartWeeksListPage: React.FC = () => {
     }
 
     const formatWeekDate = (weekStr: string) => {
-        return dayjs(weekStr).format('DD/MM/YYYY');
+        const startDate = dayjs(weekStr);
+        const endDate = startDate.add(6, 'day');
+        return `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
     };
 
     return (
@@ -196,31 +204,47 @@ export const ChartWeeksListPage: React.FC = () => {
 
                 {/* Filters */}
                 <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-                    <Group grow>
-                        <TextInput
-                            placeholder={t('charts.searchByName')}
-                            leftSection={<IconSearch size={16} />}
-                            value={searchFilter}
-                            onChange={(e) => {
-                                setSearchFilter(e.currentTarget.value);
-                                setCurrentPage(1);
-                            }}
-                        />
-                        <Select
-                            placeholder={t('charts.filterByYear')}
-                            leftSection={<IconCalendar size={16} />}
+                    <Flex direction="column" gap="md">
+                        <Group grow>
+                            <TextInput
+                                placeholder={t('charts.searchByName')}
+                                leftSection={<IconSearch size={16} />}
+                                value={searchFilter}
+                                onChange={(e) => {
+                                    setSearchFilter(e.currentTarget.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                            <Select
+                                placeholder={t('charts.filterByYear')}
+                                leftSection={<IconCalendar size={16} />}
+                                data={[
+                                    { value: '', label: t('charts.allYears') },
+                                    ...availableYears.map(y => ({ value: y, label: y }))
+                                ]}
+                                value={yearFilter || ''}
+                                onChange={(value) => {
+                                    setYearFilter(value || null);
+                                    setCurrentPage(1);
+                                }}
+                                clearable
+                            />
+                        </Group>
+                        <MultiSelect
+                            label={t('charts.filterByType')}
+                            placeholder={t('charts.selectTypes')}
                             data={[
-                                { value: '', label: t('charts.allYears') },
-                                ...availableYears.map(y => ({ value: y, label: y }))
+                                { value: 'artist', label: t('charts.artist') },
+                                { value: 'album', label: t('charts.album') },
+                                { value: 'track', label: t('charts.track') }
                             ]}
-                            value={yearFilter || ''}
+                            value={typeFilter}
                             onChange={(value) => {
-                                setYearFilter(value || null);
+                                setTypeFilter(value);
                                 setCurrentPage(1);
                             }}
-                            clearable
                         />
-                    </Group>
+                    </Flex>
                 </Card>
 
                 {/* Results count */}
@@ -231,92 +255,95 @@ export const ChartWeeksListPage: React.FC = () => {
                 {/* Table */}
                 <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                     <Box style={{ overflowX: 'auto' }}>
-                        <Table striped highlightOnHover>
+                        <Table highlightOnHover>
                             <Table.Thead>
                                 <Table.Tr>
-                                    <Table.Th>{t('charts.weekNumber')}</Table.Th>
-                                    <Table.Th>{t('charts.weekDate')}</Table.Th>
-                                    <Table.Th>{t('charts.artistTop1')}</Table.Th>
-                                    <Table.Th>{t('charts.albumTop1')}</Table.Th>
-                                    <Table.Th>{t('charts.trackTop1')}</Table.Th>
+                                    <Table.Th style={{ textAlign: 'center' }}>{t('charts.weekNumber')}</Table.Th>
+                                    {typeFilter.includes('artist') && <Table.Th>{t('charts.artistTop1')}</Table.Th>}
+                                    {typeFilter.includes('album') && <Table.Th>{t('charts.albumTop1')}</Table.Th>}
+                                    {typeFilter.includes('track') && <Table.Th>{t('charts.trackTop1')}</Table.Th>}
                                     <Table.Th style={{ width: 100 }}>{t('charts.actions')}</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
                                 {paginatedData.map((weekData) => (
                                     <Table.Tr key={weekData.week}>
-                                        <Table.Td>
-                                            <Text fw={700}>#{weekData.weekNumber}</Text>
+                                        <Table.Td style={{ textAlign: 'center' }}>
+                                            <Text fw={700} size="lg">{weekData.weekNumber}</Text>
+                                            <Text size="xs" c="dimmed">{formatWeekDate(weekData.week)}</Text>
                                         </Table.Td>
-                                        <Table.Td>
-                                            <Text size="sm">{formatWeekDate(weekData.week)}</Text>
-                                        </Table.Td>
-                                        <Table.Td>
-                                            {weekData.artistTop1 ? (
-                                                <Group gap="xs" wrap="nowrap">
-                                                    <SpotifyImageWithModal
-                                                        entityId={weekData.artistTop1.entityId}
-                                                        name={weekData.artistTop1.name}
-                                                        artistName={weekData.artistTop1.artistName}
-                                                        type="artist"
-                                                        clientId={SPOTIFY_TOKEN}
-                                                        clientSecret={SPOTIFY_SECRET}
-                                                        width={32}
-                                                        height={32}
-                                                        borderRadius={4}
-                                                    />
-                                                    <Text size="sm" lineClamp={1}>{weekData.artistTop1.name}</Text>
-                                                </Group>
-                                            ) : (
-                                                <Text size="sm" c="dimmed">-</Text>
-                                            )}
-                                        </Table.Td>
-                                        <Table.Td>
-                                            {weekData.albumTop1 ? (
-                                                <Group gap="xs" wrap="nowrap">
-                                                    <SpotifyImageWithModal
-                                                        entityId={weekData.albumTop1.entityId}
-                                                        name={weekData.albumTop1.name}
-                                                        artistName={weekData.albumTop1.artistName}
-                                                        type="album"
-                                                        clientId={SPOTIFY_TOKEN}
-                                                        clientSecret={SPOTIFY_SECRET}
-                                                        width={32}
-                                                        height={32}
-                                                        borderRadius={4}
-                                                    />
-                                                    <Box style={{ minWidth: 0 }}>
-                                                        <Text size="sm" lineClamp={1}>{weekData.albumTop1.name}</Text>
-                                                        <Text size="xs" c="dimmed" lineClamp={1}>{weekData.albumTop1.artistName}</Text>
-                                                    </Box>
-                                                </Group>
-                                            ) : (
-                                                <Text size="sm" c="dimmed">-</Text>
-                                            )}
-                                        </Table.Td>
-                                        <Table.Td>
-                                            {weekData.trackTop1 ? (
-                                                <Group gap="xs" wrap="nowrap">
-                                                    <SpotifyImageWithModal
-                                                        entityId={weekData.trackTop1.entityId}
-                                                        name={weekData.trackTop1.name}
-                                                        artistName={weekData.trackTop1.artistName}
-                                                        type="track"
-                                                        clientId={SPOTIFY_TOKEN}
-                                                        clientSecret={SPOTIFY_SECRET}
-                                                        width={32}
-                                                        height={32}
-                                                        borderRadius={4}
-                                                    />
-                                                    <Box style={{ minWidth: 0 }}>
-                                                        <Text size="sm" lineClamp={1}>{weekData.trackTop1.name}</Text>
-                                                        <Text size="xs" c="dimmed" lineClamp={1}>{weekData.trackTop1.artistName}</Text>
-                                                    </Box>
-                                                </Group>
-                                            ) : (
-                                                <Text size="sm" c="dimmed">-</Text>
-                                            )}
-                                        </Table.Td>
+                                        {typeFilter.includes('artist') && (
+                                            <Table.Td>
+                                                {weekData.artistTop1 ? (
+                                                    <Group gap="xs" wrap="nowrap">
+                                                        <SpotifyImageWithModal
+                                                            entityId={weekData.artistTop1.entityId}
+                                                            name={weekData.artistTop1.name}
+                                                            artistName={weekData.artistTop1.artistName}
+                                                            type="artist"
+                                                            clientId={SPOTIFY_TOKEN}
+                                                            clientSecret={SPOTIFY_SECRET}
+                                                            width={32}
+                                                            height={32}
+                                                            borderRadius={4}
+                                                        />
+                                                        <Text size="sm" lineClamp={1}>{weekData.artistTop1.name}</Text>
+                                                    </Group>
+                                                ) : (
+                                                    <Text size="sm" c="dimmed">-</Text>
+                                                )}
+                                            </Table.Td>
+                                        )}
+                                        {typeFilter.includes('album') && (
+                                            <Table.Td>
+                                                {weekData.albumTop1 ? (
+                                                    <Group gap="xs" wrap="nowrap">
+                                                        <SpotifyImageWithModal
+                                                            entityId={weekData.albumTop1.entityId}
+                                                            name={weekData.albumTop1.name}
+                                                            artistName={weekData.albumTop1.artistName}
+                                                            type="album"
+                                                            clientId={SPOTIFY_TOKEN}
+                                                            clientSecret={SPOTIFY_SECRET}
+                                                            width={32}
+                                                            height={32}
+                                                            borderRadius={4}
+                                                        />
+                                                        <Box style={{ minWidth: 0 }}>
+                                                            <Text size="sm" lineClamp={1}>{weekData.albumTop1.name}</Text>
+                                                            <Text size="xs" c="dimmed" lineClamp={1}>{weekData.albumTop1.artistName}</Text>
+                                                        </Box>
+                                                    </Group>
+                                                ) : (
+                                                    <Text size="sm" c="dimmed">-</Text>
+                                                )}
+                                            </Table.Td>
+                                        )}
+                                        {typeFilter.includes('track') && (
+                                            <Table.Td>
+                                                {weekData.trackTop1 ? (
+                                                    <Group gap="xs" wrap="nowrap">
+                                                        <SpotifyImageWithModal
+                                                            entityId={weekData.trackTop1.entityId}
+                                                            name={weekData.trackTop1.name}
+                                                            artistName={weekData.trackTop1.artistName}
+                                                            type="track"
+                                                            clientId={SPOTIFY_TOKEN}
+                                                            clientSecret={SPOTIFY_SECRET}
+                                                            width={32}
+                                                            height={32}
+                                                            borderRadius={4}
+                                                        />
+                                                        <Box style={{ minWidth: 0 }}>
+                                                            <Text size="sm" lineClamp={1}>{weekData.trackTop1.name}</Text>
+                                                            <Text size="xs" c="dimmed" lineClamp={1}>{weekData.trackTop1.artistName}</Text>
+                                                        </Box>
+                                                    </Group>
+                                                ) : (
+                                                    <Text size="sm" c="dimmed">-</Text>
+                                                )}
+                                            </Table.Td>
+                                        )}
                                         <Table.Td>
                                             <Button
                                                 size="xs"

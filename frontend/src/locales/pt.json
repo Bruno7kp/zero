@@ -219,6 +219,8 @@
       "allWeeks": "Todas as Semanas",
       "searchByName": "Buscar por artista/álbum/música",
       "filterByYear": "Filtrar por ano",
+      "filterByType": "Filtrar por tipo",
+      "selectTypes": "Selecione os tipos",
       "allYears": "Todos os anos",
       "weekNumber": "Semana",
       "weekDate": "Data",
