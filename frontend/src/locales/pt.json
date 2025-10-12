@@ -215,7 +215,17 @@
         }
       },
       "outdatedWarning": "Atenção: Semanas desatualizadas",
-      "outdatedWarningMessage": "Este chart possui {{missingWeeks}} semana(s) faltante(s) para sincronizar."
+      "outdatedWarningMessage": "Este chart possui {{missingWeeks}} semana(s) faltante(s) para sincronizar.",
+      "allWeeks": "Todas as Semanas",
+      "searchByName": "Buscar por artista/álbum/música",
+      "filterByYear": "Filtrar por ano",
+      "allYears": "Todos os anos",
+      "weekNumber": "Semana",
+      "weekDate": "Data",
+      "artistTop1": "#1 Artista",
+      "albumTop1": "#1 Álbum",
+      "trackTop1": "#1 Música",
+      "showingWeeks": "Mostrando {{count}} de {{total}} semanas"
     },
     "library": {
       "title": "Biblioteca"
