@@ -278,7 +278,7 @@ const CreateChartPage = () => {
     const buttonLabel = id ? t('forms.editChart.saveButton') : t('forms.createChart.createButton');
 
     return (
-        <Container>
+        <Container className="noPaddingMobile">
             <Flex direction="column" p="xs" gap="sm">
                 <CreateHeader pageTitle={pageTitle} />
                 <form onSubmit={form.onSubmit(handleSubmit)}>

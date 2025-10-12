@@ -104,21 +104,10 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                     <Badge
                                         onClick={() => handleToggle(key)}
                                         size="xl"
-                                        variant="default"
+                                        variant="light"
+                                        color="dimmed"
                                         title="OUT"
                                         className="chart-run-badge"
-                                        style={{
-                                            borderRadius: 6,
-                                            minWidth: 32,
-                                            minHeight: 32,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            padding: 0,
-                                            lineHeight: 1.1,
-                                            cursor: 'pointer'
-                                        }}
                                     >
                                         <span style={{ fontSize: 8, fontWeight: 700, display: 'block', lineHeight: 1 }}>{item.count}x</span>
                                     </Badge>
@@ -134,6 +123,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                         const routeType = chartType || 'artist';
                         const isPeak = point.position === peak;
                         const isHighlighted = point.week === highlightWeek;
+                        const badgeClass = `chart-run-badge ${isPeak ? 'chart-run-peak' : ''} ${isHighlighted ? 'chart-run-highlighted' : ''}`;
                         const handleNavigate = (e: React.MouseEvent) => {
                             e.stopPropagation();
                             navigate(`/charts/week/${point.week}/${routeType}`);
@@ -156,10 +146,9 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                         onClick={() => handleToggle(point.week)}
                                         size="xl"
                                         p={0}
-                                        variant={isPeak || isHighlighted ? 'outline' : 'outline'}
-                                        color={isHighlighted ? 'mediumblue' : isPeak ? 'teal' : 'secondary'}
+                                        variant="default"
+                                        className={badgeClass}
                                         data-week={point.week}
-                                        style={{ borderRadius: 6, minWidth: 32, cursor: 'pointer', border: isPeak || isHighlighted ? undefined : '1px solid rgba(125,125,125,0.3)' }}
                                     >
                                         <Text size="xs" fw={700}>{point.position ?? '-'}</Text>
                                     </Badge>

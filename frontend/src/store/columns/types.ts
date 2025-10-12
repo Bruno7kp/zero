@@ -21,6 +21,7 @@ export interface ViewSettings {
   listPeakWeeksCombined?: boolean;
   showDroppedItems?: boolean;
   showFormulaInsteadOfPlays?: boolean;
+  showCarousel?: boolean;
 }
 
 export interface ViewConfig {
@@ -30,6 +31,6 @@ export interface ViewConfig {
 
 export interface ColumnsState {
   views: Record<'table' | 'list' | 'grid', ViewConfig>;
-  // Global UI settings
+  // Global UI settings (deprecated - use views.*.settings.showCarousel instead)
   showCarousel?: boolean;
 }

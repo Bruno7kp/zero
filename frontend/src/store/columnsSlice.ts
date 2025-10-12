@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_VIEW_SETTINGS, defaultColumns, cloneDefaults } from './columns/defaults';
 import { applyArtistDisplayMode, applyPlaysVariationDisplay, applyRankVariationMapping } from './columns/mappings';
-import { buildInitialState, ensureViews, persistView, persistGlobal } from './columns/state';
+import { buildInitialState, ensureViews, persistView } from './columns/state';
 export type { ColumnsState, ColumnConfig, ViewConfig, ViewSettings } from './columns/types';
 export { DEFAULT_VIEW_SETTINGS as COLUMNS_DEFAULT_VIEW_SETTINGS, defaultColumns as COLUMNS_DEFAULT_COLUMNS } from './columns/defaults';
 
@@ -41,6 +41,7 @@ const columnsSlice = createSlice({
       state.views[view].settings.listPeakWeeksCombined = DEFAULT_VIEW_SETTINGS[view].listPeakWeeksCombined;
       state.views[view].settings.showDroppedItems = DEFAULT_VIEW_SETTINGS[view].showDroppedItems;
       state.views[view].settings.showFormulaInsteadOfPlays = DEFAULT_VIEW_SETTINGS[view].showFormulaInsteadOfPlays;
+      state.views[view].settings.showCarousel = DEFAULT_VIEW_SETTINGS[view].showCarousel;
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, state.views[view].settings.artistDisplayMode || 'under', view);
@@ -131,9 +132,11 @@ const columnsSlice = createSlice({
       state.views[view].settings.showFormulaInsteadOfPlays = show;
       persistView(view, state.views[view]);
     },
-    setShowCarousel(state, action: PayloadAction<boolean>) {
-      state.showCarousel = action.payload;
-      persistGlobal(state as any);
+    setShowCarousel(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; show: boolean }>) {
+      ensureViews(state as any);
+      const { view, show } = action.payload;
+      state.views[view].settings.showCarousel = show;
+      persistView(view, state.views[view]);
     },
   },
   extraReducers: () => {}

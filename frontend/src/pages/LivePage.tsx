@@ -266,7 +266,7 @@ const LivePage = () => {
     };
 
     return (
-        <Container>
+        <Container className="noPaddingMobile">
             <Flex direction="column" p="xs" gap="sm">
                 <LiveTitle title={`${t('charts.live')}${chartName ? ` - ${chartName}` : ''}`} />
                 <Divider variant="solid" size="sm" my="md"/>

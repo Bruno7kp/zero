@@ -48,10 +48,11 @@ const MainLayout: React.FC = () => {
                             : undefined,
                 }}
             >
-                <Header/>
+                <Header />
             </AppShell.Header>
 
             <AppShell.Main
+                className="noPaddingMobile"
                 style={{
                     backgroundColor:
                         colorScheme === 'dark'
@@ -61,36 +62,44 @@ const MainLayout: React.FC = () => {
             >
                 <Outlet />
             </AppShell.Main>
-            <Container>
-                <Group p="sm" w="100%" justify="center" gap={0}>
-                    <ActionIcon
-                        component="a"
-                        href="https://github.com/bruno7kp/zero"
-                        target="_blank"
-                        variant="subtle"
-                        size="md"
-                        aria-label={t('github')}
-                    >
-                        <IconBrandGithub style={{ width: rem(15), height: rem(15) }} />
-                    </ActionIcon>
-                    <Text size="sm" ta="center">
-                        <Anchor component={Link} to="/changelog" size="sm">
-                            {t('changelog.current')}
-                        </Anchor>
-                        {' - '}
-                        © {currentYear} ZeroCharts. {t('user.rights')}.
-                        {' - '}
-                        <Anchor component={Link} to="/terms" size="sm">
-                            {t('user.terms')}
-                        </Anchor>
-                        {' - '}
-                        <Anchor component={Link} to="/privacy" size="sm">
-                            {t('user.privacy')}
-                        </Anchor>
-                    </Text>
-                </Group>
+            <Container style={{
+                width: '100%',
+                maxWidth: '100%',
+                backgroundColor:
+                    colorScheme === 'dark'
+                        ? theme.colors.dark[appShellHeaderDarkIndex(themeMode)]
+                        : undefined,
+            }}>
+                <Container size="md" py="md">
+                    <Group p="sm" w="100%" justify="center" gap={0}>
+                        <ActionIcon
+                            component="a"
+                            href="https://github.com/bruno7kp"
+                            target="_blank"
+                            variant="subtle"
+                            size="md"
+                            aria-label={t('github')}
+                        >
+                            <IconBrandGithub style={{ width: rem(15), height: rem(15) }} />
+                        </ActionIcon>
+                        <Text size="sm" ta="center">
+                            <Anchor component={Link} to="/changelog" size="sm">
+                                {t('changelog.current')}
+                            </Anchor>
+                            {' - '}
+                            © {currentYear} ZeroCharts. {t('user.rights')}.
+                            {' - '}
+                            <Anchor component={Link} to="/terms" size="sm">
+                                {t('user.terms')}
+                            </Anchor>
+                            {' - '}
+                            <Anchor component={Link} to="/privacy" size="sm">
+                                {t('user.privacy')}
+                            </Anchor>
+                        </Text>
+                    </Group>
+                </Container>
             </Container>
-
         </AppShell>
     );
 };

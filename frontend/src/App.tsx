@@ -8,6 +8,7 @@ import LivePage from './pages/LivePage';
 import ProfilePage from './pages/ProfilePage';
 import ChartsPage from './pages/ChartsPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
+import ChartsWeeksListPage from './pages/ChartsWeeksListPage.tsx';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import RouteErrorBoundary from './components/RouteErrorBoundary';
@@ -65,6 +66,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ChartsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="charts/weeks"
+                    element={
+                        <ProtectedRoute>
+                            <ChartsWeeksListPage />
                         </ProtectedRoute>
                     }
                 />

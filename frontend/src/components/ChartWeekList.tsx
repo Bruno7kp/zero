@@ -206,9 +206,10 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
             {/* Dropped items section */}
             {showDroppedItems && droppedItems.length > 0 && (
                 <>
-                    <Divider my="md" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
+                    <Divider my="lg" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
                     {droppedItems.map((row: ChartData, idx: number) => (
                         <>
+                            <Divider my={0} py={0} />
                             <ChartWeekListRow
                                 key={row.id}
                                 row={row}
@@ -232,7 +233,6 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
                                 chart={chart}
                                 isDropped={true}
                             />
-                            <Divider my={0} />
                         </>
                     ))}
                 </>

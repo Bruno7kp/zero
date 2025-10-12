@@ -36,7 +36,7 @@ export const ChartsWeekPage: React.FC = () => {
     const navigate = useNavigate();
     const columnsState = useSelector((state: any) => state.columns);
     const currentContainerSize = columnsState?.views?.[view]?.settings?.containerSize || (view === 'grid' ? 'xl' : 'md');
-    const showCarousel = !!columnsState?.showCarousel;
+    const showCarousel = columnsState?.views?.[view]?.settings?.showCarousel ?? false;
 
     // Sincroniza quando rota muda externamente (ex: clique em ChartRun)
     React.useEffect(() => {
@@ -69,7 +69,7 @@ export const ChartsWeekPage: React.FC = () => {
     }, [isSync, loadingData, chartsData, selectedWeek, selectedType, displayedWeek, displayedType]);
     return (
         <>
-            <Container size={isMobile ? '100%' : currentContainerSize} px="xs">
+            <Container className="noPaddingMobile" size={isMobile ? '100%' : currentContainerSize} px="xs">
                 {chart && showCarousel && (
                     <Suspense
                         fallback={

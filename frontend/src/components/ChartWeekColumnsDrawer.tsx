@@ -27,7 +27,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     // theme hooks not needed in parent after refactor
     const viewConfig = useSelector((state: RootState) => (state as any)?.columns?.views?.[viewType]);
     const columns = viewConfig?.columns || defaultColumns;
-    const showCarousel = useSelector((state: RootState) => (state as any)?.columns?.showCarousel) as boolean | undefined;
+    const showCarousel = viewConfig?.settings?.showCarousel ?? false;
     const containerSize = viewConfig?.settings?.containerSize || (viewType === 'grid' ? 'xl' : 'md');
     const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
     const tableBackground = viewConfig?.settings?.tableBackground || 'default';
@@ -250,13 +250,13 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                                         tableBackground={tableBackground as any}
                                         listBackground={listBackground as any}
                                         showDroppedItems={showDroppedItems}
-                                        showCarousel={showCarousel ?? true}
+                                        showCarousel={showCarousel}
                                         onContainerSizeChange={(v) => handleContainerSize(v as any)}
                                         onFontScaleChange={(v) => dispatch(setFontScale({ view: viewType, scale: v as any }))}
                                         onTableBackgroundChange={(v) => dispatch(setTableBackground({ background: v }))}
                                         onListBackgroundChange={(v) => dispatch(setListBackground({ background: v }))}
                                         onShowDroppedItemsChange={(v) => dispatch(setShowDroppedItems({ view: viewType, show: v }))}
-                                        onShowCarouselChange={(v) => dispatch(setShowCarousel(v))}
+                                        onShowCarouselChange={(v) => dispatch(setShowCarousel({ view: viewType, show: v }))}
                                     />
                                 </Accordion.Panel>
                             </Accordion.Item>

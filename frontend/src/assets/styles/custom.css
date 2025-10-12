@@ -11,6 +11,14 @@
     margin-bottom: 1rem;
 }
 
+@media (max-width: 48em) {
+  .noPaddingMobile {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+
 /* Override Mantine dark theme default text color to pure white */
 :root[data-mantine-color-scheme='dark'] {
   --mantine-color-text: #ffffff;
@@ -69,7 +77,36 @@
 }
 
 /** Badges **/
-:root[data-mantine-color-scheme="light"] .mantine-Badge-root.chart-run-badge {
-  background-color: var(--mantine-color-gray-2);
-  color: var(--mantine-color-black);
+.chart-run-badge {
+  border-radius: 6px;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1.1;
+  cursor: pointer;
+  border: 1px solid rgba(125, 125, 125, 0.3);
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-peak {
+  border: 1px solid var(--mantine-color-teal-4) !important;
+  color: var(--mantine-color-teal-4) !important;
+}
+
+:root[data-mantine-color-scheme='light'] .chart-run-peak {
+  border: 1px solid var(--mantine-color-teal-6) !important;
+  color: var(--mantine-color-teal-6) !important;
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-highlighted {
+  border: 1px solid var(--mantine-color-blue-4) !important;
+  color: var(--mantine-color-blue-4) !important;
+}
+
+:root[data-mantine-color-scheme='light'] .chart-run-highlighted {
+  border: 1px solid var(--mantine-color-blue-6) !important;
+  color: var(--mantine-color-blue-6) !important;
 }
