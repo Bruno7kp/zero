@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Group, Text, Flex, Divider, Box, Button, ThemeIcon, rem, useMantineTheme } from '@mantine/core';
-import { IconListNumbers, IconMicrophone, IconDisc, IconMusic, IconChevronRight } from '@tabler/icons-react';
+import { Card, Group, Text, Flex, Divider, Box, Button, useMantineTheme } from '@mantine/core';
+import { IconMicrophone, IconDisc, IconMusic, IconChevronRight } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from '../components/SpotifyImageWithModal';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
@@ -30,9 +30,6 @@ export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, 
   return (
     <Card shadow="md" p="md" mb="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
       <Group>
-        <ThemeIcon variant="light" size="md">
-          <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
-        </ThemeIcon>
         <Text fw={700} size="md">{t('charts.weekNumber')}: {weekNumber}</Text>
         <Text size="xs" c="dimmed">{formatWeekDate(week)}</Text>
       </Group>

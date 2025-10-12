@@ -241,7 +241,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                 </Text>
 
                 {/* Timeline */}
-                <Timeline active={0} bulletSize={32} lineWidth={2}>
+                <Timeline active={100} bulletSize={32} lineWidth={2}>
                     {timelineData.map((weekData) => {
                         // Prepare top1 array for ChartWeekCard
                         const top1 = [];
@@ -270,7 +270,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                             });
                         }
                         return (
-                            <Timeline.Item key={weekData.week}>
+                            <Timeline.Item key={weekData.week} bullet={<IconListNumbers size={20} />}>
                                 <ChartWeekCard
                                     week={weekData.week}
                                     weekNumber={weekData.weekNumber}
