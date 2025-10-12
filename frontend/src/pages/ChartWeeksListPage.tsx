@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db/indexedDb';
@@ -42,6 +43,7 @@ interface WeekTop1Data {
 const ITEMS_PER_PAGE = 100;
 
 export const ChartWeeksListPage: React.FC = () => {
+    const isMobile = useIsMobile();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const theme = useMantineTheme();
@@ -54,7 +56,7 @@ export const ChartWeeksListPage: React.FC = () => {
     const [weeksData, setWeeksData] = useState<WeekTop1Data[]>([]);
     const [searchFilter, setSearchFilter] = useState('');
     const [yearFilter, setYearFilter] = useState<string | null>(null);
-    const [typeFilter, setTypeFilter] = useState<string[]>(['artist', 'album', 'track']);
+    const [typeFilter, setTypeFilter] = useState<string[]>(isMobile ? ['artist'] : ['artist', 'album', 'track']);
     const [currentPage, setCurrentPage] = useState(1);
 
     // Fetch all weeks and their #1s
@@ -189,7 +191,7 @@ export const ChartWeeksListPage: React.FC = () => {
 
     return (
         <Container size="xl">
-            <Flex direction="column" p="xs" gap="md">
+            <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
                         <ThemeIcon variant="light" color="blue" size="md">
@@ -199,9 +201,7 @@ export const ChartWeeksListPage: React.FC = () => {
                         {chart && ` - ${chart.name}`}
                     </Title>
                 </Flex>
-
-                <Divider variant="solid" size="sm" />
-
+                <Divider variant="solid" size="sm" my="md"/>
                 {/* Filters */}
                 <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                     <Flex direction="column" gap="md">
@@ -229,21 +229,20 @@ export const ChartWeeksListPage: React.FC = () => {
                                 }}
                                 clearable
                             />
+                            <MultiSelect
+                                placeholder={t('charts.selectTypes')}
+                                data={[
+                                    { value: 'artist', label: t('charts.artist') },
+                                    { value: 'album', label: t('charts.album') },
+                                    { value: 'track', label: t('charts.track') }
+                                ]}
+                                value={typeFilter}
+                                onChange={(value) => {
+                                    setTypeFilter(value);
+                                    setCurrentPage(1);
+                                }}
+                            />
                         </Group>
-                        <MultiSelect
-                            label={t('charts.filterByType')}
-                            placeholder={t('charts.selectTypes')}
-                            data={[
-                                { value: 'artist', label: t('charts.artist') },
-                                { value: 'album', label: t('charts.album') },
-                                { value: 'track', label: t('charts.track') }
-                            ]}
-                            value={typeFilter}
-                            onChange={(value) => {
-                                setTypeFilter(value);
-                                setCurrentPage(1);
-                            }}
-                        />
                     </Flex>
                 </Card>
 
@@ -258,18 +257,18 @@ export const ChartWeeksListPage: React.FC = () => {
                         <Table highlightOnHover>
                             <Table.Thead>
                                 <Table.Tr>
-                                    <Table.Th style={{ textAlign: 'center' }}>{t('charts.weekNumber')}</Table.Th>
+                                    <Table.Th ta="center" style={{ width: 170 }}>{t('charts.weekNumber')}</Table.Th>
                                     {typeFilter.includes('artist') && <Table.Th>{t('charts.artistTop1')}</Table.Th>}
                                     {typeFilter.includes('album') && <Table.Th>{t('charts.albumTop1')}</Table.Th>}
                                     {typeFilter.includes('track') && <Table.Th>{t('charts.trackTop1')}</Table.Th>}
-                                    <Table.Th style={{ width: 100 }}>{t('charts.actions')}</Table.Th>
+                                    <Table.Th ta="center" style={{ width: 125 }}>{t('charts.actions')}</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
                                 {paginatedData.map((weekData) => (
                                     <Table.Tr key={weekData.week}>
-                                        <Table.Td style={{ textAlign: 'center' }}>
-                                            <Text fw={700} size="lg">{weekData.weekNumber}</Text>
+                                        <Table.Td ta="center">
+                                            <Text fw={700} size="md">{weekData.weekNumber}</Text>
                                             <Text size="xs" c="dimmed">{formatWeekDate(weekData.week)}</Text>
                                         </Table.Td>
                                         {typeFilter.includes('artist') && (

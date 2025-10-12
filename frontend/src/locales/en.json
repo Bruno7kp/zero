@@ -218,7 +218,7 @@
       "outdatedWarningMessage": "This chart has {{missingWeeks}} week(s) pending synchronization.",
       "allWeeks": "All Weeks",
       "viewAllWeeks": "View all weeks",
-      "searchByName": "Search by artist/album/track",
+      "searchByName": "Search",
       "filterByYear": "Filter by year",
       "filterByType": "Filter by type",
       "selectTypes": "Select types",
