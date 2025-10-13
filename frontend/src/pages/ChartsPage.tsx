@@ -11,9 +11,9 @@ import {
     Text,
     Anchor
 } from '@mantine/core';
-import { ChartWeekTop1Summary } from '../components/ChartWeekTop1Summary';
-import { ChartSyncProgress } from '../components/ChartSyncProgress';
-import { ChartLiveSummary } from "../components/ChartLiveSummary";
+import { ChartWeekTop1Summary } from '../components/chartPage/ChartWeekTop1Summary';
+import { ChartSyncProgress } from '../components/chartPage/ChartSyncProgress';
+import { ChartLiveSummary } from "../components/chartPage/ChartLiveSummary";
 import { IconInfoCircle, IconListNumbers} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';

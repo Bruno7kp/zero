@@ -26,9 +26,9 @@ import { useChartMaintenance } from '../hooks/useChartMaintenance';
 import { syncCharts } from '../store/syncSlice';
 import { useTranslation } from 'react-i18next';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
-import ActiveChartCard from '../components/ActiveChartCard';
-import ChartsListCard from '../components/ChartsListCard';
-import { ClearSpotifyImagesButton } from '../components/ClearSpotifyImagesButton';
+import ActiveChartCard from '../components/settingsPage/ActiveChartCard';
+import ChartsListCard from '../components/settingsPage/ChartsListCard';
+import { ClearSpotifyImagesButton } from '../components/settingsPage/ClearSpotifyImagesButton';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 // import { db } from '../db/indexedDb'; // no longer needed for global clear

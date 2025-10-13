@@ -4,7 +4,7 @@ import { IconFlame } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 export const ChartLiveSummary = () => {
     const { t } = useTranslation();

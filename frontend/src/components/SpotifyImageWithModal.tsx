@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconPhotoOff } from '@tabler/icons-react';
 import { useSpotifyImage } from '../hooks/useSpotifyImage';
-import { ImageEditModal } from './ImageEditModal';
+import { ImageEditModal } from './dialogs/ImageEditModal';
 
 // Cache global em memória: evita flicker quando componente desmonta/remonta rápido (troca de semana/tipo/view)
 const _globalImageMemory: Record<string, string> = {};
@@ -115,7 +115,7 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
         type={type}
         clientId={clientId}
         clientSecret={clientSecret}
-        onImageChange={url => {
+  onImageChange={(url: string) => {
           if (onImageChange) onImageChange(url);
           setModalUrl(url);
         }}

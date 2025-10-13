@@ -2,10 +2,10 @@ import React from 'react';
 import { Text } from '@mantine/core';
 import { ChartItemStats } from './ChartItemStats';
 // Incremental full stats (peak/sequences/aggregate) updater
-import { rebuildFullStats, applyWeekToFullStats } from '../utils/incrementalFullStats';
-import { db } from '../db/indexedDb';
+import { rebuildFullStats, applyWeekToFullStats } from '../../utils/incrementalFullStats';
+import { db } from '../../db/indexedDb';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../store';
+import type { RootState } from '../../store';
 import { useTranslation } from 'react-i18next';
 
 export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { chartId: string, chartType: string, entityId: string, week?: string }) {

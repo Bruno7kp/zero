@@ -1,8 +1,8 @@
 import { Button, Tooltip } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
-import { ConfirmModal } from '../components/ConfirmModal';
-import { spotifyImagesDb } from '../db/spotifyImagesDb';
+import { ConfirmModal } from '../dialogs/ConfirmModal';
+import { spotifyImagesDb } from '../../db/spotifyImagesDb';
 import { useTranslation } from 'react-i18next';
 
 export function ClearSpotifyImagesButton() {

@@ -1,35 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useSelector } from 'react-redux';
-// ...existing code...
 import { db } from '../db/indexedDb';
 import type { ChartData } from '../db/indexedDb';
-import {
-    Container,
-    Title,
-    Text,
-    Group,
-    TextInput,
-    Select,
-    MultiSelect,
-    Flex,
-    Card,
-    ThemeIcon,
-    rem,
-    Loader,
-    Center,
-    Divider,
-    useMantineTheme,
-    SegmentedControl
-} from '@mantine/core';
-import { IconListNumbers, IconSearch, IconCalendar, IconFilter, IconTable, IconTimeline, IconLayoutGrid } from '@tabler/icons-react';
+import { Container, Text, Flex, Loader, Center, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-// ...existing code...
-import { ChartsWeeksTimeline } from '../components/ChartsWeeksTimeline';
-import { ChartsWeeksTableView } from '../components/ChartsWeeksTableView';
-import { ChartsWeeksGridView } from '../components/ChartsWeeksGridView';
-// ...existing code...
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import { ChartsWeeksTimeline } from '../components/weeks/ChartsWeeksTimeline.tsx';
+import { ChartsWeeksTableView } from '../components/weeks/ChartsWeeksTableView.tsx';
+import { ChartsWeeksGridView } from '../components/weeks/ChartsWeeksGridView.tsx';
+import { ChartsWeeksFilters } from '../components/weeks/ChartsWeeksFilters.tsx';
+import { ChartsWeeksHeader } from '../components/weeks/ChartsWeeksHeader.tsx';
+import { type ThemeMode } from '../theme/modes';
 
 interface WeekTop1Data {
     week: string;
@@ -43,8 +24,7 @@ interface WeekTop1Data {
 
 export const ChartsWeeksListPage: React.FC = () => {
     const { t } = useTranslation();
-    // ...existing code...
-    const theme = useMantineTheme();
+    // no-op theme hook kept for potential future use
     const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -227,6 +207,7 @@ export const ChartsWeeksListPage: React.FC = () => {
         return years;
     }, [weeksData]);
 
+
     if (!chart) {
         return (
             <Container>
@@ -250,87 +231,22 @@ export const ChartsWeeksListPage: React.FC = () => {
     return (
         <Container className="noPaddingMobile" size={viewMode === 'table' ? 'xl' : 'sm'}>
             <Flex direction="column" p="xs" gap="sm">
-                <Flex justify="center" align="center" gap="sm">
-                    <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                        <ThemeIcon variant="light" size="md">
-                            <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
-                        </ThemeIcon>
-                        {t('charts.allWeeks')}
-                        {chart && ` - ${chart.name}`}
-                    </Title>
-                </Flex>
+                <ChartsWeeksHeader title={`${t('charts.allWeeks')}${chart ? ` - ${chart.name}` : ''}`} />
                 <Divider variant="solid" size="sm" my="md"/>
                 
-                {/* Filters */}
-                <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-                    <Flex direction="column" gap="md">
-                        <Group grow>
-                            <TextInput
-                                placeholder={t('charts.searchByName')}
-                                leftSection={<IconSearch size={16} />}
-                                value={searchFilter}
-                                onChange={(e) => {
-                                    setSearchFilter(e.currentTarget.value);
-                                }}
-                            />
-                            <Select
-                                placeholder={t('charts.filterByYear')}
-                                leftSection={<IconCalendar size={16} />}
-                                data={[
-                                    { value: '', label: t('charts.allYears') },
-                                    ...availableYears.map(y => ({ value: y, label: y }))
-                                ]}
-                                value={yearFilter || ''}
-                                onChange={(value) => {
-                                    setYearFilter(value || null);
-                                }}
-                                clearable
-                            />
-                        </Group>
-                        
-                        <Group grow>
-                            <MultiSelect
-                                placeholder={t('charts.selectTypes')}
-                                leftSection={<IconFilter size={16} />}
-                                data={[
-                                    { value: 'artist', label: t('charts.artist') },
-                                    { value: 'album', label: t('charts.album') },
-                                    { value: 'track', label: t('charts.track') }
-                                ]}
-                                value={typeFilter}
-                                onChange={setTypeFilter}
-                                clearable={false}
-                                hidePickedOptions
-                            />
-                            <Select
-                                placeholder={t('charts.itemsPerPage')}
-                                data={[
-                                    { value: '10', label: '10' },
-                                    { value: '25', label: '25' },
-                                    { value: '50', label: '50' },
-                                    { value: '100', label: '100' }
-                                ]}
-                                value={String(itemsPerPage)}
-                                onChange={(value) => {
-                                    if (value) setItemsPerPage(parseInt(value, 10));
-                                }}
-                            />
-                        </Group>
-                        
-                        {/* View mode selector */}
-                        <Group justify="center">
-                            <SegmentedControl
-                                value={viewMode}
-                                onChange={(value) => setViewMode(value as 'timeline' | 'table' | 'grid')}
-                                data={[
-                                    { label: <Center><IconTimeline size={18} /></Center> as any, value: 'timeline' },
-                                    { label: <Center><IconTable size={18} /></Center> as any, value: 'table' },
-                                    { label: <Center><IconLayoutGrid size={18} /></Center> as any, value: 'grid' }
-                                ]}
-                            />
-                        </Group>
-                    </Flex>
-                </Card>
+                <ChartsWeeksFilters
+                    availableYears={availableYears}
+                    searchFilter={searchFilter}
+                    setSearchFilter={setSearchFilter}
+                    yearFilter={yearFilter}
+                    setYearFilter={setYearFilter}
+                    itemsPerPage={itemsPerPage}
+                    setItemsPerPage={setItemsPerPage}
+                    typeFilter={typeFilter}
+                    setTypeFilter={setTypeFilter}
+                    viewMode={viewMode}
+                    setViewMode={(v: 'timeline' | 'table' | 'grid') => setViewMode(v)}
+                />
 
                 {/* Results count */}
                 <Text size="sm" c="dimmed">
@@ -349,12 +265,16 @@ export const ChartsWeeksListPage: React.FC = () => {
                     <ChartsWeeksTableView 
                         weeksData={filteredData} 
                         chartId={chart?.id || 0}
+                        itemsPerPage={itemsPerPage}
+                        typeFilter={typeFilter}
+                        themeMode={themeMode}
                     />
                 )}
                 {viewMode === 'grid' && (
                     <ChartsWeeksGridView 
                         weeksData={filteredData} 
-                        themeMode={themeMode}
+                        itemsPerPage={itemsPerPage}
+                        typeFilter={typeFilter}
                     />
                 )}
             </Flex>

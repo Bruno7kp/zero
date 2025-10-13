@@ -1,12 +1,12 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import type { AppDispatch } from '../store';
-import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
-import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { useDroppedItems } from '../hooks/useDroppedItems';
+import type { AppDispatch } from '../../store';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../../store/charts';
+import { useProgressiveReveal } from '../../hooks/useProgressiveReveal';
+import { useDroppedItems } from '../../hooks/useDroppedItems';
 import { Flex, Text, useMantineTheme, Divider } from '@mantine/core';
-import type { ChartData } from '../db/indexedDb';
-import { ChartWeekListRow } from './chartList/ChartWeekListRow.tsx';
+import type { ChartData } from '../../db/indexedDb';
+import { ChartWeekListRow } from '../chartList/ChartWeekListRow.tsx';
 import { useTranslation } from 'react-i18next';
 
 interface ChartWeekListProps {

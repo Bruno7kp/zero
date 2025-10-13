@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Text, Box, ActionIcon, Flex } from '@mantine/core';
 import { IconMicrophone, IconDisc, IconMusic, IconChevronRight } from '@tabler/icons-react';
-import { SpotifyImageWithModal } from './SpotifyImageWithModal';
-import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
+import { SpotifyImageWithModal } from '../../SpotifyImageWithModal';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../../services/SpotifyApi';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { db } from '../db/indexedDb';
+import { db } from '../../../db/indexedDb';
 
 interface ChartWeekCardItemProps {
     type: 'artist' | 'album' | 'track';

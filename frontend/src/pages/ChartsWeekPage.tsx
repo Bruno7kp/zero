@@ -1,10 +1,10 @@
 import React, { useMemo, useState, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ChartWeekControls } from '../components/ChartWeekControls';
-import { ChartWeekTable } from '../components/ChartWeekTable';
-import { ChartWeekGrid } from '../components/ChartWeekGrid';
-import { ChartWeekList } from '../components/ChartWeekList';
+import { ChartWeekControls } from '../components/chartWeek/ChartWeekControls';
+import { ChartWeekTable } from '../components/chartWeek/ChartWeekTable';
+import { ChartWeekGrid } from '../components/chartWeek/ChartWeekGrid';
+import { ChartWeekList } from '../components/chartWeek/ChartWeekList';
 import { Container, Loader, Center, Box, Skeleton } from '@mantine/core';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';

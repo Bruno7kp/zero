@@ -215,9 +215,10 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
   }
 
   if (showAltVariationRedux) {
-    // Determine width based on whether hideLabel is true (icon-only = 50, icon+text = 65)
-    const isIconOnly = badgeStylesRank?.hideLabel === true;
-    const columnWidth = isIconOnly ? 50 : 65;
+    // Width rules: 65 only when icon + text; 50 for icon-only or text-only
+    const treatAsHiddenForWidth = badgeStylesRank?.hideLabel && badgeStylesRank?.iconPosition === 'before';
+    const isCompact = badgeStylesRank?.iconPosition === 'hidden' || treatAsHiddenForWidth; // compact when text-only or icon-only
+    const columnWidth = isCompact ? 50 : 65;
     
     const altVariationCol: DataTableColumn<ChartData> = {
       accessor: 'altVariation',

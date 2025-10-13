@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, lazy, Suspense } from 'react';
+import { useEffect, useMemo, useRef, lazy, Suspense, useState } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 import { Carousel } from '@mantine/carousel';
 import { Box, Skeleton } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '../../store';
 import type { ChartData } from '../../db/indexedDb';
+import { db } from '../../db/indexedDb';
 import { computeWeekDeltas, fetchChartData, fetchStatsMapIncremental } from '../../store/charts';
 import type { SlideKind } from './SlideCard';
 const SlideCard = lazy(() => import('./SlideCard'));
@@ -24,6 +25,7 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
     const dispatch = useDispatch<AppDispatch>();
     const rows: ChartData[] = useSelector((s: any) => (s.charts.data || []) as ChartData[]);
     const statsMap = useSelector((s: any) => s.charts.statsMap || {});
+    const [artistTop1Count, setArtistTop1Count] = useState<number | null>(null);
 
     // Ensure data and deltas for current week are calculated
     useEffect(() => {
@@ -84,12 +86,9 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
         const arr: Array<{ kind: SlideKind; row: ChartData }> = [];
         if (top1) arr.push({ kind: 'top1', row: top1 });
         
-        // Add total_top1s slide for album/track types only if top1 has multiple #1s
+        // Always add the artist total #1s slide for album/track types
         if (top1 && (type === 'album' || type === 'track')) {
-            const top1Stats = statsMap[top1.entityId];
-            if (top1Stats?.peak?.totalTop1s && top1Stats.peak.totalTop1s > 1) {
-                arr.push({ kind: 'total_top1s', row: top1 });
-            }
+            arr.push({ kind: 'total_top1s', row: top1 });
         }
         
         if (biggestDebut) arr.push({ kind: 'debut', row: biggestDebut });
@@ -97,7 +96,39 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
         if (biggestReentry) arr.push({ kind: 'reentry', row: biggestReentry });
         if (mostWeeks) arr.push({ kind: 'weeks', row: mostWeeks });
         return arr;
-    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks, type, statsMap]);
+    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks, type]);
+
+    // Compute how many distinct albums/tracks this artist has taken to #1 historically in this chart
+    useEffect(() => {
+        let cancelled = false;
+        async function run() {
+            if (!chart?.id || !top1 || !(type === 'album' || type === 'track')) {
+                if (!cancelled) setArtistTop1Count(null);
+                return;
+            }
+            try {
+                // Fetch all rows for this chart/type to compute distinct #1s by artist
+                const all = await db.charts_data
+                    .where(['chartId', 'chartType'])
+                    .equals([String(chart.id), String(type)])
+                    .toArray();
+                if (cancelled) return;
+                const artistName = top1.artistName;
+                const seen = new Set<string>();
+                for (const r of all) {
+                    // Only count #1s up to and including the current week
+                    if (r.week <= (week || '') && r.rank === 1 && r.artistName === artistName) {
+                        seen.add(r.entityId);
+                    }
+                }
+                setArtistTop1Count(seen.size || 0);
+            } catch {
+                if (!cancelled) setArtistTop1Count(null);
+            }
+        }
+        run();
+        return () => { cancelled = true; };
+    }, [chart?.id, top1, type, week]);
 
     const renderPlaceholder = () => (
         <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
@@ -134,7 +165,18 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
                                                         </Box>
                                                     }
                                                 >
-                                                    <SlideCard row={row} kind={kind} chartType={type} clientId={clientId} clientSecret={clientSecret} stats={statsMap[row.entityId]} />
+                                                    <SlideCard
+                                                        row={row}
+                                                        kind={kind}
+                                                        chartType={type}
+                                                        clientId={clientId}
+                                                        clientSecret={clientSecret}
+                                                        // For the artist-total-#1s slide, override stats with the computed count
+                                                        stats={kind === 'total_top1s' && (type === 'album' || type === 'track')
+                                                            ? { peak: { totalTop1s: artistTop1Count ?? 1 } }
+                                                            : statsMap[row.entityId]
+                                                        }
+                                                    />
                                                 </Suspense>
                     </Carousel.Slide>
                 ))}

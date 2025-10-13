@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChartItemStatsLoader } from '../ChartItemStatsLoader';
+import { ChartItemStatsLoader } from '../stats/ChartItemStatsLoader';
 
 interface RowExpansionStatsProps {
   chartId: string;

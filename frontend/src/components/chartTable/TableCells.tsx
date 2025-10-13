@@ -181,7 +181,7 @@ export const AltPlaysVariationCell: React.FC<{
     : undefined;
   const treatAsHiddenForWidth = badgeStylesPlays.hideLabel && badgeStylesPlays.iconPosition === 'before';
   const isCompact = badgeStylesPlays.iconPosition === 'hidden' || treatAsHiddenForWidth;
-  const widthOverride = isCompact ? 50 : 65;
+  const widthOverride = !isCompact ? 65 : 50;
   return (
     <Flex justify="center" align="center" style={{ width: '100%' }}>
       <DeltaBadge
