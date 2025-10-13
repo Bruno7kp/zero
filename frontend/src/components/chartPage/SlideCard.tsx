@@ -5,7 +5,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import styles from './SlideCard.module.css';
 
-export type SlideKind = 'top1' | 'debut' | 'climb' | 'reentry' | 'weeks';
+export type SlideKind = 'top1' | 'debut' | 'climb' | 'reentry' | 'weeks' | 'total_top1s';
 
 interface SlideCardProps {
     row: ChartData;
@@ -13,9 +13,10 @@ interface SlideCardProps {
     chartType: 'artist' | 'album' | 'track' | string;
     clientId: string;
     clientSecret: string;
+    stats?: any; // Stats object containing totals and peak data
 }
 
-export function SlideCard({ row, kind, chartType, clientId, clientSecret }: SlideCardProps) {
+export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats }: SlideCardProps) {
     const { t } = useTranslation();
     const bgRef = useRef<HTMLDivElement | null>(null);
 
@@ -26,9 +27,13 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret }: Slid
             case 'climb': return t('charts.stats.highlights.climb');
             case 'reentry': return t('charts.stats.highlights.reentry');
             case 'weeks': return t('charts.stats.highlights.weeks');
+            case 'total_top1s': 
+                if (chartType === 'album') return t('charts.stats.highlights.totalTop1Albums');
+                if (chartType === 'track') return t('charts.stats.highlights.totalTop1Tracks');
+                return t('charts.stats.highlights.totalTop1s');
             default: return '';
         }
-    }, [kind, t]);
+    }, [kind, chartType, t]);
 
     const displayName = row.name || row.artistName || '';
     const artist = chartType === 'track' || chartType === 'album' ? row.artistName : undefined;
@@ -131,6 +136,16 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret }: Slid
                     {kind === 'reentry' && (
                         <Text c="#fff" size="sm" className={styles.responsiveTextRight}>
                             {t('charts.stats.highlights.reentryDetail', { rank: row.rank })}
+                        </Text>
+                    )}
+                    {kind === 'top1' && stats?.peak?.weeksAtPeak && (
+                        <Text c="#fff" size="sm" className={styles.responsiveTextRight}>
+                            {t('charts.stats.highlights.top1Detail', { count: stats.peak.weeksAtPeak })}
+                        </Text>
+                    )}
+                    {kind === 'total_top1s' && stats?.peak?.totalTop1s && (
+                        <Text c="#fff" size="sm" className={styles.responsiveTextRight}>
+                            {t('charts.stats.highlights.totalTop1sDetail', { count: stats.peak.totalTop1s })}
                         </Text>
                     )}
                 </Box>

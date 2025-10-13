@@ -211,7 +211,12 @@
           "weeks": "Most weeks on chart",
           "climbDetail": "+{{delta}} positions (#{{rank}})",
           "debutDetail": "Debut at #{{rank}}",
-          "reentryDetail": "Re-entry at #{{rank}}"
+          "reentryDetail": "Re-entry at #{{rank}}",
+          "top1Detail": "{{count}}x at #1",
+          "totalTop1s": "Total #1s",
+          "totalTop1Albums": "Total albums at #1",
+          "totalTop1Tracks": "Total tracks at #1",
+          "totalTop1sDetail": "{{count}} already at #1"
         }
       },
       "outdatedWarning": "Warning: Outdated weeks",
