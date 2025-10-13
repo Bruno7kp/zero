@@ -215,11 +215,15 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
   }
 
   if (showAltVariationRedux) {
+    // Determine width based on whether hideLabel is true (icon-only = 50, icon+text = 65)
+    const isIconOnly = badgeStylesRank?.hideLabel === true;
+    const columnWidth = isIconOnly ? 50 : 65;
+    
     const altVariationCol: DataTableColumn<ChartData> = {
       accessor: 'altVariation',
       title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
       textAlign: 'center',
-      width: 65,
+      width: columnWidth,
       cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
       render: (row: ChartData, index: number) => (
         <AltVariationCell row={row} index={index} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />

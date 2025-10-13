@@ -83,12 +83,21 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
     const slides: Array<{ kind: SlideKind; row: ChartData }> = useMemo(() => {
         const arr: Array<{ kind: SlideKind; row: ChartData }> = [];
         if (top1) arr.push({ kind: 'top1', row: top1 });
+        
+        // Add total_top1s slide for album/track types only if top1 has multiple #1s
+        if (top1 && (type === 'album' || type === 'track')) {
+            const top1Stats = statsMap[top1.entityId];
+            if (top1Stats?.peak?.totalTop1s && top1Stats.peak.totalTop1s > 1) {
+                arr.push({ kind: 'total_top1s', row: top1 });
+            }
+        }
+        
         if (biggestDebut) arr.push({ kind: 'debut', row: biggestDebut });
         if (biggestClimb) arr.push({ kind: 'climb', row: biggestClimb });
         if (biggestReentry) arr.push({ kind: 'reentry', row: biggestReentry });
         if (mostWeeks) arr.push({ kind: 'weeks', row: mostWeeks });
         return arr;
-    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks]);
+    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks, type, statsMap]);
 
     const renderPlaceholder = () => (
         <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
@@ -125,7 +134,7 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
                                                         </Box>
                                                     }
                                                 >
-                                                    <SlideCard row={row} kind={kind} chartType={type} clientId={clientId} clientSecret={clientSecret} />
+                                                    <SlideCard row={row} kind={kind} chartType={type} clientId={clientId} clientSecret={clientSecret} stats={statsMap[row.entityId]} />
                                                 </Suspense>
                     </Carousel.Slide>
                 ))}

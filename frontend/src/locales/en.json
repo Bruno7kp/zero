@@ -211,7 +211,12 @@
           "weeks": "Most weeks on chart",
           "climbDetail": "+{{delta}} positions (#{{rank}})",
           "debutDetail": "Debut at #{{rank}}",
-          "reentryDetail": "Re-entry at #{{rank}}"
+          "reentryDetail": "Re-entry at #{{rank}}",
+          "top1Detail": "{{count}}x at #1",
+          "totalTop1s": "Total #1s",
+          "totalTop1Albums": "Total albums at #1",
+          "totalTop1Tracks": "Total tracks at #1",
+          "totalTop1sDetail": "{{count}} already at #1"
         }
       },
       "outdatedWarning": "Warning: Outdated weeks",
@@ -223,12 +228,18 @@
       "filterByType": "Filter by type",
       "selectTypes": "Select types",
       "allYears": "All years",
+      "itemsPerPage": "Items per page",
+      "viewMode": "View mode",
+      "viewTimeline": "Timeline",
+      "viewTable": "Table",
+      "viewGrid": "Grid",
       "weekNumber": "Week",
       "weekDate": "Date",
       "artistTop1": "#1 Artist",
       "albumTop1": "#1 Album",
       "trackTop1": "#1 Track",
-      "showingWeeks": "Showing {{count}} of {{total}} weeks"
+      "showingWeeks": "Showing {{count}} of {{total}} weeks",
+      "viewChart": "View chart"
     },
     "library": {
       "title": "Library"

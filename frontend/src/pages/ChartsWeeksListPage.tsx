@@ -11,6 +11,7 @@ import {
     Group,
     TextInput,
     Select,
+    MultiSelect,
     Flex,
     Card,
     ThemeIcon,
@@ -18,12 +19,15 @@ import {
     Loader,
     Center,
     Divider,
-    useMantineTheme
+    useMantineTheme,
+    SegmentedControl
 } from '@mantine/core';
-import { IconListNumbers, IconSearch, IconCalendar } from '@tabler/icons-react';
+import { IconListNumbers, IconSearch, IconCalendar, IconFilter, IconTable, IconTimeline, IconLayoutGrid } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 // ...existing code...
 import { ChartsWeeksTimeline } from '../components/ChartsWeeksTimeline';
+import { ChartsWeeksTableView } from '../components/ChartsWeeksTableView';
+import { ChartsWeeksGridView } from '../components/ChartsWeeksGridView';
 // ...existing code...
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 
@@ -51,6 +55,63 @@ export const ChartsWeeksListPage: React.FC = () => {
     const [searchFilter, setSearchFilter] = useState('');
     const [yearFilter, setYearFilter] = useState<string | null>(null);
     const [debouncedSearch] = useDebouncedValue(searchFilter, 500);
+    
+    // Load view mode from localStorage
+    const [viewMode, setViewMode] = useState<'timeline' | 'table' | 'grid'>(() => {
+        try {
+            const saved = localStorage.getItem('chartsWeeksViewMode');
+            return (saved === 'timeline' || saved === 'table' || saved === 'grid') ? saved : 'timeline';
+        } catch {
+            return 'timeline';
+        }
+    });
+    
+    // Load type filter from localStorage
+    const [typeFilter, setTypeFilter] = useState<string[]>(() => {
+        try {
+            const saved = localStorage.getItem('chartsWeeksTypeFilter');
+            return saved ? JSON.parse(saved) : ['artist', 'album', 'track'];
+        } catch {
+            return ['artist', 'album', 'track'];
+        }
+    });
+    
+    // Load items per page from localStorage
+    const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
+        try {
+            const saved = localStorage.getItem('chartsWeeksItemsPerPage');
+            return saved ? parseInt(saved, 10) : 25;
+        } catch {
+            return 25;
+        }
+    });
+    
+    // Save view mode to localStorage when it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('chartsWeeksViewMode', viewMode);
+        } catch (e) {
+            console.error('Failed to save view mode:', e);
+        }
+    }, [viewMode]);
+    
+    // Save type filter to localStorage when it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('chartsWeeksTypeFilter', JSON.stringify(typeFilter));
+        } catch (e) {
+            console.error('Failed to save type filter:', e);
+        }
+    }, [typeFilter]);
+    
+    // Save items per page to localStorage when it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('chartsWeeksItemsPerPage', String(itemsPerPage));
+        } catch (e) {
+            console.error('Failed to save items per page:', e);
+        }
+    }, [itemsPerPage]);
 
 
     // Fetch all weeks and their #1s
@@ -113,7 +174,7 @@ export const ChartsWeeksListPage: React.FC = () => {
         return () => { cancelled = true; };
     }, [chart]);
 
-    // Filter data based on search and year using useMemo
+    // Filter data based on search, year, and type using useMemo
     const filteredData = useMemo(() => {
         let filtered = [...weeksData];
 
@@ -122,25 +183,43 @@ export const ChartsWeeksListPage: React.FC = () => {
             filtered = filtered.filter(w => w.week.startsWith(yearFilter));
         }
 
-        // Filter by search text (artist/album/track name)
+        // Filter by type - only show weeks that have at least one selected type at #1
+        filtered = filtered.map(w => ({
+            ...w,
+            artistTop1: typeFilter.includes('artist') ? w.artistTop1 : null,
+            albumTop1: typeFilter.includes('album') ? w.albumTop1 : null,
+            trackTop1: typeFilter.includes('track') ? w.trackTop1 : null,
+        })).filter(w => w.artistTop1 || w.albumTop1 || w.trackTop1);
+
+        // Filter by search text (artist/album/track name) - only search in selected types
         if (debouncedSearch.trim()) {
             const search = debouncedSearch.toLowerCase();
             filtered = filtered.filter(w => {
-                const artistName = w.artistTop1?.name?.toLowerCase() || '';
-                const albumName = w.albumTop1?.name?.toLowerCase() || '';
-                const albumArtist = w.albumTop1?.artistName?.toLowerCase() || '';
-                const trackName = w.trackTop1?.name?.toLowerCase() || '';
-                const trackArtist = w.trackTop1?.artistName?.toLowerCase() || '';
-
-                const artistMatch = artistName.includes(search);
-                const albumMatch = albumName.includes(search) || albumArtist.includes(search);
-                const trackMatch = trackName.includes(search) || trackArtist.includes(search);
-                return artistMatch || albumMatch || trackMatch;
+                let matches = false;
+                
+                if (typeFilter.includes('artist') && w.artistTop1) {
+                    const artistName = w.artistTop1.name?.toLowerCase() || '';
+                    if (artistName.includes(search)) matches = true;
+                }
+                
+                if (typeFilter.includes('album') && w.albumTop1) {
+                    const albumName = w.albumTop1.name?.toLowerCase() || '';
+                    const albumArtist = w.albumTop1.artistName?.toLowerCase() || '';
+                    if (albumName.includes(search) || albumArtist.includes(search)) matches = true;
+                }
+                
+                if (typeFilter.includes('track') && w.trackTop1) {
+                    const trackName = w.trackTop1.name?.toLowerCase() || '';
+                    const trackArtist = w.trackTop1.artistName?.toLowerCase() || '';
+                    if (trackName.includes(search) || trackArtist.includes(search)) matches = true;
+                }
+                
+                return matches;
             });
         }
 
         return filtered;
-    }, [debouncedSearch, yearFilter, weeksData]);
+    }, [debouncedSearch, yearFilter, typeFilter, weeksData]);
 
     // Get available years from data
     const availableYears = useMemo(() => {
@@ -169,7 +248,7 @@ export const ChartsWeeksListPage: React.FC = () => {
     }
 
     return (
-        <Container className="noPaddingMobile" size="sm">
+        <Container className="noPaddingMobile" size={viewMode === 'table' ? 'xl' : 'sm'}>
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
@@ -181,6 +260,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                     </Title>
                 </Flex>
                 <Divider variant="solid" size="sm" my="md"/>
+                
                 {/* Filters */}
                 <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
                     <Flex direction="column" gap="md">
@@ -207,6 +287,48 @@ export const ChartsWeeksListPage: React.FC = () => {
                                 clearable
                             />
                         </Group>
+                        
+                        <Group grow>
+                            <MultiSelect
+                                placeholder={t('charts.selectTypes')}
+                                leftSection={<IconFilter size={16} />}
+                                data={[
+                                    { value: 'artist', label: t('charts.artist') },
+                                    { value: 'album', label: t('charts.album') },
+                                    { value: 'track', label: t('charts.track') }
+                                ]}
+                                value={typeFilter}
+                                onChange={setTypeFilter}
+                                clearable={false}
+                                hidePickedOptions
+                            />
+                            <Select
+                                placeholder={t('charts.itemsPerPage')}
+                                data={[
+                                    { value: '10', label: '10' },
+                                    { value: '25', label: '25' },
+                                    { value: '50', label: '50' },
+                                    { value: '100', label: '100' }
+                                ]}
+                                value={String(itemsPerPage)}
+                                onChange={(value) => {
+                                    if (value) setItemsPerPage(parseInt(value, 10));
+                                }}
+                            />
+                        </Group>
+                        
+                        {/* View mode selector */}
+                        <Group justify="center">
+                            <SegmentedControl
+                                value={viewMode}
+                                onChange={(value) => setViewMode(value as 'timeline' | 'table' | 'grid')}
+                                data={[
+                                    { label: <Center><IconTimeline size={18} /></Center> as any, value: 'timeline' },
+                                    { label: <Center><IconTable size={18} /></Center> as any, value: 'table' },
+                                    { label: <Center><IconLayoutGrid size={18} /></Center> as any, value: 'grid' }
+                                ]}
+                            />
+                        </Group>
                     </Flex>
                 </Card>
 
@@ -215,8 +337,26 @@ export const ChartsWeeksListPage: React.FC = () => {
                     {t('charts.showingWeeks', { count: filteredData.length, total: weeksData.length })}
                 </Text>
 
-                {/* Timeline */}
-                <ChartsWeeksTimeline weeksData={filteredData} themeMode={themeMode} yearFilter={yearFilter} />
+                {/* View based on selected mode */}
+                {viewMode === 'timeline' && (
+                    <ChartsWeeksTimeline 
+                        weeksData={filteredData} 
+                        themeMode={themeMode} 
+                        itemsPerPage={itemsPerPage}
+                    />
+                )}
+                {viewMode === 'table' && (
+                    <ChartsWeeksTableView 
+                        weeksData={filteredData} 
+                        chartId={chart?.id || 0}
+                    />
+                )}
+                {viewMode === 'grid' && (
+                    <ChartsWeeksGridView 
+                        weeksData={filteredData} 
+                        themeMode={themeMode}
+                    />
+                )}
             </Flex>
         </Container>
     );
