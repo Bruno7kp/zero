@@ -16,14 +16,6 @@ interface WeekTop1Data {
     trackTop1: ChartData | null;
 }
 
-interface ChartsWeeksTimelineProps {
-    weeksData: WeekTop1Data[];
-    themeMode: ThemeMode;
-    yearFilter?: string | null;
-}
-
-const ITEMS_PER_PAGE = 50;
-
 // Component for All-Kill bullet (artist photo)
 const AllKillBullet: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
     const { imageUrl } = useSpotifyImage({
@@ -51,22 +43,22 @@ const AllKillBullet: React.FC<{ entityId: string; name: string }> = ({ entityId,
     );
 };
 
-export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = React.memo(({ weeksData, themeMode, yearFilter }) => {
+interface ChartsWeeksTimelineProps {
+    weeksData: WeekTop1Data[];
+    themeMode: ThemeMode;
+    itemsPerPage?: number;
+}
+
+export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = React.memo(({ weeksData, themeMode, itemsPerPage = 50 }) => {
     const [currentPage, setCurrentPage] = useState(1);
 
-    // If yearFilter is set, show all weeks for that year (no pagination)
-    const filteredData = yearFilter
-        ? weeksData.filter(w => w.week.startsWith(yearFilter))
-        : weeksData;
-
-    const totalPages = yearFilter ? 1 : Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(weeksData.length / itemsPerPage);
 
     const paginatedData = useMemo(() => {
-        if (yearFilter) return filteredData;
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        const end = start + ITEMS_PER_PAGE;
-        return filteredData.slice(start, end);
-    }, [filteredData, currentPage, yearFilter]);
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        return weeksData.slice(start, end);
+    }, [weeksData, currentPage, itemsPerPage]);
 
     const formatWeekDate = (weekStr: string) => {
         const startDate = dayjs(weekStr);
@@ -150,7 +142,7 @@ export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = React.mem
                     );
                 })}
             </Timeline>
-            {!yearFilter && totalPages > 1 && (
+            {totalPages > 1 && (
                 <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
                     <Pagination
                         total={totalPages}

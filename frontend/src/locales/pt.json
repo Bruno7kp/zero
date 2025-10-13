@@ -228,12 +228,18 @@
       "filterByType": "Filtrar por tipo",
       "selectTypes": "Selecione os tipos",
       "allYears": "Todos os anos",
+      "itemsPerPage": "Itens por página",
+      "viewMode": "Modo de visualização",
+      "viewTimeline": "Linha do tempo",
+      "viewTable": "Tabela",
+      "viewGrid": "Grade",
       "weekNumber": "Semana",
       "weekDate": "Data",
       "artistTop1": "#1 Artista",
       "albumTop1": "#1 Álbum",
       "trackTop1": "#1 Música",
-      "showingWeeks": "Mostrando {{count}} de {{total}} semanas"
+      "showingWeeks": "Mostrando {{count}} de {{total}} semanas",
+      "viewChart": "Ver chart"
     },
     "library": {
       "title": "Biblioteca"
