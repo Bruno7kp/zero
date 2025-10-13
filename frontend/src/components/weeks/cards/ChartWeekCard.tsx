@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, Group, Text, Flex, Divider, useMantineTheme } from '@mantine/core';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { ChartWeekCardItem } from './ChartWeekCardItem';
-import { AllKillBadge } from './AllKillBadge';
+import { ChartWeekCardItem } from './ChartWeekCardItem.tsx';
+import { AllKillBadge } from '../../AllKillBadge';
 
 interface Top1Item {
   type: 'artist' | 'album' | 'track';

@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ImageEditModal } from './ImageEditModal';
-import type { AppDispatch } from '../store/index';
+import { ImageEditModal } from '../dialogs/ImageEditModal';
+import type { AppDispatch } from '../../store/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
-import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { useDroppedItems } from '../hooks/useDroppedItems';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../../store/charts';
+import { useProgressiveReveal } from '../../hooks/useProgressiveReveal';
+import { useDroppedItems } from '../../hooks/useDroppedItems';
 import { Text, Box, Grid, Modal, Divider } from '@mantine/core';
-import { selectResolvedBadge } from '../store/badgeStylesSlice';
-import type { ChartData } from '../db/indexedDb';
-import { ChartItemStatsLoader } from './ChartItemStatsLoader';
-import { makeScaleSize } from '../hooks/useFontScale';
-import GridAltVariationCorner from './chartGrid/GridAltVariationCorner';
-import GridUnderRankVariation from './chartGrid/GridUnderRankVariation';
-import GridItemRenderer from './chartGrid/GridItemRenderer';
+import { selectResolvedBadge } from '../../store/badgeStylesSlice';
+import type { ChartData } from '../../db/indexedDb';
+import { ChartItemStatsLoader } from '../stats/ChartItemStatsLoader';
+import { makeScaleSize } from '../../hooks/useFontScale';
+import GridAltVariationCorner from '../chartGrid/GridAltVariationCorner';
+import GridUnderRankVariation from '../chartGrid/GridUnderRankVariation';
+import GridItemRenderer from '../chartGrid/GridItemRenderer';
 import { useTranslation } from 'react-i18next';
-import { calculateWeekFormulaValue } from '../utils/certification';
+import { calculateWeekFormulaValue } from '../../utils/certification';
 
 interface ChartWeekGridProps {
     chart: any;
@@ -398,7 +398,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                 type={type === 'artist' || type === 'album' || type === 'track' ? type : 'artist'}
                 clientId={clientId}
                 clientSecret={clientSecret}
-                onImageChange={url => {
+                onImageChange={(url: string) => {
                     setImageModalUrl(url);
                     if (imageModalRow?.entityId) {
                         setImageForceUpdate(fu => ({ ...fu, [imageModalRow.entityId]: (fu[imageModalRow.entityId] || 0) + 1 }));

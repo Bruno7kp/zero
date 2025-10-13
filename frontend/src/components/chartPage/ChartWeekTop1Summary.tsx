@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../db/indexedDb';
+import { db } from '../../db/indexedDb';
 import { Button, Card, Group, Text, Flex, Divider, Grid, rem, ThemeIcon, useMantineTheme } from '@mantine/core';
-import { SpotifyImageWithModal } from './SpotifyImageWithModal';
+import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import {
     IconMicrophone,
     IconDisc,
@@ -11,9 +11,9 @@ import {
 } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
-import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 
 interface ChartWeekTop1SummaryProps {

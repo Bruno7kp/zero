@@ -96,7 +96,7 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
         if (biggestReentry) arr.push({ kind: 'reentry', row: biggestReentry });
         if (mostWeeks) arr.push({ kind: 'weeks', row: mostWeeks });
         return arr;
-    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks, type, statsMap]);
+    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks, type]);
 
     // Compute how many distinct albums/tracks this artist has taken to #1 historically in this chart
     useEffect(() => {
@@ -128,7 +128,7 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
         }
         run();
         return () => { cancelled = true; };
-    }, [chart?.id, top1?.artistName, top1?.entityId, type, week]);
+    }, [chart?.id, top1, type, week]);
 
     const renderPlaceholder = () => (
         <div style={{ height: 200, display: 'flex', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>

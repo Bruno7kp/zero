@@ -1,13 +1,13 @@
 import React from 'react';
 import { Paper, Grid, Text, Card, Divider, Group, ThemeIcon, rem } from '@mantine/core';
-import { formatNumber } from '../utils/format';
-import { CertificationBadge } from './CertificationBadge';
-import { getUserPlaycountCached } from '../utils/certification';
-import { useOfflineStatus } from '../hooks/useOfflineStatus';
-import { ChartRun } from './ChartRun';
+import { formatNumber } from '../../utils/format';
+import { CertificationBadge } from '../CertificationBadge';
+import { useOfflineStatus } from '../../hooks/useOfflineStatus';
+import { getUserPlaycountCached } from '../../utils/certification';
+import { ChartRun } from '../ChartRun';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../store';
+import type { RootState } from '../../store';
 import { IconCalendarCheck, IconCalendarWeek, IconChartBar, IconTimeline } from '@tabler/icons-react';
 
 export interface ChartItemStatsProps {
@@ -145,6 +145,7 @@ function LastfmPlaysBox({ chart, chartType, artistName, entityName }: { chart: a
     const { isOnline } = useOfflineStatus();
     const [plays, setPlays] = React.useState<number | null>(null);
     const { t } = useTranslation();
+    // getUserPlaycountCached returns a Promise<number> with memoized/cache logic
 
     React.useEffect(() => {
         const username = chart?.lastfm_username as string | undefined;
@@ -158,7 +159,7 @@ function LastfmPlaysBox({ chart, chartType, artistName, entityName }: { chart: a
             offline: !isOnline,
             nextWeekDay: chart?.day_of_week,
         })
-            .then(v => { if (!canceled) setPlays(v); })
+            .then((v: number) => { if (!canceled) setPlays(v); })
             .catch(() => { if (!canceled) setPlays(0); });
         return () => { canceled = true; };
     }, [chart?.lastfm_username, chart?.day_of_week, artistName, entityName, chartType, isOnline]);

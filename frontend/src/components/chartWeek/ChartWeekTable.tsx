@@ -4,29 +4,29 @@ function capitalize(str: string) {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
-import { ImageEditModal } from './ImageEditModal';
+import { ImageEditModal } from '../dialogs/ImageEditModal';
 import { useSelector, useDispatch } from 'react-redux';
-import type { RootState, AppDispatch } from '../store';
+import type { RootState, AppDispatch } from '../../store';
 import { DataTable } from 'mantine-datatable';
 import type { DataTableRowExpansionProps } from 'mantine-datatable';
 import { Paper, Text, Flex, useMantineTheme, Divider } from '@mantine/core';
-import { selectResolvedBadge } from '../store/badgeStylesSlice';
-import type { ChartData } from '../db/indexedDb';
-import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../store/charts';
-import { useProgressiveReveal } from '../hooks/useProgressiveReveal';
-import { useDroppedItems } from '../hooks/useDroppedItems';
+import { selectResolvedBadge } from '../../store/badgeStylesSlice';
+import type { ChartData } from '../../db/indexedDb';
+import { fetchChartData, fetchStatsMapIncremental, computeWeekDeltas } from '../../store/charts';
+import { useProgressiveReveal } from '../../hooks/useProgressiveReveal';
+import { useDroppedItems } from '../../hooks/useDroppedItems';
 // removed inline column builders for arrows and image; handled in builder/NameCell
 import { useTranslation } from 'react-i18next';
-import { updateColumn } from '../store/columnsSlice';
+import { updateColumn } from '../../store/columnsSlice';
 // Certification rendering moved to CertCell
-import { makeScaleSize } from '../hooks/useFontScale';
+import { makeScaleSize } from '../../hooks/useFontScale';
 // cells are used inside buildTableColumns
-import buildTableColumns from './chartTable/buildTableColumns';
-import RowExpansionStats from './chartTable/RowExpansionStats';
-import { useStableDisplayedData } from './chartTable/hooks/useStableDisplayedData';
-import { useDeferredStats } from './chartTable/hooks/useDeferredStats';
-import { useStatsEmptyFallback } from './chartTable/hooks/useStatsEmptyFallback';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import buildTableColumns from '../chartTable/buildTableColumns';
+import RowExpansionStats from '../chartTable/RowExpansionStats';
+import { useStableDisplayedData } from '../chartTable/hooks/useStableDisplayedData';
+import { useDeferredStats } from '../chartTable/hooks/useDeferredStats';
+import { useStatsEmptyFallback } from '../chartTable/hooks/useStatsEmptyFallback';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 interface ChartWeekTableProps {
     chart: any;
@@ -281,7 +281,7 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, typ
                 type={type as 'artist' | 'album' | 'track'}
                 clientId={clientId}
                 clientSecret={clientSecret}
-                onImageChange={url => {
+                onImageChange={(url: string) => {
                     setImageForceUpdate(f => ({ ...f, [imageModalRow.entityId]: Date.now() }));
                     setImageModalUrl(url);
                 }}

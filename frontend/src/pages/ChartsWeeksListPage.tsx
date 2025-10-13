@@ -5,11 +5,11 @@ import { db } from '../db/indexedDb';
 import type { ChartData } from '../db/indexedDb';
 import { Container, Text, Flex, Loader, Center, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { ChartsWeeksTimeline } from '../components/ChartsWeeksTimeline';
-import { ChartsWeeksTableView } from '../components/ChartsWeeksTableView';
-import { ChartsWeeksGridView } from '../components/ChartsWeeksGridView';
-import { ChartsWeeksFilters } from '../components/ChartsWeeksFilters';
-import { ChartsWeeksHeader } from '../components/ChartsWeeksHeader';
+import { ChartsWeeksTimeline } from '../components/weeks/ChartsWeeksTimeline.tsx';
+import { ChartsWeeksTableView } from '../components/weeks/ChartsWeeksTableView.tsx';
+import { ChartsWeeksGridView } from '../components/weeks/ChartsWeeksGridView.tsx';
+import { ChartsWeeksFilters } from '../components/weeks/ChartsWeeksFilters.tsx';
+import { ChartsWeeksHeader } from '../components/weeks/ChartsWeeksHeader.tsx';
 import { type ThemeMode } from '../theme/modes';
 
 interface WeekTop1Data {
@@ -245,7 +245,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                     typeFilter={typeFilter}
                     setTypeFilter={setTypeFilter}
                     viewMode={viewMode}
-                    setViewMode={(v) => setViewMode(v)}
+                    setViewMode={(v: 'timeline' | 'table' | 'grid') => setViewMode(v)}
                 />
 
                 {/* Results count */}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Box, Text, Group, useMantineTheme } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { spotifyImagesDb } from '../db/spotifyImagesDb';
+import { spotifyImagesDb } from '../../db/spotifyImagesDb';
 
 // Lista de domínios populares de música permitidos para imagens
 const ALLOWED_IMAGE_DOMAINS = [
@@ -126,7 +126,7 @@ export const ImageEditModal: React.FC<ImageEditModalProps> = ({
             // Remove do cache antes de buscar
             await spotifyImagesDb.images.delete(entityId);
             // Busca do SpotifyApiManager
-            const { SpotifyApiManager } = await import('../services/SpotifyApi');
+            const { SpotifyApiManager } = await import('../../services/SpotifyApi');
             const apiManager = new SpotifyApiManager({ clientId, clientSecret });
             let searchName = name;
             if (type === 'artist') {

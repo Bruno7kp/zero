@@ -1,19 +1,19 @@
-// src/components/ChartSyncProgress.tsx
+// src/components/chartPage/ChartSyncProgress.tsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { Text, Group, Button, Card, Divider, rem, ThemeIcon, Alert, Tooltip, Badge, useMantineTheme } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import { useChartDb } from '../hooks/useChartDb';
-import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../services/lastfm';
-import { applyBatchWeeks } from '../utils/incrementalFullStats';
-import { getClosedChartWeeks } from '../utils/chartWeekUtils';
+import { useChartDb } from '../../hooks/useChartDb';
+import { getWeeklyArtistChart, getWeeklyAlbumChart, getWeeklyTrackChart } from '../../services/lastfm';
+import { applyBatchWeeks } from '../../utils/incrementalFullStats';
+import { getClosedChartWeeks } from '../../utils/chartWeekUtils';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
 import { IconRefresh, IconSettings, IconAlertCircle } from "@tabler/icons-react";
-import { useOfflineStatus } from '../hooks/useOfflineStatus';
+import { useOfflineStatus } from '../../hooks/useOfflineStatus';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 

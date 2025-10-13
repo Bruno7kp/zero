@@ -5,7 +5,7 @@ import { selectResolvedBadge } from '../../store/badgeStylesSlice';
 import { useSelector } from 'react-redux';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import type { ChartData } from '../../db/indexedDb';
-import { ChartItemStatsLoader } from '../ChartItemStatsLoader';
+import { ChartItemStatsLoader } from '../stats/ChartItemStatsLoader';
 import { makeScaleSize } from '../../hooks/useFontScale';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import {
