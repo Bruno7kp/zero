@@ -13,7 +13,7 @@ const CreateHeader: React.FC<Props> = ({ pageTitle }) => {
       <Flex justify="center" align="center" gap="sm">
         <NavLink to="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-            <ThemeIcon variant="light" color="blue" size="md">
+            <ThemeIcon variant="light" size="md">
               <IconSettings style={{ width: rem(20), height: rem(20) }} />
             </ThemeIcon>
             {t('settings.title')}
@@ -23,7 +23,7 @@ const CreateHeader: React.FC<Props> = ({ pageTitle }) => {
         <Divider size="sm" orientation="vertical" />
 
         <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-          <ThemeIcon variant="light" color="blue" size="md">
+          <ThemeIcon variant="light" size="md">
             <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
           </ThemeIcon>
           {pageTitle}

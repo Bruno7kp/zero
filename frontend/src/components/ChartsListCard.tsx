@@ -62,7 +62,6 @@ const ChartsListCard = ({ charts, t, openDeleteModal, isOnline, onRebuildStats, 
                                                     <ActionIcon
                                                         size="sm"
                                                         variant="light"
-                                                        color="blue"
                                                         component={Link as any}
                                                         to={generatePath('/settings/charts/:id', { id: chart.id.toString() })}
                                                         disabled={!isOnline || disabled}

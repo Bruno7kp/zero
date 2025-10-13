@@ -150,7 +150,7 @@ function SettingsPage() {
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                        <ThemeIcon variant="light" color="blue" size="md">
+                        <ThemeIcon variant="light" size="md">
                             <IconSettings style={{ width: rem(20), height: rem(20) }} />
                         </ThemeIcon>
                         {t('settings.title')}
@@ -162,7 +162,7 @@ function SettingsPage() {
                         <Badge color={isOnline ? 'green' : 'red'} variant="light" leftSection={isOnline ? <IconCloudCheck size={14} /> : <IconCloudOff size={14} />}>{isOnline ? t('settings.online') : t('settings.offline')}</Badge>
                         {syncState.lastFullChartsSync && (
                             <Tooltip label={syncState.lastFullChartsSync}>
-                                <Badge variant="light" color="blue">{t('settings.lastSync')}: {new Date(syncState.lastFullChartsSync).toLocaleString()}</Badge>
+                                <Badge variant="light">{t('settings.lastSync')}: {new Date(syncState.lastFullChartsSync).toLocaleString()}</Badge>
                             </Tooltip>
                         )}
                         {reindexing && (

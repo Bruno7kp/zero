@@ -197,7 +197,7 @@ export const GridCard: React.FC<GridCardProps> = ({
                   ? (hasStats ? Math.max(1, (liveCount as number) ?? 1) : 1)
                   : null;
                 return (
-                  <Text fw={700} size={droppedScaleSize('sm')} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
+                  <Text fw={700} size={droppedScaleSize('sm')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                     {showPeakCount && display === 1 && renderedCountAtOne != null && (
                       <span

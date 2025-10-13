@@ -41,7 +41,7 @@ const ChartsPage = () => {
         return (
             <Grid>
                 <Grid.Col>
-                    <Alert icon={<IconInfoCircle />} color="blue" title={t('errors.warning')}>
+                    <Alert icon={<IconInfoCircle />} title={t('errors.warning')}>
                         <Text>{t('errors.selectActiveChart')}</Text>
                         {activeChartId === null && (
                             <Text mt="sm">
@@ -60,7 +60,7 @@ const ChartsPage = () => {
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                        <ThemeIcon variant="light" color="blue" size="md">
+                        <ThemeIcon variant="light" size="md">
                             <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
                         </ThemeIcon>
                         {t('charts.title')}

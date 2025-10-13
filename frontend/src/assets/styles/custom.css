@@ -91,22 +91,85 @@
   border: 1px solid rgba(125, 125, 125, 0.3);
 }
 
+/** Out badges **/
+:root[data-mantine-color-scheme='light'] .chart-run-out {
+  border: 1px solid rgba(125, 125, 125, 0.3);
+  background-color: rgba(125, 125, 125, 0.1);
+  color: #666;
+}
+
+:root[data-mantine-color-scheme='light'] .chart-run-out:hover {
+  color: #333 !important;
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-out {
+  border: 1px solid rgba(125, 125, 125, 0.3);
+  color: #ccc;
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-out:hover {
+  color: #fff !important;
+}
+
+/** In badges **/
+:root[data-mantine-color-scheme='light'] .chart-run-badge:hover {
+  border-color: #999;
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-badge:hover {
+  border-color: #999;
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-badge:not(.chart-run-out) {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/** Peaks **/
+:root[data-mantine-color-scheme='dark'] .peak {
+  color: var(--mantine-color-mediumblue-5) !important;
+}
+
 :root[data-mantine-color-scheme='dark'] .chart-run-peak {
+  border: 1px solid var(--mantine-color-mediumblue-5) !important;
+  color: var(--mantine-color-mediumblue-5) !important;
+}
+
+:root[data-mantine-color-scheme='dark'] .chart-run-peak:hover {
+  color: white !important;
+  background-color: var(--mantine-color-mediumblue-5) !important;
+}
+
+:root[data-mantine-color-scheme='light'] .peak {
+  color: var(--mantine-color-blue-6) !important;
+}
+
+:root[data-mantine-color-scheme='light'] .chart-run-peak {
+  border: 1px solid var(--mantine-color-blue-6) !important;
+  color: var(--mantine-color-blue-6) !important;
+}
+
+:root[data-mantine-color-scheme='light'] .chart-run-peak:hover {
+  color: white !important;
+  background-color: var(--mantine-color-blue-6) !important;
+}
+
+/** Highlighted **/
+:root[data-mantine-color-scheme='dark'] .chart-run-highlighted {
   border: 1px solid var(--mantine-color-teal-4) !important;
   color: var(--mantine-color-teal-4) !important;
 }
 
-:root[data-mantine-color-scheme='light'] .chart-run-peak {
+:root[data-mantine-color-scheme='dark'] .chart-run-highlighted:hover {
+  color: white !important;
+  background-color: var(--mantine-color-teal-4) !important;
+}
+
+:root[data-mantine-color-scheme='light'] .chart-run-highlighted {
   border: 1px solid var(--mantine-color-teal-6) !important;
   color: var(--mantine-color-teal-6) !important;
 }
 
-:root[data-mantine-color-scheme='dark'] .chart-run-highlighted {
-  border: 1px solid var(--mantine-color-blue-4) !important;
-  color: var(--mantine-color-blue-4) !important;
-}
-
-:root[data-mantine-color-scheme='light'] .chart-run-highlighted {
-  border: 1px solid var(--mantine-color-blue-6) !important;
-  color: var(--mantine-color-blue-6) !important;
+:root[data-mantine-color-scheme='light'] .chart-run-highlighted:hover {
+  color: white !important;
+  background-color: var(--mantine-color-teal-6) !important;
 }

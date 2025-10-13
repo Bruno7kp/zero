@@ -13,7 +13,7 @@ export const RankCell: React.FC<{
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
 }> = ({ row, showDeltaBadge, badgeStylesRank, scaleSize }) => (
   <Flex direction="column" align="center">
-    <Text fw={row.rank === 1 ? 700 : 600} size={scaleSize('lg')} c={row.rank === 1 ? 'blue' : undefined}>{row.rank}</Text>
+    <Text fw={row.rank === 1 ? 700 : 600} size={scaleSize('lg')} className={row.rank === 1 ? 'peak' : undefined}>{row.rank}</Text>
     {showDeltaBadge && (
       <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext contextView="table" />
     )}
@@ -97,7 +97,7 @@ export const PeakCell: React.FC<{
   const renderedCountAtOne = display === 1 ? (hasStats ? Math.max(1, (rawCountAtOne as number) ?? 1) : 1) : null;
   return (
     <Flex direction="column" align="center">
-      <Text fw={display === 1 ? 700 : 500} size={scaleSize('md')} c={display === 1 ? 'blue' : undefined} style={{ transition: 'color 120ms ease' }}>
+      <Text fw={display === 1 ? 700 : 500} size={scaleSize('md')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
         {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
       </Text>
       {showPeakCount && display === 1 && renderedCountAtOne != null && (

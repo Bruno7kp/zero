@@ -16,7 +16,7 @@ export const EditHeader: React.FC<EditHeaderProps> = ({ type, week, cutoff, load
   return (
     <Group justify="space-between" mb={6} gap="xs">
       <Group gap="xs">
-        <Badge color="blue" variant="light" size="xs">{String(type).toUpperCase()}</Badge>
+        <Badge variant="light" size="xs">{String(type).toUpperCase()}</Badge>
         <Badge variant="light" size="xs">{t('chartEdit.week', 'Semana')}: {week || '-'}</Badge>
         <Badge variant="light" size="xs">{t('chartEdit.cutoff', 'Cutoff')}: {cutoff}</Badge>
       </Group>

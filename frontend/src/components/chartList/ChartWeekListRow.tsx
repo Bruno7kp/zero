@@ -90,7 +90,7 @@ export const ChartWeekListRow: React.FC<{
   
   return (
   <Card key={rowId} shadow={isTransparent ? 'none' : 'md'} p={0} radius="md" style={{ background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode) }}>
-      <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: isDropped ? 30 : 72 }}>
+      <Flex align="stretch" gap="md" px="md" wrap="nowrap" style={{ height: isDropped ? 42 : 72 }}>
         <Flex align="center" gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
           {filteredColumns.map((col: any) => {
             if (col.key === 'rank') {
@@ -115,7 +115,7 @@ export const ChartWeekListRow: React.FC<{
               );
             }
             if (col.key === 'name') {
-              const imageSize = isDropped ? 36 : 72;
+              const imageSize = isDropped ? 40 : 72;
               return (
                 <Flex key={col.key} direction="row" align="center" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   {showImage && (

@@ -66,7 +66,7 @@ const NotificationsPage: React.FC = () => {
             <Flex direction="column" p="xs" gap="sm">
                 <Flex justify="center" align="center" gap="sm">
                     <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-                        <ThemeIcon variant="light" color="blue" size="md">
+                        <ThemeIcon variant="light" size="md">
                             <IconBell style={{ width: rem(20), height: rem(20) }} />
                         </ThemeIcon>
                         {t('notifications.title')}
@@ -120,7 +120,7 @@ const NotificationsPage: React.FC = () => {
                                                 {t(notification.title)}
                                             </Text>
                                             {!notification.read && (
-                                                <Badge color="blue" variant="dot" size="sm">
+                                                <Badge variant="dot" size="sm">
                                                     {t('notifications.new')}
                                                 </Badge>
                                             )}
@@ -150,7 +150,6 @@ const NotificationsPage: React.FC = () => {
                                         {!notification.read && (
                                             <ActionIcon
                                                 variant="subtle"
-                                                color="blue"
                                                 onClick={() => handleMarkAsRead(notification.id)}
                                                 title={t('notifications.markAsRead')}
                                             >

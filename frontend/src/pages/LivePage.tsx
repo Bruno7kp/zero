@@ -241,7 +241,7 @@ const LivePage = () => {
 
         if (error) {
             return (
-                <Alert icon={<IconInfoCircle />} color="blue" title={t('errors.warning')}>
+                <Alert icon={<IconInfoCircle />} title={t('errors.warning')}>
                     <Text>{error}</Text>
                     {activeChartId === null && (
                         <Text mt="sm">
@@ -256,7 +256,7 @@ const LivePage = () => {
 
         if (chartData.length === 0) {
             return (
-                <Alert icon={<IconInfoCircle />} color="blue" title={t('errors.noData.title')}>
+                <Alert icon={<IconInfoCircle />} title={t('errors.noData.title')}>
                     {t('errors.noData.description')}
                 </Alert>
             );

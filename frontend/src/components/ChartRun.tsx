@@ -104,12 +104,11 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                     <Badge
                                         onClick={() => handleToggle(key)}
                                         size="xl"
-                                        variant="light"
-                                        color="dimmed"
+                                        variant="default"
                                         title="OUT"
-                                        className="chart-run-badge"
+                                        className="chart-run-badge chart-run-out"
                                     >
-                                        <span style={{ fontSize: 8, fontWeight: 700, display: 'block', lineHeight: 1 }}>{item.count}x</span>
+                                        <span style={{ fontSize: 9, fontWeight: 500, display: 'block', lineHeight: 1 }}>{item.count}x</span>
                                     </Badge>
                                 </Popover.Target>
                                 <Popover.Dropdown style={{ minWidth: 140, textAlign: 'center' }}>

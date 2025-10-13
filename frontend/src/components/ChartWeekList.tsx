@@ -208,32 +208,29 @@ export const ChartWeekList: React.FC<ChartWeekListProps> = ({ chart, week, type,
                 <>
                     <Divider my="lg" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
                     {droppedItems.map((row: ChartData, idx: number) => (
-                        <>
-                            <Divider my={0} py={0} />
-                            <ChartWeekListRow
-                                key={row.id}
-                                row={row}
-                                idx={idx}
-                                filteredColumns={filteredColumns}
-                                showDeltaBadge={false}
-                                showDeltaPlaysBadge={false}
-                                showDeltaPercentPlaysBadge={false}
-                                showAltVariationRedux={false}
-                                showImage={showImage}
-                                showAltPlaysVariationRedux={showAltPlaysVariationRedux}
-                                altVariation={altVariation}
-                                type={type}
-                                clientId={clientId}
-                                clientSecret={clientSecret}
-                                theme={theme}
-                                week={week}
-                                listBackground={listBackground}
-                                fontScale={fontScale}
-                                listPeakWeeksCombined={listPeakWeeksCombined}
-                                chart={chart}
-                                isDropped={true}
-                            />
-                        </>
+                        <ChartWeekListRow
+                            key={row.id}
+                            row={row}
+                            idx={idx}
+                            filteredColumns={filteredColumns}
+                            showDeltaBadge={false}
+                            showDeltaPlaysBadge={false}
+                            showDeltaPercentPlaysBadge={false}
+                            showAltVariationRedux={false}
+                            showImage={showImage}
+                            showAltPlaysVariationRedux={showAltPlaysVariationRedux}
+                            altVariation={altVariation}
+                            type={type}
+                            clientId={clientId}
+                            clientSecret={clientSecret}
+                            theme={theme}
+                            week={week}
+                            listBackground={listBackground}
+                            fontScale={fontScale}
+                            listPeakWeeksCombined={listPeakWeeksCombined}
+                            chart={chart}
+                            isDropped={true}
+                        />
                     ))}
                 </>
             )}

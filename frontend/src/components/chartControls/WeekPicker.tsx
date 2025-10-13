@@ -36,7 +36,6 @@ export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, week
       <Popover.Target>
         <ActionIcon
           variant={inputValue ? 'filled' : 'default'}
-          color="blue"
           size="lg"
           m="xs"
           onClick={() => { if (!disabled) setOpened(o => !o); }}

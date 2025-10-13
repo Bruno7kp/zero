@@ -44,7 +44,6 @@ const TypeSegmented: React.FC<Props> = ({ value, onChange }) => {
           value: 'track',
         },
       ]}
-      color="blue"
     />
   );
 };
