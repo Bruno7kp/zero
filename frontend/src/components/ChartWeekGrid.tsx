@@ -226,7 +226,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                 opened={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={modalTitle}
-                size="xl"
+                size="70%"
                 styles={{
                     header: { justifyContent: 'center', position: 'relative' },
                     title: { width: '100%', textAlign: 'center', fontWeight: 700 },

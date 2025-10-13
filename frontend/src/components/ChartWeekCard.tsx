@@ -1,9 +1,10 @@
 import React from 'react';
-import { Card, Group, Text, Flex, Divider, useMantineTheme, Badge } from '@mantine/core';
+import { Card, Group, Text, Flex, Divider, useMantineTheme } from '@mantine/core';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { ChartWeekCardItem } from './ChartWeekCardItem';
+import { AllKillBadge } from './AllKillBadge';
 
 interface Top1Item {
   type: 'artist' | 'album' | 'track';
@@ -42,9 +43,7 @@ export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, 
       <Group>
         <Text fw={700} size="md">{t('charts.weekNumber')}: {weekNumber}</Text>
         <Text size="xs" c="dimmed">{formatWeekDate(week)}</Text>
-        {hasAllKill && (
-          <Badge variant="filled" size="sm">All-Kill</Badge>
-        )}
+        {hasAllKill && <AllKillBadge />}
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />
       <Flex direction="column" gap="md">

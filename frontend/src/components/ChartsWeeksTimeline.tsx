@@ -80,6 +80,8 @@ export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = React.mem
 
     return (
         <>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+                <Box style={{ width: '100%', maxWidth: 800 }}>
             <Timeline active={paginatedData.length} bulletSize={32} lineWidth={2}>
                 {paginatedData.map((weekData, index) => {
                     // Prepare top1 array for ChartWeekCard - include all types
@@ -142,6 +144,8 @@ export const ChartsWeeksTimeline: React.FC<ChartsWeeksTimelineProps> = React.mem
                     );
                 })}
             </Timeline>
+                </Box>
+            </Box>
             {totalPages > 1 && (
                 <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
                     <Pagination
