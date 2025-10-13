@@ -18,7 +18,7 @@ interface ChartsWeeksTableViewProps {
     chartId: number;
 }
 
-export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ weeksData, chartId }) => {
+export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ weeksData }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
