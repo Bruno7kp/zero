@@ -211,7 +211,7 @@ export const AltPlaysVariationCellList: React.FC<{
     : undefined;
   const treatAsHiddenForWidth = cfg.hideLabel && cfg.iconPosition === 'before';
   const isCompact = cfg.iconPosition === 'hidden' || treatAsHiddenForWidth;
-  const widthOverride = isCompact ? 50 : 65;
+  const widthOverride = !isCompact ? 65 : 50;
   return (
     <DeltaBadge
       delta={deltaValue}
