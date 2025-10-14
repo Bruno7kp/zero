@@ -71,6 +71,15 @@ export const LibraryPage: React.FC = () => {
         }
     });
 
+    const [badgeStyle, setBadgeStyle] = useState<'glass' | 'solid'>(() => {
+        try {
+            const saved = localStorage.getItem('libraryBadgeStyle');
+            return (saved === 'glass' || saved === 'solid') ? saved : 'glass';
+        } catch {
+            return 'glass';
+        }
+    });
+
     const [loading, setLoading] = useState(true);
     const [libraryData, setLibraryData] = useState<LibraryItem[]>([]);
     const [totalItems, setTotalItems] = useState(0); // Total from Last.fm API
@@ -108,6 +117,14 @@ export const LibraryPage: React.FC = () => {
             console.error('Failed to save sort by:', e);
         }
     }, [sortBy]);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('libraryBadgeStyle', badgeStyle);
+        } catch (e) {
+            console.error('Failed to save badge style:', e);
+        }
+    }, [badgeStyle]);
 
     // Fetch library data
     useEffect(() => {
@@ -358,6 +375,8 @@ export const LibraryPage: React.FC = () => {
                     setItemsPerPage={setItemsPerPage}
                     sortBy={sortBy}
                     setSortBy={setSortBy}
+                    badgeStyle={badgeStyle}
+                    setBadgeStyle={setBadgeStyle}
                 />
 
                 <LibraryStats
@@ -393,6 +412,7 @@ export const LibraryPage: React.FC = () => {
                                 setPage={setPage}
                                 totalPages={totalPages}
                                 chart={chart}
+                                badgeStyle={badgeStyle}
                             />
                         )}
                     </>
