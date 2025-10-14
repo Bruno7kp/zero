@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Card, Table, ScrollArea, Group, Text, Pagination, useMantineTheme, Avatar, Badge, Tooltip } from '@mantine/core';
+import { Card, Table, ScrollArea, Group, Text, Pagination, useMantineTheme, Avatar } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
@@ -8,7 +8,6 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
 import { CertificationIcon } from '../CertificationIcon';
 import { db } from '../../db/indexedDb';
-import { calculateWeekFormulaValue } from '../../utils/certification';
 
 interface LibraryTableViewProps {
     items: LibraryItem[];

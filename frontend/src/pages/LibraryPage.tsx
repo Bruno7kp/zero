@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Container, Text, Flex, Loader, Center, Divider } from '@mantine/core';
+import { Container, Text, Flex, Loader, Center } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { LibraryFilters } from '../components/library/LibraryFilters';

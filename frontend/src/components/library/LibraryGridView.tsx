@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Card, SimpleGrid, Group, Text, Pagination, Stack, Box, Badge, useMantineTheme } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { Card, SimpleGrid, Group, Text, Pagination, Box, Badge, useMantineTheme } from '@mantine/core';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
@@ -54,11 +53,10 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
 interface GridItemProps {
     item: LibraryItem;
     type: 'artist' | 'album' | 'track';
-    chart: any;
     badgeStyle?: 'glass' | 'solid';
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, chart, badgeStyle = 'glass' }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass' }) => {
     const theme = useMantineTheme();
     const [modalOpen, setModalOpen] = useState(false);
 
