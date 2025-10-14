@@ -7,8 +7,6 @@ import { LibraryStats } from '../components/library/LibraryStats';
 import { LibraryTableView } from '../components/library/LibraryTableView';
 import { LibraryGridView } from '../components/library/LibraryGridView';
 import { db } from '../db/indexedDb';
-import type { ChartData } from '../db/indexedDb';
-import * as lastfm from '../services/lastfm';
 
 export interface LibraryItem {
     name: string;

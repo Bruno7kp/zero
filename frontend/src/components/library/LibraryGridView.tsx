@@ -22,8 +22,6 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     totalPages,
     chart,
 }) => {
-    const { t } = useTranslation();
-
     return (
         <>
             <SimpleGrid

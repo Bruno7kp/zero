@@ -77,7 +77,6 @@ interface TableRowProps {
 }
 
 const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
-    const { t } = useTranslation();
     const [loadingPlaycount, setLoadingPlaycount] = useState(false);
     const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
 
