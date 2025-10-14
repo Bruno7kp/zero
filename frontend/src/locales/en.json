@@ -213,6 +213,8 @@
           "debutDetail": "Debut at #{{rank}}",
           "reentryDetail": "Re-entry at #{{rank}}",
           "top1Detail": "{{count}}x at #1",
+          "atNumberOneNTimes": "{{count}}x at #1",
+          "artistNthNumber1_en": "This is the artist's {{n}}{{suffix}} #1",
           "totalTop1s": "Total #1s",
           "totalTop1Albums": "Total albums at #1",
           "totalTop1Tracks": "Total tracks at #1",

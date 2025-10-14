@@ -153,6 +153,13 @@
   background-color: var(--mantine-color-blue-6) !important;
 }
 
+/* Frosted glass utility for overlays/badges */
+.frosted-glass {
+  background: rgba(0, 0, 0, 0.18) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /** Highlighted **/
 :root[data-mantine-color-scheme='dark'] .chart-run-highlighted {
   border: 1px solid var(--mantine-color-teal-4) !important;

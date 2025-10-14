@@ -85,18 +85,13 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
     const slides: Array<{ kind: SlideKind; row: ChartData }> = useMemo(() => {
         const arr: Array<{ kind: SlideKind; row: ChartData }> = [];
         if (top1) arr.push({ kind: 'top1', row: top1 });
-        
-        // Always add the artist total #1s slide for album/track types
-        if (top1 && (type === 'album' || type === 'track')) {
-            arr.push({ kind: 'total_top1s', row: top1 });
-        }
-        
+        // Remove separate total_top1s slide; combined into the top1 slide content
         if (biggestDebut) arr.push({ kind: 'debut', row: biggestDebut });
         if (biggestClimb) arr.push({ kind: 'climb', row: biggestClimb });
         if (biggestReentry) arr.push({ kind: 'reentry', row: biggestReentry });
         if (mostWeeks) arr.push({ kind: 'weeks', row: mostWeeks });
         return arr;
-    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks, type]);
+    }, [top1, biggestDebut, biggestClimb, biggestReentry, mostWeeks]);
 
     // Compute how many distinct albums/tracks this artist has taken to #1 historically in this chart
     useEffect(() => {
@@ -171,11 +166,10 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
                                                         chartType={type}
                                                         clientId={clientId}
                                                         clientSecret={clientSecret}
-                                                        // For the artist-total-#1s slide, override stats with the computed count
-                                                        stats={kind === 'total_top1s' && (type === 'album' || type === 'track')
-                                                            ? { peak: { totalTop1s: artistTop1Count ?? 1 } }
-                                                            : statsMap[row.entityId]
-                                                        }
+                                                        // For the combined top1 slide, include artist total #1s when applicable
+                                                        stats={kind === 'top1' && (type === 'album' || type === 'track')
+                                                            ? { ...(statsMap[row.entityId] || {}), peak: { ...(statsMap[row.entityId]?.peak || {}), totalTop1s: artistTop1Count ?? undefined } }
+                                                            : statsMap[row.entityId]}
                                                     />
                                                 </Suspense>
                     </Carousel.Slide>

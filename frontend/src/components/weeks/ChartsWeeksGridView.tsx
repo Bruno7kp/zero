@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { SimpleGrid, Card, Box, Badge, Flex, useMantineTheme, Timeline, Text, Pagination } from '@mantine/core';
-import { IconListNumbers } from '@tabler/icons-react';
+import { SimpleGrid, Card, Box, Badge, Flex, useMantineTheme, Text, Pagination, Button } from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { ChartData } from '../../db/indexedDb';
-import dayjs from 'dayjs';
 import { AllKillBadge } from '../AllKillBadge';
+import { ImageEditModal } from '../dialogs/ImageEditModal';
 
 interface WeekTop1Data {
 	week: string;
@@ -16,33 +16,6 @@ interface WeekTop1Data {
 	trackTop1: ChartData | null;
 }
 
-// Component for All-Kill bullet (artist photo), mirrors Timeline style
-const AllKillBullet: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
-	const { imageUrl } = useSpotifyImage({
-		entityId,
-		type: 'artist',
-		name,
-		clientId: SPOTIFY_TOKEN,
-		clientSecret: SPOTIFY_SECRET,
-	});
-
-	return (
-		<Box
-			style={{
-				width: 28,
-				height: 28,
-				borderRadius: '50%',
-				overflow: 'hidden',
-				backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
-				backgroundSize: 'cover',
-				backgroundPosition: 'center',
-				backgroundColor: imageUrl ? 'transparent' : '#ccc',
-			}}
-			title={name}
-		/>
-	);
-};
-
 interface ChartsWeeksGridViewProps {
 	weeksData: WeekTop1Data[];
 	itemsPerPage?: number;
@@ -50,15 +23,14 @@ interface ChartsWeeksGridViewProps {
 }
 
 interface GridItemProps {
-	item: ChartData | null;
-	type: 'artist' | 'album' | 'track';
-	week: string;
-	timesAtTop1?: number;
+    item: ChartData | null;
+    type: 'artist' | 'album' | 'track';
+    timesAtTop1?: number;
+    onOpenModal: (row: ChartData, imageUrl?: string) => void;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, week, timesAtTop1 = 1 }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpenModal }) => {
 	const theme = useMantineTheme();
-	const navigate = useNavigate();
 
 	const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
 	const { imageUrl } = useSpotifyImage({
@@ -70,9 +42,10 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, week, timesAtTop1 = 1 }
 		clientSecret: SPOTIFY_SECRET,
 	});
 
-	const handleClick = () => {
-		navigate(`/charts/week/${week}/${type}`);
-	};
+    const handleClick = () => {
+        if (!item) return;
+        onOpenModal(item, imageUrl || undefined);
+    };
 
 	if (!item) return null;
 
@@ -98,6 +71,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, week, timesAtTop1 = 1 }
 					right: 8,
 					zIndex: 2,
 				}}
+				className="frosted-glass"
 			>
 				{timesAtTop1}x #1
 			</Badge>
@@ -120,6 +94,26 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, week, timesAtTop1 = 1 }
 						backgroundColor: imageUrl ? 'transparent' : theme.colors.gray[7],
 					}}
 				/>
+                {/* Bottom gradient overlay with centered text */}
+                {item?.name && (
+                    <Box
+                        style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            padding: '8px 10px',
+                            background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.75) 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Text c="#fff" fw={700} size="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                            {item.name}
+                        </Text>
+                    </Box>
+                )}
 			</Box>
 		</Card>
 	);
@@ -129,15 +123,18 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
     
 	const [page, setPage] = useState(1);
 	const totalPages = Math.ceil(weeksData.length / itemsPerPage);
+    const navigate = useNavigate();
+    // Modal state
+    const [imageModalRow, setImageModalRow] = useState<ChartData | null>(null);
+    const [imageModalUrl, setImageModalUrl] = useState<string>('');
 
 	const pageData = useMemo(() => {
 		const start = (page - 1) * itemsPerPage;
 		return weeksData.slice(start, start + itemsPerPage);
 	}, [weeksData, page, itemsPerPage]);
 
-	// Determine max width based on how many types are selected
-	const selectedCount = ['artist','album','track'].filter((t) => typeFilter.includes(t)).length;
-	const containerMaxWidth = selectedCount === 3 ? 800 : selectedCount === 2 ? 500 : 300;
+    // Fixed max width for the grid container
+    const containerMaxWidth = 1000;
 
 	// Build cumulative counts up to each week (chronological order)
 	const cumulativeByWeek = useMemo(() => {
@@ -181,91 +178,89 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
 
 	return (
 		<>
-			<Flex justify="center">
-				<Box style={{ width: '100%', maxWidth: containerMaxWidth }}>
-			<Timeline active={pageData.length} bulletSize={28} lineWidth={2}>
-				{pageData.map((weekData, index) => {
-					const startDate = dayjs(weekData.week);
-					const endDate = startDate.add(6, 'day');
-					const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
-					// Mirror Timeline logic (data is in descending order): compare current with next
-					const isLast = index === pageData.length - 1;
-					const nextWeek = !isLast ? dayjs(pageData[index + 1].week) : null;
-					const expectedNext = startDate.subtract(7, 'day');
-					const lineVariant: 'solid' | 'dashed' = (!isLast && nextWeek && nextWeek.isSame(expectedNext, 'day')) ? 'solid' : (isLast ? 'solid' : 'dashed');
-
-					const hasAllKill = !!(
-						weekData.artistTop1 && weekData.albumTop1 && weekData.trackTop1 &&
-						weekData.artistTop1.name === weekData.albumTop1.artistName &&
-						weekData.artistTop1.name === weekData.trackTop1.artistName
-					);
-					const bullet = hasAllKill && weekData.artistTop1 ? (
-						<AllKillBullet entityId={weekData.artistTop1.entityId} name={weekData.artistTop1.name} />
-					) : (
-						<IconListNumbers size={18} />
-					);
-					// Build active tiles array based on filter and availability
-					const tiles: Array<React.ReactNode> = [];
-					if (typeFilter.includes('artist') && weekData.artistTop1) {
-						tiles.push(
-							<GridItem
-								key={`artist-${weekData.artistTop1.entityId}`}
-								item={weekData.artistTop1}
-								type="artist"
-								week={weekData.week}
-								timesAtTop1={(cumulativeByWeek.artist[weekData.week]?.[weekData.artistTop1.entityId] || 1)}
-							/>
-						);
-					}
-					if (typeFilter.includes('album') && weekData.albumTop1) {
-						tiles.push(
-							<GridItem
-								key={`album-${weekData.albumTop1.entityId}`}
-								item={weekData.albumTop1}
-								type="album"
-								week={weekData.week}
-								timesAtTop1={(cumulativeByWeek.album[weekData.week]?.[weekData.albumTop1.entityId] || 1)}
-							/>
-						);
-					}
-					if (typeFilter.includes('track') && weekData.trackTop1) {
-						tiles.push(
-							<GridItem
-								key={`track-${weekData.trackTop1.entityId}`}
-								item={weekData.trackTop1}
-								type="track"
-								week={weekData.week}
-								timesAtTop1={(cumulativeByWeek.track[weekData.week]?.[weekData.trackTop1.entityId] || 1)}
-							/>
-						);
-					}
-
-					// Dynamic columns: let grid grow/shrink based on active tiles
-					const cols = Math.max(tiles.length, 1);
-
-					return (
-						<Timeline.Item key={weekData.week} bullet={bullet} lineVariant={lineVariant} title={
-							<Flex align="center" gap={8} wrap="wrap">
-								<Text fw={700} size="sm">
-									Semana: {weekData.weekNumber} <Text ms="sm" span size="xs" c="dimmed">{dateRange}</Text>
-								</Text>
-								{hasAllKill && <AllKillBadge />}
-							</Flex>
-						}>
-						<SimpleGrid cols={cols} spacing="md">
-							{tiles}
-						</SimpleGrid>
-					</Timeline.Item>
-					);
-				})}
-			</Timeline>
-				</Box>
-			</Flex>
+            <Flex justify="center">
+                <Box style={{ width: '100%', maxWidth: containerMaxWidth }}>
+                    <SimpleGrid cols={{ base: 1, sm: (typeFilter.length === 3 ? 1 : typeFilter.length === 2 ? 2 : 2), lg: (typeFilter.length === 3 ? 1 : typeFilter.length === 2 ? 2 : 3) }} spacing="lg">
+                        {pageData.map((weekData) => {
+                            const hasAllKill = !!(
+                                weekData.artistTop1 && weekData.albumTop1 && weekData.trackTop1 &&
+                                weekData.artistTop1.name === weekData.albumTop1.artistName &&
+                                weekData.artistTop1.name === weekData.trackTop1.artistName
+                            );
+                            const tiles: Array<React.ReactNode> = [];
+                            if (typeFilter.includes('artist') && weekData.artistTop1) {
+                                tiles.push(
+                            <GridItem
+                                        key={`artist-${weekData.artistTop1.entityId}`}
+                                        item={weekData.artistTop1}
+                                        type="artist"
+                                        timesAtTop1={(cumulativeByWeek.artist[weekData.week]?.[weekData.artistTop1.entityId] || 1)}
+                                        onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
+                                    />
+                                );
+                            }
+                            if (typeFilter.includes('album') && weekData.albumTop1) {
+                                tiles.push(
+                            <GridItem
+                                        key={`album-${weekData.albumTop1.entityId}`}
+                                        item={weekData.albumTop1}
+                                        type="album"
+                                        timesAtTop1={(cumulativeByWeek.album[weekData.week]?.[weekData.albumTop1.entityId] || 1)}
+                                        onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
+                                    />
+                                );
+                            }
+                            if (typeFilter.includes('track') && weekData.trackTop1) {
+                                tiles.push(
+                            <GridItem
+                                        key={`track-${weekData.trackTop1.entityId}`}
+                                        item={weekData.trackTop1}
+                                        type="track"
+                                        timesAtTop1={(cumulativeByWeek.track[weekData.week]?.[weekData.trackTop1.entityId] || 1)}
+                                        onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
+                                    />
+                                );
+                            }
+                            const cols = Math.max(tiles.length, 1);
+                            return (
+                                <Flex key={weekData.week} direction="column" gap={8}>
+                                    <Flex align="center" justify="center" gap={8} wrap="wrap">
+                                        <Text fw={700} size="lg">Semana: {weekData.weekNumber}</Text>
+                                        {(typeFilter.length === 3) && hasAllKill && (
+                                            <AllKillBadge />
+                                        )}
+                                        <Button size="xs" variant="light" px={6} onClick={() => navigate(`/charts/week/${weekData.week}/artist`)}>
+                                            <IconChevronRight size={16} />
+                                        </Button>
+                                    </Flex>
+                                    <Flex justify="center">
+                                        <SimpleGrid cols={cols} spacing="md" style={{ width: '100%' }}>
+                                            {tiles}
+                                        </SimpleGrid>
+                                    </Flex>
+                                </Flex>
+                            );
+                        })}
+                    </SimpleGrid>
+                </Box>
+            </Flex>
 			{totalPages > 1 && (
 				<Flex justify="center" mt="md">
 					<Pagination total={totalPages} value={page} onChange={setPage} size="sm" />
 				</Flex>
 			)}
+            <ImageEditModal
+                opened={!!imageModalRow}
+                onClose={() => setImageModalRow(null)}
+                entityId={imageModalRow?.entityId || ''}
+                name={imageModalRow?.name || ''}
+                artistName={imageModalRow?.artistName || ''}
+                imageUrl={imageModalUrl}
+                type={(imageModalRow?.chartType as any) || 'artist'}
+                clientId={SPOTIFY_TOKEN}
+                clientSecret={SPOTIFY_SECRET}
+                onImageChange={(url: string) => setImageModalUrl(url)}
+            />
 		</>
 	);
 };
