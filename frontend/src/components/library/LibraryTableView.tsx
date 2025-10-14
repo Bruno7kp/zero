@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { Card, Table, ScrollArea, Group, Text, Pagination, useMantineTheme, Avatar, Badge } from '@mantine/core';
+import React, { useState, useMemo } from 'react';
+import { Card, Table, ScrollArea, Group, Text, Pagination, useMantineTheme, Avatar } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
+import { CertificationIcon } from '../CertificationIcon';
+import { db } from '../../db/indexedDb';
 
 interface LibraryTableViewProps {
     items: LibraryItem[];
@@ -39,10 +41,12 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
                                 <Table.Th style={{ width: 60 }}></Table.Th>
                                 <Table.Th>{t('charts.titleLabel')}</Table.Th>
                                 {type !== 'artist' && <Table.Th>{t('charts.artistLabel')}</Table.Th>}
-                                <Table.Th style={{ width: 100, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>
+                                <Table.Th style={{ width: 120, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>
                                 <Table.Th style={{ width: 100, textAlign: 'center' }}>{t('charts.weeks')}</Table.Th>
                                 <Table.Th style={{ width: 120, textAlign: 'center' }}>{t('charts.points')}</Table.Th>
+                                <Table.Th style={{ width: 120, textAlign: 'center' }}>{chart?.formula_name || 'Sales'}</Table.Th>
                                 <Table.Th style={{ width: 140, textAlign: 'center' }}>{t('charts.plays')}</Table.Th>
+                                {type !== 'artist' && <Table.Th style={{ width: 100, textAlign: 'center' }}>{t('charts.certification')}</Table.Th>}
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
@@ -79,6 +83,7 @@ interface TableRowProps {
 const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
     const [loadingPlaycount, setLoadingPlaycount] = useState(false);
     const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
+    const [totals, setTotals] = useState<{ totalPoints?: number; totalPlays?: number } | null>(null);
 
     // Get image from Spotify
     const imageUrl = useSpotifyImage({
@@ -87,6 +92,43 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
         type: type === 'track' ? 'track' : type === 'album' ? 'album' : 'artist',
         enabled: true,
     }, SPOTIFY_TOKEN, SPOTIFY_SECRET);
+
+    // Calculate sales (formula value) based on totals
+    const sales = useMemo(() => {
+        if (!totals || type === 'artist') return 0;
+        
+        const pointsWeight = type === 'track' ? (chart?.music_points_weight || 0) : (chart?.album_points_weight || 0);
+        const playsWeight = type === 'track' ? (chart?.music_plays_weight || 0) : (chart?.album_plays_weight || 0);
+        const totalPoints = totals.totalPoints || 0;
+        const totalPlays = totals.totalPlays || 0;
+        
+        return totalPoints * pointsWeight + totalPlays * playsWeight;
+    }, [totals, chart, type]);
+
+    // Load totals for certification calculation
+    React.useEffect(() => {
+        if (!item.entityId || type === 'artist') return;
+
+        const loadTotals = async () => {
+            try {
+                const chartIdStr = String(chart?.id || '');
+                const stats = await db.charts_stats.get([chartIdStr, type, item.entityId]);
+                if (stats?.totals) {
+                    setTotals(stats.totals);
+                } else {
+                    // If not in stats, calculate from points and playcount
+                    setTotals({
+                        totalPoints: item.points || 0,
+                        totalPlays: playcount || item.playcount || 0,
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading totals:', error);
+            }
+        };
+
+        loadTotals();
+    }, [item, type, chart, playcount]);
 
     // Load playcount lazily if not already loaded
     React.useEffect(() => {
@@ -153,11 +195,19 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
             )}
             <Table.Td style={{ textAlign: 'center' }}>
                 {item.peak === 1 ? (
-                    <Badge color="yellow" variant="filled">
-                        #1
-                    </Badge>
+                    <Group gap={4} justify="center" wrap="nowrap">
+                        <Text size="sm" fw={600} c="mediumblue">#1</Text>
+                        {item.timesAtPeak && item.timesAtPeak > 1 && (
+                            <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
+                        )}
+                    </Group>
                 ) : item.peak < 999 ? (
-                    <Text size="sm">#{item.peak}</Text>
+                    <Group gap={4} justify="center" wrap="nowrap">
+                        <Text size="sm">#{item.peak}</Text>
+                        {item.timesAtPeak && item.timesAtPeak > 0 && (
+                            <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
+                        )}
+                    </Group>
                 ) : (
                     <Text size="sm" c="dimmed">-</Text>
                 )}
@@ -169,6 +219,9 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
                 <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
             </Table.Td>
             <Table.Td style={{ textAlign: 'center' }}>
+                <Text size="sm">{sales > 0 ? Math.floor(sales).toLocaleString() : '-'}</Text>
+            </Table.Td>
+            <Table.Td style={{ textAlign: 'center' }}>
                 {loadingPlaycount ? (
                     <Text size="sm" c="dimmed">...</Text>
                 ) : playcount !== undefined ? (
@@ -177,6 +230,23 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
                     <Text size="sm" c="dimmed">-</Text>
                 )}
             </Table.Td>
+            {type !== 'artist' && (
+                <Table.Td style={{ textAlign: 'center' }}>
+                    {totals && item.entityId ? (
+                        <CertificationIcon
+                            chart={chart}
+                            chartType={type as 'album' | 'track'}
+                            totals={totals}
+                            entity={{ name: item.name, artistName: item.artistName || '' }}
+                            entityId={item.entityId}
+                            username={chart?.lastfm_username}
+                            size={24}
+                        />
+                    ) : (
+                        <Text size="sm" c="dimmed">-</Text>
+                    )}
+                </Table.Td>
+            )}
         </Table.Tr>
     );
 };

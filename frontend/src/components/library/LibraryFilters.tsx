@@ -12,6 +12,8 @@ interface LibraryFiltersProps {
     setItemsPerPage: (value: number) => void;
     sortBy: 'playcount' | 'points' | 'sales' | 'weeks' | 'peak';
     setSortBy: (value: 'playcount' | 'points' | 'sales' | 'weeks' | 'peak') => void;
+    badgeStyle?: 'glass' | 'solid';
+    setBadgeStyle?: (style: 'glass' | 'solid') => void;
 }
 
 export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
@@ -23,6 +25,8 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
     setItemsPerPage,
     sortBy,
     setSortBy,
+    badgeStyle,
+    setBadgeStyle,
 }) => {
     const { t } = useTranslation();
 
@@ -72,7 +76,7 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                     />
                 </Group>
 
-                <Group justify="center">
+                <Group justify="center" gap="md">
                     <SegmentedControl
                         value={viewMode}
                         withItemsBorders={false}
@@ -82,6 +86,17 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                             { label: <Center><IconLayoutGrid size={18} /></Center> as any, value: 'grid' },
                         ]}
                     />
+                    
+                    {viewMode === 'grid' && setBadgeStyle && (
+                        <SegmentedControl
+                            value={badgeStyle || 'glass'}
+                            onChange={(value) => setBadgeStyle(value as 'glass' | 'solid')}
+                            data={[
+                                { label: 'Glass', value: 'glass' },
+                                { label: 'Solid', value: 'solid' },
+                            ]}
+                        />
+                    )}
                 </Group>
             </Flex>
         </Card>

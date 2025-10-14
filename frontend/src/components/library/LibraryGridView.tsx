@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, SimpleGrid, Group, Text, Pagination, Stack, Box, Avatar, Badge } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { Card, SimpleGrid, Group, Text, Pagination, Box, Badge, useMantineTheme } from '@mantine/core';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
+import { ImageEditModal } from '../dialogs/ImageEditModal';
 
 interface LibraryGridViewProps {
     items: LibraryItem[];
@@ -12,6 +12,7 @@ interface LibraryGridViewProps {
     setPage: (page: number) => void;
     totalPages: number;
     chart: any;
+    badgeStyle?: 'glass' | 'solid';
 }
 
 export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
@@ -21,11 +22,12 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     setPage,
     totalPages,
     chart,
+    badgeStyle = 'glass',
 }) => {
     return (
         <>
             <SimpleGrid
-                cols={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
+                cols={{ base: 2, sm: 3, lg: 5 }}
                 spacing="md"
             >
                 {items.map((item, index) => (
@@ -34,6 +36,7 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
                         item={item}
                         type={type}
                         chart={chart}
+                        badgeStyle={badgeStyle}
                     />
                 ))}
             </SimpleGrid>
@@ -50,124 +53,113 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
 interface GridItemProps {
     item: LibraryItem;
     type: 'artist' | 'album' | 'track';
-    chart: any;
+    badgeStyle?: 'glass' | 'solid';
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, chart }) => {
-    const { t } = useTranslation();
-    const [loadingPlaycount, setLoadingPlaycount] = useState(false);
-    const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
+const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass' }) => {
+    const theme = useMantineTheme();
+    const [modalOpen, setModalOpen] = useState(false);
 
-    // Get image from Spotify
-    const imageUrl = useSpotifyImage({
+    const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
+    const { imageUrl } = useSpotifyImage({
+        entityId: item.entityId || '',
         name: item.name,
-        artist: item.artistName,
-        type: type === 'track' ? 'track' : type === 'album' ? 'album' : 'artist',
-        enabled: true,
-    }, SPOTIFY_TOKEN, SPOTIFY_SECRET);
+        artist: (type === 'album' || type === 'track') ? item.artistName : undefined,
+        type: spotifyType,
+        clientId: SPOTIFY_TOKEN,
+        clientSecret: SPOTIFY_SECRET,
+    });
 
-    // Load playcount lazily if not already loaded
-    React.useEffect(() => {
-        if (playcount === undefined && chart?.lastfm_username) {
-            setLoadingPlaycount(true);
-            
-            const loadPlaycount = async () => {
-                try {
-                    if (type === 'artist') {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist=${encodeURIComponent(item.name)}&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json`
-                        );
-                        const json = await response.json();
-                        setPlaycount(parseInt(json?.artist?.stats?.userplaycount || '0', 10));
-                    } else if (type === 'album' && item.artistName) {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=album.getInfo&artist=${encodeURIComponent(item.artistName)}&album=${encodeURIComponent(item.name)}&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json`
-                        );
-                        const json = await response.json();
-                        setPlaycount(parseInt(json?.album?.userplaycount || '0', 10));
-                    } else if (type === 'track' && item.artistName) {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(item.artistName)}&track=${encodeURIComponent(item.name)}&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json`
-                        );
-                        const json = await response.json();
-                        setPlaycount(parseInt(json?.track?.userplaycount || '0', 10));
-                    }
-                } catch (error) {
-                    console.error('Error loading playcount:', error);
-                    setPlaycount(0);
-                } finally {
-                    setLoadingPlaycount(false);
-                }
-            };
+    const handleClick = () => {
+        setModalOpen(true);
+    };
 
-            loadPlaycount();
-        }
-    }, [item, type, chart, playcount]);
+    // Show badge if item has peaked in the chart
+    const showBadge = item.peak < 999 && item.timesAtPeak && item.timesAtPeak > 0;
 
     return (
-        <Card 
-            withBorder 
-            p="xs" 
-            style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
-        >
-            <Stack gap="xs" align="center">
-                <Box style={{ position: 'relative', width: '100%', aspectRatio: '1', overflow: 'hidden', borderRadius: 8 }}>
-                    <Avatar
-                        src={imageUrl || undefined}
-                        alt={item.name}
-                        size="100%"
-                        radius="md"
-                        style={{ width: '100%', height: '100%' }}
+        <>
+            <Card
+                shadow="md"
+                radius="md"
+                p={0}
+                style={{
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}
+                onClick={handleClick}
+            >
+                {showBadge && (
+                    <Badge
+                        variant="filled"
+                        size="lg"
+                        style={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            zIndex: 2,
+                        }}
+                        className={badgeStyle === 'glass' ? 'frosted-glass' : undefined}
+                    >
+                        {item.timesAtPeak}x #{item.peak}
+                    </Badge>
+                )}
+
+                <Box
+                    style={{
+                        width: '100%',
+                        paddingBottom: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <Box
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundColor: imageUrl ? 'transparent' : theme.colors.gray[7],
+                        }}
                     />
-                    {item.peak === 1 && (
-                        <Badge
-                            color="yellow"
-                            variant="filled"
-                            size="sm"
+                    {/* Bottom gradient overlay with centered text */}
+                    {item?.name && (
+                        <Box
                             style={{
                                 position: 'absolute',
-                                top: 8,
-                                right: 8,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                padding: '8px 10px',
+                                background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.75) 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                             }}
                         >
-                            #1
-                        </Badge>
+                            <Text c="#fff" fw={700} size="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                                {item.name}
+                            </Text>
+                        </Box>
                     )}
                 </Box>
+            </Card>
 
-                <Stack gap={4} style={{ width: '100%' }}>
-                    <Text fw={600} size="sm" lineClamp={2} style={{ textAlign: 'center', minHeight: '2.5em' }}>
-                        {item.name}
-                    </Text>
-                    
-                    {type !== 'artist' && item.artistName && (
-                        <Text c="dimmed" size="xs" lineClamp={1} style={{ textAlign: 'center' }}>
-                            {item.artistName}
-                        </Text>
-                    )}
-
-                    <Group gap="xs" justify="center" wrap="nowrap">
-                        {item.peak < 999 && (
-                            <Text size="xs" c="dimmed">
-                                {t('charts.peak')}: #{item.peak}
-                            </Text>
-                        )}
-                        {item.weeks > 0 && (
-                            <Text size="xs" c="dimmed">
-                                {item.weeks}w
-                            </Text>
-                        )}
-                    </Group>
-
-                    {(playcount !== undefined || loadingPlaycount) && (
-                        <Text size="xs" c="dimmed" style={{ textAlign: 'center' }}>
-                            {loadingPlaycount ? '...' : playcount?.toLocaleString()}
-                        </Text>
-                    )}
-                </Stack>
-            </Stack>
-        </Card>
+            <ImageEditModal
+                opened={modalOpen}
+                onClose={() => setModalOpen(false)}
+                entityId={item.entityId || ''}
+                name={item.name}
+                artistName={item.artistName || ''}
+                imageUrl={imageUrl || ''}
+                type={type}
+                clientId={SPOTIFY_TOKEN}
+                clientSecret={SPOTIFY_SECRET}
+                onImageChange={() => {}}
+            />
+        </>
     );
 };
