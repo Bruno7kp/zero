@@ -460,6 +460,10 @@
       "clearSpotifyImagesButton": "Clear Spotify Images",
       "clearSpotifyImagesTitle": "Clear Spotify Images",
       "clearSpotifyImagesMessage": "This will delete all cached Spotify images locally. Continue?"
+    },
+    "badge": {
+      "glass": "Glass",
+      "solid": "Solid"
     }
   }
 }

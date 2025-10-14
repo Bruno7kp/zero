@@ -460,6 +460,10 @@
       "clearSpotifyImagesButton": "Limpar imagens Spotify",
       "clearSpotifyImagesTitle": "Limpar imagens do Spotify",
       "clearSpotifyImagesMessage": "Isto irá apagar todas as imagens salvas do Spotify no cache local. Continuar?"
+    },
+    "badge": {
+      "glass": "Transparente",
+      "solid": "Sólido"
     }
   }
 }

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { SimpleGrid, Card, Box, Badge, Flex, useMantineTheme, Text, Pagination, Button } from '@mantine/core';
+import { SimpleGrid, Card, Box, Badge, Flex, useMantineTheme, Text, Pagination, Button, Tooltip } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
@@ -7,6 +7,7 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { ChartData } from '../../db/indexedDb';
 import { AllKillBadge } from '../AllKillBadge';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
+import dayjs from 'dayjs';
 
 interface WeekTop1Data {
 	week: string;
@@ -20,6 +21,7 @@ interface ChartsWeeksGridViewProps {
 	weeksData: WeekTop1Data[];
 	itemsPerPage?: number;
 	typeFilter?: string[];
+	badgeStyle?: 'glass' | 'solid';
 }
 
 interface GridItemProps {
@@ -27,9 +29,10 @@ interface GridItemProps {
     type: 'artist' | 'album' | 'track';
     timesAtTop1?: number;
     onOpenModal: (row: ChartData, imageUrl?: string) => void;
+    badgeStyle?: 'glass' | 'solid';
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpenModal }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpenModal, badgeStyle = 'glass' }) => {
 	const theme = useMantineTheme();
 
 	const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
@@ -71,7 +74,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpen
 					right: 8,
 					zIndex: 2,
 				}}
-				className="frosted-glass"
+				className={badgeStyle === 'glass' ? 'frosted-glass' : undefined}
 			>
 				{timesAtTop1}x #1
 			</Badge>
@@ -119,7 +122,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpen
 	);
 };
 
-export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksData, itemsPerPage = 25, typeFilter = ['artist','album','track'] }) => {
+export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksData, itemsPerPage = 25, typeFilter = ['artist','album','track'], badgeStyle = 'glass' }) => {
     
 	const [page, setPage] = useState(1);
 	const totalPages = Math.ceil(weeksData.length / itemsPerPage);
@@ -196,6 +199,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                         type="artist"
                                         timesAtTop1={(cumulativeByWeek.artist[weekData.week]?.[weekData.artistTop1.entityId] || 1)}
                                         onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
+                                        badgeStyle={badgeStyle}
                                     />
                                 );
                             }
@@ -207,6 +211,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                         type="album"
                                         timesAtTop1={(cumulativeByWeek.album[weekData.week]?.[weekData.albumTop1.entityId] || 1)}
                                         onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
+                                        badgeStyle={badgeStyle}
                                     />
                                 );
                             }
@@ -218,14 +223,20 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                         type="track"
                                         timesAtTop1={(cumulativeByWeek.track[weekData.week]?.[weekData.trackTop1.entityId] || 1)}
                                         onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
+                                        badgeStyle={badgeStyle}
                                     />
                                 );
                             }
                             const cols = Math.max(tiles.length, 1);
+							const startDate = dayjs(weekData.week);
+							const endDate = startDate.add(6, 'day');
+							const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
                             return (
                                 <Flex key={weekData.week} direction="column" gap={8}>
                                     <Flex align="center" justify="center" gap={8} wrap="wrap">
-                                        <Text fw={700} size="lg">Semana: {weekData.weekNumber}</Text>
+										<Tooltip label={dateRange} withArrow>
+                                        	<Text fw={700} size="lg">Semana: {weekData.weekNumber}</Text>
+										</Tooltip>
                                         {(typeFilter.length === 3) && hasAllKill && (
                                             <AllKillBadge />
                                         )}
