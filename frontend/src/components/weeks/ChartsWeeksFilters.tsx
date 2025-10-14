@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Flex, Group, TextInput, Select, MultiSelect, SegmentedControl, Center, ActionIcon, Tooltip } from '@mantine/core';
-import { IconSearch, IconCalendar, IconFilter, IconTable, IconTimeline, IconLayoutGrid, IconGlass, IconSquare, IconX, IconHash, IconNumber1 } from '@tabler/icons-react';
+import { IconSearch, IconCalendar, IconFilter, IconTable, IconTimeline, IconLayoutGrid, IconHash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface ChartsWeeksFiltersProps {

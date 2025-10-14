@@ -464,6 +464,21 @@
     "badge": {
       "glass": "Transparente",
       "solid": "Sólido"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "loading": "Carregando biblioteca...",
+      "sortBy": "Ordenar por",
+      "sortByPlaycount": "Reproduções",
+      "sortByPoints": "Pontos",
+      "sortBySales": "Vendas",
+      "sortByWeeks": "Semanas",
+      "sortByPeak": "Pico",
+      "totalArtists": "Total de Artistas",
+      "totalAlbums": "Total de Álbuns",
+      "totalTracks": "Total de Músicas",
+      "number1s": "Alcançaram #1",
+      "inChart": "No Chart"
     }
   }
 }

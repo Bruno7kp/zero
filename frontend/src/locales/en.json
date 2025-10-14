@@ -464,6 +464,21 @@
     "badge": {
       "glass": "Glass",
       "solid": "Solid"
+    },
+    "library": {
+      "title": "Library",
+      "loading": "Loading library...",
+      "sortBy": "Sort by",
+      "sortByPlaycount": "Playcount",
+      "sortByPoints": "Points",
+      "sortBySales": "Sales",
+      "sortByWeeks": "Weeks",
+      "sortByPeak": "Peak",
+      "totalArtists": "Total Artists",
+      "totalAlbums": "Total Albums",
+      "totalTracks": "Total Tracks",
+      "number1s": "Reached #1",
+      "inChart": "In Chart"
     }
   }
 }
