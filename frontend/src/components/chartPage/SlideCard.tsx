@@ -43,23 +43,24 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats 
     const { imageUrl } = useSpotifyImage({ entityId: row.entityId, name: row.name, artist, type: spotifyType as any, clientId, clientSecret });
 
     const totalTop1s = stats?.peak?.totalTop1s as number | undefined;
-    const highlightSentence = useMemo(() => {
+    const weeksAtPeak = stats?.peak?.weeksAtPeak as number | undefined;
+    const combinedTop1Title = useMemo(() => {
+        if (!weeksAtPeak || weeksAtPeak < 1) return null;
+        return t('charts.stats.highlights.atNumberOneNTimes', { count: weeksAtPeak });
+    }, [weeksAtPeak, t]);
+    const combinedSubtitle = useMemo(() => {
         if (!totalTop1s || totalTop1s < 1) return null;
         const lang = i18n.language || 'en';
-        const buildEn = (n: number) => {
-            const s = (k: number) => {
-                const j = k % 10, h = k % 100;
-                if (j === 1 && h !== 11) return 'st';
-                if (j === 2 && h !== 12) return 'nd';
-                if (j === 3 && h !== 13) return 'rd';
-                return 'th';
-            };
-            return `This is the artist's ${n}${s(n)} #1`;
+        if (lang.startsWith('pt')) return t('charts.stats.highlights.artistNthNumber1', { n: totalTop1s });
+        const s = (k: number) => {
+            const j = k % 10, h = k % 100;
+            if (j === 1 && h !== 11) return 'st';
+            if (j === 2 && h !== 12) return 'nd';
+            if (j === 3 && h !== 13) return 'rd';
+            return 'th';
         };
-        const buildPt = (n: number) => `Este é o ${n}º #1 do artista`;
-        if (lang.startsWith('pt')) return buildPt(totalTop1s);
-        return buildEn(totalTop1s);
-    }, [totalTop1s, i18n.language]);
+        return t('charts.stats.highlights.artistNthNumber1_en', { n: totalTop1s, suffix: s(totalTop1s) });
+    }, [totalTop1s, i18n.language, t]);
 
     return (
         <Paper withBorder radius="md" shadow="md" h="100%" style={{ overflow: 'hidden', position: 'relative' }}>
@@ -136,7 +137,7 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats 
                     }}
                     className={styles.slidecardRightResponsive}
                 >
-                    {!isArtistTotalSlide && (
+                    {!isArtistTotalSlide && !(kind === 'top1' && (chartType === 'album' || chartType === 'track') && (weeksAtPeak || totalTop1s)) && (
                         <Title
                                 order={3} // Mantém o order 3 para telas grandes
                                 c="#fff"
@@ -146,15 +147,22 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats 
                                 {titleRight}
                             </Title>
                     )}
-                    {isArtistTotalSlide && totalTop1s && (
-                        <Title
-                            order={3}
-                            c="#fff"
-                            className={styles.responsiveTitleRight}
-                            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
-                        >
-                            {highlightSentence}
-                        </Title>
+                    {kind === 'top1' && (chartType === 'album' || chartType === 'track') && (weeksAtPeak || totalTop1s) && (
+                        <>
+                            <Title
+                                order={3}
+                                c="#fff"
+                                className={styles.responsiveTitleRight}
+                                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                            >
+                                {combinedTop1Title}
+                            </Title>
+                            {combinedSubtitle && (
+                                <Text c="#fff" size="sm" className={styles.responsiveTextRight}>
+                                    {combinedSubtitle}
+                                </Text>
+                            )}
+                        </>
                     )}
                         {kind === 'climb' && typeof row.deltaRank === 'number' && (
                             <Text c="#fff" size="sm" className={styles.responsiveTextRight}>
@@ -171,7 +179,7 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats 
                             {t('charts.stats.highlights.reentryDetail', { rank: row.rank })}
                         </Text>
                     )}
-                    {kind === 'top1' && stats?.peak?.weeksAtPeak && (
+                    {!(chartType === 'album' || chartType === 'track') && kind === 'top1' && stats?.peak?.weeksAtPeak && (
                         <Text c="#fff" size="sm" className={styles.responsiveTextRight}>
                             {t('charts.stats.highlights.top1Detail', { count: stats.peak.weeksAtPeak })}
                         </Text>

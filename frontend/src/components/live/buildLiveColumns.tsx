@@ -97,7 +97,7 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
         accessor: 'artist',
         title: t('charts.artistLabel'),
         render: (item: LiveRow) => (
-          <Text>{item.artist || '-'}</Text>
+          <Text size="sm">{item.artist || '-'}</Text>
         ),
         width: 'auto',
       }] as DataTableColumn<LiveRow>[])),

@@ -9,6 +9,7 @@ import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { AllKillBadge } from '../AllKillBadge';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { ImageEditModal } from '../dialogs/ImageEditModal';
 
 interface WeekTop1Data {
 	week: string;
@@ -26,7 +27,7 @@ interface ChartsWeeksTableViewProps {
 	themeMode?: ThemeMode;
 }
 
-const EntityCell: React.FC<{ item: ChartData | null; type: 'artist' | 'album' | 'track' }> = ({ item, type }) => {
+const EntityCell: React.FC<{ item: ChartData | null; type: 'artist' | 'album' | 'track'; onOpenModal: (row: ChartData, imageUrl?: string) => void }> = ({ item, type, onOpenModal }) => {
 	const { imageUrl } = useSpotifyImage({
 		entityId: item?.entityId || '',
 		name: item?.name || '',
@@ -38,9 +39,16 @@ const EntityCell: React.FC<{ item: ChartData | null; type: 'artist' | 'album' | 
 
 	if (!item) return <Text c="dimmed">-</Text>;
 
-	return (
+    return (
 		<Group gap="sm" wrap="nowrap" align="center">
-			<Avatar src={imageUrl || undefined} size={40} radius="sm" />
+            <Avatar
+                src={imageUrl || undefined}
+                size={40}
+                radius="sm"
+                style={{ cursor: item ? 'pointer' : 'default' }}
+                onClick={(e) => { e.stopPropagation(); if (item) onOpenModal(item, imageUrl || undefined); }}
+                onMouseDown={(e) => e.stopPropagation()}
+            />
 			<Box style={{ flex: 1, minWidth: 0 }}>
 				<Text fw={600} size="sm" lineClamp={1}>{item.name}</Text>
 				{(type !== 'artist' && item.artistName) && (
@@ -59,7 +67,9 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const [page, setPage] = useState(1);
-	const theme = useMantineTheme();
+    const theme = useMantineTheme();
+    const [imageModalRow, setImageModalRow] = useState<ChartData | null>(null);
+    const [imageModalUrl, setImageModalUrl] = useState<string>('');
 
 	const firstSelectedType: 'artist' | 'album' | 'track' = (typeFilter[0] as any) || 'artist';
 
@@ -70,6 +80,7 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
 	}, [weeksData, page, itemsPerPage]);
 
 	return (
+		<>
 		<Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
 			<ScrollArea>
 				<Table highlightOnHover>
@@ -108,19 +119,19 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
 											)}
 										</Flex>
 									</Table.Td>
-									{typeFilter.includes('artist') && (
+                                    {typeFilter.includes('artist') && (
 										<Table.Td style={{ verticalAlign: 'middle' }}>
-											<EntityCell item={weekData.artistTop1} type="artist" />
+                                            <EntityCell item={weekData.artistTop1} type="artist" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} />
 										</Table.Td>
 									)}
 									{typeFilter.includes('album') && (
 										<Table.Td style={{ verticalAlign: 'middle' }}>
-											<EntityCell item={weekData.albumTop1} type="album" />
+                                            <EntityCell item={weekData.albumTop1} type="album" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} />
 										</Table.Td>
 									)}
 									{typeFilter.includes('track') && (
 										<Table.Td style={{ verticalAlign: 'middle' }}>
-											<EntityCell item={weekData.trackTop1} type="track" />
+                                            <EntityCell item={weekData.trackTop1} type="track" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} />
 										</Table.Td>
 									)}
 									<Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
@@ -145,6 +156,19 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
 				</Box>
 			)}
 		</Card>
+		<ImageEditModal
+            opened={!!imageModalRow}
+            onClose={() => setImageModalRow(null)}
+            entityId={imageModalRow?.entityId || ''}
+            name={imageModalRow?.name || ''}
+            artistName={imageModalRow?.artistName || ''}
+            imageUrl={imageModalUrl}
+            type={(imageModalRow?.chartType as any) || 'artist'}
+            clientId={SPOTIFY_TOKEN}
+            clientSecret={SPOTIFY_SECRET}
+            onImageChange={(url: string) => setImageModalUrl(url)}
+        />
+	</>
 	);
 };
 
