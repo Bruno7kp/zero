@@ -4,6 +4,7 @@ import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
+import { t } from 'i18next';
 
 interface LibraryGridViewProps {
     items: LibraryItem[];
@@ -13,6 +14,7 @@ interface LibraryGridViewProps {
     totalPages: number;
     chart: any;
     badgeStyle?: 'glass' | 'solid';
+    showGridPlays?: boolean;
 }
 
 export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
@@ -22,6 +24,7 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     setPage,
     totalPages,
     badgeStyle = 'glass',
+    showGridPlays = true,
 }) => {
     return (
         <>
@@ -35,6 +38,7 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
                         item={item}
                         type={type}
                         badgeStyle={badgeStyle}
+                        showPlays={showGridPlays}
                     />
                 ))}
             </SimpleGrid>
@@ -52,9 +56,10 @@ interface GridItemProps {
     item: LibraryItem;
     type: 'artist' | 'album' | 'track';
     badgeStyle?: 'glass' | 'solid';
+    showPlays?: boolean;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass' }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true }) => {
     const theme = useMantineTheme();
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -76,19 +81,20 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass' })
     const showBadge = item.peak < 999 && item.timesAtPeak && item.timesAtPeak > 0;
 
     return (
-        <>
-            <Card
-                shadow="md"
-                radius="md"
-                p={0}
-                style={{
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
-                onClick={handleClick}
-            >
+        <Card
+            shadow="md"
+            radius="md"
+            p={0}
+            style={{
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+            onClick={handleClick}
+        >
+            <Box style={{ position: 'relative' }}>
                 {showBadge && (
                     <Badge
                         variant="filled"
@@ -132,19 +138,31 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass' })
                                 right: 0,
                                 bottom: 0,
                                 padding: '8px 10px',
-                                background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.75) 100%)',
+                                background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%)',
                                 display: 'flex',
+                                flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}
                         >
-                            <Text c="#fff" fw={700} size="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                            <Text c="#fff" fw={700} size="sm" pt="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
                                 {item.name}
                             </Text>
+                            {type !== 'artist' && item.artistName && (
+                                <Text c="#fff" size="xs" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center', opacity: 0.8 }}>
+                                    {item.artistName}
+                                </Text>
+                            )}
                         </Box>
                     )}
                 </Box>
-            </Card>
+            </Box>
+
+            {showPlays && item.playcount !== undefined && (
+                <Text size="xs" ta="center" tt="lowercase" p="xs">
+                    {item.playcount.toLocaleString()} {t('charts.plays')}
+                </Text>
+            )}
 
             <ImageEditModal
                 opened={modalOpen}
@@ -158,6 +176,6 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass' })
                 clientSecret={SPOTIFY_SECRET}
                 onImageChange={() => {}}
             />
-        </>
+        </Card>
     );
 };

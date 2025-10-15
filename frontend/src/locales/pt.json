@@ -477,7 +477,8 @@
       "totalTracks": "Total de Músicas",
       "number1s": "Alcançaram #1",
       "inChart": "Debutaram no chart",
-      "noItemsFound": "Nenhum item encontrado"
+      "noItemsFound": "Nenhum item encontrado",
+      "showPlays": "Mostrar reproduções"
     }
   }
 }

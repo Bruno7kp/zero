@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Grid, Group, Select, SegmentedControl, Center, Tooltip, ActionIcon, TextInput, Flex } from '@mantine/core';
-import { IconTable, IconLayoutGrid, IconFilter, IconMicrophone, IconDisc, IconMusic, IconSearch, IconHash } from '@tabler/icons-react';
+import { Card, Grid, Group, Select, SegmentedControl, Center, ActionIcon, TextInput, Flex, Menu, Checkbox } from '@mantine/core';
+import { IconLayoutGrid, IconFilter, IconMicrophone, IconDisc, IconMusic, IconSearch, IconSettings, IconTable } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface LibraryFiltersProps {
@@ -14,6 +14,17 @@ interface LibraryFiltersProps {
     setSearch: (value: string) => void;
     badgeStyle?: 'glass' | 'solid';
     setBadgeStyle?: (style: 'glass' | 'solid') => void;
+    visibleColumns: {
+        points: boolean;
+        peak: boolean;
+        weeks: boolean;
+        sales: boolean;
+        cert: boolean;
+    };
+    setVisibleColumns: (columns: { points: boolean; peak: boolean; weeks: boolean; sales: boolean; cert: boolean }) => void;
+    showGridPlays: boolean;
+    setShowGridPlays: (show: boolean) => void;
+    chart?: any;
 }
 
 export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
@@ -27,8 +38,20 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
     setSearch,
     badgeStyle,
     setBadgeStyle,
+    visibleColumns,
+    setVisibleColumns,
+    showGridPlays,
+    setShowGridPlays,
+    chart,
 }) => {
     const { t } = useTranslation();
+
+    const handleColumnToggle = (column: keyof typeof visibleColumns) => {
+        setVisibleColumns({
+            ...visibleColumns,
+            [column]: !visibleColumns[column],
+        });
+    };
 
     return (
         <Card shadow="none" style={{ background: 'transparent' }}>
@@ -80,9 +103,9 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                     </Group>
                 </Grid.Col>
 
-                {/* View mode and badge style */}
+                {/* View mode, columns menu and badge style */}
                 <Grid.Col span={{ base: 6, md: 4 }}>
-                    <Group justify="end">
+                    <Group justify="end" gap={0}>
                         <SegmentedControl
                             value={viewMode}
                             withItemsBorders={false}
@@ -92,17 +115,74 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                                 { label: <Center><IconLayoutGrid size={18} /></Center> as any, value: 'grid' },
                             ]}
                         />
-                        {viewMode === 'grid' && setBadgeStyle && (
-                            <Tooltip label={badgeStyle === 'glass' ? t('badge.glass') : t('badge.solid')}>
-                                <ActionIcon
-                                    variant={badgeStyle === 'glass' ? 'light' : 'filled'}
-                                    size="md"
-                                    onClick={() => setBadgeStyle(badgeStyle === 'glass' ? 'solid' : 'glass')}
-                                >
-                                    <IconHash size={18} />
+
+                        <Menu shadow="md" width={200} closeOnItemClick={false}>
+                            <Menu.Target>
+                                <ActionIcon variant="subtle" aria-label={t('charts.columnsConfig')}>
+                                    <IconSettings size={16} />
                                 </ActionIcon>
-                            </Tooltip>
-                        )}
+                            </Menu.Target>
+                            <Menu.Dropdown>
+                                <Menu.Label>{t('charts.columns')}</Menu.Label>
+                                {viewMode === 'table' ? (
+                                    <>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('charts.points')}
+                                                checked={visibleColumns.points}
+                                                onChange={() => handleColumnToggle('points')}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('charts.peak')}
+                                                checked={visibleColumns.peak}
+                                                onChange={() => handleColumnToggle('peak')}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('charts.weeks')}
+                                                checked={visibleColumns.weeks}
+                                                onChange={() => handleColumnToggle('weeks')}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={chart?.formula_name || 'Sales'}
+                                                checked={visibleColumns.sales}
+                                                onChange={() => handleColumnToggle('sales')}
+                                                styles={{ label: { textTransform: 'capitalize' } }}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label="Cert."
+                                                checked={visibleColumns.cert}
+                                                onChange={() => handleColumnToggle('cert')}
+                                            />
+                                        </Menu.Item>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('badge.glass')}
+                                                checked={badgeStyle === 'glass'}
+                                                onChange={() => setBadgeStyle && setBadgeStyle(badgeStyle === 'glass' ? 'solid' : 'glass')}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('library.showPlays')}
+                                                checked={showGridPlays}
+                                                onChange={() => setShowGridPlays(!showGridPlays)}
+                                            />
+                                        </Menu.Item>
+                                    </>
+                                )}
+                            </Menu.Dropdown>
+                        </Menu>
                     </Group>
                 </Grid.Col>
             </Grid>

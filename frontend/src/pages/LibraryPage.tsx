@@ -41,6 +41,10 @@ export const LibraryPage: React.FC = () => {
         setSearch,
         badgeStyle,
         setBadgeStyle,
+        visibleColumns,
+        setVisibleColumns,
+        showGridPlays,
+        setShowGridPlays,
         page,
         setPage,
     } = useLibraryFilters();
@@ -98,6 +102,11 @@ export const LibraryPage: React.FC = () => {
                     setSearch={setSearch}
                     badgeStyle={badgeStyle}
                     setBadgeStyle={setBadgeStyle}
+                    visibleColumns={visibleColumns}
+                    setVisibleColumns={setVisibleColumns}
+                    showGridPlays={showGridPlays}
+                    setShowGridPlays={setShowGridPlays}
+                    chart={chart}
                 />
 
                 <LibraryStats
@@ -131,6 +140,7 @@ export const LibraryPage: React.FC = () => {
                                         totalPages={totalPages}
                                         chart={chart}
                                         itemsPerPage={itemsPerPage}
+                                        visibleColumns={visibleColumns}
                                     />
                                 ) : (
                                     <LibraryGridView
@@ -141,6 +151,7 @@ export const LibraryPage: React.FC = () => {
                                         totalPages={totalPages}
                                         chart={chart}
                                         badgeStyle={badgeStyle}
+                                        showGridPlays={showGridPlays}
                                     />
                                 )}
                             </>

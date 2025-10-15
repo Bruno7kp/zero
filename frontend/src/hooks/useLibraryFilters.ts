@@ -17,9 +17,9 @@ export const useLibraryFilters = () => {
     const [viewMode, setViewMode] = useState<ViewMode>(() => {
         try {
             const saved = localStorage.getItem('libraryViewMode');
-            return (saved === 'table' || saved === 'grid') ? saved : 'table';
+            return (saved === 'table' || saved === 'grid') ? saved : 'grid'; // Default to grid since table is removed
         } catch {
-            return 'table';
+            return 'grid';
         }
     });
 
@@ -50,7 +50,43 @@ export const useLibraryFilters = () => {
         }
     });
 
+    const [visibleColumns, setVisibleColumns] = useState<{
+        points: boolean;
+        peak: boolean;
+        weeks: boolean;
+        sales: boolean;
+        cert: boolean;
+    }>(() => {
+        try {
+            const saved = localStorage.getItem('libraryVisibleColumns');
+            return saved ? JSON.parse(saved) : {
+                points: true,
+                peak: true,
+                weeks: true,
+                sales: false,
+                cert: false,
+            };
+        } catch {
+            return {
+                points: true,
+                peak: true,
+                weeks: true,
+                sales: false,
+                cert: false,
+            };
+        }
+    });
+
     const [page, setPage] = useState(1);
+
+    const [showGridPlays, setShowGridPlays] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem('libraryShowGridPlays');
+            return saved ? JSON.parse(saved) : true; // Default to true
+        } catch {
+            return true;
+        }
+    });
 
     // Save preferences to localStorage
     useEffect(() => {
@@ -93,6 +129,22 @@ export const useLibraryFilters = () => {
         }
     }, [badgeStyle]);
 
+    useEffect(() => {
+        try {
+            localStorage.setItem('libraryVisibleColumns', JSON.stringify(visibleColumns));
+        } catch (e) {
+            console.error('Failed to save visible columns:', e);
+        }
+    }, [visibleColumns]);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('libraryShowGridPlays', JSON.stringify(showGridPlays));
+        } catch (e) {
+            console.error('Failed to save show grid plays:', e);
+        }
+    }, [showGridPlays]);
+
     // Reset page when type or search changes
     useEffect(() => {
         setPage(1);
@@ -115,6 +167,10 @@ export const useLibraryFilters = () => {
         setSearch,
         badgeStyle,
         setBadgeStyle,
+        visibleColumns,
+        setVisibleColumns,
+        showGridPlays,
+        setShowGridPlays,
         page,
         setPage,
         stats,

@@ -19,6 +19,13 @@ interface LibraryTableViewProps {
     totalPages: number;
     chart: any;
     itemsPerPage: number;
+    visibleColumns: {
+        points: boolean;
+        peak: boolean;
+        weeks: boolean;
+        sales: boolean;
+        cert: boolean;
+    };
 }
 
 export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
@@ -29,6 +36,7 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
     totalPages,
     chart,
     itemsPerPage,
+    visibleColumns,
 }) => {
     const { t } = useTranslation();
     const theme = useMantineTheme();
@@ -52,11 +60,11 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
                                 <Table.Th style={{ width: 60, textAlign: 'center' }}>Rank</Table.Th>
                                 <Table.Th>{t('charts.titleLabel')}</Table.Th>
                                 <Table.Th style={{ width: 80, textAlign: 'center' }}>Plays</Table.Th>
-                                <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.points')}</Table.Th>
-                                <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>
-                                <Table.Th style={{ width: 85, textAlign: 'center' }}>{t('charts.weeks')}</Table.Th>
-                                {showSales && <Table.Th tt="capitalize" style={{ width: 80, textAlign: 'center' }}>{chart?.formula_name || 'Sales'}</Table.Th>}
-                                {showCert && <Table.Th style={{ width: 80, textAlign: 'center' }}>Cert.</Table.Th>}
+                                {visibleColumns.points && <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.points')}</Table.Th>}
+                                {visibleColumns.peak && <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>}
+                                {visibleColumns.weeks && <Table.Th style={{ width: 85, textAlign: 'center' }}>{t('charts.weeks')}</Table.Th>}
+                                {showSales && visibleColumns.sales && <Table.Th tt="capitalize" style={{ width: 80, textAlign: 'center' }}>{chart?.formula_name || 'Sales'}</Table.Th>}
+                                {showCert && visibleColumns.cert && <Table.Th style={{ width: 80, textAlign: 'center' }}>Cert.</Table.Th>}
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
@@ -69,6 +77,7 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
                                     chart={chart}
                                     page={page}
                                     itemsPerPage={itemsPerPage}
+                                    visibleColumns={visibleColumns}
                                 />
                             ))}
                         </Table.Tbody>
@@ -92,9 +101,16 @@ interface TableRowProps {
     chart: any;
     page: number;
     itemsPerPage: number;
+    visibleColumns: {
+        points: boolean;
+        peak: boolean;
+        weeks: boolean;
+        sales: boolean;
+        cert: boolean;
+    };
 }
 
-const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, itemsPerPage }) => {
+const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, itemsPerPage, visibleColumns }) => {
     const [loadingPlaycount, setLoadingPlaycount] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
@@ -246,37 +262,43 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                         <Text size="sm" c="dimmed">-</Text>
                     )}
                 </Table.Td>
-                <Table.Td style={{ textAlign: 'center' }}>
-                    <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
-                </Table.Td>
-                <Table.Td style={{ textAlign: 'center' }}>
-                    {item.peak === 1 ? (
-                        <Group gap={4} justify="center" wrap="nowrap">
-                            <Text size="sm" fw={600} c="mediumblue">1</Text>
-                            {item.timesAtPeak && item.timesAtPeak > 0 && (
-                                <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
-                            )}
-                        </Group>
-                    ) : item.peak < 999 ? (
-                        <Group gap={4} justify="center" wrap="nowrap">
-                            <Text size="sm">{item.peak}</Text>
-                            {item.timesAtPeak && item.timesAtPeak > 0 && (
-                                <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
-                            )}
-                        </Group>
-                    ) : (
-                        <Text size="sm" c="dimmed">-</Text>
-                    )}
-                </Table.Td>
-                <Table.Td style={{ textAlign: 'center' }}>
-                    <Text size="sm">{item.weeks > 0 ? item.weeks : '-'}</Text>
-                </Table.Td>
-                {showSales && (
+                {visibleColumns.points && (
+                    <Table.Td style={{ textAlign: 'center' }}>
+                        <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
+                    </Table.Td>
+                )}
+                {visibleColumns.peak && (
+                    <Table.Td style={{ textAlign: 'center' }}>
+                        {item.peak === 1 ? (
+                            <Group gap={4} justify="center" wrap="nowrap">
+                                <Text size="sm" fw={600} c="mediumblue">1</Text>
+                                {item.timesAtPeak && item.timesAtPeak > 0 && (
+                                    <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
+                                )}
+                            </Group>
+                        ) : item.peak < 999 ? (
+                            <Group gap={4} justify="center" wrap="nowrap">
+                                <Text size="sm">{item.peak}</Text>
+                                {item.timesAtPeak && item.timesAtPeak > 0 && (
+                                    <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
+                                )}
+                            </Group>
+                        ) : (
+                            <Text size="sm" c="dimmed">-</Text>
+                        )}
+                    </Table.Td>
+                )}
+                {visibleColumns.weeks && (
+                    <Table.Td style={{ textAlign: 'center' }}>
+                        <Text size="sm">{item.weeks > 0 ? item.weeks : '-'}</Text>
+                    </Table.Td>
+                )}
+                {showSales && visibleColumns.sales && (
                     <Table.Td style={{ textAlign: 'center' }}>
                         <Text size="sm">{sales > 0 ? Math.floor(sales).toLocaleString() : '-'}</Text>
                     </Table.Td>
                 )}
-                {showCert && (
+                {showCert && visibleColumns.cert && (
                     <Table.Td style={{ textAlign: 'center' }}>
                         {totals && item.entityId ? (
                             <CertificationIcon
