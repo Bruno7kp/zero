@@ -229,11 +229,11 @@ export const Header: React.FC = () => {
                 <Button component={NavLink} to="/charts" variant="subtle">
                     {t('charts.title')}
                 </Button>
+                <Button component={NavLink} to="/library" variant="subtle">
+                    {t('library.title')}
+                </Button>
                 <Button component={NavLink} to="/faq" variant="subtle">
                     {t('user.faq')}
-                </Button>
-                <Button component={NavLink} to="/forum" variant="subtle">
-                    {t('user.forum')}
                 </Button>
             </Group>
             {rightSection}

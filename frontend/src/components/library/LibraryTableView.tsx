@@ -41,6 +41,7 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
     const { t } = useTranslation();
     const theme = useMantineTheme();
     const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+    const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
 
     const pointsWeight = type === 'track' ? (chart?.music_points_weight || 0) : (chart?.album_points_weight || 0);
     const playsWeight = type === 'track' ? (chart?.music_plays_weight || 0) : (chart?.album_plays_weight || 0);
@@ -60,9 +61,9 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
                                 <Table.Th style={{ width: 60, textAlign: 'center' }}>Rank</Table.Th>
                                 <Table.Th>{t('charts.titleLabel')}</Table.Th>
                                 <Table.Th style={{ width: 80, textAlign: 'center' }}>Plays</Table.Th>
-                                {visibleColumns.points && <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.points')}</Table.Th>}
                                 {visibleColumns.peak && <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>}
                                 {visibleColumns.weeks && <Table.Th style={{ width: 85, textAlign: 'center' }}>{t('charts.weeks')}</Table.Th>}
+                                {visibleColumns.points && <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.points')}</Table.Th>}
                                 {showSales && visibleColumns.sales && <Table.Th tt="capitalize" style={{ width: 80, textAlign: 'center' }}>{chart?.formula_name || 'Sales'}</Table.Th>}
                                 {showCert && visibleColumns.cert && <Table.Th style={{ width: 80, textAlign: 'center' }}>Cert.</Table.Th>}
                             </Table.Tr>
@@ -78,6 +79,8 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
                                     page={page}
                                     itemsPerPage={itemsPerPage}
                                     visibleColumns={visibleColumns}
+                                    forceUpdate={imageForceUpdate[item.entityId || ''] || 0}
+                                    onImageChange={(entityId: string) => setImageForceUpdate(f => ({ ...f, [entityId]: Date.now() }))}
                                 />
                             ))}
                         </Table.Tbody>
@@ -108,9 +111,11 @@ interface TableRowProps {
         sales: boolean;
         cert: boolean;
     };
+    forceUpdate?: number;
+    onImageChange: (entityId: string) => void;
 }
 
-const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, itemsPerPage, visibleColumns }) => {
+const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, itemsPerPage, visibleColumns, forceUpdate = 0, onImageChange }) => {
     const [loadingPlaycount, setLoadingPlaycount] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
@@ -126,7 +131,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
 
     const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
     const { imageUrl } = useSpotifyImage({
-        entityId: item.entityId || '',
+        entityId: (item.entityId || '') + (forceUpdate ? `_${forceUpdate}` : ''),
         name: item.name,
         artist: (type === 'album' || type === 'track') ? item.artistName : undefined,
         type: spotifyType,
@@ -219,7 +224,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                         <Avatar
                             src={imageUrl}
                             alt={item.name}
-                            size="md"
+                            size={40}
                             radius="sm"
                             onClick={handleClick}
                             style={{ cursor: 'pointer' }}
@@ -262,11 +267,6 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                         <Text size="sm" c="dimmed">-</Text>
                     )}
                 </Table.Td>
-                {visibleColumns.points && (
-                    <Table.Td style={{ textAlign: 'center' }}>
-                        <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
-                    </Table.Td>
-                )}
                 {visibleColumns.peak && (
                     <Table.Td style={{ textAlign: 'center' }}>
                         {item.peak === 1 ? (
@@ -291,6 +291,11 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                 {visibleColumns.weeks && (
                     <Table.Td style={{ textAlign: 'center' }}>
                         <Text size="sm">{item.weeks > 0 ? item.weeks : '-'}</Text>
+                    </Table.Td>
+                )}
+                {visibleColumns.points && (
+                    <Table.Td style={{ textAlign: 'center' }}>
+                        <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
                     </Table.Td>
                 )}
                 {showSales && visibleColumns.sales && (
@@ -326,7 +331,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                 type={type}
                 clientId={SPOTIFY_TOKEN}
                 clientSecret={SPOTIFY_SECRET}
-                onImageChange={() => {}}
+                onImageChange={() => onImageChange(item.entityId || '')}
             />
         </>
     );

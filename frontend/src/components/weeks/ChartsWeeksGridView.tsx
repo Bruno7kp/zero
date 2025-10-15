@@ -31,14 +31,15 @@ interface GridItemProps {
     timesAtTop1?: number;
     onOpenModal: (row: ChartData, imageUrl?: string) => void;
     badgeStyle?: 'glass' | 'solid';
+    forceUpdate?: number;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpenModal, badgeStyle = 'glass' }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpenModal, badgeStyle = 'glass', forceUpdate = 0 }) => {
 	const theme = useMantineTheme();
 
 	const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
 	const { imageUrl } = useSpotifyImage({
-		entityId: item?.entityId || '',
+		entityId: (item?.entityId || '') + (forceUpdate ? `_${forceUpdate}` : ''),
 		name: item?.name || '',
 		artist: (type === 'album' || type === 'track') ? item?.artistName : undefined,
 		type: spotifyType,
@@ -131,6 +132,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
     // Modal state
     const [imageModalRow, setImageModalRow] = useState<ChartData | null>(null);
     const [imageModalUrl, setImageModalUrl] = useState<string>('');
+    const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
 
 	const pageData = useMemo(() => {
 		const start = (page - 1) * itemsPerPage;
@@ -201,6 +203,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                         timesAtTop1={(cumulativeByWeek.artist[weekData.week]?.[weekData.artistTop1.entityId] || 1)}
                                         onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
                                         badgeStyle={badgeStyle}
+                                        forceUpdate={imageForceUpdate[weekData.artistTop1.entityId] || 0}
                                     />
                                 );
                             }
@@ -213,6 +216,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                         timesAtTop1={(cumulativeByWeek.album[weekData.week]?.[weekData.albumTop1.entityId] || 1)}
                                         onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
                                         badgeStyle={badgeStyle}
+                                        forceUpdate={imageForceUpdate[weekData.albumTop1.entityId] || 0}
                                     />
                                 );
                             }
@@ -225,6 +229,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                         timesAtTop1={(cumulativeByWeek.track[weekData.week]?.[weekData.trackTop1.entityId] || 1)}
                                         onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }}
                                         badgeStyle={badgeStyle}
+                                        forceUpdate={imageForceUpdate[weekData.trackTop1.entityId] || 0}
                                     />
                                 );
                             }
@@ -271,7 +276,10 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                 type={(imageModalRow?.chartType as any) || 'artist'}
                 clientId={SPOTIFY_TOKEN}
                 clientSecret={SPOTIFY_SECRET}
-                onImageChange={(url: string) => setImageModalUrl(url)}
+                onImageChange={(url: string) => {
+                    setImageForceUpdate(f => ({ ...f, [imageModalRow!.entityId]: Date.now() }));
+                    setImageModalUrl(url);
+                }}
             />
 		</>
 	);

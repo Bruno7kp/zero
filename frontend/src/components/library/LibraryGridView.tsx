@@ -28,6 +28,7 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     badgeStyle = 'glass',
     showGridPlays = true,
 }) => {
+    const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
     return (
         <>
             <SimpleGrid
@@ -41,6 +42,8 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
                         type={type}
                         badgeStyle={badgeStyle}
                         showPlays={showGridPlays}
+                        forceUpdate={imageForceUpdate[item.entityId || ''] || 0}
+                        onImageChange={(entityId: string) => setImageForceUpdate(f => ({ ...f, [entityId]: Date.now() }))}
                     />
                 ))}
             </SimpleGrid>
@@ -59,9 +62,11 @@ interface GridItemProps {
     type: 'artist' | 'album' | 'track';
     badgeStyle?: 'glass' | 'solid';
     showPlays?: boolean;
+    forceUpdate?: number;
+    onImageChange: (entityId: string) => void;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true, forceUpdate = 0, onImageChange }) => {
     const theme = useMantineTheme();
     const { t } = useTranslation();
     const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
@@ -69,7 +74,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
 
     const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
     const { imageUrl } = useSpotifyImage({
-        entityId: item.entityId || '',
+        entityId: (item.entityId || '') + (forceUpdate ? `_${forceUpdate}` : ''),
         name: item.name,
         artist: (type === 'album' || type === 'track') ? item.artistName : undefined,
         type: spotifyType,
@@ -82,7 +87,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
     };
 
     // Show badge if item has peaked in the chart
-    const showBadge = item.peak < 999 && item.timesAtPeak && item.timesAtPeak > 0;
+    const showBadge = item.peak < 999;
 
     return (
         <Card
@@ -112,7 +117,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
                         }}
                         className={badgeStyle === 'glass' ? 'frosted-glass' : undefined}
                     >
-                        {item.timesAtPeak}x #{item.peak}
+                        #{item.peak}{item.peak === 1 && item.timesAtPeak && item.timesAtPeak > 0 ? ` (${item.timesAtPeak}x)` : ''}
                     </Badge>
                 )}
 
@@ -179,7 +184,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
                 type={type}
                 clientId={SPOTIFY_TOKEN}
                 clientSecret={SPOTIFY_SECRET}
-                onImageChange={() => {}}
+                onImageChange={() => onImageChange(item.entityId || '')}
             />
         </Card>
     );
