@@ -97,8 +97,8 @@ export const ChartsWeeksFilters: React.FC<ChartsWeeksFiltersProps> = ({
 							withItemsBorders={false}
 							onChange={(value) => setViewMode(value as 'timeline' | 'table' | 'grid')}
 							data={[
-								{ label: <Center><IconTimeline size={18} /></Center> as any, value: 'timeline' },
 								{ label: <Center><IconTable size={18} /></Center> as any, value: 'table' },
+								{ label: <Center><IconTimeline size={18} /></Center> as any, value: 'timeline' },
 								{ label: <Center><IconLayoutGrid size={18} /></Center> as any, value: 'grid' },
 							]}
 						/>

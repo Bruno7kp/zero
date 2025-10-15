@@ -27,9 +27,9 @@ interface ChartsWeeksTableViewProps {
 	themeMode?: ThemeMode;
 }
 
-const EntityCell: React.FC<{ item: ChartData | null; type: 'artist' | 'album' | 'track'; onOpenModal: (row: ChartData, imageUrl?: string) => void }> = ({ item, type, onOpenModal }) => {
+const EntityCell: React.FC<{ item: ChartData | null; type: 'artist' | 'album' | 'track'; onOpenModal: (row: ChartData, imageUrl?: string) => void; forceUpdate?: number }> = ({ item, type, onOpenModal, forceUpdate = 0 }) => {
 	const { imageUrl } = useSpotifyImage({
-		entityId: item?.entityId || '',
+		entityId: (item?.entityId || '') + (forceUpdate ? `_${forceUpdate}` : ''),
 		name: item?.name || '',
 		artist: (type === 'album' || type === 'track') ? item?.artistName : undefined,
 		type,
@@ -70,6 +70,7 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
     const theme = useMantineTheme();
     const [imageModalRow, setImageModalRow] = useState<ChartData | null>(null);
     const [imageModalUrl, setImageModalUrl] = useState<string>('');
+    const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
 
 	const firstSelectedType: 'artist' | 'album' | 'track' = (typeFilter[0] as any) || 'artist';
 
@@ -121,17 +122,17 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
 									</Table.Td>
                                     {typeFilter.includes('artist') && (
 										<Table.Td style={{ verticalAlign: 'middle' }}>
-                                            <EntityCell item={weekData.artistTop1} type="artist" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} />
+                                            <EntityCell item={weekData.artistTop1} type="artist" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} forceUpdate={imageForceUpdate[weekData.artistTop1?.entityId || ''] || 0} />
 										</Table.Td>
 									)}
 									{typeFilter.includes('album') && (
 										<Table.Td style={{ verticalAlign: 'middle' }}>
-                                            <EntityCell item={weekData.albumTop1} type="album" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} />
+                                            <EntityCell item={weekData.albumTop1} type="album" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} forceUpdate={imageForceUpdate[weekData.albumTop1?.entityId || ''] || 0} />
 										</Table.Td>
 									)}
 									{typeFilter.includes('track') && (
 										<Table.Td style={{ verticalAlign: 'middle' }}>
-                                            <EntityCell item={weekData.trackTop1} type="track" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} />
+                                            <EntityCell item={weekData.trackTop1} type="track" onOpenModal={(row, url) => { setImageModalRow(row); setImageModalUrl(url || ''); }} forceUpdate={imageForceUpdate[weekData.trackTop1?.entityId || ''] || 0} />
 										</Table.Td>
 									)}
 									<Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
@@ -166,7 +167,10 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({ week
             type={(imageModalRow?.chartType as any) || 'artist'}
             clientId={SPOTIFY_TOKEN}
             clientSecret={SPOTIFY_SECRET}
-            onImageChange={(url: string) => setImageModalUrl(url)}
+            onImageChange={(url: string) => {
+                setImageForceUpdate(f => ({ ...f, [imageModalRow!.entityId]: Date.now() }));
+                setImageModalUrl(url);
+            }}
         />
 	</>
 	);
