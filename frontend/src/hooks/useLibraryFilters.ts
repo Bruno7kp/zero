@@ -145,10 +145,7 @@ export const useLibraryFilters = () => {
         }
     }, [showGridPlays]);
 
-    // Reset page when type or search changes
-    useEffect(() => {
-        setPage(1);
-    }, [selectedType, search, itemsPerPage]);
+    // Reset page when type or search changes - handled by components using this hook
 
     // Calculate stats for header
     const stats = useMemo(() => {

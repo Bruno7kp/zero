@@ -123,9 +123,9 @@ export const useLibraryData = (
                                     }
                                     const exp = cacheUntil.toDate().getTime();
                                     const playcountKey = `pc:${chart.lastfm_username}:${artistName || name}:${selectedType === 'album' ? name : ''}:${selectedType === 'track' ? name : ''}`;
-                                    try { await db.playcount_cache.put({ key: playcountKey, value: rawPlaycount, expires: exp }); } catch (e) { /* ignore */ }
+                                    try { await db.playcount_cache.put({ key: playcountKey, value: rawPlaycount, expires: exp }); } catch { /* ignore */ }
                                 }
-                            } catch (e) {
+                            } catch {
                                 // ignore caching errors
                             }
                         })();

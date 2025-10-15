@@ -57,6 +57,11 @@ export const LibraryPage: React.FC = () => {
         page
     );
 
+    // Reset page when filters change
+    React.useEffect(() => {
+        setPage(1);
+    }, [selectedType, search, itemsPerPage, setPage]);
+
     // Calculate stats for header
     const stats = useMemo(() => {
         // When searching, use libraryData length

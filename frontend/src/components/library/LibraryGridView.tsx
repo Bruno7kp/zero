@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Card, SimpleGrid, Group, Text, Pagination, Box, Badge, useMantineTheme } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
-import { t } from 'i18next';
 
 interface LibraryGridViewProps {
     items: LibraryItem[];
@@ -61,6 +63,8 @@ interface GridItemProps {
 
 const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true }) => {
     const theme = useMantineTheme();
+    const { t } = useTranslation();
+    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
     const [modalOpen, setModalOpen] = useState(false);
 
     const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
@@ -86,6 +90,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
             radius="md"
             p={0}
             style={{
+                background: getCardBackgroundByMode(theme, themeMode),
                 cursor: 'pointer',
                 position: 'relative',
                 overflow: 'hidden',
