@@ -243,9 +243,6 @@
       "showingWeeks": "Mostrando {{count}} de {{total}} semanas",
       "viewChart": "Ver chart"
     },
-    "library": {
-      "title": "Biblioteca"
-    },
     "theme": {
       "title": "Tema",
       "toggle": "Alterar tema",
@@ -460,6 +457,28 @@
       "clearSpotifyImagesButton": "Limpar imagens Spotify",
       "clearSpotifyImagesTitle": "Limpar imagens do Spotify",
       "clearSpotifyImagesMessage": "Isto irá apagar todas as imagens salvas do Spotify no cache local. Continuar?"
+    },
+    "badge": {
+      "glass": "Transparente",
+      "solid": "Sólido"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "search": "Buscar",
+      "loading": "Carregando biblioteca...",
+      "sortBy": "Ordenar por",
+      "sortByPlaycount": "Reproduções",
+      "sortByPoints": "Pontos",
+      "sortBySales": "Vendas",
+      "sortByWeeks": "Semanas",
+      "sortByPeak": "Pico",
+      "totalArtists": "Total de Artistas",
+      "totalAlbums": "Total de Álbuns",
+      "totalTracks": "Total de Músicas",
+      "number1s": "Alcançaram #1",
+      "inChart": "Debutaram no chart",
+      "noItemsFound": "Nenhum item encontrado",
+      "showPlays": "Mostrar reproduções"
     }
   }
 }

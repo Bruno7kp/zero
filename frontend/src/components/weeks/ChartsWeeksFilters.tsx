@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Flex, Group, TextInput, Select, MultiSelect, SegmentedControl, Center } from '@mantine/core';
-import { IconSearch, IconCalendar, IconFilter, IconTable, IconTimeline, IconLayoutGrid } from '@tabler/icons-react';
+import { Card, Flex, Group, TextInput, Select, MultiSelect, SegmentedControl, Center, ActionIcon, Tooltip } from '@mantine/core';
+import { IconSearch, IconCalendar, IconFilter, IconTable, IconTimeline, IconLayoutGrid, IconHash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface ChartsWeeksFiltersProps {
@@ -15,6 +15,8 @@ interface ChartsWeeksFiltersProps {
 	setTypeFilter: (v: string[]) => void;
 	viewMode?: 'timeline' | 'table' | 'grid';
 	setViewMode?: (v: 'timeline' | 'table' | 'grid') => void;
+	badgeStyle: 'glass' | 'solid';
+	setBadgeStyle: (v: 'glass' | 'solid') => void;
 }
 
 export const ChartsWeeksFilters: React.FC<ChartsWeeksFiltersProps> = ({
@@ -29,6 +31,8 @@ export const ChartsWeeksFilters: React.FC<ChartsWeeksFiltersProps> = ({
 	setTypeFilter,
 	viewMode,
 	setViewMode,
+	badgeStyle,
+	setBadgeStyle,
 }) => {
 	const { t } = useTranslation();
 
@@ -59,7 +63,9 @@ export const ChartsWeeksFilters: React.FC<ChartsWeeksFiltersProps> = ({
 						data={[
 							{ value: '10', label: '10' },
 							{ value: '25', label: '25' },
+							{ value: '30', label: '30' },
 							{ value: '50', label: '50' },
+							{ value: '100', label: '100' },
 						]}
 						value={String(itemsPerPage)}
 						onChange={(value) => {
@@ -96,6 +102,17 @@ export const ChartsWeeksFilters: React.FC<ChartsWeeksFiltersProps> = ({
 								{ label: <Center><IconLayoutGrid size={18} /></Center> as any, value: 'grid' },
 							]}
 						/>
+					)}
+					{viewMode === 'grid' && (
+						<Tooltip label={badgeStyle === 'glass' ? t('badge.glass') : t('badge.solid') }>
+							<ActionIcon
+								variant={badgeStyle === 'glass' ? 'light' : 'filled'}
+								size="md"
+								onClick={() => setBadgeStyle(badgeStyle === 'glass' ? 'solid' : 'glass')}
+							>
+								{badgeStyle === 'glass' ? <IconHash size={18} /> : <IconHash size={18} />}
+							</ActionIcon>
+						</Tooltip>
 					)}
 				</Group>
 			</Flex>

@@ -279,7 +279,6 @@ export async function getUserPlaycountCached(args: {
 }): Promise<number> {
   const { username, artistName, entityName, chartType, offline, nextWeekDay } = args;
   if (!username || offline) return 0;
-
   // Determine cache expiry (next configured day_of_week or +7 days fallback)
   let cacheUntil = dayjs().add(7, 'day');
   if (typeof nextWeekDay === 'number') {
@@ -303,4 +302,19 @@ export async function getUserPlaycountCached(args: {
   }).finally(() => { delete inflight[key]; });
   inflight[key] = p;
   return p;
+}
+
+// Cache-only accessor: returns cached playcount or null, and never triggers a network request
+export async function getUserPlaycountFromCache(args: {
+  username?: string;
+  artistName: string;
+  entityName: string;
+  chartType: 'artist' | 'album' | 'track';
+  offline?: boolean;
+}): Promise<number | null> {
+  const { username, artistName, entityName, chartType, offline } = args;
+  if (!username || offline) return null;
+  const key = `pc:${username}:${artistName}:${chartType === 'album' ? entityName : ''}:${chartType === 'track' ? entityName : ''}`;
+  const cached = await getCached(key);
+  return cached;
 }

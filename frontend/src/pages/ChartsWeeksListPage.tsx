@@ -42,7 +42,7 @@ export const ChartsWeeksListPage: React.FC = () => {
             const saved = localStorage.getItem('chartsWeeksViewMode');
             return (saved === 'timeline' || saved === 'table' || saved === 'grid') ? saved : 'timeline';
         } catch {
-            return 'timeline';
+            return 'table';
         }
     });
     
@@ -63,6 +63,16 @@ export const ChartsWeeksListPage: React.FC = () => {
             return saved ? parseInt(saved, 10) : 25;
         } catch {
             return 25;
+        }
+    });
+    
+    // Load badge style from localStorage
+    const [badgeStyle, setBadgeStyle] = useState<'glass' | 'solid'>(() => {
+        try {
+            const saved = localStorage.getItem('chartsWeeksBadgeStyle');
+            return (saved === 'glass' || saved === 'solid') ? saved : 'glass';
+        } catch {
+            return 'glass';
         }
     });
     
@@ -92,6 +102,15 @@ export const ChartsWeeksListPage: React.FC = () => {
             console.error('Failed to save items per page:', e);
         }
     }, [itemsPerPage]);
+    
+    // Save badge style to localStorage when it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('chartsWeeksBadgeStyle', badgeStyle);
+        } catch (e) {
+            console.error('Failed to save badge style:', e);
+        }
+    }, [badgeStyle]);
 
 
     // Fetch all weeks and their #1s
@@ -246,6 +265,8 @@ export const ChartsWeeksListPage: React.FC = () => {
                     setTypeFilter={setTypeFilter}
                     viewMode={viewMode}
                     setViewMode={(v: 'timeline' | 'table' | 'grid') => setViewMode(v)}
+                    badgeStyle={badgeStyle}
+                    setBadgeStyle={setBadgeStyle}
                 />
 
                 {/* Results count */}
@@ -275,6 +296,7 @@ export const ChartsWeeksListPage: React.FC = () => {
                         weeksData={filteredData} 
                         itemsPerPage={itemsPerPage}
                         typeFilter={typeFilter}
+                        badgeStyle={badgeStyle}
                     />
                 )}
             </Flex>

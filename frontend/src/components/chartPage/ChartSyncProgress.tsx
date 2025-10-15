@@ -220,7 +220,7 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
                     </ThemeIcon>
                     <Text fw={600} size="lg">{t('charts.sync')}</Text>
                 </Group>
-                <Button component={Link} to="/settings" size="xs" variant="light">
+                <Button component={Link} to="/settings" size="xs" variant="subtle">
                     <IconSettings style={{ width: rem(16), height: rem(16) }} />
                 </Button>
             </Group>
