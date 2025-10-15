@@ -243,9 +243,6 @@
       "showingWeeks": "Showing {{count}} of {{total}} weeks",
       "viewChart": "View chart"
     },
-    "library": {
-      "title": "Library"
-    },
     "theme": {
       "title": "Theme",
       "toggle": "Toggle theme",
@@ -478,7 +475,7 @@
       "totalAlbums": "Total Albums",
       "totalTracks": "Total Tracks",
       "number1s": "Reached #1",
-      "inChart": "In Chart"
+      "inChart": "Debuted in chart"
     }
   }
 }

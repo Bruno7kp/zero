@@ -243,9 +243,6 @@
       "showingWeeks": "Mostrando {{count}} de {{total}} semanas",
       "viewChart": "Ver chart"
     },
-    "library": {
-      "title": "Biblioteca"
-    },
     "theme": {
       "title": "Tema",
       "toggle": "Alterar tema",
@@ -478,7 +475,7 @@
       "totalAlbums": "Total de Álbuns",
       "totalTracks": "Total de Músicas",
       "number1s": "Alcançaram #1",
-      "inChart": "No Chart"
+      "inChart": "Debutaram no chart"
     }
   }
 }

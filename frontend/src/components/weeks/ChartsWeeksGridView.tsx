@@ -8,6 +8,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { AllKillBadge } from '../AllKillBadge';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
 import dayjs from 'dayjs';
+import { t } from 'i18next';
 
 interface WeekTop1Data {
 	week: string;
@@ -235,7 +236,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                 <Flex key={weekData.week} direction="column" gap={8}>
                                     <Flex align="center" justify="center" gap={8} wrap="wrap">
 										<Tooltip label={dateRange} withArrow>
-                                        	<Text fw={700} size="lg">Semana: {weekData.weekNumber}</Text>
+                                        	<Text fw={700} size="lg">{t('charts.weekNumber')}: {weekData.weekNumber}</Text>
 										</Tooltip>
                                         {(typeFilter.length === 3) && hasAllKill && (
                                             <AllKillBadge />

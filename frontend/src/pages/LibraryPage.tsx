@@ -7,6 +7,7 @@ import { LibraryStats } from '../components/library/LibraryStats';
 import { LibraryTableView } from '../components/library/LibraryTableView';
 import { LibraryGridView } from '../components/library/LibraryGridView';
 import { db } from '../db/indexedDb';
+import { getUserTopArtists, getUserTopAlbums, getUserTopTracks } from '../services/lastfm';
 import dayjs from 'dayjs';
 import CreateHeader from '../components/createChart/CreateHeader';
 
@@ -85,6 +86,8 @@ export const LibraryPage: React.FC = () => {
     const [libraryData, setLibraryData] = useState<LibraryItem[]>([]);
     const [totalItems, setTotalItems] = useState(0); // Total from Last.fm API
     const [page, setPage] = useState(1);
+    const [number1s, setNumber1s] = useState(0);
+    const [inChart, setInChart] = useState(0);
 
     // Save preferences to localStorage
     useEffect(() => {
@@ -150,26 +153,17 @@ export const LibraryPage: React.FC = () => {
                     let total = 0;
                     
                     if (selectedType === 'artist') {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json&limit=${itemsPerPage}&page=${page}&period=overall`
-                        );
-                        const json = await response.json();
-                        apiData = json?.topartists?.artist || [];
-                        total = parseInt(json?.topartists?.['@attr']?.total || '0', 10);
+                        const res = await getUserTopArtists(chart.lastfm_username, itemsPerPage, page);
+                        apiData = res?.items || [];
+                        total = Number.isFinite(res?.total) ? res.total : apiData.length;
                     } else if (selectedType === 'album') {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json&limit=${itemsPerPage}&page=${page}&period=overall`
-                        );
-                        const json = await response.json();
-                        apiData = json?.topalbums?.album || [];
-                        total = parseInt(json?.topalbums?.['@attr']?.total || '0', 10);
+                        const res = await getUserTopAlbums(chart.lastfm_username, itemsPerPage, page);
+                        apiData = res?.items || [];
+                        total = Number.isFinite(res?.total) ? res.total : apiData.length;
                     } else if (selectedType === 'track') {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json&limit=${itemsPerPage}&page=${page}&period=overall`
-                        );
-                        const json = await response.json();
-                        apiData = json?.toptracks?.track || [];
-                        total = parseInt(json?.toptracks?.['@attr']?.total || '0', 10);
+                        const res = await getUserTopTracks(chart.lastfm_username, itemsPerPage, page);
+                        apiData = res?.items || [];
+                        total = Number.isFinite(res?.total) ? res.total : apiData.length;
                     }
 
                     if (!cancelled) {
@@ -202,11 +196,30 @@ export const LibraryPage: React.FC = () => {
                         stats.points += Math.max(0, 101 - row.rank);
                     }
 
+                    // Calculate overall stats from chart data
+                    const allChartStats = Array.from(statsMap.values());
+                    if (!cancelled) {
+                        setNumber1s(allChartStats.filter(s => s.peak === 1).length);
+                        setInChart(allChartStats.filter(s => s.weeks.size > 0).length);
+                    }
+
                     // Combine Last.fm data with chart stats
                     // Also persist returned user playcounts into the local playcount cache
                     const items: LibraryItem[] = apiData.map((item: any) => {
                         const name = item.name;
-                        const artistName = selectedType === 'artist' ? undefined : (item.artist?.name || item.artist?.['#text'] || '');
+                        let artistName: string | undefined = undefined;
+                        if (selectedType !== 'artist') {
+                            const art = item.artist;
+                            if (!art) {
+                                artistName = '';
+                            } else if (typeof art === 'string') {
+                                artistName = art;
+                            } else if (typeof art === 'object') {
+                                artistName = art.name || art['#text'] || '';
+                            } else {
+                                artistName = '';
+                            }
+                        }
                         const key = `${name}|||${artistName || ''}`;
                         const stats = statsMap.get(key) || { peak: 999, weeks: new Set(), points: 0, timesAtPeak: 0 };
                         // If API provided playcount, cache it under the same key used by certification.getUserPlaycountCached
@@ -325,6 +338,8 @@ export const LibraryPage: React.FC = () => {
                     if (!cancelled) {
                         setLibraryData(items);
                         setTotalItems(items.length);
+                        setNumber1s(items.filter(item => item.peak === 1).length);
+                        setInChart(items.filter(item => item.weeks > 0).length);
                     }
                 }
 
@@ -352,18 +367,14 @@ export const LibraryPage: React.FC = () => {
     const stats = useMemo(() => {
         // When using playcount sorting, use totalItems from API
         if (sortBy === 'playcount') {
-            const number1s = libraryData.filter(item => item.peak === 1).length;
-            const inChart = libraryData.filter(item => item.weeks > 0).length;
             return { total: totalItems, number1s, inChart };
         }
         
         // For other sorts, use libraryData length
         const total = libraryData.length;
-        const number1s = libraryData.filter(item => item.peak === 1).length;
-        const inChart = libraryData.filter(item => item.weeks > 0).length;
         
         return { total, number1s, inChart };
-    }, [libraryData, totalItems, sortBy]);
+    }, [libraryData, totalItems, sortBy, number1s, inChart]);
 
     // Paginate data - for playcount, data is already paginated
     const paginatedData = useMemo(() => {
@@ -429,6 +440,7 @@ export const LibraryPage: React.FC = () => {
                                 setPage={setPage}
                                 totalPages={totalPages}
                                 chart={chart}
+                                itemsPerPage={itemsPerPage}
                             />
                         ) : (
                             <LibraryGridView

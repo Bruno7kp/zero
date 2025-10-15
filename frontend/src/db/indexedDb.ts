@@ -54,8 +54,7 @@ export class ZeroChartsDB extends Dexie {
 
   constructor() {
     super('ZeroChartsDB');
-    // Schema v16: adds _running incremental metadata (no index change needed)
-    this.version(16).stores({
+    this.version(18).stores({
       charts_data: `++id, chartId, chartType, entityId, week, rank, plays, name, artistName, [chartId+chartType], [chartId+chartType+week], [chartId+chartType+entityId], &[chartId+chartType+entityId+week], [artistName+chartType]`,
       charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`,
       playcount_cache: `key, expires`,
