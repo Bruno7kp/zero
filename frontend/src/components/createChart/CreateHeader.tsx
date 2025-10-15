@@ -6,7 +6,7 @@ type Props = { pageTitle: string };
 
 const CreateHeader: React.FC<Props> = ({ pageTitle }) => {
   return (
-    <>
+    <Flex direction="column" p="xs" gap="sm">
       <Flex justify="center" align="center" gap="sm">
         <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
           <ThemeIcon variant="light" size="md">
@@ -16,7 +16,7 @@ const CreateHeader: React.FC<Props> = ({ pageTitle }) => {
         </Title>
       </Flex>
       <Divider variant="solid" size="sm" my="md" />
-    </>
+    </Flex>
   );
 };
 

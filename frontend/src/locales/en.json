@@ -464,6 +464,7 @@
     },
     "library": {
       "title": "Library",
+      "search": "Search",
       "loading": "Loading library...",
       "sortBy": "Sort by",
       "sortByPlaycount": "Playcount",
@@ -475,7 +476,8 @@
       "totalAlbums": "Total Albums",
       "totalTracks": "Total Tracks",
       "number1s": "Reached #1",
-      "inChart": "Debuted in chart"
+      "inChart": "Debuted in chart",
+      "noItemsFound": "No items found"
     }
   }
 }

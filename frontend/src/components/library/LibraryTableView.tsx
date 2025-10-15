@@ -130,7 +130,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
 
     // Load totals for certification calculation
     React.useEffect(() => {
-        if (!item.entityId || type === 'artist') return;
+        if (!item.entityId) return;
 
         const loadTotals = async () => {
             try {
@@ -196,7 +196,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
         <>
             <Table.Tr>
                 <Table.Td style={{ textAlign: 'center' }}>
-                    <Text size="sm" c="dimmed">{(page - 1) * itemsPerPage + index + 1}</Text>
+                    <Text size="sm">{(page - 1) * itemsPerPage + index + 1}</Text>
                 </Table.Td>
                 <Table.Td>
                     <Group align="center" wrap="nowrap">

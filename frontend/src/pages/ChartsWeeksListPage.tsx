@@ -42,7 +42,7 @@ export const ChartsWeeksListPage: React.FC = () => {
             const saved = localStorage.getItem('chartsWeeksViewMode');
             return (saved === 'timeline' || saved === 'table' || saved === 'grid') ? saved : 'timeline';
         } catch {
-            return 'timeline';
+            return 'table';
         }
     });
     

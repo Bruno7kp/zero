@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Grid, Group, Select, SegmentedControl, Center, Tooltip, ActionIcon } from '@mantine/core';
-import { IconTable, IconLayoutGrid, IconFilter, IconHash, IconMicrophone, IconDisc, IconMusic, IconArrowsUpDown } from '@tabler/icons-react';
+import { Card, Grid, Group, Select, SegmentedControl, Center, Tooltip, ActionIcon, TextInput, Flex } from '@mantine/core';
+import { IconTable, IconLayoutGrid, IconFilter, IconMicrophone, IconDisc, IconMusic, IconSearch, IconHash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 interface LibraryFiltersProps {
@@ -10,8 +10,8 @@ interface LibraryFiltersProps {
     setViewMode: (mode: 'table' | 'grid') => void;
     itemsPerPage: number;
     setItemsPerPage: (value: number) => void;
-    sortBy: 'playcount' | 'points' | 'sales' | 'weeks' | 'peak';
-    setSortBy: (value: 'playcount' | 'points' | 'sales' | 'weeks' | 'peak') => void;
+    search: string;
+    setSearch: (value: string) => void;
     badgeStyle?: 'glass' | 'solid';
     setBadgeStyle?: (style: 'glass' | 'solid') => void;
 }
@@ -23,8 +23,8 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
     setViewMode,
     itemsPerPage,
     setItemsPerPage,
-    sortBy,
-    setSortBy,
+    search,
+    setSearch,
     badgeStyle,
     setBadgeStyle,
 }) => {
@@ -33,23 +33,19 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
     return (
         <Card shadow="none" style={{ background: 'transparent' }}>
             <Grid align="center">
-                {/* Sort and Items per Page */}
+                {/* Search and Items per Page */}
                 <Grid.Col span={{ base: 12, md: 4 }}>
-                    <Group>
-                        <Select
-                            leftSection={<IconArrowsUpDown size={16} />}
-                            value={sortBy}
-                            onChange={(value) => {
-                                if (value) setSortBy(value as any);
-                            }}
-                            data={[
-                                { value: 'playcount', label: t('library.sortByPlaycount') },
-                                { value: 'points', label: t('library.sortByPoints') },
-                                { value: 'sales', label: t('library.sortBySales') },
-                                { value: 'weeks', label: t('library.sortByWeeks') },
-                                { value: 'peak', label: t('library.sortByPeak') },
-                            ]}
-                            style={{ width: 160 }}
+                    <Flex
+                        justify={{ base: 'center', md: 'flex-start' }}
+                        align="center"
+                        gap="sm"
+                    >
+                        <TextInput
+                            leftSection={<IconSearch size={16} />}
+                            placeholder={t('library.search')}
+                            value={search}
+                            onChange={(event) => setSearch(event.currentTarget.value)}
+                            style={{ width: 150 }}
                         />
                         <Select
                             leftSection={<IconFilter size={16} />}
@@ -65,7 +61,7 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                             ]}
                             style={{ width: 100 }}
                         />
-                    </Group>
+                    </Flex>
                 </Grid.Col>
 
                 {/* Type SegmentedControl */}

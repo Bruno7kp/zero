@@ -464,6 +464,7 @@
     },
     "library": {
       "title": "Biblioteca",
+      "search": "Buscar",
       "loading": "Carregando biblioteca...",
       "sortBy": "Ordenar por",
       "sortByPlaycount": "Reproduções",
@@ -475,7 +476,8 @@
       "totalAlbums": "Total de Álbuns",
       "totalTracks": "Total de Músicas",
       "number1s": "Alcançaram #1",
-      "inChart": "Debutaram no chart"
+      "inChart": "Debutaram no chart",
+      "noItemsFound": "Nenhum item encontrado"
     }
   }
 }
