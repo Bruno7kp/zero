@@ -21,7 +21,6 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     page,
     setPage,
     totalPages,
-    chart,
     badgeStyle = 'glass',
 }) => {
     return (
@@ -35,7 +34,6 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
                         key={`${item.name}-${item.artistName || ''}-${index}`}
                         item={item}
                         type={type}
-                        chart={chart}
                         badgeStyle={badgeStyle}
                     />
                 ))}

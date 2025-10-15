@@ -7,7 +7,9 @@ import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
 import { CertificationIcon } from '../CertificationIcon';
+import { ImageEditModal } from '../dialogs/ImageEditModal';
 import { db } from '../../db/indexedDb';
+import { getUserPlaycountFromCache } from '../../utils/certification';
 
 interface LibraryTableViewProps {
     items: LibraryItem[];
@@ -37,16 +39,14 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
                     <Table highlightOnHover>
                         <Table.Thead>
                             <Table.Tr>
-                                <Table.Th style={{ width: 60 }}>#</Table.Th>
-                                <Table.Th style={{ width: 60 }}></Table.Th>
+                                <Table.Th style={{ width: 60, textAlign: 'center' }}>Rank</Table.Th>
                                 <Table.Th>{t('charts.titleLabel')}</Table.Th>
-                                {type !== 'artist' && <Table.Th>{t('charts.artistLabel')}</Table.Th>}
-                                <Table.Th style={{ width: 120, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>
-                                <Table.Th style={{ width: 100, textAlign: 'center' }}>{t('charts.weeks')}</Table.Th>
-                                <Table.Th style={{ width: 120, textAlign: 'center' }}>{t('charts.points')}</Table.Th>
-                                <Table.Th style={{ width: 120, textAlign: 'center' }}>{chart?.formula_name || 'Sales'}</Table.Th>
-                                <Table.Th style={{ width: 140, textAlign: 'center' }}>{t('charts.plays')}</Table.Th>
-                                {type !== 'artist' && <Table.Th style={{ width: 100, textAlign: 'center' }}>{t('charts.certification')}</Table.Th>}
+                                <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>
+                                <Table.Th style={{ width: 85, textAlign: 'center' }}>{t('charts.weeks')}</Table.Th>
+                                <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.points')}</Table.Th>
+                                <Table.Th style={{ width: 80, textAlign: 'center' }}>Plays</Table.Th>
+                                {type !== 'artist' && <Table.Th style={{ width: 80, textAlign: 'center' }}>Cert.</Table.Th>}
+                                <Table.Th tt="capitalize" style={{ width: 80, textAlign: 'center' }}>{chart?.formula_name || 'Sales'}</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
@@ -82,16 +82,19 @@ interface TableRowProps {
 
 const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
     const [loadingPlaycount, setLoadingPlaycount] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
     const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
     const [totals, setTotals] = useState<{ totalPoints?: number; totalPlays?: number } | null>(null);
 
-    // Get image from Spotify
-    const imageUrl = useSpotifyImage({
+    const spotifyType = type === 'artist' || type === 'album' || type === 'track' ? type : 'artist';
+    const { imageUrl } = useSpotifyImage({
+        entityId: item.entityId || '',
         name: item.name,
-        artist: item.artistName,
-        type: type === 'track' ? 'track' : type === 'album' ? 'album' : 'artist',
-        enabled: true,
-    }, SPOTIFY_TOKEN, SPOTIFY_SECRET);
+        artist: (type === 'album' || type === 'track') ? item.artistName : undefined,
+        type: spotifyType,
+        clientId: SPOTIFY_TOKEN,
+        clientSecret: SPOTIFY_SECRET,
+    });
 
     // Calculate sales (formula value) based on totals
     const sales = useMemo(() => {
@@ -130,123 +133,131 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
         loadTotals();
     }, [item, type, chart, playcount]);
 
-    // Load playcount lazily if not already loaded
+    // Load playcount lazily if not already loaded — BUT ONLY FROM CACHE: do not trigger network fetches here
     React.useEffect(() => {
         if (playcount === undefined && chart?.lastfm_username) {
             setLoadingPlaycount(true);
-            
             const loadPlaycount = async () => {
                 try {
-                    if (type === 'artist') {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist=${encodeURIComponent(item.name)}&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json`
-                        );
-                        const json = await response.json();
-                        setPlaycount(parseInt(json?.artist?.stats?.userplaycount || '0', 10));
-                    } else if (type === 'album' && item.artistName) {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=album.getInfo&artist=${encodeURIComponent(item.artistName)}&album=${encodeURIComponent(item.name)}&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json`
-                        );
-                        const json = await response.json();
-                        setPlaycount(parseInt(json?.album?.userplaycount || '0', 10));
-                    } else if (type === 'track' && item.artistName) {
-                        const response = await fetch(
-                            `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(item.artistName)}&track=${encodeURIComponent(item.name)}&user=${chart.lastfm_username}&api_key=e35699481c9c3134d856e99792a2b6de&format=json`
-                        );
-                        const json = await response.json();
-                        setPlaycount(parseInt(json?.track?.userplaycount || '0', 10));
-                    }
+                    const pc = await getUserPlaycountFromCache({
+                        username: chart.lastfm_username,
+                        artistName: item.artistName || item.name,
+                        entityName: item.name,
+                        chartType: type === 'track' ? 'track' : type === 'album' ? 'album' : 'artist',
+                        offline: !!chart?.offline,
+                    });
+                    if (pc !== null) setPlaycount(pc);
+                    else setPlaycount(undefined); // keep undefined => UI shows '-' instead of fetching
                 } catch (error) {
-                    console.error('Error loading playcount:', error);
-                    setPlaycount(0);
+                    console.error('Error reading playcount from cache:', error);
                 } finally {
                     setLoadingPlaycount(false);
                 }
             };
-
             loadPlaycount();
         }
     }, [item, type, chart, playcount]);
 
+    const handleClick = () => {
+        setModalOpen(true);
+    };
+
     return (
-        <Table.Tr>
-            <Table.Td style={{ textAlign: 'center' }}>
-                <Text size="sm" c="dimmed">{index + 1}</Text>
-            </Table.Td>
-            <Table.Td>
-                <Avatar
-                    src={imageUrl || undefined}
-                    alt={item.name}
-                    size="md"
-                    radius="md"
-                />
-            </Table.Td>
-            <Table.Td>
-                <Text fw={600} size="sm" lineClamp={1}>
-                    {item.name}
-                </Text>
-            </Table.Td>
-            {type !== 'artist' && (
-                <Table.Td>
-                    <Text c="dimmed" size="xs" lineClamp={1}>
-                        {item.artistName || '-'}
-                    </Text>
-                </Table.Td>
-            )}
-            <Table.Td style={{ textAlign: 'center' }}>
-                {item.peak === 1 ? (
-                    <Group gap={4} justify="center" wrap="nowrap">
-                        <Text size="sm" fw={600} c="mediumblue">#1</Text>
-                        {item.timesAtPeak && item.timesAtPeak > 1 && (
-                            <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
-                        )}
-                    </Group>
-                ) : item.peak < 999 ? (
-                    <Group gap={4} justify="center" wrap="nowrap">
-                        <Text size="sm">#{item.peak}</Text>
-                        {item.timesAtPeak && item.timesAtPeak > 0 && (
-                            <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
-                        )}
-                    </Group>
-                ) : (
-                    <Text size="sm" c="dimmed">-</Text>
-                )}
-            </Table.Td>
-            <Table.Td style={{ textAlign: 'center' }}>
-                <Text size="sm">{item.weeks > 0 ? item.weeks : '-'}</Text>
-            </Table.Td>
-            <Table.Td style={{ textAlign: 'center' }}>
-                <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
-            </Table.Td>
-            <Table.Td style={{ textAlign: 'center' }}>
-                <Text size="sm">{sales > 0 ? Math.floor(sales).toLocaleString() : '-'}</Text>
-            </Table.Td>
-            <Table.Td style={{ textAlign: 'center' }}>
-                {loadingPlaycount ? (
-                    <Text size="sm" c="dimmed">...</Text>
-                ) : playcount !== undefined ? (
-                    <Text size="sm">{playcount.toLocaleString()}</Text>
-                ) : (
-                    <Text size="sm" c="dimmed">-</Text>
-                )}
-            </Table.Td>
-            {type !== 'artist' && (
+        <>
+            <Table.Tr>
                 <Table.Td style={{ textAlign: 'center' }}>
-                    {totals && item.entityId ? (
-                        <CertificationIcon
-                            chart={chart}
-                            chartType={type as 'album' | 'track'}
-                            totals={totals}
-                            entity={{ name: item.name, artistName: item.artistName || '' }}
-                            entityId={item.entityId}
-                            username={chart?.lastfm_username}
-                            size={24}
+                    <Text size="sm" c="dimmed">{index + 1}</Text>
+                </Table.Td>
+                <Table.Td>
+                    <Group align="center">
+                        <Avatar
+                            src={imageUrl}
+                            alt={item.name}
+                            size="md"
+                            radius="sm"
+                            onClick={handleClick}
+                            style={{ cursor: 'pointer' }}
                         />
+                        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                            <Text fw={600} size="sm" lineClamp={1}>
+                                {item.name}
+                            </Text>
+                            {type !== 'artist' && (
+                                <Text c="dimmed" size="xs" lineClamp={1}>
+                                    {item.artistName || '-'}
+                                </Text>
+                            )}
+                        </div>
+                    </Group>
+                </Table.Td>
+                
+                <Table.Td style={{ textAlign: 'center' }}>
+                    {item.peak === 1 ? (
+                        <Group gap={4} justify="center" wrap="nowrap">
+                            <Text size="sm" fw={600} c="mediumblue">1</Text>
+                            {item.timesAtPeak && item.timesAtPeak > 0 && (
+                                <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
+                            )}
+                        </Group>
+                    ) : item.peak < 999 ? (
+                        <Group gap={4} justify="center" wrap="nowrap">
+                            <Text size="sm">{item.peak}</Text>
+                            {item.timesAtPeak && item.timesAtPeak > 0 && (
+                                <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
+                            )}
+                        </Group>
                     ) : (
                         <Text size="sm" c="dimmed">-</Text>
                     )}
                 </Table.Td>
-            )}
-        </Table.Tr>
+                <Table.Td style={{ textAlign: 'center' }}>
+                    <Text size="sm">{item.weeks > 0 ? item.weeks : '-'}</Text>
+                </Table.Td>
+                <Table.Td style={{ textAlign: 'center' }}>
+                    <Text size="sm">{item.points > 0 ? item.points.toLocaleString() : '-'}</Text>
+                </Table.Td>
+                <Table.Td style={{ textAlign: 'center' }}>
+                    {loadingPlaycount ? (
+                        <Text size="sm" c="dimmed">...</Text>
+                    ) : playcount !== undefined ? (
+                        <Text size="sm">{playcount.toLocaleString()}</Text>
+                    ) : (
+                        <Text size="sm" c="dimmed">-</Text>
+                    )}
+                </Table.Td>
+                {type !== 'artist' && (
+                    <Table.Td style={{ textAlign: 'center' }}>
+                        {totals && item.entityId ? (
+                            <CertificationIcon
+                                chart={chart}
+                                chartType={type as 'album' | 'track'}
+                                totals={totals}
+                                entity={{ name: item.name, artistName: item.artistName || '' }}
+                                entityId={item.entityId}
+                                username={chart?.lastfm_username}
+                                size={24}
+                            />
+                        ) : (
+                            <Text size="sm" c="dimmed">-</Text>
+                        )}
+                    </Table.Td>
+                )}
+                <Table.Td style={{ textAlign: 'center' }}>
+                    <Text size="sm">{sales > 0 ? Math.floor(sales).toLocaleString() : '-'}</Text>
+                </Table.Td>
+            </Table.Tr>
+            <ImageEditModal
+                opened={modalOpen}
+                onClose={() => setModalOpen(false)}
+                entityId={item.entityId || ''}
+                name={item.name}
+                artistName={item.artistName || ''}
+                imageUrl={imageUrl || ''}
+                type={type}
+                clientId={SPOTIFY_TOKEN}
+                clientSecret={SPOTIFY_SECRET}
+                onImageChange={() => {}}
+            />
+        </>
     );
 };

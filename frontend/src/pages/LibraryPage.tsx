@@ -7,6 +7,7 @@ import { LibraryStats } from '../components/library/LibraryStats';
 import { LibraryTableView } from '../components/library/LibraryTableView';
 import { LibraryGridView } from '../components/library/LibraryGridView';
 import { db } from '../db/indexedDb';
+import dayjs from 'dayjs';
 import CreateHeader from '../components/createChart/CreateHeader';
 
 export interface LibraryItem {
@@ -202,11 +203,32 @@ export const LibraryPage: React.FC = () => {
                     }
 
                     // Combine Last.fm data with chart stats
+                    // Also persist returned user playcounts into the local playcount cache
                     const items: LibraryItem[] = apiData.map((item: any) => {
                         const name = item.name;
                         const artistName = selectedType === 'artist' ? undefined : (item.artist?.name || item.artist?.['#text'] || '');
                         const key = `${name}|||${artistName || ''}`;
                         const stats = statsMap.get(key) || { peak: 999, weeks: new Set(), points: 0, timesAtPeak: 0 };
+                        // If API provided playcount, cache it under the same key used by certification.getUserPlaycountCached
+                        const rawPlaycount = parseInt(item.playcount || '0', 10) || 0;
+                        (async () => {
+                            try {
+                                if (chart?.lastfm_username && rawPlaycount > 0) {
+                                    // Compute cache expiry (next configured day_of_week or +7 days fallback)
+                                    let cacheUntil = dayjs().add(7, 'day');
+                                    if (typeof chart?.day_of_week === 'number') {
+                                        let d = dayjs();
+                                        while (d.day() !== chart.day_of_week) d = d.add(1, 'day');
+                                        cacheUntil = d.endOf('day');
+                                    }
+                                    const exp = cacheUntil.toDate().getTime();
+                                    const playcountKey = `pc:${chart.lastfm_username}:${artistName || name}:${selectedType === 'album' ? name : ''}:${selectedType === 'track' ? name : ''}`;
+                                    try { await db.playcount_cache.put({ key: playcountKey, value: rawPlaycount, expires: exp }); } catch (e) { /* ignore */ }
+                                }
+                            } catch (e) {
+                                // ignore caching errors
+                            }
+                        })();
 
                         return {
                             name,
@@ -215,7 +237,7 @@ export const LibraryPage: React.FC = () => {
                             weeks: stats.weeks.size,
                             timesAtPeak: stats.timesAtPeak,
                             points: stats.points,
-                            playcount: parseInt(item.playcount || '0', 10),
+                            playcount: rawPlaycount,
                             sales: 0, // Placeholder
                             entityId: stats.entityId,
                         };
@@ -363,7 +385,7 @@ export const LibraryPage: React.FC = () => {
     }
 
     return (
-        <Container size="lg" py="xl">
+        <Container size="md">
             <CreateHeader pageTitle={t('library.title')} />
             <Flex direction="column" gap="md">
                 <LibraryFilters
