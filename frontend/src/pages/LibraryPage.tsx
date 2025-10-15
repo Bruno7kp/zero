@@ -311,8 +311,12 @@ export const LibraryPage: React.FC = () => {
                         });
                     } else if (sortBy === 'peak') {
                         items.sort((a, b) => {
-                            if (a.peak !== b.peak) return a.peak - b.peak;
-                            return b.weeks - a.weeks;
+                            if (a.peak !== b.peak) return a.peak - b.peak; // lower peak is better (#1 first)
+                            const aTimes = (a.timesAtPeak || 0);
+                            const bTimes = (b.timesAtPeak || 0);
+                            if (aTimes !== bTimes) return bTimes - aTimes; // more times at peak wins
+                            if (b.weeks !== a.weeks) return b.weeks - a.weeks; // then more total weeks
+                            return b.points - a.points; // then more points
                         });
                     } else if (sortBy === 'sales') {
                         items.sort((a, b) => (b.sales || 0) - (a.sales || 0));

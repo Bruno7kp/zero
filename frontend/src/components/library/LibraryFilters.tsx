@@ -76,9 +76,9 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                             withItemsBorders={false}
                             onChange={(value) => setSelectedType(value as 'artist' | 'album' | 'track')}
                             data={[
-                                { label: <IconMicrophone size={18} />, value: 'artist' },
-                                { label: <IconDisc size={18} />, value: 'album' },
-                                { label: <IconMusic size={18} />, value: 'track' },
+                                { label: <Center><IconMicrophone size={18} /></Center>, value: 'artist' },
+                                { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
+                                { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
                             ]}
                         />
                     </Group>

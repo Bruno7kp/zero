@@ -98,12 +98,12 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart }) => {
 
     // Calculate sales (formula value) based on totals
     const sales = useMemo(() => {
-        if (!totals || type === 'artist') return 0;
+        //if (!totals || type === 'artist') return 0;
         
         const pointsWeight = type === 'track' ? (chart?.music_points_weight || 0) : (chart?.album_points_weight || 0);
         const playsWeight = type === 'track' ? (chart?.music_plays_weight || 0) : (chart?.album_plays_weight || 0);
-        const totalPoints = totals.totalPoints || 0;
-        const totalPlays = totals.totalPlays || 0;
+        const totalPoints = totals?.totalPoints || 0;
+        const totalPlays = totals?.totalPlays || 0;
         
         return totalPoints * pointsWeight + totalPlays * playsWeight;
     }, [totals, chart, type]);
