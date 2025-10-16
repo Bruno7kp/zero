@@ -17,6 +17,7 @@ interface LibraryGridViewProps {
     chart: any;
     badgeStyle?: 'glass' | 'solid';
     showGridPlays?: boolean;
+    showGridPeak?: boolean;
 }
 
 export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
@@ -27,6 +28,7 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     totalPages,
     badgeStyle = 'glass',
     showGridPlays = true,
+    showGridPeak = true,
 }) => {
     const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
     return (
@@ -42,6 +44,7 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
                         type={type}
                         badgeStyle={badgeStyle}
                         showPlays={showGridPlays}
+                        showPeak={showGridPeak}
                         forceUpdate={imageForceUpdate[item.entityId || ''] || 0}
                         onImageChange={(entityId: string) => setImageForceUpdate(f => ({ ...f, [entityId]: Date.now() }))}
                     />
@@ -62,11 +65,12 @@ interface GridItemProps {
     type: 'artist' | 'album' | 'track';
     badgeStyle?: 'glass' | 'solid';
     showPlays?: boolean;
+    showPeak?: boolean;
     forceUpdate?: number;
     onImageChange: (entityId: string) => void;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true, forceUpdate = 0, onImageChange }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true, showPeak = true, forceUpdate = 0, onImageChange }) => {
     const theme = useMantineTheme();
     const { t } = useTranslation();
     const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
@@ -86,8 +90,8 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
         setModalOpen(true);
     };
 
-    // Show badge if item has peaked in the chart
-    const showBadge = item.peak < 999;
+    // Show badge if item has peaked in the chart and showPeak is enabled
+    const showBadge = showPeak && item.peak < 999;
 
     return (
         <Card

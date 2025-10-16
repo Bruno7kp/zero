@@ -38,10 +38,6 @@ export const generateStoriesHTML = (
 
   let html = `
     <style>
-      *{box-sizing:border-box}
-      html,body{height:100%}
-      body{margin:0;background:#0b0c0e;color:#fff;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;display:grid;place-items:center;padding:24px 0;}
-
       .poster{
         width: 1080px; 
         height: 1920px;

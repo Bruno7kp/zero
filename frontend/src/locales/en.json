@@ -478,7 +478,9 @@
       "number1s": "Reached #1",
       "inChart": "Debuted in chart",
       "noItemsFound": "No items found",
-      "showPlays": "Show plays"
+      "showPlays": "Show plays",
+      "glassBadge": "Glass background",
+      "showPeak": "Show peak"
     }
   }
 }

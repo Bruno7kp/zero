@@ -24,6 +24,8 @@ interface LibraryFiltersProps {
     setVisibleColumns: (columns: { points: boolean; peak: boolean; weeks: boolean; sales: boolean; cert: boolean }) => void;
     showGridPlays: boolean;
     setShowGridPlays: (show: boolean) => void;
+    showGridPeak: boolean;
+    setShowGridPeak: (show: boolean) => void;
     chart?: any;
 }
 
@@ -42,6 +44,8 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
     setVisibleColumns,
     showGridPlays,
     setShowGridPlays,
+    showGridPeak,
+    setShowGridPeak,
     chart,
 }) => {
     const { t } = useTranslation();
@@ -116,14 +120,14 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                             ]}
                         />
 
-                        <Menu shadow="md" width={200} closeOnItemClick={false}>
+                        <Menu shadow="md" width={210} closeOnItemClick={false}>
                             <Menu.Target>
                                 <ActionIcon variant="subtle" aria-label={t('charts.columnsConfig')}>
                                     <IconSettings size={16} />
                                 </ActionIcon>
                             </Menu.Target>
                             <Menu.Dropdown>
-                                <Menu.Label>{t('charts.columns')}</Menu.Label>
+                                <Menu.Label>{t('settings.title')}</Menu.Label>
                                 {viewMode === 'table' ? (
                                     <>
                                         <Menu.Item>
@@ -167,16 +171,25 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                                     <>
                                         <Menu.Item>
                                             <Checkbox
-                                                label={t('badge.glass')}
-                                                checked={badgeStyle === 'glass'}
-                                                onChange={() => setBadgeStyle && setBadgeStyle(badgeStyle === 'glass' ? 'solid' : 'glass')}
+                                                label={t('library.showPlays')}
+                                                checked={showGridPlays}
+                                                onChange={() => setShowGridPlays(!showGridPlays)}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Divider />
+                                        <Menu.Label>{t('charts.peak')}</Menu.Label>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('library.showPeak')}
+                                                checked={showGridPeak}
+                                                onChange={() => setShowGridPeak(!showGridPeak)}
                                             />
                                         </Menu.Item>
                                         <Menu.Item>
                                             <Checkbox
-                                                label={t('library.showPlays')}
-                                                checked={showGridPlays}
-                                                onChange={() => setShowGridPlays(!showGridPlays)}
+                                                label={t('library.glassBadge')}
+                                                checked={badgeStyle === 'glass'}
+                                                onChange={() => setBadgeStyle && setBadgeStyle(badgeStyle === 'glass' ? 'solid' : 'glass')}
                                             />
                                         </Menu.Item>
                                     </>
