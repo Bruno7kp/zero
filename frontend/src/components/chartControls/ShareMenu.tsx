@@ -3,6 +3,7 @@ import { Menu, ActionIcon, Modal, Text, Button, Box, Textarea, Group } from '@ma
 import { IconShare, IconCopy, IconCheck } from '@tabler/icons-react';
 import { useClipboard } from '@mantine/hooks';
 import { useSelector } from 'react-redux';
+import ShareImageModal from './ShareImageModal';
 
 interface ShareMenuProps {
   t: (k: any, options?: any) => string;
@@ -16,6 +17,7 @@ interface ShareMenuProps {
 
 export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, week, weekNumber, chartType, disabled }) => {
   const [modalOpened, setModalOpened] = useState(false);
+  const [shareModalOpened, setShareModalOpened] = useState(false);
   const clipboard = useClipboard({ timeout: 2000 });
   const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
 
@@ -152,6 +154,12 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
           >
             {t('charts.share.copyChart', 'Copy chart')}
           </Menu.Item>
+          <Menu.Item 
+            leftSection={<IconShare size={16} />} 
+            onClick={() => setShareModalOpened(true)}
+          >
+            {t('charts.share.shareChart', 'Compartilhar chart')}
+          </Menu.Item>
         </Menu.Dropdown>
       </Menu>
 
@@ -195,6 +203,17 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, w
           </Group>
         </Box>
       </Modal>
+
+      <ShareImageModal
+        t={t}
+        chartData={chartData}
+        chartName={chartName}
+        week={week}
+        weekNumber={weekNumber}
+        chartType={chartType}
+        opened={shareModalOpened}
+        onClose={() => setShareModalOpened(false)}
+      />
     </>
   );
 };
