@@ -88,6 +88,24 @@ export const useLibraryFilters = () => {
         }
     });
 
+    const [showGridPeak, setShowGridPeak] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem('libraryShowGridPeak');
+            return saved ? JSON.parse(saved) : true; // Default to true
+        } catch {
+            return true;
+        }
+    });
+
+    const [showGridPosition, setShowGridPosition] = useState<boolean>(() => {
+        try {
+            const saved = localStorage.getItem('libraryShowGridPosition');
+            return saved ? JSON.parse(saved) : false; // Default to false
+        } catch {
+            return false;
+        }
+    });
+
     // Save preferences to localStorage
     useEffect(() => {
         try {
@@ -145,6 +163,22 @@ export const useLibraryFilters = () => {
         }
     }, [showGridPlays]);
 
+    useEffect(() => {
+        try {
+            localStorage.setItem('libraryShowGridPeak', JSON.stringify(showGridPeak));
+        } catch (e) {
+            console.error('Failed to save show grid peak:', e);
+        }
+    }, [showGridPeak]);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('libraryShowGridPosition', JSON.stringify(showGridPosition));
+        } catch (e) {
+            console.error('Failed to save show grid position:', e);
+        }
+    }, [showGridPosition]);
+
     // Reset page when type or search changes - handled by components using this hook
 
     // Calculate stats for header
@@ -168,6 +202,10 @@ export const useLibraryFilters = () => {
         setVisibleColumns,
         showGridPlays,
         setShowGridPlays,
+        showGridPeak,
+        setShowGridPeak,
+        showGridPosition,
+        setShowGridPosition,
         page,
         setPage,
         stats,

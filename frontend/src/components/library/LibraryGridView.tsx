@@ -17,6 +17,9 @@ interface LibraryGridViewProps {
     chart: any;
     badgeStyle?: 'glass' | 'solid';
     showGridPlays?: boolean;
+    showGridPeak?: boolean;
+    showGridPosition?: boolean;
+    itemsPerPage?: number;
 }
 
 export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
@@ -27,6 +30,9 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
     totalPages,
     badgeStyle = 'glass',
     showGridPlays = true,
+    showGridPeak = true,
+    showGridPosition = false,
+    itemsPerPage = 25,
 }) => {
     const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
     return (
@@ -35,17 +41,23 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
                 cols={{ base: 2, sm: 3, lg: 5 }}
                 spacing="md"
             >
-                {items.map((item, index) => (
-                    <GridItem
-                        key={`${item.name}-${item.artistName || ''}-${index}`}
-                        item={item}
-                        type={type}
-                        badgeStyle={badgeStyle}
-                        showPlays={showGridPlays}
-                        forceUpdate={imageForceUpdate[item.entityId || ''] || 0}
-                        onImageChange={(entityId: string) => setImageForceUpdate(f => ({ ...f, [entityId]: Date.now() }))}
-                    />
-                ))}
+                {items.map((item, index) => {
+                    const position = (page - 1) * itemsPerPage + index + 1;
+                    return (
+                        <GridItem
+                            key={`${item.name}-${item.artistName || ''}-${index}`}
+                            item={item}
+                            position={position}
+                            type={type}
+                            badgeStyle={badgeStyle}
+                            showPlays={showGridPlays}
+                            showPeak={showGridPeak}
+                            showPosition={showGridPosition}
+                            forceUpdate={imageForceUpdate[item.entityId || ''] || 0}
+                            onImageChange={(entityId: string) => setImageForceUpdate(f => ({ ...f, [entityId]: Date.now() }))}
+                        />
+                    );
+                })}
             </SimpleGrid>
 
             {totalPages > 1 && (
@@ -59,14 +71,17 @@ export const LibraryGridView: React.FC<LibraryGridViewProps> = ({
 
 interface GridItemProps {
     item: LibraryItem;
+    position: number;
     type: 'artist' | 'album' | 'track';
     badgeStyle?: 'glass' | 'solid';
     showPlays?: boolean;
+    showPeak?: boolean;
+    showPosition?: boolean;
     forceUpdate?: number;
     onImageChange: (entityId: string) => void;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', showPlays = true, forceUpdate = 0, onImageChange }) => {
+const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 'glass', showPlays = true, showPeak = true, showPosition = false, forceUpdate = 0, onImageChange }) => {
     const theme = useMantineTheme();
     const { t } = useTranslation();
     const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
@@ -86,8 +101,8 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
         setModalOpen(true);
     };
 
-    // Show badge if item has peaked in the chart
-    const showBadge = item.peak < 999;
+    // Show badge if item has peaked in the chart and showPeak is enabled
+    const showBadge = showPeak && item.peak < 999;
 
     return (
         <Card
@@ -98,13 +113,13 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
                 background: getCardBackgroundByMode(theme, themeMode),
                 cursor: 'pointer',
                 position: 'relative',
-                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
+                overflow: 'visible',
             }}
             onClick={handleClick}
         >
-            <Box style={{ position: 'relative' }}>
+            <Box style={{ position: 'relative', overflow: 'hidden', borderRadius: '0.5rem' }}>
                 {showBadge && (
                     <Badge
                         variant="filled"
@@ -167,6 +182,24 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, badgeStyle = 'glass', s
                     )}
                 </Box>
             </Box>
+
+            {showPosition && (
+                <Text
+                    style={{
+                        fontFamily: 'Inter, system-ui, sans-serif',
+                        position: 'absolute',
+                        bottom: position < 10 ? 5 : position < 100 ? 10 : position < 1000 ? 15 : 20,
+                        left: position < 10 ? -15 : position < 100 ? -12 : position < 1000 ? -10 : -8,
+                        zIndex: 3,
+                        fontSize: position < 10 ? '45px' : position < 100 ? '40px' : position < 1000 ? '35px' : '20px',
+                        fontWeight: 500,
+                        color: '#fff',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                    }}
+                >
+                    {position}
+                </Text>
+            )}
 
             {showPlays && item.playcount !== undefined && (
                 <Text size="xs" ta="center" tt="lowercase" p="xs">

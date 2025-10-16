@@ -38,10 +38,6 @@ export const generateStoriesHTML = (
 
   let html = `
     <style>
-      *{box-sizing:border-box}
-      html,body{height:100%}
-      body{margin:0;background:#0b0c0e;color:#fff;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;display:grid;place-items:center;padding:24px 0;}
-
       .poster{
         width: 1080px; 
         height: 1920px;
@@ -70,7 +66,7 @@ export const generateStoriesHTML = (
       .hstack{color:#ff6d68;display:flex;align-items:flex-end;gap:12px}
       .hstack .t1{font-family:Impact,sans-serif; font-size:90px}
       .hstack .t2{font-family:Impact,sans-serif; font-size:170px}
-      .shot{width:280px;height:210px;border-radius:12px;overflow:hidden;justify-self:end;box-shadow:0 10px 40px rgba(0,0,0,.45); background: #333; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;}
+      .shot{width:280px;height:280px;border-radius:12px;overflow:hidden;justify-self:end;box-shadow:0 10px 40px rgba(0,0,0,.45); background: #333; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;}
       .shot img{width:100%;height:100%;object-fit:cover;display:block}
 
       .board{position:relative; overflow: hidden;}
@@ -94,7 +90,7 @@ export const generateStoriesHTML = (
       }
 
       .thumb{justify-content:center}
-  .thumb img{width:100px;height:100px;border-radius:10px;object-fit:cover;display:block}
+      .thumb img{width:100px;height:100px;border-radius:10px;object-fit:cover;display:block}
       
       .badge{
         position: absolute;
@@ -120,10 +116,48 @@ export const generateStoriesHTML = (
       .same {color:#ffbf4d}
       .re-pill{position:absolute;left:12px;top:15px;bottom:15px;width:38px;background:#000;border-left:3px solid #ff6d68;color:#ff6d68;display:grid;place-items:center;font-weight:900;font-size:18px;letter-spacing:.2em;}
 
-      .name{padding:0 24px;font-size:36px;font-weight:900;letter-spacing:.2px; min-width: 0;}
-      .name span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .row > div:nth-child(4) {
+        /* Remove as regras Flexbox da célula que causavam o centro */
+        display: block; 
+        /* Adiciona preenchimento interno para centralizar o texto (fallback) */
+        padding-top: 10px; 
+        padding-bottom: 10px;
+      }
 
+      .name {
+        width: 100%; /* Garante a largura total */
+        padding-left: 24px;
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: .2px;
+        min-width: 0;
+        display: block; /* MUDANÇA CRÍTICA: Volta para display: block */
+        /* Remove as regras flexbox de centralização vertical e horizontal */
+        /* text-align: left; /* Manteremos nos spans */
+      }
+
+      /* O alinhamento vertical agora será responsabilidade dos elementos internos */
+      .name .main-name,
+      .name .artist-name {
+        text-align: left; /* Garante alinhamento esquerdo no texto */
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .name .artist-name {
+        display: block;
+        font-size: 24px;
+        font-weight: 500;
+        color: #b0b3b8;
+        margin-top: 0px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .last{justify-content:center;color:#cfd2d7;font-size:32px;font-weight:800}
+      .artist-only{margin-top: 22px;}
 
       footer{border-top:1px solid rgba(255,109,104,.45);display:flex;justify-content:flex-end;padding:20px 48px;color:#cfd2d7;font-size:18px;letter-spacing:.2em; text-align: right;}
     </style>
@@ -145,18 +179,17 @@ export const generateStoriesHTML = (
   `;
 
   data.forEach((row) => {
-    const nameArtist = row.artistName ? `${row.name} - ${row.artistName}` : row.name || '';
-    const escapedNameArtist = escapeHtml(nameArtist);
     const imageUrl = row.imageUrl || row.albumImage || '';
     const deltaRank = row.deltaRank;
     let moveHtml = '';
     let lastPosition = '';
 
     if (deltaRank === 'NEW') {
-      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></div>';
+      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="8" x2="9" y2="16"></line><line x1="9" y1="8" x2="15" y2="16"></line><line x1="15" y1="8" x2="15" y2="16"></line></svg></div>';
+      //moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></div>';
       lastPosition = '—';
     } else if (deltaRank === 'RE') {
-      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></div>';
+      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg></div>';
       lastPosition = '—';
     } else if (typeof deltaRank === 'number') {
       const prevRank = row.rank + deltaRank;
@@ -176,9 +209,12 @@ export const generateStoriesHTML = (
     html += `
       <div class="row">
         <div class="rank">${row.rank}</div>
-        <div class="thumb">${imageUrl ? `<img src="${imageUrl}" alt="${escapedNameArtist}" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMG</span>'}</div>
+        <div class="thumb">${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMG</span>'}</div>
         <div class="move">${moveHtml}</div>
-        <div class="name"><span>${escapedNameArtist}</span></div>
+        <div class="name">
+          <span class="main-name ${row.artistName ? '' : 'artist-only'}">${escapeHtml(row.name)}</span>
+          ${row.artistName ? `<span class="artist-name">${escapeHtml(row.artistName)}</span>` : ''}
+        </div>
         <div class="last">${lastPosition}</div>
       </div>
     `;
