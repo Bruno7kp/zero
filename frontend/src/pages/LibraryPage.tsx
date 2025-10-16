@@ -47,6 +47,8 @@ export const LibraryPage: React.FC = () => {
         setShowGridPlays,
         showGridPeak,
         setShowGridPeak,
+        showGridPosition,
+        setShowGridPosition,
         page,
         setPage,
     } = useLibraryFilters();
@@ -115,6 +117,8 @@ export const LibraryPage: React.FC = () => {
                     setShowGridPlays={setShowGridPlays}
                     showGridPeak={showGridPeak}
                     setShowGridPeak={setShowGridPeak}
+                    showGridPosition={showGridPosition}
+                    setShowGridPosition={setShowGridPosition}
                     chart={chart}
                 />
 
@@ -162,6 +166,8 @@ export const LibraryPage: React.FC = () => {
                                         badgeStyle={badgeStyle}
                                         showGridPlays={showGridPlays}
                                         showGridPeak={showGridPeak}
+                                        showGridPosition={showGridPosition}
+                                        itemsPerPage={itemsPerPage}
                                     />
                                 )}
                             </>

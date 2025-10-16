@@ -480,7 +480,8 @@
       "noItemsFound": "No items found",
       "showPlays": "Show plays",
       "glassBadge": "Glass background",
-      "showPeak": "Show peak"
+      "showPeak": "Show peak",
+      "showPosition": "Show position"
     }
   }
 }

@@ -480,7 +480,8 @@
       "noItemsFound": "Nenhum item encontrado",
       "showPlays": "Mostrar reproduções",
       "glassBadge": "Fundo transparente",
-      "showPeak": "Mostrar pico"
+      "showPeak": "Mostrar pico",
+      "showPosition": "Mostrar posição"
     }
   }
 }

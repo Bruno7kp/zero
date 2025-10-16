@@ -26,6 +26,8 @@ interface LibraryFiltersProps {
     setShowGridPlays: (show: boolean) => void;
     showGridPeak: boolean;
     setShowGridPeak: (show: boolean) => void;
+    showGridPosition: boolean;
+    setShowGridPosition: (show: boolean) => void;
     chart?: any;
 }
 
@@ -46,6 +48,8 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
     setShowGridPlays,
     showGridPeak,
     setShowGridPeak,
+    showGridPosition,
+    setShowGridPosition,
     chart,
 }) => {
     const { t } = useTranslation();
@@ -174,6 +178,13 @@ export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
                                                 label={t('library.showPlays')}
                                                 checked={showGridPlays}
                                                 onChange={() => setShowGridPlays(!showGridPlays)}
+                                            />
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Checkbox
+                                                label={t('library.showPosition')}
+                                                checked={showGridPosition}
+                                                onChange={() => setShowGridPosition(!showGridPosition)}
                                             />
                                         </Menu.Item>
                                         <Menu.Divider />
