@@ -8,10 +8,17 @@ import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/carousel/styles.css';
 import 'mantine-datatable/styles.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
-import '@fontsource/inter/800.css';
+import '@fontsource/poppins/400.css';
+import '@fontsource/poppins/600.css';
+import '@fontsource/poppins/700.css';
+import '@fontsource/poppins/800.css';
+import '@fontsource/poppins/900.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/600.css';
+import '@fontsource/dm-sans/700.css';
+import '@fontsource/dm-sans/800.css';
+import '@fontsource/dm-sans/900.css';
+
 import './assets/styles/custom.css';
 import { AppProviders } from './providers/AppProviders';
 

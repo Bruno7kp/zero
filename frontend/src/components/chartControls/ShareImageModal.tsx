@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Box, Button, Radio, Text, Stack, Grid, Center, Loader } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
+import { Modal, Box, Grid, Center, Loader, Text, Textarea } from '@mantine/core';
+import { useSelector } from 'react-redux';
 import html2canvas from 'html2canvas';
 import { generateGridHTML } from './templates/gridTemplate';
 import { generateStoriesHTML } from './templates/storiesTemplate';
+import { generateStories2HTML } from './templates/stories2Template';
 import { generateCompletoHTML } from './templates/completoTemplate';
 import { spotifyImagesDb } from '../../db/spotifyImagesDb';
+import { generatePlainTextChart } from './utils/shareUtils';
+import { ShareOptions } from './ShareOptions';
 
 interface ShareImageModalProps {
   t: (k: any, options?: any) => string;
   chartData: any[];
   chartName: string;
+  lastfmUsername?: string;
   week: string | undefined;
   weekNumber: number | null;
   chartType: 'artist' | 'album' | 'track';
@@ -22,28 +26,41 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   t,
   chartData,
   chartName,
+  lastfmUsername,
   week,
   weekNumber,
   chartType,
   opened,
   onClose,
 }) => {
-  const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'completo'>('stories');
+  const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'stories2' | 'completo' | 'text'>('stories');
   const [selectedGridSize, setSelectedGridSize] = useState<3 | 4 | 5>(3);
   const [selectedStoriesTop, setSelectedStoriesTop] = useState<5 | 10>(10);
+  const [selectedStories2Top, setSelectedStories2Top] = useState<5 | 10>(10);
+  const [selectedStories2BackgroundType, setSelectedStories2BackgroundType] = useState<'blur' | 'solid'>('blur');
+  const [selectedStories2BackgroundColor, setSelectedStories2BackgroundColor] = useState<string>('#1a1a1a');
 
   // Estados para a imagem de prévia e o carregamento
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentImageType, setCurrentImageType] = useState<string>('');
 
+  const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
+
   // Função helper para gerar o tipo atual da imagem
   const getCurrentTypeKey = useCallback(() => {
-    return `${selectedType}-${selectedType === 'grid' ? selectedGridSize : selectedType === 'stories' ? selectedStoriesTop : 'completo'}`;
-  }, [selectedType, selectedGridSize, selectedStoriesTop]);
+    return `${selectedType}-${selectedType === 'grid' ? selectedGridSize : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}`) : selectedType === 'text' ? 'text' : 'completo'}`;
+  }, [selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor]);
 
   // Função que gera a imagem em alta resolução em background
   const generatePreviewImage = useCallback(async () => {
+    if (selectedType === 'text') {
+      setPreviewImageUrl(null);
+      setCurrentImageType(getCurrentTypeKey());
+      setIsLoading(false);
+      return;
+    }
+
     // Enriquecer data com imagens
     const enrichedData = await Promise.all(chartData.map(async (row) => {
       const cached = await spotifyImagesDb.images.get(row.entityId);
@@ -52,11 +69,24 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       return { ...row, imageUrl, albumImage };
     }));
 
-    const htmlForCanvas = selectedType === 'grid'
-      ? generateGridHTML(enrichedData, selectedGridSize)
-      : selectedType === 'stories'
-      ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, weekNumber, chartType)
-      : generateCompletoHTML(enrichedData, chartName, week, weekNumber, chartType);
+    let htmlForCanvas: string;
+    if (selectedType === 'stories2') {
+      let dateRange = '';
+      if (week) {
+        const endDate = new Date(week);
+        const startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 6);
+        const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+        dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+      }
+      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername);
+    } else {
+      htmlForCanvas = selectedType === 'grid'
+        ? generateGridHTML(enrichedData, selectedGridSize)
+        : selectedType === 'stories'
+        ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, weekNumber, chartType)
+        : generateCompletoHTML(enrichedData, chartName, week, weekNumber, chartType);
+    }
     
     const tempDiv = document.createElement('div');
     tempDiv.style.position = 'absolute';
@@ -66,14 +96,15 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 
     try {
       let options: any = { backgroundColor: '#ffffff', logging: false, allowTaint: true, useCORS: true };
-      if (selectedType === 'stories' || selectedType === 'completo') {
+      if (selectedType === 'stories' || selectedType === 'stories2' || selectedType === 'completo') {
         options = { ...options, width: 1080, height: 1920 };
       } else if (selectedType === 'grid') {
         const sizePx = selectedGridSize * 300;
         options = { ...options, width: sizePx, height: sizePx };
       }
       
-      const canvas = await html2canvas(tempDiv.querySelector('.poster') as HTMLElement, options);
+      const selector = selectedType === 'stories2' ? '.story' : '.poster';
+      const canvas = await html2canvas(tempDiv.querySelector(selector) as HTMLElement, options);
       setPreviewImageUrl(canvas.toDataURL('image/png'));
       setCurrentImageType(getCurrentTypeKey());
     } catch (error) {
@@ -83,7 +114,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedStoriesTop, week, weekNumber, chartType, chartName, getCurrentTypeKey]);
+  }, [chartData, selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, chartName, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType]);
 
   // Efeito que gera a imagem de prévia sempre que uma opção muda
   useEffect(() => {
@@ -103,14 +134,15 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     return () => {
       clearTimeout(handler);
     };
-  }, [selectedType, selectedGridSize, selectedStoriesTop, chartData, opened, generatePreviewImage]);
+  }, [selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, chartData, opened, generatePreviewImage]);
 
   // O download agora é instantâneo
   const handleDownload = () => {
     if (!previewImageUrl) return;
     const link = document.createElement('a');
-    const suffix = selectedType === 'grid' ? `_${selectedGridSize}x${selectedGridSize}` : selectedType === 'stories' ? `_${selectedStoriesTop}` : '';
-    link.download = `${chartName}_${selectedType}${suffix}.png`;
+    const suffix = selectedType === 'grid' ? `_${selectedGridSize}x${selectedGridSize}` : (selectedType === 'stories' || selectedType === 'stories2') ? `_${selectedType === 'stories' ? selectedStoriesTop : selectedStories2Top}` : '';
+    const weekSuffix = weekNumber ? `_week${weekNumber}` : '';
+    link.download = `${chartName}_${chartType}${weekSuffix}_${selectedType}${suffix}.png`;
     link.href = previewImageUrl;
     link.click();
   };
@@ -122,61 +154,53 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Text size="sm" c="dimmed" mb="md">{t('charts.share.preview', 'Preview')}</Text>
             <Center style={{ border: '1px solid rgba(125,125,125,0.3)', width: '100%', height: '90vh', padding: '10px' }}>
-              {isLoading && <Loader />}
-              {!isLoading && previewImageUrl && currentImageType === getCurrentTypeKey() && (
-                <img
-                  src={previewImageUrl}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    objectFit: 'contain',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                  }}
-                  alt="Chart Preview"
-                />
+              {selectedType === 'text' ? (
+                <Textarea value={generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)} readOnly rows={22} styles={{input: {minWidth: '500px', fontFamily: 'monospace', fontSize: '12px'}}} />
+              ) : (
+                <>
+                  {isLoading && <Loader />}
+                  {!isLoading && previewImageUrl && currentImageType === getCurrentTypeKey() && (
+                    <img
+                      src={previewImageUrl}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                      }}
+                      alt="Chart Preview"
+                    />
+                  )}
+                  {!isLoading && (!previewImageUrl || currentImageType !== getCurrentTypeKey()) && <Text>Não foi possível gerar a prévia.</Text>}
+                </>
               )}
-              {!isLoading && (!previewImageUrl || currentImageType !== getCurrentTypeKey()) && <Text>Não foi possível gerar a prévia.</Text>}
             </Center>
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 4 }}>
-            <Stack>
-              <Text size="sm" fw={500}>{t('charts.share.selectType', 'Selecionar tipo')}</Text>
-              <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
-                <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
-                <Radio value="grid" label={t('charts.share.grid', 'Grid')} />
-                <Radio value="completo" label={t('charts.share.completo', 'Completo')} />
-              </Radio.Group>
-              
-              {selectedType === 'grid' && (
-                <div>
-                  <Text size="sm" fw={500} mt="sm">{t('charts.share.gridSize', 'Grid Size')}</Text>
-                  <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5)}>
-                    <Radio value="3" label="3x3" disabled={chartData.length < 9} />
-                    <Radio value="4" label="4x4" disabled={chartData.length < 16} />
-                    <Radio value="5" label="5x5" disabled={chartData.length < 25} />
-                  </Radio.Group>
-                </div>
-              )}
-              
-              {selectedType === 'stories' && (
-                <div>
-                  <Text size="sm" fw={500} mt="sm">{t('charts.share.storiesTop', 'Top Count')}</Text>
-                  <Radio.Group value={selectedStoriesTop.toString()} onChange={(value) => setSelectedStoriesTop(parseInt(value) as 5 | 10)}>
-                    <Radio value="5" label="Top 5" />
-                    <Radio value="10" label="Top 10" disabled={chartData.length < 10} />
-                  </Radio.Group>
-                </div>
-              )}
-              
-              <Button
-                leftSection={<IconDownload size={16} />}
-                onClick={handleDownload}
-                mt="md"
-                disabled={!previewImageUrl || isLoading}
-              >
-                {isLoading ? 'Gerando imagem...' : t('charts.share.download', 'Download')}
-              </Button>
-            </Stack>
+            <ShareOptions
+              t={t}
+              selectedType={selectedType}
+              setSelectedType={setSelectedType}
+              selectedGridSize={selectedGridSize}
+              setSelectedGridSize={setSelectedGridSize}
+              selectedStoriesTop={selectedStoriesTop}
+              setSelectedStoriesTop={setSelectedStoriesTop}
+              selectedStories2Top={selectedStories2Top}
+              setSelectedStories2Top={setSelectedStories2Top}
+              selectedStories2BackgroundType={selectedStories2BackgroundType}
+              setSelectedStories2BackgroundType={setSelectedStories2BackgroundType}
+              selectedStories2BackgroundColor={selectedStories2BackgroundColor}
+              setSelectedStories2BackgroundColor={setSelectedStories2BackgroundColor}
+              chartData={chartData}
+              previewImageUrl={previewImageUrl}
+              isLoading={isLoading}
+              handleDownload={handleDownload}
+              statsMap={statsMap}
+              chartName={chartName}
+              week={week}
+              weekNumber={weekNumber}
+              chartType={chartType}
+            />
           </Grid.Col>
         </Grid>
       </Box>

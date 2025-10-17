@@ -64,8 +64,8 @@ export const generateStoriesHTML = (
 
       .tag{padding:8px 16px 6px;font-size:28px;margin-bottom:12px; border-width: 4px; text-transform: uppercase;}
       .hstack{color:#ff6d68;display:flex;align-items:flex-end;gap:12px}
-      .hstack .t1{font-family:Impact,sans-serif; font-size:90px}
-      .hstack .t2{font-family:Impact,sans-serif; font-size:170px}
+      .hstack .t1{font-family:'Poppins', sans-serif; font-weight: 800; font-size:90px}
+      .hstack .t2{font-family:'Poppins', sans-serif; font-weight: 800; font-size:170px}
       .shot{width:280px;height:280px;border-radius:12px;overflow:hidden;justify-self:end;box-shadow:0 10px 40px rgba(0,0,0,.45); background: #333; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;}
       .shot img{width:100%;height:100%;object-fit:cover;display:block}
 
