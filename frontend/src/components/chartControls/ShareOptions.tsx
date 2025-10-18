@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Radio, Stack, Text, ColorPicker } from '@mantine/core';
-import { IconDownload, IconCopy, IconCheck } from '@tabler/icons-react';
+import { Button, Radio, Stack, Text, ColorPicker, Accordion, Flex, Box } from '@mantine/core';
+import { IconDownload, IconCopy, IconCheck, IconShare, IconSettings, IconPhoto, IconGridDots } from '@tabler/icons-react';
 import { useClipboard } from '@mantine/hooks';
 import { generatePlainTextChart } from './utils/shareUtils';
 
@@ -20,13 +20,13 @@ interface ShareOptionsProps {
   setSelectedStories2BackgroundColor: (color: string) => void;
   selectedStories2ShowPlays: 'last' | 'plays' | 'peak' | 'weeks';
   setSelectedStories2ShowPlays: (show: 'last' | 'plays' | 'peak' | 'weeks') => void;
+  chartType: 'artist' | 'album' | 'track';
   chartData: any[];
   previewImageUrl: string | null;
   isLoading: boolean;
   chartName: string;
   week: string | undefined;
   weekNumber: number | null;
-  chartType: 'artist' | 'album' | 'track';
   statsMap: any;
   handleDownload: () => void;
 }
@@ -47,114 +47,164 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedStories2BackgroundColor,
   selectedStories2ShowPlays,
   setSelectedStories2ShowPlays,
+  chartType,
   chartData,
   previewImageUrl,
   isLoading,
   chartName,
   week,
   weekNumber,
-  chartType,
   statsMap,
   handleDownload,
 }) => {
   const clipboard = useClipboard({ timeout: 2000 });
 
   return (
-    <Stack>
-      <Text size="sm" fw={500}>{t('charts.share.selectType', 'Selecionar tipo')}</Text>
-      <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
-        <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
-        <Radio value="stories2" label={t('charts.share.stories2', 'Stories 2')} />
-        <Radio value="grid" label={t('charts.share.grid', 'Grid')} />
-        <Radio value="completo" label={t('charts.share.completo', 'Completo')} />
-        <Radio value="text" label={t('charts.share.text', 'Text')} />
-      </Radio.Group>
-      
-      {selectedType === 'grid' && (
-        <div>
-          <Text size="sm" fw={500} mt="sm">{t('charts.share.gridSize', 'Grid Size')}</Text>
-          <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5)}>
-            <Radio value="3" label="3x3" disabled={chartData.length < 9} />
-            <Radio value="4" label="4x4" disabled={chartData.length < 16} />
-            <Radio value="5" label="5x5" disabled={chartData.length < 25} />
-          </Radio.Group>
-        </div>
-      )}
-      
-      {selectedType === 'stories' && (
-        <div>
-          <Text size="sm" fw={500} mt="sm">{t('charts.share.storiesTop', 'Top Count')}</Text>
-          <Radio.Group value={selectedStoriesTop.toString()} onChange={(value) => setSelectedStoriesTop(parseInt(value) as 5 | 10)}>
-            <Radio value="5" label="Top 5" />
-            <Radio value="10" label="Top 10" disabled={chartData.length < 10} />
-          </Radio.Group>
-        </div>
-      )}
-      
-      {selectedType === 'stories2' && (
-        <div>
-          <Text size="sm" fw={500} mt="sm">{t('charts.share.storiesTop', 'Top Count')}</Text>
-          <Radio.Group value={selectedStories2Top.toString()} onChange={(value) => setSelectedStories2Top(parseInt(value) as 5 | 10)}>
-            <Radio value="5" label="Top 5" />
-            <Radio value="10" label="Top 10" disabled={chartData.length < 10} />
-          </Radio.Group>
-          
-          <Text size="sm" fw={500} mt="sm">{t('charts.share.backgroundType', 'Background Type')}</Text>
-          <Radio.Group value={selectedStories2BackgroundType} onChange={(value) => setSelectedStories2BackgroundType(value as 'blur' | 'solid')}>
-            <Radio value="blur" label={t('charts.share.backgroundBlur', 'Blurred Image')} />
-            <Radio value="solid" label={t('charts.share.backgroundSolid', 'Solid Color')} />
-          </Radio.Group>
-          
-          {selectedStories2BackgroundType === 'solid' && (
-            <div style={{ marginTop: '12px' }}>
-              <Text size="sm" fw={500} mb="xs">{t('charts.share.backgroundColor', 'Background Color')}</Text>
-              <ColorPicker
-                value={selectedStories2BackgroundColor}
-                onChange={setSelectedStories2BackgroundColor}
-                size="lg"
-                format="hex"
-                swatches={[
-                  // Grays
-                  '#1a1a1a', '#666666', '#f5f5f5',
-                  
-                  // Greens
-                  '#117e39', '#22c55e',
-                  
-                  // Reds/Pinks
-                  '#a31818', '#f088be',
-                  
-                  // Blues
-                  '#070049', '#2563eb', '#60a5fa',
-                  
-                  // Yellows/Oranges
-                  '#e66109', '#fbbf24',
-                  
-                  // Purples
-                  '#7d0eb1', '#c4b5fd'
-                ]}
-              />
-            </div>
+    <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box style={{ flex: 1, overflowY: 'auto', overscrollBehavior: 'contain' }}>
+        <Accordion multiple variant="separated" radius="md">
+          {/* Tipo de Compartilhamento */}
+          <Accordion.Item value="type">
+            <Accordion.Control>
+              <Flex direction="column" gap={2}>
+                <Flex align="center" gap={8}><IconShare size={16} /><Text fw={600}>{t('charts.share.selectType', 'Select Type')}</Text></Flex>
+                <Text size="xs" c="dimmed">{t('charts.share.selectTypeDescription', 'Choose the format for sharing your chart')}</Text>
+              </Flex>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
+                <Stack gap="xs">
+                  <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
+                  <Radio value="stories2" label={t('charts.share.stories2', 'Stories 2')} />
+                  <Radio value="grid" label={t('charts.share.grid', 'Grid')} />
+                  <Radio value="completo" label={t('charts.share.completo', 'Complete')} />
+                  <Radio value="text" label={t('charts.share.text', 'Text')} />
+                </Stack>
+              </Radio.Group>
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          {/* Configurações do Grid */}
+          {selectedType === 'grid' && (
+            <Accordion.Item value="grid-settings">
+              <Accordion.Control>
+                <Flex direction="column" gap={2}>
+                  <Flex align="center" gap={8}><IconGridDots size={16} /><Text fw={600}>{t('charts.share.gridSize', 'Grid Size')}</Text></Flex>
+                  <Text size="xs" c="dimmed">{t('charts.share.gridSizeDescription', 'Select the grid dimensions')}</Text>
+                </Flex>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5)}>
+                  <Stack gap="xs">
+                    <Radio value="3" label="3x3" disabled={chartData.length < 9} />
+                    <Radio value="4" label="4x4" disabled={chartData.length < 16} />
+                    <Radio value="5" label="5x5" disabled={chartData.length < 25} />
+                  </Stack>
+                </Radio.Group>
+              </Accordion.Panel>
+            </Accordion.Item>
           )}
-          
-          <Text size="sm" fw={500} mt="sm">{t('charts.share.showColumn', 'Show Column')}</Text>
-          <Radio.Group value={selectedStories2ShowPlays} onChange={(value) => setSelectedStories2ShowPlays(value as 'last' | 'plays' | 'peak' | 'weeks')}>
-            <Radio value="last" label={t('charts.share.lastPosition', 'Last Position')} />
-            <Radio value="plays" label={t('charts.share.plays', 'Plays')} />
-            <Radio value="peak" label={t('charts.share.peak', 'Peak')} />
-            <Radio value="weeks" label={t('charts.share.weeks', 'Weeks')} />
-          </Radio.Group>
-        </div>
-      )}
-      
-      <Button
-        leftSection={selectedType === 'text' ? (clipboard.copied ? <IconCheck size={16} /> : <IconCopy size={16} />) : <IconDownload size={16} />}
-        onClick={selectedType === 'text' ? () => clipboard.copy(generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)) : handleDownload}
-        mt="md"
-        disabled={selectedType !== 'text' && (!previewImageUrl || isLoading)}
-        color={selectedType === 'text' && clipboard.copied ? 'teal' : 'blue'}
-      >
-        {selectedType === 'text' ? (clipboard.copied ? t('common.copied', 'Copied!') : t('common.copy', 'Copy')) : (isLoading ? 'Gerando imagem...' : t('charts.share.download', 'Download'))}
-      </Button>
-    </Stack>
+
+          {/* Configurações do Stories */}
+          {selectedType === 'stories' && (
+            <Accordion.Item value="stories-settings">
+              <Accordion.Control>
+                <Flex direction="column" gap={2}>
+                  <Flex align="center" gap={8}><IconPhoto size={16} /><Text fw={600}>{t('charts.share.storiesTop', 'Top Count')}</Text></Flex>
+                  <Text size="xs" c="dimmed">{t('charts.share.storiesTopDescription', 'Number of items to include')}</Text>
+                </Flex>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Radio.Group value={selectedStoriesTop.toString()} onChange={(value) => setSelectedStoriesTop(parseInt(value) as 5 | 10)}>
+                  <Stack gap="xs">
+                    <Radio value="5" label="Top 5" />
+                    <Radio value="10" label="Top 10" disabled={chartData.length < 10} />
+                  </Stack>
+                </Radio.Group>
+              </Accordion.Panel>
+            </Accordion.Item>
+          )}
+
+          {/* Configurações do Stories 2 */}
+          {selectedType === 'stories2' && (
+            <Accordion.Item value="stories2-settings">
+              <Accordion.Control>
+                <Flex direction="column" gap={2}>
+                  <Flex align="center" gap={8}><IconSettings size={16} /><Text fw={600}>{t('charts.share.stories2Settings', 'Stories 2 Settings')}</Text></Flex>
+                  <Text size="xs" c="dimmed">{t('charts.share.stories2SettingsDescription', 'Customize appearance and data display')}</Text>
+                </Flex>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap="md">
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.storiesTop', 'Top Count')}</Text>
+                    <Radio.Group value={selectedStories2Top.toString()} onChange={(value) => setSelectedStories2Top(parseInt(value) as 5 | 10)}>
+                      <Stack gap="xs">
+                        <Radio value="5" label="Top 5" />
+                        <Radio value="10" label="Top 10" disabled={chartData.length < 10} />
+                      </Stack>
+                    </Radio.Group>
+                  </div>
+
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.backgroundType', 'Background Type')}</Text>
+                    <Radio.Group value={selectedStories2BackgroundType} onChange={(value) => setSelectedStories2BackgroundType(value as 'blur' | 'solid')}>
+                      <Stack gap="xs">
+                        <Radio value="blur" label={t('charts.share.backgroundBlur', 'Blurred Image')} />
+                        <Radio value="solid" label={t('charts.share.backgroundSolid', 'Solid Color')} />
+                      </Stack>
+                    </Radio.Group>
+                  </div>
+
+                  {selectedStories2BackgroundType === 'solid' && (
+                    <div>
+                      <Text size="sm" fw={500} mb="xs">{t('charts.share.backgroundColor', 'Background Color')}</Text>
+                      <ColorPicker
+                        value={selectedStories2BackgroundColor}
+                        onChange={setSelectedStories2BackgroundColor}
+                        size="lg"
+                        format="hex"
+                        swatches={[
+                          '#1a1a1a', '#666666', '#f5f5f5',
+                          '#117e39', '#22c55e',
+                          '#a31818', '#f088be',
+                          '#070049', '#2563eb', '#60a5fa',
+                          '#e66109', '#fbbf24',
+                          '#7d0eb1', '#c4b5fd'
+                        ]}
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.showColumn', 'Show Column')}</Text>
+                    <Radio.Group value={selectedStories2ShowPlays} onChange={(value) => setSelectedStories2ShowPlays(value as 'last' | 'plays' | 'peak' | 'weeks')}>
+                      <Stack gap="xs">
+                        <Radio value="last" label={t('charts.share.lastPosition', 'Last Position')} />
+                        <Radio value="plays" label={t('charts.share.plays', 'Plays')} />
+                        <Radio value="peak" label={t('charts.share.peak', 'Peak')} />
+                        <Radio value="weeks" label={t('charts.share.weeks', 'Weeks')} />
+                      </Stack>
+                    </Radio.Group>
+                  </div>
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+          )}
+        </Accordion>
+      </Box>
+
+      <Box style={{ flexShrink: 0, paddingTop: 'var(--mantine-spacing-md)' }}>
+        <Button
+          leftSection={selectedType === 'text' ? (clipboard.copied ? <IconCheck size={16} /> : <IconCopy size={16} />) : <IconDownload size={16} />}
+          onClick={selectedType === 'text' ? () => clipboard.copy(generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)) : handleDownload}
+          fullWidth
+          disabled={selectedType !== 'text' && (!previewImageUrl || isLoading)}
+          color={selectedType === 'text' && clipboard.copied ? 'teal' : 'blue'}
+        >
+          {selectedType === 'text' ? (clipboard.copied ? t('common.copied', 'Copied!') : t('common.copy', 'Copy')) : (isLoading ? 'Generating image...' : t('charts.share.download', 'Download'))}
+        </Button>
+      </Box>
+    </Box>
   );
 };

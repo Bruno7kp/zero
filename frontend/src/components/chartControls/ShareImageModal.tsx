@@ -47,8 +47,6 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [currentImageType, setCurrentImageType] = useState<string>('');
 
   const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
-
-  // Função helper para gerar o tipo atual da imagem
   const getCurrentTypeKey = useCallback(() => {
     return `${selectedType}-${selectedType === 'grid' ? selectedGridSize : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays}`) : selectedType === 'text' ? 'text' : 'completo'}`;
   }, [selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor, selectedStories2ShowPlays]);
@@ -121,7 +119,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, chartName, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays]);
+  }, [chartData, selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, chartName, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, statsMap]);
 
   // Efeito que gera a imagem de prévia sempre que uma opção muda
   useEffect(() => {
@@ -175,6 +173,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedStories2BackgroundColor={setSelectedStories2BackgroundColor}
               selectedStories2ShowPlays={selectedStories2ShowPlays}
               setSelectedStories2ShowPlays={setSelectedStories2ShowPlays}
+              chartType={chartType}
               chartData={chartData}
               previewImageUrl={previewImageUrl}
               isLoading={isLoading}
@@ -183,14 +182,13 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               chartName={chartName}
               week={week}
               weekNumber={weekNumber}
-              chartType={chartType}
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Text size="sm" c="dimmed" mb="md">{t('charts.share.preview', 'Preview')}</Text>
-            <Center style={{ border: '1px solid rgba(125,125,125,0.3)', width: '100%', height: '90vh', padding: '10px' }}>
+            <Center style={{ border: '1px solid rgba(125,125,125,0.3)', width: '100%', padding: '10px' }} h={{ base: 'auto', sm: '85vh' }}>
               {selectedType === 'text' ? (
-                <Textarea value={generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)} readOnly rows={22} styles={{input: {minWidth: '500px', fontFamily: 'monospace', fontSize: '12px'}}} />
+                <Textarea w="100%" value={generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)} readOnly rows={22} styles={{input: {margin: '0 auto', width: '100%', maxWidth: '550px', fontFamily: 'monospace', fontSize: '12px'}}} />
               ) : (
                 <>
                   {isLoading && <Loader />}
