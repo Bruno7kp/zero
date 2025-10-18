@@ -7,7 +7,8 @@ export const generateStories2HTML = async (
     dateRange?: string,
     backgroundType: 'blur' | 'solid' = 'blur',
     backgroundColor: string = '#1a1a1a',
-    username?: string
+    username?: string,
+    showPlays: boolean = false
 ): Promise<string> => {
     if (!chartData || chartData.length === 0 || !week) {
         return '<div>No data available</div>';
@@ -191,7 +192,7 @@ export const generateStories2HTML = async (
             </span>
           </div>
           <h1 class="title"><span class="a">TOP ${typeLabel}</span></h1>
-          <div class="chartdate">${username ? `@${username}` : (dateRange || chartDate.toUpperCase())}</div>
+          <div class="chartdate">${dateRange || chartDate.toUpperCase()}</div>
         </div>
         <div class="cover">
           ${topImage ? `<img src="${topImage}" alt="Capa do ${typeLabel.toLowerCase()} número 1" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--fallback-text);">IMG</div>`}
@@ -206,7 +207,7 @@ export const generateStories2HTML = async (
             <div></div>
             <div></div>
             <div>${typeLabel}</div>
-            <div style="text-align: right">LAST</div>
+            <div style="text-align: right">${showPlays ? 'PLAYS' : 'LAST'}</div>
           </div>
   `;
 
@@ -236,6 +237,9 @@ export const generateStories2HTML = async (
         }
 
         const lastPosition = (() => {
+            if (showPlays) {
+                return row.plays ? row.plays.toLocaleString() : '—';
+            }
             if (deltaRank === 'NEW' || deltaRank === 'RE') return '—';
             if (typeof deltaRank === 'number') {
                 const prev = row.rank + deltaRank;
@@ -269,7 +273,7 @@ export const generateStories2HTML = async (
       </section>
 
       <footer class="footer">
-        <p>zerocharts.com.br • ${new Date().getFullYear()}</p>
+        <p>zerocharts.com.br • ${username ? `@${username}` : new Date().getFullYear()}</p>
       </footer>
     </main>
   `;

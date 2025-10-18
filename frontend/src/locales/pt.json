@@ -119,6 +119,8 @@
         "backgroundBlur": "Imagem",
         "backgroundSolid": "Cor sólida",
         "backgroundColor": "Cor de fundo",
+        "showColumn": "Mostrar coluna",
+        "lastPosition": "Última posição",
         "download": "Download",
         "copyChart": "Copiar o chart",
         "copyChartTitle": "Copiar chart como texto",
