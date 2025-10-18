@@ -48,6 +48,11 @@ export const generateStories2HTML = async (
         });
     };
 
+    const truncateText = (text: string, maxLength: number): string => {
+        if (!text || text.length <= maxLength) return text;
+        return text.substring(0, maxLength - 3) + '...';
+    };
+
     const typeLabel = (() => {
         if (chartType === 'artist') return 'ARTISTS';
         if (chartType === 'album') return 'ALBUMS';
@@ -131,7 +136,7 @@ export const generateStories2HTML = async (
       .header { padding: 84px 72px 36px 72px; display: grid; grid-template-columns: 1fr 380px 120px; gap: 48px; align-items: center; }
       .brandRow { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; opacity: 0.95; }
       .brandText { font-weight: 800; letter-spacing: 0.02em; }
-      .title { font-family: 'Poppins', 'DM Sans', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
+      .title { font-family: 'Poppins', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
       .title .a { display: block; font-size: 124px; font-weight: 900; letter-spacing: -0.01em; }
       .chartdate { font-size: 25px; margin-top: 18px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.9; color: var(--stories-text-color); }
 
@@ -139,20 +144,20 @@ export const generateStories2HTML = async (
       .cover img { width: 100%; height: 100%; object-fit: cover; }
 
       .table { margin: 24px 48px 0 48px; }
-      .thead, .row { display: grid; grid-template-columns: 100px 110px 70px 1fr 150px; align-items: center; }
+      .thead, .row { display: grid; grid-template-columns: 100px 110px 70px 500px 150px; align-items: center; }
       .thead { background: var(--stories-bg-overlay-strong); padding: 22px 28px; color: var(--stories-text-secondary); font-weight: 800; letter-spacing: 0.12em; }
       .row { padding: 16px 28px; position: relative; }
       .row + .row { border-top: 1px solid var(--stories-bg-overlay); }
 
       .rankCell { display: flex; align-items: center; }
-      .rank { height: 72px; width: 88px; border-radius: 18px; color: var(--stories-text-color); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', 'DM Sans', sans-serif; font-weight: 900; font-size: 42px; }
+      .rank { height: 72px; width: 88px; border-radius: 18px; color: var(--stories-text-color); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 42px; }
 
       .thumb { height: 84px; width: 84px; border-radius: 14px; background: var(--stories-rank-bg); overflow: hidden; justify-self: center; }
       .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-      .albumInfo { padding-left: 12px; }
-      .albumName { font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--stories-text-color); }
-      .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); }
+      .albumInfo { padding-left: 12px; min-width: 0; max-width: 500px; overflow: hidden; }
+      .albumName { width: 100%; overflow: hidden; font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
       .last { justify-self: end; font-size: 28px; font-weight: 800; opacity: 0.95; color: var(--stories-text-color); }
 
@@ -258,8 +263,8 @@ export const generateStories2HTML = async (
           <div class="trendIcon ${trendClass}">${trendIcon}</div>
         </div>
         <div class="albumInfo">
-          <div class="albumName">${escapeHtml(row.name)}</div>
-          ${row.artistName ? `<div class="albumArtist">${escapeHtml(row.artistName)}</div>` : ''}
+          <div class="albumName">${escapeHtml(truncateText(row.name, 30))}</div>
+          ${row.artistName ? `<div class="albumArtist">${escapeHtml(truncateText(row.artistName, 50))}</div>` : ''}
         </div>
         <div class="last">${lastPosition}</div>
       </div>
