@@ -112,6 +112,7 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats 
                             <Title
                                 order={2} // Mantém o order 2 para telas grandes
                                 c="#fff"
+                                fw={700}
                                 className={styles.responsiveTitle} // Adicione esta classe
                                 style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
                             >
@@ -141,6 +142,7 @@ export function SlideCard({ row, kind, chartType, clientId, clientSecret, stats 
                         <Title
                                 order={3} // Mantém o order 3 para telas grandes
                                 c="#fff"
+                                fw={700}
                                 className={styles.responsiveTitleRight} // Adicione esta classe
                                 style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
                             >

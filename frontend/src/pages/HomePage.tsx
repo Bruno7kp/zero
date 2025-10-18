@@ -93,7 +93,7 @@ const HomePage: React.FC = () => {
 
             {/* Seção Sobre o ZeroCharts */}
             <Container py="xl" my="xl">
-                <Title order={2} ta="center" mb="lg">
+                <Title order={2} fw={600} ta="center" mb="lg">
                     <ThemeIcon variant="light" color="blue" size="md" me="sm">
                         <IconChartBar style={{ width: rem(20), height: rem(20) }} />
                     </ThemeIcon>
@@ -109,7 +109,7 @@ const HomePage: React.FC = () => {
                         <ThemeIcon color="blue" size="xl" radius="xl">
                             <IconPlayerPlay style={{ width: rem(24), height: rem(24) }} />
                         </ThemeIcon>
-                        <Title order={4} mt="sm">
+                        <Title order={4} fw={600} mt="sm">
                             {t('home.about.feature1Title')}
                         </Title>
                         <Text size="sm" c="dimmed">
@@ -120,7 +120,7 @@ const HomePage: React.FC = () => {
                         <ThemeIcon color="red" size="xl" radius="xl">
                             <IconSettings style={{ width: rem(24), height: rem(24) }} />
                         </ThemeIcon>
-                        <Title order={4} mt="sm">
+                        <Title order={4} fw={600} mt="sm">
                             {t('home.about.feature2Title')}
                         </Title>
                         <Text size="sm" c="dimmed">
@@ -131,7 +131,7 @@ const HomePage: React.FC = () => {
                         <ThemeIcon color="green" size="xl" radius="xl">
                             <IconStar style={{ width: rem(24), height: rem(24) }} />
                         </ThemeIcon>
-                        <Title order={4} mt="sm">
+                        <Title order={4} fw={600} mt="sm">
                             {t('home.about.feature3Title')}
                         </Title>
                         <Text size="sm" c="dimmed">
@@ -165,11 +165,11 @@ const HomePage: React.FC = () => {
             {/* Seção Última Atualização */}
             <Box py="xl">
                 <Container>
-                    <Title order={3} ta="center" mb="lg">
+                    <Title order={3} fw={600} ta="center" mb="lg">
                         {t('home.latestUpdate.title')}
                     </Title>
                     <Card shadow="sm" padding="lg" radius="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-                        <Title order={4}>{latestUpdate.title}</Title>
+                        <Title order={4} fw={600}>{latestUpdate.title}</Title>
                         <Text size="sm" c="dimmed" mb="md">
                             {latestUpdate.date}
                         </Text>

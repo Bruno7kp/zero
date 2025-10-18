@@ -107,7 +107,7 @@ export const ChartWeekCardItem: React.FC<ChartWeekCardItemProps> = React.memo(({
             </Grid.Col>
             <Grid.Col span="auto">
                 <Box style={{ minWidth: 0 }}>
-                    <Text fw={700} size="sm" style={{ lineHeight: 1.3 }}>{name}</Text>
+                    <Text fw={600} size="sm" style={{ lineHeight: 1.3 }}>{name}</Text>
                     {artistName && (
                         <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>{artistName}</Text>
                     )}

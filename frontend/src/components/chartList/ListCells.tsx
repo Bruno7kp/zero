@@ -14,7 +14,7 @@ export const RankCellList: React.FC<{
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
 }> = ({ row, showDeltaBadge, badgeStylesRank, scaleSize }) => (
   <Flex direction="column" align="center" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
-    <Text fw={700} size={scaleSize('xl')} className={row.rank === 1 ? 'peak' : undefined}>{row.rank}</Text>
+    <Text fw={600} size={scaleSize('xl')} className={row.rank === 1 ? 'peak' : undefined}>{row.rank}</Text>
     {showDeltaBadge && (
       <DeltaBadge delta={row.deltaRank} cfg={badgeStylesRank} kind="rank" textSize="xs" columnContext contextView="list" />
     )}
@@ -64,7 +64,7 @@ export const PlaysCellList: React.FC<{
     : undefined;
   return (
     <Flex direction="column" align="center" mr="sm" style={{ minWidth: 72, maxWidth: 72, flex: '0 0 72px' }}>
-      <Text fw={700} size={scaleSize('xl')}>{formattedValue}</Text>
+      <Text fw={600} size={scaleSize('xl')}>{formattedValue}</Text>
       {showUnder && (
         <DeltaBadge
           delta={deltaValue}
@@ -108,7 +108,7 @@ export const CombinedPeakWeeksBlock: React.FC<{
   >
     <Text size={scaleSize('xs')} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>{t('charts.peak')}</Text>
     <Flex align="center" gap={6} style={{ justifySelf: 'start' }}>
-      <Text fw={700} size={scaleSize('xl')} className={displayPeak === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
+      <Text fw={600} size={scaleSize('xl')} className={displayPeak === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
         {displayPeak != null ? displayPeak : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
       </Text>
       {showPeakCount && displayPeak === 1 && renderedCountAtOne != null && (
@@ -116,7 +116,7 @@ export const CombinedPeakWeeksBlock: React.FC<{
       )}
     </Flex>
     <Text size={scaleSize('xs')} tt="uppercase" style={{ lineHeight: 1, letterSpacing: 0.5, textAlign: 'right' }}>{t('charts.weeks')}</Text>
-    <Text fw={700} size={scaleSize('sm')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
+    <Text fw={600} size={scaleSize('sm')} style={{ transition: 'color 120ms ease', textAlign: 'left', lineHeight: 1.2 }}>
       {displayWeeks != null ? displayWeeks : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
     </Text>
   </Box>
@@ -130,7 +130,7 @@ export const PeakCellList: React.FC<{
   rank?: number;
 }> = ({ display, renderedCountAtOne, showPeakCount, scaleSize, rank }) => (
   <Flex direction="column" align="center" mr="sm" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
-    <Text fw={700} size={scaleSize('xl')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
+    <Text fw={600} size={scaleSize('xl')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
       {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
     </Text>
     {showPeakCount && display === 1 && renderedCountAtOne != null ? (
@@ -147,7 +147,7 @@ export const WeeksCellList: React.FC<{
   scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
 }> = ({ display, rank, scaleSize }) => (
   <Flex direction="column" align="center" mr="sm" style={{ minWidth: 48, maxWidth: 48, flex: '0 0 48px' }}>
-    <Text fw={700} size={scaleSize('xl')} style={{ transition: 'color 120ms ease' }}>
+    <Text fw={600} size={scaleSize('xl')} style={{ transition: 'color 120ms ease' }}>
       {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
     </Text>
     {rank === 1 && (
@@ -251,6 +251,6 @@ export const CertCellList: React.FC<{
           size={24}
           deferMs={450}
         />
-      : <Text fw={700} style={{ fontSize }}>{loading ? '…' : '-'}</Text>)}
+      : <Text fw={600} style={{ fontSize }}>{loading ? '…' : '-'}</Text>)}
   </Flex>
 );

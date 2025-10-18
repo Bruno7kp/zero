@@ -30,7 +30,7 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
         title: 'Rank',
         width: 80,
         textAlign: 'center',
-        render: ({ rank }) => <Text fw={700}>{rank}</Text>,
+        render: ({ rank }) => <Text fw={600}>{rank}</Text>,
       },
       ...(
         showVariation
@@ -84,7 +84,7 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
               </Flex>
             )}
             <Flex direction="column" justify="center" align="flex-start">
-              <Text fw={700} style={{ fontFamily: 'Poppins' }}>{item.name}</Text>
+              <Text fw={600}>{item.name}</Text>
               {artistMode === 'under' && chartType !== 'artist' && !!item.artist && (
                 <Text size="sm">{item.artist}</Text>
               )}

@@ -61,7 +61,7 @@ export const NameCell: React.FC<NameCellProps> = ({
         </Flex>
       )}
       <Flex direction="column" justify="center" align="flex-start">
-        <Text fw={700} size={scaleSize('md')} style={{ fontFamily: 'Poppins' }}>{row.name}</Text>
+        <Text fw={600} size={scaleSize('md')}>{row.name}</Text>
         {artistMode === 'under' && row.artistName && <Text size={scaleSize('sm')}>{row.artistName}</Text>}
       </Flex>
     </Flex>

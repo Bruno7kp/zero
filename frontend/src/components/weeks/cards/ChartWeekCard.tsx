@@ -41,7 +41,7 @@ export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, 
   return (
     <Card shadow="md" p="md" mb="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
       <Group>
-        <Text fw={700} size="md">{t('charts.weekNumber')}: {weekNumber}</Text>
+        <Text fw={600} size="md">{t('charts.weekNumber')}: {weekNumber}</Text>
         <Text size="xs" c="dimmed">{formatWeekDate(week)}</Text>
         {hasAllKill && <AllKillBadge />}
       </Group>

@@ -159,7 +159,7 @@ export const CertificationBadge: React.FC<Props> = ({ chart, chartType, totals, 
                     <MetalVinylDisc level={(level as any) || 'none'} size={50} />
                 </ThemeIcon>
                 <Stack gap={2} style={{ flex: 1 }}>
-                    <Text fw={700} size="sm" tt="uppercase">
+                    <Text fw={600} size="sm" tt="uppercase">
                         {level !== 'none' ? `${multiplier > 1 ? multiplier + 'x ' : ''}${t('values.' + level)}` : t('charts.stats.noCert')}
                     </Text>
                     <Text size="xs">{t('charts.stats.currentValue', { value: formatNumber(Math.floor(totalFormula)), unit: formulaName })}</Text>

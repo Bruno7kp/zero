@@ -181,7 +181,7 @@ export const GridCard: React.FC<GridCardProps> = ({
         )}
       </Box>
       <Box px="sm" py={8} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 64 }}>
-        <Text fw={700} size={droppedScaleSize('md')} lineClamp={2} style={{ fontFamily: 'Poppins', width: '100%', textAlign: 'center' }}>{row.name}</Text>
+        <Text fw={600} size={droppedScaleSize('md')} lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
         {row.artistName && <Text size={droppedScaleSize('sm')} c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
       </Box>
       {(showPlays || showPeak || showTotalWeeks) && (
@@ -197,7 +197,7 @@ export const GridCard: React.FC<GridCardProps> = ({
                   ? (hasStats ? Math.max(1, (liveCount as number) ?? 1) : 1)
                   : null;
                 return (
-                  <Text fw={700} size={droppedScaleSize('sm')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
+                  <Text fw={600} size={droppedScaleSize('sm')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                     {showPeakCount && display === 1 && renderedCountAtOne != null && (
                       <span
@@ -218,7 +218,7 @@ export const GridCard: React.FC<GridCardProps> = ({
           {showPlays && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
               <Text size={droppedScaleSize('xs')} tt="capitalize" c="dimmed">{showFormulaInsteadOfPlays && formulaName ? formulaName : 'Plays'}</Text>
-              <Text fw={700} size={droppedScaleSize('sm')}>
+              <Text fw={600} size={droppedScaleSize('sm')}>
                 {formatNumber((showFormulaInsteadOfPlays && formulaValue != null ? Math.floor(formulaValue) : row.plays) as any)}
               </Text>
             </Box>
@@ -229,7 +229,7 @@ export const GridCard: React.FC<GridCardProps> = ({
               {(() => {
                 const display = stats?.totals?.withinCutoff ?? undefined;
                 return (
-                  <Text fw={700} size={droppedScaleSize('sm')} style={{ transition: 'color 120ms ease' }}>
+                  <Text fw={600} size={droppedScaleSize('sm')} style={{ transition: 'color 120ms ease' }}>
                     {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
                   </Text>
                 );

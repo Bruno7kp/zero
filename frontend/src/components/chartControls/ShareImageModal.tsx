@@ -39,7 +39,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [selectedStories2Top, setSelectedStories2Top] = useState<5 | 10>(10);
   const [selectedStories2BackgroundType, setSelectedStories2BackgroundType] = useState<'blur' | 'solid'>('blur');
   const [selectedStories2BackgroundColor, setSelectedStories2BackgroundColor] = useState<string>('#1a1a1a');
-  const [selectedStories2ShowPlays, setSelectedStories2ShowPlays] = useState<boolean>(false);
+  const [selectedStories2ShowPlays, setSelectedStories2ShowPlays] = useState<'last' | 'plays' | 'peak' | 'weeks'>('last');
 
   // Estados para a imagem de prévia e o carregamento
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 
   // Função helper para gerar o tipo atual da imagem
   const getCurrentTypeKey = useCallback(() => {
-    return `${selectedType}-${selectedType === 'grid' ? selectedGridSize : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays ? 'plays' : 'last'}`) : selectedType === 'text' ? 'text' : 'completo'}`;
+    return `${selectedType}-${selectedType === 'grid' ? selectedGridSize : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays}`) : selectedType === 'text' ? 'text' : 'completo'}`;
   }, [selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor, selectedStories2ShowPlays]);
 
   // Função que gera a imagem em alta resolução em background
@@ -62,12 +62,18 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       return;
     }
 
-    // Enriquecer data com imagens
+    // Enriquecer data com imagens e estatísticas
     const enrichedData = await Promise.all(chartData.map(async (row) => {
       const cached = await spotifyImagesDb.images.get(row.entityId);
       const imageUrl = cached?.imageUrl || null;
       const albumImage = imageUrl; // para compatibilidade
-      return { ...row, imageUrl, albumImage };
+      
+      // Adicionar informações de estatísticas
+      const stats = statsMap?.[row.entityId] || {};
+      const peak = stats?.peak?.position ?? null;
+      const weeks = stats?.totals?.withinCutoff ?? null;
+      
+      return { ...row, imageUrl, albumImage, peak, weeks };
     }));
 
     let htmlForCanvas: string;

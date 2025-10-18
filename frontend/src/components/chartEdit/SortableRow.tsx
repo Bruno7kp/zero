@@ -31,11 +31,11 @@ export const SortableRow: React.FC<SortableRowProps> = ({ r, cutoff, loading, ad
   return (
     <Table.Tr key={r.entityId} ref={setNodeRef} style={style}>
       <Table.Td style={{ textAlign: 'center' }}>
-        <Text fw={700} size="sm" c={r.rank === 1 ? 'blue' : undefined}>{r.rank}</Text>
+        <Text fw={600} size="sm" c={r.rank === 1 ? 'blue' : undefined}>{r.rank}</Text>
       </Table.Td>
       <Table.Td>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Text fw={700} size="sm">{r.name}</Text>
+          <Text fw={600} size="sm">{r.name}</Text>
           {r.artistName && <Text size="xs" c="dimmed">{r.artistName}</Text>}
         </div>
       </Table.Td>

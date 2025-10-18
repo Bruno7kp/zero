@@ -223,7 +223,7 @@ export const CertCell: React.FC<{
         deferMs={300}
       />
     ) : (
-      <Text fw={700} size={scaleSize('xl')}>-</Text>
+      <Text fw={600} size={scaleSize('xl')}>-</Text>
     )}
   </Flex>
 );

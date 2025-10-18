@@ -130,10 +130,10 @@ interface StatBoxProps {
 const StatBox: React.FC<StatBoxProps> = ({ label, value, sub, color }) => (
     <Grid.Col span={{ base: 4, sm: 2 }}>
         <Card p="sm" withBorder style={{ textAlign: 'center' }}>
-            <Text fw={700} tt="uppercase" size="xs" ta="center">{label}</Text>
+            <Text fw={600} tt="uppercase" size="xs" ta="center">{label}</Text>
             <Divider my="xs" variant="dashed" size="sm" />
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 4 }}>
-                <Text fw={700} size="xl" c={color || 'blue'} style={{ lineHeight: 1 }}>{formatNumber(value)}</Text>
+                <Text fw={600} size="xl" c={color || 'blue'} style={{ lineHeight: 1 }}>{formatNumber(value)}</Text>
                 {sub && <Text size="xs" c="dimmed" style={{ lineHeight: 1 }}>{sub}</Text>}
             </div>
         </Card>

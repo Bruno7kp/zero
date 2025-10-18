@@ -4,7 +4,7 @@ import { forest, ruby, cobalt, honey, cherry, lazuli, grass, bee, darkblue, deni
 // Base theme shared across all modes
 const baseTheme = createTheme({
   defaultRadius: 'lg',
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'Inter, Greycliff CF, sans-serif',
   colors: {
     forest,
     ruby,

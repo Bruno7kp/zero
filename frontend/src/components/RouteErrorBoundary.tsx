@@ -31,7 +31,7 @@ export class RouteErrorBoundary extends React.Component<React.PropsWithChildren,
     if (this.state.hasError) {
       return (
         <Stack p="lg">
-          <Title order={3}>
+          <Title order={3} fw={600}>
             <IconAlertTriangle style={{ verticalAlign: 'middle', marginRight: 8 }} /> Something went wrong
           </Title>
           <Alert color="red" variant="light" title="Runtime error" icon={<IconAlertTriangle size={18} />}> 

@@ -23,7 +23,7 @@ export const LibraryStats: React.FC<LibraryStatsProps> = ({ type, total, number1
                     <Text size="sm" c="dimmed">
                         {t(`library.total${type.charAt(0).toUpperCase() + type.slice(1)}s`)}
                     </Text>
-                    <Text size="xl" fw={700}>
+                    <Text size="xl" fw={600}>
                         {total.toLocaleString()}
                     </Text>
                 </Stack>
@@ -32,7 +32,7 @@ export const LibraryStats: React.FC<LibraryStatsProps> = ({ type, total, number1
                     <Text size="sm" c="dimmed">
                         {t('library.number1s')}
                     </Text>
-                    <Text size="xl" fw={700}>
+                    <Text size="xl" fw={600}>
                         {number1s.toLocaleString()}
                     </Text>
                 </Stack>
@@ -41,7 +41,7 @@ export const LibraryStats: React.FC<LibraryStatsProps> = ({ type, total, number1
                     <Text size="sm" c="dimmed">
                         {t('library.inChart')}
                     </Text>
-                    <Text size="xl" fw={700}>
+                    <Text size="xl" fw={600}>
                         {inChart.toLocaleString()}
                     </Text>
                 </Stack>

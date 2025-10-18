@@ -6,7 +6,7 @@ type Props = { title: string };
 
 const LiveTitle: React.FC<Props> = ({ title }) => (
   <Flex justify="center" align="center" gap="sm">
-    <Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
+    <Title order={2} fw={600} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
       <ThemeIcon variant="light" color="red" size="md">
         <IconFlame style={{ width: rem(20), height: rem(20) }} />
       </ThemeIcon>

@@ -237,7 +237,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             <Accordion.Item value="layout">
                                 <Accordion.Control>
                                     <Flex direction="column" gap={2}>
-                                        <Flex align="center" gap={8}><IconLayoutGrid size={16} /><Text fw={700}>{t('charts.general')}</Text></Flex>
+                                        <Flex align="center" gap={8}><IconLayoutGrid size={16} /><Text fw={600}>{t('charts.general')}</Text></Flex>
                                         <Text size="xs" c="dimmed">{t('charts.drawer.generalDescription')}</Text>
                                     </Flex>
                                 </Accordion.Control>
@@ -264,7 +264,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             <Accordion.Item value="columns">
                                 <Accordion.Control>
                                     <Flex direction="column" gap={2}>
-                                        <Flex align="center" gap={8}><IconColumns size={16} /><Text fw={700}>{t('charts.columns')}</Text></Flex>
+                                        <Flex align="center" gap={8}><IconColumns size={16} /><Text fw={600}>{t('charts.columns')}</Text></Flex>
                                         <Text size="xs" c="dimmed">{t('charts.drawer.columnsDescription')}</Text>
                                     </Flex>
                                 </Accordion.Control>
@@ -295,7 +295,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             <Accordion.Item value="variations">
                                 <Accordion.Control>
                                     <Flex direction="column" gap={2}>
-                                        <Flex align="center" gap={8}><IconArrowsUpDown size={16} /><Text fw={700}>{t('charts.variations')}</Text></Flex>
+                                        <Flex align="center" gap={8}><IconArrowsUpDown size={16} /><Text fw={600}>{t('charts.variations')}</Text></Flex>
                                         <Text size="xs" c="dimmed">{t('charts.drawer.variationDescription')}</Text>
                                     </Flex>
                                 </Accordion.Control>
@@ -315,7 +315,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
                             <Accordion.Item value="badges">
                                 <Accordion.Control>
                                     <Flex direction="column" gap={2}>
-                                        <Flex align="center" gap={8}><IconAdjustments size={16} /><Text fw={700}>{t('charts.badgeStyles.title')}</Text></Flex>
+                                        <Flex align="center" gap={8}><IconAdjustments size={16} /><Text fw={600}>{t('charts.badgeStyles.title')}</Text></Flex>
                                         <Text size="xs" c="dimmed">{t('charts.drawer.badgesDescription')}</Text>
                                     </Flex>
                                 </Accordion.Control>

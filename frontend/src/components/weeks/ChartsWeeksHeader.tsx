@@ -9,7 +9,7 @@ interface ChartsWeeksHeaderProps {
 export const ChartsWeeksHeader: React.FC<ChartsWeeksHeaderProps> = ({ title }) => {
 	return (
 		<Flex justify="center" align="center" gap="sm">
-			<Title order={2} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
+			<Title order={2} fw={600} style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
 				<ThemeIcon variant="light" size="md">
 					<IconListNumbers style={{ width: rem(20), height: rem(20) }} />
 				</ThemeIcon>

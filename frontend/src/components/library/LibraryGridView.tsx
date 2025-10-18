@@ -170,7 +170,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
                                 justifyContent: 'center',
                             }}
                         >
-                            <Text c="#fff" fw={700} size="sm" pt="sm" style={{ fontFamily: 'Poppins', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                            <Text c="#fff" fw={600} size="sm" pt="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
                                 {item.name}
                             </Text>
                             {type !== 'artist' && item.artistName && (
@@ -186,12 +186,15 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
             {showPosition && (
                 <Text
                     style={{
-                        fontFamily: 'DM Sans, system-ui, sans-serif',
+                        fontFamily: 'Inter, system-ui, sans-serif',
                         position: 'absolute',
-                        bottom: position < 10 ? 5 : position < 100 ? 10 : position < 1000 ? 15 : 20,
+                        bottom: (() => {
+                            const baseBottom = position < 10 ? 5 : position < 100 ? 10 : position < 1000 ? 15 : 20;
+                            return showPlays ? baseBottom : baseBottom - 30;
+                        })(),
                         left: position < 10 ? -15 : position < 100 ? -12 : position < 1000 ? -10 : -8,
                         zIndex: 3,
-                        fontSize: position < 10 ? '45px' : position < 100 ? '40px' : position < 1000 ? '35px' : '20px',
+                        fontSize: position < 10 ? '45px' : position < 100 ? '35px' : position < 1000 ? '30px' : '20px',
                         fontWeight: 500,
                         color: '#fff',
                         textShadow: '2px 2px 4px rgba(0,0,0,0.8)',

@@ -18,8 +18,8 @@ interface ShareOptionsProps {
   setSelectedStories2BackgroundType: (type: 'blur' | 'solid') => void;
   selectedStories2BackgroundColor: string;
   setSelectedStories2BackgroundColor: (color: string) => void;
-  selectedStories2ShowPlays: boolean;
-  setSelectedStories2ShowPlays: (show: boolean) => void;
+  selectedStories2ShowPlays: 'last' | 'plays' | 'peak' | 'weeks';
+  setSelectedStories2ShowPlays: (show: 'last' | 'plays' | 'peak' | 'weeks') => void;
   chartData: any[];
   previewImageUrl: string | null;
   isLoading: boolean;
@@ -137,9 +137,11 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
           )}
           
           <Text size="sm" fw={500} mt="sm">{t('charts.share.showColumn', 'Show Column')}</Text>
-          <Radio.Group value={selectedStories2ShowPlays ? 'plays' : 'last'} onChange={(value) => setSelectedStories2ShowPlays(value === 'plays')}>
+          <Radio.Group value={selectedStories2ShowPlays} onChange={(value) => setSelectedStories2ShowPlays(value as 'last' | 'plays' | 'peak' | 'weeks')}>
             <Radio value="last" label={t('charts.share.lastPosition', 'Last Position')} />
             <Radio value="plays" label={t('charts.share.plays', 'Plays')} />
+            <Radio value="peak" label={t('charts.share.peak', 'Peak')} />
+            <Radio value="weeks" label={t('charts.share.weeks', 'Weeks')} />
           </Radio.Group>
         </div>
       )}

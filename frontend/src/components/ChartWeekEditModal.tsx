@@ -276,7 +276,7 @@ export const ChartWeekEditModal: React.FC<Props> = ({ opened, onClose, chart, we
     }
 
     return (
-        <Modal opened={opened} onClose={onClose} title={<Group gap="xs"><IconDownload size={16} /><Text fw={700} size="sm">{t('chartEdit.title', 'Editar semana do chart')}</Text></Group>} size="90%" centered>
+        <Modal opened={opened} onClose={onClose} title={<Group gap="xs"><IconDownload size={16} /><Text fw={600} size="sm">{t('chartEdit.title', 'Editar semana do chart')}</Text></Group>} size="90%" centered>
             <EditHeader
                 type={type}
                 week={week}

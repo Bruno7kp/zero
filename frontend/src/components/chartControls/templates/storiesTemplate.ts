@@ -48,12 +48,12 @@ export const generateStoriesHTML = (
         overflow: hidden; 
       }
 
-      header, .board, footer {
+      .poster header, .board, footer {
         grid-column: 1 / -1; 
         min-width: 0; 
       }
 
-      header{
+      .poster header{
         display: grid;
         grid-template-columns:1fr 280px; 
         gap:20px;

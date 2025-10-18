@@ -8,7 +8,7 @@ export const generateStories2HTML = async (
     backgroundType: 'blur' | 'solid' = 'blur',
     backgroundColor: string = '#1a1a1a',
     username?: string,
-    showPlays: boolean = false
+    showColumn: 'last' | 'plays' | 'peak' | 'weeks' = 'last'
 ): Promise<string> => {
     if (!chartData || chartData.length === 0 || !week) {
         return '<div>No data available</div>';
@@ -105,26 +105,17 @@ export const generateStories2HTML = async (
 
     let html = `
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { height: 100%; }
-      
       :root {
-        --text-color: ${isLightBackground ? '#000000' : '#ffffff'};
-        --text-secondary: ${isLightBackground ? '#333333' : '#d5d5e0'};
-        --text-muted: ${isLightBackground ? '#666666' : 'rgba(255,255,255,0.6)'};
-        --bg-overlay: ${isLightBackground ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};
-        --bg-overlay-strong: ${isLightBackground ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)'};
-        --border-color: ${isLightBackground ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)'};
-        --shadow-color: ${isLightBackground ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.45)'};
-        --rank-bg: ${isLightBackground ? '#ffffff' : '#241b38'};
-        --fallback-bg: ${isLightBackground ? '#cccccc' : '#333333'};
-        --fallback-text: ${isLightBackground ? '#000000' : '#ffffff'};
-      }
-      
-      body { 
-        background: #111; 
-        color: var(--text-color); 
-        font-family: 'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; 
+        --stories-text-color: ${isLightBackground ? '#000000' : '#ffffff'};
+        --stories-text-secondary: ${isLightBackground ? '#333333' : '#d5d5e0'};
+        --stories-text-muted: ${isLightBackground ? '#666666' : 'rgba(255,255,255,0.6)'};
+        --stories-bg-overlay: ${isLightBackground ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};
+        --stories-bg-overlay-strong: ${isLightBackground ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)'};
+        --stories-border-color: ${isLightBackground ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)'};
+        --stories-shadow-color: ${isLightBackground ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.45)'};
+        --stories-rank-bg: ${isLightBackground ? '#ffffff' : '#241b38'};
+        --stories-fallback-bg: ${isLightBackground ? '#cccccc' : '#333333'};
+        --stories-fallback-text: ${isLightBackground ? '#000000' : '#ffffff'};
       }
 
       .story {
@@ -140,44 +131,44 @@ export const generateStories2HTML = async (
       .header { padding: 84px 72px 36px 72px; display: grid; grid-template-columns: 1fr 380px 120px; gap: 48px; align-items: center; }
       .brandRow { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; opacity: 0.95; }
       .brandText { font-weight: 800; letter-spacing: 0.02em; }
-      .title { font-family: 'Poppins', 'DM Sans', sans-serif; line-height: 0.92; color: var(--text-color); }
+      .title { font-family: 'Poppins', 'DM Sans', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
       .title .a { display: block; font-size: 124px; font-weight: 900; letter-spacing: -0.01em; }
-      .chartdate { font-size: 25px; margin-top: 18px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.9; color: var(--text-color); }
+      .chartdate { font-size: 25px; margin-top: 18px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.9; color: var(--stories-text-color); }
 
-      .cover { width: 380px; aspect-ratio: 1/1; border-radius: 28px; overflow: hidden; position: relative; box-shadow: 0 28px 90px var(--shadow-color); }
+      .cover { width: 380px; aspect-ratio: 1/1; border-radius: 28px; overflow: hidden; position: relative; box-shadow: 0 28px 90px var(--stories-shadow-color); }
       .cover img { width: 100%; height: 100%; object-fit: cover; }
 
       .table { margin: 24px 48px 0 48px; }
       .thead, .row { display: grid; grid-template-columns: 100px 110px 70px 1fr 150px; align-items: center; }
-      .thead { background: var(--bg-overlay-strong); padding: 22px 28px; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.12em; }
+      .thead { background: var(--stories-bg-overlay-strong); padding: 22px 28px; color: var(--stories-text-secondary); font-weight: 800; letter-spacing: 0.12em; }
       .row { padding: 16px 28px; position: relative; }
-      .row + .row { border-top: 1px solid var(--bg-overlay); }
+      .row + .row { border-top: 1px solid var(--stories-bg-overlay); }
 
       .rankCell { display: flex; align-items: center; }
-      .rank { height: 72px; width: 88px; border-radius: 18px; color: var(--text-color); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', 'DM Sans', sans-serif; font-weight: 900; font-size: 42px; }
+      .rank { height: 72px; width: 88px; border-radius: 18px; color: var(--stories-text-color); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', 'DM Sans', sans-serif; font-weight: 900; font-size: 42px; }
 
-      .thumb { height: 84px; width: 84px; border-radius: 14px; background: var(--rank-bg); overflow: hidden; justify-self: center; }
+      .thumb { height: 84px; width: 84px; border-radius: 14px; background: var(--stories-rank-bg); overflow: hidden; justify-self: center; }
       .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
       .albumInfo { padding-left: 12px; }
-      .albumName { font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--text-color); }
-      .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--text-color); }
+      .albumName { font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--stories-text-color); }
+      .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); }
 
-      .last { justify-self: end; font-size: 28px; font-weight: 800; opacity: 0.95; color: var(--text-color); }
+      .last { justify-self: end; font-size: 28px; font-weight: 800; opacity: 0.95; color: var(--stories-text-color); }
 
-      .listWrap { background: var(--bg-overlay); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 28px; overflow: hidden;  }
-      .row.top { background: var(--bg-overlay-strong); }
+      .listWrap { background: var(--stories-bg-overlay); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--stories-border-color); border-radius: 28px; overflow: hidden;  }
+      .row.top { background: var(--stories-bg-overlay-strong); }
 
       .trendCell { display: flex; justify-content: center; align-items: center; }
       .trendIcon { width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; }
       .trendIcon.trend-up { background-color: #1ed760; }
       .trendIcon.trend-down { background-color: #f43f5e; }
-      .trendIcon.trend-neutral { background-color: var(--bg-overlay); }
+      .trendIcon.trend-neutral { background-color: var(--stories-bg-overlay); }
       .trendIcon.trend-debut { background-color: #3f86f4; }
       .trendIcon.trend-reentry { background-color: #f4b63f; }
       .feather { width: 32px; height: 32px; stroke-width: 2; }
 
-      .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; color: var(--text-muted); }
+      .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; color: var(--stories-text-muted); }
       .brandText img { width: 50%; }
     </style>
   `;
@@ -195,7 +186,7 @@ export const generateStories2HTML = async (
           <div class="chartdate">${dateRange || chartDate.toUpperCase()}</div>
         </div>
         <div class="cover">
-          ${topImage ? `<img src="${topImage}" alt="Capa do ${typeLabel.toLowerCase()} número 1" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--fallback-text);">IMG</div>`}
+          ${topImage ? `<img src="${topImage}" alt="Capa do ${typeLabel.toLowerCase()} número 1" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--stories-fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--stories-fallback-text);">IMG</div>`}
         </div>
         <div></div>
       </header>
@@ -207,7 +198,7 @@ export const generateStories2HTML = async (
             <div></div>
             <div></div>
             <div>${typeLabel}</div>
-            <div style="text-align: right">${showPlays ? 'PLAYS' : 'LAST'}</div>
+            <div style="text-align: right">${showColumn === 'plays' ? 'PLAYS' : showColumn === 'peak' ? 'PEAK' : showColumn === 'weeks' ? 'WEEKS' : 'LAST'}</div>
           </div>
   `;
 
@@ -237,15 +228,22 @@ export const generateStories2HTML = async (
         }
 
         const lastPosition = (() => {
-            if (showPlays) {
+            if (showColumn === 'plays') {
                 return row.plays ? row.plays.toLocaleString() : '—';
+            } else if (showColumn === 'peak') {
+                // Peak position - assuming it's available in row.peak or similar
+                return row.peak ? `${row.peak}` : '—';
+            } else if (showColumn === 'weeks') {
+                // Weeks on chart - assuming it's available in row.weeks or similar
+                return row.weeks ? row.weeks.toString() : '—';
+            } else { // showColumn === 'last'
+                if (deltaRank === 'NEW' || deltaRank === 'RE') return '—';
+                if (typeof deltaRank === 'number') {
+                    const prev = row.rank + deltaRank;
+                    return prev > 0 ? prev.toString() : '—';
+                }
+                return '—';
             }
-            if (deltaRank === 'NEW' || deltaRank === 'RE') return '—';
-            if (typeof deltaRank === 'number') {
-                const prev = row.rank + deltaRank;
-                return prev > 0 ? prev.toString() : '—';
-            }
-            return '—';
         })();
 
         const rowClass = index === 0 ? 'row top' : 'row';
@@ -254,7 +252,7 @@ export const generateStories2HTML = async (
       <div class="${rowClass}">
         <div class="rankCell"><div class="rank">${row.rank}</div></div>
         <div class="thumb">
-          ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--fallback-text);font-size:12px;">IMG</div>`}
+          ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--stories-fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--stories-fallback-text);font-size:12px;">IMG</div>`}
         </div>
         <div class="trendCell">
           <div class="trendIcon ${trendClass}">${trendIcon}</div>

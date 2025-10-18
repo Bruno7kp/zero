@@ -112,7 +112,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                     </Badge>
                                 </Popover.Target>
                                 <Popover.Dropdown style={{ minWidth: 140, textAlign: 'center' }}>
-                                    <Text size="xs" fw={700}>{t('charts.stats.outOfChart', { n: item.count })}</Text>
+                                    <Text size="xs" fw={600}>{t('charts.stats.outOfChart', { n: item.count })}</Text>
                                 </Popover.Dropdown>
                             </Popover>
                         );
@@ -149,12 +149,12 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                                         className={badgeClass}
                                         data-week={point.week}
                                     >
-                                        <Text size="xs" fw={700}>{point.position ?? '-'}</Text>
+                                        <Text size="xs" fw={600}>{point.position ?? '-'}</Text>
                                     </Badge>
                                 </Popover.Target>
                                 <Popover.Dropdown style={{ minWidth: 150, textAlign: 'center' }}>
                                     <Stack gap={4} align="center">
-                                        <Text size="xs" fw={700}>{t('charts.stats.week', { n: run.findIndex(r => r.week === point.week) + 1 })}</Text>
+                                        <Text size="xs" fw={600}>{t('charts.stats.week', { n: run.findIndex(r => r.week === point.week) + 1 })}</Text>
                                         <Text size="10px" c="dimmed">{dayjs(point.week).format('DD/MM/YYYY')} - {dayjs(point.week).add(6, 'day').format('DD/MM/YYYY')}</Text>
                                         <Text size="10px">{point.plays} {t('charts.stats.playsLabel')}</Text>
                                         <Button size="compact-xs" variant="light" onClick={handleNavigate}>

@@ -114,7 +114,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpen
                             justifyContent: 'center',
                         }}
                     >
-                        <Text c="#fff" fw={700} size="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                        <Text c="#fff" fw={600} size="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
                             {item.name}
                         </Text>
                     </Box>
@@ -241,7 +241,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({ weeksD
                                 <Flex key={weekData.week} direction="column" gap={8}>
                                     <Flex align="center" justify="center" gap={8} wrap="wrap">
 										<Tooltip label={dateRange} withArrow>
-                                        	<Text fw={700} size="lg">{t('charts.weekNumber')}: {weekData.weekNumber}</Text>
+                                        	<Text fw={600} size="lg">{t('charts.weekNumber')}: {weekData.weekNumber}</Text>
 										</Tooltip>
                                         {(typeFilter.length === 3) && hasAllKill && (
                                             <AllKillBadge />
