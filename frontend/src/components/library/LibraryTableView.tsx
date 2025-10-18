@@ -231,9 +231,10 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                         />
                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: 300, overflow: 'hidden' }}>
                             <Text
-                                fw={600}
+                                fw={700}
                                 size="sm"
                                 style={{
+                                    fontFamily: 'Poppins',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'

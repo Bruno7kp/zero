@@ -141,7 +141,7 @@ export const ChartWeekListRow: React.FC<{
                     />
                   )}
                   <Flex direction="column" align="flex-start" ml="sm" style={{ justifyContent: 'center', height: '100%', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <Text fw={700} size={effectiveScaleSize('lg')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.name}</Text>
+                    <Text fw={700} size={effectiveScaleSize('lg')} style={{ fontFamily: 'Poppins', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.name}</Text>
                     {row.artistName && <Text size={effectiveScaleSize('md')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>{row.artistName}</Text>}
                   </Flex>
                 </Flex>
