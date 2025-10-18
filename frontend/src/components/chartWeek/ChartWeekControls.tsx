@@ -132,6 +132,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
             t={t as any}
             chartData={chartData}
             chartName={chartName}
+            lastfmUsername={chart?.lastfm_username}
             week={week}
             weekNumber={weekNum}
             chartType={type as 'artist' | 'album' | 'track'}
