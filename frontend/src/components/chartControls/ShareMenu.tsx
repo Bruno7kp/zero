@@ -19,11 +19,12 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, l
 
   return (
     <>
-      <ActionIcon 
-        variant="subtle" 
-        aria-label={t('charts.share.title', 'Share')} 
-        ml={0} 
-        my="xs" 
+      <ActionIcon
+        variant="subtle"
+        aria-label={t('charts.share.title', 'Share')}
+        ml={0}
+        my="xs"
+        me={{ base: 'sm', sm: 0 }}
         disabled={disabled}
         onClick={() => setShareModalOpened(true)}
       >

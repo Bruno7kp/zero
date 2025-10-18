@@ -158,31 +158,6 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     <Modal opened={opened} onClose={onClose} title={t('charts.share.shareChartTitle', 'Compartilhar chart')} fullScreen centered>
       <Box>
         <Grid>
-          <Grid.Col span={{ base: 12, md: 8 }}>
-            <Text size="sm" c="dimmed" mb="md">{t('charts.share.preview', 'Preview')}</Text>
-            <Center style={{ border: '1px solid rgba(125,125,125,0.3)', width: '100%', height: '90vh', padding: '10px' }}>
-              {selectedType === 'text' ? (
-                <Textarea value={generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)} readOnly rows={22} styles={{input: {minWidth: '500px', fontFamily: 'monospace', fontSize: '12px'}}} />
-              ) : (
-                <>
-                  {isLoading && <Loader />}
-                  {!isLoading && previewImageUrl && currentImageType === getCurrentTypeKey() && (
-                    <img
-                      src={previewImageUrl}
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        objectFit: 'contain',
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                      }}
-                      alt="Chart Preview"
-                    />
-                  )}
-                  {!isLoading && (!previewImageUrl || currentImageType !== getCurrentTypeKey()) && <Text>Não foi possível gerar a prévia.</Text>}
-                </>
-              )}
-            </Center>
-          </Grid.Col>
           <Grid.Col span={{ base: 12, md: 4 }}>
             <ShareOptions
               t={t}
@@ -210,6 +185,31 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               weekNumber={weekNumber}
               chartType={chartType}
             />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <Text size="sm" c="dimmed" mb="md">{t('charts.share.preview', 'Preview')}</Text>
+            <Center style={{ border: '1px solid rgba(125,125,125,0.3)', width: '100%', height: '90vh', padding: '10px' }}>
+              {selectedType === 'text' ? (
+                <Textarea value={generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)} readOnly rows={22} styles={{input: {minWidth: '500px', fontFamily: 'monospace', fontSize: '12px'}}} />
+              ) : (
+                <>
+                  {isLoading && <Loader />}
+                  {!isLoading && previewImageUrl && currentImageType === getCurrentTypeKey() && (
+                    <img
+                      src={previewImageUrl}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                      }}
+                      alt="Chart Preview"
+                    />
+                  )}
+                  {!isLoading && (!previewImageUrl || currentImageType !== getCurrentTypeKey()) && <Text>Não foi possível gerar a prévia.</Text>}
+                </>
+              )}
+            </Center>
           </Grid.Col>
         </Grid>
       </Box>
