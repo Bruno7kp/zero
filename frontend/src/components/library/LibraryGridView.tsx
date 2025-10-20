@@ -163,7 +163,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
                                 right: 0,
                                 bottom: 0,
                                 padding: '8px 10px',
-                                background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%)',
+                                background: themeMode === 'light' ? 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%)' : 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
@@ -196,8 +196,8 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
                         zIndex: 3,
                         fontSize: position < 10 ? '45px' : position < 100 ? '35px' : position < 1000 ? '30px' : '20px',
                         fontWeight: 500,
-                        color: themeMode === 'light' ? theme.colors.gray[5] : '#fff',
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                        color: '#fff',
+                        textShadow: themeMode === 'light' ? '0px 0px 4px rgba(0,0,0,1)' : '2px 2px 4px rgba(0,0,0,0.8)',
                     }}
                 >
                     {position}
