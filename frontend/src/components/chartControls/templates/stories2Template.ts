@@ -207,7 +207,7 @@ export const generateStories2HTML = async (
         <div>
           <div class="brandRow">
             <span class="brandText">
-                <img src="/${isLightBackground ? 'zero-black.png' : 'zero-white.png'}" alt="ZERO" />
+                <img src="/${isLightBackground ? 'zero-black.svg' : 'zero-white.svg'}" alt="ZERO" />
             </span>
           </div>
           <h1 class="title"><span class="a">TOP ${typeLabel}</span></h1>

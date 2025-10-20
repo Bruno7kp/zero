@@ -1,6 +1,6 @@
 export const generateGridHTML = (
   chartData: any[],
-  size: 3 | 4 | 5,
+  size: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10,
   showText: boolean = true
 ): string => {
   if (!chartData || chartData.length === 0) {

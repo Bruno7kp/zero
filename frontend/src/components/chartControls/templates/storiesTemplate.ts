@@ -170,7 +170,7 @@ export const generateStoriesHTML = (
       <header>
         <div>
           <div class="tag">zero charts</div>
-          <div class="hstack"><div class="t1">${typeLabel}</div><div class="t2">${topCount === 5 ? '5' : '10'}</div></div>
+          <div class="hstack"><div class="t1">TOP ${typeLabel}</div><div class="t2">${topCount === 5 ? '5' : '10'}</div></div>
         </div>
         <figure class="shot">${topImage ? `<img src="${topImage}" alt="Foto principal do Chart" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMAGE</span>'}</figure>
       </header>
