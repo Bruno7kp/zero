@@ -8,7 +8,10 @@ export const generateStories2HTML = async (
     backgroundType: 'blur' | 'solid' = 'blur',
     backgroundColor: string = '#1a1a1a',
     username?: string,
-    showColumn: 'last' | 'plays' | 'peak' | 'weeks' = 'last'
+    showColumn: 'last' | 'plays' | 'peak' | 'weeks' = 'last',
+    listWrapBackgroundType: 'transparent' | 'solid' = 'transparent',
+    listWrapBackgroundColor: string = '#ffffff',
+    showAlbumCovers: boolean = true
 ): Promise<string> => {
     if (!chartData || chartData.length === 0 || !week) {
         return '<div>No data available</div>';
@@ -144,7 +147,7 @@ export const generateStories2HTML = async (
       .cover img { width: 100%; height: 100%; object-fit: cover; }
 
       .table { margin: 24px 48px 0 48px; }
-      .thead, .row { display: grid; grid-template-columns: 100px 110px 70px 500px 150px; align-items: center; }
+      .thead, .row { display: grid; grid-template-columns: ${showAlbumCovers ? '100px 110px 70px 500px 150px' : '100px 70px 600px 150px'}; align-items: center; }
       .thead { background: var(--stories-bg-overlay-strong); padding: 22px 28px; color: var(--stories-text-secondary); font-weight: 800; letter-spacing: 0.12em; }
       .row { padding: 16px 28px; position: relative; }
       .row + .row { border-top: 1px solid var(--stories-bg-overlay); }
@@ -155,7 +158,7 @@ export const generateStories2HTML = async (
       .thumb { height: 84px; width: 84px; border-radius: 14px; background: var(--stories-rank-bg); overflow: hidden; justify-self: center; }
       .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-      .albumInfo { padding-left: 12px; min-width: 0; max-width: 500px; overflow: hidden; }
+      .albumInfo { padding-left: 12px; min-width: 0; max-width: 600px; overflow: hidden; }
       .albumName { width: 100%; overflow: hidden; font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -177,6 +180,26 @@ export const generateStories2HTML = async (
       .brandText img { width: 50%; }
     </style>
   `;
+
+    if (listWrapBackgroundType === 'solid') {
+        const isLightListWrap = isLightColor(listWrapBackgroundColor);
+        html += `
+    <style>
+      .listWrap {
+        background: ${listWrapBackgroundColor} !important;
+        backdrop-filter: none !important;
+      }
+      .listWrap .thead,
+      .listWrap .albumName,
+      .listWrap .albumArtist,
+      .listWrap .last,
+      .listWrap .rank,
+      .listWrap .trendIcon {
+        color: ${isLightListWrap ? '#000000' : '#ffffff'} !important;
+      }
+    </style>
+    `;
+    }
 
     html += `
     <main class="story">
@@ -200,7 +223,7 @@ export const generateStories2HTML = async (
         <div class="listWrap">
           <div class="thead">
             <div style="text-align: center;">#</div>
-            <div></div>
+            ${showAlbumCovers ? '<div></div>' : ''}
             <div></div>
             <div>${typeLabel}</div>
             <div style="text-align: right">${showColumn === 'plays' ? 'PLAYS' : showColumn === 'peak' ? 'PEAK' : showColumn === 'weeks' ? 'WEEKS' : 'LAST'}</div>
@@ -256,14 +279,14 @@ export const generateStories2HTML = async (
         html += `
       <div class="${rowClass}">
         <div class="rankCell"><div class="rank">${row.rank}</div></div>
-        <div class="thumb">
+        ${showAlbumCovers ? `<div class="thumb">
           ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--stories-fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--stories-fallback-text);font-size:12px;">IMG</div>`}
-        </div>
+        </div>` : ''}
         <div class="trendCell">
           <div class="trendIcon ${trendClass}">${trendIcon}</div>
         </div>
         <div class="albumInfo">
-          <div class="albumName">${escapeHtml(truncateText(row.name, 30))}</div>
+          <div class="albumName">${escapeHtml(truncateText(row.name, showAlbumCovers ? 30 : 36))}</div>
           ${row.artistName ? `<div class="albumArtist">${escapeHtml(truncateText(row.artistName, 50))}</div>` : ''}
         </div>
         <div class="last">${lastPosition}</div>

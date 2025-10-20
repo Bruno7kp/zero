@@ -121,6 +121,7 @@
         "text": "Text",
         "gridSize": "Grid size",
         "gridSizeDescription": "Select the grid dimensions",
+        "showGridText": "Show Text",
         "storiesTop": "Top",
         "storiesTopDescription": "Number of items to include",
         "backgroundType": "Background type",
@@ -131,6 +132,11 @@
         "lastPosition": "Last position",
         "stories2Settings": "Stories 2 Settings",
         "stories2SettingsDescription": "Customize appearance and data display",
+        "listWrapBackgroundType": "List Wrap Background",
+        "listWrapTransparent": "Transparent",
+        "listWrapSolid": "Solid Color",
+        "listWrapBackgroundColor": "List Wrap Background Color",
+        "showAlbumCovers": "Show Album Covers",
         "download": "Download",
         "copyChart": "Copy chart",
         "copyChartTitle": "Copy chart as plain text",
@@ -463,7 +469,9 @@
       "confirmationMessage": "Are you sure you want to proceed?",
       "copy": "Copy",
       "copied": "Copied!",
-      "week": "Week"
+      "week": "Week",
+      "show": "Show",
+      "hide": "Hide"
     },
     "chartEdit": {
       "title": "Edit chart week",

@@ -279,9 +279,6 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                         ) : item.peak < 999 ? (
                             <Group gap={4} justify="center" wrap="nowrap">
                                 <Text size="sm">{item.peak}</Text>
-                                {item.timesAtPeak && item.timesAtPeak > 0 && (
-                                    <Text size="xs" c="dimmed">({item.timesAtPeak}x)</Text>
-                                )}
                             </Group>
                         ) : (
                             <Text size="sm" c="dimmed">-</Text>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Radio, Stack, Text, ColorPicker, Accordion, Flex, Box } from '@mantine/core';
+import { Button, Radio, Stack, Text, ColorPicker, Accordion, Flex, Box, Switch } from '@mantine/core';
 import { IconDownload, IconCopy, IconCheck, IconShare, IconSettings, IconPhoto, IconGridDots } from '@tabler/icons-react';
 import { useClipboard } from '@mantine/hooks';
 import { generatePlainTextChart } from './utils/shareUtils';
@@ -10,6 +10,8 @@ interface ShareOptionsProps {
   setSelectedType: (type: 'grid' | 'stories' | 'stories2' | 'completo' | 'text') => void;
   selectedGridSize: 3 | 4 | 5;
   setSelectedGridSize: (size: 3 | 4 | 5) => void;
+  selectedGridShowText: boolean;
+  setSelectedGridShowText: (show: boolean) => void;
   selectedStoriesTop: 5 | 10;
   setSelectedStoriesTop: (top: 5 | 10) => void;
   selectedStories2Top: 5 | 10;
@@ -20,6 +22,12 @@ interface ShareOptionsProps {
   setSelectedStories2BackgroundColor: (color: string) => void;
   selectedStories2ShowPlays: 'last' | 'plays' | 'peak' | 'weeks';
   setSelectedStories2ShowPlays: (show: 'last' | 'plays' | 'peak' | 'weeks') => void;
+  selectedStories2ListWrapBackgroundType: 'transparent' | 'solid';
+  setSelectedStories2ListWrapBackgroundType: (type: 'transparent' | 'solid') => void;
+  selectedStories2ListWrapBackgroundColor: string;
+  setSelectedStories2ListWrapBackgroundColor: (color: string) => void;
+  selectedStories2ShowAlbumCovers: boolean;
+  setSelectedStories2ShowAlbumCovers: (show: boolean) => void;
   chartType: 'artist' | 'album' | 'track';
   chartData: any[];
   previewImageUrl: string | null;
@@ -37,6 +45,8 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedType,
   selectedGridSize,
   setSelectedGridSize,
+  selectedGridShowText,
+  setSelectedGridShowText,
   selectedStoriesTop,
   setSelectedStoriesTop,
   selectedStories2Top,
@@ -47,6 +57,12 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedStories2BackgroundColor,
   selectedStories2ShowPlays,
   setSelectedStories2ShowPlays,
+  selectedStories2ListWrapBackgroundType,
+  setSelectedStories2ListWrapBackgroundType,
+  selectedStories2ListWrapBackgroundColor,
+  setSelectedStories2ListWrapBackgroundColor,
+  selectedStories2ShowAlbumCovers,
+  setSelectedStories2ShowAlbumCovers,
   chartType,
   chartData,
   previewImageUrl,
@@ -74,8 +90,8 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
             <Accordion.Panel>
               <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
                 <Stack gap="xs">
-                  <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
                   <Radio value="stories2" label={t('charts.share.stories2', 'Stories 2')} />
+                  <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
                   <Radio value="grid" label={t('charts.share.grid', 'Grid')} />
                   <Radio value="completo" label={t('charts.share.completo', 'Complete')} />
                   <Radio value="text" label={t('charts.share.text', 'Text')} />
@@ -94,13 +110,24 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
                 </Flex>
               </Accordion.Control>
               <Accordion.Panel>
-                <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5)}>
-                  <Stack gap="xs">
-                    <Radio value="3" label="3x3" disabled={chartData.length < 9} />
-                    <Radio value="4" label="4x4" disabled={chartData.length < 16} />
-                    <Radio value="5" label="5x5" disabled={chartData.length < 25} />
-                  </Stack>
-                </Radio.Group>
+                <Stack gap="md">
+                  <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5)}>
+                    <Stack gap="xs">
+                      <Radio value="3" label="3x3" disabled={chartData.length < 9} />
+                      <Radio value="4" label="4x4" disabled={chartData.length < 16} />
+                      <Radio value="5" label="5x5" disabled={chartData.length < 25} />
+                    </Stack>
+                  </Radio.Group>
+
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.showGridText', 'Show Text')}</Text>
+                    <Switch
+                      checked={selectedGridShowText}
+                      onChange={(event) => setSelectedGridShowText(event.currentTarget.checked)}
+                      label={selectedGridShowText ? t('common.show', 'Show') : t('common.hide', 'Hide')}
+                    />
+                  </div>
+                </Stack>
               </Accordion.Panel>
             </Accordion.Item>
           )}
@@ -186,6 +213,45 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
                         <Radio value="weeks" label={t('charts.share.weeks', 'Weeks')} />
                       </Stack>
                     </Radio.Group>
+                  </div>
+
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.listWrapBackgroundType', 'List Wrap Background')}</Text>
+                    <Radio.Group value={selectedStories2ListWrapBackgroundType} onChange={(value) => setSelectedStories2ListWrapBackgroundType(value as 'transparent' | 'solid')}>
+                      <Stack gap="xs">
+                        <Radio value="transparent" label={t('charts.share.listWrapTransparent', 'Transparent')} />
+                        <Radio value="solid" label={t('charts.share.listWrapSolid', 'Solid Color')} />
+                      </Stack>
+                    </Radio.Group>
+                  </div>
+
+                  {selectedStories2ListWrapBackgroundType === 'solid' && (
+                    <div>
+                      <Text size="sm" fw={500} mb="xs">{t('charts.share.listWrapBackgroundColor', 'List Wrap Background Color')}</Text>
+                      <ColorPicker
+                        value={selectedStories2ListWrapBackgroundColor}
+                        onChange={setSelectedStories2ListWrapBackgroundColor}
+                        size="lg"
+                        format="hex"
+                        swatches={[
+                          '#1a1a1a', '#666666', '#f5f5f5',
+                          '#117e39', '#22c55e',
+                          '#a31818', '#f088be',
+                          '#070049', '#2563eb', '#60a5fa',
+                          '#e66109', '#fbbf24',
+                          '#7d0eb1', '#c4b5fd'
+                        ]}
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.showAlbumCovers', 'Show Album Covers')}</Text>
+                    <Switch
+                      checked={selectedStories2ShowAlbumCovers}
+                      onChange={(event) => setSelectedStories2ShowAlbumCovers(event.currentTarget.checked)}
+                      label={selectedStories2ShowAlbumCovers ? t('common.show', 'Show') : t('common.hide', 'Hide')}
+                    />
                   </div>
                 </Stack>
               </Accordion.Panel>
