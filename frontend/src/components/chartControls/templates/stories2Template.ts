@@ -139,7 +139,7 @@ export const generateStories2HTML = async (
       .header { padding: 84px 72px 36px 72px; display: grid; grid-template-columns: 1fr 380px 120px; gap: 48px; align-items: center; }
       .brandRow { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; opacity: 0.95; }
       .brandText { font-weight: 800; letter-spacing: 0.02em; }
-      .title { font-family: 'Poppins', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
+      .title { font-family: 'Satoshi-Variable', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
       .title .a { display: block; font-size: 124px; font-weight: 900; letter-spacing: -0.01em; }
       .chartdate { font-size: 25px; margin-top: 18px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.9; color: var(--stories-text-color); }
 
@@ -153,7 +153,7 @@ export const generateStories2HTML = async (
       .row + .row { border-top: 1px solid var(--stories-bg-overlay); }
 
       .rankCell { display: flex; align-items: center; }
-      .rank { height: 72px; width: 88px; border-radius: 18px; color: var(--stories-text-color); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 42px; }
+      .rank { height: 72px; width: 88px; border-radius: 18px; color: var(--stories-text-color); display: flex; align-items: center; justify-content: center; font-family: 'Satoshi-Variable', sans-serif; font-weight: 900; font-size: 42px; }
 
       .thumb { height: 84px; width: 84px; border-radius: 14px; background: var(--stories-rank-bg); overflow: hidden; justify-self: center; }
       .thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -162,7 +162,7 @@ export const generateStories2HTML = async (
       .albumName { width: 100%; overflow: hidden; font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-      .last { justify-self: end; font-size: 28px; font-weight: 800; opacity: 0.95; color: var(--stories-text-color); }
+      .last { justify-self: end; font-size: 28px; font-weight: 800; opacity: 0.95; color: var(--stories-text-color); font-family: 'Satoshi-Variable', sans-serif; }
 
       .listWrap { background: var(--stories-bg-overlay); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--stories-border-color); border-radius: 28px; overflow: hidden;  }
       .row.top { background: var(--stories-bg-overlay-strong); }

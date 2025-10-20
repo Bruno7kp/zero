@@ -86,7 +86,8 @@ export const generateStoriesHTML = (
         color:#000;
         font-weight:900;
         font-size:48px;
-        position: relative; 
+        position: relative;
+        font-family: 'Satoshi-Variable', sans-serif;
       }
 
       .thumb{justify-content:center}
@@ -157,7 +158,7 @@ export const generateStoriesHTML = (
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .last{justify-content:center;color:#cfd2d7;font-size:32px;font-weight:800}
+      .last{justify-content:center;color:#cfd2d7;font-size:32px;font-family: 'Satoshi-Variable', sans-serif;font-weight:800}
       .artist-only{margin-top: 22px;}
 
       footer{border-top:1px solid rgba(255,109,104,.45);display:flex;justify-content:flex-end;padding:20px 48px;color:#cfd2d7;font-size:18px;letter-spacing:.2em; text-align: right;}

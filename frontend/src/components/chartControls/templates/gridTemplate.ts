@@ -26,7 +26,7 @@ export const generateGridHTML = (
   
   // Estilos fixos para alta resolução
   const sizePx = size * 300;
-  const containerStyle = `font-family: Poppins, sans-serif; background: #fff; color: #000; width: ${sizePx}px; height: ${sizePx}px; box-sizing: border-box; display: grid; grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr); gap: 0px;`;
+  const containerStyle = `font-family: 'Satoshi-Variable', sans-serif; background: #fff; color: #000; width: ${sizePx}px; height: ${sizePx}px; box-sizing: border-box; display: grid; grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr); gap: 0px;`;
   const itemStyle = `width: 300px; height: 300px; position: relative; display: flex; justify-content: center; align-items: center;`;
 
   let html = `<div class="poster" style="${containerStyle}">`;
