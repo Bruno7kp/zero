@@ -186,16 +186,16 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
             {showPosition && (
                 <Text
                     style={{
-                        fontFamily: 'Inter, system-ui, sans-serif',
+                        fontFamily: 'Satoshi-Variable, system-ui, sans-serif',
                         position: 'absolute',
                         bottom: (() => {
                             const baseBottom = position < 10 ? 5 : position < 100 ? 10 : position < 1000 ? 15 : 20;
                             return showPlays ? baseBottom : baseBottom - 30;
                         })(),
-                        left: position < 10 ? -15 : position < 100 ? -12 : position < 1000 ? -10 : -8,
+                        left: position < 10 ? -10 : position < 100 ? -12 : position < 1000 ? -10 : -8,
                         zIndex: 3,
                         fontSize: position < 10 ? '45px' : position < 100 ? '35px' : position < 1000 ? '30px' : '20px',
-                        fontWeight: 500,
+                        fontWeight: 900,
                         color: '#fff',
                         textShadow: themeMode === 'light' ? '0px 0px 4px rgba(0,0,0,1)' : '2px 2px 4px rgba(0,0,0,0.8)',
                     }}

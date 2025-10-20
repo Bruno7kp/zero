@@ -8,8 +8,8 @@ interface ShareOptionsProps {
   t: (k: any, options?: any) => string;
   selectedType: 'grid' | 'stories' | 'stories2' | 'completo' | 'text';
   setSelectedType: (type: 'grid' | 'stories' | 'stories2' | 'completo' | 'text') => void;
-  selectedGridSize: 3 | 4 | 5;
-  setSelectedGridSize: (size: 3 | 4 | 5) => void;
+  selectedGridSize: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  setSelectedGridSize: (size: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10) => void;
   selectedGridShowText: boolean;
   setSelectedGridShowText: (show: boolean) => void;
   selectedStoriesTop: 5 | 10;
@@ -28,6 +28,10 @@ interface ShareOptionsProps {
   setSelectedStories2ListWrapBackgroundColor: (color: string) => void;
   selectedStories2ShowAlbumCovers: boolean;
   setSelectedStories2ShowAlbumCovers: (show: boolean) => void;
+  selectedCompletoBackgroundColor: string;
+  setSelectedCompletoBackgroundColor: (color: string) => void;
+  selectedCompletoTop: string;
+  setSelectedCompletoTop: (top: string) => void;
   chartType: 'artist' | 'album' | 'track';
   chartData: any[];
   previewImageUrl: string | null;
@@ -63,6 +67,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedStories2ListWrapBackgroundColor,
   selectedStories2ShowAlbumCovers,
   setSelectedStories2ShowAlbumCovers,
+  selectedCompletoBackgroundColor,
+  setSelectedCompletoBackgroundColor,
+  selectedCompletoTop,
+  setSelectedCompletoTop,
   chartType,
   chartData,
   previewImageUrl,
@@ -111,15 +119,18 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack gap="md">
-                  <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5)}>
-                    <Stack gap="xs">
-                      <Radio value="3" label="3x3" disabled={chartData.length < 9} />
-                      <Radio value="4" label="4x4" disabled={chartData.length < 16} />
-                      <Radio value="5" label="5x5" disabled={chartData.length < 25} />
-                    </Stack>
-                  </Radio.Group>
-
-                  <div>
+                    <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10)}>
+                      <Stack gap="xs">
+                        {chartData.length >= 9 && <Radio value="3" label="3x3" />}
+                        {chartData.length >= 16 && <Radio value="4" label="4x4" />}
+                        {chartData.length >= 25 && <Radio value="5" label="5x5" />}
+                        {chartData.length >= 36 && <Radio value="6" label="6x6" />}
+                        {chartData.length >= 49 && <Radio value="7" label="7x7" />}
+                        {chartData.length >= 64 && <Radio value="8" label="8x8" />}
+                        {chartData.length >= 81 && <Radio value="9" label="9x9" />}
+                        {chartData.length >= 100 && <Radio value="10" label="10x10" />}
+                      </Stack>
+                    </Radio.Group>                  <div>
                     <Text size="sm" fw={500} mb="xs">{t('charts.share.showGridText', 'Show Text')}</Text>
                     <Switch
                       checked={selectedGridShowText}
@@ -257,16 +268,58 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               </Accordion.Panel>
             </Accordion.Item>
           )}
-        </Accordion>
-      </Box>
+          {/* Configurações do Completo */}
+          {selectedType === 'completo' && (
+            <Accordion.Item value="completo-settings">
+              <Accordion.Control>
+                <Flex direction="column" gap={2}>
+                  <Flex align="center" gap={8}><IconSettings size={16} /><Text fw={600}>{t('charts.share.completoSettings', 'Completo Settings')}</Text></Flex>
+                  <Text size="xs" c="dimmed">{t('charts.share.completoSettingsDescription', 'Customize background color')}</Text>
+                </Flex>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap="md">
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.completoTop', 'Top Count')}</Text>
+                    <Radio.Group value={selectedCompletoTop} onChange={(value) => setSelectedCompletoTop(value)}>
+                      <Stack gap="xs">
+                        <Radio value="full" label={`Top ${chartData.length}`} />
+                        {chartData.length > 10 && <Radio value="10" label="Top 10" />}
+                        {chartData.length > 20 && <Radio value="20" label="Top 20" />}
+                        {chartData.length > 50 && <Radio value="50" label="Top 50" />}
+                      </Stack>
+                    </Radio.Group>
+                  </div>
+                  <div>
+                    <Text size="sm" fw={500} mb="xs">{t('charts.share.backgroundColor', 'Background Color')}</Text>
+                    <ColorPicker
+                      value={selectedCompletoBackgroundColor}
+                      onChange={setSelectedCompletoBackgroundColor}
+                      size="lg"
+                      format="hex"
+                      swatches={[
+                        '#1a1a1a', '#666666', '#f5f5f5',
+                        '#117e39', '#22c55e',
+                        '#a31818', '#f088be',
+                        '#070049', '#2563eb', '#60a5fa',
+                        '#e66109', '#fbbf24',
+                        '#7d0eb1', '#c4b5fd'
+                      ]}
+                    />
+                  </div>
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+          )}
 
-      <Box style={{ flexShrink: 0, paddingTop: 'var(--mantine-spacing-md)' }}>
+        </Accordion>
         <Button
           leftSection={selectedType === 'text' ? (clipboard.copied ? <IconCheck size={16} /> : <IconCopy size={16} />) : <IconDownload size={16} />}
           onClick={selectedType === 'text' ? () => clipboard.copy(generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)) : handleDownload}
           fullWidth
           disabled={selectedType !== 'text' && (!previewImageUrl || isLoading)}
           color={selectedType === 'text' && clipboard.copied ? 'teal' : 'blue'}
+          mt="md"
         >
           {selectedType === 'text' ? (clipboard.copied ? t('common.copied', 'Copied!') : t('common.copy', 'Copy')) : (isLoading ? 'Generating image...' : t('charts.share.download', 'Download'))}
         </Button>

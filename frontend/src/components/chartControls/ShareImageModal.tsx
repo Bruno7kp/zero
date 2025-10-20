@@ -30,11 +30,11 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   week,
   weekNumber,
   chartType,
-  opened,
+    opened,
   onClose,
 }) => {
   const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'stories2' | 'completo' | 'text'>('stories2');
-  const [selectedGridSize, setSelectedGridSize] = useState<3 | 4 | 5>(3);
+  const [selectedGridSize, setSelectedGridSize] = useState<3 | 4 | 5 | 6 | 7 | 8 | 9 | 10>(3);
   const [selectedGridShowText, setSelectedGridShowText] = useState<boolean>(true);
   const [selectedStoriesTop, setSelectedStoriesTop] = useState<5 | 10>(10);
   const [selectedStories2Top, setSelectedStories2Top] = useState<5 | 10>(10);
@@ -44,6 +44,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [selectedStories2ListWrapBackgroundType, setSelectedStories2ListWrapBackgroundType] = useState<'transparent' | 'solid'>('transparent');
   const [selectedStories2ListWrapBackgroundColor, setSelectedStories2ListWrapBackgroundColor] = useState<string>('#1a1a1a');
   const [selectedStories2ShowAlbumCovers, setSelectedStories2ShowAlbumCovers] = useState<boolean>(true);
+  const [selectedCompletoBackgroundColor, setSelectedCompletoBackgroundColor] = useState<string>('#1a1a1a');
+  const [selectedCompletoTop, setSelectedCompletoTop] = useState<string>("full");
 
   // Estados para a imagem de prévia e o carregamento
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -52,8 +54,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 
   const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
   const getCurrentTypeKey = useCallback(() => {
-    return `${selectedType}-${selectedType === 'grid' ? `${selectedGridSize}-${selectedGridShowText}` : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays}-${selectedStories2ListWrapBackgroundType}${selectedStories2ListWrapBackgroundType === 'solid' ? `-${selectedStories2ListWrapBackgroundColor}` : ''}-${selectedStories2ShowAlbumCovers}`) : selectedType === 'text' ? 'text' : 'completo'}`;
-  }, [selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers]);
+    return `${selectedType}-${selectedType === 'grid' ? `${selectedGridSize}-${selectedGridShowText}` : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays}-${selectedStories2ListWrapBackgroundType}${selectedStories2ListWrapBackgroundType === 'solid' ? `-${selectedStories2ListWrapBackgroundColor}` : ''}-${selectedStories2ShowAlbumCovers}`) : selectedType === 'text' ? 'text' : `${selectedCompletoBackgroundColor}-${selectedCompletoTop}`}`;
+  }, [selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers, selectedCompletoBackgroundColor, selectedCompletoTop]);
 
   // Função que gera a imagem em alta resolução em background
   const generatePreviewImage = useCallback(async () => {
@@ -79,6 +81,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     }));
 
     let htmlForCanvas: string;
+    let topCount: number = 20; // default
     if (selectedType === 'stories2') {
       let dateRange = '';
       if (week) {
@@ -90,11 +93,12 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       }
       htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers);
     } else {
+      topCount = selectedCompletoTop === "full" ? chartData.length : parseInt(selectedCompletoTop);
       htmlForCanvas = selectedType === 'grid'
         ? generateGridHTML(enrichedData, selectedGridSize, selectedGridShowText)
         : selectedType === 'stories'
         ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, weekNumber, chartType)
-        : generateCompletoHTML(enrichedData, chartName, week, weekNumber, chartType);
+        : generateCompletoHTML(enrichedData, week, weekNumber, chartType, selectedCompletoBackgroundColor, topCount);
     }
     
     const tempDiv = document.createElement('div');
@@ -105,14 +109,16 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 
     try {
       let options: any = { backgroundColor: '#ffffff', logging: false, allowTaint: true, useCORS: true };
-      if (selectedType === 'stories' || selectedType === 'stories2' || selectedType === 'completo') {
+      if (selectedType === 'stories' || selectedType === 'stories2') {
         options = { ...options, width: 1080, height: 1920 };
       } else if (selectedType === 'grid') {
         const sizePx = selectedGridSize * 300;
         options = { ...options, width: sizePx, height: sizePx };
+      } else if (selectedType === 'completo') {
+        options = { ...options, width: 950, backgroundColor: selectedCompletoBackgroundColor };
       }
       
-      const selector = selectedType === 'stories2' ? '.story' : '.poster';
+      const selector = selectedType === 'stories2' ? '.story' : selectedType === 'completo' ? '.chart-container' : '.poster';
       const canvas = await html2canvas(tempDiv.querySelector(selector) as HTMLElement, options);
       setPreviewImageUrl(canvas.toDataURL('image/png'));
       setCurrentImageType(getCurrentTypeKey());
@@ -123,7 +129,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, chartName, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap]);
+  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop]);
 
   // Efeito que gera a imagem de prévia sempre que uma opção muda
   useEffect(() => {
@@ -143,7 +149,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     return () => {
       clearTimeout(handler);
     };
-  }, [selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers, chartData, opened, generatePreviewImage]);
+  }, [selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers, chartData, opened, generatePreviewImage, selectedCompletoTop, selectedCompletoBackgroundColor]);
 
   // O download agora é instantâneo
   const handleDownload = () => {
@@ -161,6 +167,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       <Box>
         <Grid>
           <Grid.Col span={{ base: 12, md: 4 }}>
+            <Text size="sm" c="dimmed" mb="md">{t('settings.title')}</Text>
             <ShareOptions
               t={t}
               selectedType={selectedType}
@@ -185,6 +192,10 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
               selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
               setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
+              selectedCompletoBackgroundColor={selectedCompletoBackgroundColor}
+              setSelectedCompletoBackgroundColor={setSelectedCompletoBackgroundColor}
+              selectedCompletoTop={selectedCompletoTop}
+              setSelectedCompletoTop={setSelectedCompletoTop}
               chartType={chartType}
               chartData={chartData}
               previewImageUrl={previewImageUrl}
@@ -198,7 +209,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Text size="sm" c="dimmed" mb="md">{t('charts.share.preview', 'Preview')}</Text>
-            <Center style={{ border: '1px solid rgba(125,125,125,0.3)', width: '100%', padding: '10px' }} h={{ base: 'auto', sm: '85vh' }}>
+            <Center style={{ border: '1px solid rgba(125,125,125,0.3)', borderRadius: '8px', width: '100%', padding: '10px' }} h={{ base: 'auto', sm: '85vh' }}>
               {selectedType === 'text' ? (
                 <Textarea w="100%" value={generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)} readOnly rows={22} styles={{input: {margin: '0 auto', width: '100%', maxWidth: '550px', fontFamily: 'monospace', fontSize: '12px'}}} />
               ) : (
