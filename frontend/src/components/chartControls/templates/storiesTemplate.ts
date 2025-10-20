@@ -131,6 +131,7 @@ export const generateStoriesHTML = (
         font-weight: 900;
         letter-spacing: .2px;
         min-width: 0;
+        color: #ffffff;
         display: block; /* MUDANÇA CRÍTICA: Volta para display: block */
         /* Remove as regras flexbox de centralização vertical e horizontal */
         /* text-align: left; /* Manteremos nos spans */

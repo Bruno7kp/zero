@@ -121,6 +121,7 @@
         "text": "Texto",
         "gridSize": "Tamanho do grid",
         "gridSizeDescription": "Selecione as dimensões da grade",
+        "showGridText": "Mostrar Texto",
         "storiesTop": "Top",
         "storiesTopDescription": "Número de itens a incluir",
         "backgroundType": "Tipo de fundo",
@@ -131,6 +132,11 @@
         "lastPosition": "Última posição",
         "stories2Settings": "Configurações do Stories 2",
         "stories2SettingsDescription": "Personalize aparência e exibição de dados",
+        "listWrapBackgroundType": "Fundo da Lista",
+        "listWrapTransparent": "Transparente",
+        "listWrapSolid": "Cor Sólida",
+        "listWrapBackgroundColor": "Cor de Fundo da Lista",
+        "showAlbumCovers": "Mostrar Capas de Álbum",
         "download": "Download",
         "copyChart": "Copiar o chart",
         "copyChartTitle": "Copiar chart como texto",
@@ -463,7 +469,9 @@
       "confirmationMessage": "Tem certeza que deseja prosseguir?",
       "copy": "Copiar",
       "copied": "Copiado!",
-      "week": "Semana"
+      "week": "Semana",
+      "show": "Mostrar",
+      "hide": "Ocultar"
     },
     "chartEdit": {
       "title": "Editar semana do chart",

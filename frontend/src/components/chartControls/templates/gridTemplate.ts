@@ -1,6 +1,7 @@
 export const generateGridHTML = (
   chartData: any[],
   size: 3 | 4 | 5,
+  showText: boolean = true
 ): string => {
   if (!chartData || chartData.length === 0) {
     return '<div>No data available</div>';
@@ -32,29 +33,30 @@ export const generateGridHTML = (
 
   data.forEach((row: any) => {
     const imageUrl = row.imageUrl || row.albumImage || '';
-    const nameArtist = row.artistName ? `${row.name} - ${row.artistName}` : row.name || '';
-    const escapedNameArtist = escapeHtml(nameArtist);
     const deltaRank = row.deltaRank;
     let iconHtml = '';
     if (deltaRank === 'NEW') {
-      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="8" x2="9" y2="16"></line><line x1="9" y1="8" x2="15" y2="16"></line><line x1="15" y1="8" x2="15" y2="16"></line></svg>';
+      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
     } else if (deltaRank === 'RE') {
-      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>';
+      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
     } else if (deltaRank > 0) {
-      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4dff87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>';
+      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
     } else if (deltaRank < 0) {
-      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>';
+      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>';
     } else {
-      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>';
+      iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
     }
     const imageHtml = imageUrl ? `<img src="${imageUrl}" alt="" crossorigin="anonymous" onerror="this.style.display='none'" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;" />` : '<div style="width: 100%; height: 100%; background: #ccc; position: absolute; top: 0; left: 0;"></div>';
-    const overlayHtml = `<div style="position: absolute; bottom: -1px; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 50%, transparent 100%); color: white; padding: 5px 10px; font-size: 14px; font-family: Arial, sans-serif; height: 40px; display: flex; align-items: center;">
+    const overlayHtml = showText ? `<div style="position: absolute; bottom: -1px; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 14px; font-family: Inter, Arial, sans-serif; height: 55px; display: flex; align-items: center;">
       <div style="display: flex; align-items: center; gap: 5px; width: 100%;">
-        <span style="font-weight: bold; font-size: 18px;">${row.rank}</span>
-        ${iconHtml}
-        <span style="font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">${escapedNameArtist}</span>
+        <span style="font-weight: bold; font-size: 40px;">${row.rank}</span>
+        <div style="width: 30px; display: flex; justify-content: center; align-items: center;">${iconHtml}</div>
+        <div style="display: flex; flex-direction: column; flex: 1; gap:0px">
+          <span style="font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(row.name || '')}</span>
+          <span style="font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(row.artistName || '')}</span>
+        </div>
       </div>
-    </div>`;
+    </div>` : '';
     html += `<div style="${itemStyle}">${imageHtml}${overlayHtml}</div>`;
   });
 

@@ -35,11 +35,15 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 }) => {
   const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'stories2' | 'completo' | 'text'>('stories2');
   const [selectedGridSize, setSelectedGridSize] = useState<3 | 4 | 5>(3);
+  const [selectedGridShowText, setSelectedGridShowText] = useState<boolean>(true);
   const [selectedStoriesTop, setSelectedStoriesTop] = useState<5 | 10>(10);
   const [selectedStories2Top, setSelectedStories2Top] = useState<5 | 10>(10);
   const [selectedStories2BackgroundType, setSelectedStories2BackgroundType] = useState<'blur' | 'solid'>('blur');
   const [selectedStories2BackgroundColor, setSelectedStories2BackgroundColor] = useState<string>('#1a1a1a');
   const [selectedStories2ShowPlays, setSelectedStories2ShowPlays] = useState<'last' | 'plays' | 'peak' | 'weeks'>('last');
+  const [selectedStories2ListWrapBackgroundType, setSelectedStories2ListWrapBackgroundType] = useState<'transparent' | 'solid'>('transparent');
+  const [selectedStories2ListWrapBackgroundColor, setSelectedStories2ListWrapBackgroundColor] = useState<string>('#1a1a1a');
+  const [selectedStories2ShowAlbumCovers, setSelectedStories2ShowAlbumCovers] = useState<boolean>(true);
 
   // Estados para a imagem de prévia e o carregamento
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -48,8 +52,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 
   const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
   const getCurrentTypeKey = useCallback(() => {
-    return `${selectedType}-${selectedType === 'grid' ? selectedGridSize : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays}`) : selectedType === 'text' ? 'text' : 'completo'}`;
-  }, [selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor, selectedStories2ShowPlays]);
+    return `${selectedType}-${selectedType === 'grid' ? `${selectedGridSize}-${selectedGridShowText}` : (selectedType === 'stories' || selectedType === 'stories2') ? (selectedType === 'stories' ? selectedStoriesTop : `${selectedStories2Top}-${selectedStories2BackgroundType}${selectedStories2BackgroundType === 'solid' ? `-${selectedStories2BackgroundColor}` : ''}-${selectedStories2ShowPlays}-${selectedStories2ListWrapBackgroundType}${selectedStories2ListWrapBackgroundType === 'solid' ? `-${selectedStories2ListWrapBackgroundColor}` : ''}-${selectedStories2ShowAlbumCovers}`) : selectedType === 'text' ? 'text' : 'completo'}`;
+  }, [selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, selectedStories2BackgroundType, selectedStories2BackgroundColor, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers]);
 
   // Função que gera a imagem em alta resolução em background
   const generatePreviewImage = useCallback(async () => {
@@ -84,10 +88,10 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
         dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
       }
-      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays);
+      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers);
     } else {
       htmlForCanvas = selectedType === 'grid'
-        ? generateGridHTML(enrichedData, selectedGridSize)
+        ? generateGridHTML(enrichedData, selectedGridSize, selectedGridShowText)
         : selectedType === 'stories'
         ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, weekNumber, chartType)
         : generateCompletoHTML(enrichedData, chartName, week, weekNumber, chartType);
@@ -119,7 +123,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, chartName, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, statsMap]);
+  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, chartName, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap]);
 
   // Efeito que gera a imagem de prévia sempre que uma opção muda
   useEffect(() => {
@@ -139,7 +143,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     return () => {
       clearTimeout(handler);
     };
-  }, [selectedType, selectedGridSize, selectedStoriesTop, selectedStories2Top, selectedStories2ShowPlays, chartData, opened, generatePreviewImage]);
+  }, [selectedType, selectedGridSize, selectedGridShowText, selectedStoriesTop, selectedStories2Top, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers, chartData, opened, generatePreviewImage]);
 
   // O download agora é instantâneo
   const handleDownload = () => {
@@ -163,6 +167,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedType={setSelectedType}
               selectedGridSize={selectedGridSize}
               setSelectedGridSize={setSelectedGridSize}
+              selectedGridShowText={selectedGridShowText}
+              setSelectedGridShowText={setSelectedGridShowText}
               selectedStoriesTop={selectedStoriesTop}
               setSelectedStoriesTop={setSelectedStoriesTop}
               selectedStories2Top={selectedStories2Top}
@@ -173,6 +179,12 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedStories2BackgroundColor={setSelectedStories2BackgroundColor}
               selectedStories2ShowPlays={selectedStories2ShowPlays}
               setSelectedStories2ShowPlays={setSelectedStories2ShowPlays}
+              selectedStories2ListWrapBackgroundType={selectedStories2ListWrapBackgroundType}
+              setSelectedStories2ListWrapBackgroundType={setSelectedStories2ListWrapBackgroundType}
+              selectedStories2ListWrapBackgroundColor={selectedStories2ListWrapBackgroundColor}
+              setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
+              selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
+              setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
               chartType={chartType}
               chartData={chartData}
               previewImageUrl={previewImageUrl}
