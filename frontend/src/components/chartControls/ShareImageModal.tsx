@@ -33,7 +33,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   opened,
   onClose,
 }) => {
-  const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'stories2' | 'completo' | 'text'>('stories');
+  const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'stories2' | 'completo' | 'text'>('stories2');
   const [selectedGridSize, setSelectedGridSize] = useState<3 | 4 | 5>(3);
   const [selectedStoriesTop, setSelectedStoriesTop] = useState<5 | 10>(10);
   const [selectedStories2Top, setSelectedStories2Top] = useState<5 | 10>(10);

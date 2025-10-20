@@ -196,7 +196,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
                         zIndex: 3,
                         fontSize: position < 10 ? '45px' : position < 100 ? '35px' : position < 1000 ? '30px' : '20px',
                         fontWeight: 500,
-                        color: '#fff',
+                        color: themeMode === 'light' ? theme.colors.gray[5] : '#fff',
                         textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
                     }}
                 >

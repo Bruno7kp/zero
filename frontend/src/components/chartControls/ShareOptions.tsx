@@ -74,8 +74,8 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
             <Accordion.Panel>
               <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
                 <Stack gap="xs">
-                  <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
                   <Radio value="stories2" label={t('charts.share.stories2', 'Stories 2')} />
+                  <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
                   <Radio value="grid" label={t('charts.share.grid', 'Grid')} />
                   <Radio value="completo" label={t('charts.share.completo', 'Complete')} />
                   <Radio value="text" label={t('charts.share.text', 'Text')} />

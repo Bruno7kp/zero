@@ -110,13 +110,19 @@ const GridItem: React.FC<GridItemProps> = ({ item, type, timesAtTop1 = 1, onOpen
                             padding: '8px 10px',
                             background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.75) 100%)',
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}
                     >
-                        <Text c="#fff" fw={600} size="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                        <Text c="#fff" fw={600} size="sm" pt="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
                             {item.name}
                         </Text>
+						{type !== 'artist' && item.artistName && (
+							<Text c="#fff" size="xs" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center', opacity: 0.8 }}>
+								{item.artistName}
+							</Text>
+						)}
                     </Box>
                 )}
 			</Box>
