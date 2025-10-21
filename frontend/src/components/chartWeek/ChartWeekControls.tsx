@@ -136,6 +136,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
             week={week}
             weekNumber={weekNum}
             chartType={type as 'artist' | 'album' | 'track'}
+            chart={chart}
             disabled={!week || isBusy || !chartData || chartData.length === 0}
         />
     );

@@ -11,10 +11,11 @@ interface ShareMenuProps {
   week: string | undefined;
   weekNumber: number | null;
   chartType: 'artist' | 'album' | 'track';
+  chart: any;
   disabled?: boolean;
 }
 
-export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, lastfmUsername, week, weekNumber, chartType, disabled }) => {
+export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, lastfmUsername, week, weekNumber, chartType, chart, disabled }) => {
   const [shareModalOpened, setShareModalOpened] = useState(false);
 
   return (
@@ -39,6 +40,7 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, l
         week={week}
         weekNumber={weekNumber}
         chartType={chartType}
+        chart={chart}
         opened={shareModalOpened}
         onClose={() => setShareModalOpened(false)}
       />

@@ -233,6 +233,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, type, index, chart, page, ite
                             <Text
                                 fw={600}
                                 size="sm"
+                                className="entity-name"
                                 style={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',

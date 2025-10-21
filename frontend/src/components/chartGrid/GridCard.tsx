@@ -181,7 +181,7 @@ export const GridCard: React.FC<GridCardProps> = ({
         )}
       </Box>
       <Box px="sm" py={8} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 64 }}>
-        <Text fw={600} size={droppedScaleSize('md')} lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
+        <Text fw={600} size={droppedScaleSize('md')} className="entity-name" lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
         {row.artistName && <Text size={droppedScaleSize('sm')} c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
       </Box>
       {(showPlays || showPeak || showTotalWeeks) && (
