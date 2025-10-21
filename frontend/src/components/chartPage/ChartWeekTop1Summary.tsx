@@ -140,7 +140,7 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({ char
                                 />
                             </Grid.Col>
                             <Grid.Col span={6}>
-                                <Text fw={600} size="sm" style={{ lineHeight: 1.3 }}>
+                                <Text fw={600} size="sm" className="entity-name" style={{ lineHeight: 1.3 }}>
                                     {item.name}
                                 </Text>
                                 {item.artistName && (

@@ -170,7 +170,7 @@ const GridItem: React.FC<GridItemProps> = ({ item, position, type, badgeStyle = 
                                 justifyContent: 'center',
                             }}
                         >
-                            <Text c="#fff" fw={600} size="sm" pt="sm" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
+                            <Text c="#fff" fw={600} size="sm" pt="sm" className="entity-name" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '90%', textAlign: 'center' }}>
                                 {item.name}
                             </Text>
                             {type !== 'artist' && item.artistName && (

@@ -84,7 +84,7 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
               </Flex>
             )}
             <Flex direction="column" justify="center" align="flex-start">
-              <Text fw={600}>{item.name}</Text>
+              <Text fw={600} className="entity-name">{item.name}</Text>
               {artistMode === 'under' && chartType !== 'artist' && !!item.artist && (
                 <Text size="sm">{item.artist}</Text>
               )}
