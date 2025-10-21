@@ -159,8 +159,8 @@ export const generateStories2HTML = async (
       .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
       .albumInfo { padding-left: 12px; min-width: 0; max-width: 600px; overflow: hidden; }
-      .albumName { width: 100%; overflow: hidden; font-size: 34px; font-weight: 800; line-height: 1.1; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .albumName { width: 100%; overflow: hidden; font-size: 34px; font-weight: 800; line-height: 1.3; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Satoshi-Variable', sans-serif; }
+      .albumArtist { font-size: 28px; font-weight: 400; opacity: 0.85; margin-top: 2px; color: var(--stories-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Satoshi-Variable', sans-serif; }
 
       .last { justify-self: end; font-size: 28px; font-weight: 800; opacity: 0.95; color: var(--stories-text-color); font-family: 'Satoshi-Variable', sans-serif; }
 
@@ -176,7 +176,7 @@ export const generateStories2HTML = async (
       .trendIcon.trend-reentry { background-color: #f4b63f; }
       .feather { width: 32px; height: 32px; stroke-width: 2; }
 
-      .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; color: var(--stories-text-muted); }
+      .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; color: var(--stories-text-muted); }
       .brandText img { width: 50%; }
     </style>
   `;

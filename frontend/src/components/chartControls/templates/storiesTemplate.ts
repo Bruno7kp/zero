@@ -136,6 +136,7 @@ export const generateStoriesHTML = (
         display: block; /* MUDANÇA CRÍTICA: Volta para display: block */
         /* Remove as regras flexbox de centralização vertical e horizontal */
         /* text-align: left; /* Manteremos nos spans */
+        font-family: 'Satoshi-Variable', sans-serif;
       }
 
       /* O alinhamento vertical agora será responsabilidade dos elementos internos */
@@ -146,6 +147,7 @@ export const generateStoriesHTML = (
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-family: 'Satoshi-Variable', sans-serif;
       }
 
       .name .artist-name {

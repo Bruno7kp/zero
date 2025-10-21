@@ -229,6 +229,7 @@ export const generateCompletoHTML = (
         overflow: hidden;
         text-overflow: ellipsis;
         color: var(---completo-text-color);
+        font-family: 'Satoshi-Variable', sans-serif;
       }
 
       .song-artist {
