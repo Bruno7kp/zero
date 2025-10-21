@@ -122,6 +122,7 @@
         "gridSize": "Grid size",
         "gridSizeDescription": "Select the grid dimensions",
         "showGridText": "Show Text",
+        "showVariationIcons": "Show Variation Icons",
         "storiesTop": "Top",
         "storiesTopDescription": "Number of items to include",
         "backgroundType": "Background type",
@@ -140,6 +141,10 @@
         "completoSettings": "Completo Settings",
         "completoSettingsDescription": "Customize background color",
         "completoTop": "Top",
+        "showColoredIcons": "Show Colored Icons",
+        "showCertification": "Show Certification",
+        "columns": "Columns (max 2)",
+        "sales": "Sales",
         "download": "Download",
         "copyChart": "Copy chart",
         "copyChartTitle": "Copy chart as plain text",
@@ -155,7 +160,10 @@
         "topAlbumsHeader": "Top Albums",
         "topTracksHeader": "Top Tracks",
         "weekNumberLabel": "Week {{num}}",
-        "weekLabelFallback": "{{week}}"
+        "weekLabelFallback": "{{week}}",
+        "updatePreview": "Update Preview",
+        "generating": "Generating...",
+        "generatingImage": "Generating image..."
       },
       "badgeStyles": {
         "title": "Badge Customization",

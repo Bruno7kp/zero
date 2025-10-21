@@ -1,7 +1,8 @@
 export const generateGridHTML = (
   chartData: any[],
   size: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10,
-  showText: boolean = true
+  showText: boolean = true,
+  showVariationIcons: boolean = true
 ): string => {
   if (!chartData || chartData.length === 0) {
     return '<div>No data available</div>';
@@ -50,8 +51,8 @@ export const generateGridHTML = (
     const overlayHtml = showText ? `<div style="position: absolute; bottom: -1px; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 14px; font-family: 'Satoshi-Variable', sans-serif; height: 55px; display: flex; align-items: center;">
       <div style="display: flex; align-items: center; gap: 5px; width: 100%;">
         <span style="font-weight: bold; font-size: 40px;">${row.rank}</span>
-        <div style="width: 30px; display: flex; justify-content: center; align-items: center;">${iconHtml}</div>
-        <div style="display: flex; flex-direction: column; flex: 1; gap:0px">
+        ${showVariationIcons ? `<div style="width: 30px; display: flex; justify-content: center; align-items: center;">${iconHtml}</div>` : ''}
+        <div style="display: flex; flex-direction: column; flex: 1; gap:0px${showVariationIcons ? '' : '; margin-left: 10px'}">
           <span style="font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(row.name || '')}</span>
           <span style="font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(row.artistName || '')}</span>
         </div>

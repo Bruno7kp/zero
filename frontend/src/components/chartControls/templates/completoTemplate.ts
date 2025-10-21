@@ -4,7 +4,10 @@ export const generateCompletoHTML = (
   _weekNumber: number | null,
   _chartType: 'artist' | 'album' | 'track',
   backgroundColor: string = '#000000',
-  topCount: number = 20
+  topCount: number = 20,
+  showColoredIcons: boolean = true,
+  selectedColumns: string[] = ['plays', 'last'],
+  chart?: any
 ): string => {
   if (!chartData || chartData.length === 0 || !week) {
     return '<div>No data available</div>';
@@ -39,6 +42,16 @@ export const generateCompletoHTML = (
   const data = chartData.slice(0, topCount); // Use variable topCount
   const topImage = data[0]?.imageUrl || data[0]?.albumImage || '';
 
+  // Calculate date range for the week
+  let dateRange = '';
+  if (week) {
+    const endDate = new Date(week);
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 6);
+    const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  }
+
   // Split data into two columns
   const midPoint = Math.ceil(data.length / 2);
   const column1 = data.slice(0, midPoint);
@@ -62,6 +75,35 @@ export const generateCompletoHTML = (
   };
 
   const isLightBackground = isLightColor(backgroundColor);
+
+  // Function to format numbers with abbreviations (k, M, B)
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000000) {
+      return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    }
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    }
+    return num.toString();
+  };
+
+  // Function to calculate sales based on chart formula
+  const calculateSales = (row: any): number => {
+    if (!chart) return 0;
+    
+    const effectiveType = _chartType === 'track' ? 'track' : 'album';
+    const pointsWeight = effectiveType === 'track' ? Number(chart?.music_points_weight || 0) : Number(chart?.album_points_weight || 0);
+    const playsWeight = effectiveType === 'track' ? Number(chart?.music_plays_weight || 0) : Number(chart?.album_plays_weight || 0);
+    
+    const stabilityPoints = row.rank != null && row.rank > 0 ? Math.max(0, 101 - row.rank) : 0;
+    const safePlays = typeof row.plays === 'number' ? row.plays : 0;
+    const raw = stabilityPoints * pointsWeight + safePlays * playsWeight;
+    
+    return Number.isFinite(raw) ? Math.round(raw) : 0;
+  };
 
   let html = `
     <style>
@@ -136,6 +178,20 @@ export const generateCompletoHTML = (
         color: #fff;
       }
 
+      .chart-dates {
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: #fff;
+        text-shadow: 0 0 4px rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.3);
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+
       .chart-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -202,6 +258,9 @@ export const generateCompletoHTML = (
       }
       .new-entry {
         color: var(---completo-color-new);
+      }
+      .neutral {
+        color: var(---completo-text-color);
       }
 
       .song-cover {
@@ -278,9 +337,59 @@ export const generateCompletoHTML = (
           </div>
           <h1 class="chart-title">TOP ${topCount} ${typeLabel}</h1>
         </div>
+        ${dateRange ? `<div class="chart-dates">${dateRange}</div>` : ''}
       </div>
       <div class="chart-grid">
   `;
+
+  // Function to generate stats HTML based on selected columns
+  const generateStatsHTML = (row: any): string => {
+    let statsHTML = '';
+    
+    selectedColumns.forEach(column => {
+      let label = '';
+      let value = '';
+      
+      switch (column) {
+        case 'plays':
+          label = 'plays';
+          value = row.plays ? formatNumber(row.plays) : '0';
+          break;
+        case 'vendas':
+          label = 'vendas';
+          value = formatNumber(calculateSales(row));
+          break;
+        case 'peak':
+          label = 'peak';
+          value = row.peak ? row.peak.toString() : '—';
+          break;
+        case 'last':
+          label = 'last';
+          if (row.deltaRank === 'NEW' || row.deltaRank === 'RE') {
+            value = '—';
+          } else if (typeof row.deltaRank === 'number') {
+            const prev = row.rank + row.deltaRank;
+            value = prev > 0 ? prev.toString() : '—';
+          } else {
+            value = '—';
+          }
+          break;
+        case 'weeks':
+          label = 'weeks';
+          value = row.weeks ? row.weeks.toString() : '—';
+          break;
+      }
+      
+      statsHTML += `
+        <div class="stat">
+          <span class="stat-label">${label}</span>
+          <span class="stat-value">${value}</span>
+        </div>
+      `;
+    });
+    
+    return statsHTML;
+  };
 
   // Function to generate trend icon
   const getTrendIcon = (deltaRank: any) => {
@@ -288,19 +397,23 @@ export const generateCompletoHTML = (
     let trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
 
     if (deltaRank === 'NEW') {
-      trendClass = 'new-entry';
+      trendClass = showColoredIcons ? 'new-entry' : 'neutral';
       trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
     } else if (deltaRank === 'RE') {
-      trendClass = 'new-entry'; // Using new-entry for reentry as well
+      trendClass = showColoredIcons ? 'new-entry' : 'neutral'; // Using new-entry for reentry as well
       trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
     } else if (typeof deltaRank === 'number') {
       if (deltaRank > 0) {
-        trendClass = 'move-up';
+        trendClass = showColoredIcons ? 'move-up' : 'neutral';
         trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
       } else if (deltaRank < 0) {
-        trendClass = 'move-down';
+        trendClass = showColoredIcons ? 'move-down' : 'neutral';
         trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>';
+      } else {
+        trendClass = 'neutral';
       }
+    } else {
+      trendClass = 'neutral';
     }
 
     return { trendClass, trendIcon };
@@ -311,15 +424,6 @@ export const generateCompletoHTML = (
   column1.forEach((row) => {
     const imageUrl = row.imageUrl || row.albumImage || '';
     const { trendClass, trendIcon } = getTrendIcon(row.deltaRank);
-    const plays = row.plays ? row.plays.toLocaleString() : '0';
-    const lastPosition = (() => {
-      if (row.deltaRank === 'NEW' || row.deltaRank === 'RE') return '—';
-      if (typeof row.deltaRank === 'number') {
-        const prev = row.rank + row.deltaRank;
-        return prev > 0 ? prev.toString() : '—';
-      }
-      return '—';
-    })();
 
     html += `
       <div class="song-item">
@@ -333,14 +437,7 @@ export const generateCompletoHTML = (
           ${row.artistName ? `<p class="song-artist">${escapeHtml(truncateText(row.artistName, 30))}</p>` : ''}
         </div>
         <div class="song-stats">
-          <div class="stat">
-            <span class="stat-label">plays</span>
-            <span class="stat-value">${plays}</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">last</span>
-            <span class="stat-value">${lastPosition}</span>
-          </div>
+          ${generateStatsHTML(row)}
         </div>
       </div>
     `;
@@ -352,15 +449,6 @@ export const generateCompletoHTML = (
   column2.forEach((row) => {
     const imageUrl = row.imageUrl || row.albumImage || '';
     const { trendClass, trendIcon } = getTrendIcon(row.deltaRank);
-    const plays = row.plays ? row.plays.toLocaleString() : '0';
-    const lastPosition = (() => {
-      if (row.deltaRank === 'NEW' || row.deltaRank === 'RE') return '—';
-      if (typeof row.deltaRank === 'number') {
-        const prev = row.rank + row.deltaRank;
-        return prev > 0 ? prev.toString() : '—';
-      }
-      return '—';
-    })();
 
     html += `
       <div class="song-item">
@@ -374,14 +462,7 @@ export const generateCompletoHTML = (
           ${row.artistName ? `<p class="song-artist">${escapeHtml(truncateText(row.artistName, 30))}</p>` : ''}
         </div>
         <div class="song-stats">
-          <div class="stat">
-            <span class="stat-label">plays</span>
-            <span class="stat-value">${plays}</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">last</span>
-            <span class="stat-value">${lastPosition}</span>
-          </div>
+          ${generateStatsHTML(row)}
         </div>
       </div>
     `;
