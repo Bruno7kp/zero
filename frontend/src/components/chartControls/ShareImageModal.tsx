@@ -242,7 +242,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart.id]);
+  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart]);
 
   // Efeito que gera a imagem de prévia apenas quando o tipo muda ou modal abre
   useEffect(() => {
@@ -253,7 +253,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       setIsLoading(true);
       generatePreviewImage();
     }
-  }, [opened, selectedType]); // Removido generatePreviewImage das dependências
+  }, [opened, selectedType, generatePreviewImage]);
 
   // O download agora é instantâneo
   const handleDownload = () => {
