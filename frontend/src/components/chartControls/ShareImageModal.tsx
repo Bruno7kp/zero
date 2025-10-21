@@ -253,7 +253,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       setIsLoading(true);
       generatePreviewImage();
     }
-  }, [opened, selectedType, generatePreviewImage]);
+  }, [opened, selectedType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // O download agora é instantâneo
   const handleDownload = () => {
