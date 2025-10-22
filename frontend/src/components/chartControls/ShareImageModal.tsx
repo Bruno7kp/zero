@@ -62,6 +62,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [selectedStories2ListWrapBackgroundType, setSelectedStories2ListWrapBackgroundType] = useState<'transparent' | 'solid'>(savedSettings.selectedStories2ListWrapBackgroundType || 'transparent');
   const [selectedStories2ListWrapBackgroundColor, setSelectedStories2ListWrapBackgroundColor] = useState<string>(savedSettings.selectedStories2ListWrapBackgroundColor || '#1a1a1a');
   const [selectedStories2ShowAlbumCovers, setSelectedStories2ShowAlbumCovers] = useState<boolean>(savedSettings.selectedStories2ShowAlbumCovers ?? true);
+  const [selectedStories2ShowColoredIcons, setSelectedStories2ShowColoredIcons] = useState<boolean>(savedSettings.selectedStories2ShowColoredIcons ?? true);
+  const [selectedStories2ShowIconBackground, setSelectedStories2ShowIconBackground] = useState<boolean>(savedSettings.selectedStories2ShowIconBackground ?? true);
   const [selectedCompletoBackgroundColor, setSelectedCompletoBackgroundColor] = useState<string>(savedSettings.selectedCompletoBackgroundColor || '#1a1a1a');
   const [selectedCompletoTop, setSelectedCompletoTop] = useState<string>(savedSettings.selectedCompletoTop || "full");
   const [selectedCompletoShowColoredIcons, setSelectedCompletoShowColoredIcons] = useState<boolean>(savedSettings.selectedCompletoShowColoredIcons ?? true);
@@ -84,6 +86,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         selectedStories2ListWrapBackgroundType,
         selectedStories2ListWrapBackgroundColor,
         selectedStories2ShowAlbumCovers,
+        selectedStories2ShowColoredIcons,
+        selectedStories2ShowIconBackground,
         selectedCompletoBackgroundColor,
         selectedCompletoTop,
         selectedCompletoShowColoredIcons,
@@ -107,6 +111,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     selectedStories2ListWrapBackgroundType,
     selectedStories2ListWrapBackgroundColor,
     selectedStories2ShowAlbumCovers,
+    selectedStories2ShowColoredIcons,
+    selectedStories2ShowIconBackground,
     selectedCompletoBackgroundColor,
     selectedCompletoTop,
     selectedCompletoShowColoredIcons,
@@ -252,7 +258,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
         dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
       }
-      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers);
+      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers, selectedStories2ShowColoredIcons, selectedStories2ShowIconBackground);
     } else {
       topCount = selectedCompletoTop === "full" ? chartData.length : parseInt(selectedCompletoTop);
       // Validar a URL customizada antes de usar
@@ -295,7 +301,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, selectedCompletoCustomHeaderImage, chart, enrichedDataCache]);
+  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, selectedStories2ShowColoredIcons, selectedStories2ShowIconBackground, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, selectedCompletoCustomHeaderImage, chart, enrichedDataCache]);
 
   // Efeito que gera a imagem de prévia apenas quando o tipo muda ou modal abre
   useEffect(() => {
@@ -368,6 +374,10 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
               selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
               setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
+              selectedStories2ShowColoredIcons={selectedStories2ShowColoredIcons}
+              setSelectedStories2ShowColoredIcons={setSelectedStories2ShowColoredIcons}
+              selectedStories2ShowIconBackground={selectedStories2ShowIconBackground}
+              setSelectedStories2ShowIconBackground={setSelectedStories2ShowIconBackground}
               selectedCompletoBackgroundColor={selectedCompletoBackgroundColor}
               setSelectedCompletoBackgroundColor={setSelectedCompletoBackgroundColor}
               selectedCompletoTop={selectedCompletoTop}

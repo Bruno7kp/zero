@@ -37,6 +37,10 @@ interface ShareOptionsProps {
   setSelectedStories2ListWrapBackgroundColor: (color: string) => void;
   selectedStories2ShowAlbumCovers: boolean;
   setSelectedStories2ShowAlbumCovers: (show: boolean) => void;
+  selectedStories2ShowColoredIcons: boolean;
+  setSelectedStories2ShowColoredIcons: (show: boolean) => void;
+  selectedStories2ShowIconBackground: boolean;
+  setSelectedStories2ShowIconBackground: (show: boolean) => void;
   selectedCompletoBackgroundColor: string;
   setSelectedCompletoBackgroundColor: (color: string) => void;
   selectedCompletoTop: string;
@@ -86,6 +90,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedStories2ListWrapBackgroundColor,
   selectedStories2ShowAlbumCovers,
   setSelectedStories2ShowAlbumCovers,
+  selectedStories2ShowColoredIcons,
+  setSelectedStories2ShowColoredIcons,
+  selectedStories2ShowIconBackground,
+  setSelectedStories2ShowIconBackground,
   selectedCompletoBackgroundColor,
   setSelectedCompletoBackgroundColor,
   selectedCompletoTop,
@@ -159,6 +167,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
               selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
               setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
+              selectedStories2ShowColoredIcons={selectedStories2ShowColoredIcons}
+              setSelectedStories2ShowColoredIcons={setSelectedStories2ShowColoredIcons}
+              selectedStories2ShowIconBackground={selectedStories2ShowIconBackground}
+              setSelectedStories2ShowIconBackground={setSelectedStories2ShowIconBackground}
               chartData={chartData}
             />
           )}

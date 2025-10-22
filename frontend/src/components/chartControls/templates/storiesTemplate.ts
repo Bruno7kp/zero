@@ -54,20 +54,73 @@ export const generateStoriesHTML = (
       }
 
       .poster header{
-        display: grid;
-        grid-template-columns:1fr 280px; 
-        gap:20px;
-        align-items:end;
-        padding:48px 48px 24px;
-        border-bottom:1px solid rgba(255,109,104,.45);
+        position: relative;
+        height: 380px;
+        ${topImage ? `background-image: url("${topImage}");` : 'background-color: #333;'}
+        background-size: cover;
+        background-position: center center;
+        border-bottom:1px solid rgba(255,109,104);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 48px 48px 36px;
+        overflow: hidden;
       }
 
-      .tag{padding:8px 16px 6px;font-size:28px;margin-bottom:12px; border-width: 4px; text-transform: uppercase;}
-      .hstack{color:#ff6d68;display:flex;align-items:flex-end;gap:12px}
-      .hstack .t1{font-family:'Poppins', sans-serif; font-weight: 800; font-size:90px}
-      .hstack .t2{font-family:'Poppins', sans-serif; font-weight: 800; font-size:170px}
-      .shot{width:280px;height:280px;border-radius:12px;overflow:hidden;justify-self:end;box-shadow:0 10px 40px rgba(0,0,0,.45); background: #333; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;}
-      .shot img{width:100%;height:100%;object-fit:cover;display:block}
+      .poster header::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+        background: linear-gradient(to top right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 45%, transparent 80%);
+        pointer-events: none;
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .logo-container img {
+        width: 250px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      }
+
+      .title-container {
+        display: flex;
+        align-items: flex-end;
+        gap: 44px;
+      }
+
+      .title-type {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        font-size: 90px;
+        color: #ffffff;
+        text-transform: uppercase;
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      }
+
+      .title-number {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        font-size: 170px;
+        color: #ff6d68;
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      }
 
       .board{position:relative; overflow: hidden;}
       .rows{padding:0 48px 12px}
@@ -170,11 +223,15 @@ export const generateStoriesHTML = (
   html += `
     <main class="poster">
       <header>
-        <div>
-          <div class="tag">zero charts</div>
-          <div class="hstack"><div class="t1">TOP ${typeLabel}</div><div class="t2">${topCount === 5 ? '5' : '10'}</div></div>
+        <div class="header-content">
+          <div class="logo-container">
+            <img src="/zero-white.svg" alt="ZERO" />
+          </div>
+          <div class="title-container">
+            <div class="title-type">${typeLabel}</div>
+            <div class="title-number">${topCount === 5 ? '5' : '10'}</div>
+          </div>
         </div>
-        <figure class="shot">${topImage ? `<img src="${topImage}" alt="Foto principal do Chart" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMAGE</span>'}</figure>
       </header>
 
       <section class="board">

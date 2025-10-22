@@ -18,6 +18,10 @@ interface Stories2SettingsProps {
   setSelectedStories2ListWrapBackgroundColor: (color: string) => void;
   selectedStories2ShowAlbumCovers: boolean;
   setSelectedStories2ShowAlbumCovers: (show: boolean) => void;
+  selectedStories2ShowColoredIcons: boolean;
+  setSelectedStories2ShowColoredIcons: (show: boolean) => void;
+  selectedStories2ShowIconBackground: boolean;
+  setSelectedStories2ShowIconBackground: (show: boolean) => void;
   chartData: any[];
 }
 
@@ -37,6 +41,10 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
   setSelectedStories2ListWrapBackgroundColor,
   selectedStories2ShowAlbumCovers,
   setSelectedStories2ShowAlbumCovers,
+  selectedStories2ShowColoredIcons,
+  setSelectedStories2ShowColoredIcons,
+  selectedStories2ShowIconBackground,
+  setSelectedStories2ShowIconBackground,
   chartData,
 }) => {
   return (
@@ -137,6 +145,24 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
               checked={selectedStories2ShowAlbumCovers}
               onChange={(event) => setSelectedStories2ShowAlbumCovers(event.currentTarget.checked)}
               label={selectedStories2ShowAlbumCovers ? t('common.show', 'Show') : t('common.hide', 'Hide')}
+            />
+          </div>
+
+          <div>
+            <Text size="sm" fw={500} mb="xs">{t('charts.share.showColoredIcons', 'Show Colored Icons')}</Text>
+            <Switch
+              checked={selectedStories2ShowColoredIcons}
+              onChange={(event) => setSelectedStories2ShowColoredIcons(event.currentTarget.checked)}
+              label={selectedStories2ShowColoredIcons ? t('charts.enabled', 'Enabled') : t('charts.disabled', 'Disabled')}
+            />
+          </div>
+
+          <div>
+            <Text size="sm" fw={500} mb="xs">{t('charts.share.showIconBackground', 'Show Icon Background')}</Text>
+            <Switch
+              checked={selectedStories2ShowIconBackground}
+              onChange={(event) => setSelectedStories2ShowIconBackground(event.currentTarget.checked)}
+              label={selectedStories2ShowIconBackground ? t('common.show', 'Show') : t('common.hide', 'Hide')}
             />
           </div>
         </Stack>
