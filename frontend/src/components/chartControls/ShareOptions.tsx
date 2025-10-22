@@ -45,6 +45,9 @@ interface ShareOptionsProps {
   setSelectedCompletoShowColoredIcons: (show: boolean) => void;
   selectedCompletoColumns: string[];
   setSelectedCompletoColumns: (columns: string[]) => void;
+  selectedCompletoCustomHeaderImage: string;
+  setSelectedCompletoCustomHeaderImage: (url: string) => void;
+  isAllowedImageDomain: (url: string) => boolean;
   chartType: 'artist' | 'album' | 'track';
   chartData: any[];
   previewImageUrl: string | null;
@@ -91,6 +94,9 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedCompletoShowColoredIcons,
   selectedCompletoColumns,
   setSelectedCompletoColumns,
+  selectedCompletoCustomHeaderImage,
+  setSelectedCompletoCustomHeaderImage,
+  isAllowedImageDomain,
   chartType,
   chartData,
   previewImageUrl,
@@ -168,6 +174,9 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               setSelectedCompletoShowColoredIcons={setSelectedCompletoShowColoredIcons}
               selectedCompletoColumns={selectedCompletoColumns}
               setSelectedCompletoColumns={setSelectedCompletoColumns}
+              selectedCompletoCustomHeaderImage={selectedCompletoCustomHeaderImage}
+              setSelectedCompletoCustomHeaderImage={setSelectedCompletoCustomHeaderImage}
+              isAllowedImageDomain={isAllowedImageDomain}
               chartData={chartData}
             />
           )}

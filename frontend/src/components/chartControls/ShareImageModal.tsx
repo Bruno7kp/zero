@@ -66,6 +66,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [selectedCompletoTop, setSelectedCompletoTop] = useState<string>(savedSettings.selectedCompletoTop || "full");
   const [selectedCompletoShowColoredIcons, setSelectedCompletoShowColoredIcons] = useState<boolean>(savedSettings.selectedCompletoShowColoredIcons ?? true);
   const [selectedCompletoColumns, setSelectedCompletoColumns] = useState<string[]>(savedSettings.selectedCompletoColumns || ['plays', 'last']);
+  const [selectedCompletoCustomHeaderImage, setSelectedCompletoCustomHeaderImage] = useState<string>(savedSettings.selectedCompletoCustomHeaderImage || '');
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
@@ -87,6 +88,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         selectedCompletoTop,
         selectedCompletoShowColoredIcons,
         selectedCompletoColumns,
+        selectedCompletoCustomHeaderImage,
       };
       localStorage.setItem(`shareSettings_${chart.id}_${chartType}`, JSON.stringify(settings));
     }
@@ -109,28 +111,63 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     selectedCompletoTop,
     selectedCompletoShowColoredIcons,
     selectedCompletoColumns,
+    selectedCompletoCustomHeaderImage,
   ]);
 
   // Estados para a imagem de prévia e o carregamento
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentImageType, setCurrentImageType] = useState<string>('');
+  
+  // Cache dos dados enriquecidos para evitar reprocessamento
+  const [enrichedDataCache, setEnrichedDataCache] = useState<any[] | null>(null);
 
   const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
   const dispatch = useDispatch();
 
+  // Lista de domínios permitidos para imagens (mesma lista do ImageEditModal)
+  const ALLOWED_IMAGE_DOMAINS = [
+    'i.scdn.co', 'open.spotify.com',
+    'last.fm', 'lastfm-img2.akamaized.net', 'lastfm.freetls.fastly.net',
+    'e-cdns-images.dzcdn.net',
+    'is5-ssl.mzstatic.com', 'is4-ssl.mzstatic.com',
+    'img.discogs.com', 'coverartarchive.org',
+    'f4.bcbits.com', 'resources.tidal.com',
+    'i1.sndcdn.com', 'images-na.ssl-images-amazon.com',
+    'yt3.ggpht.com', 'i.ytimg.com',
+    'i.imgur.com', 'imgur.com',
+    'res.cloudinary.com', 'images.unsplash.com',
+    'live.staticflickr.com', 'lh3.googleusercontent.com',
+    'raw.githubusercontent.com', 'user-images.githubusercontent.com',
+  ];
+
+  const isAllowedImageDomain = useCallback((url: string): boolean => {
+    if (!url) return true; // Empty URL is allowed (will use default)
+    try {
+      const u = new URL(url);
+      return ALLOWED_IMAGE_DOMAINS.some(domain => u.hostname.endsWith(domain));
+    } catch {
+      return false;
+    }
+  }, []);
+
   // Load stats map if needed
   useEffect(() => {
     if (opened && chartData.length > 0 && week && chart?.id) {
-      // Always clear cache and reload to ensure fresh data
-      const cacheKey = `${chart.id}_${chartType}_${week}`;
-      dispatch(removeStatsCacheEntry(cacheKey));
-      dispatch(fetchStatsMapIncremental({ 
-        chartId: String(chart.id), 
-        chartType: String(chartType), 
-        data: chartData, 
-        week 
-      }) as any);
+      // Aguarda o modal renderizar antes de carregar os stats
+      const timeoutId = setTimeout(() => {
+        // Always clear cache and reload to ensure fresh data
+        const cacheKey = `${chart.id}_${chartType}_${week}`;
+        dispatch(removeStatsCacheEntry(cacheKey));
+        dispatch(fetchStatsMapIncremental({ 
+          chartId: String(chart.id), 
+          chartType: String(chartType), 
+          data: chartData, 
+          week 
+        }) as any);
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [opened, chartData, week, chart?.id, chartType, dispatch]);
 
@@ -147,51 +184,62 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       return;
     }
 
-    // Enriquecer data com imagens e estatísticas
-    const enrichedData = await Promise.all(chartData.map(async (row) => {
-      const cached = await spotifyImagesDb.images.get(row.entityId);
-      const imageUrl = cached?.imageUrl || null;
-      const albumImage = imageUrl; // para compatibilidade
-      
-      // Calcular stats localmente se não estiver disponível no statsMap
-      let peak = null;
-      let weeks = null;
-      
-      const existingStats = statsMap?.[row.entityId];
-      if (existingStats?.peak?.position && existingStats?.totals?.withinCutoff) {
-        peak = existingStats.peak.position;
-        weeks = existingStats.totals.withinCutoff;
-      } else {
-        // Calcular stats diretamente do banco
-        try {
-          const historicalData = await db.charts_data
-            .where('[chartId+chartType+entityId+week]')
-            .between([chart.id.toString(), chartType, row.entityId, '0000'], [chart.id.toString(), chartType, row.entityId, week])
-            .toArray();
-          
-          if (historicalData.length > 0) {
-            let minRank = Infinity;
-            let weeksCount = 0;
+    // Usar cache se disponível, caso contrário enriquecer os dados
+    let enrichedData: any[];
+    
+    if (enrichedDataCache) {
+      // Usa o cache existente - muito mais rápido!
+      enrichedData = enrichedDataCache;
+    } else {
+      // Enriquecer data com imagens e estatísticas (apenas na primeira vez)
+      enrichedData = await Promise.all(chartData.map(async (row) => {
+        const cached = await spotifyImagesDb.images.get(row.entityId);
+        const imageUrl = cached?.imageUrl || null;
+        const albumImage = imageUrl; // para compatibilidade
+        
+        // Calcular stats localmente se não estiver disponível no statsMap
+        let peak = null;
+        let weeks = null;
+        
+        const existingStats = statsMap?.[row.entityId];
+        if (existingStats?.peak?.position && existingStats?.totals?.withinCutoff) {
+          peak = existingStats.peak.position;
+          weeks = existingStats.totals.withinCutoff;
+        } else {
+          // Calcular stats diretamente do banco
+          try {
+            const historicalData = await db.charts_data
+              .where('[chartId+chartType+entityId+week]')
+              .between([chart.id.toString(), chartType, row.entityId, '0000'], [chart.id.toString(), chartType, row.entityId, week])
+              .toArray();
             
-            for (const hist of historicalData) {
-              if (hist.rank != null) {
-                weeksCount++;
-                if (typeof hist.rank === 'number' && hist.rank < minRank) {
-                  minRank = hist.rank;
+            if (historicalData.length > 0) {
+              let minRank = Infinity;
+              let weeksCount = 0;
+              
+              for (const hist of historicalData) {
+                if (hist.rank != null) {
+                  weeksCount++;
+                  if (typeof hist.rank === 'number' && hist.rank < minRank) {
+                    minRank = hist.rank;
+                  }
                 }
               }
+              
+              peak = minRank === Infinity ? null : minRank;
+              weeks = weeksCount;
             }
-            
-            peak = minRank === Infinity ? null : minRank;
-            weeks = weeksCount;
+          } catch (error) {
+            console.error('Error calculating stats for', row.entityId, error);
           }
-        } catch (error) {
-          console.error('Error calculating stats for', row.entityId, error);
         }
-      }
+        
+        return { ...row, imageUrl, albumImage, peak, weeks };
+      }));
       
-      return { ...row, imageUrl, albumImage, peak, weeks };
-    }));
+      // Salva no cache para uso futuro
+      setEnrichedDataCache(enrichedData);
+    }
 
     let htmlForCanvas: string;
     let topCount: number = 20; // default
@@ -207,11 +255,16 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers);
     } else {
       topCount = selectedCompletoTop === "full" ? chartData.length : parseInt(selectedCompletoTop);
+      // Validar a URL customizada antes de usar
+      const validCustomHeaderImage = selectedCompletoCustomHeaderImage && isAllowedImageDomain(selectedCompletoCustomHeaderImage) 
+        ? selectedCompletoCustomHeaderImage 
+        : '';
+      
       htmlForCanvas = selectedType === 'grid'
         ? generateGridHTML(enrichedData, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons)
         : selectedType === 'stories'
         ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, weekNumber, chartType)
-        : generateCompletoHTML(enrichedData, week, weekNumber, chartType, selectedCompletoBackgroundColor, topCount, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart);
+        : generateCompletoHTML(enrichedData, week, weekNumber, chartType, selectedCompletoBackgroundColor, topCount, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart, validCustomHeaderImage);
     }
     
     const tempDiv = document.createElement('div');
@@ -242,7 +295,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart]);
+  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, selectedCompletoCustomHeaderImage, chart, enrichedDataCache]);
 
   // Efeito que gera a imagem de prévia apenas quando o tipo muda ou modal abre
   useEffect(() => {
@@ -251,7 +304,24 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       setPreviewImageUrl(null);
       setCurrentImageType('');
       setIsLoading(true);
-      generatePreviewImage();
+      
+      // Aguarda o modal estar completamente renderizado antes de gerar a imagem
+      // Usa requestAnimationFrame para garantir que o navegador renderize primeiro
+      const rafId = requestAnimationFrame(() => {
+        const timeoutId = setTimeout(() => {
+          generatePreviewImage();
+        }, 200);
+        
+        // Cleanup do timeout
+        return () => clearTimeout(timeoutId);
+      });
+      
+      return () => {
+        cancelAnimationFrame(rafId);
+      };
+    } else {
+      // Limpa o cache quando o modal é fechado
+      setEnrichedDataCache(null);
     }
   }, [opened, selectedType]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -306,6 +376,9 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedCompletoShowColoredIcons={setSelectedCompletoShowColoredIcons}
               selectedCompletoColumns={selectedCompletoColumns}
               setSelectedCompletoColumns={setSelectedCompletoColumns}
+              selectedCompletoCustomHeaderImage={selectedCompletoCustomHeaderImage}
+              setSelectedCompletoCustomHeaderImage={setSelectedCompletoCustomHeaderImage}
+              isAllowedImageDomain={isAllowedImageDomain}
               chartType={chartType}
               chartData={chartData}
               previewImageUrl={previewImageUrl}
@@ -319,7 +392,13 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
                 setPreviewImageUrl(null);
                 setIsLoading(true);
                 setCurrentImageType('');
-                generatePreviewImage();
+                
+                // Usa requestAnimationFrame + setTimeout para não travar a UI
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    generatePreviewImage();
+                  }, 50);
+                });
               }}
             />
           </Grid.Col>

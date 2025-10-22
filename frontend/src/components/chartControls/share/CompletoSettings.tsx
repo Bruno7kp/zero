@@ -1,6 +1,6 @@
 import React from 'react';
-import { Radio, Stack, Text, Accordion, Flex, ColorInput, Switch, Checkbox } from '@mantine/core';
-import { IconSettings } from '@tabler/icons-react';
+import { Radio, Stack, Text, Accordion, Flex, ColorInput, Switch, Checkbox, TextInput } from '@mantine/core';
+import { IconSettings, IconAlertCircle } from '@tabler/icons-react';
 
 interface CompletoSettingsProps {
   t: (k: any, options?: any) => string;
@@ -12,6 +12,9 @@ interface CompletoSettingsProps {
   setSelectedCompletoShowColoredIcons: (show: boolean) => void;
   selectedCompletoColumns: string[];
   setSelectedCompletoColumns: (columns: string[]) => void;
+  selectedCompletoCustomHeaderImage: string;
+  setSelectedCompletoCustomHeaderImage: (url: string) => void;
+  isAllowedImageDomain: (url: string) => boolean;
   chartData: any[];
 }
 
@@ -25,6 +28,9 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
   setSelectedCompletoShowColoredIcons,
   selectedCompletoColumns,
   setSelectedCompletoColumns,
+  selectedCompletoCustomHeaderImage,
+  setSelectedCompletoCustomHeaderImage,
+  isAllowedImageDomain,
   chartData,
 }) => {
   return (
@@ -100,6 +106,19 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
                 />
               ))}
             </Stack>
+          </div>
+          <div>
+            <Text size="sm" fw={500} mb="xs">{t('charts.share.customHeaderImage', 'Custom Header Image')}</Text>
+            <TextInput
+              value={selectedCompletoCustomHeaderImage}
+              onChange={(event) => setSelectedCompletoCustomHeaderImage(event.currentTarget.value)}
+              placeholder={t('charts.share.customHeaderImagePlaceholder', 'Leave empty to use first place image')}
+              description={t('charts.share.customHeaderImageDescription', 'Use a trusted URL (Spotify, Last.fm, Imgur, etc.)')}
+              error={selectedCompletoCustomHeaderImage && !isAllowedImageDomain(selectedCompletoCustomHeaderImage) 
+                ? t('charts.share.invalidImageDomain', 'Please use a trusted image domain')
+                : null}
+              rightSection={selectedCompletoCustomHeaderImage && !isAllowedImageDomain(selectedCompletoCustomHeaderImage) ? <IconAlertCircle size={16} color="red" /> : null}
+            />
           </div>
         </Stack>
       </Accordion.Panel>

@@ -7,7 +7,8 @@ export const generateCompletoHTML = (
   topCount: number = 20,
   showColoredIcons: boolean = true,
   selectedColumns: string[] = ['plays', 'last'],
-  chart?: any
+  chart?: any,
+  customHeaderImage?: string
 ): string => {
   if (!chartData || chartData.length === 0 || !week) {
     return '<div>No data available</div>';
@@ -40,7 +41,8 @@ export const generateCompletoHTML = (
   })();
 
   const data = chartData.slice(0, topCount); // Use variable topCount
-  const topImage = data[0]?.imageUrl || data[0]?.albumImage || '';
+  const defaultTopImage = data[0]?.imageUrl || data[0]?.albumImage || '';
+  const topImage = customHeaderImage || defaultTopImage;
 
   // Calculate date range for the week
   let dateRange = '';

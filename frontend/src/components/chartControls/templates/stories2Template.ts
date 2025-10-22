@@ -139,7 +139,7 @@ export const generateStories2HTML = async (
       .header { padding: 84px 72px 36px 72px; display: grid; grid-template-columns: 1fr 380px 120px; gap: 48px; align-items: center; }
       .brandRow { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; opacity: 0.95; }
       .brandText { font-weight: 800; letter-spacing: 0.02em; }
-      .title { font-family: 'Satoshi-Variable', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
+      .title { font-family: Poppins, sans-serif !important; line-height: 0.92; color: var(--stories-text-color); }
       .title .a { display: block; font-size: 124px; font-weight: 900; letter-spacing: -0.01em; }
       .chartdate { font-size: 25px; margin-top: 18px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.9; color: var(--stories-text-color); }
 
