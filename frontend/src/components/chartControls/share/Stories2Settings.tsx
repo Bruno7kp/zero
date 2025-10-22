@@ -1,6 +1,7 @@
 import React from 'react';
 import { Radio, Stack, Text, Accordion, Flex, ColorInput, Switch } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
+import { COLOR_SWATCHES } from '../templates/utils/colorSwatches';
 
 interface Stories2SettingsProps {
   t: (k: any, options?: any) => string;
@@ -85,14 +86,8 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
                 onChange={setSelectedStories2BackgroundColor}
                 size="md"
                 format="hex"
-                swatches={[
-                  '#1a1a1a', '#666666', '#f5f5f5',
-                  '#117e39', '#22c55e',
-                  '#a31818', '#f088be',
-                  '#070049', '#2563eb', '#60a5fa',
-                  '#e66109', '#fbbf24',
-                  '#7d0eb1', '#c4b5fd'
-                ]}
+                swatchesPerRow={10}
+                swatches={COLOR_SWATCHES}
               />
             </div>
           )}
@@ -127,14 +122,8 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
                 onChange={setSelectedStories2ListWrapBackgroundColor}
                 size="md"
                 format="hex"
-                swatches={[
-                  '#1a1a1a', '#666666', '#f5f5f5',
-                  '#117e39', '#22c55e',
-                  '#a31818', '#f088be',
-                  '#070049', '#2563eb', '#60a5fa',
-                  '#e66109', '#fbbf24',
-                  '#7d0eb1', '#c4b5fd'
-                ]}
+                swatchesPerRow={10}
+                swatches={COLOR_SWATCHES}
               />
             </div>
           )}

@@ -1,3 +1,7 @@
+import { generateCertificationSvg } from './utils/certificationSvg';
+import { isLightColor } from './utils/colorUtils';
+import type { DiscLevel } from '../../MetalVinylDisc';
+
 export const generateCompletoHTML = (
   chartData: any[],
   week: string | undefined,
@@ -8,7 +12,9 @@ export const generateCompletoHTML = (
   showColoredIcons: boolean = true,
   selectedColumns: string[] = ['plays', 'last'],
   chart?: any,
-  customHeaderImage?: string
+  customHeaderImage?: string,
+  certificationsData?: Record<string, any>,
+  showCert: boolean = false
 ): string => {
   if (!chartData || chartData.length === 0 || !week) {
     return '<div>No data available</div>';
@@ -59,23 +65,6 @@ export const generateCompletoHTML = (
   const column1 = data.slice(0, midPoint);
   const column2 = data.slice(midPoint);
 
-  // Function to detect if color is light or dark
-  const isLightColor = (color: string): boolean => {
-    // Remove # if present
-    const hex = color.replace('#', '');
-    
-    // Convert to RGB
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    
-    // Calculate luminance
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    
-    // Return true if light (luminance > 0.5)
-    return luminance > 0.5;
-  };
-
   const isLightBackground = isLightColor(backgroundColor);
 
   // Function to format numbers with abbreviations (k, M, B)
@@ -107,6 +96,22 @@ export const generateCompletoHTML = (
     return Number.isFinite(raw) ? Math.round(raw) : 0;
   };
 
+  // Function to render certification badge
+  const renderCertification = (row: any): string => {
+    if (!showCert || _chartType === 'artist' || !certificationsData) {
+      return '';
+    }
+    
+    const cert = certificationsData[row.entityId];
+    if (!cert || !cert.level) {
+      return '';
+    }
+
+    // Generate inline SVG without multiplier
+    const svgDataUrl = generateCertificationSvg(cert.level as DiscLevel);
+    return `<img src="${svgDataUrl}" width="24" height="24" style="margin: auto;" alt="${cert.level}" />`;
+  };
+
   let html = `
     <style>
       :root {
@@ -135,12 +140,7 @@ export const generateCompletoHTML = (
       .chart-header {
         position: relative;
         height: 250px;
-        ${topImage ? `background-image: linear-gradient(
-          to right,
-          rgba(0, 0, 0, 0.9) 20%,
-          rgba(0, 0, 0, 0.1) 100%
-        ),
-        url("${topImage}");` : `background-color: ${backgroundColor};`}
+        ${topImage ? `background-image: url("${topImage}");` : `background-color: ${backgroundColor};`}
         background-size: cover;
         background-position: center 30%;
         padding: 20px;
@@ -150,8 +150,25 @@ export const generateCompletoHTML = (
         justify-content: flex-end;
       }
 
+      .chart-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -1px;
+        right: 0;
+        bottom: -1px;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.9) 20%,
+          rgba(0, 0, 0, 0.1) 100%
+        );
+        pointer-events: none;
+      }
+
       .header-text {
         flex-shrink: 0;
+        position: relative;
+        z-index: 1;
       }
 
       .logo {
@@ -181,6 +198,7 @@ export const generateCompletoHTML = (
       }
 
       .chart-dates {
+        display: none;
         position: absolute;
         bottom: 0px;
         right: 0px;
@@ -192,6 +210,7 @@ export const generateCompletoHTML = (
         background: rgba(0,0,0,0.3);
         padding: 4px 8px;
         border-radius: 4px;
+        z-index: 1;
       }
 
       .chart-grid {
@@ -314,6 +333,15 @@ export const generateCompletoHTML = (
         width: 40px;
       }
 
+      .stat-cert {
+        margin-left: 15px;
+        text-align: center;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       .stat-label {
         display: block;
         font-size: 9px;
@@ -347,6 +375,19 @@ export const generateCompletoHTML = (
   // Function to generate stats HTML based on selected columns
   const generateStatsHTML = (row: any): string => {
     let statsHTML = '';
+    
+    // Add certification first if enabled
+    if (showCert && _chartType !== 'artist') {
+      const certHTML = renderCertification(row);
+      
+      if (certHTML) {
+        statsHTML += `
+          <div class="stat-cert">
+            ${certHTML}
+          </div>
+        `;
+      }
+    }
     
     selectedColumns.forEach(column => {
       let label = '';

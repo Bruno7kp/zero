@@ -1,6 +1,7 @@
 import React from 'react';
 import { Radio, Stack, Text, Accordion, Flex, ColorInput, Switch, Checkbox, TextInput } from '@mantine/core';
 import { IconSettings, IconAlertCircle } from '@tabler/icons-react';
+import { COLOR_SWATCHES } from '../templates/utils/colorSwatches';
 
 interface CompletoSettingsProps {
   t: (k: any, options?: any) => string;
@@ -14,7 +15,10 @@ interface CompletoSettingsProps {
   setSelectedCompletoColumns: (columns: string[]) => void;
   selectedCompletoCustomHeaderImage: string;
   setSelectedCompletoCustomHeaderImage: (url: string) => void;
+  selectedCompletoShowCert: boolean;
+  setSelectedCompletoShowCert: (show: boolean) => void;
   isAllowedImageDomain: (url: string) => boolean;
+  chartType: 'artist' | 'album' | 'track';
   chartData: any[];
 }
 
@@ -30,7 +34,10 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
   setSelectedCompletoColumns,
   selectedCompletoCustomHeaderImage,
   setSelectedCompletoCustomHeaderImage,
+  selectedCompletoShowCert,
+  setSelectedCompletoShowCert,
   isAllowedImageDomain,
+  chartType,
   chartData,
 }) => {
   return (
@@ -61,14 +68,8 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
               onChange={setSelectedCompletoBackgroundColor}
               size="md"
               format="hex"
-              swatches={[
-                '#1a1a1a', '#666666', '#f5f5f5',
-                '#117e39', '#22c55e',
-                '#a31818', '#f088be',
-                '#070049', '#2563eb', '#60a5fa',
-                '#e66109', '#fbbf24',
-                '#7d0eb1', '#c4b5fd'
-              ]}
+              swatchesPerRow={10}
+              swatches={COLOR_SWATCHES}
             />
           </div>
           <div>
@@ -118,6 +119,18 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
                 ? t('charts.share.invalidImageDomain', 'Please use a trusted image domain')
                 : null}
               rightSection={selectedCompletoCustomHeaderImage && !isAllowedImageDomain(selectedCompletoCustomHeaderImage) ? <IconAlertCircle size={16} color="red" /> : null}
+            />
+          </div>
+          <div>
+            <Text size="sm" fw={500} mb="xs">{t('charts.share.showCertification', 'Show Certification')}</Text>
+            <Switch
+              checked={selectedCompletoShowCert}
+              onChange={(event) => {
+                setSelectedCompletoShowCert(event.currentTarget.checked);
+              }}
+              label={selectedCompletoShowCert ? t('charts.enabled', 'Enabled') : t('charts.disabled', 'Disabled')}
+              disabled={chartType === 'artist'}
+              description={chartType === 'artist' ? t('charts.share.certNotAvailableForArtists', 'Not available for artist charts') : undefined}
             />
           </div>
         </Stack>

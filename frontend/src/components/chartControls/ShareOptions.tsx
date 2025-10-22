@@ -23,6 +23,10 @@ interface ShareOptionsProps {
   setSelectedGridShowVariationIcons: (show: boolean) => void;
   selectedStoriesTop: 5 | 10;
   setSelectedStoriesTop: (top: 5 | 10) => void;
+  selectedStoriesPrimaryColor: string;
+  setSelectedStoriesPrimaryColor: (color: string) => void;
+  selectedStoriesHighlightColor: string;
+  setSelectedStoriesHighlightColor: (color: string) => void;
   selectedStories2Top: 5 | 10;
   setSelectedStories2Top: (top: 5 | 10) => void;
   selectedStories2BackgroundType: 'blur' | 'solid';
@@ -51,6 +55,8 @@ interface ShareOptionsProps {
   setSelectedCompletoColumns: (columns: string[]) => void;
   selectedCompletoCustomHeaderImage: string;
   setSelectedCompletoCustomHeaderImage: (url: string) => void;
+  selectedCompletoShowCert: boolean;
+  setSelectedCompletoShowCert: (show: boolean) => void;
   isAllowedImageDomain: (url: string) => boolean;
   chartType: 'artist' | 'album' | 'track';
   chartData: any[];
@@ -76,6 +82,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedGridShowVariationIcons,
   selectedStoriesTop,
   setSelectedStoriesTop,
+  selectedStoriesPrimaryColor,
+  setSelectedStoriesPrimaryColor,
+  selectedStoriesHighlightColor,
+  setSelectedStoriesHighlightColor,
   selectedStories2Top,
   setSelectedStories2Top,
   selectedStories2BackgroundType,
@@ -104,6 +114,8 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedCompletoColumns,
   selectedCompletoCustomHeaderImage,
   setSelectedCompletoCustomHeaderImage,
+  selectedCompletoShowCert,
+  setSelectedCompletoShowCert,
   isAllowedImageDomain,
   chartType,
   chartData,
@@ -146,6 +158,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               t={t}
               selectedStoriesTop={selectedStoriesTop}
               setSelectedStoriesTop={setSelectedStoriesTop}
+              selectedStoriesPrimaryColor={selectedStoriesPrimaryColor}
+              setSelectedStoriesPrimaryColor={setSelectedStoriesPrimaryColor}
+              selectedStoriesHighlightColor={selectedStoriesHighlightColor}
+              setSelectedStoriesHighlightColor={setSelectedStoriesHighlightColor}
               chartData={chartData}
             />
           )}
@@ -188,7 +204,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               setSelectedCompletoColumns={setSelectedCompletoColumns}
               selectedCompletoCustomHeaderImage={selectedCompletoCustomHeaderImage}
               setSelectedCompletoCustomHeaderImage={setSelectedCompletoCustomHeaderImage}
+              selectedCompletoShowCert={selectedCompletoShowCert}
+              setSelectedCompletoShowCert={setSelectedCompletoShowCert}
               isAllowedImageDomain={isAllowedImageDomain}
+              chartType={chartType}
               chartData={chartData}
             />
           )}
