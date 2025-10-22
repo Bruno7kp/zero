@@ -12,6 +12,23 @@ import { generatePlainTextChart } from './utils/shareUtils';
 import { ShareOptions } from './ShareOptions';
 import { fetchStatsMapIncremental } from '../../store/charts';
 import { removeStatsCacheEntry } from '../../store/chartsSlice';
+import { computeCertificationFromCache } from './utils/certificationFromCache';
+
+// Lista de domínios permitidos para imagens (mesma lista do ImageEditModal)
+const ALLOWED_IMAGE_DOMAINS = [
+  'i.scdn.co', 'open.spotify.com',
+  'last.fm', 'lastfm-img2.akamaized.net', 'lastfm.freetls.fastly.net',
+  'e-cdns-images.dzcdn.net',
+  'is5-ssl.mzstatic.com', 'is4-ssl.mzstatic.com',
+  'img.discogs.com', 'coverartarchive.org',
+  'f4.bcbits.com', 'resources.tidal.com',
+  'i1.sndcdn.com', 'images-na.ssl-images-amazon.com',
+  'yt3.ggpht.com', 'i.ytimg.com',
+  'i.imgur.com', 'imgur.com',
+  'res.cloudinary.com', 'images.unsplash.com',
+  'live.staticflickr.com', 'lh3.googleusercontent.com',
+  'raw.githubusercontent.com', 'user-images.githubusercontent.com',
+];
 
 interface ShareImageModalProps {
   t: (k: any, options?: any) => string;
@@ -55,6 +72,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [selectedGridShowText, setSelectedGridShowText] = useState<boolean>(savedSettings.selectedGridShowText ?? true);
   const [selectedGridShowVariationIcons, setSelectedGridShowVariationIcons] = useState<boolean>(savedSettings.selectedGridShowVariationIcons ?? true);
   const [selectedStoriesTop, setSelectedStoriesTop] = useState<5 | 10>(savedSettings.selectedStoriesTop || 10);
+  const [selectedStoriesPrimaryColor, setSelectedStoriesPrimaryColor] = useState<string>(savedSettings.selectedStoriesPrimaryColor || '#ff6d68');
+  const [selectedStoriesHighlightColor, setSelectedStoriesHighlightColor] = useState<string>(savedSettings.selectedStoriesHighlightColor || '#ffffff');
   const [selectedStories2Top, setSelectedStories2Top] = useState<5 | 10>(savedSettings.selectedStories2Top || 10);
   const [selectedStories2BackgroundType, setSelectedStories2BackgroundType] = useState<'blur' | 'solid'>(savedSettings.selectedStories2BackgroundType || 'blur');
   const [selectedStories2BackgroundColor, setSelectedStories2BackgroundColor] = useState<string>(savedSettings.selectedStories2BackgroundColor || '#1a1a1a');
@@ -62,10 +81,14 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [selectedStories2ListWrapBackgroundType, setSelectedStories2ListWrapBackgroundType] = useState<'transparent' | 'solid'>(savedSettings.selectedStories2ListWrapBackgroundType || 'transparent');
   const [selectedStories2ListWrapBackgroundColor, setSelectedStories2ListWrapBackgroundColor] = useState<string>(savedSettings.selectedStories2ListWrapBackgroundColor || '#1a1a1a');
   const [selectedStories2ShowAlbumCovers, setSelectedStories2ShowAlbumCovers] = useState<boolean>(savedSettings.selectedStories2ShowAlbumCovers ?? true);
+  const [selectedStories2ShowColoredIcons, setSelectedStories2ShowColoredIcons] = useState<boolean>(savedSettings.selectedStories2ShowColoredIcons ?? true);
+  const [selectedStories2ShowIconBackground, setSelectedStories2ShowIconBackground] = useState<boolean>(savedSettings.selectedStories2ShowIconBackground ?? true);
   const [selectedCompletoBackgroundColor, setSelectedCompletoBackgroundColor] = useState<string>(savedSettings.selectedCompletoBackgroundColor || '#1a1a1a');
   const [selectedCompletoTop, setSelectedCompletoTop] = useState<string>(savedSettings.selectedCompletoTop || "full");
   const [selectedCompletoShowColoredIcons, setSelectedCompletoShowColoredIcons] = useState<boolean>(savedSettings.selectedCompletoShowColoredIcons ?? true);
   const [selectedCompletoColumns, setSelectedCompletoColumns] = useState<string[]>(savedSettings.selectedCompletoColumns || ['plays', 'last']);
+  const [selectedCompletoCustomHeaderImage, setSelectedCompletoCustomHeaderImage] = useState<string>(savedSettings.selectedCompletoCustomHeaderImage || '');
+  const [selectedCompletoShowCert, setSelectedCompletoShowCert] = useState<boolean>(savedSettings.selectedCompletoShowCert ?? false);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
@@ -76,6 +99,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         selectedGridShowText,
         selectedGridShowVariationIcons,
         selectedStoriesTop,
+        selectedStoriesPrimaryColor,
+        selectedStoriesHighlightColor,
         selectedStories2Top,
         selectedStories2BackgroundType,
         selectedStories2BackgroundColor,
@@ -83,10 +108,14 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         selectedStories2ListWrapBackgroundType,
         selectedStories2ListWrapBackgroundColor,
         selectedStories2ShowAlbumCovers,
+        selectedStories2ShowColoredIcons,
+        selectedStories2ShowIconBackground,
         selectedCompletoBackgroundColor,
         selectedCompletoTop,
         selectedCompletoShowColoredIcons,
         selectedCompletoColumns,
+        selectedCompletoCustomHeaderImage,
+        selectedCompletoShowCert,
       };
       localStorage.setItem(`shareSettings_${chart.id}_${chartType}`, JSON.stringify(settings));
     }
@@ -98,6 +127,8 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     selectedGridShowText,
     selectedGridShowVariationIcons,
     selectedStoriesTop,
+    selectedStoriesPrimaryColor,
+    selectedStoriesHighlightColor,
     selectedStories2Top,
     selectedStories2BackgroundType,
     selectedStories2BackgroundColor,
@@ -105,32 +136,56 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     selectedStories2ListWrapBackgroundType,
     selectedStories2ListWrapBackgroundColor,
     selectedStories2ShowAlbumCovers,
+    selectedStories2ShowColoredIcons,
+    selectedStories2ShowIconBackground,
     selectedCompletoBackgroundColor,
     selectedCompletoTop,
     selectedCompletoShowColoredIcons,
     selectedCompletoColumns,
+    selectedCompletoCustomHeaderImage,
+    selectedCompletoShowCert,
   ]);
 
   // Estados para a imagem de prévia e o carregamento
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentImageType, setCurrentImageType] = useState<string>('');
+  
+  // Cache dos dados enriquecidos para evitar reprocessamento
+  const [enrichedDataCache, setEnrichedDataCache] = useState<any[] | null>(null);
+  // Cache de certificações computadas
+  const [certificationsCache, setCertificationsCache] = useState<Record<string, any>>({});
 
   const statsMap = useSelector((state: any) => state.charts?.statsMap || {});
   const dispatch = useDispatch();
 
+  const isAllowedImageDomain = useCallback((url: string): boolean => {
+    if (!url) return true; // Empty URL is allowed (will use default)
+    try {
+      const u = new URL(url);
+      return ALLOWED_IMAGE_DOMAINS.some(domain => u.hostname.endsWith(domain));
+    } catch {
+      return false;
+    }
+  }, []);
+
   // Load stats map if needed
   useEffect(() => {
     if (opened && chartData.length > 0 && week && chart?.id) {
-      // Always clear cache and reload to ensure fresh data
-      const cacheKey = `${chart.id}_${chartType}_${week}`;
-      dispatch(removeStatsCacheEntry(cacheKey));
-      dispatch(fetchStatsMapIncremental({ 
-        chartId: String(chart.id), 
-        chartType: String(chartType), 
-        data: chartData, 
-        week 
-      }) as any);
+      // Aguarda o modal renderizar antes de carregar os stats
+      const timeoutId = setTimeout(() => {
+        // Always clear cache and reload to ensure fresh data
+        const cacheKey = `${chart.id}_${chartType}_${week}`;
+        dispatch(removeStatsCacheEntry(cacheKey));
+        dispatch(fetchStatsMapIncremental({ 
+          chartId: String(chart.id), 
+          chartType: String(chartType), 
+          data: chartData, 
+          week 
+        }) as any);
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [opened, chartData, week, chart?.id, chartType, dispatch]);
 
@@ -147,51 +202,110 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       return;
     }
 
-    // Enriquecer data com imagens e estatísticas
-    const enrichedData = await Promise.all(chartData.map(async (row) => {
-      const cached = await spotifyImagesDb.images.get(row.entityId);
-      const imageUrl = cached?.imageUrl || null;
-      const albumImage = imageUrl; // para compatibilidade
-      
-      // Calcular stats localmente se não estiver disponível no statsMap
-      let peak = null;
-      let weeks = null;
-      
-      const existingStats = statsMap?.[row.entityId];
-      if (existingStats?.peak?.position && existingStats?.totals?.withinCutoff) {
-        peak = existingStats.peak.position;
-        weeks = existingStats.totals.withinCutoff;
-      } else {
-        // Calcular stats diretamente do banco
-        try {
-          const historicalData = await db.charts_data
-            .where('[chartId+chartType+entityId+week]')
-            .between([chart.id.toString(), chartType, row.entityId, '0000'], [chart.id.toString(), chartType, row.entityId, week])
-            .toArray();
-          
-          if (historicalData.length > 0) {
-            let minRank = Infinity;
-            let weeksCount = 0;
-            
-            for (const hist of historicalData) {
-              if (hist.rank != null) {
-                weeksCount++;
-                if (typeof hist.rank === 'number' && hist.rank < minRank) {
-                  minRank = hist.rank;
+    // Usar cache se disponível, caso contrário enriquecer os dados
+    let enrichedData: any[];
+    
+    if (enrichedDataCache) {
+      // Usa o cache existente - muito mais rápido!
+      enrichedData = enrichedDataCache;
+    } else {
+      // Enriquecer data com imagens e estatísticas (apenas na primeira vez)
+      enrichedData = await Promise.all(chartData.map(async (row) => {
+        const cached = await spotifyImagesDb.images.get(row.entityId);
+        const imageUrl = cached?.imageUrl || null;
+        const albumImage = imageUrl; // para compatibilidade
+        
+        // Calcular stats localmente se não estiver disponível no statsMap
+        let peak = null;
+        let weeks = null;
+        let totalPoints = null;
+        
+        const existingStats = statsMap?.[row.entityId];
+        if (existingStats?.peak?.position && existingStats?.totals?.withinCutoff) {
+          peak = existingStats.peak.position;
+          weeks = existingStats.totals.withinCutoff;
+          totalPoints = existingStats.totals.totalPoints || 0;
+        } else {
+          // Buscar stats do IndexedDB se não estiver no statsMap
+          try {
+            const dbStats = await db.charts_stats.get([chart.id.toString(), chartType, row.entityId]);
+            if (dbStats) {
+              peak = dbStats.peak?.position || null;
+              weeks = dbStats.totals?.withinCutoff || null;
+              totalPoints = dbStats.totals?.totalPoints || 0;
+            } else {
+              // Se não houver stats no IndexedDB, calcular diretamente dos dados
+              const historicalData = await db.charts_data
+                .where('[chartId+chartType+entityId+week]')
+                .between([chart.id.toString(), chartType, row.entityId, '0000'], [chart.id.toString(), chartType, row.entityId, week])
+                .toArray();
+              
+              if (historicalData.length > 0) {
+                let minRank = Infinity;
+                let weeksCount = 0;
+                let pointsSum = 0;
+                
+                for (const hist of historicalData) {
+                  if (hist.rank != null) {
+                    weeksCount++;
+                    if (typeof hist.rank === 'number') {
+                      if (hist.rank < minRank) {
+                        minRank = hist.rank;
+                      }
+                      // Somar pontos de estabilidade: 101 - rank
+                      pointsSum += Math.max(0, 101 - hist.rank);
+                    }
+                  }
                 }
+                
+                peak = minRank === Infinity ? null : minRank;
+                weeks = weeksCount;
+                totalPoints = pointsSum;
               }
             }
-            
-            peak = minRank === Infinity ? null : minRank;
-            weeks = weeksCount;
+          } catch (error) {
+            console.error('Error calculating stats for', row.entityId, error);
           }
-        } catch (error) {
-          console.error('Error calculating stats for', row.entityId, error);
         }
-      }
+        
+        return { ...row, imageUrl, albumImage, peak, weeks, totalPoints };
+      }));
       
-      return { ...row, imageUrl, albumImage, peak, weeks };
-    }));
+      // Salva no cache para uso futuro
+      setEnrichedDataCache(enrichedData);
+      
+      // Computar certificações do cache apenas se showCert estiver habilitado e for tipo album/track
+      if (selectedCompletoShowCert && chartType !== 'artist') {
+        const certPromises = enrichedData.map(async (row) => {
+          // totalPoints já vem calculado do enrichedData (soma de 101-rank de todas as semanas)
+          const totalPoints = row.totalPoints || 0;
+          
+          // Determinar o nome do artista corretamente
+          const artistName = row.artist || row.artistName || '';
+          
+          const cert = await computeCertificationFromCache({
+            chart,
+            chartType: chartType as 'album' | 'track',
+            totalPoints,
+            entityName: row.name || '',
+            artistName: artistName,
+            username: lastfmUsername,
+          });
+          
+          return { entityId: row.entityId, cert };
+        });
+        
+        const certResults = await Promise.all(certPromises);
+        const certMap: Record<string, any> = {};
+        certResults.forEach(({ entityId, cert }) => {
+          if (cert) {
+            certMap[entityId] = cert;
+          }
+        });
+        
+        setCertificationsCache(certMap);
+      }
+    }
 
     let htmlForCanvas: string;
     let topCount: number = 20; // default
@@ -204,14 +318,32 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
         dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
       }
-      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers);
+      htmlForCanvas = await generateStories2HTML(enrichedData, selectedStories2Top, week, weekNumber, chartType, dateRange, selectedStories2BackgroundType, selectedStories2BackgroundColor, lastfmUsername, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundType, selectedStories2ListWrapBackgroundColor, selectedStories2ShowAlbumCovers, selectedStories2ShowColoredIcons, selectedStories2ShowIconBackground);
     } else {
       topCount = selectedCompletoTop === "full" ? chartData.length : parseInt(selectedCompletoTop);
+      // Validar a URL customizada antes de usar
+      const validCustomHeaderImage = selectedCompletoCustomHeaderImage && isAllowedImageDomain(selectedCompletoCustomHeaderImage) 
+        ? selectedCompletoCustomHeaderImage 
+        : '';
+      
       htmlForCanvas = selectedType === 'grid'
         ? generateGridHTML(enrichedData, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons)
         : selectedType === 'stories'
-        ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, weekNumber, chartType)
-        : generateCompletoHTML(enrichedData, week, weekNumber, chartType, selectedCompletoBackgroundColor, topCount, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart);
+        ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, chartType, chart, selectedStoriesHighlightColor, selectedStoriesPrimaryColor)
+        : generateCompletoHTML(
+            enrichedData, 
+            week, 
+            weekNumber, 
+            chartType, 
+            selectedCompletoBackgroundColor, 
+            topCount, 
+            selectedCompletoShowColoredIcons, 
+            selectedCompletoColumns, 
+            chart, 
+            validCustomHeaderImage, 
+            certificationsCache, 
+            selectedCompletoShowCert
+          );
     }
     
     const tempDiv = document.createElement('div');
@@ -242,7 +374,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       document.body.removeChild(tempDiv);
       setIsLoading(false);
     }
-  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, chart]);
+  }, [chartData, selectedType, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons, selectedStoriesTop, selectedStoriesPrimaryColor, selectedStoriesHighlightColor, selectedStories2Top, week, weekNumber, chartType, getCurrentTypeKey, lastfmUsername, selectedStories2BackgroundColor, selectedStories2BackgroundType, selectedStories2ShowPlays, selectedStories2ListWrapBackgroundColor, selectedStories2ListWrapBackgroundType, selectedStories2ShowAlbumCovers, selectedStories2ShowColoredIcons, selectedStories2ShowIconBackground, statsMap, selectedCompletoBackgroundColor, selectedCompletoTop, selectedCompletoShowColoredIcons, selectedCompletoColumns, selectedCompletoCustomHeaderImage, selectedCompletoShowCert, chart, enrichedDataCache, certificationsCache, isAllowedImageDomain]);
 
   // Efeito que gera a imagem de prévia apenas quando o tipo muda ou modal abre
   useEffect(() => {
@@ -251,7 +383,24 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       setPreviewImageUrl(null);
       setCurrentImageType('');
       setIsLoading(true);
-      generatePreviewImage();
+      
+      // Aguarda o modal estar completamente renderizado antes de gerar a imagem
+      // Usa requestAnimationFrame para garantir que o navegador renderize primeiro
+      const rafId = requestAnimationFrame(() => {
+        const timeoutId = setTimeout(() => {
+          generatePreviewImage();
+        }, 200);
+        
+        // Cleanup do timeout
+        return () => clearTimeout(timeoutId);
+      });
+      
+      return () => {
+        cancelAnimationFrame(rafId);
+      };
+    } else {
+      // Limpa o cache quando o modal é fechado
+      setEnrichedDataCache(null);
     }
   }, [opened, selectedType]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -284,6 +433,10 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedGridShowVariationIcons={setSelectedGridShowVariationIcons}
               selectedStoriesTop={selectedStoriesTop}
               setSelectedStoriesTop={setSelectedStoriesTop}
+              selectedStoriesPrimaryColor={selectedStoriesPrimaryColor}
+              setSelectedStoriesPrimaryColor={setSelectedStoriesPrimaryColor}
+              selectedStoriesHighlightColor={selectedStoriesHighlightColor}
+              setSelectedStoriesHighlightColor={setSelectedStoriesHighlightColor}
               selectedStories2Top={selectedStories2Top}
               setSelectedStories2Top={setSelectedStories2Top}
               selectedStories2BackgroundType={selectedStories2BackgroundType}
@@ -298,6 +451,10 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
               selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
               setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
+              selectedStories2ShowColoredIcons={selectedStories2ShowColoredIcons}
+              setSelectedStories2ShowColoredIcons={setSelectedStories2ShowColoredIcons}
+              selectedStories2ShowIconBackground={selectedStories2ShowIconBackground}
+              setSelectedStories2ShowIconBackground={setSelectedStories2ShowIconBackground}
               selectedCompletoBackgroundColor={selectedCompletoBackgroundColor}
               setSelectedCompletoBackgroundColor={setSelectedCompletoBackgroundColor}
               selectedCompletoTop={selectedCompletoTop}
@@ -306,6 +463,11 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
               setSelectedCompletoShowColoredIcons={setSelectedCompletoShowColoredIcons}
               selectedCompletoColumns={selectedCompletoColumns}
               setSelectedCompletoColumns={setSelectedCompletoColumns}
+              selectedCompletoCustomHeaderImage={selectedCompletoCustomHeaderImage}
+              setSelectedCompletoCustomHeaderImage={setSelectedCompletoCustomHeaderImage}
+              selectedCompletoShowCert={selectedCompletoShowCert}
+              setSelectedCompletoShowCert={setSelectedCompletoShowCert}
+              isAllowedImageDomain={isAllowedImageDomain}
               chartType={chartType}
               chartData={chartData}
               previewImageUrl={previewImageUrl}
@@ -319,7 +481,13 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
                 setPreviewImageUrl(null);
                 setIsLoading(true);
                 setCurrentImageType('');
-                generatePreviewImage();
+                
+                // Usa requestAnimationFrame + setTimeout para não travar a UI
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    generatePreviewImage();
+                  }, 50);
+                });
               }}
             />
           </Grid.Col>

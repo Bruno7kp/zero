@@ -27,7 +27,7 @@ export const generateGridHTML = (
   
   // Estilos fixos para alta resolução
   const sizePx = size * 300;
-  const containerStyle = `font-family: 'Satoshi-Variable', sans-serif; background: #fff; color: #000; width: ${sizePx}px; height: ${sizePx}px; box-sizing: border-box; display: grid; grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr); gap: 0px;`;
+  const containerStyle = `font-family: 'Inter', sans-serif; background: #fff; color: #000; width: ${sizePx}px; height: ${sizePx}px; box-sizing: border-box; display: grid; grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr); gap: 0px;`;
   const itemStyle = `width: 300px; height: 300px; position: relative; display: flex; justify-content: center; align-items: center;`;
 
   let html = `<div class="poster" style="${containerStyle}">`;
@@ -48,7 +48,7 @@ export const generateGridHTML = (
       iconHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
     }
     const imageHtml = imageUrl ? `<img src="${imageUrl}" alt="" crossorigin="anonymous" onerror="this.style.display='none'" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;" />` : '<div style="width: 100%; height: 100%; background: #ccc; position: absolute; top: 0; left: 0;"></div>';
-    const overlayHtml = showText ? `<div style="position: absolute; bottom: -1px; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 14px; font-family: 'Satoshi-Variable', sans-serif; height: 55px; display: flex; align-items: center;">
+    const overlayHtml = showText ? `<div style="position: absolute; bottom: -1px; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 14px; font-family: 'Inter', sans-serif; height: 55px; display: flex; align-items: center;">
       <div style="display: flex; align-items: center; gap: 5px; width: 100%;">
         <span style="font-weight: bold; font-size: 40px;">${row.rank}</span>
         ${showVariationIcons ? `<div style="width: 30px; display: flex; justify-content: center; align-items: center;">${iconHtml}</div>` : ''}

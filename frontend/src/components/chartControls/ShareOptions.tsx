@@ -23,6 +23,10 @@ interface ShareOptionsProps {
   setSelectedGridShowVariationIcons: (show: boolean) => void;
   selectedStoriesTop: 5 | 10;
   setSelectedStoriesTop: (top: 5 | 10) => void;
+  selectedStoriesPrimaryColor: string;
+  setSelectedStoriesPrimaryColor: (color: string) => void;
+  selectedStoriesHighlightColor: string;
+  setSelectedStoriesHighlightColor: (color: string) => void;
   selectedStories2Top: 5 | 10;
   setSelectedStories2Top: (top: 5 | 10) => void;
   selectedStories2BackgroundType: 'blur' | 'solid';
@@ -37,6 +41,10 @@ interface ShareOptionsProps {
   setSelectedStories2ListWrapBackgroundColor: (color: string) => void;
   selectedStories2ShowAlbumCovers: boolean;
   setSelectedStories2ShowAlbumCovers: (show: boolean) => void;
+  selectedStories2ShowColoredIcons: boolean;
+  setSelectedStories2ShowColoredIcons: (show: boolean) => void;
+  selectedStories2ShowIconBackground: boolean;
+  setSelectedStories2ShowIconBackground: (show: boolean) => void;
   selectedCompletoBackgroundColor: string;
   setSelectedCompletoBackgroundColor: (color: string) => void;
   selectedCompletoTop: string;
@@ -45,6 +53,11 @@ interface ShareOptionsProps {
   setSelectedCompletoShowColoredIcons: (show: boolean) => void;
   selectedCompletoColumns: string[];
   setSelectedCompletoColumns: (columns: string[]) => void;
+  selectedCompletoCustomHeaderImage: string;
+  setSelectedCompletoCustomHeaderImage: (url: string) => void;
+  selectedCompletoShowCert: boolean;
+  setSelectedCompletoShowCert: (show: boolean) => void;
+  isAllowedImageDomain: (url: string) => boolean;
   chartType: 'artist' | 'album' | 'track';
   chartData: any[];
   previewImageUrl: string | null;
@@ -69,6 +82,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedGridShowVariationIcons,
   selectedStoriesTop,
   setSelectedStoriesTop,
+  selectedStoriesPrimaryColor,
+  setSelectedStoriesPrimaryColor,
+  selectedStoriesHighlightColor,
+  setSelectedStoriesHighlightColor,
   selectedStories2Top,
   setSelectedStories2Top,
   selectedStories2BackgroundType,
@@ -83,6 +100,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedStories2ListWrapBackgroundColor,
   selectedStories2ShowAlbumCovers,
   setSelectedStories2ShowAlbumCovers,
+  selectedStories2ShowColoredIcons,
+  setSelectedStories2ShowColoredIcons,
+  selectedStories2ShowIconBackground,
+  setSelectedStories2ShowIconBackground,
   selectedCompletoBackgroundColor,
   setSelectedCompletoBackgroundColor,
   selectedCompletoTop,
@@ -91,6 +112,11 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
   setSelectedCompletoShowColoredIcons,
   selectedCompletoColumns,
   setSelectedCompletoColumns,
+  selectedCompletoCustomHeaderImage,
+  setSelectedCompletoCustomHeaderImage,
+  selectedCompletoShowCert,
+  setSelectedCompletoShowCert,
+  isAllowedImageDomain,
   chartType,
   chartData,
   previewImageUrl,
@@ -132,6 +158,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               t={t}
               selectedStoriesTop={selectedStoriesTop}
               setSelectedStoriesTop={setSelectedStoriesTop}
+              selectedStoriesPrimaryColor={selectedStoriesPrimaryColor}
+              setSelectedStoriesPrimaryColor={setSelectedStoriesPrimaryColor}
+              selectedStoriesHighlightColor={selectedStoriesHighlightColor}
+              setSelectedStoriesHighlightColor={setSelectedStoriesHighlightColor}
               chartData={chartData}
             />
           )}
@@ -153,6 +183,10 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
               selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
               setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
+              selectedStories2ShowColoredIcons={selectedStories2ShowColoredIcons}
+              setSelectedStories2ShowColoredIcons={setSelectedStories2ShowColoredIcons}
+              selectedStories2ShowIconBackground={selectedStories2ShowIconBackground}
+              setSelectedStories2ShowIconBackground={setSelectedStories2ShowIconBackground}
               chartData={chartData}
             />
           )}
@@ -168,6 +202,12 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               setSelectedCompletoShowColoredIcons={setSelectedCompletoShowColoredIcons}
               selectedCompletoColumns={selectedCompletoColumns}
               setSelectedCompletoColumns={setSelectedCompletoColumns}
+              selectedCompletoCustomHeaderImage={selectedCompletoCustomHeaderImage}
+              setSelectedCompletoCustomHeaderImage={setSelectedCompletoCustomHeaderImage}
+              selectedCompletoShowCert={selectedCompletoShowCert}
+              setSelectedCompletoShowCert={setSelectedCompletoShowCert}
+              isAllowedImageDomain={isAllowedImageDomain}
+              chartType={chartType}
               chartData={chartData}
             />
           )}

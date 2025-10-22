@@ -1,9 +1,13 @@
+import { isLightColor } from './utils/colorUtils';
+
 export const generateStoriesHTML = (
   chartData: any[],
   topCount: 5 | 10,
   week: string | undefined,
-  weekNumber: number | null,
-  chartType: 'artist' | 'album' | 'track'
+  chartType: 'artist' | 'album' | 'track',
+  chart?: any,
+  highlightColor: string = '#ffffff',
+  primaryColor: string = '#ff6d68'
 ): string => {
   if (!chartData || chartData.length === 0 || !week) {
     return '<div>No data available</div>';
@@ -33,8 +37,26 @@ export const generateStoriesHTML = (
   const data = chartData.slice(0, topCount);
   const topImage = data[0]?.imageUrl || data[0]?.albumImage || '';
 
-  // Data do chart
-  const chartDate = week || `Week ${weekNumber || ''}`;
+  // Calculate date range for the week
+  let dateRange = '';
+  if (week) {
+    const endDate = new Date(week);
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 6);
+    const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  }
+
+  const username = chart?.lastfm_username || '';
+  const footerText = username ? `@${username} - ${dateRange}` : dateRange;
+
+  // Determine text color based on highlight color
+  const isLightHighlight = isLightColor(highlightColor);
+  const highlightTextColor = isLightHighlight ? '#000000' : '#ffffff';
+
+  // Determine text color based on primary color
+  const isLightPrimary = isLightColor(primaryColor);
+  const primaryTextColor = isLightPrimary ? '#000000' : '#ffffff';
 
   let html = `
     <style>
@@ -54,20 +76,73 @@ export const generateStoriesHTML = (
       }
 
       .poster header{
-        display: grid;
-        grid-template-columns:1fr 280px; 
-        gap:20px;
-        align-items:end;
-        padding:48px 48px 24px;
-        border-bottom:1px solid rgba(255,109,104,.45);
+        position: relative;
+        height: 450px;
+        ${topImage ? `background-image: url("${topImage}");` : 'background-color: #333;'}
+        background-size: cover;
+        background-position: center center;
+        border-bottom:2px solid rgba(255,109,104);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 48px 48px 36px;
+        overflow: hidden;
       }
 
-      .tag{padding:8px 16px 6px;font-size:28px;margin-bottom:12px; border-width: 4px; text-transform: uppercase;}
-      .hstack{color:#ff6d68;display:flex;align-items:flex-end;gap:12px}
-      .hstack .t1{font-family:'Poppins', sans-serif; font-weight: 800; font-size:90px}
-      .hstack .t2{font-family:'Poppins', sans-serif; font-weight: 800; font-size:170px}
-      .shot{width:280px;height:280px;border-radius:12px;overflow:hidden;justify-self:end;box-shadow:0 10px 40px rgba(0,0,0,.45); background: #333; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;}
-      .shot img{width:100%;height:100%;object-fit:cover;display:block}
+      .poster header::before {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        top: 0;
+        background: linear-gradient(to top right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 45%, transparent 80%);
+        pointer-events: none;
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .logo-container img {
+        width: 300px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      }
+
+      .title-container {
+        display: flex;
+        align-items: baseline;
+        gap: 44px;
+      }
+
+      .title-type {
+        font-family: 'Bebas Neue', sans-serif;
+        font-weight: 400;
+        font-size: 90px;
+        color: rgba(255,255,255,0.8);
+        text-transform: uppercase;
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      }
+
+      .title-number {
+        font-family: 'Bebas Neue', sans-serif;
+        font-weight: 400;
+        font-size: 200px;
+        color: ${primaryColor};
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      }
 
       .board{position:relative; overflow: hidden;}
       .rows{padding:0 48px 12px}
@@ -82,12 +157,40 @@ export const generateStoriesHTML = (
 
       .rank{
         justify-content:center;
-        background:#ff6d68;
-        color:#000;
+        background: ${primaryColor};
+        color: ${primaryTextColor};
         font-weight:900;
         font-size:48px;
         position: relative;
-        font-family: 'Satoshi-Variable', sans-serif;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .row.highlight {
+        background: ${highlightColor};
+      }
+
+      .row.highlight .rank {
+        background: ${highlightColor};
+        color: ${highlightTextColor};
+      }
+
+      .row.highlight .name,
+      .row.highlight .last,
+      .row.highlight .move {
+        color: ${highlightTextColor};
+      }
+
+      .row.highlight .name .artist-name {
+        color: ${highlightTextColor};
+        opacity: 0.7;
+      }
+
+      .row.highlight .arrow {
+        color: ${highlightTextColor} !important;
+      }
+
+      .row.highlight .arrow svg {
+        stroke: ${highlightTextColor} !important;
       }
 
       .thumb{justify-content:center}
@@ -136,7 +239,7 @@ export const generateStoriesHTML = (
         display: block; /* MUDANÇA CRÍTICA: Volta para display: block */
         /* Remove as regras flexbox de centralização vertical e horizontal */
         /* text-align: left; /* Manteremos nos spans */
-        font-family: 'Satoshi-Variable', sans-serif;
+        font-family: 'Inter', sans-serif;
       }
 
       /* O alinhamento vertical agora será responsabilidade dos elementos internos */
@@ -147,7 +250,7 @@ export const generateStoriesHTML = (
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-family: 'Satoshi-Variable', sans-serif;
+        font-family: 'Inter', sans-serif;
       }
 
       .name .artist-name {
@@ -159,8 +262,9 @@ export const generateStoriesHTML = (
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-family: 'Inter', sans-serif;
       }
-      .last{justify-content:center;color:#cfd2d7;font-size:32px;font-family: 'Satoshi-Variable', sans-serif;font-weight:800}
+      .last{justify-content:center;color:#cfd2d7;font-size:32px;font-family: 'Inter', sans-serif;font-weight:800}
       .artist-only{margin-top: 22px;}
 
       footer{border-top:1px solid rgba(255,109,104,.45);display:flex;justify-content:flex-end;padding:20px 48px;color:#cfd2d7;font-size:18px;letter-spacing:.2em; text-align: right;}
@@ -170,11 +274,15 @@ export const generateStoriesHTML = (
   html += `
     <main class="poster">
       <header>
-        <div>
-          <div class="tag">zero charts</div>
-          <div class="hstack"><div class="t1">TOP ${typeLabel}</div><div class="t2">${topCount === 5 ? '5' : '10'}</div></div>
+        <div class="header-content">
+          <div class="logo-container">
+            <img src="/zero-white.svg" alt="ZERO" />
+          </div>
+          <div class="title-container">
+            <div class="title-type">${typeLabel}</div>
+            <div class="title-number">${topCount === 5 ? '5' : '10'}</div>
+          </div>
         </div>
-        <figure class="shot">${topImage ? `<img src="${topImage}" alt="Foto principal do Chart" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMAGE</span>'}</figure>
       </header>
 
       <section class="board">
@@ -187,6 +295,7 @@ export const generateStoriesHTML = (
     const deltaRank = row.deltaRank;
     let moveHtml = '';
     let lastPosition = '';
+    const isFirstPlace = row.rank === 1;
 
     if (deltaRank === 'NEW') {
       moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="8" x2="9" y2="16"></line><line x1="9" y1="8" x2="15" y2="16"></line><line x1="15" y1="8" x2="15" y2="16"></line></svg></div>';
@@ -211,7 +320,7 @@ export const generateStoriesHTML = (
     }
 
     html += `
-      <div class="row">
+      <div class="row${isFirstPlace ? ' highlight' : ''}">
         <div class="rank">${row.rank}</div>
         <div class="thumb">${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMG</span>'}</div>
         <div class="move">${moveHtml}</div>
@@ -228,7 +337,7 @@ export const generateStoriesHTML = (
         </div>
       </section>
 
-      <footer>CHART DATED ${chartDate.toUpperCase()}</footer>
+      <footer>${footerText.toUpperCase()}</footer>
     </main>
   `;
 

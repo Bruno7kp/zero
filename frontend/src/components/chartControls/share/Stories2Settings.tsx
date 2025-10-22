@@ -1,6 +1,7 @@
 import React from 'react';
 import { Radio, Stack, Text, Accordion, Flex, ColorInput, Switch } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
+import { COLOR_SWATCHES } from '../templates/utils/colorSwatches';
 
 interface Stories2SettingsProps {
   t: (k: any, options?: any) => string;
@@ -18,6 +19,10 @@ interface Stories2SettingsProps {
   setSelectedStories2ListWrapBackgroundColor: (color: string) => void;
   selectedStories2ShowAlbumCovers: boolean;
   setSelectedStories2ShowAlbumCovers: (show: boolean) => void;
+  selectedStories2ShowColoredIcons: boolean;
+  setSelectedStories2ShowColoredIcons: (show: boolean) => void;
+  selectedStories2ShowIconBackground: boolean;
+  setSelectedStories2ShowIconBackground: (show: boolean) => void;
   chartData: any[];
 }
 
@@ -37,6 +42,10 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
   setSelectedStories2ListWrapBackgroundColor,
   selectedStories2ShowAlbumCovers,
   setSelectedStories2ShowAlbumCovers,
+  selectedStories2ShowColoredIcons,
+  setSelectedStories2ShowColoredIcons,
+  selectedStories2ShowIconBackground,
+  setSelectedStories2ShowIconBackground,
   chartData,
 }) => {
   return (
@@ -77,14 +86,8 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
                 onChange={setSelectedStories2BackgroundColor}
                 size="md"
                 format="hex"
-                swatches={[
-                  '#1a1a1a', '#666666', '#f5f5f5',
-                  '#117e39', '#22c55e',
-                  '#a31818', '#f088be',
-                  '#070049', '#2563eb', '#60a5fa',
-                  '#e66109', '#fbbf24',
-                  '#7d0eb1', '#c4b5fd'
-                ]}
+                swatchesPerRow={10}
+                swatches={COLOR_SWATCHES}
               />
             </div>
           )}
@@ -119,14 +122,8 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
                 onChange={setSelectedStories2ListWrapBackgroundColor}
                 size="md"
                 format="hex"
-                swatches={[
-                  '#1a1a1a', '#666666', '#f5f5f5',
-                  '#117e39', '#22c55e',
-                  '#a31818', '#f088be',
-                  '#070049', '#2563eb', '#60a5fa',
-                  '#e66109', '#fbbf24',
-                  '#7d0eb1', '#c4b5fd'
-                ]}
+                swatchesPerRow={10}
+                swatches={COLOR_SWATCHES}
               />
             </div>
           )}
@@ -137,6 +134,24 @@ export const Stories2Settings: React.FC<Stories2SettingsProps> = ({
               checked={selectedStories2ShowAlbumCovers}
               onChange={(event) => setSelectedStories2ShowAlbumCovers(event.currentTarget.checked)}
               label={selectedStories2ShowAlbumCovers ? t('common.show', 'Show') : t('common.hide', 'Hide')}
+            />
+          </div>
+
+          <div>
+            <Text size="sm" fw={500} mb="xs">{t('charts.share.showColoredIcons', 'Show Colored Icons')}</Text>
+            <Switch
+              checked={selectedStories2ShowColoredIcons}
+              onChange={(event) => setSelectedStories2ShowColoredIcons(event.currentTarget.checked)}
+              label={selectedStories2ShowColoredIcons ? t('charts.enabled', 'Enabled') : t('charts.disabled', 'Disabled')}
+            />
+          </div>
+
+          <div>
+            <Text size="sm" fw={500} mb="xs">{t('charts.share.showIconBackground', 'Show Icon Background')}</Text>
+            <Switch
+              checked={selectedStories2ShowIconBackground}
+              onChange={(event) => setSelectedStories2ShowIconBackground(event.currentTarget.checked)}
+              label={selectedStories2ShowIconBackground ? t('common.show', 'Show') : t('common.hide', 'Hide')}
             />
           </div>
         </Stack>

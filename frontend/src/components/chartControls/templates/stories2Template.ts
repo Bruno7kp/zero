@@ -11,7 +11,9 @@ export const generateStories2HTML = async (
     showColumn: 'last' | 'plays' | 'peak' | 'weeks' = 'last',
     listWrapBackgroundType: 'transparent' | 'solid' = 'transparent',
     listWrapBackgroundColor: string = '#ffffff',
-    showAlbumCovers: boolean = true
+    showAlbumCovers: boolean = true,
+    showColoredIcons: boolean = true,
+    showIconBackground: boolean = true
 ): Promise<string> => {
     if (!chartData || chartData.length === 0 || !week) {
         return '<div>No data available</div>';
@@ -139,7 +141,7 @@ export const generateStories2HTML = async (
       .header { padding: 84px 72px 36px 72px; display: grid; grid-template-columns: 1fr 380px 120px; gap: 48px; align-items: center; }
       .brandRow { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; opacity: 0.95; }
       .brandText { font-weight: 800; letter-spacing: 0.02em; }
-      .title { font-family: 'Satoshi-Variable', sans-serif; line-height: 0.92; color: var(--stories-text-color); }
+      .title { font-family: Poppins, sans-serif !important; line-height: 0.92; color: var(--stories-text-color); }
       .title .a { display: block; font-size: 124px; font-weight: 900; letter-spacing: -0.01em; }
       .chartdate { font-size: 25px; margin-top: 18px; font-weight: 700; letter-spacing: 0.18em; opacity: 0.9; color: var(--stories-text-color); }
 
@@ -174,6 +176,14 @@ export const generateStories2HTML = async (
       .trendIcon.trend-neutral { background-color: var(--stories-bg-overlay); }
       .trendIcon.trend-debut { background-color: #3f86f4; }
       .trendIcon.trend-reentry { background-color: #f4b63f; }
+      .trendIcon.no-bg { background-color: transparent !important; }
+      .trendIcon.no-bg.trend-up { color: #1ed760; }
+      .trendIcon.no-bg.trend-down { color: #f43f5e; }
+      .trendIcon.no-bg.trend-neutral { color: var(--stories-text-color); }
+      .trendIcon.no-bg.trend-debut { color: #3f86f4; }
+      .trendIcon.no-bg.trend-reentry { color: #f4b63f; }
+      .trendIcon.no-color { background-color: var(--stories-bg-overlay) !important; }
+      .trendIcon.no-bg.no-color { background-color: transparent !important; color: var(--stories-text-color) !important; }
       .feather { width: 32px; height: 32px; stroke-width: 2; }
 
       .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; letter-spacing: 0.1em; color: var(--stories-text-muted); }
@@ -183,6 +193,7 @@ export const generateStories2HTML = async (
 
     if (listWrapBackgroundType === 'solid') {
         const isLightListWrap = isLightColor(listWrapBackgroundColor);
+        const listWrapTextColor = isLightListWrap ? '#000000' : '#ffffff';
         html += `
     <style>
       .listWrap {
@@ -195,7 +206,10 @@ export const generateStories2HTML = async (
       .listWrap .last,
       .listWrap .rank,
       .listWrap .trendIcon {
-        color: ${isLightListWrap ? '#000000' : '#ffffff'} !important;
+        color: ${listWrapTextColor} !important;
+      }
+      .listWrap .trendIcon.no-bg.no-color {
+        color: ${listWrapTextColor} !important;
       }
     </style>
     `;
@@ -276,6 +290,27 @@ export const generateStories2HTML = async (
 
         const rowClass = index === 0 ? 'row top' : 'row';
 
+        // Build icon classes based on settings
+        let iconClasses = `trendIcon ${trendClass}`;
+        
+        // Lógica corrigida:
+        // 1. Se não tem cor E não tem fundo: ícone branco sem fundo
+        // 2. Se não tem cor mas tem fundo: fundo cinza com ícone branco
+        // 3. Se tem cor mas não tem fundo: ícone colorido sem fundo
+        // 4. Se tem cor e tem fundo: fundo colorido com ícone branco (padrão)
+        
+        if (!showColoredIcons && !showIconBackground) {
+            // Caso 1: sem cor e sem fundo = ícone branco, sem fundo
+            iconClasses += ' no-bg no-color';
+        } else if (!showColoredIcons && showIconBackground) {
+            // Caso 2: sem cor com fundo = fundo cinza
+            iconClasses += ' no-color';
+        } else if (showColoredIcons && !showIconBackground) {
+            // Caso 3: com cor sem fundo = ícone colorido
+            iconClasses += ' no-bg';
+        }
+        // Caso 4 é o padrão, não precisa adicionar classes extras
+
         html += `
       <div class="${rowClass}">
         <div class="rankCell"><div class="rank">${row.rank}</div></div>
@@ -283,7 +318,7 @@ export const generateStories2HTML = async (
           ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : `<div style="width:100%;height:100%;background:var(--stories-fallback-bg);display:flex;align-items:center;justify-content:center;color:var(--stories-fallback-text);font-size:12px;">IMG</div>`}
         </div>` : ''}
         <div class="trendCell">
-          <div class="trendIcon ${trendClass}">${trendIcon}</div>
+          <div class="${iconClasses}">${trendIcon}</div>
         </div>
         <div class="albumInfo">
           <div class="albumName">${escapeHtml(truncateText(row.name, showAlbumCovers ? 30 : 36))}</div>
