@@ -60,6 +60,9 @@ export const generateCompletoHTML = (
     dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
   }
 
+  const username = chart?.lastfm_username || '';
+  const userText = username ? `@${username}` : '';
+
   // Split data into two columns
   const midPoint = Math.ceil(data.length / 2);
   const column1 = data.slice(0, midPoint);
@@ -119,6 +122,7 @@ export const generateCompletoHTML = (
         ---completo-color-down: #e22c2c;
         ---completo-color-stable: #888;
         ---completo-color-new: #3498db;
+        ---completo-color-reentry: #ffbf4d;
         ---completo-base-font-size: 14px;
         ---completo-cover-size: 45px;
         ---completo-vertical-gap: 12px;
@@ -198,7 +202,6 @@ export const generateCompletoHTML = (
       }
 
       .chart-dates {
-        display: none;
         position: absolute;
         bottom: 0px;
         right: 0px;
@@ -206,11 +209,24 @@ export const generateCompletoHTML = (
         font-size: 12px;
         font-weight: 500;
         color: #fff;
-        text-shadow: 0 0 4px rgba(0,0,0,0.5);
-        background: rgba(0,0,0,0.3);
+        text-shadow: 0 0 5px rgba(0,0,0,0.5);
         padding: 4px 8px;
         border-radius: 4px;
         z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        align-items: flex-end;
+      }
+
+      .chart-user {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .chart-date {
+        font-size: 12px;
+        font-weight: 500;
       }
 
       .chart-grid {
@@ -279,6 +295,9 @@ export const generateCompletoHTML = (
       }
       .new-entry {
         color: var(---completo-color-new);
+      }
+      .re-entry {
+        color: var(---completo-color-reentry);
       }
       .neutral {
         color: var(---completo-text-color);
@@ -367,7 +386,7 @@ export const generateCompletoHTML = (
           </div>
           <h1 class="chart-title">TOP ${topCount} ${typeLabel}</h1>
         </div>
-        ${dateRange ? `<div class="chart-dates">${dateRange}</div>` : ''}
+        ${userText || dateRange ? `<div class="chart-dates">${userText ? `<span class="chart-user">${userText}</span>` : ''}<span class="chart-date">${dateRange}</span></div>` : ''}
       </div>
       <div class="chart-grid">
   `;
@@ -443,7 +462,7 @@ export const generateCompletoHTML = (
       trendClass = showColoredIcons ? 'new-entry' : 'neutral';
       trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
     } else if (deltaRank === 'RE') {
-      trendClass = showColoredIcons ? 'new-entry' : 'neutral'; // Using new-entry for reentry as well
+      trendClass = showColoredIcons ? 're-entry' : 'neutral'; // Using new-entry for reentry as well
       trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
     } else if (typeof deltaRank === 'number') {
       if (deltaRank > 0) {
