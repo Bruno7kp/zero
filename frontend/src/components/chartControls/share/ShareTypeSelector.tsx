@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radio, Stack, Text, Accordion, Flex } from '@mantine/core';
+import { Radio, Stack, Text, Accordion, Flex, Divider } from '@mantine/core';
 import { IconShare } from '@tabler/icons-react';
 
 interface ShareTypeSelectorProps {
@@ -24,10 +24,11 @@ export const ShareTypeSelector: React.FC<ShareTypeSelectorProps> = ({
       <Accordion.Panel>
         <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
           <Stack gap="xs">
-            <Radio value="stories2" label={t('charts.share.stories2', 'Stories 2')} />
+            <Radio value="stories2" label={t('charts.share.stories2', 'Stories Pro')} />
+            <Radio value="completo" label={t('charts.share.completo', 'Complete')} />
+            <Divider />
             <Radio value="stories" label={t('charts.share.stories', 'Stories')} />
             <Radio value="grid" label={t('charts.share.grid', 'Grid')} />
-            <Radio value="completo" label={t('charts.share.completo', 'Complete')} />
             <Radio value="text" label={t('charts.share.text', 'Text')} />
           </Stack>
         </Radio.Group>

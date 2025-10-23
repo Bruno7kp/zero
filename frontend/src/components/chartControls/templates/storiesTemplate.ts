@@ -28,9 +28,9 @@ export const generateStoriesHTML = (
   };
 
   const typeLabel = (() => {
-    if (chartType === 'artist') return 'ARTIST';
-    if (chartType === 'album') return 'ALBUM';
-    if (chartType === 'track') return 'TRACK';
+    if (chartType === 'artist') return 'TOP ARTISTS';
+    if (chartType === 'album') return 'TOP ALBUMS';
+    if (chartType === 'track') return 'TOP TRACKS';
     return '';
   })();
 
@@ -81,7 +81,7 @@ export const generateStoriesHTML = (
         ${topImage ? `background-image: url("${topImage}");` : 'background-color: #333;'}
         background-size: cover;
         background-position: center center;
-        border-bottom:2px solid rgba(255,109,104);
+        border-bottom:2px solid ${primaryColor};
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -96,7 +96,7 @@ export const generateStoriesHTML = (
         left: 0;
         right: 0;
         top: 0;
-        background: linear-gradient(to top right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 45%, transparent 80%);
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.0) 100%);
         pointer-events: none;
       }
 
@@ -123,6 +123,7 @@ export const generateStoriesHTML = (
         display: flex;
         align-items: baseline;
         gap: 44px;
+        justify-content: flex-end;
       }
 
       .title-type {
@@ -138,10 +139,11 @@ export const generateStoriesHTML = (
       .title-number {
         font-family: 'Bebas Neue', sans-serif;
         font-weight: 400;
-        font-size: 200px;
+        font-size: 170px;
         color: ${primaryColor};
         line-height: 1;
         text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        text-align: right;
       }
 
       .board{position:relative; overflow: hidden;}
@@ -151,8 +153,8 @@ export const generateStoriesHTML = (
       .headerRow div:first-child,.headerRow div:last-child{text-align:center}
 
       .row{display:grid;grid-template-columns:90px 125px 65px 1fr 100px;align-items:center;height:122px;position:relative}
-      .row + .row{border-top:1px solid rgba(255,109,104,.2)}
-      .row > div{border-right:1px solid rgba(255,109,104,.2);height:100%;display:flex;align-items:center}
+      .row + .row{border-top:1px solid ${primaryColor}40}
+      .row > div{border-right:1px solid ${primaryColor}40;height:100%;display:flex;align-items:center}
       .row > div:last-child{border-right:none}
 
       .rank{
@@ -267,7 +269,7 @@ export const generateStoriesHTML = (
       .last{justify-content:center;color:#cfd2d7;font-size:32px;font-family: 'Inter', sans-serif;font-weight:800}
       .artist-only{margin-top: 22px;}
 
-      footer{border-top:1px solid rgba(255,109,104,.45);display:flex;justify-content:flex-end;padding:20px 48px;color:#cfd2d7;font-size:18px;letter-spacing:.2em; text-align: right;}
+      footer{border-top:1px solid ${primaryColor}80;display:flex;justify-content:flex-end;padding:20px 48px;color:#cfd2d7;font-size:18px;letter-spacing:.2em; text-align: right;}
     </style>
   `;
 
@@ -279,8 +281,7 @@ export const generateStoriesHTML = (
             <img src="/zero-white.svg" alt="ZERO" />
           </div>
           <div class="title-container">
-            <div class="title-type">${typeLabel}</div>
-            <div class="title-number">${topCount === 5 ? '5' : '10'}</div>
+            <div class="title-number">${typeLabel}</div>
           </div>
         </div>
       </header>
@@ -302,7 +303,7 @@ export const generateStoriesHTML = (
       //moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></div>';
       lastPosition = '—';
     } else if (deltaRank === 'RE') {
-      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg></div>';
+      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8.5" y1="8" x2="8.5" y2="16"></line><path d="M 8.5 8 L 13.5 8 C 16 8 16 12 13.5 12 L 8.5 12" /><line x1="13.5" y1="12" x2="16" y2="16"></line></svg></div>';
       lastPosition = '—';
     } else if (typeof deltaRank === 'number') {
       const prevRank = row.rank + deltaRank;
