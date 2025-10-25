@@ -542,6 +542,152 @@
       "glassBadge": "Glass background",
       "showPeak": "Show peak",
       "showPosition": "Show position"
+    },
+    "stats": {
+      "title": "Statistics",
+      "home": {
+        "title": "Chart Statistics",
+        "description": "Explore various statistics and records from your chart",
+        "allStats": "All Statistics"
+      },
+      "sidebar": {
+        "title": "Statistics",
+        "overview": "Overview"
+      },
+      "filters": {
+        "year": "Year",
+        "allYears": "All years",
+        "type": "Type",
+        "position": "Position",
+        "topN": "Top {{n}}",
+        "all": "All positions",
+        "cutoff": "Cutoff ({{n}})",
+        "toggleSales": "Show sales columns",
+        "sortBy": "Sort by"
+      },
+      "rank": {
+        "title": "All #{{n}}s",
+        "titleArtist": "All #{{n}} Artists",
+        "titleAlbum": "All #{{n}} Albums",
+        "titleTrack": "All #{{n}} Tracks",
+        "description": "Items that reached position #{{n}}",
+        "columns": {
+          "week": "Week",
+          "times": "Times at #{{n}}",
+          "image": "Image",
+          "title": "Title",
+          "plays": "Plays",
+          "sales": "Sales",
+          "viewChart": "View chart"
+        }
+      },
+      "pak": {
+        "title": "Perfect All Kill",
+        "description": "Artists who simultaneously reached #1 in all three categories",
+        "columns": {
+          "week": "Week",
+          "times": "Times with PAK",
+          "image": "Image",
+          "artist": "Artist",
+          "album": "Album",
+          "track": "Track",
+          "viewChart": "View chart"
+        },
+        "noData": "No Perfect All Kill records found"
+      },
+      "timesAtRank": {
+        "title": "Most Times at #{{n}}",
+        "titleArtist": "Most Times at #{{n}} - Artists",
+        "titleAlbum": "Most Times at #{{n}} - Albums",
+        "titleTrack": "Most Times at #{{n}} - Tracks",
+        "description": "Items with most weeks at position #{{n}}",
+        "columns": {
+          "rank": "#",
+          "times": "Times at #{{n}}",
+          "image": "Image",
+          "title": "Title"
+        }
+      },
+      "timesAtTop": {
+        "title": "Most Times in Top {{n}}",
+        "titleArtist": "Most Times in Top {{n}} - Artists",
+        "titleAlbum": "Most Times in Top {{n}} - Albums",
+        "titleTrack": "Most Times in Top {{n}} - Tracks",
+        "description": "Items with most weeks in the top {{n}}",
+        "columns": {
+          "rank": "#",
+          "times": "Times in Top {{n}}",
+          "image": "Image",
+          "title": "Title"
+        }
+      },
+      "plays": {
+        "title": "Most Plays in a Week",
+        "titleArtist": "Most Plays in a Week - Artists",
+        "titleAlbum": "Most Plays in a Week - Albums",
+        "titleTrack": "Most Plays in a Week - Tracks",
+        "description": "Highest play counts in a single week",
+        "columns": {
+          "rank": "#",
+          "week": "Week",
+          "position": "Position",
+          "image": "Image",
+          "title": "Title",
+          "plays": "Plays",
+          "sales": "Sales",
+          "viewChart": "View chart"
+        }
+      },
+      "debuts": {
+        "title": "Best Debuts",
+        "titleArtist": "Best Debuts - Artists",
+        "titleAlbum": "Best Debuts - Albums",
+        "titleTrack": "Best Debuts - Tracks",
+        "description": "Best first appearances on the chart",
+        "columns": {
+          "rank": "#",
+          "week": "Week",
+          "position": "Position",
+          "image": "Image",
+          "title": "Title",
+          "plays": "Plays",
+          "sales": "Sales",
+          "viewChart": "View chart"
+        }
+      },
+      "points": {
+        "title": "Points Accumulators",
+        "titleArtist": "Points Accumulators - Artists",
+        "titleAlbum": "Points Accumulators - Albums",
+        "titleTrack": "Points Accumulators - Tracks",
+        "description": "Items with the highest total points over time",
+        "columns": {
+          "rank": "#",
+          "image": "Image",
+          "title": "Title",
+          "weeksOnChart": "Weeks on chart",
+          "totalPoints": "Total points"
+        }
+      },
+      "timesAtTopByArtist": {
+        "title": "Artists with Most #{{n}}s",
+        "titleAlbum": "Artists with Most Albums at #{{n}}",
+        "titleTrack": "Artists with Most Tracks at #{{n}}",
+        "description": "Artists with most items at position #{{n}}",
+        "columns": {
+          "rank": "#",
+          "image": "Image",
+          "artist": "Artist",
+          "itemsAtN": "Items at #{{n}}",
+          "totalWeeks": "Total weeks at #{{n}}"
+        },
+        "sortByItems": "Items count",
+        "sortByWeeks": "Total weeks"
+      },
+      "loading": "Loading statistics...",
+      "noData": "No data available",
+      "itemsPerPage": "Items per page",
+      "page": "Page {{current}} of {{total}}"
     }
   }
 }

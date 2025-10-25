@@ -542,6 +542,152 @@
       "glassBadge": "Fundo transparente",
       "showPeak": "Mostrar pico",
       "showPosition": "Mostrar posição"
+    },
+    "stats": {
+      "title": "Estatísticas",
+      "home": {
+        "title": "Estatísticas do Chart",
+        "description": "Explore várias estatísticas e recordes do seu chart",
+        "allStats": "Todas as Estatísticas"
+      },
+      "sidebar": {
+        "title": "Estatísticas",
+        "overview": "Visão Geral"
+      },
+      "filters": {
+        "year": "Ano",
+        "allYears": "Todos os anos",
+        "type": "Tipo",
+        "position": "Posição",
+        "topN": "Top {{n}}",
+        "all": "Todas as posições",
+        "cutoff": "Limite ({{n}})",
+        "toggleSales": "Mostrar colunas de vendas",
+        "sortBy": "Ordenar por"
+      },
+      "rank": {
+        "title": "Todos os #{{n}}s",
+        "titleArtist": "Todos os Artistas #{{n}}",
+        "titleAlbum": "Todos os Álbuns #{{n}}",
+        "titleTrack": "Todas as Músicas #{{n}}",
+        "description": "Itens que alcançaram a posição #{{n}}",
+        "columns": {
+          "week": "Semana",
+          "times": "Vezes em #{{n}}",
+          "image": "Imagem",
+          "title": "Título",
+          "plays": "Reproduções",
+          "sales": "Vendas",
+          "viewChart": "Ver chart"
+        }
+      },
+      "pak": {
+        "title": "Perfect All Kill",
+        "description": "Artistas que alcançaram simultaneamente #1 nas três categorias",
+        "columns": {
+          "week": "Semana",
+          "times": "Vezes com PAK",
+          "image": "Imagem",
+          "artist": "Artista",
+          "album": "Álbum",
+          "track": "Música",
+          "viewChart": "Ver chart"
+        },
+        "noData": "Nenhum registro de Perfect All Kill encontrado"
+      },
+      "timesAtRank": {
+        "title": "Mais Vezes em #{{n}}",
+        "titleArtist": "Mais Vezes em #{{n}} - Artistas",
+        "titleAlbum": "Mais Vezes em #{{n}} - Álbuns",
+        "titleTrack": "Mais Vezes em #{{n}} - Músicas",
+        "description": "Itens com mais semanas na posição #{{n}}",
+        "columns": {
+          "rank": "#",
+          "times": "Vezes em #{{n}}",
+          "image": "Imagem",
+          "title": "Título"
+        }
+      },
+      "timesAtTop": {
+        "title": "Mais Vezes no Top {{n}}",
+        "titleArtist": "Mais Vezes no Top {{n}} - Artistas",
+        "titleAlbum": "Mais Vezes no Top {{n}} - Álbuns",
+        "titleTrack": "Mais Vezes no Top {{n}} - Músicas",
+        "description": "Itens com mais semanas no top {{n}}",
+        "columns": {
+          "rank": "#",
+          "times": "Vezes no Top {{n}}",
+          "image": "Imagem",
+          "title": "Título"
+        }
+      },
+      "plays": {
+        "title": "Mais Reproduções em uma Semana",
+        "titleArtist": "Mais Reproduções em uma Semana - Artistas",
+        "titleAlbum": "Mais Reproduções em uma Semana - Álbuns",
+        "titleTrack": "Mais Reproduções em uma Semana - Músicas",
+        "description": "Maiores contagens de reprodução em uma única semana",
+        "columns": {
+          "rank": "#",
+          "week": "Semana",
+          "position": "Posição",
+          "image": "Imagem",
+          "title": "Título",
+          "plays": "Reproduções",
+          "sales": "Vendas",
+          "viewChart": "Ver chart"
+        }
+      },
+      "debuts": {
+        "title": "Melhores Estreias",
+        "titleArtist": "Melhores Estreias - Artistas",
+        "titleAlbum": "Melhores Estreias - Álbuns",
+        "titleTrack": "Melhores Estreias - Músicas",
+        "description": "Melhores primeiras aparições no chart",
+        "columns": {
+          "rank": "#",
+          "week": "Semana",
+          "position": "Posição",
+          "image": "Imagem",
+          "title": "Título",
+          "plays": "Reproduções",
+          "sales": "Vendas",
+          "viewChart": "Ver chart"
+        }
+      },
+      "points": {
+        "title": "Acumuladores de Pontos",
+        "titleArtist": "Acumuladores de Pontos - Artistas",
+        "titleAlbum": "Acumuladores de Pontos - Álbuns",
+        "titleTrack": "Acumuladores de Pontos - Músicas",
+        "description": "Itens com maior total de pontos ao longo do tempo",
+        "columns": {
+          "rank": "#",
+          "image": "Imagem",
+          "title": "Título",
+          "weeksOnChart": "Semanas no chart",
+          "totalPoints": "Total de pontos"
+        }
+      },
+      "timesAtTopByArtist": {
+        "title": "Artistas com Mais #{{n}}s",
+        "titleAlbum": "Artistas com Mais Álbuns em #{{n}}",
+        "titleTrack": "Artistas com Mais Músicas em #{{n}}",
+        "description": "Artistas com mais itens na posição #{{n}}",
+        "columns": {
+          "rank": "#",
+          "image": "Imagem",
+          "artist": "Artista",
+          "itemsAtN": "Itens em #{{n}}",
+          "totalWeeks": "Total de semanas em #{{n}}"
+        },
+        "sortByItems": "Quantidade de itens",
+        "sortByWeeks": "Total de semanas"
+      },
+      "loading": "Carregando estatísticas...",
+      "noData": "Nenhum dado disponível",
+      "itemsPerPage": "Itens por página",
+      "page": "Página {{current}} de {{total}}"
     }
   }
 }
