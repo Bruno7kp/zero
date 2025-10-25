@@ -119,7 +119,10 @@ const StatsPage: React.FC = () => {
     if (item.exact) {
       return location.pathname === item.path;
     }
-    return location.pathname.includes(`/${item.group}`);
+    // Match the group more precisely to avoid false positives
+    // e.g., times_at_top_by_artist shouldn't match times_at_top
+    const pathParts = location.pathname.split('/');
+    return pathParts.some(part => part === item.group);
   };
 
   if (!chart) {
@@ -142,8 +145,8 @@ const StatsPage: React.FC = () => {
         {/* Sidebar */}
         <Grid.Col span={{ base: 12, md: 3 }}>
           <Card p="md" style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
-            <Flex justify="space-between" align="center" mb="md">
-              <Title order={4}>{t('stats.sidebar.title')}</Title>
+            <Flex justify="space-between" align="center" mb={{ base: 0 }}>
+              <Title order={4} hiddenFrom="md">{t('stats.sidebar.title')}</Title>
               <ActionIcon 
                 variant="subtle" 
                 onClick={toggle}

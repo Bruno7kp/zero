@@ -565,7 +565,9 @@
         "toggleSales": "Mostrar colunas de vendas",
         "sortBy": "Ordenar por",
         "settings": "Configurações",
-        "displayOptions": "Opções de Exibição"
+        "displayOptions": "Opções de Exibição",
+        "albums": "Álbuns",
+        "tracks": "Músicas"
       },
       "rank": {
         "title": "Todos os #{{n}}s",
@@ -676,12 +678,14 @@
         "titleAlbum": "Artistas com Mais Álbuns em #{{n}}",
         "titleTrack": "Artistas com Mais Músicas em #{{n}}",
         "description": "Artistas com mais itens na posição #{{n}}",
+        "inTopN": "no Top {{n}}",
         "columns": {
           "rank": "#",
           "image": "Imagem",
           "artist": "Artista",
           "itemsAtN": "Itens em #{{n}}",
-          "totalWeeks": "Total de semanas em #{{n}}"
+          "totalWeeks": "Total de semanas em #{{n}}",
+          "totalWeeksShort": "Total de Semanas"
         },
         "sortByItems": "Quantidade de itens",
         "sortByWeeks": "Total de semanas"

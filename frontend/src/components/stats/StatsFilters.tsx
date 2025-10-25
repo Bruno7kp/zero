@@ -20,6 +20,7 @@ export interface StatsFiltersProps {
   cutoff?: number;
   customFilters?: React.ReactNode;
   allowAllPosition?: boolean;
+  hideArtistType?: boolean;
 }
 
 const StatsFilters: React.FC<StatsFiltersProps> = ({
@@ -37,7 +38,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   showSalesToggle = true,
   cutoff = 100,
   customFilters,
-  allowAllPosition = false
+  allowAllPosition = false,
+  hideArtistType = false
 }) => {
   const { t } = useTranslation();
 
@@ -61,11 +63,18 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             value={type}
             withItemsBorders={false}
             onChange={onTypeChange}
-            data={[
-              { label: <Center><IconMicrophone size={18} /></Center>, value: 'artist' },
-              { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
-              { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
-            ]}
+            data={
+              hideArtistType
+                ? [
+                    { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
+                    { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
+                  ]
+                : [
+                    { label: <Center><IconMicrophone size={18} /></Center>, value: 'artist' },
+                    { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
+                    { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
+                  ]
+            }
           />
         )}
 

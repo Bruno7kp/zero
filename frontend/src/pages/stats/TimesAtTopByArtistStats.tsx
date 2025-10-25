@@ -3,17 +3,22 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Stack, 
-  Title, 
   Text, 
   Loader, 
   Center,
   Select,
+  NumberInput,
   Card,
-  Avatar
+  Avatar,
+  Table,
+  ScrollArea,
+  Pagination,
+  Box,
+  Flex
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { DataTable } from 'mantine-datatable';
+import { IconHash, IconArrowsSort } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getArtistsWithMostAtRank, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
@@ -24,9 +29,9 @@ import { useMantineTheme } from '@mantine/core';
 const PAGE_SIZE = 25;
 
 // Component to render image cell with hooks
-const ImageCell: React.FC<{ artistName: string; entityId: string }> = ({ artistName, entityId }) => {
+const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
   const { imageUrl } = useSpotifyImage({
-    entityId,
+    entityId: `artist-${artistName}-`,
     name: artistName,
     artist: artistName,
     type: 'artist',
@@ -57,6 +62,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
   }>>([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState<'album' | 'track'>((typeParam as 'album' | 'track') || 'track');
+  const [rank, setRank] = useState(Number(rankParam) || 1);
   const [sortBy, setSortBy] = useState<'items' | 'weeks'>('items');
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
@@ -67,7 +73,15 @@ const TimesAtTopByArtistStats: React.FC = () => {
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
-  const rank = Number(rankParam) || 1;
+  // Get chart cutoff for type
+  const getCutoff = (chartType: string) => {
+    if (!chart) return 100;
+    const cutoffMap: any = {
+      album: chart.album_cutoff || 100,
+      track: chart.music_cutoff || 100
+    };
+    return cutoffMap[chartType] || 100;
+  };
 
   useEffect(() => {
     if (!chart) return;
@@ -110,6 +124,11 @@ const TimesAtTopByArtistStats: React.FC = () => {
     }
   };
 
+  const handleRankChange = (value: number) => {
+    setRank(value);
+    navigate(`/stats/times_at_top_by_artist/${value}/${type}`);
+  };
+
   const sortedData = React.useMemo(() => {
     const sorted = [...data];
     if (sortBy === 'items') {
@@ -133,15 +152,11 @@ const TimesAtTopByArtistStats: React.FC = () => {
     );
   }
 
-  const titleKey = type === 'album' ? 'titleAlbum' : 'titleTrack';
+  const cutoff = getCutoff(type);
+  const typeLabel = type === 'album' ? t('stats.filters.albums') : t('stats.filters.tracks');
 
   return (
     <Stack gap="md">
-      <div>
-        <Title order={2}>{t(`stats.timesAtTopByArtist.${titleKey}`, { n: rank })}</Title>
-        <Text c="dimmed">{t('stats.timesAtTopByArtist.description', { n: rank })}</Text>
-      </div>
-
       <StatsFilters
         year={year}
         onYearChange={setYear}
@@ -149,17 +164,32 @@ const TimesAtTopByArtistStats: React.FC = () => {
         onTypeChange={handleTypeChange}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
+        hideArtistType={true}
         customFilters={
-          <Select
-            label={t('stats.filters.sortBy')}
-            value={sortBy}
-            onChange={(value) => value && setSortBy(value as 'items' | 'weeks')}
-            data={[
-              { value: 'items', label: t('stats.timesAtTopByArtist.sortByItems') },
-              { value: 'weeks', label: t('stats.timesAtTopByArtist.sortByWeeks') }
-            ]}
-            style={{ minWidth: 150 }}
-          />
+          <>
+            <NumberInput
+              value={rank}
+              onChange={(value) => {
+                if (typeof value === 'number') {
+                  handleRankChange(Math.max(1, Math.min(cutoff, value)));
+                }
+              }}
+              min={1}
+              max={cutoff}
+              style={{ minWidth: 120 }}
+              leftSection={<IconHash size={16} />}
+            />
+            <Select
+              value={sortBy}
+              onChange={(value) => value && setSortBy(value as 'items' | 'weeks')}
+              data={[
+                { value: 'items', label: t('stats.timesAtTopByArtist.sortByItems') },
+                { value: 'weeks', label: t('stats.timesAtTopByArtist.sortByWeeks') }
+              ]}
+              style={{ minWidth: 150 }}
+              leftSection={<IconArrowsSort size={16} />}
+            />
+          </>
         }
       />
 
@@ -168,62 +198,70 @@ const TimesAtTopByArtistStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <Card p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-          <DataTable
-            className="datatable-transparent"
-            records={paginatedData.map((item, index) => ({ ...item, displayRank: (page - 1) * PAGE_SIZE + index + 1 }))}
-          columns={[
-            {
-              accessor: 'displayRank',
-              title: t('stats.timesAtTopByArtist.columns.rank'),
-              width: 60,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'image',
-              title: t('stats.timesAtTopByArtist.columns.image'),
-              width: 60,
-              render: (record) => {
-                // Get the first item's entity ID for the artist image
-                const firstItem = record.items[0];
-                return (
-                  <ImageCell 
-                    artistName={record.artistName}
-                    entityId={firstItem?.entityId || ''}
-                  />
-                );
-              }
-            },
-            {
-              accessor: 'artistName',
-              title: t('stats.timesAtTopByArtist.columns.artist'),
-              render: (record) => (
-                <Text size="sm" fw={500}>{record.artistName}</Text>
-              )
-            },
-            {
-              accessor: 'itemsCount',
-              title: t('stats.timesAtTopByArtist.columns.itemsAtN', { n: rank }),
-              width: 150,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'totalWeeks',
-              title: t('stats.timesAtTopByArtist.columns.totalWeeks', { n: rank }),
-              width: 150,
-              textAlign: 'center'
-            }
-          ]}
-          minHeight={200}
-          noRecordsText={t('stats.noData')}
-          totalRecords={sortedData.length}
-          recordsPerPage={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-          paginationText={({ from, to, totalRecords }) =>
-            `${from}-${to} of ${totalRecords}`
-          }
-        />
+        <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+          <ScrollArea>
+            <Table highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
+                  <Table.Th>{t('stats.timesAtTopByArtist.columns.artist')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {typeLabel} {t('stats.timesAtTopByArtist.inTopN', { n: rank })}
+                  </Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.timesAtTopByArtist.columns.totalWeeksShort')}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.length === 0 ? (
+                  <Table.Tr>
+                    <Table.Td colSpan={4}>
+                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ) : (
+                  paginatedData.map((record, index) => {
+                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+
+                    return (
+                      <Table.Tr key={record.artistName}>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{displayRank}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ verticalAlign: 'middle' }}>
+                          <Flex gap="sm" wrap="nowrap" align="center">
+                            <ImageCell 
+                              artistName={record.artistName}
+                            />
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.artistName}</Text>
+                            </Box>
+                          </Flex>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.itemsCount}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.totalWeeks}</Text>
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+          {sortedData.length > PAGE_SIZE && (
+            <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
+              <Pagination 
+                total={Math.ceil(sortedData.length / PAGE_SIZE)} 
+                value={page} 
+                onChange={setPage} 
+                size="sm" 
+              />
+            </Box>
+          )}
         </Card>
       )}
     </Stack>

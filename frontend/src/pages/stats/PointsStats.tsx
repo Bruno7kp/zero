@@ -3,16 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Stack, 
-  Title, 
   Text, 
   Loader, 
   Center,
   Card,
-  Avatar
+  Avatar,
+  Table,
+  ScrollArea,
+  Pagination,
+  Box,
+  Flex
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { DataTable } from 'mantine-datatable';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getPointsAccumulators, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
@@ -117,14 +120,8 @@ const PointsStats: React.FC = () => {
     );
   }
 
-  const titleKey = type === 'artist' ? 'titleArtist' : type === 'album' ? 'titleAlbum' : 'titleTrack';
-
   return (
     <Stack gap="md">
-      <div>
-        <Title order={2}>{t(`stats.points.${titleKey}`)}</Title>
-        <Text c="dimmed">{t('stats.points.description')}</Text>
-      </div>
 
       <StatsFilters
         year={year}
@@ -140,66 +137,72 @@ const PointsStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <Card p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-          <DataTable
-            className="datatable-transparent"
-            records={paginatedData.map((item, index) => ({ ...item, rank: (page - 1) * PAGE_SIZE + index + 1 }))}
-          columns={[
-            {
-              accessor: 'rank',
-              title: t('stats.points.columns.rank'),
-              width: 60,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'image',
-              title: t('stats.points.columns.image'),
-              width: 60,
-              render: (record) => (
-                <ImageCell 
-                  entityId={record.entityId}
-                  name={record.name}
-                  artistName={record.artistName}
-                  type={type}
-                />
-              )
-            },
-            {
-              accessor: 'name',
-              title: t('stats.points.columns.title'),
-              render: (record) => (
-                <div>
-                  <Text size="sm" fw={500}>{record.name}</Text>
-                  {type !== 'artist' && (
-                    <Text size="xs" c="dimmed">{record.artistName}</Text>
-                  )}
-                </div>
-              )
-            },
-            {
-              accessor: 'weeksOnChart',
-              title: t('stats.points.columns.weeksOnChart'),
-              width: 150,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'totalPoints',
-              title: t('stats.points.columns.totalPoints'),
-              width: 150,
-              textAlign: 'center',
-              render: (record) => record.totalPoints.toLocaleString()
-            }
-          ]}
-          minHeight={200}
-          noRecordsText={t('stats.noData')}
-          totalRecords={data.length}
-          recordsPerPage={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-          paginationText={({ from, to, totalRecords }) =>
-            `${from}-${to} of ${totalRecords}`
-          }
-        />
+        <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+          <ScrollArea>
+            <Table highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
+                  <Table.Th style={{ width: 'auto' }}>{t('stats.points.columns.title')}</Table.Th>
+                  <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.weeksOnChart')}</Table.Th>
+                  <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.totalPoints')}</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.length === 0 ? (
+                  <Table.Tr>
+                    <Table.Td colSpan={4}>
+                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ) : (
+                  paginatedData.map((record, index) => {
+                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+
+                    return (
+                      <Table.Tr key={record.entityId}>
+                        <Table.Td style={{ textAlign: 'center' }}>
+                          <Text size="sm">{displayRank}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ verticalAlign: 'middle' }}>
+                          <Flex gap="sm" wrap="nowrap" align="center">
+                            <ImageCell 
+                              entityId={record.entityId}
+                              name={record.name}
+                              artistName={record.artistName}
+                              type={type}
+                            />
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
+                              {type !== 'artist' && record.artistName && (
+                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              )}
+                            </Box>
+                          </Flex>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center' }}>
+                          <Text size="sm">{record.weeksOnChart}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center' }}>
+                          <Text size="sm">{record.totalPoints.toLocaleString()}</Text>
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+          {data.length > PAGE_SIZE && (
+            <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
+              <Pagination 
+                total={Math.ceil(data.length / PAGE_SIZE)} 
+                value={page} 
+                onChange={setPage} 
+                size="sm" 
+              />
+            </Box>
+          )}
         </Card>
       )}
     </Stack>

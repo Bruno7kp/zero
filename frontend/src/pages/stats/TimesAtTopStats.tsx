@@ -8,11 +8,16 @@ import {
   Card,
   Avatar,
   Text,
-  NumberInput
+  NumberInput,
+  Table,
+  ScrollArea,
+  Pagination,
+  Box,
+  Flex
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { DataTable } from 'mantine-datatable';
+import { IconHash } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getTimesInTopN, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
@@ -70,9 +75,9 @@ const TimesAtTopStats: React.FC = () => {
   const getCutoff = (chartType: string) => {
     if (!chart) return 100;
     const cutoffMap: any = {
-      artist: chart.artistCutoff || 100,
-      album: chart.albumCutoff || 100,
-      track: chart.musicCutoff || 100
+      artist: chart.artist_cutoff || 100,
+      album: chart.album_cutoff || 100,
+      track: chart.music_cutoff || 100
     };
     return cutoffMap[chartType] || 100;
   };
@@ -147,7 +152,6 @@ const TimesAtTopStats: React.FC = () => {
         showSalesToggle={false}
         customFilters={
           <NumberInput
-            label={t('stats.filters.position')}
             value={topN}
             onChange={(value) => {
               if (typeof value === 'number') {
@@ -157,6 +161,7 @@ const TimesAtTopStats: React.FC = () => {
             min={1}
             max={cutoff}
             style={{ minWidth: 120 }}
+            leftSection={<IconHash size={16} />}
           />
         }
       />
@@ -166,52 +171,63 @@ const TimesAtTopStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <Card p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-          <DataTable
-            className="datatable-transparent"
-            records={paginatedData.map((item, index) => ({ ...item, rank: (page - 1) * PAGE_SIZE + index + 1 }))}
-            columns={[
-              {
-                accessor: 'rank',
-                title: t('stats.timesAtTop.columns.rank'),
-                width: 60,
-                textAlign: 'center'
-              },
-              {
-                accessor: 'count',
-                title: t('stats.timesAtTop.columns.times', { n: topN }),
-                width: 120,
-                textAlign: 'center'
-              },
-              {
-                accessor: 'image',
-                title: t('stats.timesAtTop.columns.image'),
-                width: 60,
-                render: (record) => <ImageCell record={record} type={type} />
-              },
-              {
-                accessor: 'name',
-                title: t('stats.timesAtTop.columns.title'),
-                render: (record) => (
-                  <div>
-                    <Text size="sm" fw={500}>{record.name}</Text>
-                    {type !== 'artist' && (
-                      <Text size="xs" c="dimmed">{record.artistName}</Text>
-                    )}
-                  </div>
-                )
-              }
-            ]}
-            minHeight={200}
-            noRecordsText={t('stats.noData')}
-            totalRecords={data.length}
-            recordsPerPage={PAGE_SIZE}
-            page={page}
-            onPageChange={setPage}
-            paginationText={({ from, to, totalRecords }) =>
-              `${from}-${to} of ${totalRecords}`
-            }
-          />
+        <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+          <ScrollArea>
+            <Table highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>X</Table.Th>
+                  <Table.Th>{t('stats.timesAtTop.columns.title')}</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.length === 0 ? (
+                  <Table.Tr>
+                    <Table.Td colSpan={3}>
+                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ) : (
+                  paginatedData.map((record: any, index) => {
+                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+
+                    return (
+                      <Table.Tr key={record.entityId}>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{displayRank}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.count}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ verticalAlign: 'middle' }}>
+                          <Flex gap="sm" wrap="nowrap" align="center">
+                            <ImageCell record={record} type={type} />
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
+                              {type !== 'artist' && record.artistName && (
+                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              )}
+                            </Box>
+                          </Flex>
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+          {data.length > PAGE_SIZE && (
+            <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
+              <Pagination 
+                total={Math.ceil(data.length / PAGE_SIZE)} 
+                value={page} 
+                onChange={setPage} 
+                size="sm" 
+              />
+            </Box>
+          )}
         </Card>
       )}
     </Stack>

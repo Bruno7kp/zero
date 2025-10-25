@@ -114,7 +114,7 @@ export async function getTimesInTopN(filters: StatsFilters & { topN: number }): 
   
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year));
+    data = data.filter(item => item.week.startsWith(filters.year!));
   }
   
   const grouped = new Map<string, { name: string; artistName: string; count: number }>();
@@ -152,12 +152,12 @@ export async function getHighestPlays(filters: StatsFilters): Promise<ChartData[
   if (filters.position && filters.positionOperator === 'eq') {
     data = data.filter(item => item.rank === filters.position);
   } else if (filters.position && filters.positionOperator === 'lte') {
-    data = data.filter(item => item.rank <= filters.position);
+    data = data.filter(item => item.rank <= filters.position!);
   }
   
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year));
+    data = data.filter(item => item.week.startsWith(filters.year!));
   }
   
   // Sort by plays descending
@@ -176,7 +176,7 @@ export async function getBestDebuts(filters: StatsFilters): Promise<ChartData[]>
   
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year));
+    data = data.filter(item => item.week.startsWith(filters.year!));
   }
   
   // Group by entity to find first appearance
@@ -197,7 +197,7 @@ export async function getBestDebuts(filters: StatsFilters): Promise<ChartData[]>
   if (filters.position && filters.positionOperator === 'eq') {
     debuts = debuts.filter(item => item.rank === filters.position);
   } else if (filters.position && filters.positionOperator === 'lte') {
-    debuts = debuts.filter(item => item.rank <= filters.position);
+    debuts = debuts.filter(item => item.rank <= filters.position!);
   }
   
   // Sort by plays descending (not rank)
@@ -222,7 +222,7 @@ export async function getPointsAccumulators(filters: StatsFilters): Promise<Arra
   
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year));
+    data = data.filter(item => item.week.startsWith(filters.year!));
   }
   
   const grouped = new Map<string, {
@@ -338,11 +338,18 @@ export async function getArtistsWithMostAtRank(filters: {
   totalWeeks: number;
   items: Array<{ entityId: string; name: string; count: number }>;
 }>> {
-  const items = await getItemsAtRank({
-    chartId: filters.chartId,
-    chartType: filters.chartType,
-    rank: filters.rank,
-    year: filters.year
+  // Get all items in top N (rank <= filters.rank)
+  const query = db.charts_data
+    .where('[chartId+chartType]')
+    .equals([filters.chartId, filters.chartType]);
+  
+  const allItems = await query.toArray();
+  
+  // Filter by rank (<=) and year
+  const items = allItems.filter(item => {
+    if (item.rank > filters.rank) return false;
+    if (filters.year && !item.week.startsWith(filters.year)) return false;
+    return true;
   });
   
   // Group by artist
