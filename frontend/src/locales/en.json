@@ -563,7 +563,9 @@
         "all": "All positions",
         "cutoff": "Cutoff ({{n}})",
         "toggleSales": "Show sales columns",
-        "sortBy": "Sort by"
+        "sortBy": "Sort by",
+        "settings": "Settings",
+        "displayOptions": "Display Options"
       },
       "rank": {
         "title": "All #{{n}}s",

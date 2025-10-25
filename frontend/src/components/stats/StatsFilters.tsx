@@ -1,6 +1,7 @@
 // Shared filters component for stats pages
 import React from 'react';
-import { Group, Select, Switch, SegmentedControl, NumberInput } from '@mantine/core';
+import { Group, Select, SegmentedControl, NumberInput, Center, ActionIcon, Menu, Checkbox, Flex } from '@mantine/core';
+import { IconMicrophone, IconDisc, IconMusic, IconSettings, IconCalendar, IconHash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 export interface StatsFiltersProps {
@@ -52,79 +53,92 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   }, [yearRange, t]);
 
   return (
-    <Group gap="md" mb="md" wrap="wrap">
-      <Select
-        label={t('stats.filters.year')}
-        value={year}
-        onChange={(value) => value && onYearChange(value)}
-        data={yearOptions}
-        style={{ minWidth: 150 }}
-      />
-
-      {showTypeFilter && type && onTypeChange && (
-        <div style={{ minWidth: 200 }}>
+    <Flex gap="md" mb="md" wrap="wrap" justify="space-between" align="flex-end">
+      {/* Left side - Type and other filters */}
+      <Group gap="md" wrap="wrap">
+        {showTypeFilter && type && onTypeChange && (
           <SegmentedControl
             value={type}
+            withItemsBorders={false}
             onChange={onTypeChange}
             data={[
-              { value: 'artist', label: t('charts.artist') },
-              { value: 'album', label: t('charts.album') },
-              { value: 'track', label: t('charts.track') }
+              { label: <Center><IconMicrophone size={18} /></Center>, value: 'artist' },
+              { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
+              { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
             ]}
-            fullWidth
           />
-        </div>
-      )}
+        )}
 
-      {showPositionFilter && position !== undefined && onPositionChange && (
-        allowAllPosition && position === 'all' ? (
-          <Select
-            label={t('stats.filters.position')}
-            value={String(position)}
-            onChange={(value) => {
-              if (value === 'all') {
-                // Keep as string 'all'
-              } else if (value) {
-                onPositionChange(Number(value));
-              }
-            }}
-            data={[
-              { value: 'all', label: t('stats.filters.all') },
-              ...Array.from({ length: cutoff }, (_, i) => ({
-                value: String(i + 1),
-                label: `#${i + 1}`
-              }))
-            ]}
-            style={{ minWidth: 120 }}
-            searchable
-          />
-        ) : (
-          <NumberInput
-            label={t('stats.filters.position')}
-            value={typeof position === 'number' ? position : 1}
-            onChange={(value) => {
-              if (typeof value === 'number') {
-                onPositionChange(Math.max(1, Math.min(cutoff, value)));
-              }
-            }}
-            min={1}
-            max={cutoff}
-            style={{ minWidth: 120 }}
-          />
-        )
-      )}
-
-      {customFilters}
-
-      {showSalesToggle && onToggleSales && (
-        <Switch
-          label={t('stats.filters.toggleSales')}
-          checked={showSales || false}
-          onChange={(event) => onToggleSales(event.currentTarget.checked)}
-          mt="auto"
+        <Select
+          leftSection={<IconCalendar size={16} />}
+          value={year}
+          onChange={(value) => value && onYearChange(value)}
+          data={yearOptions}
+          style={{ minWidth: 150 }}
         />
+
+        {showPositionFilter && position !== undefined && onPositionChange && (
+          allowAllPosition && position === 'all' ? (
+            <Select
+              leftSection={<IconHash size={16} />}
+              value={String(position)}
+              onChange={(value) => {
+                if (value === 'all') {
+                  // Keep as string 'all'
+                } else if (value) {
+                  onPositionChange(Number(value));
+                }
+              }}
+              data={[
+                { value: 'all', label: t('stats.filters.all') },
+                ...Array.from({ length: cutoff }, (_, i) => ({
+                  value: String(i + 1),
+                  label: `#${i + 1}`
+                }))
+              ]}
+              style={{ minWidth: 150 }}
+              searchable
+            />
+          ) : (
+            <NumberInput
+              leftSection={<IconHash size={16} />}
+              value={typeof position === 'number' ? position : 1}
+              onChange={(value) => {
+                if (typeof value === 'number') {
+                  onPositionChange(Math.max(1, Math.min(cutoff, value)));
+                }
+              }}
+              min={1}
+              max={cutoff}
+              style={{ minWidth: 150 }}
+            />
+          )
+        )}
+
+        {customFilters}
+      </Group>
+
+      {/* Right side - Settings menu */}
+      {showSalesToggle && onToggleSales && (
+        <Menu shadow="md" width={200} closeOnItemClick={false}>
+          <Menu.Target>
+            <ActionIcon variant="subtle" size="lg" aria-label={t('stats.filters.settings')}>
+              <IconSettings size={18} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Label>{t('stats.filters.displayOptions')}</Menu.Label>
+            <Menu.Item>
+              <Checkbox
+                label={t('stats.filters.toggleSales')}
+                checked={showSales || false}
+                onChange={(event) => onToggleSales(event.currentTarget.checked)}
+              />
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       )}
-    </Group>
+    </Flex>
   );
 };
 

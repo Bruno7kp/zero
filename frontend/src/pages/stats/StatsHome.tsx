@@ -9,7 +9,7 @@ import {
   Stack,
   Group,
   ActionIcon,
-  useMantineColorScheme
+  useMantineTheme
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import {
@@ -23,15 +23,14 @@ import {
   IconArrowRight
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode } from '../../theme/modes';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 const StatsHome: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { colorScheme } = useMantineColorScheme();
-  const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
-  const bgColor = getCardBackgroundByMode(themeMode, colorScheme);
-
+  const theme = useMantineTheme();
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
+  
   const statsCards = [
     {
       icon: IconTrophy,
@@ -93,10 +92,6 @@ const StatsHome: React.FC = () => {
 
   return (
     <Stack gap="xl">
-      <div>
-        <Title order={1} mb="xs">{t('stats.home.title')}</Title>
-        <Text c="dimmed">{t('stats.home.description')}</Text>
-      </div>
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
         {statsCards.map((card, index) => (
@@ -108,7 +103,7 @@ const StatsHome: React.FC = () => {
             withBorder
             style={{ 
               cursor: 'pointer',
-              backgroundColor: bgColor,
+              backgroundColor: getCardBackgroundByMode(theme, themeMode),
               transition: 'transform 0.2s',
               ':hover': {
                 transform: 'translateY(-4px)'

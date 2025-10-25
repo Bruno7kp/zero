@@ -20,6 +20,8 @@ import StatsFilters from '../../components/stats/StatsFilters';
 import { getPerfectAllKills, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { useMantineTheme } from '@mantine/core';
 
 const PAGE_SIZE = 25;
 
@@ -28,7 +30,7 @@ const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, nam
   const { imageUrl } = useSpotifyImage({
     entityId,
     name,
-    artistName: name,
+    artist: name,
     type: 'artist',
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
@@ -64,6 +66,8 @@ const PerfectAllKillStats: React.FC = () => {
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);
+  const theme = useMantineTheme();
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
   useEffect(() => {
     if (!chart) return;
@@ -142,8 +146,9 @@ const PerfectAllKillStats: React.FC = () => {
           <Text c="dimmed">{t('stats.pak.noData')}</Text>
         </Center>
       ) : (
-        <Card p="md" withBorder>
+        <Card p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <DataTable
+            className="datatable-transparent"
             records={paginatedData}
             columns={[
               {

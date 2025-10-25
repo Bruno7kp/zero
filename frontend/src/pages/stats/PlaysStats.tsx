@@ -10,7 +10,9 @@ import {
   Select,
   Group,
   ActionIcon,
-  Anchor
+  Anchor,
+  Card,
+  Avatar
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -19,10 +21,33 @@ import { IconExternalLink } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getHighestPlays, getYearRange, calculateSales } from '../../utils/statsQueries';
 import type { ChartData } from '../../db/indexedDb';
-import { SpotifyImageWithModal } from '../../components/SpotifyImageWithModal';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { useMantineTheme } from '@mantine/core';
 
 const PAGE_SIZE = 25;
+
+// Component to render image cell with hooks
+const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type }) => {
+  const { imageUrl } = useSpotifyImage({
+    entityId: record.entityId,
+    name: record.name,
+    artist: record.artistName,
+    type: type as 'artist' | 'album' | 'track',
+    clientId: SPOTIFY_TOKEN,
+    clientSecret: SPOTIFY_SECRET
+  });
+  
+  return (
+    <Avatar 
+      src={imageUrl} 
+      alt={record.name}
+      size={40}
+      radius="md"
+    />
+  );
+};
 
 const PlaysStats: React.FC = () => {
   const { t } = useTranslation();
@@ -40,6 +65,8 @@ const PlaysStats: React.FC = () => {
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);
+  const theme = useMantineTheme();
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
   // Get chart cutoff for type
   const getCutoff = (chartType: string) => {
@@ -177,8 +204,10 @@ const PlaysStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <DataTable
-          records={paginatedData.map((item, index) => ({ ...item, displayRank: (page - 1) * PAGE_SIZE + index + 1 }))}
+        <Card p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+          <DataTable
+            className="datatable-transparent"
+            records={paginatedData.map((item, index) => ({ ...item, displayRank: (page - 1) * PAGE_SIZE + index + 1 }))}
           columns={[
             {
               accessor: 'displayRank',
@@ -203,18 +232,7 @@ const PlaysStats: React.FC = () => {
               title: t('stats.plays.columns.image'),
               width: 60,
               render: (record) => (
-                <SpotifyImageWithModal
-                  entityId={record.entityId}
-                  name={record.name}
-                  artistName={record.artistName}
-                  type={type as 'artist' | 'album' | 'track'}
-                  size={40}
-                  clientId={SPOTIFY_TOKEN}
-                  clientSecret={SPOTIFY_SECRET}
-                  forceUpdate={0}
-                  lastImageUrl={null}
-                  onImageUpdate={() => {}}
-                />
+                <ImageCell record={record} type={type} />
               )
             },
             {
@@ -278,6 +296,7 @@ const PlaysStats: React.FC = () => {
             `${from}-${to} of ${totalRecords}`
           }
         />
+        </Card>
       )}
     </Stack>
   );

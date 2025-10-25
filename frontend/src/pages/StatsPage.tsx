@@ -13,7 +13,7 @@ import {
   Card,
   Flex,
   ActionIcon,
-  useMantineColorScheme,
+  useMantineTheme,
   Grid
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -49,9 +49,9 @@ const StatsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [opened, { toggle }] = useDisclosure(false);
-  const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
-  const bgColor = getCardBackgroundByMode(themeMode, colorScheme);
+  const bgColor = getCardBackgroundByMode(theme, themeMode);
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -124,7 +124,7 @@ const StatsPage: React.FC = () => {
 
   if (!chart) {
     return (
-      <Container size="md" py="xl">
+      <Container size="100%" py="xl" className="noPaddingMobile">
         <Center>
           <Stack align="center" gap="md">
             <Text>{t('errors.selectActiveChart')}</Text>
@@ -135,8 +135,8 @@ const StatsPage: React.FC = () => {
   }
 
   return (
-    <Container className="noPaddingMobile">
-      <CreateHeader pageTitle={t('stats.title')} />
+    <Container size="100%" className="noPaddingMobile">
+      <CreateHeader pageTitle={t('stats.title')} icon={IconChartBar} />
       
       <Grid gutter="md">
         {/* Sidebar */}

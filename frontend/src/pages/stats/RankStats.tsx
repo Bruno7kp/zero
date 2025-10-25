@@ -21,6 +21,8 @@ import { getItemsAtRank, getYearRange, calculateSales } from '../../utils/statsQ
 import type { ChartData } from '../../db/indexedDb';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { useMantineTheme } from '@mantine/core';
 
 const PAGE_SIZE = 25;
 
@@ -29,7 +31,7 @@ const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type
   const { imageUrl } = useSpotifyImage({
     entityId: record.entityId,
     name: record.name,
-    artistName: record.artistName,
+    artist: record.artistName,
     type: type as 'artist' | 'album' | 'track',
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
@@ -61,6 +63,8 @@ const RankStats: React.FC = () => {
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);
+  const theme = useMantineTheme();
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
   // Get chart cutoff for type
   const getCutoff = (chartType: string) => {
@@ -184,8 +188,9 @@ const RankStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <Card p="md" withBorder>
+        <Card p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <DataTable
+            className="datatable-transparent"
             records={paginatedData}
             columns={[
               {

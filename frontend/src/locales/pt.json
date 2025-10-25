@@ -563,7 +563,9 @@
         "all": "Todas as posições",
         "cutoff": "Limite ({{n}})",
         "toggleSales": "Mostrar colunas de vendas",
-        "sortBy": "Ordenar por"
+        "sortBy": "Ordenar por",
+        "settings": "Configurações",
+        "displayOptions": "Opções de Exibição"
       },
       "rank": {
         "title": "Todos os #{{n}}s",
