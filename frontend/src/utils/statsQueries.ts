@@ -200,8 +200,8 @@ export async function getBestDebuts(filters: StatsFilters): Promise<ChartData[]>
     debuts = debuts.filter(item => item.rank <= filters.position);
   }
   
-  // Sort by rank (best position first)
-  return debuts.sort((a, b) => a.rank - b.rank);
+  // Sort by plays descending (not rank)
+  return debuts.sort((a, b) => b.plays - a.plays);
 }
 
 /**

@@ -1,16 +1,17 @@
-// Best Debuts stats
+// Best Debuts stats - ordered by playcount
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Stack, 
-  Title, 
-  Text, 
   Loader, 
   Center,
-  Select,
   Group,
   ActionIcon,
-  Anchor
+  Anchor,
+  Card,
+  Avatar,
+  Text,
+  NumberInput
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -19,10 +20,31 @@ import { IconExternalLink } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getBestDebuts, getYearRange, calculateSales } from '../../utils/statsQueries';
 import type { ChartData } from '../../db/indexedDb';
-import { SpotifyImageWithModal } from '../../components/SpotifyImageWithModal';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 
 const PAGE_SIZE = 25;
+
+// Component to render image cell with hooks
+const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type }) => {
+  const { imageUrl } = useSpotifyImage({
+    entityId: record.entityId,
+    name: record.name,
+    artistName: record.artistName,
+    type: type as 'artist' | 'album' | 'track',
+    clientId: SPOTIFY_TOKEN,
+    clientSecret: SPOTIFY_SECRET
+  });
+  
+  return (
+    <Avatar 
+      src={imageUrl} 
+      alt={record.name}
+      size={40}
+      radius="md"
+    />
+  );
+};
 
 const DebutsStats: React.FC = () => {
   const { t } = useTranslation();
@@ -32,7 +54,7 @@ const DebutsStats: React.FC = () => {
   const [data, setData] = useState<ChartData[]>([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
-  const [position, setPosition] = useState(positionParam || 'all');
+  const [position, setPosition] = useState<number | 'all'>(positionParam === 'all' ? 'all' : Number(positionParam) || 1);
   const [showSales, setShowSales] = useState(false);
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
@@ -95,7 +117,7 @@ const DebutsStats: React.FC = () => {
 
         if (position !== 'all') {
           filters.position = Number(position);
-          filters.positionOperator = 'lte';
+          filters.positionOperator = 'eq';
         }
 
         const results = await getBestDebuts(filters);
@@ -115,11 +137,9 @@ const DebutsStats: React.FC = () => {
     navigate(`/stats/debuts/${position}/${newType}`);
   };
 
-  const handlePositionChange = (value: string | null) => {
-    if (value) {
-      setPosition(value);
-      navigate(`/stats/debuts/${value}/${type}`);
-    }
+  const handlePositionChange = (value: number) => {
+    setPosition(value);
+    navigate(`/stats/debuts/${value}/${type}`);
   };
 
   const paginatedData = React.useMemo(() => {
@@ -136,23 +156,9 @@ const DebutsStats: React.FC = () => {
   }
 
   const cutoff = getCutoff(type);
-  const positionOptions = [
-    { value: 'all', label: t('stats.filters.all') },
-    { value: '1', label: '#1' },
-    { value: '5', label: t('stats.filters.topN', { n: 5 }) },
-    { value: '10', label: t('stats.filters.topN', { n: 10 }) },
-    { value: String(cutoff), label: t('stats.filters.cutoff', { n: cutoff }) }
-  ];
-
-  const titleKey = type === 'artist' ? 'titleArtist' : type === 'album' ? 'titleAlbum' : 'titleTrack';
 
   return (
     <Stack gap="md">
-      <div>
-        <Title order={2}>{t(`stats.debuts.${titleKey}`)}</Title>
-        <Text c="dimmed">{t('stats.debuts.description')}</Text>
-      </div>
-
       <StatsFilters
         year={year}
         onYearChange={setYear}
@@ -162,12 +168,18 @@ const DebutsStats: React.FC = () => {
         onToggleSales={setShowSales}
         yearRange={yearRange || undefined}
         customFilters={
-          <Select
+          <NumberInput
             label={t('stats.filters.position')}
-            value={position}
-            onChange={handlePositionChange}
-            data={positionOptions}
-            style={{ minWidth: 150 }}
+            value={position === 'all' ? 1 : position}
+            onChange={(value) => {
+              if (typeof value === 'number') {
+                handlePositionChange(Math.max(1, Math.min(cutoff, value)));
+              }
+            }}
+            min={1}
+            max={cutoff}
+            style={{ minWidth: 120 }}
+            description="Filtrar por posição específica de estreia"
           />
         }
       />
@@ -177,107 +189,96 @@ const DebutsStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <DataTable
-          records={paginatedData.map((item, index) => ({ ...item, displayRank: (page - 1) * PAGE_SIZE + index + 1 }))}
-          columns={[
-            {
-              accessor: 'displayRank',
-              title: t('stats.debuts.columns.rank'),
-              width: 60,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'week',
-              title: t('stats.debuts.columns.week'),
-              width: 100
-            },
-            {
-              accessor: 'rank',
-              title: t('stats.debuts.columns.position'),
-              width: 80,
-              textAlign: 'center',
-              render: (record) => `#${record.rank}`
-            },
-            {
-              accessor: 'image',
-              title: t('stats.debuts.columns.image'),
-              width: 60,
-              render: (record) => (
-                <SpotifyImageWithModal
-                  entityId={record.entityId}
-                  name={record.name}
-                  artistName={record.artistName}
-                  type={type as 'artist' | 'album' | 'track'}
-                  size={40}
-                  clientId={SPOTIFY_TOKEN}
-                  clientSecret={SPOTIFY_SECRET}
-                  forceUpdate={0}
-                  lastImageUrl={null}
-                  onImageUpdate={() => {}}
-                />
-              )
-            },
-            {
-              accessor: 'name',
-              title: t('stats.debuts.columns.title'),
-              render: (record) => (
-                <div>
-                  <Text size="sm" fw={500}>{record.name}</Text>
-                  {type !== 'artist' && (
-                    <Text size="xs" c="dimmed">{record.artistName}</Text>
-                  )}
-                </div>
-              )
-            },
-            {
-              accessor: 'plays',
-              title: t('stats.debuts.columns.plays'),
-              width: 120,
-              render: (record) => record.plays.toLocaleString()
-            },
-            ...(showSales ? [{
-              accessor: 'sales',
-              title: t('stats.debuts.columns.sales'),
-              width: 120,
-              render: (record: ChartData) => {
-                const weights = getWeights(type);
-                const sales = calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints);
-                return Math.round(sales).toLocaleString();
+        <Card p="md" withBorder>
+          <DataTable
+            records={paginatedData.map((item, index) => ({ ...item, displayRank: (page - 1) * PAGE_SIZE + index + 1 }))}
+            columns={[
+              {
+                accessor: 'displayRank',
+                title: t('stats.debuts.columns.rank'),
+                width: 60,
+                textAlign: 'center'
+              },
+              {
+                accessor: 'week',
+                title: t('stats.debuts.columns.week'),
+                width: 100
+              },
+              {
+                accessor: 'rank',
+                title: t('stats.debuts.columns.position'),
+                width: 80,
+                textAlign: 'center',
+                render: (record) => `#${record.rank}`
+              },
+              {
+                accessor: 'image',
+                title: t('stats.debuts.columns.image'),
+                width: 60,
+                render: (record) => <ImageCell record={record} type={type} />
+              },
+              {
+                accessor: 'name',
+                title: t('stats.debuts.columns.title'),
+                render: (record) => (
+                  <div>
+                    <Text size="sm" fw={500}>{record.name}</Text>
+                    {type !== 'artist' && (
+                      <Text size="xs" c="dimmed">{record.artistName}</Text>
+                    )}
+                  </div>
+                )
+              },
+              {
+                accessor: 'plays',
+                title: t('stats.debuts.columns.plays'),
+                width: 120,
+                render: (record) => record.plays.toLocaleString()
+              },
+              ...(showSales ? [{
+                accessor: 'sales',
+                title: t('stats.debuts.columns.sales'),
+                width: 120,
+                render: (record: ChartData) => {
+                  const weights = getWeights(type);
+                  const sales = calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints);
+                  return Math.round(sales).toLocaleString();
+                }
+              }] : []),
+              {
+                accessor: 'actions',
+                title: t('stats.debuts.columns.viewChart'),
+                width: 100,
+                textAlign: 'center',
+                render: (record) => (
+                  <Group gap="xs" justify="center">
+                    <Anchor
+                      component="a"
+                      href={`/charts/week/${record.week}/${type}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/charts/week/${record.week}/${type}`);
+                      }}
+                    >
+                      <ActionIcon variant="subtle" size="sm">
+                        <IconExternalLink size={16} />
+                      </ActionIcon>
+                    </Anchor>
+                  </Group>
+                )
               }
-            }] : []),
-            {
-              accessor: 'actions',
-              title: t('stats.debuts.columns.viewChart'),
-              width: 100,
-              textAlign: 'center',
-              render: (record) => (
-                <Group gap="xs" justify="center">
-                  <Anchor
-                    component="a"
-                    href={`/charts/week/${record.week}/${type}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(`/charts/week/${record.week}/${type}`);
-                    }}
-                  >
-                    <ActionIcon variant="subtle" size="sm">
-                      <IconExternalLink size={16} />
-                    </ActionIcon>
-                  </Anchor>
-                </Group>
-              )
+            ]}
+            minHeight={200}
+            noRecordsText={t('stats.noData')}
+            totalRecords={data.length}
+            recordsPerPage={PAGE_SIZE}
+            page={page}
+            onPageChange={setPage}
+            paginationText={({ from, to, totalRecords }) =>
+              `${from}-${to} of ${totalRecords}`
             }
-          ]}
-          minHeight={200}
-          noRecordsText={t('stats.noData')}
-          totalRecords={data.length}
-          recordsPerPage={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-          paginationText={({ from, to, totalRecords }) =>
-            `${from}-${to} of ${totalRecords}`
-          }
-        />
+          />
+        </Card>
       )}
     </Stack>
   );

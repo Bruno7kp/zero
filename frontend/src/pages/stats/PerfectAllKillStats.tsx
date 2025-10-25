@@ -1,14 +1,15 @@
-// Perfect All Kill stats - artists who reached #1 in all three categories simultaneously
+// Perfect All Kill stats - shows weeks where artists achieved PAK
 import React, { useState, useEffect } from 'react';
 import { 
   Stack, 
-  Title, 
-  Text, 
   Loader, 
   Center,
   Group,
   ActionIcon,
-  Anchor
+  Anchor,
+  Card,
+  Avatar,
+  Text
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -17,10 +18,31 @@ import { DataTable } from 'mantine-datatable';
 import { IconExternalLink } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getPerfectAllKills, getYearRange } from '../../utils/statsQueries';
-import { SpotifyImageWithModal } from '../../components/SpotifyImageWithModal';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 
 const PAGE_SIZE = 25;
+
+// Component to render image cell with hooks
+const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
+  const { imageUrl } = useSpotifyImage({
+    entityId,
+    name,
+    artistName: name,
+    type: 'artist',
+    clientId: SPOTIFY_TOKEN,
+    clientSecret: SPOTIFY_SECRET
+  });
+  
+  return (
+    <Avatar 
+      src={imageUrl} 
+      alt={name}
+      size={40}
+      radius="md"
+    />
+  );
+};
 
 const PerfectAllKillStats: React.FC = () => {
   const { t } = useTranslation();
@@ -64,6 +86,8 @@ const PerfectAllKillStats: React.FC = () => {
           String(chart.id),
           year === 'all' ? undefined : year
         );
+        // Sort by week descending (most recent first)
+        results.sort((a, b) => b.week.localeCompare(a.week));
         setData(results);
       } catch (error) {
         console.error('Error loading PAK stats:', error);
@@ -75,37 +99,21 @@ const PerfectAllKillStats: React.FC = () => {
     loadData();
   }, [chart, year]);
 
-  // Group by artist to count how many times they achieved PAK
-  const groupedData = React.useMemo(() => {
-    const grouped = new Map<string, {
-      artistName: string;
-      artistEntityId: string;
-      count: number;
-      weeks: typeof data;
-    }>();
-
-    data.forEach(item => {
-      const existing = grouped.get(item.artistName);
-      if (existing) {
-        existing.count++;
-        existing.weeks.push(item);
-      } else {
-        grouped.set(item.artistName, {
-          artistName: item.artistName,
-          artistEntityId: item.artistEntityId,
-          count: 1,
-          weeks: [item]
-        });
-      }
+  // Add occurrence counter for each row (how many times this artist achieved PAK)
+  const dataWithOccurrence = React.useMemo(() => {
+    const occurrenceTracker = new Map<string, number>();
+    return data.map(item => {
+      const key = item.artistName;
+      const currentOccurrence = (occurrenceTracker.get(key) || 0) + 1;
+      occurrenceTracker.set(key, currentOccurrence);
+      return { ...item, occurrence: currentOccurrence };
     });
-
-    return Array.from(grouped.values()).sort((a, b) => b.count - a.count);
   }, [data]);
 
   const paginatedData = React.useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
-    return groupedData.slice(start, start + PAGE_SIZE);
-  }, [groupedData, page]);
+    return dataWithOccurrence.slice(start, start + PAGE_SIZE);
+  }, [dataWithOccurrence, page]);
 
   if (!chart) {
     return (
@@ -117,11 +125,6 @@ const PerfectAllKillStats: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <div>
-        <Title order={2}>{t('stats.pak.title')}</Title>
-        <Text c="dimmed">{t('stats.pak.description')}</Text>
-      </div>
-
       <StatsFilters
         year={year}
         onYearChange={setYear}
@@ -139,108 +142,83 @@ const PerfectAllKillStats: React.FC = () => {
           <Text c="dimmed">{t('stats.pak.noData')}</Text>
         </Center>
       ) : (
-        <DataTable
-          records={paginatedData}
-          columns={[
-            {
-              accessor: 'week',
-              title: t('stats.pak.columns.week'),
-              width: 100,
-              render: (record) => record.weeks[0]?.week || '-'
-            },
-            {
-              accessor: 'count',
-              title: t('stats.pak.columns.times'),
-              width: 120,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'image',
-              title: t('stats.pak.columns.image'),
-              width: 60,
-              render: (record) => (
-                <SpotifyImageWithModal
-                  entityId={record.artistEntityId}
-                  name={record.artistName}
-                  artistName={record.artistName}
-                  type="artist"
-                  size={40}
-                  clientId={SPOTIFY_TOKEN}
-                  clientSecret={SPOTIFY_SECRET}
-                  forceUpdate={0}
-                  lastImageUrl={null}
-                  onImageUpdate={() => {}}
-                />
-              )
-            },
-            {
-              accessor: 'artistName',
-              title: t('stats.pak.columns.artist'),
-              render: (record) => (
-                <Text size="sm" fw={500}>{record.artistName}</Text>
-              )
-            },
-            {
-              accessor: 'albumName',
-              title: t('stats.pak.columns.album'),
-              render: (record) => {
-                const albums = [...new Set(record.weeks.map(w => w.albumName))];
-                return (
-                  <div>
-                    {albums.map((album, i) => (
-                      <Text key={i} size="sm">{album}</Text>
-                    ))}
-                  </div>
-                );
+        <Card p="md" withBorder>
+          <DataTable
+            records={paginatedData}
+            columns={[
+              {
+                accessor: 'week',
+                title: t('stats.pak.columns.week'),
+                width: 100
+              },
+              {
+                accessor: 'occurrence',
+                title: t('stats.pak.columns.times'),
+                width: 120,
+                textAlign: 'center',
+                render: (record: any) => `${record.occurrence}ª`
+              },
+              {
+                accessor: 'image',
+                title: t('stats.pak.columns.image'),
+                width: 60,
+                render: (record) => <ImageCell entityId={record.artistEntityId} name={record.artistName} />
+              },
+              {
+                accessor: 'artistName',
+                title: t('stats.pak.columns.artist'),
+                render: (record) => (
+                  <Text size="sm" fw={500}>{record.artistName}</Text>
+                )
+              },
+              {
+                accessor: 'albumName',
+                title: t('stats.pak.columns.album'),
+                render: (record) => (
+                  <Text size="sm">{record.albumName}</Text>
+                )
+              },
+              {
+                accessor: 'trackName',
+                title: t('stats.pak.columns.track'),
+                render: (record) => (
+                  <Text size="sm">{record.trackName}</Text>
+                )
+              },
+              {
+                accessor: 'actions',
+                title: t('stats.pak.columns.viewChart'),
+                width: 100,
+                textAlign: 'center',
+                render: (record) => (
+                  <Group gap="xs" justify="center">
+                    <Anchor
+                      component="a"
+                      href={`/charts/week/${record.week}/artist`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/charts/week/${record.week}/artist`);
+                      }}
+                    >
+                      <ActionIcon variant="subtle" size="sm">
+                        <IconExternalLink size={16} />
+                      </ActionIcon>
+                    </Anchor>
+                  </Group>
+                )
               }
-            },
-            {
-              accessor: 'trackName',
-              title: t('stats.pak.columns.track'),
-              render: (record) => {
-                const tracks = [...new Set(record.weeks.map(w => w.trackName))];
-                return (
-                  <div>
-                    {tracks.map((track, i) => (
-                      <Text key={i} size="sm">{track}</Text>
-                    ))}
-                  </div>
-                );
-              }
-            },
-            {
-              accessor: 'actions',
-              title: t('stats.pak.columns.viewChart'),
-              width: 100,
-              textAlign: 'center',
-              render: (record) => (
-                <Group gap="xs" justify="center">
-                  <Anchor
-                    component="a"
-                    href={`/charts/week/${record.weeks[0]?.week}/artist`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(`/charts/week/${record.weeks[0]?.week}/artist`);
-                    }}
-                  >
-                    <ActionIcon variant="subtle" size="sm">
-                      <IconExternalLink size={16} />
-                    </ActionIcon>
-                  </Anchor>
-                </Group>
-              )
+            ]}
+            minHeight={200}
+            noRecordsText={t('stats.pak.noData')}
+            totalRecords={dataWithOccurrence.length}
+            recordsPerPage={PAGE_SIZE}
+            page={page}
+            onPageChange={setPage}
+            paginationText={({ from, to, totalRecords }) =>
+              `${from}-${to} of ${totalRecords}`
             }
-          ]}
-          minHeight={200}
-          noRecordsText={t('stats.pak.noData')}
-          totalRecords={groupedData.length}
-          recordsPerPage={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-          paginationText={({ from, to, totalRecords }) =>
-            `${from}-${to} of ${totalRecords}`
-          }
-        />
+          />
+        </Card>
       )}
     </Stack>
   );

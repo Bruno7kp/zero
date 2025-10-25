@@ -3,21 +3,43 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Stack, 
-  Title, 
-  Text, 
   Loader, 
   Center,
-  Select
+  Card,
+  Avatar,
+  Text,
+  NumberInput
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { DataTable } from 'mantine-datatable';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getTimesInTopN, getYearRange } from '../../utils/statsQueries';
-import { SpotifyImageWithModal } from '../../components/SpotifyImageWithModal';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 
 const PAGE_SIZE = 25;
+
+// Component to render image cell with hooks
+const ImageCell: React.FC<{ record: any; type: string }> = ({ record, type }) => {
+  const { imageUrl } = useSpotifyImage({
+    entityId: record.entityId,
+    name: record.name,
+    artistName: record.artistName,
+    type: type as 'artist' | 'album' | 'track',
+    clientId: SPOTIFY_TOKEN,
+    clientSecret: SPOTIFY_SECRET
+  });
+  
+  return (
+    <Avatar 
+      src={imageUrl} 
+      alt={record.name}
+      size={40}
+      radius="md"
+    />
+  );
+};
 
 const TimesAtTopStats: React.FC = () => {
   const { t } = useTranslation();
@@ -90,12 +112,9 @@ const TimesAtTopStats: React.FC = () => {
     navigate(`/stats/times_at_top/${topN}/${newType}`);
   };
 
-  const handleTopNChange = (value: string | null) => {
-    if (value) {
-      const newTopN = Number(value);
-      setTopN(newTopN);
-      navigate(`/stats/times_at_top/${newTopN}/${type}`);
-    }
+  const handleTopNChange = (value: number) => {
+    setTopN(value);
+    navigate(`/stats/times_at_top/${value}/${type}`);
   };
 
   const paginatedData = React.useMemo(() => {
@@ -112,23 +131,9 @@ const TimesAtTopStats: React.FC = () => {
   }
 
   const cutoff = getCutoff(type);
-  const topNOptions = [
-    { value: '1', label: t('stats.filters.topN', { n: 1 }) },
-    { value: '5', label: t('stats.filters.topN', { n: 5 }) },
-    { value: '10', label: t('stats.filters.topN', { n: 10 }) },
-    { value: '20', label: t('stats.filters.topN', { n: 20 }) },
-    { value: String(cutoff), label: t('stats.filters.cutoff', { n: cutoff }) }
-  ];
-
-  const titleKey = type === 'artist' ? 'titleArtist' : type === 'album' ? 'titleAlbum' : 'titleTrack';
 
   return (
     <Stack gap="md">
-      <div>
-        <Title order={2}>{t(`stats.timesAtTop.${titleKey}`, { n: topN })}</Title>
-        <Text c="dimmed">{t('stats.timesAtTop.description', { n: topN })}</Text>
-      </div>
-
       <StatsFilters
         year={year}
         onYearChange={setYear}
@@ -137,12 +142,17 @@ const TimesAtTopStats: React.FC = () => {
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         customFilters={
-          <Select
+          <NumberInput
             label={t('stats.filters.position')}
-            value={String(topN)}
-            onChange={handleTopNChange}
-            data={topNOptions}
-            style={{ minWidth: 150 }}
+            value={topN}
+            onChange={(value) => {
+              if (typeof value === 'number') {
+                handleTopNChange(Math.max(1, Math.min(cutoff, value)));
+              }
+            }}
+            min={1}
+            max={cutoff}
+            style={{ minWidth: 120 }}
           />
         }
       />
@@ -152,63 +162,52 @@ const TimesAtTopStats: React.FC = () => {
           <Loader size="lg" />
         </Center>
       ) : (
-        <DataTable
-          records={paginatedData.map((item, index) => ({ ...item, rank: (page - 1) * PAGE_SIZE + index + 1 }))}
-          columns={[
-            {
-              accessor: 'rank',
-              title: t('stats.timesAtTop.columns.rank'),
-              width: 60,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'count',
-              title: t('stats.timesAtTop.columns.times', { n: topN }),
-              width: 120,
-              textAlign: 'center'
-            },
-            {
-              accessor: 'image',
-              title: t('stats.timesAtTop.columns.image'),
-              width: 60,
-              render: (record) => (
-                <SpotifyImageWithModal
-                  entityId={record.entityId}
-                  name={record.name}
-                  artistName={record.artistName}
-                  type={type as 'artist' | 'album' | 'track'}
-                  size={40}
-                  clientId={SPOTIFY_TOKEN}
-                  clientSecret={SPOTIFY_SECRET}
-                  forceUpdate={0}
-                  lastImageUrl={null}
-                  onImageUpdate={() => {}}
-                />
-              )
-            },
-            {
-              accessor: 'name',
-              title: t('stats.timesAtTop.columns.title'),
-              render: (record) => (
-                <div>
-                  <Text size="sm" fw={500}>{record.name}</Text>
-                  {type !== 'artist' && (
-                    <Text size="xs" c="dimmed">{record.artistName}</Text>
-                  )}
-                </div>
-              )
+        <Card p="md" withBorder>
+          <DataTable
+            records={paginatedData.map((item, index) => ({ ...item, rank: (page - 1) * PAGE_SIZE + index + 1 }))}
+            columns={[
+              {
+                accessor: 'rank',
+                title: t('stats.timesAtTop.columns.rank'),
+                width: 60,
+                textAlign: 'center'
+              },
+              {
+                accessor: 'count',
+                title: t('stats.timesAtTop.columns.times', { n: topN }),
+                width: 120,
+                textAlign: 'center'
+              },
+              {
+                accessor: 'image',
+                title: t('stats.timesAtTop.columns.image'),
+                width: 60,
+                render: (record) => <ImageCell record={record} type={type} />
+              },
+              {
+                accessor: 'name',
+                title: t('stats.timesAtTop.columns.title'),
+                render: (record) => (
+                  <div>
+                    <Text size="sm" fw={500}>{record.name}</Text>
+                    {type !== 'artist' && (
+                      <Text size="xs" c="dimmed">{record.artistName}</Text>
+                    )}
+                  </div>
+                )
+              }
+            ]}
+            minHeight={200}
+            noRecordsText={t('stats.noData')}
+            totalRecords={data.length}
+            recordsPerPage={PAGE_SIZE}
+            page={page}
+            onPageChange={setPage}
+            paginationText={({ from, to, totalRecords }) =>
+              `${from}-${to} of ${totalRecords}`
             }
-          ]}
-          minHeight={200}
-          noRecordsText={t('stats.noData')}
-          totalRecords={data.length}
-          recordsPerPage={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-          paginationText={({ from, to, totalRecords }) =>
-            `${from}-${to} of ${totalRecords}`
-          }
-        />
+          />
+        </Card>
       )}
     </Stack>
   );
