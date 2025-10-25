@@ -1,6 +1,6 @@
 // Shared filters component for stats pages
 import React from 'react';
-import { Group, Select, Switch } from '@mantine/core';
+import { Group, Select, Switch, SegmentedControl, NumberInput } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 export interface StatsFiltersProps {
@@ -8,16 +8,17 @@ export interface StatsFiltersProps {
   onYearChange: (value: string) => void;
   type?: string;
   onTypeChange?: (value: string) => void;
-  position?: string;
-  onPositionChange?: (value: string) => void;
+  position?: number | string;
+  onPositionChange?: (value: number) => void;
   showSales?: boolean;
   onToggleSales?: (value: boolean) => void;
   yearRange?: { minYear: number; maxYear: number };
   showTypeFilter?: boolean;
   showPositionFilter?: boolean;
   showSalesToggle?: boolean;
-  positionOptions?: Array<{ value: string; label: string }>;
+  cutoff?: number;
   customFilters?: React.ReactNode;
+  allowAllPosition?: boolean;
 }
 
 const StatsFilters: React.FC<StatsFiltersProps> = ({
@@ -33,8 +34,9 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   showTypeFilter = true,
   showPositionFilter = false,
   showSalesToggle = true,
-  positionOptions,
-  customFilters
+  cutoff = 100,
+  customFilters,
+  allowAllPosition = false
 }) => {
   const { t } = useTranslation();
 
@@ -49,14 +51,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
     return [{ value: 'all', label: t('stats.filters.allYears') }, ...years];
   }, [yearRange, t]);
 
-  const typeOptions = [
-    { value: 'artist', label: t('charts.artist') },
-    { value: 'album', label: t('charts.album') },
-    { value: 'track', label: t('charts.track') }
-  ];
-
   return (
-    <Group gap="md" mb="md">
+    <Group gap="md" mb="md" wrap="wrap">
       <Select
         label={t('stats.filters.year')}
         value={year}
@@ -66,23 +62,56 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
       />
 
       {showTypeFilter && type && onTypeChange && (
-        <Select
-          label={t('stats.filters.type')}
-          value={type}
-          onChange={(value) => value && onTypeChange(value)}
-          data={typeOptions}
-          style={{ minWidth: 150 }}
-        />
+        <div style={{ minWidth: 200 }}>
+          <SegmentedControl
+            value={type}
+            onChange={onTypeChange}
+            data={[
+              { value: 'artist', label: t('charts.artist') },
+              { value: 'album', label: t('charts.album') },
+              { value: 'track', label: t('charts.track') }
+            ]}
+            fullWidth
+          />
+        </div>
       )}
 
-      {showPositionFilter && position && onPositionChange && positionOptions && (
-        <Select
-          label={t('stats.filters.position')}
-          value={position}
-          onChange={(value) => value && onPositionChange(value)}
-          data={positionOptions}
-          style={{ minWidth: 150 }}
-        />
+      {showPositionFilter && position !== undefined && onPositionChange && (
+        allowAllPosition && position === 'all' ? (
+          <Select
+            label={t('stats.filters.position')}
+            value={String(position)}
+            onChange={(value) => {
+              if (value === 'all') {
+                // Keep as string 'all'
+              } else if (value) {
+                onPositionChange(Number(value));
+              }
+            }}
+            data={[
+              { value: 'all', label: t('stats.filters.all') },
+              ...Array.from({ length: cutoff }, (_, i) => ({
+                value: String(i + 1),
+                label: `#${i + 1}`
+              }))
+            ]}
+            style={{ minWidth: 120 }}
+            searchable
+          />
+        ) : (
+          <NumberInput
+            label={t('stats.filters.position')}
+            value={typeof position === 'number' ? position : 1}
+            onChange={(value) => {
+              if (typeof value === 'number') {
+                onPositionChange(Math.max(1, Math.min(cutoff, value)));
+              }
+            }}
+            min={1}
+            max={cutoff}
+            style={{ minWidth: 120 }}
+          />
+        )
       )}
 
       {customFilters}

@@ -2,7 +2,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  AppShell, 
   Container, 
   Title, 
   Text, 
@@ -11,10 +10,11 @@ import {
   Stack,
   NavLink,
   ScrollArea,
-  Box,
-  Burger,
-  Group,
-  useMantineColorScheme
+  Card,
+  Flex,
+  ActionIcon,
+  useMantineColorScheme,
+  Grid
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -26,10 +26,12 @@ import {
   IconHeadphones,
   IconRocket,
   IconCoin,
-  IconCrown
+  IconCrown,
+  IconMenu2
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode } from '../theme/modes';
+import CreateHeader from '../components/createChart/CreateHeader';
 
 // Lazy load stat components for performance
 const StatsHome = lazy(() => import('./stats/StatsHome'));
@@ -46,7 +48,7 @@ const StatsPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [opened, { toggle, close }] = useDisclosure(false);
+  const [opened, { toggle }] = useDisclosure(false);
   const { colorScheme } = useMantineColorScheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
   const bgColor = getCardBackgroundByMode(themeMode, colorScheme);
@@ -133,53 +135,45 @@ const StatsPage: React.FC = () => {
   }
 
   return (
-    <AppShell
-      navbar={{
-        width: 250,
-        breakpoint: 'sm',
-        collapsed: { mobile: !opened }
-      }}
-      padding={0}
-    >
-      <AppShell.Navbar p="md" style={{ backgroundColor: bgColor }}>
-        <AppShell.Section>
-          <Title order={3} mb="md">{t('stats.sidebar.title')}</Title>
-        </AppShell.Section>
-        
-        <AppShell.Section grow component={ScrollArea}>
-          <Stack gap="xs">
-            {navItems.map((item, index) => (
-              <NavLink
-                key={index}
-                active={isActive(item)}
-                label={item.label}
-                leftSection={<item.icon size={18} />}
-                onClick={() => {
-                  navigate(item.path);
-                  close();
-                }}
-              />
-            ))}
-          </Stack>
-        </AppShell.Section>
-      </AppShell.Navbar>
-
-      <AppShell.Main>
-        <Box style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: bgColor }}>
-          <Container size="xl" py="md">
-            <Group>
-              <Burger
-                opened={opened}
+    <Container className="noPaddingMobile">
+      <CreateHeader pageTitle={t('stats.title')} />
+      
+      <Grid gutter="md">
+        {/* Sidebar */}
+        <Grid.Col span={{ base: 12, md: 3 }}>
+          <Card p="md" style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
+            <Flex justify="space-between" align="center" mb="md">
+              <Title order={4}>{t('stats.sidebar.title')}</Title>
+              <ActionIcon 
+                variant="subtle" 
                 onClick={toggle}
-                hiddenFrom="sm"
-                size="sm"
-              />
-              <Title order={2}>{t('stats.title')}</Title>
-            </Group>
-          </Container>
-        </Box>
+                hiddenFrom="md"
+              >
+                <IconMenu2 size={18} />
+              </ActionIcon>
+            </Flex>
+            
+            <ScrollArea.Autosize mah={600} type="auto">
+              <Stack gap="xs" display={{ base: opened ? 'flex' : 'none', md: 'flex' }}>
+                {navItems.map((item, index) => (
+                  <NavLink
+                    key={index}
+                    active={isActive(item)}
+                    label={item.label}
+                    leftSection={<item.icon size={18} />}
+                    onClick={() => {
+                      navigate(item.path);
+                      toggle();
+                    }}
+                  />
+                ))}
+              </Stack>
+            </ScrollArea.Autosize>
+          </Card>
+        </Grid.Col>
 
-        <Container size="xl" py="md">
+        {/* Main Content */}
+        <Grid.Col span={{ base: 12, md: 9 }}>
           <Suspense fallback={
             <Center py="xl">
               <Stack align="center" gap="md">
@@ -200,9 +194,9 @@ const StatsPage: React.FC = () => {
               <Route path="/times_at_top_by_artist/:rank/:type" element={<TimesAtTopByArtistStats />} />
             </Routes>
           </Suspense>
-        </Container>
-      </AppShell.Main>
-    </AppShell>
+        </Grid.Col>
+      </Grid>
+    </Container>
   );
 };
 
