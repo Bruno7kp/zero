@@ -155,7 +155,7 @@ php artisan test
 docker compose exec app php artisan test
 ```
 
-**Lint (when enabled)**:
+**Lint** (currently disabled in CI, can be enabled with Laravel Pint):
 ```bash
 cd backend
 ./vendor/bin/pint
@@ -214,16 +214,18 @@ Triggers on push to `main` and `refactor` branches, and on pull requests to `mai
 ### Branch Strategy
 
 - `main`: Production branch - stable, approved code only
-  - Generates Docker tags: `:main`, `:sha-<short>`, `:latest`
+  - Generates Docker tags: `:main`, `:sha-<short>`, and `:latest` (when it's the default branch)
 - `refactor`: Staging/integration branch
   - Generates Docker tags: `:refactor`, `:sha-<short>`
 - Feature branches: Create PRs to `refactor` for staging, then to `main` for production
 
 ### Docker Images
 
-Two images are built:
-- `ghcr.io/bruno7kp/zero-backend`: PHP-FPM backend
-- `ghcr.io/bruno7kp/zero-web`: Nginx + built frontend SPA
+Two images are built and pushed to GitHub Container Registry:
+- `ghcr.io/{owner}/{repo}-backend`: PHP-FPM backend
+- `ghcr.io/{owner}/{repo}-web`: Nginx + built frontend SPA
+
+The actual image names are dynamically determined from the repository owner and name.
 
 ## API Structure
 
@@ -321,7 +323,7 @@ Two images are built:
 - Generate `APP_KEY` if new instance
 - Run `php artisan migrate --force`
 - Cache config: `php artisan config:cache route:cache view:cache`
-- Setup queue worker: `php artisan queue:work --tries=1`
+- Setup queue worker: `php artisan queue:work --tries=3` (adjust retry count as needed)
 
 **Frontend**:
 - Set `VITE_API_BASE_URL` to production API URL (or `/api` if same domain)
