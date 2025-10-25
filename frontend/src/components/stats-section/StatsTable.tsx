@@ -25,7 +25,7 @@ export function StatsTable<T extends Record<string, any>>({
 }: StatsTableProps<T>) {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
-    const [pageSize] = useState(100);
+    const [pageSize] = useState(25);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus<T>>(
         defaultSortStatus || { columnAccessor: 'rank', direction: 'asc' }
     );
