@@ -5,6 +5,7 @@ import { StatsFilters } from '../StatsFilters';
 import { StatsTable } from '../StatsTable';
 import { useStatsData } from '../useStatsData';
 import { formatNumber } from '../../../utils/format';
+import { StatsImageCell } from '../StatsImageCell';
 import type { DataTableColumn } from 'mantine-datatable';
 
 interface RankRow {
@@ -65,8 +66,22 @@ export const StatsRankPage: React.FC<{ position?: string; type?: string }> = ({
 
     const columns: DataTableColumn<RankRow & { count: number }>[] = [
         {
+            accessor: 'image',
+            title: '',
+            render: (row) => (
+                <StatsImageCell
+                    entityId={row.entityId}
+                    name={row.name}
+                    artistName={row.artistName}
+                    type={type as 'artist' | 'album' | 'track'}
+                />
+            ),
+            width: 60,
+            textAlign: 'center'
+        },
+        {
             accessor: 'count',
-            title: t('stats.timesAtRank', { defaultValue: 'Times at #' + pos }),
+            title: t('stats.timesAtRank', { defaultValue: 'Times at #' + pos, rank: pos }),
             render: (row) => <Badge color="blue" variant="filled">{row.count}</Badge>,
             sortable: true
         },
@@ -99,10 +114,10 @@ export const StatsRankPage: React.FC<{ position?: string; type?: string }> = ({
         <Stack gap="md" p="md">
             <div>
                 <Title order={2}>
-                    {t('stats.allAtRank', { defaultValue: `All #${pos}s` })}
+                    {t('stats.allAtRank', { defaultValue: `All #${pos}s`, rank: pos })}
                 </Title>
                 <Text c="dimmed">
-                    {t('stats.allAtRankDesc', { defaultValue: `All entries that reached position #${pos}` })}
+                    {t('stats.allAtRankDesc', { defaultValue: `All entries that reached position #${pos}`, rank: pos })}
                 </Text>
             </div>
 
@@ -122,6 +137,7 @@ export const StatsRankPage: React.FC<{ position?: string; type?: string }> = ({
                 loading={loading}
                 defaultSortStatus={{ columnAccessor: 'count', direction: 'desc' }}
                 showSalesToggle={true}
+                showImagesToggle={true}
             />
         </Stack>
     );

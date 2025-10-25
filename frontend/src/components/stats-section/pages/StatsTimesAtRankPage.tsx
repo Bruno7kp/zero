@@ -5,6 +5,7 @@ import { StatsFilters } from '../StatsFilters';
 import { StatsTable } from '../StatsTable';
 import { useStatsData } from '../useStatsData';
 import { formatNumber } from '../../../utils/format';
+import { StatsImageCell } from '../StatsImageCell';
 import type { DataTableColumn } from 'mantine-datatable';
 
 interface TimesAtRankRow {
@@ -52,6 +53,20 @@ export const StatsTimesAtRankPage: React.FC<{ position?: string; type?: string }
 
     const columns: DataTableColumn<TimesAtRankRow>[] = [
         {
+            accessor: 'image',
+            title: '',
+            render: (row) => (
+                <StatsImageCell
+                    entityId={row.entityId}
+                    name={row.name}
+                    artistName={row.artistName}
+                    type={type as 'artist' | 'album' | 'track'}
+                />
+            ),
+            width: 60,
+            textAlign: 'center'
+        },
+        {
             accessor: 'count',
             title: t('stats.weeks', { defaultValue: 'Weeks' }),
             render: (row) => formatNumber(row.count),
@@ -74,10 +89,10 @@ export const StatsTimesAtRankPage: React.FC<{ position?: string; type?: string }
         <Stack gap="md" p="md">
             <div>
                 <Title order={2}>
-                    {t('stats.mostWeeksAtRank', { defaultValue: `Most Weeks at #${pos}` })}
+                    {t('stats.mostWeeksAtRank', { defaultValue: `Most Weeks at #${pos}`, rank: pos })}
                 </Title>
                 <Text c="dimmed">
-                    {t('stats.mostWeeksAtRankDesc', { defaultValue: `Entries with the most weeks at position #${pos}` })}
+                    {t('stats.mostWeeksAtRankDesc', { defaultValue: `Entries with the most weeks at position #${pos}`, rank: pos })}
                 </Text>
             </div>
 
@@ -96,6 +111,7 @@ export const StatsTimesAtRankPage: React.FC<{ position?: string; type?: string }
                 columns={columns}
                 loading={loading}
                 defaultSortStatus={{ columnAccessor: 'count', direction: 'desc' }}
+                showImagesToggle={true}
             />
         </Stack>
     );

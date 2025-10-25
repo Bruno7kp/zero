@@ -5,6 +5,7 @@ import { StatsFilters } from '../StatsFilters';
 import { StatsTable } from '../StatsTable';
 import { useStatsData } from '../useStatsData';
 import { formatNumber } from '../../../utils/format';
+import { StatsImageCell } from '../StatsImageCell';
 import type { DataTableColumn } from 'mantine-datatable';
 
 interface PointsRow {
@@ -49,6 +50,20 @@ export const StatsPointsPage: React.FC<{ type?: string }> = ({
     }, [year, type, chart, fetchAggregatedStats]);
 
     const columns: DataTableColumn<PointsRow>[] = [
+        {
+            accessor: 'image',
+            title: '',
+            render: (row) => (
+                <StatsImageCell
+                    entityId={row.entityId}
+                    name={row.name}
+                    artistName={row.artistName}
+                    type={type as 'artist' | 'album' | 'track'}
+                />
+            ),
+            width: 60,
+            textAlign: 'center'
+        },
         {
             accessor: 'name',
             title: type === 'artist' ? t('charts.artist', { defaultValue: 'Artist' }) : t('charts.title', { defaultValue: 'Title' }),
@@ -97,6 +112,7 @@ export const StatsPointsPage: React.FC<{ type?: string }> = ({
                 columns={columns}
                 loading={loading}
                 defaultSortStatus={{ columnAccessor: 'totalPoints', direction: 'desc' }}
+                showImagesToggle={true}
             />
         </Stack>
     );

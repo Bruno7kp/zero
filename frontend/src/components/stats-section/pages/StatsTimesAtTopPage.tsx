@@ -5,6 +5,7 @@ import { StatsFilters } from '../StatsFilters';
 import { StatsTable } from '../StatsTable';
 import { useStatsData } from '../useStatsData';
 import { formatNumber } from '../../../utils/format';
+import { StatsImageCell } from '../StatsImageCell';
 import type { DataTableColumn } from 'mantine-datatable';
 
 interface TimesAtTopRow {
@@ -52,6 +53,20 @@ export const StatsTimesAtTopPage: React.FC<{ position?: string; type?: string }>
 
     const columns: DataTableColumn<TimesAtTopRow>[] = [
         {
+            accessor: 'image',
+            title: '',
+            render: (row) => (
+                <StatsImageCell
+                    entityId={row.entityId}
+                    name={row.name}
+                    artistName={row.artistName}
+                    type={type as 'artist' | 'album' | 'track'}
+                />
+            ),
+            width: 60,
+            textAlign: 'center'
+        },
+        {
             accessor: 'count',
             title: t('stats.weeks', { defaultValue: 'Weeks' }),
             render: (row) => formatNumber(row.count),
@@ -74,10 +89,10 @@ export const StatsTimesAtTopPage: React.FC<{ position?: string; type?: string }>
         <Stack gap="md" p="md">
             <div>
                 <Title order={2}>
-                    {t('stats.longestInTop', { defaultValue: `Longest in Top ${pos}` })}
+                    {t('stats.longestInTop', { defaultValue: `Longest in Top ${pos}`, n: pos })}
                 </Title>
                 <Text c="dimmed">
-                    {t('stats.longestInTopDesc', { defaultValue: `Entries with the most weeks in the top ${pos}` })}
+                    {t('stats.longestInTopDesc', { defaultValue: `Entries with the most weeks in the top ${pos}`, n: pos })}
                 </Text>
             </div>
 
@@ -96,6 +111,7 @@ export const StatsTimesAtTopPage: React.FC<{ position?: string; type?: string }>
                 columns={columns}
                 loading={loading}
                 defaultSortStatus={{ columnAccessor: 'count', direction: 'desc' }}
+                showImagesToggle={true}
             />
         </Stack>
     );

@@ -10,6 +10,7 @@ interface StatsTableProps<T> {
     loading?: boolean;
     defaultSortStatus?: DataTableSortStatus<T>;
     showSalesToggle?: boolean;
+    showImagesToggle?: boolean;
     rowExpansion?: any;
 }
 
@@ -19,6 +20,7 @@ export function StatsTable<T extends Record<string, any>>({
     loading = false,
     defaultSortStatus,
     showSalesToggle = false,
+    showImagesToggle = false,
     rowExpansion
 }: StatsTableProps<T>) {
     const { t } = useTranslation();
@@ -28,16 +30,16 @@ export function StatsTable<T extends Record<string, any>>({
         defaultSortStatus || { columnAccessor: 'rank', direction: 'asc' }
     );
     const [showSales, setShowSales] = useState(false);
+    const [showImages, setShowImages] = useState(true);
 
-    // Filter columns based on sales visibility
+    // Filter columns based on sales and images visibility
     const visibleColumns = useMemo(() => {
-        if (!showSalesToggle) return columns;
-        
         return columns.filter(col => {
-            if (col.accessor === 'sales') return showSales;
+            if (showSalesToggle && col.accessor === 'sales') return showSales;
+            if (showImagesToggle && col.accessor === 'image') return showImages;
             return true;
         });
-    }, [columns, showSales, showSalesToggle]);
+    }, [columns, showSales, showImages, showSalesToggle, showImagesToggle]);
 
     // Sort data
     const sortedData = useMemo(() => {
@@ -70,16 +72,27 @@ export function StatsTable<T extends Record<string, any>>({
 
     return (
         <Paper>
-            {showSalesToggle && (
+            {(showSalesToggle || showImagesToggle) && (
                 <Group p="md" justify="space-between">
                     <Text size="sm" fw={500}>
                         {t('stats.totalRecords', { defaultValue: 'Total Records' })}: {data.length}
                     </Text>
-                    <Switch
-                        label={t('stats.showSales', { defaultValue: 'Show Sales' })}
-                        checked={showSales}
-                        onChange={(e) => setShowSales(e.currentTarget.checked)}
-                    />
+                    <Group gap="md">
+                        {showImagesToggle && (
+                            <Switch
+                                label={t('stats.showImages', { defaultValue: 'Show Images' })}
+                                checked={showImages}
+                                onChange={(e) => setShowImages(e.currentTarget.checked)}
+                            />
+                        )}
+                        {showSalesToggle && (
+                            <Switch
+                                label={t('stats.showSales', { defaultValue: 'Show Sales' })}
+                                checked={showSales}
+                                onChange={(e) => setShowSales(e.currentTarget.checked)}
+                            />
+                        )}
+                    </Group>
                 </Group>
             )}
             

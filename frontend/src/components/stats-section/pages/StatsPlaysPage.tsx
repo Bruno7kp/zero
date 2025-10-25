@@ -6,6 +6,7 @@ import { StatsFilters } from '../StatsFilters';
 import { StatsTable } from '../StatsTable';
 import { useStatsData } from '../useStatsData';
 import { formatNumber } from '../../../utils/format';
+import { StatsImageCell } from '../StatsImageCell';
 import type { DataTableColumn } from 'mantine-datatable';
 
 interface PlaysRow {
@@ -55,6 +56,20 @@ export const StatsPlaysPage: React.FC<{ position?: string; type?: string }> = ({
     }, [year, type, position, chart, fetchPlaysOrDebuts]);
 
     const columns: DataTableColumn<PlaysRow>[] = [
+        {
+            accessor: 'image',
+            title: '',
+            render: (row) => (
+                <StatsImageCell
+                    entityId={row.entityId}
+                    name={row.name}
+                    artistName={row.artistName}
+                    type={type as 'artist' | 'album' | 'track'}
+                />
+            ),
+            width: 60,
+            textAlign: 'center'
+        },
         {
             accessor: 'week',
             title: t('charts.week', { defaultValue: 'Week' }),
@@ -119,6 +134,7 @@ export const StatsPlaysPage: React.FC<{ position?: string; type?: string }> = ({
                 loading={loading}
                 defaultSortStatus={{ columnAccessor: 'plays', direction: 'desc' }}
                 showSalesToggle={true}
+                showImagesToggle={true}
             />
         </Stack>
     );
