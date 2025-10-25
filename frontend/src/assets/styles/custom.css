@@ -302,5 +302,5 @@ h1, h2, h3, h4, h5, h6 {
 /* Stats card hover effect */
 .stat-card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: var(--mantine-shadow-md);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

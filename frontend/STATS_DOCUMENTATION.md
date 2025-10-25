@@ -94,7 +94,7 @@ The stats section provides comprehensive analytics for chart data stored in Inde
   - `fetchPlaysOrDebuts`: Get plays or debut data
   - `fetchArtistAggregatedStats`: Aggregate by artist
 - Includes utilities:
-  - `calculateSales`: (plays × weightplays) + (points × weightpoints)
+  - `calculateSales`: (plays × weightPlays) + (points × weightPoints)
   - `calculatePoints`: Based on rank and chart cutoff
 
 ## Data Flow
