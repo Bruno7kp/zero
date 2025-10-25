@@ -1,4 +1,4 @@
-import { type JSX } from 'react';
+import { type JSX, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -19,6 +19,9 @@ import './i18n';
 import CreateChartPage from "./pages/CreateChartPage.tsx";
 import { Loader, Center, Flex, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
+
+// Lazy load StatsPage for better performance
+const StatsPage = lazy(() => import('./pages/StatsPage'));
 
 // Componente para proteger rotas. Redireciona para o login se não estiver autenticado.
 const ProtectedRoute = ({ children }: { children: JSX.Element; }) => {
@@ -141,6 +144,22 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <CreateChartPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="stats/*"
+                    element={
+                        <ProtectedRoute>
+                            <Suspense fallback={
+                                <Center style={{ height: '50vh' }}>
+                                    <Flex direction="column" align="center" gap="md">
+                                        <Loader size="xl" />
+                                    </Flex>
+                                </Center>
+                            }>
+                                <StatsPage />
+                            </Suspense>
                         </ProtectedRoute>
                     }
                 />
