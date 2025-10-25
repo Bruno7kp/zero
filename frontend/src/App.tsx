@@ -17,6 +17,8 @@ import MainLayout from './layouts/MainLayout';
 import { useSelector } from 'react-redux';
 import './i18n';
 import CreateChartPage from "./pages/CreateChartPage.tsx";
+import StatsPage from './pages/StatsPage';
+import StatsDetailPage from './pages/StatsDetailPage';
 import { Loader, Center, Flex, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
@@ -149,6 +151,22 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <NotificationsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="stats"
+                    element={
+                        <ProtectedRoute>
+                            <StatsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="stats/:name/:position?/:type?"
+                    element={
+                        <ProtectedRoute>
+                            <StatsDetailPage />
                         </ProtectedRoute>
                     }
                 />
