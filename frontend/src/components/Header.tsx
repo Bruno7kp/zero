@@ -29,6 +29,7 @@ import {
     IconDroplet,
     IconMoon,
     IconBell,
+    IconChartBar,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
@@ -146,6 +147,13 @@ export const Header: React.FC = () => {
                             leftSection={<IconFlame style={{ width: rem(14), height: rem(14) }} />}
                         >
                             {t('charts.live')}
+                        </Menu.Item>
+                        <Menu.Item
+                            component={NavLink}
+                            to="/stats"
+                            leftSection={<IconChartBar style={{ width: rem(14), height: rem(14) }} />}
+                        >
+                            {t('stats.title', { defaultValue: 'Statistics' })}
                         </Menu.Item>
                         <Menu.Item
                             component={NavLink}
