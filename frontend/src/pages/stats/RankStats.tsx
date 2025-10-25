@@ -1,0 +1,304 @@
+// All #Ns stat page - shows weeks where items reached a specific rank
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  Stack, 
+  Loader, 
+  Center,
+  Card,
+  Avatar,
+  Text,
+  Table,
+  ScrollArea,
+  Pagination,
+  Box,
+  Button,
+  Tooltip,
+  Flex
+} from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { IconChevronRight } from '@tabler/icons-react';
+import dayjs from 'dayjs';
+import StatsFilters from '../../components/stats/StatsFilters';
+import { getItemsAtRank, getYearRange, calculateSales } from '../../utils/statsQueries';
+import type { ChartData } from '../../db/indexedDb';
+import { db } from '../../db/indexedDb';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { useMantineTheme } from '@mantine/core';
+
+const PAGE_SIZE = 25;
+
+// Component to render image cell with hooks
+const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type }) => {
+  const { imageUrl } = useSpotifyImage({
+    entityId: record.entityId,
+    name: record.name,
+    artist: record.artistName,
+    type: type as 'artist' | 'album' | 'track',
+    clientId: SPOTIFY_TOKEN,
+    clientSecret: SPOTIFY_SECRET
+  });
+  
+  return (
+    <Avatar 
+      src={imageUrl} 
+      alt={record.name}
+      size={40}
+      radius="md"
+    />
+  );
+};
+
+const RankStats: React.FC = () => {
+  const { t } = useTranslation();
+  const { rank: rankParam, type: typeParam } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<ChartData[]>([]);
+  const [year, setYear] = useState('all');
+  const [type, setType] = useState(typeParam || 'artist');
+  const [rank, setRank] = useState(Number(rankParam) || 1);
+  const [showSales, setShowSales] = useState(false);
+  const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
+  const [page, setPage] = useState(1);
+
+  const charts = useSelector((state: any) => state.charts.charts);
+  const activeChartId = useSelector((state: any) => state.charts.activeChartId);
+  const chart = charts.find((c: any) => c.id === activeChartId);
+  const theme = useMantineTheme();
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
+
+  // Get chart cutoff for type
+  const getCutoff = (chartType: string) => {
+    if (!chart) return 100;
+    const cutoffMap: any = {
+      artist: chart.artist_cutoff || 100,
+      album: chart.album_cutoff || 100,
+      track: chart.music_cutoff || 100
+    };
+    return cutoffMap[chartType] || 100;
+  };
+
+  // Get weight values for sales calculation
+  const getWeights = (chartType: string) => {
+    if (!chart) return { weightPlays: 1, weightPoints: 0 };
+    
+    if (chartType === 'track') {
+      return {
+        weightPlays: chart.musicPlaysWeight || 1,
+        weightPoints: chart.musicPointsWeight || 0
+      };
+    } else if (chartType === 'album') {
+      return {
+        weightPlays: chart.albumPlaysWeight || 1,
+        weightPoints: chart.albumPointsWeight || 0
+      };
+    }
+    return { weightPlays: 1, weightPoints: 0 };
+  };
+
+  useEffect(() => {
+    if (!chart) return;
+
+    const loadYearRange = async () => {
+      const range = await getYearRange(String(chart.id), type);
+      setYearRange(range);
+    };
+
+    loadYearRange();
+  }, [chart, type]);
+
+  useEffect(() => {
+    if (!chart) return;
+
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const results = await getItemsAtRank({
+          chartId: String(chart.id),
+          chartType: type,
+          rank,
+          year: year === 'all' ? undefined : year
+        });
+        // Sort by week descending (most recent first)
+        results.sort((a, b) => b.week.localeCompare(a.week));
+        
+        // Get all weeks for calculating week numbers
+        const allWeeks = await db.charts_data
+          .where('[chartId+chartType]')
+          .equals([String(chart.id), type])
+          .toArray();
+        const uniqueWeeks = [...new Set(allWeeks.map(w => w.week))].sort();
+        
+        // Add weekNumber to each result (1 = oldest week, N = newest week)
+        const resultsWithWeekNumber = results.map(item => ({
+          ...item,
+          weekNumber: uniqueWeeks.indexOf(item.week) + 1
+        }));
+        
+        setData(resultsWithWeekNumber);
+      } catch (error) {
+        console.error('Error loading rank stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [chart, type, rank, year]);
+
+  const handleTypeChange = (newType: string) => {
+    setType(newType);
+    navigate(`/stats/rank/${rank}/${newType}`);
+  };
+
+  const handlePositionChange = (newRank: number) => {
+    setRank(newRank);
+    navigate(`/stats/rank/${newRank}/${type}`);
+  };
+
+  // Add occurrence counter for each row
+  const dataWithOccurrence = React.useMemo(() => {
+    const occurrenceTracker = new Map<string, number>();
+    // Reverse the data to count from oldest to newest
+    const reversedData = [...data].reverse();
+    const result = reversedData.map(item => {
+      const key = `${item.entityId}`;
+      const currentOccurrence = (occurrenceTracker.get(key) || 0) + 1;
+      occurrenceTracker.set(key, currentOccurrence);
+      return { ...item, occurrence: currentOccurrence };
+    });
+    // Reverse back to show newest first
+    return result.reverse();
+  }, [data]);
+
+  const paginatedData = React.useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return dataWithOccurrence.slice(start, start + PAGE_SIZE);
+  }, [dataWithOccurrence, page]);
+
+  if (!chart) {
+    return (
+      <Center py="xl">
+        <Text>{t('errors.selectActiveChart')}</Text>
+      </Center>
+    );
+  }
+
+  const cutoff = getCutoff(type);
+
+  return (
+    <Stack gap="md">
+      <StatsFilters
+        year={year}
+        onYearChange={setYear}
+        type={type}
+        onTypeChange={handleTypeChange}
+        position={rank}
+        onPositionChange={handlePositionChange}
+        showSales={showSales}
+        onToggleSales={setShowSales}
+        yearRange={yearRange || undefined}
+        showPositionFilter={true}
+        cutoff={cutoff}
+      />
+
+      {loading ? (
+        <Center py="xl">
+          <Loader size="lg" />
+        </Center>
+      ) : (
+        <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+          <ScrollArea>
+            <Table highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>X</Table.Th>
+                  <Table.Th>{t('stats.rank.columns.title')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.rank.columns.plays')}</Table.Th>
+                  {showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.rank.columns.sales')}</Table.Th>}
+                  <Table.Th style={{ width: 1 }}></Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.length === 0 ? (
+                  <Table.Tr>
+                    <Table.Td colSpan={showSales ? 6 : 5}>
+                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ) : (
+                  paginatedData.map((record: any) => {
+                    const startDate = dayjs(record.week);
+                    const endDate = startDate.add(6, 'day');
+                    const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
+                    const weights = getWeights(type);
+                    const sales = showSales ? calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints) : 0;
+
+                    return (
+                      <Table.Tr key={`${record.week}-${record.entityId}`}>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Tooltip label={dateRange} withArrow>
+                            <Text fw={800} size="lg">{record.weekNumber}</Text>
+                          </Tooltip>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.occurrence}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ verticalAlign: 'middle' }}>
+                          <Flex gap="sm" wrap="nowrap" align="center">
+                            <ImageCell record={record} type={type} />
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
+                              {type !== 'artist' && record.artistName && (
+                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              )}
+                            </Box>
+                          </Flex>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.plays.toLocaleString()}</Text>
+                        </Table.Td>
+                        {showSales && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            <Text size="sm">{Math.round(sales).toLocaleString()}</Text>
+                          </Table.Td>
+                        )}
+                        <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
+                          <Button
+                            size="xs"
+                            variant="light"
+                            px={6}
+                            onClick={() => navigate(`/charts/week/${record.week}/${type}`)}
+                          >
+                            <IconChevronRight size={16} />
+                          </Button>
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+          {dataWithOccurrence.length > PAGE_SIZE && (
+            <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
+              <Pagination 
+                total={Math.ceil(dataWithOccurrence.length / PAGE_SIZE)} 
+                value={page} 
+                onChange={setPage} 
+                size="sm" 
+              />
+            </Box>
+          )}
+        </Card>
+      )}
+    </Stack>
+  );
+};
+
+export default RankStats;

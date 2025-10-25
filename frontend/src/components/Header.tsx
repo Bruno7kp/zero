@@ -29,6 +29,7 @@ import {
     IconDroplet,
     IconMoon,
     IconBell,
+    IconChartBar,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
@@ -156,6 +157,13 @@ export const Header: React.FC = () => {
                         </Menu.Item>
                         <Menu.Item
                             component={NavLink}
+                            to="/stats"
+                            leftSection={<IconChartBar style={{ width: rem(14), height: rem(14) }} />}
+                        >
+                            {t('stats.title')}
+                        </Menu.Item>
+                        <Menu.Item
+                            component={NavLink}
                             to="/friends"
                             leftSection={<IconUsers style={{ width: rem(14), height: rem(14) }} />}
                         >
@@ -228,6 +236,9 @@ export const Header: React.FC = () => {
             <Group visibleFrom="md">
                 <Button component={NavLink} to="/charts" variant="subtle">
                     {t('charts.title')}
+                </Button>
+                <Button component={NavLink} to="/stats" variant="subtle">
+                    {t('stats.title')}
                 </Button>
                 <Button component={NavLink} to="/library" variant="subtle">
                     {t('library.title')}
