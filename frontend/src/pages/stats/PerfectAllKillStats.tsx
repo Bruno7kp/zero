@@ -30,8 +30,6 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 
-const PAGE_SIZE = 25;
-
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
   const { imageUrl } = useSpotifyImage({
@@ -70,6 +68,9 @@ const PerfectAllKillStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('week-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -140,10 +141,74 @@ const PerfectAllKillStats: React.FC = () => {
     return result.reverse();
   }, [data]);
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return dataWithOccurrence;
+    
+    const query = searchQuery.toLowerCase();
+    return dataWithOccurrence.filter(item => 
+      item.artistName.toLowerCase().includes(query) ||
+      item.albumName.toLowerCase().includes(query) ||
+      item.trackName.toLowerCase().includes(query)
+    );
+  }, [dataWithOccurrence, searchQuery]);
+
+  // Sort data
+  const sortedData = React.useMemo(() => {
+    const sorted = [...filteredData];
+    
+    switch (sortBy) {
+      case 'week-desc':
+        return sorted.sort((a, b) => b.week.localeCompare(a.week));
+      case 'week-asc':
+        return sorted.sort((a, b) => a.week.localeCompare(b.week));
+      case 'artist-asc':
+        return sorted.sort((a, b) => a.artistName.localeCompare(b.artistName));
+      case 'artist-desc':
+        return sorted.sort((a, b) => b.artistName.localeCompare(a.artistName));
+      case 'album-asc':
+        return sorted.sort((a, b) => a.albumName.localeCompare(b.albumName));
+      case 'album-desc':
+        return sorted.sort((a, b) => b.albumName.localeCompare(a.albumName));
+      case 'track-asc':
+        return sorted.sort((a, b) => a.trackName.localeCompare(b.trackName));
+      case 'track-desc':
+        return sorted.sort((a, b) => b.trackName.localeCompare(a.trackName));
+      case 'times-desc':
+        return sorted.sort((a, b) => b.occurrence - a.occurrence);
+      case 'times-asc':
+        return sorted.sort((a, b) => a.occurrence - b.occurrence);
+      default:
+        return sorted;
+    }
+  }, [filteredData, sortBy]);
+
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return dataWithOccurrence.slice(start, start + PAGE_SIZE);
-  }, [dataWithOccurrence, page]);
+    const start = (page - 1) * pageSize;
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, page, pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, pageSize]);
+
+  // Sort options
+  const sortOptions = React.useMemo(() => {
+    return [
+      { value: 'week-desc', label: t('stats.pak.sort.weekDesc') },
+      { value: 'week-asc', label: t('stats.pak.sort.weekAsc') },
+      { value: 'artist-asc', label: t('stats.pak.sort.artistAsc') },
+      { value: 'artist-desc', label: t('stats.pak.sort.artistDesc') },
+      { value: 'album-asc', label: t('stats.pak.sort.albumAsc') },
+      { value: 'album-desc', label: t('stats.pak.sort.albumDesc') },
+      { value: 'track-asc', label: t('stats.pak.sort.trackAsc') },
+      { value: 'track-desc', label: t('stats.pak.sort.trackDesc') },
+      { value: 'times-desc', label: t('stats.pak.sort.timesDesc') },
+      { value: 'times-asc', label: t('stats.pak.sort.timesAsc') },
+    ];
+  }, [t]);
 
   if (!chart) {
     return (
@@ -165,6 +230,13 @@ const PerfectAllKillStats: React.FC = () => {
         yearRange={yearRange || undefined}
         showTypeFilter={false}
         showSalesToggle={false}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={sortOptions}
       />
 
       {loading ? (
@@ -235,10 +307,10 @@ const PerfectAllKillStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {dataWithOccurrence.length > PAGE_SIZE && (
+          {sortedData.length > pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(dataWithOccurrence.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

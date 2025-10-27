@@ -25,8 +25,6 @@ import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 import { db } from '../../db/indexedDb';
 
-const PAGE_SIZE = 25;
-
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ record: any; type: string }> = ({ record, type }) => {
   const { imageUrl } = useSpotifyImage({
@@ -65,6 +63,9 @@ const TimesAtRankStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('times-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -150,10 +151,61 @@ const TimesAtRankStats: React.FC = () => {
     navigate(`/stats/times_at_rank/${newRank}/${type}`);
   };
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    
+    const query = searchQuery.toLowerCase();
+    return data.filter(item => 
+      item.name.toLowerCase().includes(query) ||
+      (item.artistName && item.artistName.toLowerCase().includes(query))
+    );
+  }, [data, searchQuery]);
+
+  // Sort data
+  const sortedData = React.useMemo(() => {
+    const sorted = [...filteredData];
+    
+    switch (sortBy) {
+      case 'position-desc':
+        return sorted; // Already sorted by position implicitly (higher rank = better)
+      case 'position-asc':
+        return sorted.reverse();
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'times-desc':
+        return sorted.sort((a, b) => b.count - a.count);
+      case 'times-asc':
+        return sorted.sort((a, b) => a.count - b.count);
+      default:
+        return sorted;
+    }
+  }, [filteredData, sortBy]);
+
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
+    const start = (page - 1) * pageSize;
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, page, pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, pageSize]);
+
+  // Sort options
+  const sortOptions = React.useMemo(() => {
+    return [
+      { value: 'times-desc', label: t('stats.timesAtRank.sort.timesDesc') },
+      { value: 'times-asc', label: t('stats.timesAtRank.sort.timesAsc') },
+      { value: 'position-desc', label: t('stats.timesAtRank.sort.positionDesc') },
+      { value: 'position-asc', label: t('stats.timesAtRank.sort.positionAsc') },
+      { value: 'name-asc', label: t('stats.timesAtRank.sort.nameAsc') },
+      { value: 'name-desc', label: t('stats.timesAtRank.sort.nameDesc') },
+    ];
+  }, [t]);
 
   if (!chart) {
     return (
@@ -187,6 +239,13 @@ const TimesAtRankStats: React.FC = () => {
         showPeakOnlyToggle={true}
         showPositionFilter={true}
         cutoff={cutoff}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={sortOptions}
       />
 
       {loading ? (
@@ -219,7 +278,7 @@ const TimesAtRankStats: React.FC = () => {
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record: any, index) => {
-                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+                    const displayRank = (page - 1) * pageSize + index + 1;
 
                     return (
                       <Table.Tr key={record.entityId}>
@@ -252,10 +311,10 @@ const TimesAtRankStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {data.length > PAGE_SIZE && (
+          {sortedData.length > pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(data.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

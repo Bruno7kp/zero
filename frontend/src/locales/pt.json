@@ -552,7 +552,9 @@
       },
       "sidebar": {
         "title": "Estatísticas",
-        "overview": "Visão Geral"
+        "overview": "Visão Geral",
+        "collapse": "Recolher menu",
+        "expand": "Expandir menu"
       },
       "filters": {
         "year": "Ano",
@@ -574,7 +576,9 @@
         "settings": "Configurações",
         "displayOptions": "Opções de Exibição",
         "albums": "Álbuns",
-        "tracks": "Músicas"
+        "tracks": "Músicas",
+        "searchPlaceholder": "Buscar por nome ou artista...",
+        "perPage": "por página"
       },
       "rank": {
         "title": "Todos os #{{n}}s",
@@ -590,6 +594,18 @@
           "plays": "Reproduções",
           "sales": "Vendas",
           "viewChart": "Ver chart"
+        },
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "timesDesc": "Vezes (maior para menor)",
+          "timesAsc": "Vezes (menor para maior)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "playsAsc": "Reproduções (menor para maior)",
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)"
         }
       },
       "pak": {
@@ -604,7 +620,19 @@
           "track": "Música",
           "viewChart": "Ver chart"
         },
-        "noData": "Nenhum registro de Perfect All Kill encontrado"
+        "noData": "Nenhum registro de Perfect All Kill encontrado",
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "albumAsc": "Álbum (A-Z)",
+          "albumDesc": "Álbum (Z-A)",
+          "trackAsc": "Música (A-Z)",
+          "trackDesc": "Música (Z-A)",
+          "timesDesc": "Vezes (maior-menor)",
+          "timesAsc": "Vezes (menor-maior)"
+        }
       },
       "timesAtRank": {
         "title": "Mais Semanas em #{{n}}",
@@ -617,6 +645,14 @@
           "times": "Semanas em #{{n}}",
           "image": "Imagem",
           "title": "Título"
+        },
+        "sort": {
+          "timesDesc": "Semanas (maior-menor)",
+          "timesAsc": "Semanas (menor-maior)",
+          "positionDesc": "Posição (melhor-pior)",
+          "positionAsc": "Posição (pior-melhor)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)"
         }
       },
       "timesAtTop": {
@@ -630,6 +666,14 @@
           "times": "Semanas no Top {{n}}",
           "image": "Imagem",
           "title": "Título"
+        },
+        "sort": {
+          "timesDesc": "Semanas (maior-menor)",
+          "timesAsc": "Semanas (menor-maior)",
+          "positionDesc": "Posição (melhor-pior)",
+          "positionAsc": "Posição (pior-melhor)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)"
         }
       },
       "plays": {
@@ -647,6 +691,18 @@
           "plays": "Reproduções",
           "sales": "Vendas",
           "viewChart": "Ver chart"
+        },
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "playsDesc": "Reproduções (maior-menor)",
+          "playsAsc": "Reproduções (menor-maior)",
+          "rankDesc": "Posição (melhor-pior)",
+          "rankAsc": "Posição (pior-melhor)",
+          "salesDesc": "Vendas (maior-menor)",
+          "salesAsc": "Vendas (menor-maior)"
         }
       },
       "debuts": {
@@ -664,6 +720,18 @@
           "plays": "Reproduções",
           "sales": "Vendas",
           "viewChart": "Ver chart"
+        },
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "playsDesc": "Reproduções (maior-menor)",
+          "playsAsc": "Reproduções (menor-maior)",
+          "rankDesc": "Posição (melhor-pior)",
+          "rankAsc": "Posição (pior-melhor)",
+          "salesDesc": "Vendas (maior-menor)",
+          "salesAsc": "Vendas (menor-maior)"
         }
       },
       "points": {
@@ -678,6 +746,16 @@
           "title": "Título",
           "weeksOnChart": "Semanas no chart",
           "totalPoints": "Total de pontos"
+        },
+        "sort": {
+          "pointsDesc": "Pontos (maior-menor)",
+          "pointsAsc": "Pontos (menor-maior)",
+          "weeksDesc": "Semanas (maior-menor)",
+          "weeksAsc": "Semanas (menor-maior)",
+          "positionDesc": "Posição (melhor-pior)",
+          "positionAsc": "Posição (pior-melhor)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)"
         }
       },
       "timesAtTopByArtist": {
@@ -695,7 +773,11 @@
           "totalWeeksShort": "Total de Semanas"
         },
         "sortByItems": "Quantidade de itens",
-        "sortByWeeks": "Total de semanas"
+        "sortByWeeks": "Total de semanas",
+        "sort": {
+          "itemsDesc": "Quantidade de itens (maior-menor)",
+          "weeksDesc": "Total de semanas (maior-menor)"
+        }
       },
       "loading": "Carregando estatísticas...",
       "noData": "Nenhum dado disponível",

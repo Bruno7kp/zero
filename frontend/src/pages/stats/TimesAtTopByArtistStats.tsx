@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { IconArrowsSort, IconArrowBarUp } from '@tabler/icons-react';
+import { IconArrowBarUp } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getArtistsWithMostAtRank, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
@@ -25,8 +25,6 @@ import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
-
-const PAGE_SIZE = 25;
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
@@ -67,6 +65,8 @@ const TimesAtTopByArtistStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -130,20 +130,45 @@ const TimesAtTopByArtistStats: React.FC = () => {
     navigate(`/stats/times_at_top_by_artist/${value}/${type}`);
   };
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    
+    const query = searchQuery.toLowerCase();
+    return data.filter(item => 
+      item.artistName.toLowerCase().includes(query)
+    );
+  }, [data, searchQuery]);
+
+  // Sort data
   const sortedData = React.useMemo(() => {
-    const sorted = [...data];
+    const sorted = [...filteredData];
     if (sortBy === 'items') {
       sorted.sort((a, b) => b.itemsCount - a.itemsCount || b.totalWeeks - a.totalWeeks);
     } else {
       sorted.sort((a, b) => b.totalWeeks - a.totalWeeks || b.itemsCount - a.itemsCount);
     }
     return sorted;
-  }, [data, sortBy]);
+  }, [filteredData, sortBy]);
 
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return sortedData.slice(start, start + PAGE_SIZE);
-  }, [sortedData, page]);
+    const start = (page - 1) * pageSize;
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, page, pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, pageSize]);
+
+  // Sort options
+  const sortOptions = React.useMemo(() => {
+    return [
+      { value: 'items', label: t('stats.timesAtTopByArtist.sort.itemsDesc') },
+      { value: 'weeks', label: t('stats.timesAtTopByArtist.sort.weeksDesc') },
+    ];
+  }, [t]);
 
   if (!chart) {
     return (
@@ -170,34 +195,29 @@ const TimesAtTopByArtistStats: React.FC = () => {
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         hideArtistType={true}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={(value) => setSortBy(value as 'items' | 'weeks')}
+        sortOptions={sortOptions}
         customFilters={
-          <>
-            <Select
-              value={String(rank)}
-              onChange={(value) => {
-                if (value) {
-                  handleRankChange(Number(value));
-                }
-              }}
-              data={Array.from({ length: cutoff }, (_, i) => ({
-                value: String(i + 1),
-                label: `Top ${i + 1}`
-              }))}
-              style={{ minWidth: 120 }}
-              leftSection={<IconArrowBarUp size={16} />}
-              searchable
-            />
-            <Select
-              value={sortBy}
-              onChange={(value) => value && setSortBy(value as 'items' | 'weeks')}
-              data={[
-                { value: 'items', label: t('stats.timesAtTopByArtist.sortByItems') },
-                { value: 'weeks', label: t('stats.timesAtTopByArtist.sortByWeeks') }
-              ]}
-              style={{ minWidth: 150 }}
-              leftSection={<IconArrowsSort size={16} />}
-            />
-          </>
+          <Select
+            value={String(rank)}
+            onChange={(value) => {
+              if (value) {
+                handleRankChange(Number(value));
+              }
+            }}
+            data={Array.from({ length: cutoff }, (_, i) => ({
+              value: String(i + 1),
+              label: `Top ${i + 1}`
+            }))}
+            style={{ minWidth: 120 }}
+            leftSection={<IconArrowBarUp size={16} />}
+            searchable
+          />
         }
       />
 
@@ -230,7 +250,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record, index) => {
-                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+                    const displayRank = (page - 1) * pageSize + index + 1;
 
                     return (
                       <Table.Tr key={record.artistName}>
@@ -260,10 +280,10 @@ const TimesAtTopByArtistStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {sortedData.length > PAGE_SIZE && (
+          {sortedData.length > pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(sortedData.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

@@ -552,7 +552,9 @@
       },
       "sidebar": {
         "title": "Statistics",
-        "overview": "Overview"
+        "overview": "Overview",
+        "collapse": "Collapse sidebar",
+        "expand": "Expand sidebar"
       },
       "filters": {
         "year": "Year",
@@ -574,7 +576,9 @@
         "settings": "Settings",
         "displayOptions": "Display Options",
         "albums": "Albums",
-        "tracks": "Tracks"
+        "tracks": "Tracks",
+        "searchPlaceholder": "Search by name or artist...",
+        "perPage": "per page"
       },
       "rank": {
         "title": "All #{{n}}s",
@@ -590,6 +594,18 @@
           "plays": "Plays",
           "sales": "Sales",
           "viewChart": "View chart"
+        },
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "timesDesc": "Times (high to low)",
+          "timesAsc": "Times (low to high)",
+          "playsDesc": "Plays (high to low)",
+          "playsAsc": "Plays (low to high)",
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)"
         }
       },
       "pak": {
@@ -604,7 +620,19 @@
           "track": "Track",
           "viewChart": "View chart"
         },
-        "noData": "No Perfect All Kill records found"
+        "noData": "No Perfect All Kill records found",
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "albumAsc": "Album (A-Z)",
+          "albumDesc": "Album (Z-A)",
+          "trackAsc": "Track (A-Z)",
+          "trackDesc": "Track (Z-A)",
+          "timesDesc": "Times (high to low)",
+          "timesAsc": "Times (low to high)"
+        }
       },
       "timesAtRank": {
         "title": "Most Weeks at #{{n}}",
@@ -617,6 +645,14 @@
           "times": "Weeks at #{{n}}",
           "image": "Image",
           "title": "Title"
+        },
+        "sort": {
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)",
+          "positionDesc": "Position (best to worst)",
+          "positionAsc": "Position (worst to best)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)"
         }
       },
       "timesAtTop": {
@@ -630,6 +666,14 @@
           "times": "Weeks in Top {{n}}",
           "image": "Image",
           "title": "Title"
+        },
+        "sort": {
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)",
+          "positionDesc": "Position (best to worst)",
+          "positionAsc": "Position (worst to best)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)"
         }
       },
       "plays": {
@@ -647,6 +691,18 @@
           "plays": "Plays",
           "sales": "Sales",
           "viewChart": "View chart"
+        },
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "playsDesc": "Plays (high to low)",
+          "playsAsc": "Plays (low to high)",
+          "rankDesc": "Position (best to worst)",
+          "rankAsc": "Position (worst to best)",
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)"
         }
       },
       "debuts": {
@@ -664,6 +720,18 @@
           "plays": "Plays",
           "sales": "Sales",
           "viewChart": "View chart"
+        },
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "playsDesc": "Plays (high to low)",
+          "playsAsc": "Plays (low to high)",
+          "rankDesc": "Position (best to worst)",
+          "rankAsc": "Position (worst to best)",
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)"
         }
       },
       "points": {
@@ -678,6 +746,16 @@
           "title": "Title",
           "weeksOnChart": "Weeks on chart",
           "totalPoints": "Total points"
+        },
+        "sort": {
+          "pointsDesc": "Points (high to low)",
+          "pointsAsc": "Points (low to high)",
+          "weeksDesc": "Weeks (high to low)",
+          "weeksAsc": "Weeks (low to high)",
+          "positionDesc": "Position (best to worst)",
+          "positionAsc": "Position (worst to best)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)"
         }
       },
       "timesAtTopByArtist": {
@@ -695,7 +773,11 @@
           "totalWeeksShort": "Total Weeks"
         },
         "sortByItems": "Items count",
-        "sortByWeeks": "Total weeks"
+        "sortByWeeks": "Total weeks",
+        "sort": {
+          "itemsDesc": "Items count (high to low)",
+          "weeksDesc": "Total weeks (high to low)"
+        }
       },
       "loading": "Loading statistics...",
       "noData": "No data available",

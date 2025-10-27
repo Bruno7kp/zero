@@ -393,7 +393,8 @@ export async function getArtistsWithMostAtRank(filters: {
 }
 
 /**
- * Calculate sales using formula: (plays * weightPlays) + (points * weightPoints)
+ * Calculate sales using formula: (plays * weightPlays) + (stabilityPoints * weightPoints)
+ * stabilityPoints = 101 - rank (matches calculateWeekFormulaValue from certification.ts)
  */
 export function calculateSales(
   plays: number,
@@ -401,6 +402,6 @@ export function calculateSales(
   weightPlays: number,
   weightPoints: number
 ): number {
-  const points = Math.max(1, 101 - rank);
-  return (plays * weightPlays) + (points * weightPoints);
+  const stabilityPoints = Math.max(0, 101 - rank);
+  return (plays * weightPlays) + (stabilityPoints * weightPoints);
 }

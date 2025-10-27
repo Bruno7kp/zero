@@ -31,8 +31,6 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 
-const PAGE_SIZE = 25;
-
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type }) => {
   const { imageUrl } = useSpotifyImage({
@@ -66,6 +64,9 @@ const DebutsStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('week-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -85,22 +86,22 @@ const DebutsStats: React.FC = () => {
   };
 
   // Get weight values for sales calculation
-  const getWeights = (chartType: string) => {
+  const getWeights = React.useCallback((chartType: string) => {
     if (!chart) return { weightPlays: 1, weightPoints: 0 };
     
     if (chartType === 'track') {
       return {
-        weightPlays: chart.musicPlaysWeight || 1,
-        weightPoints: chart.musicPointsWeight || 0
+        weightPlays: chart.music_plays_weight || 1,
+        weightPoints: chart.music_points_weight || 0
       };
     } else if (chartType === 'album') {
       return {
-        weightPlays: chart.albumPlaysWeight || 1,
-        weightPoints: chart.albumPointsWeight || 0
+        weightPlays: chart.album_plays_weight || 1,
+        weightPoints: chart.album_points_weight || 0
       };
     }
     return { weightPlays: 1, weightPoints: 0 };
-  };
+  }, [chart]);
 
   useEffect(() => {
     if (!chart) return;
@@ -166,10 +167,89 @@ const DebutsStats: React.FC = () => {
     navigate(`/stats/debuts/${value}/${type}`);
   };
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    
+    const query = searchQuery.toLowerCase();
+    return data.filter(item => 
+      item.name.toLowerCase().includes(query) ||
+      (item.artistName && item.artistName.toLowerCase().includes(query))
+    );
+  }, [data, searchQuery]);
+
+  // Sort data
+  const sortedData = React.useMemo(() => {
+    const sorted = [...filteredData];
+    const weights = getWeights(type);
+    
+    switch (sortBy) {
+      case 'week-desc':
+        return sorted.sort((a, b) => b.week.localeCompare(a.week));
+      case 'week-asc':
+        return sorted.sort((a, b) => a.week.localeCompare(b.week));
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'plays-desc':
+        return sorted.sort((a, b) => b.plays - a.plays);
+      case 'plays-asc':
+        return sorted.sort((a, b) => a.plays - b.plays);
+      case 'rank-desc':
+        return sorted.sort((a, b) => a.rank - b.rank); // Lower rank number = better
+      case 'rank-asc':
+        return sorted.sort((a, b) => b.rank - a.rank);
+      case 'sales-desc':
+        return sorted.sort((a, b) => {
+          const salesA = calculateSales(a.plays, a.rank, weights.weightPlays, weights.weightPoints);
+          const salesB = calculateSales(b.plays, b.rank, weights.weightPlays, weights.weightPoints);
+          return salesB - salesA;
+        });
+      case 'sales-asc':
+        return sorted.sort((a, b) => {
+          const salesA = calculateSales(a.plays, a.rank, weights.weightPlays, weights.weightPoints);
+          const salesB = calculateSales(b.plays, b.rank, weights.weightPlays, weights.weightPoints);
+          return salesA - salesB;
+        });
+      default:
+        return sorted;
+    }
+  }, [filteredData, sortBy, type, getWeights]);
+
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
+    const start = (page - 1) * pageSize;
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, page, pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, pageSize]);
+
+  // Dynamic sort options
+  const sortOptions = React.useMemo(() => {
+    const baseOptions = [
+      { value: 'week-desc', label: t('stats.debuts.sort.weekDesc') },
+      { value: 'week-asc', label: t('stats.debuts.sort.weekAsc') },
+      { value: 'name-asc', label: t('stats.debuts.sort.nameAsc') },
+      { value: 'name-desc', label: t('stats.debuts.sort.nameDesc') },
+      { value: 'plays-desc', label: t('stats.debuts.sort.playsDesc') },
+      { value: 'plays-asc', label: t('stats.debuts.sort.playsAsc') },
+      { value: 'rank-desc', label: t('stats.debuts.sort.rankDesc') },
+      { value: 'rank-asc', label: t('stats.debuts.sort.rankAsc') },
+    ];
+
+    if (preferences.showSales && chart?.music_plays_weight !== undefined) {
+      baseOptions.push(
+        { value: 'sales-desc', label: t('stats.debuts.sort.salesDesc') },
+        { value: 'sales-asc', label: t('stats.debuts.sort.salesAsc') }
+      );
+    }
+
+    return baseOptions;
+  }, [preferences.showSales, chart, t]);
 
   if (!chart) {
     return (
@@ -197,6 +277,13 @@ const DebutsStats: React.FC = () => {
         tableSize={preferences.tableSize}
         onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={sortOptions}
         customFilters={
           <Select
             value={position === 'all' ? 'all' : String(position)}
@@ -260,7 +347,7 @@ const DebutsStats: React.FC = () => {
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record: any, index) => {
-                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+                    const displayRank = (page - 1) * pageSize + index + 1;
                     const startDate = dayjs(record.week);
                     const endDate = startDate.add(6, 'day');
                     const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
@@ -321,10 +408,10 @@ const DebutsStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {data.length > PAGE_SIZE && (
+          {sortedData.length > pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(data.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

@@ -14,8 +14,8 @@ import {
   Flex,
   ActionIcon,
   useMantineTheme,
-  Grid,
-  Divider
+  Divider,
+  Box
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,12 @@ import {
   IconCoin,
   IconCrown,
   IconMenu2,
-  IconCalendarUp
+  IconCalendarUp,
+  IconLayoutSidebarLeftCollapse,
+  IconLayoutSidebarLeftExpand
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode } from '../theme/modes';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import CreateHeader from '../components/createChart/CreateHeader';
 
 // Lazy load stat components for performance
@@ -51,8 +53,9 @@ const StatsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [opened, { toggle }] = useDisclosure(false);
+  const [collapsed, { toggle: toggleCollapsed }] = useDisclosure(false);
   const theme = useMantineTheme();
-  const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
   const bgColor = getCardBackgroundByMode(theme, themeMode);
 
   const charts = useSelector((state: any) => state.charts.charts);
@@ -156,23 +159,78 @@ const StatsPage: React.FC = () => {
     <Container size="100%" className="noPaddingMobile">
       <CreateHeader pageTitle={t('stats.title')} icon={IconChartBar} />
       
-      <Grid gutter="md">
+      <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
-        <Grid.Col span={{ base: 12, md: 3 }}>
-          <Card p="md" style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
-            <Flex justify="space-between" align="center" mb={{ base: 0 }}>
-              <Title order={4} hiddenFrom="md">{t('stats.sidebar.title')}</Title>
+        <Box 
+          style={{ 
+            flexShrink: 0,
+            width: collapsed ? '55px' : '350px',
+            transition: 'width 200ms ease',
+          }}
+          hiddenFrom="base"
+          visibleFrom="md"
+        >
+          <Card p={collapsed ? 'xs' : 'md'} style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
+            <Flex justify={collapsed ? 'center' : 'space-between'} align="center" mb={collapsed ? 0 : 'md'}>
+              {/* Collapse button - desktop only */}
+              <ActionIcon 
+                variant="subtle" 
+                onClick={toggleCollapsed}
+                aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
+              >
+                {collapsed ? <IconLayoutSidebarLeftExpand size={18} /> : <IconLayoutSidebarLeftCollapse size={18} />}
+              </ActionIcon>
+            </Flex>
+            
+            <ScrollArea.Autosize mah={600} type="auto">
+              <Stack gap={0}>
+                {navItems.map((item, index) => 
+                  item.divider ? (
+                    <Divider key={index} my="xs" />
+                  ) : (
+                    <NavLink
+                      key={index}
+                      active={isActive(item)}
+                      label={collapsed ? undefined : item.label!}
+                      leftSection={<item.icon size={18} />}
+                      onClick={() => {
+                        if (item.path) {
+                          navigate(item.path);
+                        }
+                      }}
+                      styles={{
+                        root: {
+                          justifyContent: collapsed ? 'center' : 'flex-start',
+                          paddingLeft: collapsed ? 8 : undefined,
+                          paddingRight: collapsed ? 8 : undefined,
+                        },
+                        section: {
+                          marginRight: collapsed ? 0 : undefined,
+                        }
+                      }}
+                    />
+                  )
+                )}
+              </Stack>
+            </ScrollArea.Autosize>
+          </Card>
+        </Box>
+
+        {/* Mobile Sidebar */}
+        <Box hiddenFrom="md" style={{ width: '100%' }}>
+          <Card p="md" style={{ backgroundColor: bgColor }}>
+            <Flex justify="space-between" align="center" mb={0}>
+              <Title order={4}>{t('stats.sidebar.title')}</Title>
               <ActionIcon 
                 variant="subtle" 
                 onClick={toggle}
-                hiddenFrom="md"
               >
                 <IconMenu2 size={18} />
               </ActionIcon>
             </Flex>
             
             <ScrollArea.Autosize mah={600} type="auto">
-              <Stack gap={0} display={{ base: opened ? 'flex' : 'none', md: 'flex' }}>
+              <Stack gap={0} display={opened ? 'flex' : 'none'}>
                 {navItems.map((item, index) => 
                   item.divider ? (
                     <Divider key={index} my="xs" />
@@ -194,10 +252,10 @@ const StatsPage: React.FC = () => {
               </Stack>
             </ScrollArea.Autosize>
           </Card>
-        </Grid.Col>
+        </Box>
 
         {/* Main Content */}
-        <Grid.Col span={{ base: 12, md: 9 }}>
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense fallback={
             <Center py="xl">
               <Stack align="center" gap="md">
@@ -218,8 +276,8 @@ const StatsPage: React.FC = () => {
               <Route path="/times_at_top_by_artist/:rank/:type" element={<TimesAtTopByArtistStats />} />
             </Routes>
           </Suspense>
-        </Grid.Col>
-      </Grid>
+        </Box>
+      </Flex>
     </Container>
   );
 };
