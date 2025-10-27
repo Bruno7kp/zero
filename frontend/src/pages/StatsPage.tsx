@@ -32,7 +32,8 @@ import {
   IconMenu2,
   IconCalendarUp,
   IconLayoutSidebarLeftCollapse,
-  IconLayoutSidebarLeftExpand
+  IconLayoutSidebarLeftExpand,
+  IconSparkles
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
@@ -48,6 +49,7 @@ const PlaysStats = lazy(() => import('./stats/PlaysStats'));
 const DebutsStats = lazy(() => import('./stats/DebutsStats'));
 const PointsStats = lazy(() => import('./stats/PointsStats'));
 const TimesAtTopByArtistStats = lazy(() => import('./stats/TimesAtTopByArtistStats'));
+const DebutsAtOneByArtistStats = lazy(() => import('./stats/DebutsAtOneByArtistStats'));
 
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -112,6 +114,12 @@ const StatsPage: React.FC = () => {
       label: t('stats.debuts.title'), 
       path: '/stats/debuts/all/track',
       group: 'debuts'
+    },
+    { 
+      icon: IconSparkles, 
+      label: t('stats.debutsAtOneByArtist.title', { n: 1 }), 
+      path: '/stats/debuts_at_one_by_artist/track',
+      group: 'debuts_at_one_by_artist'
     },
     { 
       icon: IconHeadphones, 
@@ -301,6 +309,7 @@ const StatsPage: React.FC = () => {
               <Route path="/debuts/:position/:type" element={<DebutsStats />} />
               <Route path="/points/:type" element={<PointsStats />} />
               <Route path="/times_at_top_by_artist/:rank/:type" element={<TimesAtTopByArtistStats />} />
+              <Route path="/debuts_at_one_by_artist/:type" element={<DebutsAtOneByArtistStats />} />
             </Routes>
           </Suspense>
         </Box>

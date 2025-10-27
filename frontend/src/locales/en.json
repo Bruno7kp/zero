@@ -791,6 +791,22 @@
           "weeksDesc": "Total weeks"
         }
       },
+      "debutsAtOneByArtist": {
+        "title": "Artists with Most Debuts at #1",
+        "titleAlbum": "Artists with Most Album Debuts in Top {{n}}",
+        "titleTrack": "Artists with Most Track Debuts in Top {{n}}",
+        "description": "Artists with most first appearances in top positions",
+        "columns": {
+          "rank": "#",
+          "image": "Image",
+          "artist": "Artist",
+          "debuts": "{{type}} Debuts"
+        },
+        "sort": {
+          "itemsDesc": "Debuts count"
+        },
+        "noData": "No debuts found"
+      },
       "loading": "Loading statistics...",
       "noData": "No data available",
       "itemsPerPage": "Items per page",

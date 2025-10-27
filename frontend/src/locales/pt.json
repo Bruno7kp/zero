@@ -789,6 +789,22 @@
           "weeksDesc": "Total de semanas"
         }
       },
+      "debutsAtOneByArtist": {
+        "title": "Artistas com Mais Estreias em #1",
+        "titleAlbum": "Artistas com Mais Estreias de Álbuns no Top {{n}}",
+        "titleTrack": "Artistas com Mais Estreias de Músicas no Top {{n}}",
+        "description": "Artistas com mais primeiras aparições nas melhores posições",
+        "columns": {
+          "rank": "#",
+          "image": "Imagem",
+          "artist": "Artista",
+          "debuts": "Estreias de {{type}}"
+        },
+        "sort": {
+          "itemsDesc": "Quantidade de estreias"
+        },
+        "noData": "Nenhuma estreia encontrada"
+      },
       "loading": "Carregando estatísticas...",
       "noData": "Nenhum dado disponível",
       "itemsPerPage": "Itens por página",
