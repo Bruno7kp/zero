@@ -217,8 +217,8 @@ const RankStats: React.FC = () => {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>X</Table.Th>
                   <Table.Th>{t('stats.rank.columns.title')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.rank.columns.times', { n: rank })}</Table.Th>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.rank.columns.plays')}</Table.Th>
                   {showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.rank.columns.sales')}</Table.Th>}
                   <Table.Th style={{ width: 1 }}></Table.Th>
@@ -243,11 +243,8 @@ const RankStats: React.FC = () => {
                       <Table.Tr key={`${record.week}-${record.entityId}`}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Tooltip label={dateRange} withArrow>
-                            <Text fw={800} size="lg">{record.weekNumber}</Text>
+                            <Text size="sm">{record.weekNumber}</Text>
                           </Tooltip>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.occurrence}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
@@ -259,6 +256,9 @@ const RankStats: React.FC = () => {
                               )}
                             </Box>
                           </Flex>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.occurrence}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Text size="sm">{record.plays.toLocaleString()}</Text>

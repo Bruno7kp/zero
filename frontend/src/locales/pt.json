@@ -577,7 +577,7 @@
         "description": "Itens que alcançaram a posição #{{n}}",
         "columns": {
           "week": "Semana",
-          "times": "Vezes em #{{n}}",
+          "times": "Semanas em #{{n}}",
           "image": "Imagem",
           "title": "Título",
           "plays": "Reproduções",
@@ -590,7 +590,7 @@
         "description": "Artistas que alcançaram simultaneamente #1 nas três categorias",
         "columns": {
           "week": "Semana",
-          "times": "Vezes com PAK",
+          "times": "Total",
           "image": "Imagem",
           "artist": "Artista",
           "album": "Álbum",
@@ -600,27 +600,27 @@
         "noData": "Nenhum registro de Perfect All Kill encontrado"
       },
       "timesAtRank": {
-        "title": "Mais Vezes em #{{n}}",
-        "titleArtist": "Mais Vezes em #{{n}} - Artistas",
-        "titleAlbum": "Mais Vezes em #{{n}} - Álbuns",
-        "titleTrack": "Mais Vezes em #{{n}} - Músicas",
+        "title": "Mais Semanas em #{{n}}",
+        "titleArtist": "Mais Semanas em #{{n}} - Artistas",
+        "titleAlbum": "Mais Semanas em #{{n}} - Álbuns",
+        "titleTrack": "Mais Semanas em #{{n}} - Músicas",
         "description": "Itens com mais semanas na posição #{{n}}",
         "columns": {
           "rank": "#",
-          "times": "Vezes em #{{n}}",
+          "times": "Semanas em #{{n}}",
           "image": "Imagem",
           "title": "Título"
         }
       },
       "timesAtTop": {
-        "title": "Mais Vezes no Top {{n}}",
-        "titleArtist": "Mais Vezes no Top {{n}} - Artistas",
-        "titleAlbum": "Mais Vezes no Top {{n}} - Álbuns",
-        "titleTrack": "Mais Vezes no Top {{n}} - Músicas",
+        "title": "Mais Semanas Acumuladas",
+        "titleArtist": "Mais Semanas no Top {{n}} - Artistas",
+        "titleAlbum": "Mais Semanas no Top {{n}} - Álbuns",
+        "titleTrack": "Mais Semanas no Top {{n}} - Músicas",
         "description": "Itens com mais semanas no top {{n}}",
         "columns": {
           "rank": "#",
-          "times": "Vezes no Top {{n}}",
+          "times": "Semanas no Top {{n}}",
           "image": "Imagem",
           "title": "Título"
         }

@@ -176,10 +176,10 @@ const PerfectAllKillStats: React.FC = () => {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>X</Table.Th>
                   <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
                   <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
                   <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.pak.columns.times')}</Table.Th>
                   <Table.Th style={{ width: 1 }}></Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -193,11 +193,8 @@ const PerfectAllKillStats: React.FC = () => {
                     <Table.Tr key={`${record.week}-${record.artistEntityId}`}>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <Tooltip label={dateRange} withArrow>
-                          <Text fw={800} size="lg">{record.weekNumber}</Text>
+                          <Text size="sm">{record.weekNumber}</Text>
                         </Tooltip>
-                      </Table.Td>
-                      <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        <Text size="sm">{record.occurrence}</Text>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
                         <Flex gap="sm" wrap="nowrap" align="center">
@@ -212,6 +209,9 @@ const PerfectAllKillStats: React.FC = () => {
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
                         <Text size="sm" lineClamp={1}>{record.trackName}</Text>
+                      </Table.Td>
+                      <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <Text size="sm">{record.occurrence}</Text>
                       </Table.Td>
                       <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                         <Button

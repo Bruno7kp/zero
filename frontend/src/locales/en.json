@@ -577,7 +577,7 @@
         "description": "Items that reached position #{{n}}",
         "columns": {
           "week": "Week",
-          "times": "Times at #{{n}}",
+          "times": "Weeks at #{{n}}",
           "image": "Image",
           "title": "Title",
           "plays": "Plays",
@@ -590,7 +590,7 @@
         "description": "Artists who simultaneously reached #1 in all three categories",
         "columns": {
           "week": "Week",
-          "times": "Times with PAK",
+          "times": "Total",
           "image": "Image",
           "artist": "Artist",
           "album": "Album",
@@ -600,27 +600,27 @@
         "noData": "No Perfect All Kill records found"
       },
       "timesAtRank": {
-        "title": "Most Times at #{{n}}",
-        "titleArtist": "Most Times at #{{n}} - Artists",
-        "titleAlbum": "Most Times at #{{n}} - Albums",
-        "titleTrack": "Most Times at #{{n}} - Tracks",
+        "title": "Most Weeks at #{{n}}",
+        "titleArtist": "Most Weeks at #{{n}} - Artists",
+        "titleAlbum": "Most Weeks at #{{n}} - Albums",
+        "titleTrack": "Most Weeks at #{{n}} - Tracks",
         "description": "Items with most weeks at position #{{n}}",
         "columns": {
           "rank": "#",
-          "times": "Times at #{{n}}",
+          "times": "Weeks at #{{n}}",
           "image": "Image",
           "title": "Title"
         }
       },
       "timesAtTop": {
-        "title": "Most Times in Top {{n}}",
-        "titleArtist": "Most Times in Top {{n}} - Artists",
-        "titleAlbum": "Most Times in Top {{n}} - Albums",
-        "titleTrack": "Most Times in Top {{n}} - Tracks",
+        "title": "Most Weeks Accumulated",
+        "titleArtist": "Most Weeks in Top {{n}} - Artists",
+        "titleAlbum": "Most Weeks in Top {{n}} - Albums",
+        "titleTrack": "Most Weeks in Top {{n}} - Tracks",
         "description": "Items with most weeks in the top {{n}}",
         "columns": {
           "rank": "#",
-          "times": "Times in Top {{n}}",
+          "times": "Weeks in Top {{n}}",
           "image": "Image",
           "title": "Title"
         }

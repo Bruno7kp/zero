@@ -217,11 +217,11 @@ const DebutsStats: React.FC = () => {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.position')}</Table.Th>
                   <Table.Th>{t('stats.debuts.columns.title')}</Table.Th>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.plays')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.position')}</Table.Th>
                   {showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.sales')}</Table.Th>}
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
                   <Table.Th style={{ width: 1 }}></Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -246,14 +246,6 @@ const DebutsStats: React.FC = () => {
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Text size="sm">{displayRank}</Text>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Tooltip label={dateRange} withArrow>
-                            <Text fw={800} size="lg">{record.weekNumber}</Text>
-                          </Tooltip>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.rank}</Text>
-                        </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
                             <ImageCell record={record} type={type} />
@@ -268,11 +260,19 @@ const DebutsStats: React.FC = () => {
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Text size="sm">{record.plays.toLocaleString()}</Text>
                         </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.rank}</Text>
+                        </Table.Td>
                         {showSales && (
                           <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                             <Text size="sm">{Math.round(sales).toLocaleString()}</Text>
                           </Table.Td>
                         )}
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Tooltip label={dateRange} withArrow>
+                            <Text size="sm">{record.weekNumber}</Text>
+                          </Tooltip>
+                        </Table.Td>
                         <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                           <Button
                             size="xs"

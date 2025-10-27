@@ -27,7 +27,8 @@ import {
   IconRocket,
   IconCoin,
   IconCrown,
-  IconMenu2
+  IconMenu2,
+  IconCalendarUp
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode } from '../theme/modes';
@@ -66,10 +67,40 @@ const StatsPage: React.FC = () => {
       exact: true
     },
     { 
+      icon: IconCrown, 
+      label: t('stats.timesAtTopByArtist.title', { n: 1 }), 
+      path: '/stats/times_at_top_by_artist/1/track',
+      group: 'times_at_top_by_artist'
+    },
+    { 
       icon: IconTrophy, 
       label: t('stats.rank.title', { n: 1 }), 
-      path: '/stats/rank/1/artist',
+      path: '/stats/rank/1/track',
       group: 'rank'
+    },
+    { 
+      icon: IconStar, 
+      label: t('stats.timesAtRank.title', { n: 1 }), 
+      path: '/stats/times_at_rank/1/track',
+      group: 'times_at_rank'
+    },
+    { 
+      icon: IconCalendarUp, 
+      label: t('stats.timesAtTop.title', { n: 10 }), 
+      path: '/stats/times_at_top/10/track',
+      group: 'times_at_top'
+    },
+    { 
+      icon: IconRocket, 
+      label: t('stats.debuts.title'), 
+      path: '/stats/debuts/all/track',
+      group: 'debuts'
+    },
+    { 
+      icon: IconHeadphones, 
+      label: t('stats.plays.title'), 
+      path: '/stats/plays/all/track',
+      group: 'plays'
     },
     { 
       icon: IconFlame, 
@@ -78,40 +109,10 @@ const StatsPage: React.FC = () => {
       group: 'pak'
     },
     { 
-      icon: IconStar, 
-      label: t('stats.timesAtRank.title', { n: 1 }), 
-      path: '/stats/times_at_rank/1/artist',
-      group: 'times_at_rank'
-    },
-    { 
-      icon: IconStar, 
-      label: t('stats.timesAtTop.title', { n: 10 }), 
-      path: '/stats/times_at_top/10/artist',
-      group: 'times_at_top'
-    },
-    { 
-      icon: IconHeadphones, 
-      label: t('stats.plays.title'), 
-      path: '/stats/plays/all/artist',
-      group: 'plays'
-    },
-    { 
-      icon: IconRocket, 
-      label: t('stats.debuts.title'), 
-      path: '/stats/debuts/all/artist',
-      group: 'debuts'
-    },
-    { 
       icon: IconCoin, 
       label: t('stats.points.title'), 
-      path: '/stats/points/artist',
+      path: '/stats/points/track',
       group: 'points'
-    },
-    { 
-      icon: IconCrown, 
-      label: t('stats.timesAtTopByArtist.title', { n: 1 }), 
-      path: '/stats/times_at_top_by_artist/1/track',
-      group: 'times_at_top_by_artist'
     }
   ];
 

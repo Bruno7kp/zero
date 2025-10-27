@@ -165,8 +165,8 @@ const TimesAtRankStats: React.FC = () => {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>X</Table.Th>
                   <Table.Th>{t('stats.timesAtRank.columns.title')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtRank.columns.times', { n: rank })}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -185,9 +185,6 @@ const TimesAtRankStats: React.FC = () => {
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Text size="sm">{displayRank}</Text>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.count}</Text>
-                        </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
                             <ImageCell record={record} type={type} />
@@ -198,6 +195,9 @@ const TimesAtRankStats: React.FC = () => {
                               )}
                             </Box>
                           </Flex>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size="sm">{record.count}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );

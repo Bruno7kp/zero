@@ -20,7 +20,8 @@ import {
   IconRocket,
   IconCoin,
   IconCrown,
-  IconArrowRight
+  IconArrowRight,
+  IconCalendarUp
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
@@ -36,7 +37,7 @@ const StatsHome: React.FC = () => {
       icon: IconTrophy,
       title: t('stats.rank.title', { n: 1 }),
       description: t('stats.rank.description', { n: 1 }),
-      path: '/stats/rank/1/artist',
+      path: '/stats/rank/1/track',
       color: 'gold'
     },
     {
@@ -50,35 +51,35 @@ const StatsHome: React.FC = () => {
       icon: IconStar,
       title: t('stats.timesAtRank.title', { n: 1 }),
       description: t('stats.timesAtRank.description', { n: 1 }),
-      path: '/stats/times_at_rank/1/artist',
+      path: '/stats/times_at_rank/1/track',
       color: 'yellow'
     },
     {
-      icon: IconStar,
+      icon: IconCalendarUp,
       title: t('stats.timesAtTop.title', { n: 10 }),
       description: t('stats.timesAtTop.description', { n: 10 }),
-      path: '/stats/times_at_top/10/artist',
+      path: '/stats/times_at_top/10/track',
       color: 'blue'
     },
     {
       icon: IconHeadphones,
       title: t('stats.plays.title'),
       description: t('stats.plays.description'),
-      path: '/stats/plays/all/artist',
+      path: '/stats/plays/all/track',
       color: 'purple'
     },
     {
       icon: IconRocket,
       title: t('stats.debuts.title'),
       description: t('stats.debuts.description'),
-      path: '/stats/debuts/all/artist',
+      path: '/stats/debuts/all/track',
       color: 'green'
     },
     {
       icon: IconCoin,
       title: t('stats.points.title'),
       description: t('stats.points.description'),
-      path: '/stats/points/artist',
+      path: '/stats/points/track',
       color: 'cyan'
     },
     {
