@@ -68,7 +68,6 @@ const PerfectAllKillStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('week-desc');
 
@@ -185,14 +184,14 @@ const PerfectAllKillStats: React.FC = () => {
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return sortedData.slice(start, start + pageSize);
-  }, [sortedData, page, pageSize]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize]);
 
   // Sort options
   const sortOptions = React.useMemo(() => {
@@ -230,8 +229,8 @@ const PerfectAllKillStats: React.FC = () => {
         yearRange={yearRange || undefined}
         showTypeFilter={false}
         showSalesToggle={false}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -307,10 +306,10 @@ const PerfectAllKillStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {sortedData.length > pageSize && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(sortedData.length / pageSize)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

@@ -600,8 +600,10 @@
           "weekAsc": "Week (oldest first)",
           "nameAsc": "Name (A-Z)",
           "nameDesc": "Name (Z-A)",
-          "timesDesc": "Times (high to low)",
-          "timesAsc": "Times (low to high)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)",
           "playsDesc": "Plays (high to low)",
           "playsAsc": "Plays (low to high)",
           "salesDesc": "Sales (high to low)",
@@ -630,8 +632,8 @@
           "albumDesc": "Album (Z-A)",
           "trackAsc": "Track (A-Z)",
           "trackDesc": "Track (Z-A)",
-          "timesDesc": "Times (high to low)",
-          "timesAsc": "Times (low to high)"
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)"
         }
       },
       "timesAtRank": {
@@ -652,7 +654,9 @@
           "positionDesc": "Position (best to worst)",
           "positionAsc": "Position (worst to best)",
           "nameAsc": "Name (A-Z)",
-          "nameDesc": "Name (Z-A)"
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
         }
       },
       "timesAtTop": {
@@ -673,7 +677,9 @@
           "positionDesc": "Position (best to worst)",
           "positionAsc": "Position (worst to best)",
           "nameAsc": "Name (A-Z)",
-          "nameDesc": "Name (Z-A)"
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
         }
       },
       "plays": {
@@ -697,6 +703,8 @@
           "weekAsc": "Week (oldest first)",
           "nameAsc": "Name (A-Z)",
           "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
           "playsDesc": "Plays (high to low)",
           "playsAsc": "Plays (low to high)",
           "rankDesc": "Position (best to worst)",
@@ -726,6 +734,8 @@
           "weekAsc": "Week (oldest first)",
           "nameAsc": "Name (A-Z)",
           "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
           "playsDesc": "Plays (high to low)",
           "playsAsc": "Plays (low to high)",
           "rankDesc": "Position (best to worst)",
@@ -755,7 +765,9 @@
           "positionDesc": "Position (best to worst)",
           "positionAsc": "Position (worst to best)",
           "nameAsc": "Name (A-Z)",
-          "nameDesc": "Name (Z-A)"
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
         }
       },
       "timesAtTopByArtist": {
@@ -775,8 +787,8 @@
         "sortByItems": "Items count",
         "sortByWeeks": "Total weeks",
         "sort": {
-          "itemsDesc": "Items count (high to low)",
-          "weeksDesc": "Total weeks (high to low)"
+          "itemsDesc": "Items count",
+          "weeksDesc": "Total weeks"
         }
       },
       "loading": "Loading statistics...",

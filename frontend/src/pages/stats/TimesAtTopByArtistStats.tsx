@@ -65,7 +65,6 @@ const TimesAtTopByArtistStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
   const [searchQuery, setSearchQuery] = useState('');
 
   const charts = useSelector((state: any) => state.charts.charts);
@@ -153,14 +152,14 @@ const TimesAtTopByArtistStats: React.FC = () => {
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return sortedData.slice(start, start + pageSize);
-  }, [sortedData, page, pageSize]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize]);
 
   // Sort options
   const sortOptions = React.useMemo(() => {
@@ -195,8 +194,8 @@ const TimesAtTopByArtistStats: React.FC = () => {
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         hideArtistType={true}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -250,7 +249,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record, index) => {
-                    const displayRank = (page - 1) * pageSize + index + 1;
+                    const displayRank = (page - 1) * preferences.pageSize + index + 1;
 
                     return (
                       <Table.Tr key={record.artistName}>
@@ -280,10 +279,10 @@ const TimesAtTopByArtistStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {sortedData.length > pageSize && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(sortedData.length / pageSize)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

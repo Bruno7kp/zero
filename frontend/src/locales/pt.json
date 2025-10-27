@@ -600,8 +600,10 @@
           "weekAsc": "Semana (mais antiga)",
           "nameAsc": "Nome (A-Z)",
           "nameDesc": "Nome (Z-A)",
-          "timesDesc": "Vezes (maior para menor)",
-          "timesAsc": "Vezes (menor para maior)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)",
           "playsDesc": "Reproduções (maior para menor)",
           "playsAsc": "Reproduções (menor para maior)",
           "salesDesc": "Vendas (maior para menor)",
@@ -630,8 +632,8 @@
           "albumDesc": "Álbum (Z-A)",
           "trackAsc": "Música (A-Z)",
           "trackDesc": "Música (Z-A)",
-          "timesDesc": "Vezes (maior-menor)",
-          "timesAsc": "Vezes (menor-maior)"
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)"
         }
       },
       "timesAtRank": {
@@ -647,12 +649,14 @@
           "title": "Título"
         },
         "sort": {
-          "timesDesc": "Semanas (maior-menor)",
-          "timesAsc": "Semanas (menor-maior)",
-          "positionDesc": "Posição (melhor-pior)",
-          "positionAsc": "Posição (pior-melhor)",
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)",
+          "positionDesc": "Posição (melhor para pior)",
+          "positionAsc": "Posição (pior para melhor)",
           "nameAsc": "Nome (A-Z)",
-          "nameDesc": "Nome (Z-A)"
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
         }
       },
       "timesAtTop": {
@@ -668,12 +672,14 @@
           "title": "Título"
         },
         "sort": {
-          "timesDesc": "Semanas (maior-menor)",
-          "timesAsc": "Semanas (menor-maior)",
-          "positionDesc": "Posição (melhor-pior)",
-          "positionAsc": "Posição (pior-melhor)",
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)",
+          "positionDesc": "Posição (melhor para pior)",
+          "positionAsc": "Posição (pior para melhor)",
           "nameAsc": "Nome (A-Z)",
-          "nameDesc": "Nome (Z-A)"
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
         }
       },
       "plays": {
@@ -697,12 +703,14 @@
           "weekAsc": "Semana (mais antiga)",
           "nameAsc": "Nome (A-Z)",
           "nameDesc": "Nome (Z-A)",
-          "playsDesc": "Reproduções (maior-menor)",
-          "playsAsc": "Reproduções (menor-maior)",
-          "rankDesc": "Posição (melhor-pior)",
-          "rankAsc": "Posição (pior-melhor)",
-          "salesDesc": "Vendas (maior-menor)",
-          "salesAsc": "Vendas (menor-maior)"
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "playsAsc": "Reproduções (menor para maior)",
+          "rankDesc": "Posição (melhor para pior)",
+          "rankAsc": "Posição (pior para melhor)",
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)"
         }
       },
       "debuts": {
@@ -726,12 +734,14 @@
           "weekAsc": "Semana (mais antiga)",
           "nameAsc": "Nome (A-Z)",
           "nameDesc": "Nome (Z-A)",
-          "playsDesc": "Reproduções (maior-menor)",
-          "playsAsc": "Reproduções (menor-maior)",
-          "rankDesc": "Posição (melhor-pior)",
-          "rankAsc": "Posição (pior-melhor)",
-          "salesDesc": "Vendas (maior-menor)",
-          "salesAsc": "Vendas (menor-maior)"
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "playsAsc": "Reproduções (menor para maior)",
+          "rankDesc": "Posição (melhor para pior)",
+          "rankAsc": "Posição (pior para melhor)",
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)"
         }
       },
       "points": {
@@ -748,12 +758,12 @@
           "totalPoints": "Total de pontos"
         },
         "sort": {
-          "pointsDesc": "Pontos (maior-menor)",
-          "pointsAsc": "Pontos (menor-maior)",
-          "weeksDesc": "Semanas (maior-menor)",
-          "weeksAsc": "Semanas (menor-maior)",
-          "positionDesc": "Posição (melhor-pior)",
-          "positionAsc": "Posição (pior-melhor)",
+          "pointsDesc": "Pontos (maior para menor)",
+          "pointsAsc": "Pontos (menor para maior)",
+          "weeksDesc": "Semanas (maior para menor)",
+          "weeksAsc": "Semanas (menor para maior)",
+          "positionDesc": "Posição (melhor para pior)",
+          "positionAsc": "Posição (pior para melhor)",
           "nameAsc": "Nome (A-Z)",
           "nameDesc": "Nome (Z-A)"
         }
@@ -775,8 +785,8 @@
         "sortByItems": "Quantidade de itens",
         "sortByWeeks": "Total de semanas",
         "sort": {
-          "itemsDesc": "Quantidade de itens (maior-menor)",
-          "weeksDesc": "Total de semanas (maior-menor)"
+          "itemsDesc": "Quantidade de itens",
+          "weeksDesc": "Total de semanas"
         }
       },
       "loading": "Carregando estatísticas...",

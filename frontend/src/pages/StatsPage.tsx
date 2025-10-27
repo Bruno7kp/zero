@@ -15,7 +15,8 @@ import {
   ActionIcon,
   useMantineTheme,
   Divider,
-  Box
+  Box,
+  Tooltip
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -143,6 +144,12 @@ const StatsPage: React.FC = () => {
     return pathParts.some(part => part === item.group);
   };
 
+  // Get page title based on current route
+  const getPageTitle = () => {
+    const activeItem = navItems.find(item => !item.divider && isActive(item));
+    return activeItem?.label || t('stats.title');
+  };
+
   if (!chart) {
     return (
       <Container size="100%" py="xl" className="noPaddingMobile">
@@ -157,7 +164,7 @@ const StatsPage: React.FC = () => {
 
   return (
     <Container size="100%" className="noPaddingMobile">
-      <CreateHeader pageTitle={t('stats.title')} icon={IconChartBar} />
+      <CreateHeader pageTitle={getPageTitle()} icon={IconChartBar} />
       
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
@@ -180,6 +187,13 @@ const StatsPage: React.FC = () => {
               >
                 {collapsed ? <IconLayoutSidebarLeftExpand size={18} /> : <IconLayoutSidebarLeftCollapse size={18} />}
               </ActionIcon>
+              
+              {/* Title - centered */}
+              {!collapsed && (
+                <Title order={4} style={{ flex: 1, textAlign: 'center', marginLeft: -34 }}>
+                  {t('stats.sidebar.title')}
+                </Title>
+              )}
             </Flex>
             
             <ScrollArea.Autosize mah={600} type="auto">
@@ -188,27 +202,35 @@ const StatsPage: React.FC = () => {
                   item.divider ? (
                     <Divider key={index} my="xs" />
                   ) : (
-                    <NavLink
+                    <Tooltip 
                       key={index}
-                      active={isActive(item)}
-                      label={collapsed ? undefined : item.label!}
-                      leftSection={<item.icon size={18} />}
-                      onClick={() => {
-                        if (item.path) {
-                          navigate(item.path);
-                        }
-                      }}
-                      styles={{
-                        root: {
-                          justifyContent: collapsed ? 'center' : 'flex-start',
-                          paddingLeft: collapsed ? 8 : undefined,
-                          paddingRight: collapsed ? 8 : undefined,
-                        },
-                        section: {
-                          marginRight: collapsed ? 0 : undefined,
-                        }
-                      }}
-                    />
+                      label={item.label}
+                      position="right"
+                      disabled={!collapsed}
+                      withArrow
+                    >
+                      <NavLink
+                        active={isActive(item)}
+                        label={collapsed ? undefined : item.label!}
+                        leftSection={<item.icon size={18} />}
+                        onClick={() => {
+                          if (item.path) {
+                            navigate(item.path);
+                          }
+                        }}
+                        styles={{
+                          root: {
+                            justifyContent: collapsed ? 'center' : 'flex-start',
+                            paddingLeft: collapsed ? 8 : undefined,
+                            paddingRight: collapsed ? 8 : undefined,
+                            borderRadius: 8,
+                          },
+                          section: {
+                            marginRight: collapsed ? 0 : undefined,
+                          }
+                        }}
+                      />
+                    </Tooltip>
                   )
                 )}
               </Stack>
@@ -244,6 +266,11 @@ const StatsPage: React.FC = () => {
                         if (item.path) {
                           navigate(item.path);
                           toggle();
+                        }
+                      }}
+                      styles={{
+                        root: {
+                          borderRadius: 8,
                         }
                       }}
                     />

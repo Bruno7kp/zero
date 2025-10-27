@@ -64,7 +64,6 @@ const TimesAtTopStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('times-desc');
 
@@ -157,6 +156,10 @@ const TimesAtTopStats: React.FC = () => {
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'name-desc':
         return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'artist-asc':
+        return sorted.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
+      case 'artist-desc':
+        return sorted.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
       default:
         return sorted;
     }
@@ -164,26 +167,30 @@ const TimesAtTopStats: React.FC = () => {
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return sortedData.slice(start, start + pageSize);
-  }, [sortedData, page, pageSize]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize]);
 
   // Sort options
   const sortOptions = React.useMemo(() => {
     return [
       { value: 'times-desc', label: t('stats.timesAtTop.sort.timesDesc') },
       { value: 'times-asc', label: t('stats.timesAtTop.sort.timesAsc') },
-      { value: 'position-desc', label: t('stats.timesAtTop.sort.positionDesc') },
-      { value: 'position-asc', label: t('stats.timesAtTop.sort.positionAsc') },
+      //{ value: 'position-desc', label: t('stats.timesAtTop.sort.positionDesc') },
+      //{ value: 'position-asc', label: t('stats.timesAtTop.sort.positionAsc') },
       { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
       { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
+      ...(type !== 'artist' && preferences.showArtistColumn ? [
+        { value: 'artist-asc', label: t('stats.timesAtTop.sort.artistAsc') },
+        { value: 'artist-desc', label: t('stats.timesAtTop.sort.artistDesc') },
+      ] : []),
     ];
-  }, [t]);
+  }, [t, type, preferences.showArtistColumn]);
 
   if (!chart) {
     return (
@@ -210,8 +217,8 @@ const TimesAtTopStats: React.FC = () => {
         onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -266,7 +273,7 @@ const TimesAtTopStats: React.FC = () => {
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record: any, index) => {
-                    const displayRank = (page - 1) * pageSize + index + 1;
+                    const displayRank = (page - 1) * preferences.pageSize + index + 1;
 
                     return (
                       <Table.Tr key={record.entityId}>
@@ -286,7 +293,7 @@ const TimesAtTopStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -299,10 +306,10 @@ const TimesAtTopStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {sortedData.length > pageSize && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(sortedData.length / pageSize)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

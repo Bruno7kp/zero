@@ -7,6 +7,7 @@ export interface StatsPreferences {
   tableSize: 'xs' | 'sm' | 'md';
   showSales: boolean;
   peakOnly: boolean;
+  pageSize: number;
 }
 
 const DEFAULT_PREFERENCES: StatsPreferences = {
@@ -14,7 +15,8 @@ const DEFAULT_PREFERENCES: StatsPreferences = {
   showArtistColumn: false,
   tableSize: 'sm',
   showSales: false,
-  peakOnly: false
+  peakOnly: false,
+  pageSize: 25
 };
 
 const STORAGE_KEY = 'stats-preferences';

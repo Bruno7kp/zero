@@ -62,7 +62,6 @@ const RankStats: React.FC = () => {
   const [rank, setRank] = useState(Number(rankParam) || 1);
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('week-desc');
   
@@ -228,6 +227,10 @@ const RankStats: React.FC = () => {
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'name-desc':
         return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'artist-asc':
+        return sorted.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
+      case 'artist-desc':
+        return sorted.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
       case 'plays-desc':
         return sorted.sort((a, b) => b.plays - a.plays);
       case 'plays-asc':
@@ -255,14 +258,14 @@ const RankStats: React.FC = () => {
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return sortedData.slice(start, start + pageSize);
-  }, [sortedData, page, pageSize]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
 
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize]);
 
   // Sort options
   const sortOptions = React.useMemo(() => [
@@ -270,6 +273,10 @@ const RankStats: React.FC = () => {
     { value: 'week-asc', label: t('stats.rank.sort.weekAsc') },
     { value: 'name-asc', label: t('stats.rank.sort.nameAsc') },
     { value: 'name-desc', label: t('stats.rank.sort.nameDesc') },
+    ...(type !== 'artist' && preferences.showArtistColumn ? [
+      { value: 'artist-asc', label: t('stats.rank.sort.artistAsc') },
+      { value: 'artist-desc', label: t('stats.rank.sort.artistDesc') },
+    ] : []),
     { value: 'times-desc', label: t('stats.rank.sort.timesDesc') },
     { value: 'times-asc', label: t('stats.rank.sort.timesAsc') },
     { value: 'plays-desc', label: t('stats.rank.sort.playsDesc') },
@@ -278,7 +285,7 @@ const RankStats: React.FC = () => {
       { value: 'sales-desc', label: t('stats.rank.sort.salesDesc') },
       { value: 'sales-asc', label: t('stats.rank.sort.salesAsc') },
     ] : [])
-  ], [t, preferences.showSales]);
+  ], [t, type, preferences.showArtistColumn, preferences.showSales]);
 
   if (!chart) {
     return (
@@ -313,8 +320,8 @@ const RankStats: React.FC = () => {
         showPositionFilter={true}
         showPeakOnlyToggle={true}
         cutoff={cutoff}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -384,7 +391,7 @@ const RankStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -415,10 +422,10 @@ const RankStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {sortedData.length > pageSize && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(sortedData.length / pageSize)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

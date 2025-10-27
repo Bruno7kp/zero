@@ -64,9 +64,8 @@ const DebutsStats: React.FC = () => {
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('week-desc');
+  const [sortBy, setSortBy] = useState('plays-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -192,6 +191,10 @@ const DebutsStats: React.FC = () => {
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'name-desc':
         return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'artist-asc':
+        return sorted.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
+      case 'artist-desc':
+        return sorted.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
       case 'plays-desc':
         return sorted.sort((a, b) => b.plays - a.plays);
       case 'plays-asc':
@@ -219,14 +222,14 @@ const DebutsStats: React.FC = () => {
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return sortedData.slice(start, start + pageSize);
-  }, [sortedData, page, pageSize]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize]);
 
   // Dynamic sort options
   const sortOptions = React.useMemo(() => {
@@ -235,11 +238,21 @@ const DebutsStats: React.FC = () => {
       { value: 'week-asc', label: t('stats.debuts.sort.weekAsc') },
       { value: 'name-asc', label: t('stats.debuts.sort.nameAsc') },
       { value: 'name-desc', label: t('stats.debuts.sort.nameDesc') },
+    ];
+
+    if (type !== 'artist' && preferences.showArtistColumn) {
+      baseOptions.push(
+        { value: 'artist-asc', label: t('stats.debuts.sort.artistAsc') },
+        { value: 'artist-desc', label: t('stats.debuts.sort.artistDesc') }
+      );
+    }
+
+    baseOptions.push(
       { value: 'plays-desc', label: t('stats.debuts.sort.playsDesc') },
       { value: 'plays-asc', label: t('stats.debuts.sort.playsAsc') },
       { value: 'rank-desc', label: t('stats.debuts.sort.rankDesc') },
-      { value: 'rank-asc', label: t('stats.debuts.sort.rankAsc') },
-    ];
+      { value: 'rank-asc', label: t('stats.debuts.sort.rankAsc') }
+    );
 
     if (preferences.showSales && chart?.music_plays_weight !== undefined) {
       baseOptions.push(
@@ -249,7 +262,7 @@ const DebutsStats: React.FC = () => {
     }
 
     return baseOptions;
-  }, [preferences.showSales, chart, t]);
+  }, [preferences.showSales, preferences.showArtistColumn, chart, type, t]);
 
   if (!chart) {
     return (
@@ -277,8 +290,8 @@ const DebutsStats: React.FC = () => {
         tableSize={preferences.tableSize}
         onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -347,7 +360,7 @@ const DebutsStats: React.FC = () => {
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record: any, index) => {
-                    const displayRank = (page - 1) * pageSize + index + 1;
+                    const displayRank = (page - 1) * preferences.pageSize + index + 1;
                     const startDate = dayjs(record.week);
                     const endDate = startDate.add(6, 'day');
                     const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
@@ -372,7 +385,7 @@ const DebutsStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -408,10 +421,10 @@ const DebutsStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {sortedData.length > pageSize && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(sortedData.length / pageSize)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 
