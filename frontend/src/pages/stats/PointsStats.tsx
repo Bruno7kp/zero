@@ -19,11 +19,10 @@ import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getPointsAccumulators, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
-
-const PAGE_SIZE = 25;
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ entityId: string; name: string; artistName: string; type: string }> = ({ entityId, name, artistName, type }) => {
@@ -60,8 +59,11 @@ const PointsStats: React.FC = () => {
   }>>([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('points-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -107,10 +109,75 @@ const PointsStats: React.FC = () => {
     navigate(`/stats/points/${newType}`);
   };
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    
+    const query = searchQuery.toLowerCase();
+    return data.filter(item => 
+      item.name.toLowerCase().includes(query) ||
+      (item.artistName && item.artistName.toLowerCase().includes(query))
+    );
+  }, [data, searchQuery]);
+
+  // Sort data
+  const sortedData = React.useMemo(() => {
+    const sorted = [...filteredData];
+    
+    switch (sortBy) {
+      case 'points-desc':
+        return sorted.sort((a, b) => b.totalPoints - a.totalPoints);
+      case 'points-asc':
+        return sorted.sort((a, b) => a.totalPoints - b.totalPoints);
+      case 'weeks-desc':
+        return sorted.sort((a, b) => b.weeksOnChart - a.weeksOnChart);
+      case 'weeks-asc':
+        return sorted.sort((a, b) => a.weeksOnChart - b.weeksOnChart);
+      case 'position-desc':
+        return sorted; // Already sorted by points
+      case 'position-asc':
+        return sorted.reverse();
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'artist-asc':
+        return sorted.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
+      case 'artist-desc':
+        return sorted.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
+      default:
+        return sorted;
+    }
+  }, [filteredData, sortBy]);
+
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, preferences.pageSize]);
+
+  // Sort options
+  const sortOptions = React.useMemo(() => {
+    return [
+      { value: 'points-desc', label: t('stats.points.sort.pointsDesc') },
+      { value: 'points-asc', label: t('stats.points.sort.pointsAsc') },
+      { value: 'weeks-desc', label: t('stats.points.sort.weeksDesc') },
+      { value: 'weeks-asc', label: t('stats.points.sort.weeksAsc') },
+      //{ value: 'position-desc', label: t('stats.points.sort.positionDesc') },
+      //{ value: 'position-asc', label: t('stats.points.sort.positionAsc') },
+      { value: 'name-asc', label: t('stats.points.sort.nameAsc') },
+      { value: 'name-desc', label: t('stats.points.sort.nameDesc') },
+      ...(type !== 'artist' && preferences.showArtistColumn ? [
+        { value: 'artist-asc', label: t('stats.points.sort.artistAsc') },
+        { value: 'artist-desc', label: t('stats.points.sort.artistDesc') },
+      ] : []),
+    ];
+  }, [t, type, preferences.showArtistColumn]);
 
   if (!chart) {
     return (
@@ -128,8 +195,21 @@ const PointsStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        showArtistColumn={preferences.showArtistColumn}
+        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={sortOptions}
       />
 
       {loading ? (
@@ -140,51 +220,63 @@ const PointsStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
-                  <Table.Th style={{ width: 'auto' }}>{t('stats.points.columns.title')}</Table.Th>
-                  <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.weeksOnChart')}</Table.Th>
-                  <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.totalPoints')}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedData.length === 0 ? (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
+                    <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
+                    <Table.Th style={{ width: 'auto' }}>{t('stats.points.columns.title')}</Table.Th>
+                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
+                    <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.weeksOnChart')}</Table.Th>
+                    <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.totalPoints')}</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedData.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={
+                        1 + // rank
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 + // weeks
+                        1 // points
+                      }>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record, index) => {
-                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+                    const displayRank = (page - 1) * preferences.pageSize + index + 1;
 
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size="sm">{displayRank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell 
+                            {preferences.showImages && <ImageCell 
                               entityId={record.entityId}
                               name={record.name}
                               artistName={record.artistName}
                               type={type}
-                            />
+                            />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
-                              {type !== 'artist' && record.artistName && (
-                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
+                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                          </Table.Td>
+                        )}
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size="sm">{record.weeksOnChart}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weeksOnChart}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size="sm">{record.totalPoints.toLocaleString()}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.totalPoints.toLocaleString()}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );
@@ -193,10 +285,10 @@ const PointsStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {data.length > PAGE_SIZE && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(data.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

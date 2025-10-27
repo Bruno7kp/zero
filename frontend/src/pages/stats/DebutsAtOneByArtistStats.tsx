@@ -1,25 +1,25 @@
-// Times in Top N stats - shows who stayed in top N most weeks
+// Artists with most debuts at #1 stats
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Stack, 
+  Text, 
   Loader, 
   Center,
   Card,
   Avatar,
-  Text,
-  Select,
   Table,
   ScrollArea,
   Pagination,
-  Box,
-  Flex
+  Flex,
+  Select,
+  Box
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { IconArrowBarUp } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
-import { getTimesInTopN, getYearRange } from '../../utils/statsQueries';
+import { getArtistsWithMostDebutsAtOne, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
@@ -27,12 +27,12 @@ import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 
 // Component to render image cell with hooks
-const ImageCell: React.FC<{ record: any; type: string }> = ({ record, type }) => {
+const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
   const { imageUrl } = useSpotifyImage({
-    entityId: record.entityId,
-    name: record.name,
-    artist: record.artistName,
-    type: type as 'artist' | 'album' | 'track',
+    entityId: `artist-${artistName}-`,
+    name: artistName,
+    artist: artistName,
+    type: 'artist',
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
   });
@@ -40,32 +40,30 @@ const ImageCell: React.FC<{ record: any; type: string }> = ({ record, type }) =>
   return (
     <Avatar 
       src={imageUrl} 
-      alt={record.name}
+      alt={artistName}
       size={40}
       radius="md"
     />
   );
 };
 
-const TimesAtTopStats: React.FC = () => {
+const DebutsAtOneByArtistStats: React.FC = () => {
   const { t } = useTranslation();
-  const { topN: topNParam, type: typeParam } = useParams();
+  const { type: typeParam } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Array<{
-    entityId: string;
-    name: string;
     artistName: string;
-    count: number;
+    itemsCount: number;
   }>>([]);
   const [year, setYear] = useState('all');
-  const [type, setType] = useState(typeParam || 'artist');
-  const [topN, setTopN] = useState(Number(topNParam) || 10);
+  const [type, setType] = useState<'album' | 'track'>((typeParam as 'album' | 'track') || 'track');
+  const [rank, setRank] = useState(1);
+  const [sortBy, setSortBy] = useState<'items'>('items');
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('times-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -77,7 +75,6 @@ const TimesAtTopStats: React.FC = () => {
   const getCutoff = (chartType: string) => {
     if (!chart) return 100;
     const cutoffMap: any = {
-      artist: chart.artist_cutoff || 100,
       album: chart.album_cutoff || 100,
       track: chart.music_cutoff || 100
     };
@@ -101,31 +98,32 @@ const TimesAtTopStats: React.FC = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const results = await getTimesInTopN({
+        const results = await getArtistsWithMostDebutsAtOne({
           chartId: String(chart.id),
           chartType: type,
-          topN,
+          rank,
           year: year === 'all' ? undefined : year
         });
         setData(results);
       } catch (error) {
-        console.error('Error loading times at top stats:', error);
+        console.error('Error loading debuts at one by artist stats:', error);
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, [chart, type, topN, year]);
+  }, [chart, type, rank, year]);
 
   const handleTypeChange = (newType: string) => {
-    setType(newType);
-    navigate(`/stats/times_at_top/${topN}/${newType}`);
+    if (newType === 'album' || newType === 'track') {
+      setType(newType);
+      navigate(`/stats/debuts_at_one_by_artist/${newType}`);
+    }
   };
 
-  const handleTopNChange = (value: number) => {
-    setTopN(value);
-    navigate(`/stats/times_at_top/${value}/${type}`);
+  const handleRankChange = (value: number) => {
+    setRank(value);
   };
 
   // Filter data by search query
@@ -134,36 +132,14 @@ const TimesAtTopStats: React.FC = () => {
     
     const query = searchQuery.toLowerCase();
     return data.filter(item => 
-      item.name.toLowerCase().includes(query) ||
-      (item.artistName && item.artistName.toLowerCase().includes(query))
+      item.artistName.toLowerCase().includes(query)
     );
   }, [data, searchQuery]);
 
-  // Sort data
+  // Sort data (already sorted by items count)
   const sortedData = React.useMemo(() => {
-    const sorted = [...filteredData];
-    
-    switch (sortBy) {
-      case 'times-desc':
-        return sorted.sort((a, b) => b.count - a.count);
-      case 'times-asc':
-        return sorted.sort((a, b) => a.count - b.count);
-      case 'position-desc':
-        return sorted; // Already sorted by position implicitly
-      case 'position-asc':
-        return sorted.reverse();
-      case 'name-asc':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-      case 'name-desc':
-        return sorted.sort((a, b) => b.name.localeCompare(a.name));
-      case 'artist-asc':
-        return sorted.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
-      case 'artist-desc':
-        return sorted.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
-      default:
-        return sorted;
-    }
-  }, [filteredData, sortBy]);
+    return [...filteredData];
+  }, [filteredData]);
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
@@ -179,18 +155,9 @@ const TimesAtTopStats: React.FC = () => {
   // Sort options
   const sortOptions = React.useMemo(() => {
     return [
-      { value: 'times-desc', label: t('stats.timesAtTop.sort.timesDesc') },
-      { value: 'times-asc', label: t('stats.timesAtTop.sort.timesAsc') },
-      //{ value: 'position-desc', label: t('stats.timesAtTop.sort.positionDesc') },
-      //{ value: 'position-asc', label: t('stats.timesAtTop.sort.positionAsc') },
-      { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
-      ...(type !== 'artist' && preferences.showArtistColumn ? [
-        { value: 'artist-asc', label: t('stats.timesAtTop.sort.artistAsc') },
-        { value: 'artist-desc', label: t('stats.timesAtTop.sort.artistDesc') },
-      ] : []),
+      { value: 'items', label: t('stats.debutsAtOneByArtist.sort.itemsDesc') },
     ];
-  }, [t, type, preferences.showArtistColumn]);
+  }, [t]);
 
   if (!chart) {
     return (
@@ -201,6 +168,7 @@ const TimesAtTopStats: React.FC = () => {
   }
 
   const cutoff = getCutoff(type);
+  const typeLabel = type === 'album' ? t('stats.filters.albums') : t('stats.filters.tracks');
 
   return (
     <Stack gap="md">
@@ -211,25 +179,24 @@ const TimesAtTopStats: React.FC = () => {
         onTypeChange={handleTypeChange}
         showImages={preferences.showImages}
         onToggleImages={(value) => updatePreference('showImages', value)}
-        showArtistColumn={preferences.showArtistColumn}
-        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
         tableSize={preferences.tableSize}
         onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
+        hideArtistType={true}
         pageSize={preferences.pageSize}
         onPageSizeChange={(value) => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
-        onSortChange={setSortBy}
+        onSortChange={(value) => setSortBy(value as 'items')}
         sortOptions={sortOptions}
         customFilters={
           <Select
-            value={String(topN)}
+            value={String(rank)}
             onChange={(value) => {
               if (value) {
-                handleTopNChange(Number(value));
+                handleRankChange(Number(value));
               }
             }}
             data={Array.from({ length: cutoff }, (_, i) => ({
@@ -247,65 +214,51 @@ const TimesAtTopStats: React.FC = () => {
         <Center py="xl">
           <Loader size="lg" />
         </Center>
+      ) : sortedData.length === 0 ? (
+        <Center py="xl">
+          <Text>{t('stats.debutsAtOneByArtist.noData')}</Text>
+        </Center>
       ) : (
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
-            <Table highlightOnHover>
+              <Table highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                    <Table.Th>{t('stats.timesAtTop.columns.title')}</Table.Th>
-                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtTop.columns.times', { n: topN })}</Table.Th>
+                    <Table.Th>{t('stats.debutsAtOneByArtist.columns.artist')}</Table.Th>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debutsAtOneByArtist.columns.debuts', { type: typeLabel })}</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {paginatedData.length === 0 ? (
-                    <Table.Tr>
-                      <Table.Td colSpan={
-                        1 + // rank
-                        1 + // title
-                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
-                        1 // times
-                      }>
-                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
-                    </Table.Td>
-                  </Table.Tr>
-                ) : (
-                  paginatedData.map((record: any, index) => {
+                  {paginatedData.map((record, index) => {
                     const displayRank = (page - 1) * preferences.pageSize + index + 1;
-
+                    
                     return (
-                      <Table.Tr key={record.entityId}>
+                      <Table.Tr key={record.artistName}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            {preferences.showImages && <ImageCell record={record} type={type} />}
+                            {preferences.showImages && <ImageCell artistName={record.artistName} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
-                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
-                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
-                              )}
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>
+                                {record.artistName}
+                              </Text>
                             </Box>
                           </Flex>
                         </Table.Td>
-                        {preferences.showArtistColumn && type !== 'artist' && (
-                          <Table.Td>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
-                          </Table.Td>
-                        )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.count}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>
+                            {record.itemsCount}
+                          </Text>
                         </Table.Td>
                       </Table.Tr>
                     );
-                  })
-                )}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
+                  })}
+                </Table.Tbody>
+              </Table>
+            </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
@@ -322,5 +275,4 @@ const TimesAtTopStats: React.FC = () => {
   );
 };
 
-export default TimesAtTopStats;
-
+export default DebutsAtOneByArtistStats;

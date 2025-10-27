@@ -23,13 +23,12 @@ import dayjs from 'dayjs';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getPerfectAllKills, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { db } from '../../db/indexedDb';
 import type { ChartData } from '../../db/indexedDb';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
-
-const PAGE_SIZE = 25;
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
@@ -66,8 +65,11 @@ const PerfectAllKillStats: React.FC = () => {
     trackEntityId: string;
   }>>([]);
   const [year, setYear] = useState('all');
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('week-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -138,10 +140,74 @@ const PerfectAllKillStats: React.FC = () => {
     return result.reverse();
   }, [data]);
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return dataWithOccurrence;
+    
+    const query = searchQuery.toLowerCase();
+    return dataWithOccurrence.filter(item => 
+      item.artistName.toLowerCase().includes(query) ||
+      item.albumName.toLowerCase().includes(query) ||
+      item.trackName.toLowerCase().includes(query)
+    );
+  }, [dataWithOccurrence, searchQuery]);
+
+  // Sort data
+  const sortedData = React.useMemo(() => {
+    const sorted = [...filteredData];
+    
+    switch (sortBy) {
+      case 'week-desc':
+        return sorted.sort((a, b) => b.week.localeCompare(a.week));
+      case 'week-asc':
+        return sorted.sort((a, b) => a.week.localeCompare(b.week));
+      case 'artist-asc':
+        return sorted.sort((a, b) => a.artistName.localeCompare(b.artistName));
+      case 'artist-desc':
+        return sorted.sort((a, b) => b.artistName.localeCompare(a.artistName));
+      case 'album-asc':
+        return sorted.sort((a, b) => a.albumName.localeCompare(b.albumName));
+      case 'album-desc':
+        return sorted.sort((a, b) => b.albumName.localeCompare(a.albumName));
+      case 'track-asc':
+        return sorted.sort((a, b) => a.trackName.localeCompare(b.trackName));
+      case 'track-desc':
+        return sorted.sort((a, b) => b.trackName.localeCompare(a.trackName));
+      case 'times-desc':
+        return sorted.sort((a, b) => b.occurrence - a.occurrence);
+      case 'times-asc':
+        return sorted.sort((a, b) => a.occurrence - b.occurrence);
+      default:
+        return sorted;
+    }
+  }, [filteredData, sortBy]);
+
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return dataWithOccurrence.slice(start, start + PAGE_SIZE);
-  }, [dataWithOccurrence, page]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, preferences.pageSize]);
+
+  // Sort options
+  const sortOptions = React.useMemo(() => {
+    return [
+      { value: 'week-desc', label: t('stats.pak.sort.weekDesc') },
+      { value: 'week-asc', label: t('stats.pak.sort.weekAsc') },
+      { value: 'artist-asc', label: t('stats.pak.sort.artistAsc') },
+      { value: 'artist-desc', label: t('stats.pak.sort.artistDesc') },
+      { value: 'album-asc', label: t('stats.pak.sort.albumAsc') },
+      { value: 'album-desc', label: t('stats.pak.sort.albumDesc') },
+      { value: 'track-asc', label: t('stats.pak.sort.trackAsc') },
+      { value: 'track-desc', label: t('stats.pak.sort.trackDesc') },
+      { value: 'times-desc', label: t('stats.pak.sort.timesDesc') },
+      { value: 'times-asc', label: t('stats.pak.sort.timesAsc') },
+    ];
+  }, [t]);
 
   if (!chart) {
     return (
@@ -156,9 +222,20 @@ const PerfectAllKillStats: React.FC = () => {
       <StatsFilters
         year={year}
         onYearChange={setYear}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showTypeFilter={false}
         showSalesToggle={false}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={sortOptions}
       />
 
       {loading ? (
@@ -173,17 +250,17 @@ const PerfectAllKillStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>X</Table.Th>
-                  <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
-                  <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
-                  <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
-                  <Table.Th style={{ width: 1 }}></Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
+                    <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
+                    <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
+                    <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.pak.columns.times')}</Table.Th>
+                    <Table.Th style={{ width: 1 }}></Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
                 {paginatedData.map((record: any) => {
                   const startDate = dayjs(record.week);
                   const endDate = startDate.add(6, 'day');
@@ -193,25 +270,25 @@ const PerfectAllKillStats: React.FC = () => {
                     <Table.Tr key={`${record.week}-${record.artistEntityId}`}>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <Tooltip label={dateRange} withArrow>
-                          <Text fw={800} size="lg">{record.weekNumber}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
                         </Tooltip>
-                      </Table.Td>
-                      <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        <Text size="sm">{record.occurrence}</Text>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
                         <Flex gap="sm" wrap="nowrap" align="center">
-                          <ImageCell entityId={record.artistEntityId} name={record.artistName} />
+                          {preferences.showImages && <ImageCell entityId={record.artistEntityId} name={record.artistName} />}
                           <Box style={{ flex: 1, minWidth: 0 }}>
-                            <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.artistName}</Text>
+                            <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Box>
                         </Flex>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text size="sm" lineClamp={1}>{record.albumName}</Text>
+                        <Text lineClamp={1} size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.albumName}</Text>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text size="sm" lineClamp={1}>{record.trackName}</Text>
+                        <Text lineClamp={1} size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.trackName}</Text>
+                      </Table.Td>
+                      <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
                       </Table.Td>
                       <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                         <Button
@@ -229,10 +306,10 @@ const PerfectAllKillStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {dataWithOccurrence.length > PAGE_SIZE && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(dataWithOccurrence.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

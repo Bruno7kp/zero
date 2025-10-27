@@ -26,11 +26,10 @@ import { getHighestPlays, getYearRange, calculateSales } from '../../utils/stats
 import type { ChartData } from '../../db/indexedDb';
 import { db } from '../../db/indexedDb';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
-
-const PAGE_SIZE = 25;
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type }) => {
@@ -62,9 +61,11 @@ const PlaysStats: React.FC = () => {
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [position, setPosition] = useState(positionParam || 'all');
-  const [showSales, setShowSales] = useState(false);
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('plays-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -84,22 +85,22 @@ const PlaysStats: React.FC = () => {
   };
 
   // Get weight values for sales calculation
-  const getWeights = (chartType: string) => {
+  const getWeights = React.useCallback((chartType: string) => {
     if (!chart) return { weightPlays: 1, weightPoints: 0 };
     
     if (chartType === 'track') {
       return {
-        weightPlays: chart.musicPlaysWeight || 1,
-        weightPoints: chart.musicPointsWeight || 0
+        weightPlays: chart.music_plays_weight || 1,
+        weightPoints: chart.music_points_weight || 0
       };
     } else if (chartType === 'album') {
       return {
-        weightPlays: chart.albumPlaysWeight || 1,
-        weightPoints: chart.albumPointsWeight || 0
+        weightPlays: chart.album_plays_weight || 1,
+        weightPoints: chart.album_points_weight || 0
       };
     }
     return { weightPlays: 1, weightPoints: 0 };
-  };
+  }, [chart]);
 
   useEffect(() => {
     if (!chart) return;
@@ -167,10 +168,103 @@ const PlaysStats: React.FC = () => {
     }
   };
 
+  // Filter data by search query
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    
+    const query = searchQuery.toLowerCase();
+    return data.filter(item => 
+      item.name.toLowerCase().includes(query) ||
+      (item.artistName && item.artistName.toLowerCase().includes(query))
+    );
+  }, [data, searchQuery]);
+
+  // Sort data
+  const sortedData = React.useMemo(() => {
+    const sorted = [...filteredData];
+    const weights = getWeights(type);
+    
+    switch (sortBy) {
+      case 'week-desc':
+        return sorted.sort((a, b) => b.week.localeCompare(a.week));
+      case 'week-asc':
+        return sorted.sort((a, b) => a.week.localeCompare(b.week));
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'artist-asc':
+        return sorted.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
+      case 'artist-desc':
+        return sorted.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
+      case 'plays-desc':
+        return sorted.sort((a, b) => b.plays - a.plays);
+      case 'plays-asc':
+        return sorted.sort((a, b) => a.plays - b.plays);
+      case 'rank-desc':
+        return sorted.sort((a, b) => a.rank - b.rank); // Lower rank number = better
+      case 'rank-asc':
+        return sorted.sort((a, b) => b.rank - a.rank);
+      case 'sales-desc':
+        return sorted.sort((a, b) => {
+          const salesA = calculateSales(a.plays, a.rank, weights.weightPlays, weights.weightPoints);
+          const salesB = calculateSales(b.plays, b.rank, weights.weightPlays, weights.weightPoints);
+          return salesB - salesA;
+        });
+      case 'sales-asc':
+        return sorted.sort((a, b) => {
+          const salesA = calculateSales(a.plays, a.rank, weights.weightPlays, weights.weightPoints);
+          const salesB = calculateSales(b.plays, b.rank, weights.weightPlays, weights.weightPoints);
+          return salesA - salesB;
+        });
+      default:
+        return sorted;
+    }
+  }, [filteredData, sortBy, type, getWeights]);
+
+  // Paginate data
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
+    const start = (page - 1) * preferences.pageSize;
+    return sortedData.slice(start, start + preferences.pageSize);
+  }, [sortedData, page, preferences.pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery, sortBy, preferences.pageSize]);
+
+  // Dynamic sort options
+  const sortOptions = React.useMemo(() => {
+    const baseOptions = [
+      { value: 'week-desc', label: t('stats.plays.sort.weekDesc') },
+      { value: 'week-asc', label: t('stats.plays.sort.weekAsc') },
+      { value: 'name-asc', label: t('stats.plays.sort.nameAsc') },
+      { value: 'name-desc', label: t('stats.plays.sort.nameDesc') },
+    ];
+
+    if (type !== 'artist' && preferences.showArtistColumn) {
+      baseOptions.push(
+        { value: 'artist-asc', label: t('stats.plays.sort.artistAsc') },
+        { value: 'artist-desc', label: t('stats.plays.sort.artistDesc') }
+      );
+    }
+
+    baseOptions.push(
+      { value: 'plays-desc', label: t('stats.plays.sort.playsDesc') },
+      { value: 'plays-asc', label: t('stats.plays.sort.playsAsc') },
+      { value: 'rank-desc', label: t('stats.plays.sort.rankDesc') },
+      { value: 'rank-asc', label: t('stats.plays.sort.rankAsc') }
+    );
+
+    if (preferences.showSales && chart?.music_plays_weight !== undefined) {
+      baseOptions.push(
+        { value: 'sales-desc', label: t('stats.plays.sort.salesDesc') },
+        { value: 'sales-asc', label: t('stats.plays.sort.salesAsc') }
+      );
+    }
+
+    return baseOptions;
+  }, [preferences.showSales, preferences.showArtistColumn, chart, type, t]);
 
   if (!chart) {
     return (
@@ -198,9 +292,22 @@ const PlaysStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
-        showSales={showSales}
-        onToggleSales={setShowSales}
+        showSales={preferences.showSales}
+        onToggleSales={(value) => updatePreference('showSales', value)}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        showArtistColumn={preferences.showArtistColumn}
+        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
+        pageSize={preferences.pageSize}
+        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={sortOptions}
         customFilters={
           <Select
             value={position}
@@ -220,65 +327,80 @@ const PlaysStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.plays.columns.position')}</Table.Th>
-                  <Table.Th>{t('stats.plays.columns.title')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.plays.columns.plays')}</Table.Th>
-                  {showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.plays.columns.sales')}</Table.Th>}
-                  <Table.Th style={{ width: 1 }}></Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedData.length === 0 ? (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={showSales ? 7 : 6}>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
+                    <Table.Th>{t('stats.plays.columns.title')}</Table.Th>
+                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.plays.columns.plays')}</Table.Th>
+                    {preferences.showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.plays.columns.sales')}</Table.Th>}
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.plays.columns.position')}</Table.Th>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
+                    <Table.Th style={{ width: 1 }}></Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedData.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={
+                        1 + // rank
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 + // plays
+                        (preferences.showSales ? 1 : 0) +
+                        1 + // position
+                        1 + // week
+                        1 // button
+                      }>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
                 ) : (
                   paginatedData.map((record: any, index) => {
-                    const displayRank = (page - 1) * PAGE_SIZE + index + 1;
+                    const displayRank = (page - 1) * preferences.pageSize + index + 1;
                     const startDate = dayjs(record.week);
                     const endDate = startDate.add(6, 'day');
                     const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
                     const weights = getWeights(type);
-                    const sales = showSales ? calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints) : 0;
+                    const sales = preferences.showSales ? calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints) : 0;
 
                     return (
                       <Table.Tr key={`${record.week}-${record.entityId}`}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{displayRank}</Text>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Tooltip label={dateRange} withArrow>
-                            <Text fw={800} size="lg">{record.weekNumber}</Text>
-                          </Tooltip>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.rank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell record={record} type={type} />
+                            {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
-                              {type !== 'artist' && record.artistName && (
-                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
+                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.plays.toLocaleString()}</Text>
-                        </Table.Td>
-                        {showSales && (
-                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            <Text size="sm">{Math.round(sales).toLocaleString()}</Text>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.plays.toLocaleString()}</Text>
+                        </Table.Td>
+                        {preferences.showSales && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{Math.round(sales).toLocaleString()}</Text>
+                          </Table.Td>
+                        )}
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.rank}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Tooltip label={dateRange} withArrow>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
+                          </Tooltip>
+                        </Table.Td>
                         <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                           <Button
                             size="xs"
@@ -296,10 +418,10 @@ const PlaysStats: React.FC = () => {
               </Table.Tbody>
             </Table>
           </ScrollArea>
-          {data.length > PAGE_SIZE && (
+          {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination 
-                total={Math.ceil(data.length / PAGE_SIZE)} 
+                total={Math.ceil(sortedData.length / preferences.pageSize)} 
                 value={page} 
                 onChange={setPage} 
                 size="sm" 

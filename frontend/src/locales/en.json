@@ -552,7 +552,9 @@
       },
       "sidebar": {
         "title": "Statistics",
-        "overview": "Overview"
+        "overview": "Overview",
+        "collapse": "Collapse sidebar",
+        "expand": "Expand sidebar"
       },
       "filters": {
         "year": "Year",
@@ -563,11 +565,20 @@
         "all": "All positions",
         "cutoff": "Cutoff ({{n}})",
         "toggleSales": "Show sales columns",
+        "peakOnly": "Peak only",
+        "showImages": "Show images",
+        "showArtistColumn": "Separate artist column",
+        "tableSize": "Table size",
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
         "sortBy": "Sort by",
         "settings": "Settings",
         "displayOptions": "Display Options",
         "albums": "Albums",
-        "tracks": "Tracks"
+        "tracks": "Tracks",
+        "searchPlaceholder": "Search by name or artist...",
+        "perPage": "per page"
       },
       "rank": {
         "title": "All #{{n}}s",
@@ -577,12 +588,26 @@
         "description": "Items that reached position #{{n}}",
         "columns": {
           "week": "Week",
-          "times": "Times at #{{n}}",
+          "times": "Weeks at #{{n}}",
           "image": "Image",
           "title": "Title",
           "plays": "Plays",
           "sales": "Sales",
           "viewChart": "View chart"
+        },
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)",
+          "playsDesc": "Plays (high to low)",
+          "playsAsc": "Plays (low to high)",
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)"
         }
       },
       "pak": {
@@ -590,39 +615,71 @@
         "description": "Artists who simultaneously reached #1 in all three categories",
         "columns": {
           "week": "Week",
-          "times": "Times with PAK",
+          "times": "Total",
           "image": "Image",
           "artist": "Artist",
           "album": "Album",
           "track": "Track",
           "viewChart": "View chart"
         },
-        "noData": "No Perfect All Kill records found"
+        "noData": "No Perfect All Kill records found",
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "albumAsc": "Album (A-Z)",
+          "albumDesc": "Album (Z-A)",
+          "trackAsc": "Track (A-Z)",
+          "trackDesc": "Track (Z-A)",
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)"
+        }
       },
       "timesAtRank": {
-        "title": "Most Times at #{{n}}",
-        "titleArtist": "Most Times at #{{n}} - Artists",
-        "titleAlbum": "Most Times at #{{n}} - Albums",
-        "titleTrack": "Most Times at #{{n}} - Tracks",
+        "title": "Most Weeks at #{{n}}",
+        "titleArtist": "Most Weeks at #{{n}} - Artists",
+        "titleAlbum": "Most Weeks at #{{n}} - Albums",
+        "titleTrack": "Most Weeks at #{{n}} - Tracks",
         "description": "Items with most weeks at position #{{n}}",
         "columns": {
           "rank": "#",
-          "times": "Times at #{{n}}",
+          "times": "Weeks at #{{n}}",
           "image": "Image",
           "title": "Title"
+        },
+        "sort": {
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)",
+          "positionDesc": "Position (best to worst)",
+          "positionAsc": "Position (worst to best)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
         }
       },
       "timesAtTop": {
-        "title": "Most Times in Top {{n}}",
-        "titleArtist": "Most Times in Top {{n}} - Artists",
-        "titleAlbum": "Most Times in Top {{n}} - Albums",
-        "titleTrack": "Most Times in Top {{n}} - Tracks",
+        "title": "Most Weeks Accumulated",
+        "titleArtist": "Most Weeks in Top {{n}} - Artists",
+        "titleAlbum": "Most Weeks in Top {{n}} - Albums",
+        "titleTrack": "Most Weeks in Top {{n}} - Tracks",
         "description": "Items with most weeks in the top {{n}}",
         "columns": {
           "rank": "#",
-          "times": "Times in Top {{n}}",
+          "times": "Weeks in Top {{n}}",
           "image": "Image",
           "title": "Title"
+        },
+        "sort": {
+          "timesDesc": "Weeks (high to low)",
+          "timesAsc": "Weeks (low to high)",
+          "positionDesc": "Position (best to worst)",
+          "positionAsc": "Position (worst to best)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
         }
       },
       "plays": {
@@ -640,6 +697,20 @@
           "plays": "Plays",
           "sales": "Sales",
           "viewChart": "View chart"
+        },
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "playsDesc": "Plays (high to low)",
+          "playsAsc": "Plays (low to high)",
+          "rankDesc": "Position (best to worst)",
+          "rankAsc": "Position (worst to best)",
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)"
         }
       },
       "debuts": {
@@ -657,6 +728,20 @@
           "plays": "Plays",
           "sales": "Sales",
           "viewChart": "View chart"
+        },
+        "sort": {
+          "weekDesc": "Week (newest first)",
+          "weekAsc": "Week (oldest first)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "playsDesc": "Plays (high to low)",
+          "playsAsc": "Plays (low to high)",
+          "rankDesc": "Position (best to worst)",
+          "rankAsc": "Position (worst to best)",
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)"
         }
       },
       "points": {
@@ -671,6 +756,18 @@
           "title": "Title",
           "weeksOnChart": "Weeks on chart",
           "totalPoints": "Total points"
+        },
+        "sort": {
+          "pointsDesc": "Points (high to low)",
+          "pointsAsc": "Points (low to high)",
+          "weeksDesc": "Weeks (high to low)",
+          "weeksAsc": "Weeks (low to high)",
+          "positionDesc": "Position (best to worst)",
+          "positionAsc": "Position (worst to best)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
         }
       },
       "timesAtTopByArtist": {
@@ -688,7 +785,27 @@
           "totalWeeksShort": "Total Weeks"
         },
         "sortByItems": "Items count",
-        "sortByWeeks": "Total weeks"
+        "sortByWeeks": "Total weeks",
+        "sort": {
+          "itemsDesc": "Items count",
+          "weeksDesc": "Total weeks"
+        }
+      },
+      "debutsAtOneByArtist": {
+        "title": "Artists with Most Debuts at #1",
+        "titleAlbum": "Artists with Most Album Debuts in Top {{n}}",
+        "titleTrack": "Artists with Most Track Debuts in Top {{n}}",
+        "description": "Artists with most first appearances in top positions",
+        "columns": {
+          "rank": "#",
+          "image": "Image",
+          "artist": "Artist",
+          "debuts": "{{type}} Debuts"
+        },
+        "sort": {
+          "itemsDesc": "Debuts count"
+        },
+        "noData": "No debuts found"
       },
       "loading": "Loading statistics...",
       "noData": "No data available",

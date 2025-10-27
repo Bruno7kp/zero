@@ -172,26 +172,26 @@ export async function getBestDebuts(filters: StatsFilters): Promise<ChartData[]>
     .where('[chartId+chartType]')
     .equals([filters.chartId, filters.chartType]);
   
-  let data = await query.toArray();
+  const allData = await query.toArray();
   
-  // Filter by year if specified
-  if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year!));
-  }
-  
-  // Group by entity to find first appearance
+  // Group by entity to find first appearance overall
   const firstAppearances = new Map<string, ChartData>();
   
   // Sort by week to process chronologically
-  data.sort((a, b) => a.week.localeCompare(b.week));
+  allData.sort((a, b) => a.week.localeCompare(b.week));
   
-  data.forEach(item => {
+  allData.forEach(item => {
     if (!firstAppearances.has(item.entityId)) {
       firstAppearances.set(item.entityId, item);
     }
   });
   
   let debuts = Array.from(firstAppearances.values());
+  
+  // Filter by year if specified - only keep items that actually debuted in that year
+  if (filters.year && filters.year !== 'all') {
+    debuts = debuts.filter(item => item.week.startsWith(filters.year!));
+  }
   
   // Filter by position if specified
   if (filters.position && filters.positionOperator === 'eq') {
@@ -393,7 +393,8 @@ export async function getArtistsWithMostAtRank(filters: {
 }
 
 /**
- * Calculate sales using formula: (plays * weightPlays) + (points * weightPoints)
+ * Calculate sales using formula: (plays * weightPlays) + (stabilityPoints * weightPoints)
+ * stabilityPoints = 101 - rank (matches calculateWeekFormulaValue from certification.ts)
  */
 export function calculateSales(
   plays: number,
@@ -401,6 +402,68 @@ export function calculateSales(
   weightPlays: number,
   weightPoints: number
 ): number {
-  const points = Math.max(1, 101 - rank);
-  return (plays * weightPlays) + (points * weightPoints);
+  const stabilityPoints = Math.max(0, 101 - rank);
+  return (plays * weightPlays) + (stabilityPoints * weightPoints);
+}
+
+/**
+ * Get artists with most debuts at top N positions
+ */
+export async function getArtistsWithMostDebutsAtOne(filters: {
+  chartId: string;
+  chartType: 'album' | 'track';
+  rank: number;
+  year?: string;
+}): Promise<Array<{
+  artistName: string;
+  itemsCount: number;
+}>> {
+  // Get all items at or above the specified rank (rank <= filters.rank)
+  const query = db.charts_data
+    .where('[chartId+chartType]')
+    .equals([filters.chartId, filters.chartType]);
+  
+  const allItems = await query.toArray();
+  
+  // Filter by rank (<=) and year
+  const itemsInTopN = allItems.filter(item => {
+    if (item.rank > filters.rank) return false;
+    if (filters.year && !item.week.startsWith(filters.year)) return false;
+    return true;
+  });
+  
+  // Get all items to identify debuts (first appearance)
+  const allItemsByEntity = new Map<string, string[]>();
+  allItems.forEach(item => {
+    if (!allItemsByEntity.has(item.entityId)) {
+      allItemsByEntity.set(item.entityId, []);
+    }
+    allItemsByEntity.get(item.entityId)!.push(item.week);
+  });
+  
+  // Sort weeks to find first appearance
+  allItemsByEntity.forEach((weeks) => {
+    weeks.sort();
+  });
+  
+  // Filter items in top N that are debuts
+  const debutsInTopN = itemsInTopN.filter(item => {
+    const weeks = allItemsByEntity.get(item.entityId);
+    if (!weeks || weeks.length === 0) return false;
+    // First week is the debut
+    return weeks[0] === item.week;
+  });
+  
+  // Group by artist
+  const byArtist = new Map<string, number>();
+  
+  debutsInTopN.forEach(item => {
+    const artist = item.artistName;
+    byArtist.set(artist, (byArtist.get(artist) || 0) + 1);
+  });
+  
+  return Array.from(byArtist.entries()).map(([artistName, itemsCount]) => ({
+    artistName,
+    itemsCount
+  })).sort((a, b) => b.itemsCount - a.itemsCount);
 }

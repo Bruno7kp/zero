@@ -109,14 +109,31 @@ function ChartCarousel({ chart, week, type, clientId, clientSecret }: ChartCarou
                     .toArray();
                 if (cancelled) return;
                 const artistName = top1.artistName;
-                const seen = new Set<string>();
+                const currentEntityId = top1.entityId;
+                
+                // Find the first week this specific entity reached #1
+                let firstWeekAtNumber1: string | null = null;
                 for (const r of all) {
-                    // Only count #1s up to and including the current week
-                    if (r.week <= (week || '') && r.rank === 1 && r.artistName === artistName) {
-                        seen.add(r.entityId);
+                    if (r.entityId === currentEntityId && r.rank === 1) {
+                        if (!firstWeekAtNumber1 || r.week < firstWeekAtNumber1) {
+                            firstWeekAtNumber1 = r.week;
+                        }
                     }
                 }
-                setArtistTop1Count(seen.size || 0);
+                
+                // Now count how many distinct entities by this artist reached #1 BEFORE that first week
+                const seen = new Set<string>();
+                if (firstWeekAtNumber1) {
+                    for (const r of all) {
+                        // Only count #1s that occurred BEFORE the first week of the current entity
+                        if (r.week < firstWeekAtNumber1 && r.rank === 1 && r.artistName === artistName) {
+                            seen.add(r.entityId);
+                        }
+                    }
+                }
+                
+                // The count is the number of previous #1s + 1 (this one)
+                setArtistTop1Count(seen.size + 1);
             } catch {
                 if (!cancelled) setArtistTop1Count(null);
             }

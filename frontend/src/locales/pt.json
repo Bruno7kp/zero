@@ -552,7 +552,9 @@
       },
       "sidebar": {
         "title": "Estatísticas",
-        "overview": "Visão Geral"
+        "overview": "Visão Geral",
+        "collapse": "Recolher menu",
+        "expand": "Expandir menu"
       },
       "filters": {
         "year": "Ano",
@@ -563,11 +565,20 @@
         "all": "Todas as posições",
         "cutoff": "Limite ({{n}})",
         "toggleSales": "Mostrar colunas de vendas",
+        "peakOnly": "Apenas picos",
+        "showImages": "Mostrar imagens",
+        "showArtistColumn": "Coluna de artista separada",
+        "tableSize": "Tamanho da tabela",
+        "small": "Pequeno",
+        "medium": "Médio",
+        "large": "Grande",
         "sortBy": "Ordenar por",
         "settings": "Configurações",
         "displayOptions": "Opções de Exibição",
         "albums": "Álbuns",
-        "tracks": "Músicas"
+        "tracks": "Músicas",
+        "searchPlaceholder": "Buscar por nome ou artista...",
+        "perPage": "por página"
       },
       "rank": {
         "title": "Todos os #{{n}}s",
@@ -577,12 +588,26 @@
         "description": "Itens que alcançaram a posição #{{n}}",
         "columns": {
           "week": "Semana",
-          "times": "Vezes em #{{n}}",
+          "times": "Semanas em #{{n}}",
           "image": "Imagem",
           "title": "Título",
           "plays": "Reproduções",
           "sales": "Vendas",
           "viewChart": "Ver chart"
+        },
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "playsAsc": "Reproduções (menor para maior)",
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)"
         }
       },
       "pak": {
@@ -590,39 +615,71 @@
         "description": "Artistas que alcançaram simultaneamente #1 nas três categorias",
         "columns": {
           "week": "Semana",
-          "times": "Vezes com PAK",
+          "times": "Total",
           "image": "Imagem",
           "artist": "Artista",
           "album": "Álbum",
           "track": "Música",
           "viewChart": "Ver chart"
         },
-        "noData": "Nenhum registro de Perfect All Kill encontrado"
+        "noData": "Nenhum registro de Perfect All Kill encontrado",
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "albumAsc": "Álbum (A-Z)",
+          "albumDesc": "Álbum (Z-A)",
+          "trackAsc": "Música (A-Z)",
+          "trackDesc": "Música (Z-A)",
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)"
+        }
       },
       "timesAtRank": {
-        "title": "Mais Vezes em #{{n}}",
-        "titleArtist": "Mais Vezes em #{{n}} - Artistas",
-        "titleAlbum": "Mais Vezes em #{{n}} - Álbuns",
-        "titleTrack": "Mais Vezes em #{{n}} - Músicas",
+        "title": "Mais Semanas em #{{n}}",
+        "titleArtist": "Mais Semanas em #{{n}} - Artistas",
+        "titleAlbum": "Mais Semanas em #{{n}} - Álbuns",
+        "titleTrack": "Mais Semanas em #{{n}} - Músicas",
         "description": "Itens com mais semanas na posição #{{n}}",
         "columns": {
           "rank": "#",
-          "times": "Vezes em #{{n}}",
+          "times": "Semanas em #{{n}}",
           "image": "Imagem",
           "title": "Título"
+        },
+        "sort": {
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)",
+          "positionDesc": "Posição (melhor para pior)",
+          "positionAsc": "Posição (pior para melhor)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
         }
       },
       "timesAtTop": {
-        "title": "Mais Vezes no Top {{n}}",
-        "titleArtist": "Mais Vezes no Top {{n}} - Artistas",
-        "titleAlbum": "Mais Vezes no Top {{n}} - Álbuns",
-        "titleTrack": "Mais Vezes no Top {{n}} - Músicas",
+        "title": "Mais Semanas Acumuladas",
+        "titleArtist": "Mais Semanas no Top {{n}} - Artistas",
+        "titleAlbum": "Mais Semanas no Top {{n}} - Álbuns",
+        "titleTrack": "Mais Semanas no Top {{n}} - Músicas",
         "description": "Itens com mais semanas no top {{n}}",
         "columns": {
           "rank": "#",
-          "times": "Vezes no Top {{n}}",
+          "times": "Semanas no Top {{n}}",
           "image": "Imagem",
           "title": "Título"
+        },
+        "sort": {
+          "timesDesc": "Semanas (maior para menor)",
+          "timesAsc": "Semanas (menor para maior)",
+          "positionDesc": "Posição (melhor para pior)",
+          "positionAsc": "Posição (pior para melhor)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
         }
       },
       "plays": {
@@ -640,6 +697,20 @@
           "plays": "Reproduções",
           "sales": "Vendas",
           "viewChart": "Ver chart"
+        },
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "playsAsc": "Reproduções (menor para maior)",
+          "rankDesc": "Posição (melhor para pior)",
+          "rankAsc": "Posição (pior para melhor)",
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)"
         }
       },
       "debuts": {
@@ -657,6 +728,20 @@
           "plays": "Reproduções",
           "sales": "Vendas",
           "viewChart": "Ver chart"
+        },
+        "sort": {
+          "weekDesc": "Semana (mais recente)",
+          "weekAsc": "Semana (mais antiga)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "playsAsc": "Reproduções (menor para maior)",
+          "rankDesc": "Posição (melhor para pior)",
+          "rankAsc": "Posição (pior para melhor)",
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)"
         }
       },
       "points": {
@@ -671,6 +756,16 @@
           "title": "Título",
           "weeksOnChart": "Semanas no chart",
           "totalPoints": "Total de pontos"
+        },
+        "sort": {
+          "pointsDesc": "Pontos (maior para menor)",
+          "pointsAsc": "Pontos (menor para maior)",
+          "weeksDesc": "Semanas (maior para menor)",
+          "weeksAsc": "Semanas (menor para maior)",
+          "positionDesc": "Posição (melhor para pior)",
+          "positionAsc": "Posição (pior para melhor)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)"
         }
       },
       "timesAtTopByArtist": {
@@ -688,7 +783,27 @@
           "totalWeeksShort": "Total de Semanas"
         },
         "sortByItems": "Quantidade de itens",
-        "sortByWeeks": "Total de semanas"
+        "sortByWeeks": "Total de semanas",
+        "sort": {
+          "itemsDesc": "Quantidade de itens",
+          "weeksDesc": "Total de semanas"
+        }
+      },
+      "debutsAtOneByArtist": {
+        "title": "Artistas com Mais Estreias em #1",
+        "titleAlbum": "Artistas com Mais Estreias de Álbuns no Top {{n}}",
+        "titleTrack": "Artistas com Mais Estreias de Músicas no Top {{n}}",
+        "description": "Artistas com mais primeiras aparições nas melhores posições",
+        "columns": {
+          "rank": "#",
+          "image": "Imagem",
+          "artist": "Artista",
+          "debuts": "Estreias de {{type}}"
+        },
+        "sort": {
+          "itemsDesc": "Quantidade de estreias"
+        },
+        "noData": "Nenhuma estreia encontrada"
       },
       "loading": "Carregando estatísticas...",
       "noData": "Nenhum dado disponível",
