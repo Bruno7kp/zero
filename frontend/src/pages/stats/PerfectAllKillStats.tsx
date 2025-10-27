@@ -23,6 +23,7 @@ import dayjs from 'dayjs';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getPerfectAllKills, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { db } from '../../db/indexedDb';
 import type { ChartData } from '../../db/indexedDb';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
@@ -66,6 +67,7 @@ const PerfectAllKillStats: React.FC = () => {
     trackEntityId: string;
   }>>([]);
   const [year, setYear] = useState('all');
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
 
@@ -156,6 +158,10 @@ const PerfectAllKillStats: React.FC = () => {
       <StatsFilters
         year={year}
         onYearChange={setYear}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showTypeFilter={false}
         showSalesToggle={false}
@@ -173,17 +179,17 @@ const PerfectAllKillStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                  <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
-                  <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
-                  <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.pak.columns.times')}</Table.Th>
-                  <Table.Th style={{ width: 1 }}></Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
+                    <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
+                    <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
+                    <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.pak.columns.times')}</Table.Th>
+                    <Table.Th style={{ width: 1 }}></Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
                 {paginatedData.map((record: any) => {
                   const startDate = dayjs(record.week);
                   const endDate = startDate.add(6, 'day');
@@ -193,25 +199,25 @@ const PerfectAllKillStats: React.FC = () => {
                     <Table.Tr key={`${record.week}-${record.artistEntityId}`}>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <Tooltip label={dateRange} withArrow>
-                          <Text size="sm">{record.weekNumber}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
                         </Tooltip>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
                         <Flex gap="sm" wrap="nowrap" align="center">
-                          <ImageCell entityId={record.artistEntityId} name={record.artistName} />
+                          {preferences.showImages && <ImageCell entityId={record.artistEntityId} name={record.artistName} />}
                           <Box style={{ flex: 1, minWidth: 0 }}>
-                            <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.artistName}</Text>
+                            <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Box>
                         </Flex>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text size="sm" lineClamp={1}>{record.albumName}</Text>
+                        <Text lineClamp={1} size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.albumName}</Text>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text size="sm" lineClamp={1}>{record.trackName}</Text>
+                        <Text lineClamp={1} size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.trackName}</Text>
                       </Table.Td>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        <Text size="sm">{record.occurrence}</Text>
+                        <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
                       </Table.Td>
                       <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                         <Button

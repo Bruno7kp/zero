@@ -1,6 +1,6 @@
 // Shared filters component for stats pages
 import React from 'react';
-import { Group, Select, SegmentedControl, NumberInput, Center, ActionIcon, Menu, Checkbox, Flex } from '@mantine/core';
+import { Group, Select, SegmentedControl, Center, ActionIcon, Menu, Checkbox, Flex, Divider } from '@mantine/core';
 import { IconMicrophone, IconDisc, IconMusic, IconSettings, IconCalendar, IconHash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,10 +13,22 @@ export interface StatsFiltersProps {
   onPositionChange?: (value: number) => void;
   showSales?: boolean;
   onToggleSales?: (value: boolean) => void;
+  peakOnly?: boolean;
+  onTogglePeakOnly?: (value: boolean) => void;
+  showImages?: boolean;
+  onToggleImages?: (value: boolean) => void;
+  showArtistColumn?: boolean;
+  onToggleArtistColumn?: (value: boolean) => void;
+  tableSize?: 'xs' | 'sm' | 'md';
+  onTableSizeChange?: (value: 'xs' | 'sm' | 'md') => void;
   yearRange?: { minYear: number; maxYear: number };
   showTypeFilter?: boolean;
   showPositionFilter?: boolean;
   showSalesToggle?: boolean;
+  showPeakOnlyToggle?: boolean;
+  showImageToggle?: boolean;
+  showArtistColumnToggle?: boolean;
+  showTableSizeToggle?: boolean;
   cutoff?: number;
   customFilters?: React.ReactNode;
   allowAllPosition?: boolean;
@@ -32,10 +44,22 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onPositionChange,
   showSales,
   onToggleSales,
+  peakOnly,
+  onTogglePeakOnly,
+  showImages,
+  onToggleImages,
+  showArtistColumn,
+  onToggleArtistColumn,
+  tableSize,
+  onTableSizeChange,
   yearRange,
   showTypeFilter = true,
   showPositionFilter = false,
   showSalesToggle = true,
+  showPeakOnlyToggle = false,
+  showImageToggle = true,
+  showArtistColumnToggle = true,
+  showTableSizeToggle = true,
   cutoff = 100,
   customFilters,
   allowAllPosition = false,
@@ -87,49 +111,42 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
         />
 
         {showPositionFilter && position !== undefined && onPositionChange && (
-          allowAllPosition && position === 'all' ? (
-            <Select
-              leftSection={<IconHash size={16} />}
-              value={String(position)}
-              onChange={(value) => {
-                if (value === 'all') {
-                  // Keep as string 'all'
-                } else if (value) {
-                  onPositionChange(Number(value));
-                }
-              }}
-              data={[
-                { value: 'all', label: t('stats.filters.all') },
-                ...Array.from({ length: cutoff }, (_, i) => ({
-                  value: String(i + 1),
-                  label: `#${i + 1}`
-                }))
-              ]}
-              style={{ minWidth: 150 }}
-              searchable
-            />
-          ) : (
-            <NumberInput
-              leftSection={<IconHash size={16} />}
-              value={typeof position === 'number' ? position : 1}
-              onChange={(value) => {
-                if (typeof value === 'number') {
-                  onPositionChange(Math.max(1, Math.min(cutoff, value)));
-                }
-              }}
-              min={1}
-              max={cutoff}
-              style={{ minWidth: 150 }}
-            />
-          )
+          <Select
+            leftSection={<IconHash size={16} />}
+            value={String(position)}
+            onChange={(value) => {
+              if (value === 'all' && allowAllPosition) {
+                // Keep as string 'all' - handled by parent
+              } else if (value) {
+                onPositionChange(Number(value));
+              }
+            }}
+            data={
+              allowAllPosition
+                ? [
+                    { value: 'all', label: t('stats.filters.all') },
+                    ...Array.from({ length: cutoff }, (_, i) => ({
+                      value: String(i + 1),
+                      label: `#${i + 1}`
+                    }))
+                  ]
+                : Array.from({ length: cutoff }, (_, i) => ({
+                    value: String(i + 1),
+                    label: `${i + 1}`
+                  }))
+            }
+            style={{ minWidth: 150 }}
+            searchable
+          />
         )}
 
         {customFilters}
       </Group>
 
       {/* Right side - Settings menu */}
-      {showSalesToggle && onToggleSales && (
-        <Menu shadow="md" width={200} closeOnItemClick={false}>
+      {(showSalesToggle || showPeakOnlyToggle || showImageToggle || showArtistColumnToggle || showTableSizeToggle) && 
+       (onToggleSales || onTogglePeakOnly || onToggleImages || onToggleArtistColumn || onTableSizeChange) && (
+        <Menu shadow="md" width={220} closeOnItemClick={false}>
           <Menu.Target>
             <ActionIcon variant="subtle" size="lg" aria-label={t('stats.filters.settings')}>
               <IconSettings size={18} />
@@ -137,13 +154,69 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Label>{t('stats.filters.displayOptions')}</Menu.Label>
-            <Menu.Item>
-              <Checkbox
-                label={t('stats.filters.toggleSales')}
-                checked={showSales || false}
-                onChange={(event) => onToggleSales(event.currentTarget.checked)}
-              />
-            </Menu.Item>
+            
+            {showSalesToggle && onToggleSales && (
+              <Menu.Item>
+                <Checkbox
+                  label={t('stats.filters.toggleSales')}
+                  checked={showSales || false}
+                  onChange={(event) => onToggleSales(event.currentTarget.checked)}
+                />
+              </Menu.Item>
+            )}
+            
+            {showPeakOnlyToggle && onTogglePeakOnly && (
+              <Menu.Item>
+                <Checkbox
+                  label={t('stats.filters.peakOnly')}
+                  checked={peakOnly || false}
+                  onChange={(event) => onTogglePeakOnly(event.currentTarget.checked)}
+                />
+              </Menu.Item>
+            )}
+            
+            {(showSalesToggle || showPeakOnlyToggle) && (showImageToggle || showArtistColumnToggle || showTableSizeToggle) && (
+              <Divider my="xs" />
+            )}
+            
+            {showImageToggle && onToggleImages && (
+              <Menu.Item>
+                <Checkbox
+                  label={t('stats.filters.showImages')}
+                  checked={showImages !== false}
+                  onChange={(event) => onToggleImages(event.currentTarget.checked)}
+                />
+              </Menu.Item>
+            )}
+            
+            {showArtistColumnToggle && onToggleArtistColumn && (
+              <Menu.Item>
+                <Checkbox
+                  label={t('stats.filters.showArtistColumn')}
+                  checked={showArtistColumn || false}
+                  onChange={(event) => onToggleArtistColumn(event.currentTarget.checked)}
+                />
+              </Menu.Item>
+            )}
+            
+            {showTableSizeToggle && onTableSizeChange && (
+              <>
+                <Divider my="xs" />
+                <Menu.Label>{t('stats.filters.tableSize')}</Menu.Label>
+                <Menu.Item>
+                  <SegmentedControl
+                    value={tableSize || 'sm'}
+                    onChange={(value) => onTableSizeChange(value as 'xs' | 'sm' | 'md')}
+                    data={[
+                      { label: 'A-', value: 'xs' },
+                      { label: 'A', value: 'sm' },
+                      { label: 'A+', value: 'md' }
+                    ]}
+                    fullWidth
+                  />
+                </Menu.Item>
+              </>
+            )}
           </Menu.Dropdown>
         </Menu>
       )}

@@ -7,7 +7,6 @@ import {
   Loader, 
   Center,
   Select,
-  NumberInput,
   Card,
   Avatar,
   Table,
@@ -18,10 +17,11 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { IconHash, IconArrowsSort } from '@tabler/icons-react';
+import { IconArrowsSort, IconArrowBarUp } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getArtistsWithMostAtRank, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -64,6 +64,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
   const [type, setType] = useState<'album' | 'track'>((typeParam as 'album' | 'track') || 'track');
   const [rank, setRank] = useState(Number(rankParam) || 1);
   const [sortBy, setSortBy] = useState<'items' | 'weeks'>('items');
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
 
@@ -162,22 +163,29 @@ const TimesAtTopByArtistStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         hideArtistType={true}
         customFilters={
           <>
-            <NumberInput
-              value={rank}
+            <Select
+              value={String(rank)}
               onChange={(value) => {
-                if (typeof value === 'number') {
-                  handleRankChange(Math.max(1, Math.min(cutoff, value)));
+                if (value) {
+                  handleRankChange(Number(value));
                 }
               }}
-              min={1}
-              max={cutoff}
+              data={Array.from({ length: cutoff }, (_, i) => ({
+                value: String(i + 1),
+                label: `Top ${i + 1}`
+              }))}
               style={{ minWidth: 120 }}
-              leftSection={<IconHash size={16} />}
+              leftSection={<IconArrowBarUp size={16} />}
+              searchable
             />
             <Select
               value={sortBy}
@@ -201,22 +209,22 @@ const TimesAtTopByArtistStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                  <Table.Th>{t('stats.timesAtTopByArtist.columns.artist')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {typeLabel} {t('stats.timesAtTopByArtist.inTopN', { n: rank })}
-                  </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.timesAtTopByArtist.columns.totalWeeksShort')}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedData.length === 0 ? (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
+                    <Table.Th>{t('stats.timesAtTopByArtist.columns.artist')}</Table.Th>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {typeLabel} {t('stats.timesAtTopByArtist.inTopN', { n: rank })}
+                    </Table.Th>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t('stats.timesAtTopByArtist.columns.totalWeeksShort')}
+                    </Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedData.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={4}>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -227,23 +235,23 @@ const TimesAtTopByArtistStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.artistName}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{displayRank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell 
+                            {preferences.showImages && <ImageCell 
                               artistName={record.artistName}
-                            />
+                            />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                             </Box>
                           </Flex>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.itemsCount}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.itemsCount}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.totalWeeks}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.totalWeeks}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );

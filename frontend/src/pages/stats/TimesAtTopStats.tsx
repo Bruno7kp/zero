@@ -8,7 +8,7 @@ import {
   Card,
   Avatar,
   Text,
-  NumberInput,
+  Select,
   Table,
   ScrollArea,
   Pagination,
@@ -17,10 +17,11 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { IconHash } from '@tabler/icons-react';
+import { IconArrowBarUp } from '@tabler/icons-react';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getTimesInTopN, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -62,6 +63,7 @@ const TimesAtTopStats: React.FC = () => {
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [topN, setTopN] = useState(Number(topNParam) || 10);
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
 
@@ -148,20 +150,29 @@ const TimesAtTopStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        showArtistColumn={preferences.showArtistColumn}
+        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         customFilters={
-          <NumberInput
-            value={topN}
+          <Select
+            value={String(topN)}
             onChange={(value) => {
-              if (typeof value === 'number') {
-                handleTopNChange(Math.max(1, Math.min(cutoff, value)));
+              if (value) {
+                handleTopNChange(Number(value));
               }
             }}
-            min={1}
-            max={cutoff}
+            data={Array.from({ length: cutoff }, (_, i) => ({
+              value: String(i + 1),
+              label: `Top ${i + 1}`
+            }))}
             style={{ minWidth: 120 }}
-            leftSection={<IconHash size={16} />}
+            leftSection={<IconArrowBarUp size={16} />}
+            searchable
           />
         }
       />
@@ -174,17 +185,23 @@ const TimesAtTopStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                  <Table.Th>{t('stats.timesAtTop.columns.title')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtTop.columns.times', { n: topN })}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedData.length === 0 ? (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={3}>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
+                    <Table.Th>{t('stats.timesAtTop.columns.title')}</Table.Th>
+                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtTop.columns.times', { n: topN })}</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedData.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={
+                        1 + // rank
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 // times
+                      }>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -195,21 +212,26 @@ const TimesAtTopStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{displayRank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell record={record} type={type} />
+                            {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
-                              {type !== 'artist' && record.artistName && (
-                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
+                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                          </Table.Td>
+                        )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.count}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.count}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );

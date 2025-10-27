@@ -172,26 +172,26 @@ export async function getBestDebuts(filters: StatsFilters): Promise<ChartData[]>
     .where('[chartId+chartType]')
     .equals([filters.chartId, filters.chartType]);
   
-  let data = await query.toArray();
+  const allData = await query.toArray();
   
-  // Filter by year if specified
-  if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year!));
-  }
-  
-  // Group by entity to find first appearance
+  // Group by entity to find first appearance overall
   const firstAppearances = new Map<string, ChartData>();
   
   // Sort by week to process chronologically
-  data.sort((a, b) => a.week.localeCompare(b.week));
+  allData.sort((a, b) => a.week.localeCompare(b.week));
   
-  data.forEach(item => {
+  allData.forEach(item => {
     if (!firstAppearances.has(item.entityId)) {
       firstAppearances.set(item.entityId, item);
     }
   });
   
   let debuts = Array.from(firstAppearances.values());
+  
+  // Filter by year if specified - only keep items that actually debuted in that year
+  if (filters.year && filters.year !== 'all') {
+    debuts = debuts.filter(item => item.week.startsWith(filters.year!));
+  }
   
   // Filter by position if specified
   if (filters.position && filters.positionOperator === 'eq') {

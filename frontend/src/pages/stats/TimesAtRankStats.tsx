@@ -19,9 +19,11 @@ import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getTimesAtRank, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
+import { db } from '../../db/indexedDb';
 
 const PAGE_SIZE = 25;
 
@@ -60,6 +62,7 @@ const TimesAtRankStats: React.FC = () => {
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [rank, setRank] = useState(Number(rankParam) || 1);
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
 
@@ -103,7 +106,30 @@ const TimesAtRankStats: React.FC = () => {
           rank,
           year: year === 'all' ? undefined : year
         });
-        setData(results);
+        
+        // If peakOnly is enabled, filter items that had peak at this rank
+        let filteredResults = results;
+        if (preferences.peakOnly) {
+          // Get all data for each entity to check their peak
+          const allData = await db.charts_data
+            .where('[chartId+chartType]')
+            .equals([String(chart.id), type])
+            .toArray();
+          
+          // Calculate peak for each entity
+          const peakByEntity = new Map<string, number>();
+          allData.forEach(item => {
+            const currentPeak = peakByEntity.get(item.entityId);
+            if (!currentPeak || item.rank < currentPeak) {
+              peakByEntity.set(item.entityId, item.rank);
+            }
+          });
+          
+          // Filter only items where peak equals the selected rank
+          filteredResults = results.filter(item => peakByEntity.get(item.entityId) === rank);
+        }
+        
+        setData(filteredResults);
       } catch (error) {
         console.error('Error loading times at rank stats:', error);
       } finally {
@@ -112,7 +138,7 @@ const TimesAtRankStats: React.FC = () => {
     };
 
     loadData();
-  }, [chart, type, rank, year]);
+  }, [chart, type, rank, year, preferences.peakOnly]);
 
   const handleTypeChange = (newType: string) => {
     setType(newType);
@@ -148,8 +174,17 @@ const TimesAtRankStats: React.FC = () => {
         onTypeChange={handleTypeChange}
         position={rank}
         onPositionChange={handlePositionChange}
+        peakOnly={preferences.peakOnly}
+        onTogglePeakOnly={(value) => updatePreference('peakOnly', value)}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        showArtistColumn={preferences.showArtistColumn}
+        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
+        showPeakOnlyToggle={true}
         showPositionFilter={true}
         cutoff={cutoff}
       />
@@ -162,17 +197,23 @@ const TimesAtRankStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                  <Table.Th>{t('stats.timesAtRank.columns.title')}</Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtRank.columns.times', { n: rank })}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedData.length === 0 ? (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={3}>
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
+                    <Table.Th>{t('stats.timesAtRank.columns.title')}</Table.Th>
+                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtRank.columns.times', { n: rank })}</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedData.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={
+                        1 + // rank
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 // times
+                      }>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -183,21 +224,26 @@ const TimesAtRankStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{displayRank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell record={record} type={type} />
+                            {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
-                              {type !== 'artist' && record.artistName && (
-                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
+                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                          </Table.Td>
+                        )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.count}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.count}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );

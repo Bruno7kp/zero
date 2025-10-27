@@ -8,7 +8,7 @@ import {
   Card,
   Avatar,
   Text,
-  NumberInput,
+  Select,
   Table,
   ScrollArea,
   Pagination,
@@ -26,6 +26,7 @@ import { getBestDebuts, getYearRange, calculateSales } from '../../utils/statsQu
 import type { ChartData } from '../../db/indexedDb';
 import { db } from '../../db/indexedDb';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -62,7 +63,7 @@ const DebutsStats: React.FC = () => {
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [position, setPosition] = useState<number | 'all'>(positionParam === 'all' ? 'all' : Number(positionParam) || 1);
-  const [showSales, setShowSales] = useState(false);
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
 
@@ -187,21 +188,36 @@ const DebutsStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
-        showSales={showSales}
-        onToggleSales={setShowSales}
+        showSales={preferences.showSales}
+        onToggleSales={(value) => updatePreference('showSales', value)}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        showArtistColumn={preferences.showArtistColumn}
+        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         customFilters={
-          <NumberInput
-            value={position === 'all' ? 1 : position}
+          <Select
+            value={position === 'all' ? 'all' : String(position)}
             onChange={(value) => {
-              if (typeof value === 'number') {
-                handlePositionChange(Math.max(1, Math.min(cutoff, value)));
+              if (value === 'all') {
+                setPosition('all');
+                navigate(`/stats/debuts/all/${type}`);
+              } else if (value) {
+                handlePositionChange(Number(value));
               }
             }}
-            min={1}
-            max={cutoff}
+            data={[
+              { value: 'all', label: t('stats.filters.all') },
+              ...Array.from({ length: cutoff }, (_, i) => ({
+                value: String(i + 1),
+                label: String(i + 1)
+              }))
+            ]}
             style={{ minWidth: 120 }}
             leftSection={<IconHash size={16} />}
+            searchable
           />
         }
       />
@@ -218,9 +234,10 @@ const DebutsStats: React.FC = () => {
                 <Table.Tr>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
                   <Table.Th>{t('stats.debuts.columns.title')}</Table.Th>
+                  {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.plays')}</Table.Th>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.position')}</Table.Th>
-                  {showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.sales')}</Table.Th>}
+                  {preferences.showSales && <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debuts.columns.sales')}</Table.Th>}
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
                   <Table.Th style={{ width: 1 }}></Table.Th>
                 </Table.Tr>
@@ -228,7 +245,16 @@ const DebutsStats: React.FC = () => {
               <Table.Tbody>
                 {paginatedData.length === 0 ? (
                   <Table.Tr>
-                    <Table.Td colSpan={showSales ? 7 : 6}>
+                    <Table.Td colSpan={
+                      1 + // rank
+                      1 + // title
+                      (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                      1 + // plays
+                      1 + // position
+                      (preferences.showSales ? 1 : 0) +
+                      1 + // week
+                      1 // button
+                    }>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -239,38 +265,43 @@ const DebutsStats: React.FC = () => {
                     const endDate = startDate.add(6, 'day');
                     const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
                     const weights = getWeights(type);
-                    const sales = showSales ? calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints) : 0;
+                    const sales = preferences.showSales ? calculateSales(record.plays, record.rank, weights.weightPlays, weights.weightPoints) : 0;
 
                     return (
                       <Table.Tr key={`${record.week}-${record.entityId}`}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{displayRank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell record={record} type={type} />
+                            {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
-                              {type !== 'artist' && record.artistName && (
-                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
+                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                          </Table.Td>
+                        )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.plays.toLocaleString()}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.plays.toLocaleString()}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size="sm">{record.rank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.rank}</Text>
                         </Table.Td>
-                        {showSales && (
+                        {preferences.showSales && (
                           <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            <Text size="sm">{Math.round(sales).toLocaleString()}</Text>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{Math.round(sales).toLocaleString()}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Tooltip label={dateRange} withArrow>
-                            <Text size="sm">{record.weekNumber}</Text>
+                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
                           </Tooltip>
                         </Table.Td>
                         <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>

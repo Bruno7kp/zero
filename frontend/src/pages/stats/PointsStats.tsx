@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getPointsAccumulators, getYearRange } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -60,6 +61,7 @@ const PointsStats: React.FC = () => {
   }>>([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
+  const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
 
@@ -128,6 +130,12 @@ const PointsStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
+        showImages={preferences.showImages}
+        onToggleImages={(value) => updatePreference('showImages', value)}
+        showArtistColumn={preferences.showArtistColumn}
+        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+        tableSize={preferences.tableSize}
+        onTableSizeChange={(value) => updatePreference('tableSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
       />
@@ -140,18 +148,25 @@ const PointsStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
-                  <Table.Th style={{ width: 'auto' }}>{t('stats.points.columns.title')}</Table.Th>
-                  <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.weeksOnChart')}</Table.Th>
-                  <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.totalPoints')}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {paginatedData.length === 0 ? (
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
+                    <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
+                    <Table.Th style={{ width: 'auto' }}>{t('stats.points.columns.title')}</Table.Th>
+                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
+                    <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.weeksOnChart')}</Table.Th>
+                    <Table.Th style={{ width: 150, textAlign: 'center' }}>{t('stats.points.columns.totalPoints')}</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {paginatedData.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={
+                        1 + // rank
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 + // weeks
+                        1 // points
+                      }>
                       <Text ta="center" py="xl">{t('stats.noData')}</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -162,29 +177,34 @@ const PointsStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size="sm">{displayRank}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            <ImageCell 
+                            {preferences.showImages && <ImageCell 
                               entityId={record.entityId}
                               name={record.name}
                               artistName={record.artistName}
                               type={type}
-                            />
+                            />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} size="sm" lineClamp={1} className="entity-name">{record.name}</Text>
-                              {type !== 'artist' && record.artistName && (
-                                <Text c="dimmed" size="xs" lineClamp={1}>{record.artistName}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
+                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                          </Table.Td>
+                        )}
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size="sm">{record.weeksOnChart}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weeksOnChart}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size="sm">{record.totalPoints.toLocaleString()}</Text>
+                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.totalPoints.toLocaleString()}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );

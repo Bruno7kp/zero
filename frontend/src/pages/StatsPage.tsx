@@ -14,7 +14,8 @@ import {
   Flex,
   ActionIcon,
   useMantineTheme,
-  Grid
+  Grid,
+  Divider
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -58,14 +59,25 @@ const StatsPage: React.FC = () => {
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);
 
+  // Get chart cutoff for track type
+  const trackCutoff = chart?.music_cutoff || 100;
+
   // Navigation items
-  const navItems = [
+  const navItems: Array<{ 
+    icon?: any; 
+    label?: string; 
+    path?: string;
+    exact?: boolean;
+    group?: string;
+    divider?: boolean;
+  }> = [
     { 
       icon: IconChartBar, 
       label: t('stats.sidebar.overview'), 
       path: '/stats',
       exact: true
     },
+    { divider: true },
     { 
       icon: IconCrown, 
       label: t('stats.timesAtTopByArtist.title', { n: 1 }), 
@@ -86,10 +98,11 @@ const StatsPage: React.FC = () => {
     },
     { 
       icon: IconCalendarUp, 
-      label: t('stats.timesAtTop.title', { n: 10 }), 
-      path: '/stats/times_at_top/10/track',
+      label: t('stats.timesAtTop.title', { n: trackCutoff }), 
+      path: `/stats/times_at_top/${trackCutoff}/track`,
       group: 'times_at_top'
     },
+    { divider: true },
     { 
       icon: IconRocket, 
       label: t('stats.debuts.title'), 
@@ -102,6 +115,7 @@ const StatsPage: React.FC = () => {
       path: '/stats/plays/all/track',
       group: 'plays'
     },
+    { divider: true },
     { 
       icon: IconFlame, 
       label: t('stats.pak.title'), 
@@ -158,19 +172,25 @@ const StatsPage: React.FC = () => {
             </Flex>
             
             <ScrollArea.Autosize mah={600} type="auto">
-              <Stack gap="xs" display={{ base: opened ? 'flex' : 'none', md: 'flex' }}>
-                {navItems.map((item, index) => (
-                  <NavLink
-                    key={index}
-                    active={isActive(item)}
-                    label={item.label}
-                    leftSection={<item.icon size={18} />}
-                    onClick={() => {
-                      navigate(item.path);
-                      toggle();
-                    }}
-                  />
-                ))}
+              <Stack gap={0} display={{ base: opened ? 'flex' : 'none', md: 'flex' }}>
+                {navItems.map((item, index) => 
+                  item.divider ? (
+                    <Divider key={index} my="xs" />
+                  ) : (
+                    <NavLink
+                      key={index}
+                      active={isActive(item)}
+                      label={item.label!}
+                      leftSection={<item.icon size={18} />}
+                      onClick={() => {
+                        if (item.path) {
+                          navigate(item.path);
+                          toggle();
+                        }
+                      }}
+                    />
+                  )
+                )}
               </Stack>
             </ScrollArea.Autosize>
           </Card>
