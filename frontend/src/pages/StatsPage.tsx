@@ -58,7 +58,7 @@ const StatsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [opened, { toggle }] = useDisclosure(false);
-  const [collapsed, { toggle: toggleCollapsed }] = useDisclosure(false);
+  // collapsed state is persisted via stats preferences
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
   const bgColor = getCardBackgroundByMode(theme, themeMode);
@@ -160,8 +160,11 @@ const StatsPage: React.FC = () => {
     return activeItem?.label || t('stats.title');
   };
 
-  const { preferences } = useStatsPreferences();
+  const { preferences, updatePreference } = useStatsPreferences();
   const isMobile = useIsMobile();
+
+  const collapsed = preferences.collapsed;
+  const toggleCollapsed = () => updatePreference('collapsed', !collapsed);
 
   if (!chart) {
     return (

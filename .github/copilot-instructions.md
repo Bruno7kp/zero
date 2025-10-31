@@ -157,3 +157,37 @@ Esses pontos são críticos — alterar o schema do Dexie sem migração ou esqu
    - Formatação e ferramentas: adicionamos `.editorconfig`, uma configuração do Prettier em `frontend/.prettierrc` e um script `format` no `frontend/package.json` para padronizar o estilo. No backend há um script `composer format` que executa o Pint.
 
    Nota rápida para agents: se você estiver escrevendo código que acessa preferências persistidas, leia/reutilize os slices existentes (ex.: `statsPreferences`, `columns`) e evite adicionar leituras diretas a `localStorage`. Para dados grandes/historicamente persistidos (charts, semanas) continue usando IndexedDB/Dexie e siga o fluxo de migração descrito acima.
+
+   ### Commit messages — Gitflow + Conventional Commits
+
+   Estamos usando o modelo de branches Gitflow na equipe. Para manter histórico consistente e facilitar leitura/automação, peça ao gerador de mensagens de commit (ou escreva manualmente) para seguir um formato baseado em Conventional Commits combinado com o prefixo do branch.
+
+   Regras rápidas:
+   - Cabeçalho: `<type>(<scope>): <short summary>` — mantenha <= 72 caracteres.
+   - `type` sugerido (mapa de branch → type):
+      - `feature/*` → `feat`
+      - `hotfix/*` ou `bugfix/*` → `fix`
+      - `release/*` → `chore` (ou `release` quando aplicável)
+      - `docs/*` → `docs`
+      - `refactor/*` → `refactor`
+      - `test/*` → `test`
+      - `ci/*` → `ci`
+      - `build/*` → `build`
+      - `style/*` → `style`
+
+   Exemplos:
+   - feat(stats): persist sidebar collapsed state  (branch: `feature/stats-persist-collapsed`)
+   - fix(api): return 404 when chart not found           (branch: `hotfix/api-chart-404`)
+   - chore(release): bump backend to 1.2.0               (branch: `release/1.2.0`)
+
+   Corpo (opcional): detalhe o que foi feito e por quê. Use bullets quando útil.
+
+   Footer (opcional): referências a issues/tickets. Ex.: `Refs: #123` ou `Closes: #456`.
+
+   Diretivas para geradores/AI:
+   - Gere a mensagem em português ou inglês conforme o idioma do PR, mas mantenha o cabeçalho curto e em inglês quando possível (padrão do repo é inglês nas chaves).
+   - Inclua o escopo quando claro (`stats`, `charts`, `api`, `frontend`, `backend`).
+   - Use o tipo que corresponde ao branch atual — o gerador deve inspecionar o nome do branch e mapear para o `type` correto.
+   - Garanta o imperativo no resumo (por ex. "persist" em vez de "persisted"/"persisting").
+
+   Se quiser, posso adicionar um gancho de `commit-msg` (husky + commitlint) e um `commitizen` adapter para forçar esse padrão automaticamente — diga se quer que eu coloque isso no repositório.

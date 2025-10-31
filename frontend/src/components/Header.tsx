@@ -24,7 +24,6 @@ import {
   IconPlaylist,
   IconUsers,
   IconFlame,
-  IconMessageCircle,
   IconInfoCircle,
   IconDroplet,
   IconMoon,
@@ -194,13 +193,6 @@ export const Header: React.FC = () => {
             <Menu.Divider />
             <Menu.Item
               component={NavLink}
-              to="/forum"
-              leftSection={<IconMessageCircle style={{ width: rem(14), height: rem(14) }} />}
-            >
-              {t('user.forum')}
-            </Menu.Item>
-            <Menu.Item
-              component={NavLink}
               to="/faq"
               leftSection={<IconInfoCircle style={{ width: rem(14), height: rem(14) }} />}
             >
@@ -237,11 +229,11 @@ export const Header: React.FC = () => {
         <Button component={NavLink} to="/charts" variant="subtle">
           {t('charts.title')}
         </Button>
-        <Button component={NavLink} to="/stats" variant="subtle">
-          {t('stats.title')}
-        </Button>
         <Button component={NavLink} to="/library" variant="subtle">
           {t('library.title')}
+        </Button>
+        <Button component={NavLink} to="/stats" variant="subtle">
+          {t('stats.title')}
         </Button>
         <Button component={NavLink} to="/faq" variant="subtle">
           {t('user.faq')}

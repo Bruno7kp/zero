@@ -287,6 +287,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                       <Menu.Item>
                         <SegmentedControl
                           value={containerSize || 'xl'}
+                          size="xs"
                           onChange={value =>
                             onContainerSizeChange(value as '100%' | 'md' | 'lg' | 'xl')
                           }
@@ -304,11 +305,11 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
 
                   {showFontSizeToggle && onFontSizeChange && (
                     <>
-                      <Divider my="xs" />
                       <Menu.Label>{t('stats.filters.fontSize')}</Menu.Label>
                       <Menu.Item>
                         <SegmentedControl
                           value={fontSize || 'sm'}
+                          size="xs"
                           onChange={value => onFontSizeChange(value as 'xs' | 'sm' | 'md')}
                           data={[
                             { label: 'A-', value: 'xs' },

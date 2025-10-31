@@ -7,6 +7,8 @@ export interface StatsPreferences {
   showArtistColumn: boolean;
   fontSize: 'xs' | 'sm' | 'md';
   containerSize: '100%' | 'md' | 'lg' | 'xl';
+  // whether the stats sidebar is collapsed (desktop)
+  collapsed: boolean;
   showSales: boolean;
   peakOnly: boolean;
   pageSize: number;
@@ -17,6 +19,7 @@ export const DEFAULT_PREFERENCES: StatsPreferences = {
   showArtistColumn: false,
   fontSize: 'sm',
   containerSize: 'xl',
+  collapsed: false,
   showSales: false,
   peakOnly: false,
   pageSize: 25,
