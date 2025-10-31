@@ -40,6 +40,7 @@ import { getThemeAssets } from '../theme/assets';
 import type { ThemeMode } from '../theme/modes';
 import { setLanguage } from '../store/i18nSlice';
 import { useNotifications } from '../hooks/useNotifications';
+import { useDisclosure } from '@mantine/hooks';
 
 export const Header: React.FC = () => {
   const dispatch = useDispatch();
@@ -52,6 +53,10 @@ export const Header: React.FC = () => {
   const { i18n, t } = useTranslation();
   const { unreadCount } = useNotifications();
   const unreadBadgeLabel = unreadCount > 99 ? '99+' : `${unreadCount}`;
+
+  // Control user menu explicitly so it can be closed after navigation on mobile
+  const [userMenuOpened, { open: openUserMenu, close: closeUserMenu, toggle: toggleUserMenu }] =
+    useDisclosure(false);
 
   const handleLogout = () => {
     dispatch(reduxLogout() as any).unwrap();
@@ -119,10 +124,27 @@ export const Header: React.FC = () => {
         </Button>
       ) : (
         // Dropdown de Usuário para usuários autenticados
-        <Menu shadow="md" width={200} trigger="click-hover" openDelay={100} closeDelay={400}>
+        <Menu
+          shadow="md"
+          width={200}
+          trigger="click-hover"
+          openDelay={100}
+          closeDelay={400}
+          opened={userMenuOpened}
+          onOpen={openUserMenu}
+          onClose={closeUserMenu}
+        >
           <Menu.Target>
             <Indicator disabled={unreadCount === 0} color="red" size={10} offset={7}>
-              <ActionIcon variant="subtle" size="lg" aria-label={t('user.title')}>
+              <ActionIcon
+                variant="subtle"
+                size="lg"
+                aria-label={t('user.title')}
+                onClick={e => {
+                  e.preventDefault();
+                  toggleUserMenu();
+                }}
+              >
                 <IconUserCircle style={{ width: rem(24), height: rem(24) }} />
               </ActionIcon>
             </Indicator>
@@ -137,6 +159,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/charts"
               leftSection={<IconListNumbers style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('charts.title')}
             </Menu.Item>
@@ -144,6 +167,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/live"
               leftSection={<IconFlame style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('charts.live')}
             </Menu.Item>
@@ -151,6 +175,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/library"
               leftSection={<IconPlaylist style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('library.title')}
             </Menu.Item>
@@ -158,6 +183,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/stats"
               leftSection={<IconChartBar style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('stats.title')}
             </Menu.Item>
@@ -165,6 +191,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/friends"
               leftSection={<IconUsers style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('user.friends')}
             </Menu.Item>
@@ -180,6 +207,7 @@ export const Header: React.FC = () => {
                   </Badge>
                 ) : undefined
               }
+              onClick={() => closeUserMenu()}
             >
               {t('notifications.title')}
             </Menu.Item>
@@ -187,6 +215,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/settings"
               leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('settings.title')}
             </Menu.Item>
@@ -195,6 +224,7 @@ export const Header: React.FC = () => {
               component={NavLink}
               to="/faq"
               leftSection={<IconInfoCircle style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
             >
               {t('user.faq')}
             </Menu.Item>
@@ -202,7 +232,10 @@ export const Header: React.FC = () => {
             <Menu.Item
               color="red"
               leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}
-              onClick={handleLogout}
+              onClick={() => {
+                handleLogout();
+                closeUserMenu();
+              }}
             >
               {t('user.logout')}
             </Menu.Item>

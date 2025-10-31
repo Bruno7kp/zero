@@ -97,6 +97,8 @@ Purpose: help AI contributors be productive quickly by listing the repo's archit
    - Backend: follow Laravel conventions (routes → controllers → models). Use dependency injection and keep logic out of controllers when possible.
    - IndexedDB: any schema change must increment the Dexie DB version and include migration transforms under `frontend/src/db/`.
 
+   - Code comments and inline documentation: write comments in English. UI strings and translations must continue to use the `frontend/src/locales/*` files (en/pt). This helps cross-team readability and tooling that processes comments or generates docs.
+
 - Integration points & important env vars:
    - Google OAuth: backend `.env` keys `GOOGLE_CLIENT_ID`/`SECRET` and callback URL.
    - Frontend: `VITE_API_BASE_URL` (default `http://localhost:8081/api`) and `VITE_GOOGLE_CLIENT_ID`.
@@ -182,7 +184,7 @@ Esses pontos são críticos — alterar o schema do Dexie sem migração ou esqu
 
    Corpo (opcional): detalhe o que foi feito e por quê. Use bullets quando útil.
 
-   Footer (opcional): referências a issues/tickets. Ex.: `Refs: #123` ou `Closes: #456`.
+   Footer (opcional): referências a issues/tickets. Ex.: `Refs: ISSUE_ID` ou `Closes: ISSUE_ID`.
 
    Diretivas para geradores/AI:
    - Gere a mensagem em português ou inglês conforme o idioma do PR, mas mantenha o cabeçalho curto e em inglês quando possível (padrão do repo é inglês nas chaves).
