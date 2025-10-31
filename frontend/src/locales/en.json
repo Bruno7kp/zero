@@ -690,7 +690,9 @@
           "rank": "#",
           "image": "Image",
           "title": "Title",
-          "longest": "Longest sequence"
+          "longest": "Longest sequence",
+          "startWeek": "Start week",
+          "endWeek": "End week"
         },
         "sort": {
           "longestDesc": "Longest (high to low)",
@@ -800,6 +802,24 @@
           "nameDesc": "Name (Z-A)",
           "artistAsc": "Artist (A-Z)",
           "artistDesc": "Artist (Z-A)"
+        }
+      },
+      "mostSales": {
+        "title": "Most Sales (Top 100 by plays)",
+        "description": "Top 100 tracks from Last.fm combined with stability points to estimate sales. Filtered to the user's top 100 tracks.",
+        "columns": {
+          "plays": "Plays",
+          "points": "Stability Points",
+          "sales": "Estimated Sales"
+        },
+        "sort": {
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)",
+          "playsDesc": "Plays (high to low)",
+          "pointsDesc": "Points (high to low)"
+        },
+        "tooltip": {
+          "top100": "This table is built from the user's top 100 tracks on Last.fm; only those 100 tracks are considered."
         }
       },
       "timesAtTopByArtist": {

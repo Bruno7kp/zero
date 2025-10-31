@@ -31,6 +31,7 @@ import {
   IconCrown,
   IconMenu2,
   IconCalendarUp,
+  IconBoxMultiple1,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
   IconSparkles,
@@ -50,6 +51,7 @@ const TimesAtTopStats = lazy(() => import('./stats/TimesAtTopStats'));
 const PlaysStats = lazy(() => import('./stats/PlaysStats'));
 const DebutsStats = lazy(() => import('./stats/DebutsStats'));
 const PointsStats = lazy(() => import('./stats/PointsStats'));
+const MostSalesStats = lazy(() => import('./stats/MostSalesStats'));
 const TimesAtTopByArtistStats = lazy(() => import('./stats/TimesAtTopByArtistStats'));
 const DebutsAtOneByArtistStats = lazy(() => import('./stats/DebutsAtOneByArtistStats'));
 const LongestConsecutiveAtOneStats = lazy(() => import('./stats/LongestConsecutiveAtOneStats'));
@@ -114,10 +116,10 @@ const StatsPage: React.FC = () => {
       group: 'times_at_top',
     },
     {
-      icon: IconCalendarUp,
+      icon: IconBoxMultiple1,
       label: t('stats.longestConsecutiveAtOne.title'),
       path: '/stats/longest_consecutive_at_one/track',
-      group: 'times_at_top',
+      group: 'longest_consecutive_at_one',
     },
     { divider: true },
     {
@@ -162,6 +164,12 @@ const StatsPage: React.FC = () => {
       label: t('stats.points.title'),
       path: '/stats/points/track',
       group: 'points',
+    },
+    {
+      icon: IconCoin,
+      label: t('stats.mostSales.title'),
+      path: '/stats/most_sales/track',
+      group: 'most_sales',
     },
   ];
 
@@ -364,6 +372,7 @@ const StatsPage: React.FC = () => {
                 path="/most_simultaneous_by_artist/:type"
                 element={<MostSimultaneousByArtistStats />}
               />
+              <Route path="/most_sales/:type" element={<MostSalesStats />} />
               <Route path="/weeks_to_number_one/:type" element={<WeeksToNumberOneStats />} />
             </Routes>
           </Suspense>

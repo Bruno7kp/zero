@@ -528,29 +528,56 @@ export async function getLongestConsecutiveAtOne(filters: StatsFilters & { rank?
     byEntity.get(item.entityId)!.weeks.push(item.week);
   });
 
-  const results: Array<{ entityId: string; name: string; artistName: string; longest: number }> =
-    [];
+  const results: Array<{
+    entityId: string;
+    name: string;
+    artistName: string;
+    longest: number;
+    startWeek?: string | null;
+    endWeek?: string | null;
+  }> = [];
 
   for (const [entityId, info] of byEntity.entries()) {
     const weeks = info.weeks.sort();
     let longest = 0;
     let current = 0;
     let prevDate: number | null = null;
+    let currentStart: string | null = null;
+    let bestStart: string | null = null;
+    let bestEnd: string | null = null;
 
     for (const w of weeks) {
       const d = new Date(w).getTime();
       if (prevDate == null) {
+        // start new sequence
         current = 1;
+        currentStart = w;
       } else {
         // consecutive week if exactly 7 days apart
-        if (d - prevDate === 7 * 86400000) current++;
-        else current = 1;
+        if (d - prevDate === 7 * 86400000) {
+          current++;
+        } else {
+          // sequence broken, reset
+          current = 1;
+          currentStart = w;
+        }
       }
-      if (current > longest) longest = current;
+      if (current > longest) {
+        longest = current;
+        bestStart = currentStart;
+        bestEnd = w;
+      }
       prevDate = d;
     }
 
-    results.push({ entityId, name: info.name, artistName: info.artistName, longest });
+    results.push({
+      entityId,
+      name: info.name,
+      artistName: info.artistName,
+      longest,
+      startWeek: bestStart,
+      endWeek: bestEnd,
+    });
   }
 
   return results.sort((a, b) => b.longest - a.longest);

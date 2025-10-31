@@ -192,7 +192,13 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                     <Table.Th>{t('charts.artist')}</Table.Th>
                   )}
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.sequences')}
+                    {t('stats.longestConsecutiveAtOne.columns.longest')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.longestConsecutiveAtOne.columns.startWeek')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.longestConsecutiveAtOne.columns.endWeek')}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -201,7 +207,7 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                   <Table.Tr>
                     <Table.Td
                       colSpan={
-                        1 + 1 + (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) + 1
+                        1 + 1 + (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) + 3
                       }
                     >
                       <Text ta="center" py="xl">
@@ -291,6 +297,32 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                             }
                           >
                             {record.longest}
+                          </Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {record.startWeek || '-'}
+                          </Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {record.endWeek || '-'}
                           </Text>
                         </Table.Td>
                       </Table.Tr>

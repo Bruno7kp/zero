@@ -690,7 +690,9 @@
           "rank": "#",
           "image": "Imagem",
           "title": "Título",
-          "longest": "Maior sequência"
+          "longest": "Maior sequência",
+          "startWeek": "Semana inicial",
+          "endWeek": "Semana final"
         },
         "sort": {
           "longestDesc": "Sequência (maior para menor)",
@@ -800,6 +802,24 @@
           "nameDesc": "Nome (Z-A)",
           "artistAsc": "Artista (A-Z)",
           "artistDesc": "Artista (Z-A)"
+        }
+      },
+      "mostSales": {
+        "title": "Mais Vendas (Top 100 por reproduções)",
+        "description": "Top 100 músicas do usuário no Last.fm combinado com pontos de estabilidade para estimar vendas. Filtrado apenas nas 100 músicas do usuário.",
+        "columns": {
+          "plays": "Reproduções",
+          "points": "Pontos de Estabilidade",
+          "sales": "Vendas Estimadas"
+        },
+        "sort": {
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "pointsDesc": "Pontos (maior para menor)"
+        },
+        "tooltip": {
+          "top100": "Esta tabela é construída a partir das 100 principais músicas do usuário no Last.fm; apenas essas 100 músicas são consideradas."
         }
       },
       "timesAtTopByArtist": {

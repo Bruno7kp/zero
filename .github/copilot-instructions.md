@@ -104,6 +104,24 @@ Purpose: help AI contributors be productive quickly by listing the repo's archit
    - Frontend: `VITE_API_BASE_URL` (default `http://localhost:8081/api`) and `VITE_GOOGLE_CLIENT_ID`.
    - Spotify helpers reference credentials in `frontend/src/services/SpotifyApi` (`SPOTIFY_TOKEN`, `SPOTIFY_SECRET`).
 
+   - Sales calculation (standardized):
+      - Sales (the "formula" used across the app) is defined as a linear combination of two measures:
+         - Plays (from Last.fm or cached playcount) multiplied by a plays weight.
+         - Stability points: per-week value derived from rank (101 - rank, minimum 0) summed across all weeks for the entity, multiplied by a points weight.
+      - Canonical formula: sales = plays * playsWeight + stabilityPoints * pointsWeight.
+      - Chart-level weights are stored on the chart model/config and accessed as `music_plays_weight` / `music_points_weight` (or album variants). Use those values when computing sales or certifications.
+      - Implementation notes for contributors/AI:
+         1. When asked to compute "sales" or certificates, always state explicitly which weights you used and whether plays came from Last.fm (user playcount) or from local week data.
+         2. For stats that rely on the user's Top 100 (or other Last.fm endpoints), compute plays from Last.fm first (with caching) and then join with the chart stabilityPoints computed from `charts_data` (IndexedDB). If a track has no match in `charts_data`, use stabilityPoints = 0 and annotate the row.
+         3. Prefer using `calculateWeekFormulaValue` / `computeCertification` (in `frontend/src/utils/certification.ts`) for weekly formula logic and `getPointsAccumulators` (in `frontend/src/utils/statsQueries.ts`) for aggregated stability points per entity.
+         4. Document clearly in UI tooltips when a stat is limited to Last.fm Top N (e.g., Top 100) so users understand the filter.
+
+            5. Artist-level sales handling:
+                - When computing sales for `chartType === 'artist'`, use the same formula and weight fields as albums (i.e. `album_plays_weight` and `album_points_weight`) unless explicit `artist_*` weights are provided on the chart. This ensures consistency across entity types even when artists do not have dedicated certification thresholds.
+                - Compute stability points for artists the same way (sum of max(0, 101 - rank) across relevant weeks for the artist chart rows).
+                - Always return a numeric sales value for artists. If the chart does not define certification thresholds for artists (gold/platinum/diamond), report the sales number and set the certification level to `none` (do not fail).
+                - In UI/tooling and in AI responses, explicitly state that artist sales used the album-formula weights and whether certification thresholds existed; if thresholds are missing, note that certification was not applied.
+
 - Small contract for common changes:
    - Add API endpoint: edit `backend/routes/api.php` → new controller in `backend/app/Http/Controllers/` → add tests in `backend/tests/Feature/` → run `php artisan test`.
    - Add frontend page: add component in `frontend/src/pages/` → register route in router (check `main.tsx`) → add translations in `frontend/src/locales/` → follow Mantine patterns used by other pages.
