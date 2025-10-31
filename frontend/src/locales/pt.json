@@ -105,7 +105,7 @@
       "showDroppedItemsLabel": "Mostrar saídas",
       "showDroppedItems_description": "Exibe artistas/álbuns/músicas que estavam na semana anterior mas saíram na atual",
       "droppedItemsLabel": "Saídas ({{count}})",
-        "share": {
+      "share": {
         "title": "Compartilhar",
         "shareChartTitle": "Compartilhar chart",
         "preview": "Prévia",
@@ -568,8 +568,8 @@
         "peakOnly": "Apenas picos",
         "showImages": "Mostrar imagens",
         "showArtistColumn": "Coluna de artista separada",
-  "containerSize": "Tamanho do container",
-  "fontSize": "Tamanho da fonte",
+        "containerSize": "Tamanho do container",
+        "fontSize": "Tamanho da fonte",
         "small": "Pequeno",
         "medium": "Médio",
         "large": "Grande",

@@ -7,24 +7,27 @@ import pt from './locales/pt.json';
 import * as storage from './utils/storage';
 import { KEYS } from './constants/storageKeys';
 
-i18n.use(LanguageDetector).use(initReactI18next).init({
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
     resources: {
-        en: { translation: en.translation },
-        pt: { translation: pt.translation },
+      en: { translation: en.translation },
+      pt: { translation: pt.translation },
     },
     // Remova a linha 'lng', permitindo que o LanguageDetector funcione
     fallbackLng: 'en',
     interpolation: {
-        escapeValue: false,
+      escapeValue: false,
     },
-});
+  });
 
-i18n.on('languageChanged', (lng) => {
-    try {
-        storage.set(KEYS.I18NEXT_LANG, lng);
-    } catch {
-        // ignore storage errors
-    }
+i18n.on('languageChanged', lng => {
+  try {
+    storage.set(KEYS.I18NEXT_LANG, lng);
+  } catch {
+    // ignore storage errors
+  }
 });
 
 export default i18n;

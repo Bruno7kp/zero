@@ -22,27 +22,43 @@ interface ChartWeekCardProps {
   hasAllKill?: boolean | null;
 }
 
-export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({ week, weekNumber, top1, themeMode, formatWeekDate, hasAllKill = false }) => {
+export const ChartWeekCard: React.FC<ChartWeekCardProps> = ({
+  week,
+  weekNumber,
+  top1,
+  themeMode,
+  formatWeekDate,
+  hasAllKill = false,
+}) => {
   const theme = useMantineTheme();
   const { t } = useTranslation();
-  
+
   // Get the showFormulaInsteadOfPlays setting and chart info from state
-  const showFormulaInsteadOfPlays = useSelector((state: any) => 
-    state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays ?? false
+  const showFormulaInsteadOfPlays = useSelector(
+    (state: any) => state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays ?? false
   );
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);
-  
-  const formulaLabel = chart?.formula_name ? 
-    chart.formula_name.charAt(0).toUpperCase() + chart.formula_name.slice(1) : 
-    t('charts.sales');
+
+  const formulaLabel = chart?.formula_name
+    ? chart.formula_name.charAt(0).toUpperCase() + chart.formula_name.slice(1)
+    : t('charts.sales');
 
   return (
-    <Card shadow="md" p="md" mb="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+    <Card
+      shadow="md"
+      p="md"
+      mb="md"
+      style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+    >
       <Group>
-        <Text fw={600} size="md">{t('charts.weekNumber')}: {weekNumber}</Text>
-        <Text size="xs" c="dimmed">{formatWeekDate(week)}</Text>
+        <Text fw={600} size="md">
+          {t('charts.weekNumber')}: {weekNumber}
+        </Text>
+        <Text size="xs" c="dimmed">
+          {formatWeekDate(week)}
+        </Text>
         {hasAllKill && <AllKillBadge />}
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />

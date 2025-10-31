@@ -3,7 +3,15 @@ import type { DataTableColumn } from 'mantine-datatable';
 import type { ChartData } from '../../db/indexedDb';
 import { Text } from '@mantine/core';
 import { IconArrowsDownUp } from '@tabler/icons-react';
-import { RankCell, PlaysCell, PeakCell, WeeksCell, AltVariationCell, AltPlaysVariationCell, CertCell } from './TableCells';
+import {
+  RankCell,
+  PlaysCell,
+  PeakCell,
+  WeeksCell,
+  AltVariationCell,
+  AltPlaysVariationCell,
+  CertCell,
+} from './TableCells';
 import NameCell from './NameCell';
 
 export interface BuildTableColumnsArgs {
@@ -32,7 +40,7 @@ export interface BuildTableColumnsArgs {
   altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
   chart: any;
   viewSettings?: any;
-  scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
+  scaleSize: (s: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   onNameImageChange?: (row: ChartData) => void;
   onNameImageLoad?: (row: ChartData, url: string) => void;
   nameImageSize?: number;
@@ -80,12 +88,14 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
   let built = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
     const resolvedTitle =
       col.label != null
-        ? (typeof col.label === 'string'
-          ? (col.label.startsWith('charts.') ? t(col.label as any) : col.label)
-          : col.label)
-        : (col.labelComplete
-          ? t(col.labelComplete)
-          : col.key);
+        ? typeof col.label === 'string'
+          ? col.label.startsWith('charts.')
+            ? t(col.label as any)
+            : col.label
+          : col.label
+        : col.labelComplete
+        ? t(col.labelComplete)
+        : col.key;
     const base: Partial<DataTableColumn<ChartData>> = {
       accessor: col.key,
       title: resolvedTitle as any,
@@ -96,7 +106,12 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       return {
         ...base,
         render: (row: ChartData) => (
-          <RankCell row={row} showDeltaBadge={!!showDeltaBadge} badgeStylesRank={badgeStylesRank} scaleSize={scaleSize as any} />
+          <RankCell
+            row={row}
+            showDeltaBadge={!!showDeltaBadge}
+            badgeStylesRank={badgeStylesRank}
+            scaleSize={scaleSize as any}
+          />
         ),
       } as DataTableColumn<ChartData>;
     }
@@ -130,13 +145,13 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
             row={row}
             showImage={!!showImage}
             artistMode={artistMode}
-            type={(type === 'artist' || type === 'album' || type === 'track') ? type : 'artist'}
+            type={type === 'artist' || type === 'album' || type === 'track' ? type : 'artist'}
             clientId={clientId}
             clientSecret={clientSecret}
             imageForceUpdate={imageForceUpdate[row.entityId]}
             lastImageUrl={lastImageUrlByEntityId[row.entityId]}
             onImageChange={() => onNameImageChange && onNameImageChange(row)}
-            onImageLoad={(url) => onNameImageLoad && onNameImageLoad(row, url)}
+            onImageLoad={url => onNameImageLoad && onNameImageLoad(row, url)}
             scaleSize={scaleSize as any}
             imageSize={nameImageSize}
           />
@@ -151,7 +166,13 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
         textAlign: 'left' as const,
         width: undefined,
         render: (row: ChartData) => (
-          <Text fw={500} size={scaleSize('sm')} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName || '-'}</Text>
+          <Text
+            fw={500}
+            size={scaleSize('sm')}
+            style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
+          >
+            {row.artistName || '-'}
+          </Text>
         ),
       } as DataTableColumn<ChartData>;
     }
@@ -185,11 +206,16 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       return {
         ...base,
         title: 'Cert.',
-        render: (row: ChartData) => (
-          (type === 'album' || type === 'track')
-            ? <CertCell row={row} chart={chart} type={type as 'album' | 'track'} stats={statsMap[row.entityId]} scaleSize={scaleSize as any} />
-            : null
-        ),
+        render: (row: ChartData) =>
+          type === 'album' || type === 'track' ? (
+            <CertCell
+              row={row}
+              chart={chart}
+              type={type as 'album' | 'track'}
+              stats={statsMap[row.entityId]}
+              scaleSize={scaleSize as any}
+            />
+          ) : null,
       } as DataTableColumn<ChartData>;
     }
     return {
@@ -206,20 +232,27 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
         title: t('charts.artistLabel') as any,
         textAlign: 'left' as const,
         render: (row: ChartData) => (
-          <Text fw={500} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{row.artistName || '-'}</Text>
+          <Text
+            fw={500}
+            style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
+          >
+            {row.artistName || '-'}
+          </Text>
         ),
       };
       const nameIdx = built.findIndex((c: any) => (c as any).accessor === 'name');
-      if (nameIdx !== -1) built.splice(nameIdx + 1, 0, artistCol); else built.push(artistCol);
+      if (nameIdx !== -1) built.splice(nameIdx + 1, 0, artistCol);
+      else built.push(artistCol);
     }
   }
 
   if (showAltVariationRedux) {
     // Width rules: 65 only when icon + text; 50 for icon-only or text-only
-    const treatAsHiddenForWidth = badgeStylesRank?.hideLabel && badgeStylesRank?.iconPosition === 'before';
+    const treatAsHiddenForWidth =
+      badgeStylesRank?.hideLabel && badgeStylesRank?.iconPosition === 'before';
     const isCompact = badgeStylesRank?.iconPosition === 'hidden' || treatAsHiddenForWidth; // compact when text-only or icon-only
     const columnWidth = isCompact ? 50 : 65;
-    
+
     const altVariationCol: DataTableColumn<ChartData> = {
       accessor: 'altVariation',
       title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
@@ -227,13 +260,25 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
       width: columnWidth,
       cellsStyle: () => ({ paddingRight: 0, paddingLeft: 0 }),
       render: (row: ChartData, index: number) => (
-        <AltVariationCell row={row} index={index} badgeStylesRank={badgeStylesRank} altVariation={altVariation} />
-      )
+        <AltVariationCell
+          row={row}
+          index={index}
+          badgeStylesRank={badgeStylesRank}
+          altVariation={altVariation}
+        />
+      ),
     };
-    const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altVariation');
-    if (existingIdx !== -1) built[existingIdx] = altVariationCol; else {
-      const rankIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'rank');
-      if (rankIdx !== -1) built = [...built.slice(0, rankIdx + 1), altVariationCol, ...built.slice(rankIdx + 1)]; else built = [altVariationCol, ...built];
+    const existingIdx = built.findIndex(
+      (c: DataTableColumn<ChartData>) => (c as any).accessor === 'altVariation'
+    );
+    if (existingIdx !== -1) built[existingIdx] = altVariationCol;
+    else {
+      const rankIdx = built.findIndex(
+        (c: DataTableColumn<ChartData>) => (c as any).accessor === 'rank'
+      );
+      if (rankIdx !== -1)
+        built = [...built.slice(0, rankIdx + 1), altVariationCol, ...built.slice(rankIdx + 1)];
+      else built = [altVariationCol, ...built];
     }
   }
 
@@ -253,12 +298,19 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
           chart={chart}
           chartType={type}
         />
-      )
+      ),
     };
-    const existingIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'altPlaysVariation');
-    if (existingIdx !== -1) built[existingIdx] = altPlaysCol; else {
-      const playsIdx = built.findIndex((c: DataTableColumn<ChartData>) => (c as any).accessor === 'plays');
-      if (playsIdx !== -1) built = [...built.slice(0, playsIdx + 1), altPlaysCol, ...built.slice(playsIdx + 1)]; else built = [altPlaysCol, ...built];
+    const existingIdx = built.findIndex(
+      (c: DataTableColumn<ChartData>) => (c as any).accessor === 'altPlaysVariation'
+    );
+    if (existingIdx !== -1) built[existingIdx] = altPlaysCol;
+    else {
+      const playsIdx = built.findIndex(
+        (c: DataTableColumn<ChartData>) => (c as any).accessor === 'plays'
+      );
+      if (playsIdx !== -1)
+        built = [...built.slice(0, playsIdx + 1), altPlaysCol, ...built.slice(playsIdx + 1)];
+      else built = [altPlaysCol, ...built];
     }
   }
 

@@ -36,13 +36,13 @@ const notificationsSlice = createSlice({
         notification.read = true;
       }
     },
-    markAllAsRead: (state) => {
-      state.notifications.forEach(n => n.read = true);
+    markAllAsRead: state => {
+      state.notifications.forEach(n => (n.read = true));
     },
     removeNotification: (state, action: PayloadAction<string>) => {
       state.notifications = state.notifications.filter(n => n.id !== action.payload);
     },
-    clearAllNotifications: (state) => {
+    clearAllNotifications: state => {
       state.notifications = [];
     },
   },

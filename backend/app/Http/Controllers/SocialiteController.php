@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
 {
@@ -18,22 +18,32 @@ class SocialiteController extends Controller
         $ts = time();
         $rand = bin2hex(random_bytes(8));
         $secret = config('app.key') ?: env('APP_KEY', 'key');
-        $data = $ts . '|' . $rand;
+        $data = $ts.'|'.$rand;
         $sig = hash_hmac('sha256', $data, $secret);
-        return $ts . '|' . $rand . '|' . $sig;
+
+        return $ts.'|'.$rand.'|'.$sig;
     }
 
     private function validateStateToken(?string $state, int $ttlSeconds = 300): bool
     {
-        if (!$state) return false;
+        if (! $state) {
+            return false;
+        }
         $parts = explode('|', $state);
-        if (count($parts) !== 3) return false;
+        if (count($parts) !== 3) {
+            return false;
+        }
         [$ts, $rand, $sig] = $parts;
-        if (!ctype_digit($ts)) return false;
-        if ((time() - (int)$ts) > $ttlSeconds) return false; // expired
+        if (! ctype_digit($ts)) {
+            return false;
+        }
+        if ((time() - (int) $ts) > $ttlSeconds) {
+            return false;
+        } // expired
         $secret = config('app.key') ?: env('APP_KEY', 'key');
-        $data = $ts . '|' . $rand;
+        $data = $ts.'|'.$rand;
         $expected = hash_hmac('sha256', $data, $secret);
+
         return hash_equals($expected, $sig);
     }
 
@@ -56,8 +66,10 @@ class SocialiteController extends Controller
         $base = 'https://accounts.google.com/o/oauth2/v2/auth';
         $state = urlencode($this->buildStateToken());
         $query = "client_id={$clientId}&redirect_uri={$redirect}&response_type=code&scope={$scopes}&access_type=online&prompt=select_account&state={$state}";
-        return $base . '?' . $query;
+
+        return $base.'?'.$query;
     }
+
     public function redirectToGoogle()
     {
         // Using API route group (no session), so we must use stateless() to avoid session/state exceptions
@@ -66,7 +78,7 @@ class SocialiteController extends Controller
             // Detect config repository readiness before using helper
             $configRepoBound = function_exists('app') && app()->bound('config');
             $useSocialite = filter_var(env('OAUTH_USE_SOCIALITE', false), FILTER_VALIDATE_BOOLEAN);
-            if (!$configRepoBound || env('OAUTH_FORCE_FALLBACK') || !$useSocialite) {
+            if (! $configRepoBound || env('OAUTH_FORCE_FALLBACK') || ! $useSocialite) {
                 $url = $this->manualGoogleRedirectUrl();
                 if ($diag) {
                     return response()->json([
@@ -76,11 +88,13 @@ class SocialiteController extends Controller
                         'url' => $url,
                     ]);
                 }
-                return redirect()->away($url)->header('Cache-Control','no-store');
+
+                return redirect()->away($url)->header('Cache-Control', 'no-store');
             }
 
             $cfg = config('services.google');
-            if ($diag) { /* silent snapshot disabled in production cleanup */ }
+            if ($diag) { /* silent snapshot disabled in production cleanup */
+            }
             Log::error('[DEBUG_OAUTH] Entering redirectToGoogle method');
             Log::info('Google OAuth redirect init', [
                 'client_id' => $cfg['client_id'] ?? null,
@@ -99,9 +113,10 @@ class SocialiteController extends Controller
                 ]);
             }
             $resp = $driver->redirect();
+
             return $resp;
         } catch (\Throwable $e) {
-            Log::error('Google OAuth redirect failure: ' . $e->getMessage(), [
+            Log::error('Google OAuth redirect failure: '.$e->getMessage(), [
                 'trace_top' => collect(explode("\n", $e->getTraceAsString()))->take(5)->all(),
             ]);
             if (env('OAUTH_DIAG')) {
@@ -111,6 +126,7 @@ class SocialiteController extends Controller
                     'message' => $e->getMessage(),
                 ], 500);
             }
+
             return response()->json(['error' => 'OAuth redirect failed'], 500);
         }
     }
@@ -122,7 +138,7 @@ class SocialiteController extends Controller
             if ($request->isMethod('post')) {
                 // Aceita 'token' ou 'credential' (Google One Tap normalmente usa 'credential')
                 $idToken = $request->input('token') ?: $request->input('credential');
-                if (!$idToken) {
+                if (! $idToken) {
                     // Fallback: tentar interpretar raw body JSON caso cabeçalho Content-Type esteja incorreto
                     $raw = $request->getContent();
                     if ($raw) {
@@ -135,7 +151,7 @@ class SocialiteController extends Controller
                 if ($idToken) {
                     // Validar o ID token diretamente no endpoint do Google
                     // OBS: Em produção, considere usar verificação por chave pública (JWKS) para reduzir latência.
-                    $tokenInfoUrl = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken);
+                    $tokenInfoUrl = 'https://oauth2.googleapis.com/tokeninfo?id_token='.urlencode($idToken);
                     $response = @file_get_contents($tokenInfoUrl);
                     if ($response === false) {
                         throw new \Exception('Could not validate ID token');
@@ -145,7 +161,7 @@ class SocialiteController extends Controller
                     $aud = $payload['aud'] ?? null;
                     // Aceitar múltiplos client_ids via env GOOGLE_CLIENT_IDS (separados por vírgula) ou fallback para GOOGLE_CLIENT_ID
                     $allowedClientIds = array_filter(array_map('trim', explode(',', env('GOOGLE_CLIENT_IDS', (string) config('services.google.client_id')))));
-                    if (!is_array($payload) || empty($payload['email']) || !$aud || !in_array($aud, $allowedClientIds, true)) {
+                    if (! is_array($payload) || empty($payload['email']) || ! $aud || ! in_array($aud, $allowedClientIds, true)) {
                         throw new \Exception('Invalid ID token payload (aud/email mismatch)');
                     }
 
@@ -167,43 +183,47 @@ class SocialiteController extends Controller
 
                     // Se já existia e não tinha google_id/avatar, atualiza de forma segura
                     $updates = [];
-                    if (!$user->google_id && $googleId) { $updates['google_id'] = $googleId; }
-                    if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
-                    if (!empty($updates)) { $user->fill($updates)->save(); }
-
-
+                    if (! $user->google_id && $googleId) {
+                        $updates['google_id'] = $googleId;
+                    }
+                    if (! $user->avatar && $avatar) {
+                        $updates['avatar'] = $avatar;
+                    }
+                    if (! empty($updates)) {
+                        $user->fill($updates)->save();
                     }
 
-                    // Criar token de acesso do Sanctum
-                    $token = $user->createToken('auth_token')->plainTextToken;
-
-                    return response()->json([
-                        'user' => [
-                            'name' => $user->name,
-                            'email' => $user->email,
-                            'avatar' => $user->avatar,
-                        ],
-                        'token' => $token,
-                    ]);
                 }
 
+                // Criar token de acesso do Sanctum
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return response()->json([
+                    'user' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'avatar' => $user->avatar,
+                    ],
+                    'token' => $token,
+                ]);
+            }
 
             $useSocialite = filter_var(env('OAUTH_USE_SOCIALITE', false), FILTER_VALIDATE_BOOLEAN);
-            if (!$useSocialite) {
+            if (! $useSocialite) {
                 // Fluxo manual de troca de code por tokens (sem Socialite)
                 $code = $request->query('code');
                 $state = $request->query('state');
-                if (!$code) {
+                if (! $code) {
                     return response()->json(['error' => 'Missing authorization code'], 400);
                 }
-                if (!$this->validateStateToken($state)) {
+                if (! $this->validateStateToken($state)) {
                     return response()->json(['error' => 'Invalid or expired state'], 400);
                 }
 
                 $clientId = env('GOOGLE_CLIENT_ID');
                 $clientSecret = env('GOOGLE_CLIENT_SECRET');
                 $redirectUri = env('GOOGLE_CALLBACK_URL');
-                if (!$clientId || !$clientSecret || !$redirectUri) {
+                if (! $clientId || ! $clientSecret || ! $redirectUri) {
                     return response()->json(['error' => 'Google OAuth env incomplete'], 500);
                 }
 
@@ -215,24 +235,25 @@ class SocialiteController extends Controller
                     'grant_type' => 'authorization_code',
                 ]);
 
-                if (!$tokenResp->ok()) {
+                if (! $tokenResp->ok()) {
                     Log::error('Google manual token exchange failed', ['status' => $tokenResp->status(), 'body' => $tokenResp->body()]);
+
                     return response()->json(['error' => 'Token exchange failed'], 401);
                 }
 
                 $tokenJson = $tokenResp->json();
                 $accessToken = $tokenJson['access_token'] ?? null;
                 $idToken = $tokenJson['id_token'] ?? null;
-                if (!$accessToken) {
+                if (! $accessToken) {
                     return response()->json(['error' => 'Missing access token'], 401);
                 }
 
                 // Obter dados do usuário (preferir endpoint userinfo oficial)
                 $userinfo = Http::withToken($accessToken)->get('https://openidconnect.googleapis.com/v1/userinfo');
-                if (!$userinfo->ok()) {
+                if (! $userinfo->ok()) {
                     Log::warning('Google userinfo failed; attempting tokeninfo fallback', ['status' => $userinfo->status()]);
                     if ($idToken) {
-                        $ti = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken));
+                        $ti = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token='.urlencode($idToken));
                         $payload = $ti ? json_decode($ti, true) : null;
                     } else {
                         return response()->json(['error' => 'User info retrieval failed'], 401);
@@ -241,7 +262,7 @@ class SocialiteController extends Controller
                     $payload = $userinfo->json();
                 }
 
-                if (!is_array($payload) || empty($payload['email'])) {
+                if (! is_array($payload) || empty($payload['email'])) {
                     return response()->json(['error' => 'Invalid user payload'], 401);
                 }
 
@@ -262,9 +283,15 @@ class SocialiteController extends Controller
                 );
 
                 $updates = [];
-                if (!$user->google_id && $googleId) { $updates['google_id'] = $googleId; }
-                if (!$user->avatar && $avatar) { $updates['avatar'] = $avatar; }
-                if ($updates) { $user->fill($updates)->save(); }
+                if (! $user->google_id && $googleId) {
+                    $updates['google_id'] = $googleId;
+                }
+                if (! $user->avatar && $avatar) {
+                    $updates['avatar'] = $avatar;
+                }
+                if ($updates) {
+                    $user->fill($updates)->save();
+                }
 
                 $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -318,7 +345,8 @@ class SocialiteController extends Controller
                 'token' => $token,
             ]);
         } catch (\Exception $e) {
-            Log::error('Google Socialite login failed: ' . $e->getMessage());
+            Log::error('Google Socialite login failed: '.$e->getMessage());
+
             return response()->json(['error' => 'Authentication failed.'], 401);
         }
     }

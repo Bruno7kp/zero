@@ -1,7 +1,28 @@
 // Shared filters component for stats pages
 import React from 'react';
-import { Group, Select, SegmentedControl, Center, ActionIcon, Menu, Checkbox, Flex, Divider, TextInput } from '@mantine/core';
-import { IconMicrophone, IconDisc, IconMusic, IconSettings, IconCalendar, IconHash, IconSearch, IconSortDescending, IconFilter } from '@tabler/icons-react';
+import {
+  Group,
+  Select,
+  SegmentedControl,
+  Center,
+  ActionIcon,
+  Menu,
+  Checkbox,
+  Flex,
+  Divider,
+  TextInput,
+} from '@mantine/core';
+import {
+  IconMicrophone,
+  IconDisc,
+  IconMusic,
+  IconSettings,
+  IconCalendar,
+  IconHash,
+  IconSearch,
+  IconSortDescending,
+  IconFilter,
+} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
@@ -85,7 +106,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onSortChange,
   showContainerSizeToggle = true,
   showFontSizeToggle = true,
-  sortOptions
+  sortOptions,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -116,7 +137,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
         <Select
           leftSection={<IconCalendar size={16} />}
           value={year}
-          onChange={(value) => value && onYearChange(value)}
+          onChange={value => value && onYearChange(value)}
           data={yearOptions}
           style={{ minWidth: 150, flex: '0 0 auto' }}
         />
@@ -130,13 +151,48 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             data={
               hideArtistType
                 ? [
-                    { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
-                    { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
+                    {
+                      label: (
+                        <Center>
+                          <IconDisc size={18} />
+                        </Center>
+                      ),
+                      value: 'album',
+                    },
+                    {
+                      label: (
+                        <Center>
+                          <IconMusic size={18} />
+                        </Center>
+                      ),
+                      value: 'track',
+                    },
                   ]
                 : [
-                    { label: <Center><IconMicrophone size={18} /></Center>, value: 'artist' },
-                    { label: <Center><IconDisc size={18} /></Center>, value: 'album' },
-                    { label: <Center><IconMusic size={18} /></Center>, value: 'track' },
+                    {
+                      label: (
+                        <Center>
+                          <IconMicrophone size={18} />
+                        </Center>
+                      ),
+                      value: 'artist',
+                    },
+                    {
+                      label: (
+                        <Center>
+                          <IconDisc size={18} />
+                        </Center>
+                      ),
+                      value: 'album',
+                    },
+                    {
+                      label: (
+                        <Center>
+                          <IconMusic size={18} />
+                        </Center>
+                      ),
+                      value: 'track',
+                    },
                   ]
             }
             style={{ flex: '0 0 auto' }}
@@ -147,9 +203,9 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
         <Group gap="xs" wrap="nowrap">
           {onPageSizeChange && (
             <Select
-                leftSection={<IconFilter size={16} />}
+              leftSection={<IconFilter size={16} />}
               value={String(pageSize || 25)}
-              onChange={(value) => value && onPageSizeChange(Number(value))}
+              onChange={value => value && onPageSizeChange(Number(value))}
               data={[
                 { value: '10', label: `10` },
                 { value: '25', label: `25` },
@@ -160,102 +216,113 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             />
           )}
 
-          {(showSalesToggle || showPeakOnlyToggle || showImageToggle || showArtistColumnToggle || showFontSizeToggle) &&
-          (onToggleSales || onTogglePeakOnly || onToggleImages || onToggleArtistColumn || onFontSizeChange) && (
-            <Menu shadow="md" width={300} closeOnItemClick={false}>
-              <Menu.Target>
-                <ActionIcon variant="subtle" size="lg" aria-label={t('stats.filters.settings')}>
-                  <IconSettings size={18} />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>{t('stats.filters.displayOptions')}</Menu.Label>
+          {(showSalesToggle ||
+            showPeakOnlyToggle ||
+            showImageToggle ||
+            showArtistColumnToggle ||
+            showFontSizeToggle) &&
+            (onToggleSales ||
+              onTogglePeakOnly ||
+              onToggleImages ||
+              onToggleArtistColumn ||
+              onFontSizeChange) && (
+              <Menu shadow="md" width={300} closeOnItemClick={false}>
+                <Menu.Target>
+                  <ActionIcon variant="subtle" size="lg" aria-label={t('stats.filters.settings')}>
+                    <IconSettings size={18} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>{t('stats.filters.displayOptions')}</Menu.Label>
 
-                {showSalesToggle && onToggleSales && (
-                  <Menu.Item>
-                    <Checkbox
-                      label={t('stats.filters.toggleSales')}
-                      checked={showSales || false}
-                      onChange={(event) => onToggleSales(event.currentTarget.checked)}
-                    />
-                  </Menu.Item>
-                )}
-
-                {showPeakOnlyToggle && onTogglePeakOnly && (
-                  <Menu.Item>
-                    <Checkbox
-                      label={t('stats.filters.peakOnly')}
-                      checked={peakOnly || false}
-                      onChange={(event) => onTogglePeakOnly(event.currentTarget.checked)}
-                    />
-                  </Menu.Item>
-                )}
-
-                {(showSalesToggle || showPeakOnlyToggle) && (showImageToggle || showArtistColumnToggle || showFontSizeToggle) && (
-                  <Divider my="xs" />
-                )}
-
-                {showImageToggle && onToggleImages && (
-                  <Menu.Item>
-                    <Checkbox
-                      label={t('stats.filters.showImages')}
-                      checked={showImages !== false}
-                      onChange={(event) => onToggleImages(event.currentTarget.checked)}
-                    />
-                  </Menu.Item>
-                )}
-
-                {showArtistColumnToggle && onToggleArtistColumn && (
-                  <Menu.Item>
-                    <Checkbox
-                      label={t('stats.filters.showArtistColumn')}
-                      checked={showArtistColumn || false}
-                      onChange={(event) => onToggleArtistColumn(event.currentTarget.checked)}
-                    />
-                  </Menu.Item>
-                )}
-
-                {showContainer && onContainerSizeChange && (
-                  <>
-                    <Divider my="xs" />
-                    <Menu.Label>{t('stats.filters.containerSize')}</Menu.Label>
+                  {showSalesToggle && onToggleSales && (
                     <Menu.Item>
-                      <SegmentedControl
-                        value={containerSize || 'xl'}
-                        onChange={(value) => onContainerSizeChange(value as '100%' | 'md' | 'lg' | 'xl')}
-                        data={[
-                          { label: 'MD', value: 'md' },
-                          { label: 'LG', value: 'lg' },
-                          { label: 'XL', value: 'xl' },
-                          { label: '100%', value: '100%' }
-                        ]}
-                        fullWidth
+                      <Checkbox
+                        label={t('stats.filters.toggleSales')}
+                        checked={showSales || false}
+                        onChange={event => onToggleSales(event.currentTarget.checked)}
                       />
                     </Menu.Item>
-                  </>
-                )}
+                  )}
 
-                {showFontSizeToggle && onFontSizeChange && (
-                  <>
-                    <Divider my="xs" />
-                    <Menu.Label>{t('stats.filters.fontSize')}</Menu.Label>
+                  {showPeakOnlyToggle && onTogglePeakOnly && (
                     <Menu.Item>
-                      <SegmentedControl
-                        value={fontSize || 'sm'}
-                        onChange={(value) => onFontSizeChange(value as 'xs' | 'sm' | 'md')}
-                        data={[
-                          { label: 'A-', value: 'xs' },
-                          { label: 'A', value: 'sm' },
-                          { label: 'A+', value: 'md' }
-                        ]}
-                        fullWidth
+                      <Checkbox
+                        label={t('stats.filters.peakOnly')}
+                        checked={peakOnly || false}
+                        onChange={event => onTogglePeakOnly(event.currentTarget.checked)}
                       />
                     </Menu.Item>
-                  </>
-                )}
-              </Menu.Dropdown>
-            </Menu>
-          )}
+                  )}
+
+                  {(showSalesToggle || showPeakOnlyToggle) &&
+                    (showImageToggle || showArtistColumnToggle || showFontSizeToggle) && (
+                      <Divider my="xs" />
+                    )}
+
+                  {showImageToggle && onToggleImages && (
+                    <Menu.Item>
+                      <Checkbox
+                        label={t('stats.filters.showImages')}
+                        checked={showImages !== false}
+                        onChange={event => onToggleImages(event.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  )}
+
+                  {showArtistColumnToggle && onToggleArtistColumn && (
+                    <Menu.Item>
+                      <Checkbox
+                        label={t('stats.filters.showArtistColumn')}
+                        checked={showArtistColumn || false}
+                        onChange={event => onToggleArtistColumn(event.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  )}
+
+                  {showContainer && onContainerSizeChange && (
+                    <>
+                      <Divider my="xs" />
+                      <Menu.Label>{t('stats.filters.containerSize')}</Menu.Label>
+                      <Menu.Item>
+                        <SegmentedControl
+                          value={containerSize || 'xl'}
+                          onChange={value =>
+                            onContainerSizeChange(value as '100%' | 'md' | 'lg' | 'xl')
+                          }
+                          data={[
+                            { label: 'MD', value: 'md' },
+                            { label: 'LG', value: 'lg' },
+                            { label: 'XL', value: 'xl' },
+                            { label: '100%', value: '100%' },
+                          ]}
+                          fullWidth
+                        />
+                      </Menu.Item>
+                    </>
+                  )}
+
+                  {showFontSizeToggle && onFontSizeChange && (
+                    <>
+                      <Divider my="xs" />
+                      <Menu.Label>{t('stats.filters.fontSize')}</Menu.Label>
+                      <Menu.Item>
+                        <SegmentedControl
+                          value={fontSize || 'sm'}
+                          onChange={value => onFontSizeChange(value as 'xs' | 'sm' | 'md')}
+                          data={[
+                            { label: 'A-', value: 'xs' },
+                            { label: 'A', value: 'sm' },
+                            { label: 'A+', value: 'md' },
+                          ]}
+                          fullWidth
+                        />
+                      </Menu.Item>
+                    </>
+                  )}
+                </Menu.Dropdown>
+              </Menu>
+            )}
         </Group>
       </Flex>
 
@@ -266,7 +333,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             leftSection={<IconSearch size={16} />}
             placeholder={t('stats.filters.searchPlaceholder')}
             value={searchQuery || ''}
-            onChange={(event) => onSearchChange(event.currentTarget.value)}
+            onChange={event => onSearchChange(event.currentTarget.value)}
             style={{ flex: '1 1 200px', minWidth: 150 }}
           />
         )}
@@ -275,7 +342,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
           <Select
             leftSection={<IconHash size={16} />}
             value={String(position)}
-            onChange={(value) => {
+            onChange={value => {
               if (value === 'all' && allowAllPosition) {
                 // Keep as string 'all' - handled by parent
               } else if (value) {
@@ -288,12 +355,12 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                     { value: 'all', label: t('stats.filters.all') },
                     ...Array.from({ length: cutoff }, (_, i) => ({
                       value: String(i + 1),
-                      label: `#${i + 1}`
-                    }))
+                      label: `#${i + 1}`,
+                    })),
                   ]
                 : Array.from({ length: cutoff }, (_, i) => ({
                     value: String(i + 1),
-                    label: `${i + 1}`
+                    label: `${i + 1}`,
                   }))
             }
             style={{ flex: '0 1 150px', minWidth: 120 }}
@@ -307,7 +374,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
           <Select
             leftSection={<IconSortDescending size={16} />}
             value={sortBy}
-            onChange={(value) => value && onSortChange(value)}
+            onChange={value => value && onSortChange(value)}
             data={sortedSortOptions}
             placeholder={t('stats.filters.sortBy')}
             style={{ flex: '0 1 250px', minWidth: 150 }}

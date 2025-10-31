@@ -1,6 +1,11 @@
 import React from 'react';
 import { useMantineTheme } from '@mantine/core';
-import { IconCaretUpFilled, IconCaretDownFilled, IconStarFilled, IconArrowBackUp } from '@tabler/icons-react';
+import {
+  IconCaretUpFilled,
+  IconCaretDownFilled,
+  IconStarFilled,
+  IconArrowBackUp,
+} from '@tabler/icons-react';
 
 type DeltaValue = number | 'NEW' | 'RE' | '=' | 0 | null | undefined;
 
@@ -9,7 +14,10 @@ interface GridUnderRankVariationProps {
   badgeStylesRank: any;
 }
 
-export const GridUnderRankVariation: React.FC<GridUnderRankVariationProps> = ({ value, badgeStylesRank }) => {
+export const GridUnderRankVariation: React.FC<GridUnderRankVariationProps> = ({
+  value,
+  badgeStylesRank,
+}) => {
   const theme = useMantineTheme();
 
   // Loading placeholder while delta not ready
@@ -53,13 +61,24 @@ export const GridUnderRankVariation: React.FC<GridUnderRankVariationProps> = ({ 
   const iconEl = (() => {
     const upDownSize = baseSize + (isIconOnly ? 4 : 0);
     const reSize = baseSize + (isIconOnly ? 2 : 0);
-    if (value === 'NEW') return <IconStarFilled size={baseSize} color={color} style={{ marginTop: 2 }} />;
-    if (value === 'RE') return <IconArrowBackUp size={reSize} stroke={3} color={color} style={{ marginTop: 2, transform: 'scaleX(-1)' }} />;
+    if (value === 'NEW')
+      return <IconStarFilled size={baseSize} color={color} style={{ marginTop: 2 }} />;
+    if (value === 'RE')
+      return (
+        <IconArrowBackUp
+          size={reSize}
+          stroke={3}
+          color={color}
+          style={{ marginTop: 2, transform: 'scaleX(-1)' }}
+        />
+      );
     if (typeof value === 'number') {
-      if (value > 0) return <IconCaretUpFilled size={upDownSize} color={color} style={{ marginTop: 2 }} />;
-      if (value < 0) return <IconCaretDownFilled size={upDownSize} color={color} style={{ marginTop: 2 }} />;
+      if (value > 0)
+        return <IconCaretUpFilled size={upDownSize} color={color} style={{ marginTop: 2 }} />;
+      if (value < 0)
+        return <IconCaretDownFilled size={upDownSize} color={color} style={{ marginTop: 2 }} />;
     }
-    if ((value === '=' || value === 0)) return null;
+    if (value === '=' || value === 0) return null;
     return null;
   })();
 

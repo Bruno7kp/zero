@@ -12,7 +12,11 @@ export function getRaw(key: string, fallbackKeys: string[] = []): string | null 
   return null;
 }
 
-export function getJson<T>(key: string, fallbackKeys: string[] = [], defaultValue: T | null = null): T | null {
+export function getJson<T>(
+  key: string,
+  fallbackKeys: string[] = [],
+  defaultValue: T | null = null
+): T | null {
   const raw = getRaw(key, fallbackKeys);
   if (raw === null) return defaultValue;
   try {
@@ -30,7 +34,11 @@ export function setJson<T>(key: string, value: T): void {
   }
 }
 
-export function get(key: string, fallbackKeys: string[] = [], defaultValue: string | null = null): string | null {
+export function get(
+  key: string,
+  fallbackKeys: string[] = [],
+  defaultValue: string | null = null
+): string | null {
   const raw = getRaw(key, fallbackKeys);
   return raw === null ? defaultValue : raw;
 }

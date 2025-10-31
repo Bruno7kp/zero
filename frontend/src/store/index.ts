@@ -20,7 +20,19 @@ import storage from 'redux-persist/lib/storage';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync', 'badgeStyles', 'notifications', 'statsPreferences', 'libraryFilters', 'chartsWeeks'],
+  whitelist: [
+    'charts',
+    'lang',
+    'theme',
+    'i18n',
+    'columns',
+    'sync',
+    'badgeStyles',
+    'notifications',
+    'statsPreferences',
+    'libraryFilters',
+    'chartsWeeks',
+  ],
 };
 
 const rootReducer = combineReducers({

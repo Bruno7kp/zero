@@ -3,14 +3,14 @@ import { Divider, Flex, rem, ThemeIcon, Title } from '@mantine/core';
 import { IconPlaylist } from '@tabler/icons-react';
 import type { Icon } from '@tabler/icons-react';
 
-type Props = { 
+type Props = {
   pageTitle: string;
-  icon?: React.ForwardRefExoticComponent<Omit<Icon, "ref"> & React.RefAttributes<Icon>>;
+  icon?: React.ForwardRefExoticComponent<Omit<Icon, 'ref'> & React.RefAttributes<Icon>>;
 };
 
 const CreateHeader: React.FC<Props> = ({ pageTitle, icon: CustomIcon }) => {
   const IconComponent = CustomIcon || IconPlaylist;
-  
+
   return (
     <Flex direction="column" p="xs" gap="sm">
       <Flex justify="center" align="center" gap="sm">

@@ -1,12 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 
-export function useStableDisplayedData(data: any[], week?: string, type?: string, chartId?: string | number) {
+export function useStableDisplayedData(
+  data: any[],
+  week?: string,
+  type?: string,
+  chartId?: string | number
+) {
   const [displayedData, setDisplayedData] = useState<any[]>(data);
   // Track last non-empty dataset to avoid flicker without reading refs during render
-  const [lastNonEmptyDisplayedData, setLastNonEmptyDisplayedData] = useState<any[]>(Array.isArray(data) && data.length ? data : []);
+  const [lastNonEmptyDisplayedData, setLastNonEmptyDisplayedData] = useState<any[]>(
+    Array.isArray(data) && data.length ? data : []
+  );
   const [displayedKey, setDisplayedKey] = useState<string | null>(null);
   const [switchHoldUntil, setSwitchHoldUntil] = useState<number | null>(null);
-  const currentKey = useMemo(() => `${chartId || 'x'}|${type || 'n/a'}|${week || 'n/a'}`, [chartId, type, week]);
+  const currentKey = useMemo(
+    () => `${chartId || 'x'}|${type || 'n/a'}|${week || 'n/a'}`,
+    [chartId, type, week]
+  );
 
   const isDeltasReady = useMemo(() => {
     return (rows: any[], targetWeek?: string) => {
@@ -67,6 +77,7 @@ export function useStableDisplayedData(data: any[], week?: string, type?: string
     return () => clearInterval(id);
   }, [switchHoldUntil, data, week, isDeltasReady, currentKey]);
 
-  const safeDisplayedData = (displayedData && displayedData.length > 0) ? displayedData : lastNonEmptyDisplayedData;
+  const safeDisplayedData =
+    displayedData && displayedData.length > 0 ? displayedData : lastNonEmptyDisplayedData;
   return { safeDisplayedData };
 }

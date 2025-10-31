@@ -11,7 +11,13 @@ type Props = {
   setShowVariation: (value: boolean) => void;
 };
 
-const PeriodAndToggle: React.FC<Props> = ({ chartName, startDate, endDate, showVariation, setShowVariation }) => {
+const PeriodAndToggle: React.FC<Props> = ({
+  chartName,
+  startDate,
+  endDate,
+  showVariation,
+  setShowVariation,
+}) => {
   const { t } = useTranslation();
   return (
     <Group justify="center">
@@ -26,7 +32,9 @@ const PeriodAndToggle: React.FC<Props> = ({ chartName, startDate, endDate, showV
             size="sm"
             aria-pressed={showVariation}
             aria-label={t('charts.deltaRankLabel')}
-            title={`${t('charts.deltaRankLabel')} — ${showVariation ? t('charts.show') : t('charts.hide')}`}
+            title={`${t('charts.deltaRankLabel')} — ${
+              showVariation ? t('charts.show') : t('charts.hide')
+            }`}
             onClick={() => setShowVariation(!showVariation)}
           >
             <IconArrowsDownUp size={16} />

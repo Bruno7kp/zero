@@ -6,8 +6,8 @@ const i18nSlice = createSlice({
   reducers: {
     setLanguage(state, action) {
       state.language = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const { setLanguage } = i18nSlice.actions;

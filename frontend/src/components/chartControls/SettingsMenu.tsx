@@ -12,7 +12,15 @@ interface SettingsMenuProps {
   onSetView: (v: 'table' | 'grid' | 'list') => void;
 }
 
-export const SettingsMenu: React.FC<SettingsMenuProps> = ({ t, week, isBusy, isMobile, onOpenDrawer, onOpenEdit, onSetView }) => {
+export const SettingsMenu: React.FC<SettingsMenuProps> = ({
+  t,
+  week,
+  isBusy,
+  isMobile,
+  onOpenDrawer,
+  onOpenEdit,
+  onSetView,
+}) => {
   return (
     <Menu withinPortal position="bottom" shadow="md" withArrow>
       <Menu.Target>
@@ -24,7 +32,11 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ t, week, isBusy, isM
         <Menu.Item leftSection={<IconSettings size={16} />} onClick={onOpenDrawer}>
           {t('charts.columnsConfig')}
         </Menu.Item>
-        <Menu.Item leftSection={<IconPencil size={16} />} disabled={!week || isBusy} onClick={onOpenEdit}>
+        <Menu.Item
+          leftSection={<IconPencil size={16} />}
+          disabled={!week || isBusy}
+          onClick={onOpenEdit}
+        >
           {t('common.edit')}
         </Menu.Item>
         {isMobile && (

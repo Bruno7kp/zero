@@ -24,22 +24,26 @@ import './assets/styles/custom.css';
 import { AppProviders } from './providers/AppProviders';
 
 export function Root() {
-    const [ready, setReady] = useState(false);
-    useEffect(() => {
-        let mounted = true;
-        ensureDbReady().finally(() => { if (mounted) setReady(true); });
-        return () => { mounted = false; };
-    }, []);
-    if (!ready) return null; // could render a splash/loading if desired
-    return (
-        <AppProviders>
-            <App />
-        </AppProviders>
-    );
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    ensureDbReady().finally(() => {
+      if (mounted) setReady(true);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+  if (!ready) return null; // could render a splash/loading if desired
+  return (
+    <AppProviders>
+      <App />
+    </AppProviders>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <React.StrictMode>
-        <Root />
-    </React.StrictMode>
+  <React.StrictMode>
+    <Root />
+  </React.StrictMode>
 );

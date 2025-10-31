@@ -9,7 +9,6 @@ import {
   selectStatsPreferences,
 } from '../store/statsPreferencesSlice';
 
-
 export function useStatsPreferences() {
   const dispatch = useDispatch<AppDispatch>();
   const preferences = useSelector((state: RootState) => selectStatsPreferences(state));

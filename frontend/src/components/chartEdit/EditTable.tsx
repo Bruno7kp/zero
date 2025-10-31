@@ -12,11 +12,24 @@ interface EditTableProps {
   onDragEnd: (event: any) => void;
 }
 
-export const EditTable: React.FC<EditTableProps> = ({ groupedByPlays, cutoff, loading, labels, onDragEnd }) => {
+export const EditTable: React.FC<EditTableProps> = ({
+  groupedByPlays,
+  cutoff,
+  loading,
+  labels,
+  onDragEnd,
+}) => {
   return (
     <ScrollArea h={520} offsetScrollbars>
       <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <Table striped highlightOnHover withTableBorder withColumnBorders verticalSpacing={4} horizontalSpacing={8}>
+        <Table
+          striped
+          highlightOnHover
+          withTableBorder
+          withColumnBorders
+          verticalSpacing={4}
+          horizontalSpacing={8}
+        >
           <Table.Thead>
             <Table.Tr>
               <Table.Th style={{ width: 60, textAlign: 'center' }}>{labels.pos}</Table.Th>
@@ -28,14 +41,31 @@ export const EditTable: React.FC<EditTableProps> = ({ groupedByPlays, cutoff, lo
           <Table.Tbody>
             {groupedByPlays.map(({ plays, items }) => (
               <React.Fragment key={`grp-${plays}`}>
-                <SortableContext items={items.map(i => i.entityId)} strategy={verticalListSortingStrategy}>
-                  {items.map((r) => (
-                    <SortableRow key={r.entityId} r={r} cutoff={cutoff} loading={loading} adjustLabel={labels.adjust} />
+                <SortableContext
+                  items={items.map(i => i.entityId)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {items.map(r => (
+                    <SortableRow
+                      key={r.entityId}
+                      r={r}
+                      cutoff={cutoff}
+                      loading={loading}
+                      adjustLabel={labels.adjust}
+                    />
                   ))}
                 </SortableContext>
                 <Table.Tr>
                   <Table.Td colSpan={4}>
-                    <Divider my={2} label={<Badge size="xs" variant="light">{plays} {labels.plays}</Badge>} labelPosition="center" />
+                    <Divider
+                      my={2}
+                      label={
+                        <Badge size="xs" variant="light">
+                          {plays} {labels.plays}
+                        </Badge>
+                      }
+                      labelPosition="center"
+                    />
                   </Table.Td>
                 </Table.Tr>
               </React.Fragment>

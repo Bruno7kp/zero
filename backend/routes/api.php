@@ -1,10 +1,11 @@
 <?php
+
 // routes/api.php (clean restored)
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 
 // Google OAuth (redirect + callback GET/POST)
 Route::get('/auth/google/redirect', [SocialiteController::class, 'redirectToGoogle']);
@@ -31,5 +32,3 @@ Route::get('/health', function () {
         'git_sha' => env('APP_GIT_SHA', 'dev'),
     ]);
 });
-
-

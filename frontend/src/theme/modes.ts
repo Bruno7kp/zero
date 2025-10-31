@@ -67,25 +67,25 @@ export function getCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): s
     case 'light':
       return (theme as any).white || '#ffffff';
     case 'black':
-      return ((theme as any).colors?.dark?.[7]) ?? '#000000';
+      return (theme as any).colors?.dark?.[7] ?? '#000000';
     case 'blue':
-      return ((theme as any).colors?.dark?.[7]) ?? '#1A1B1E';
+      return (theme as any).colors?.dark?.[7] ?? '#1A1B1E';
     case 'dark':
     default:
-      return ((theme as any).colors?.dark?.[8]) ?? '#1A1B1E';
+      return (theme as any).colors?.dark?.[8] ?? '#1A1B1E';
   }
 }
 
 export function getSecondaryCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): string {
   switch (mode) {
     case 'light':
-      return ((theme as any).colors?.gray?.[1]) || '#ffffff';
+      return (theme as any).colors?.gray?.[1] || '#ffffff';
     case 'black':
-      return ((theme as any).colors?.dark?.[6]) ?? '#000000';
+      return (theme as any).colors?.dark?.[6] ?? '#000000';
     case 'blue':
-      return ((theme as any).colors?.dark?.[6]) ?? '#1A1B1E';
+      return (theme as any).colors?.dark?.[6] ?? '#1A1B1E';
     case 'dark':
     default:
-      return ((theme as any).colors?.dark?.[6]) ?? '#1A1B1E';
+      return (theme as any).colors?.dark?.[6] ?? '#1A1B1E';
   }
 }

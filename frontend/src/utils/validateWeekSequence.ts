@@ -10,7 +10,8 @@ export async function validateWeekSequence(chartId: string, chartType: string) {
     .where(['chartId', 'chartType'])
     .equals([chartId, chartType])
     .sortBy('week');
-  if (!rows.length) return { ok: true, gaps: [] as Array<{ after: string; expected: string; found: string }> };
+  if (!rows.length)
+    return { ok: true, gaps: [] as Array<{ after: string; expected: string; found: string }> };
   const seenWeeks = Array.from(new Set(rows.map(r => r.week))).sort();
   const gaps: Array<{ after: string; expected: string; found: string }> = [];
   for (let i = 1; i < seenWeeks.length; i++) {
@@ -25,14 +26,15 @@ export async function validateWeekSequence(chartId: string, chartType: string) {
 }
 
 /**
- * Marca todas as semanas entre firstWeek e lastWeek como 'partial' caso não possuam nenhum registro, 
+ * Marca todas as semanas entre firstWeek e lastWeek como 'partial' caso não possuam nenhum registro,
  * para evitar falsos NEW consecutivos em presença de buracos.
  */
-export async function markMissingWeeksAsPartial(chartId: string, firstWeek: string, lastWeek: string) {
-  const allEntityWeeks = await db.charts_data
-    .where('chartId')
-    .equals(chartId)
-    .sortBy('week');
+export async function markMissingWeeksAsPartial(
+  chartId: string,
+  firstWeek: string,
+  lastWeek: string
+) {
+  const allEntityWeeks = await db.charts_data.where('chartId').equals(chartId).sortBy('week');
   if (!allEntityWeeks.length) return;
   const existingSet = new Set(allEntityWeeks.map(r => r.week));
   let cursor = dayjs(firstWeek);
@@ -40,7 +42,11 @@ export async function markMissingWeeksAsPartial(chartId: string, firstWeek: stri
   while (cursor.isBefore(end)) {
     const w = cursor.format('YYYY-MM-DD');
     if (!existingSet.has(w)) {
-      try { await db.chart_weeks.put({ chartId, week: w, status: 'partial' }); } catch {/* ignore */}
+      try {
+        await db.chart_weeks.put({ chartId, week: w, status: 'partial' });
+      } catch {
+        /* ignore */
+      }
     }
     cursor = cursor.add(7, 'day');
   }

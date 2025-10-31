@@ -15,8 +15,13 @@ export interface BadgeStyleConfig {
   hideLabel?: boolean; // novo: mostra apenas ícone (label oculto)
 }
 
-export interface ViewBadgeState { rank: { preset: string }; plays: { preset: string }; }
-export interface BadgeStylesState { views: Record<'table' | 'list' | 'grid', ViewBadgeState>; }
+export interface ViewBadgeState {
+  rank: { preset: string };
+  plays: { preset: string };
+}
+export interface BadgeStylesState {
+  views: Record<'table' | 'list' | 'grid', ViewBadgeState>;
+}
 
 // Novos presets baseados na especificação do usuário
 // 1. transparente (sem ícone)
@@ -29,37 +34,112 @@ export interface BadgeStylesState { views: Record<'table' | 'list' | 'grid', Vie
 // 8. especial leve (maximalistaLight) - igual ao maximalista, mas segundo badge transparente
 const PRESETS: Record<string, BadgeStyleConfig> = {
   transparent: {
-    variant: 'transparent', radius: 0, iconPosition: 'hidden', size: 'xs', condensed: true, colorStrategy: 'direction', emphasizeZero: false
+    variant: 'transparent',
+    radius: 0,
+    iconPosition: 'hidden',
+    size: 'xs',
+    condensed: true,
+    colorStrategy: 'direction',
+    emphasizeZero: false,
   },
   transparentIcon: {
-    variant: 'transparent', radius: 0, iconPosition: 'before', size: 'xs', condensed: true, colorStrategy: 'direction', emphasizeZero: false
+    variant: 'transparent',
+    radius: 0,
+    iconPosition: 'before',
+    size: 'xs',
+    condensed: true,
+    colorStrategy: 'direction',
+    emphasizeZero: false,
   },
   transparentIconOnly: {
-    variant: 'transparent', radius: 0, iconPosition: 'before', size: 'xs', condensed: true, colorStrategy: 'direction', emphasizeZero: false, hideLabel: true
+    variant: 'transparent',
+    radius: 0,
+    iconPosition: 'before',
+    size: 'xs',
+    condensed: true,
+    colorStrategy: 'direction',
+    emphasizeZero: false,
+    hideLabel: true,
   },
   light: {
-    variant: 'light', radius: 'pill', iconPosition: 'hidden', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
+    variant: 'light',
+    radius: 'pill',
+    iconPosition: 'hidden',
+    size: 'sm',
+    condensed: false,
+    colorStrategy: 'direction',
+    emphasizeZero: true,
   },
   lightIcon: {
-    variant: 'light', radius: 'pill', iconPosition: 'before', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
+    variant: 'light',
+    radius: 'pill',
+    iconPosition: 'before',
+    size: 'sm',
+    condensed: false,
+    colorStrategy: 'direction',
+    emphasizeZero: true,
   },
   lightIconOnly: {
-    variant: 'light', radius: 'pill', iconPosition: 'before', size: 'sm', condensed: true, colorStrategy: 'direction', emphasizeZero: true, hideLabel: true
+    variant: 'light',
+    radius: 'pill',
+    iconPosition: 'before',
+    size: 'sm',
+    condensed: true,
+    colorStrategy: 'direction',
+    emphasizeZero: true,
+    hideLabel: true,
   },
   solid: {
-    variant: 'filled', radius: 'sm', iconPosition: 'hidden', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
+    variant: 'filled',
+    radius: 'sm',
+    iconPosition: 'hidden',
+    size: 'sm',
+    condensed: false,
+    colorStrategy: 'direction',
+    emphasizeZero: true,
   },
   solidIcon: {
-    variant: 'filled', radius: 'sm', iconPosition: 'before', size: 'sm', condensed: false, colorStrategy: 'direction', emphasizeZero: true
+    variant: 'filled',
+    radius: 'sm',
+    iconPosition: 'before',
+    size: 'sm',
+    condensed: false,
+    colorStrategy: 'direction',
+    emphasizeZero: true,
   },
   solidIconOnly: {
-    variant: 'filled', radius: 'sm', iconPosition: 'before', size: 'sm', condensed: true, colorStrategy: 'direction', emphasizeZero: true, hideLabel: true
+    variant: 'filled',
+    radius: 'sm',
+    iconPosition: 'before',
+    size: 'sm',
+    condensed: true,
+    colorStrategy: 'direction',
+    emphasizeZero: true,
+    hideLabel: true,
   },
   maximalist: {
-    variant: 'light', radius: 0, iconPosition: 'split', size: 'xs', condensed: true, colorStrategy: 'static', staticColor: 'gray', emphasizeZero: false, splitIconVariant: 'filled', splitTall: true
+    variant: 'light',
+    radius: 0,
+    iconPosition: 'split',
+    size: 'xs',
+    condensed: true,
+    colorStrategy: 'static',
+    staticColor: 'gray',
+    emphasizeZero: false,
+    splitIconVariant: 'filled',
+    splitTall: true,
   },
   maximalistLight: {
-    variant: 'light', radius: 0, iconPosition: 'split', size: 'xs', condensed: true, colorStrategy: 'static', staticColor: 'gray', emphasizeZero: false, splitIconVariant: 'transparent', splitTall: true
+    variant: 'light',
+    radius: 0,
+    iconPosition: 'split',
+    size: 'xs',
+    condensed: true,
+    colorStrategy: 'static',
+    staticColor: 'gray',
+    emphasizeZero: false,
+    splitIconVariant: 'transparent',
+    splitTall: true,
   },
   // (Removidos presets "iconOnly" para maximalista conforme solicitação)
 };
@@ -67,7 +147,7 @@ const PRESETS: Record<string, BadgeStyleConfig> = {
 // Aliases para presets removidos que possam existir em storage legado
 const PRESET_ALIASES: Record<string, string> = {
   maximalistIconOnly: 'maximalist',
-  maximalistLightIconOnly: 'maximalistLight'
+  maximalistLightIconOnly: 'maximalistLight',
 };
 
 // Initial defaults aligned to requested view defaults (table):
@@ -78,7 +158,7 @@ const initialState: BadgeStylesState = {
     table: { rank: { preset: 'light' }, plays: { preset: 'transparent' } },
     list: { rank: { preset: 'solidIcon' }, plays: { preset: 'light' } },
     grid: { rank: { preset: 'transparentIconOnly' }, plays: { preset: 'light' } },
-  }
+  },
 };
 
 function resolve(preset: string): BadgeStyleConfig {
@@ -90,21 +170,32 @@ export const badgeStylesSlice = createSlice({
   name: 'badgeStyles',
   initialState,
   reducers: {
-    setPreset(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; kind: 'rank' | 'plays'; preset: string }>) {
+    setPreset(
+      state,
+      action: PayloadAction<{
+        view: 'table' | 'list' | 'grid';
+        kind: 'rank' | 'plays';
+        preset: string;
+      }>
+    ) {
       const { view, kind, preset } = action.payload;
       if (!state.views[view]) return;
       state.views[view][kind].preset = preset;
     },
     resetAll() {
       return { ...initialState };
-    }
+    },
   },
-  extraReducers: () => {}
+  extraReducers: () => {},
 });
 
 export const { setPreset, resetAll } = badgeStylesSlice.actions;
 
-export function selectResolvedBadge(state: any, kind: 'rank' | 'plays', view: 'table' | 'list' | 'grid' = 'table'): BadgeStyleConfig {
+export function selectResolvedBadge(
+  state: any,
+  kind: 'rank' | 'plays',
+  view: 'table' | 'list' | 'grid' = 'table'
+): BadgeStyleConfig {
   const slice: BadgeStylesState = state.badgeStyles;
   const entry = slice.views?.[view]?.[kind] || slice.views.table[kind];
   return resolve(entry.preset);

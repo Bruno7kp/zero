@@ -1,6 +1,11 @@
 import { getClosedChartWeeks } from './chartWeekUtils';
 
-export function getRecentWeeks(startDate: string, dayOfWeek: number, timezone: string, limit: number): string[] {
+export function getRecentWeeks(
+  startDate: string,
+  dayOfWeek: number,
+  timezone: string,
+  limit: number
+): string[] {
   const all = getClosedChartWeeks(startDate, dayOfWeek, timezone);
   return all.slice(-limit);
 }

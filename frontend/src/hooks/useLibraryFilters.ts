@@ -1,11 +1,7 @@
 import { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
-import {
-  selectLibraryFilters,
-  updateLibraryFilter,
-
-} from '../store/libraryFiltersSlice';
+import { selectLibraryFilters, updateLibraryFilter } from '../store/libraryFiltersSlice';
 
 export const useLibraryFilters = () => {
   const dispatch = useDispatch<AppDispatch>();

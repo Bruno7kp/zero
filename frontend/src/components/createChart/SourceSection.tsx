@@ -1,5 +1,17 @@
 import React from 'react';
-import { Card, Divider, Grid, Group, NumberInput, Select, Text, TextInput, ThemeIcon, rem, useMantineTheme } from '@mantine/core';
+import {
+  Card,
+  Divider,
+  Grid,
+  Group,
+  NumberInput,
+  Select,
+  Text,
+  TextInput,
+  ThemeIcon,
+  rem,
+  useMantineTheme,
+} from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { IconUserCog } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +35,9 @@ const SourceSection: React.FC<Props> = ({ form, dayOfWeekOptions, allTimezones, 
         <ThemeIcon variant="light" size="md">
           <IconUserCog style={{ width: rem(20), height: rem(20) }} />
         </ThemeIcon>
-        <Text fw={600} size="lg">{t('forms.createChart.sourceTitle')}</Text>
+        <Text fw={600} size="lg">
+          {t('forms.createChart.sourceTitle')}
+        </Text>
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />
       <Grid>
@@ -63,7 +77,7 @@ const SourceSection: React.FC<Props> = ({ form, dayOfWeekOptions, allTimezones, 
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Select
             label={t('forms.createChart.dayOfWeekLabel')}
-            data={dayOfWeekOptions.map((day) => ({ ...day, label: t(`days.${day.value}`) }))}
+            data={dayOfWeekOptions.map(day => ({ ...day, label: t(`days.${day.value}`) }))}
             {...form.getInputProps('day_of_week')}
           />
         </Grid.Col>
@@ -77,13 +91,28 @@ const SourceSection: React.FC<Props> = ({ form, dayOfWeekOptions, allTimezones, 
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <NumberInput min={5} max={100} label={t('forms.createChart.musicCutoffLabel')} {...form.getInputProps('music_cutoff')} />
+          <NumberInput
+            min={5}
+            max={100}
+            label={t('forms.createChart.musicCutoffLabel')}
+            {...form.getInputProps('music_cutoff')}
+          />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <NumberInput min={5} max={100} label={t('forms.createChart.albumCutoffLabel')} {...form.getInputProps('album_cutoff')} />
+          <NumberInput
+            min={5}
+            max={100}
+            label={t('forms.createChart.albumCutoffLabel')}
+            {...form.getInputProps('album_cutoff')}
+          />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <NumberInput min={5} max={100} label={t('forms.createChart.artistCutoffLabel')} {...form.getInputProps('artist_cutoff')} />
+          <NumberInput
+            min={5}
+            max={100}
+            label={t('forms.createChart.artistCutoffLabel')}
+            {...form.getInputProps('artist_cutoff')}
+          />
         </Grid.Col>
       </Grid>
     </Card>

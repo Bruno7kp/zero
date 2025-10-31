@@ -13,7 +13,7 @@ import {
   ScrollArea,
   Pagination,
   Box,
-  Flex
+  Flex,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -34,17 +34,10 @@ const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
     artist: artistName,
     type: 'artist',
     clientId: SPOTIFY_TOKEN,
-    clientSecret: SPOTIFY_SECRET
+    clientSecret: SPOTIFY_SECRET,
   });
 
-  return (
-    <Avatar
-      src={imageUrl}
-      alt={artistName}
-      size={40}
-      radius="md"
-    />
-  );
+  return <Avatar src={imageUrl} alt={artistName} size={40} radius="md" />;
 };
 
 const TimesAtTopByArtistStats: React.FC = () => {
@@ -52,12 +45,14 @@ const TimesAtTopByArtistStats: React.FC = () => {
   const { rank: rankParam, type: typeParam } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<Array<{
-    artistName: string;
-    itemsCount: number;
-    totalWeeks: number;
-    items: Array<{ entityId: string; name: string; count: number }>;
-  }>>([]);
+  const [data, setData] = useState<
+    Array<{
+      artistName: string;
+      itemsCount: number;
+      totalWeeks: number;
+      items: Array<{ entityId: string; name: string; count: number }>;
+    }>
+  >([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState<'album' | 'track'>((typeParam as 'album' | 'track') || 'track');
   const [rank, setRank] = useState(Number(rankParam) || 1);
@@ -78,7 +73,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
     if (!chart) return 100;
     const cutoffMap: any = {
       album: chart.album_cutoff || 100,
-      track: chart.music_cutoff || 100
+      track: chart.music_cutoff || 100,
     };
     return cutoffMap[chartType] || 100;
   };
@@ -104,7 +99,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
           chartId: String(chart.id),
           chartType: type,
           rank,
-          year: year === 'all' ? undefined : year
+          year: year === 'all' ? undefined : year,
         });
         setData(results);
       } catch (error) {
@@ -134,9 +129,7 @@ const TimesAtTopByArtistStats: React.FC = () => {
     if (!searchQuery.trim()) return data;
 
     const query = searchQuery.toLowerCase();
-    return data.filter(item =>
-      item.artistName.toLowerCase().includes(query)
-    );
+    return data.filter(item => item.artistName.toLowerCase().includes(query));
   }, [data, searchQuery]);
 
   // Sort data
@@ -188,32 +181,32 @@ const TimesAtTopByArtistStats: React.FC = () => {
         type={type}
         onTypeChange={handleTypeChange}
         showImages={preferences.showImages}
-        onToggleImages={(value) => updatePreference('showImages', value)}
-  containerSize={preferences.containerSize}
-  onContainerSizeChange={(value) => updatePreference('containerSize', value)}
-  fontSize={preferences.fontSize}
-  onFontSizeChange={(value) => updatePreference('fontSize', value)}
+        onToggleImages={value => updatePreference('showImages', value)}
+        containerSize={preferences.containerSize}
+        onContainerSizeChange={value => updatePreference('containerSize', value)}
+        fontSize={preferences.fontSize}
+        onFontSizeChange={value => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         hideArtistType={true}
         pageSize={preferences.pageSize}
-        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        onPageSizeChange={value => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
-        onSortChange={(value) => setSortBy(value as 'items' | 'weeks')}
+        onSortChange={value => setSortBy(value as 'items' | 'weeks')}
         sortOptions={sortOptions}
         customFilters={
           <Select
             value={String(rank)}
-            onChange={(value) => {
+            onChange={value => {
               if (value) {
                 handleRankChange(Number(value));
               }
             }}
             data={Array.from({ length: cutoff }, (_, i) => ({
               value: String(i + 1),
-              label: `Top ${i + 1}`
+              label: `Top ${i + 1}`,
             }))}
             style={{ minWidth: 120 }}
             leftSection={<IconArrowBarUp size={16} />}
@@ -230,23 +223,27 @@ const TimesAtTopByArtistStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-                <Table.Thead>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    #
+                  </Table.Th>
+                  <Table.Th>{t('stats.timesAtTopByArtist.columns.artist')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {typeLabel} {t('stats.timesAtTopByArtist.inTopN', { n: rank })}
+                  </Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.timesAtTopByArtist.columns.totalWeeksShort')}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.length === 0 ? (
                   <Table.Tr>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                    <Table.Th>{t('stats.timesAtTopByArtist.columns.artist')}</Table.Th>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      {typeLabel} {t('stats.timesAtTopByArtist.inTopN', { n: rank })}
-                    </Table.Th>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      {t('stats.timesAtTopByArtist.columns.totalWeeksShort')}
-                    </Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {paginatedData.length === 0 ? (
-                    <Table.Tr>
-                      <Table.Td colSpan={4}>
-                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
+                    <Table.Td colSpan={4}>
+                      <Text ta="center" py="xl">
+                        {t('stats.noData')}
+                      </Text>
                     </Table.Td>
                   </Table.Tr>
                 ) : (
@@ -256,23 +253,64 @@ const TimesAtTopByArtistStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.artistName}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {displayRank}
+                          </Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            {preferences.showImages && <ImageCell
-                              artistName={record.artistName}
-                            />}
+                            {preferences.showImages && <ImageCell artistName={record.artistName} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                              <Text
+                                fw={600}
+                                lineClamp={1}
+                                className="entity-name"
+                                size={
+                                  preferences.fontSize === 'xs'
+                                    ? 'sm'
+                                    : preferences.fontSize === 'md'
+                                    ? 'lg'
+                                    : 'md'
+                                }
+                              >
+                                {record.artistName}
+                              </Text>
                             </Box>
                           </Flex>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.itemsCount}</Text>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {record.itemsCount}
+                          </Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.totalWeeks}</Text>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {record.totalWeeks}
+                          </Text>
                         </Table.Td>
                       </Table.Tr>
                     );
@@ -298,4 +336,3 @@ const TimesAtTopByArtistStats: React.FC = () => {
 };
 
 export default TimesAtTopByArtistStats;
-

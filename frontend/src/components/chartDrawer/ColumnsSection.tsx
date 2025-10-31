@@ -40,15 +40,23 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
     <Stack gap={6}>
       {viewType === 'list' && (
         <Box>
-          <Text size="xs" c="dimmed" mb={4}>{t('charts.listPeakWeeksCombinedLabel') || 'Peak + Weeks layout (list only)'}</Text>
+          <Text size="xs" c="dimmed" mb={4}>
+            {t('charts.listPeakWeeksCombinedLabel') || 'Peak + Weeks layout (list only)'}
+          </Text>
           <SegmentedControl
             fullWidth
             size="xs"
             value={listPeakWeeksCombined ? 'combined' : 'separate'}
-            onChange={(v) => onToggleListPeakWeeksCombined(v === 'combined')}
+            onChange={v => onToggleListPeakWeeksCombined(v === 'combined')}
             data={[
-              { label: t('charts.listPeakWeeksCombined_separate') || 'Separate', value: 'separate' },
-              { label: t('charts.listPeakWeeksCombined_combined') || 'Combined', value: 'combined' },
+              {
+                label: t('charts.listPeakWeeksCombined_separate') || 'Separate',
+                value: 'separate',
+              },
+              {
+                label: t('charts.listPeakWeeksCombined_combined') || 'Combined',
+                value: 'combined',
+              },
             ]}
           />
         </Box>
@@ -56,12 +64,14 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
 
       {viewType === 'table' && (
         <Box>
-          <Text size="xs" c="dimmed" mb={4}>{t('charts.artistDisplayModeLabel')}</Text>
+          <Text size="xs" c="dimmed" mb={4}>
+            {t('charts.artistDisplayModeLabel')}
+          </Text>
           <SegmentedControl
             fullWidth
             size="xs"
             value={artistDisplayMode}
-            onChange={(v) => onArtistDisplayModeChange(v as 'under' | 'column')}
+            onChange={v => onArtistDisplayModeChange(v as 'under' | 'column')}
             data={[
               { label: t('charts.artistDisplay_separateColumn'), value: 'column' },
               { label: t('charts.artistDisplay_underTitle'), value: 'under' },
@@ -71,12 +81,14 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
       )}
 
       <Box>
-        <Text size="xs" c="dimmed" mb={4}>{t('charts.peakLabel')}</Text>
+        <Text size="xs" c="dimmed" mb={4}>
+          {t('charts.peakLabel')}
+        </Text>
         <SegmentedControl
           fullWidth
           size="xs"
           value={peakMode}
-          onChange={(v) => onPeakModeChange(v as 'hide' | 'show' | 'showWithCount')}
+          onChange={v => onPeakModeChange(v as 'hide' | 'show' | 'showWithCount')}
           data={[
             { label: t('charts.peakShowWithCount'), value: 'showWithCount' },
             { label: t('charts.show'), value: 'show' },
@@ -91,7 +103,7 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
         <Switch
           label={t('charts.imageLabel')}
           checked={columnsWithVisibility.find(c => c.key === 'image')?.visible ?? false}
-          onChange={(e) => onToggleColumn('image', e.currentTarget.checked)}
+          onChange={e => onToggleColumn('image', e.currentTarget.checked)}
           size="sm"
         />
       )}
@@ -99,7 +111,7 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
       <Switch
         label={t('charts.playsLabel')}
         checked={columnsWithVisibility.find(c => c.key === 'plays')?.visible ?? false}
-        onChange={(e) => onToggleColumn('plays', e.currentTarget.checked)}
+        onChange={e => onToggleColumn('plays', e.currentTarget.checked)}
         size="sm"
       />
 
@@ -107,7 +119,7 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
         <Switch
           label={t('charts.showFormulaInsteadOfPlays')}
           checked={showFormulaInsteadOfPlays}
-          onChange={(e) => onToggleShowFormulaInsteadOfPlays(e.currentTarget.checked)}
+          onChange={e => onToggleShowFormulaInsteadOfPlays(e.currentTarget.checked)}
           size="sm"
         />
       )}
@@ -115,7 +127,7 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
       <Switch
         label={t('charts.weeksLabel')}
         checked={columnsWithVisibility.find(c => c.key === 'totalWeeks')?.visible ?? false}
-        onChange={(e) => onToggleColumn('totalWeeks', e.currentTarget.checked)}
+        onChange={e => onToggleColumn('totalWeeks', e.currentTarget.checked)}
         size="sm"
       />
 
@@ -123,7 +135,7 @@ export const ColumnsSection: React.FC<ColumnsSectionProps> = ({
         <Switch
           label={t('charts.certLabel')}
           checked={columnsWithVisibility.find(c => c.key === 'cert')?.visible ?? false}
-          onChange={(e) => onToggleColumn('cert', e.currentTarget.checked)}
+          onChange={e => onToggleColumn('cert', e.currentTarget.checked)}
           size="sm"
         />
       )}

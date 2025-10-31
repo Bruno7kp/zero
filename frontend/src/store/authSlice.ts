@@ -39,7 +39,7 @@ const initialState: AuthState = {
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
   async (googleResponse: any) => {
-  const response = await fetch(apiUrl('/auth/google/callback'), {
+    const response = await fetch(apiUrl('/auth/google/callback'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: googleResponse.credential }),
@@ -52,14 +52,11 @@ export const loginWithGoogle = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk(
-  'auth/logout',
-  async () => {
-    storage.remove(KEYS.USER_TOKEN);
-    storage.remove(KEYS.USER_DATA);
-    return null;
-  }
-);
+export const logout = createAsyncThunk('auth/logout', async () => {
+  storage.remove(KEYS.USER_TOKEN);
+  storage.remove(KEYS.USER_DATA);
+  return null;
+});
 
 const authSlice = createSlice({
   name: 'auth',

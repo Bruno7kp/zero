@@ -8,14 +8,14 @@ interface RowExpansionStatsProps {
   week?: string;
 }
 
-export const RowExpansionStats: React.FC<RowExpansionStatsProps> = ({ chartId, chartType, entityId, week }) => {
+export const RowExpansionStats: React.FC<RowExpansionStatsProps> = ({
+  chartId,
+  chartType,
+  entityId,
+  week,
+}) => {
   return (
-    <ChartItemStatsLoader
-      chartId={chartId}
-      chartType={chartType}
-      entityId={entityId}
-      week={week}
-    />
+    <ChartItemStatsLoader chartId={chartId} chartType={chartType} entityId={entityId} week={week} />
   );
 };
 

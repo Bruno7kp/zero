@@ -13,7 +13,7 @@ import {
   Box,
   Button,
   Tooltip,
-  Flex
+  Flex,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -38,32 +38,27 @@ const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, nam
     artist: name,
     type: 'artist',
     clientId: SPOTIFY_TOKEN,
-    clientSecret: SPOTIFY_SECRET
+    clientSecret: SPOTIFY_SECRET,
   });
 
-  return (
-    <Avatar
-      src={imageUrl}
-      alt={name}
-      size={40}
-      radius="md"
-    />
-  );
+  return <Avatar src={imageUrl} alt={name} size={40} radius="md" />;
 };
 
 const PerfectAllKillStats: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<Array<{
-    week: string;
-    artistName: string;
-    albumName: string;
-    trackName: string;
-    artistEntityId: string;
-    albumEntityId: string;
-    trackEntityId: string;
-  }>>([]);
+  const [data, setData] = useState<
+    Array<{
+      week: string;
+      artistName: string;
+      albumName: string;
+      trackName: string;
+      artistEntityId: string;
+      albumEntityId: string;
+      trackEntityId: string;
+    }>
+  >([]);
   const [year, setYear] = useState('all');
   const { preferences, updatePreference } = useStatsPreferences();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
@@ -102,16 +97,13 @@ const PerfectAllKillStats: React.FC = () => {
         results.sort((a, b) => b.week.localeCompare(a.week));
 
         // Get all weeks for calculating week numbers
-        const allWeeks = await db.charts_data
-          .where('chartId')
-          .equals(String(chart.id))
-          .toArray();
+        const allWeeks = await db.charts_data.where('chartId').equals(String(chart.id)).toArray();
         const uniqueWeeks = [...new Set(allWeeks.map((w: ChartData) => w.week))].sort();
 
         // Add weekNumber to each result (1 = oldest week, N = newest week)
         const resultsWithWeekNumber = results.map(item => ({
           ...item,
-          weekNumber: uniqueWeeks.indexOf(item.week) + 1
+          weekNumber: uniqueWeeks.indexOf(item.week) + 1,
         }));
 
         setData(resultsWithWeekNumber);
@@ -145,10 +137,11 @@ const PerfectAllKillStats: React.FC = () => {
     if (!searchQuery.trim()) return dataWithOccurrence;
 
     const query = searchQuery.toLowerCase();
-    return dataWithOccurrence.filter(item =>
-      item.artistName.toLowerCase().includes(query) ||
-      item.albumName.toLowerCase().includes(query) ||
-      item.trackName.toLowerCase().includes(query)
+    return dataWithOccurrence.filter(
+      item =>
+        item.artistName.toLowerCase().includes(query) ||
+        item.albumName.toLowerCase().includes(query) ||
+        item.trackName.toLowerCase().includes(query)
     );
   }, [dataWithOccurrence, searchQuery]);
 
@@ -219,20 +212,20 @@ const PerfectAllKillStats: React.FC = () => {
 
   return (
     <Stack gap="md">
-  <StatsFilters
+      <StatsFilters
         year={year}
         onYearChange={setYear}
         showImages={preferences.showImages}
-        onToggleImages={(value) => updatePreference('showImages', value)}
-  containerSize={preferences.containerSize}
-  onContainerSizeChange={(value) => updatePreference('containerSize', value)}
-  fontSize={preferences.fontSize}
-  onFontSizeChange={(value) => updatePreference('fontSize', value)}
+        onToggleImages={value => updatePreference('showImages', value)}
+        containerSize={preferences.containerSize}
+        onContainerSizeChange={value => updatePreference('containerSize', value)}
+        fontSize={preferences.fontSize}
+        onFontSizeChange={value => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showTypeFilter={false}
         showSalesToggle={false}
         pageSize={preferences.pageSize}
-        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        onPageSizeChange={value => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -252,45 +245,108 @@ const PerfectAllKillStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('charts.weekNumber')}</Table.Th>
-                    <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
-                    <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
-                    <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.pak.columns.times')}</Table.Th>
-                    <Table.Th style={{ width: 1 }}></Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('charts.weekNumber')}
+                  </Table.Th>
+                  <Table.Th>{t('stats.pak.columns.artist')}</Table.Th>
+                  <Table.Th>{t('stats.pak.columns.album')}</Table.Th>
+                  <Table.Th>{t('stats.pak.columns.track')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.pak.columns.times')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 1 }}></Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
                 {paginatedData.map((record: any) => {
                   const startDate = dayjs(record.week);
                   const endDate = startDate.add(6, 'day');
-                  const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format('DD/MM/YYYY')}`;
+                  const dateRange = `${startDate.format('DD/MM/YYYY')} - ${endDate.format(
+                    'DD/MM/YYYY'
+                  )}`;
 
                   return (
                     <Table.Tr key={`${record.week}-${record.artistEntityId}`}>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <Tooltip label={dateRange} withArrow>
-                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {record.weekNumber}
+                          </Text>
                         </Tooltip>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
                         <Flex gap="sm" wrap="nowrap" align="center">
-                          {preferences.showImages && <ImageCell entityId={record.artistEntityId} name={record.artistName} />}
+                          {preferences.showImages && (
+                            <ImageCell entityId={record.artistEntityId} name={record.artistName} />
+                          )}
                           <Box style={{ flex: 1, minWidth: 0 }}>
-                            <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text
+                              fw={600}
+                              lineClamp={1}
+                              className="entity-name"
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              {record.artistName}
+                            </Text>
                           </Box>
                         </Flex>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text lineClamp={1} size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.albumName}</Text>
+                        <Text
+                          lineClamp={1}
+                          size={
+                            preferences.fontSize === 'xs'
+                              ? 'sm'
+                              : preferences.fontSize === 'md'
+                              ? 'lg'
+                              : 'md'
+                          }
+                        >
+                          {record.albumName}
+                        </Text>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text lineClamp={1} size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.trackName}</Text>
+                        <Text
+                          lineClamp={1}
+                          size={
+                            preferences.fontSize === 'xs'
+                              ? 'sm'
+                              : preferences.fontSize === 'md'
+                              ? 'lg'
+                              : 'md'
+                          }
+                        >
+                          {record.trackName}
+                        </Text>
                       </Table.Td>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
+                        <Text
+                          size={
+                            preferences.fontSize === 'xs'
+                              ? 'sm'
+                              : preferences.fontSize === 'md'
+                              ? 'lg'
+                              : 'md'
+                          }
+                        >
+                          {record.occurrence}
+                        </Text>
                       </Table.Td>
                       <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                         <Button
@@ -325,4 +381,3 @@ const PerfectAllKillStats: React.FC = () => {
 };
 
 export default PerfectAllKillStats;
-

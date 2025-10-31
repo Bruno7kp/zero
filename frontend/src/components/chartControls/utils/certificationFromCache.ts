@@ -26,24 +26,29 @@ export async function computeCertificationFromCache(params: {
     return null;
   }
 
-  const pointsWeight = chartType === 'track' 
-    ? Number(chart.music_points_weight || 0) 
-    : Number(chart.album_points_weight || 0);
-  const playsWeight = chartType === 'track' 
-    ? Number(chart.music_plays_weight || 0) 
-    : Number(chart.album_plays_weight || 0);
-  const gold = chartType === 'track' 
-    ? Number(chart.music_gold_value || 0) 
-    : Number(chart.album_gold_value || 0);
-  const platinum = chartType === 'track' 
-    ? Number(chart.music_platinum_value || 0) 
-    : Number(chart.album_platinum_value || 0);
-  const diamond = chartType === 'track' 
-    ? Number(chart.music_diamond_value || 0) 
-    : Number(chart.album_diamond_value || 0);
+  const pointsWeight =
+    chartType === 'track'
+      ? Number(chart.music_points_weight || 0)
+      : Number(chart.album_points_weight || 0);
+  const playsWeight =
+    chartType === 'track'
+      ? Number(chart.music_plays_weight || 0)
+      : Number(chart.album_plays_weight || 0);
+  const gold =
+    chartType === 'track'
+      ? Number(chart.music_gold_value || 0)
+      : Number(chart.album_gold_value || 0);
+  const platinum =
+    chartType === 'track'
+      ? Number(chart.music_platinum_value || 0)
+      : Number(chart.album_platinum_value || 0);
+  const diamond =
+    chartType === 'track'
+      ? Number(chart.music_diamond_value || 0)
+      : Number(chart.album_diamond_value || 0);
 
   const stabilityPoints = totalPoints || 0;
-  
+
   // Buscar playcount usando o mesmo cache que a tabela (memory + IndexedDB)
   // getUserPlaycountFromCache nunca faz requisição à API - apenas lê o cache
   let userPlaycount = 0;
@@ -54,7 +59,7 @@ export async function computeCertificationFromCache(params: {
       entityName,
       chartType,
     });
-    
+
     if (cached !== null) {
       userPlaycount = cached;
     } else if (playsWeight > 0) {
@@ -69,7 +74,9 @@ export async function computeCertificationFromCache(params: {
     { type: 'gold' as const, value: gold },
     { type: 'platinum' as const, value: platinum },
     { type: 'diamond' as const, value: diamond },
-  ].filter(t => t.value > 0).sort((a, b) => a.value - b.value);
+  ]
+    .filter(t => t.value > 0)
+    .sort((a, b) => a.value - b.value);
 
   if (!thresholds.length) {
     return null;

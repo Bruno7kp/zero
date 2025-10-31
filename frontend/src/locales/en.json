@@ -105,7 +105,7 @@
       "showDroppedItemsLabel": "Show dropouts",
       "showDroppedItems_description": "Display artists/albums/tracks that were in previous week but dropped out",
       "droppedItemsLabel": "Dropouts ({{count}})",
-        "share": {
+      "share": {
         "title": "Share",
         "shareChartTitle": "Share chart",
         "preview": "Preview",
@@ -568,8 +568,8 @@
         "peakOnly": "Peak only",
         "showImages": "Show images",
         "showArtistColumn": "Separate artist column",
-  "containerSize": "Container size",
-  "fontSize": "Font size",
+        "containerSize": "Container size",
+        "fontSize": "Font size",
         "small": "Small",
         "medium": "Medium",
         "large": "Large",

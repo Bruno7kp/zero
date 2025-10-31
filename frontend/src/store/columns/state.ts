@@ -1,6 +1,10 @@
 import type { ColumnsState, ViewConfig } from './types';
 import { defaultColumns, cloneDefaults, DEFAULT_VIEW_SETTINGS } from './defaults';
-import { applyArtistDisplayMode, applyPlaysVariationDisplay, applyRankVariationMapping } from './mappings';
+import {
+  applyArtistDisplayMode,
+  applyPlaysVariationDisplay,
+  applyRankVariationMapping,
+} from './mappings';
 export const hydrateView = (view: 'table' | 'list' | 'grid'): ViewConfig => {
   // Legacy localStorage read removed. Always use defaults; persisted state is
   // handled by redux-persist. If users had previous localStorage config they
@@ -42,14 +46,16 @@ export function ensureViews(state: any): asserts state is ColumnsState {
     });
     const legacySettings = state.settings || {};
     let adjusted = rebuilt;
-    if (legacySettings.rankVariationLocation) adjusted = applyRankVariationMapping(adjusted, legacySettings.rankVariationLocation, 'table');
+    if (legacySettings.rankVariationLocation)
+      adjusted = applyRankVariationMapping(adjusted, legacySettings.rankVariationLocation, 'table');
     adjusted = applyPlaysVariationDisplay(
       adjusted,
       legacySettings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS.table.playsVariationDisplay!,
       legacySettings.playsVariationLocation || DEFAULT_VIEW_SETTINGS.table.playsVariationLocation,
       'table'
     );
-    if (legacySettings.artistDisplayMode) adjusted = applyArtistDisplayMode(adjusted, legacySettings.artistDisplayMode, 'table');
+    if (legacySettings.artistDisplayMode)
+      adjusted = applyArtistDisplayMode(adjusted, legacySettings.artistDisplayMode, 'table');
     state.views = {
       table: { columns: adjusted, settings: { ...DEFAULT_VIEW_SETTINGS.table, ...legacySettings } },
       list: hydrateView('list'),

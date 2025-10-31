@@ -42,10 +42,21 @@ async function getCached(key: string): Promise<number | null> {
 
 async function setCached(key: string, value: number, expires: number) {
   memCache[key] = { value, expires };
-  try { await db.playcount_cache.put({ key, value, expires }); } catch {/* ignore */}
+  try {
+    await db.playcount_cache.put({ key, value, expires });
+  } catch {
+    /* ignore */
+  }
 }
 
-async function fetchPlaycount({ username, artist, album, track, enabled, cacheUntil }: FetchPlaycountArgs): Promise<number> {
+async function fetchPlaycount({
+  username,
+  artist,
+  album,
+  track,
+  enabled,
+  cacheUntil,
+}: FetchPlaycountArgs): Promise<number> {
   if (!enabled) return 0;
   const key = `pc:${username}:${artist}:${album || ''}:${track || ''}`;
   const cached = await getCached(key);
@@ -83,13 +94,19 @@ export interface ComputeCertificationParams {
   nextWeekDay?: number; // target day-of-week from chart config
 }
 
-export async function computeCertification(params: ComputeCertificationParams & { force?: boolean }): Promise<CertificationResult> {
+export async function computeCertification(
+  params: ComputeCertificationParams & { force?: boolean }
+): Promise<CertificationResult> {
   const { chart, chartType, totals, entity, username, offline, nextWeekDay, force } = params;
-  const pointsWeight = chartType === 'track' ? (chart.music_points_weight || 0) : (chart.album_points_weight || 0);
-  const playsWeight = chartType === 'track' ? (chart.music_plays_weight || 0) : (chart.album_plays_weight || 0);
-  const gold = chartType === 'track' ? (chart.music_gold_value || 0) : (chart.album_gold_value || 0);
-  const platinum = chartType === 'track' ? (chart.music_platinum_value || 0) : (chart.album_platinum_value || 0);
-  const diamond = chartType === 'track' ? (chart.music_diamond_value || 0) : (chart.album_diamond_value || 0);
+  const pointsWeight =
+    chartType === 'track' ? chart.music_points_weight || 0 : chart.album_points_weight || 0;
+  const playsWeight =
+    chartType === 'track' ? chart.music_plays_weight || 0 : chart.album_plays_weight || 0;
+  const gold = chartType === 'track' ? chart.music_gold_value || 0 : chart.album_gold_value || 0;
+  const platinum =
+    chartType === 'track' ? chart.music_platinum_value || 0 : chart.album_platinum_value || 0;
+  const diamond =
+    chartType === 'track' ? chart.music_diamond_value || 0 : chart.album_diamond_value || 0;
 
   const stabilityPoints = totals.totalPoints || 0;
   let userPlaycount = 0;
@@ -107,8 +124,14 @@ export async function computeCertification(params: ComputeCertificationParams & 
   if (playsWeight > 0 && !offline && username) {
     if (force) {
       // Invalida cache para esta chave
-      const key = `pc:${username}:${entity.artistName}:${chartType === 'album' ? entity.name : ''}:${chartType === 'track' ? entity.name : ''}`;
-      try { await db.playcount_cache.delete(key); } catch {/* ignore */}
+      const key = `pc:${username}:${entity.artistName}:${
+        chartType === 'album' ? entity.name : ''
+      }:${chartType === 'track' ? entity.name : ''}`;
+      try {
+        await db.playcount_cache.delete(key);
+      } catch {
+        /* ignore */
+      }
       delete memCache[key];
     }
     userPlaycount = await fetchPlaycount({
@@ -135,7 +158,9 @@ export async function computeCertification(params: ComputeCertificationParams & 
     { type: 'gold' as const, value: gold },
     { type: 'platinum' as const, value: platinum },
     { type: 'diamond' as const, value: diamond },
-  ].filter(t => t.value > 0).sort((a, b) => a.value - b.value);
+  ]
+    .filter(t => t.value > 0)
+    .sort((a, b) => a.value - b.value);
 
   if (thresholds.length) {
     // Highest threshold not exceeding totalFormula sets level
@@ -180,7 +205,17 @@ export async function computeCertification(params: ComputeCertificationParams & 
     }
   }
 
-  return { totalFormula, level, multiplier, nextTarget, remainingToNext, playcountUsed: userPlaycount, nextType, nextLevel, nextMultiple };
+  return {
+    totalFormula,
+    level,
+    multiplier,
+    nextTarget,
+    remainingToNext,
+    playcountUsed: userPlaycount,
+    nextType,
+    nextLevel,
+    nextMultiple,
+  };
 }
 
 /**
@@ -202,8 +237,14 @@ export function calculateWeekFormulaValue(params: {
   const { chart, chartType, rank, plays } = params;
   if (!chart) return 0;
   const effectiveType = resolveFormulaChartType(chartType);
-  const pointsWeight = effectiveType === 'track' ? Number(chart.music_points_weight || 0) : Number(chart.album_points_weight || 0);
-  const playsWeight = effectiveType === 'track' ? Number(chart.music_plays_weight || 0) : Number(chart.album_plays_weight || 0);
+  const pointsWeight =
+    effectiveType === 'track'
+      ? Number(chart.music_points_weight || 0)
+      : Number(chart.album_points_weight || 0);
+  const playsWeight =
+    effectiveType === 'track'
+      ? Number(chart.music_plays_weight || 0)
+      : Number(chart.album_plays_weight || 0);
   const rankNumber = typeof rank === 'number' ? rank : null;
   const stabilityPoints = rankNumber != null && rankNumber > 0 ? Math.max(0, 101 - rankNumber) : 0;
   const safePlays = typeof plays === 'number' ? plays : 0;
@@ -241,20 +282,32 @@ export function computeWeeklyFormulaMetrics(params: {
 
   if (typeof deltaPlays === 'number') {
     const numericRank = typeof rank === 'number' ? rank : null;
-    const derivedPreviousRank = numericRank != null
-      ? (typeof deltaRank === 'number' ? numericRank + deltaRank : numericRank)
-      : null;
-    const previousRank = derivedPreviousRank != null && derivedPreviousRank > 0 ? derivedPreviousRank : null;
+    const derivedPreviousRank =
+      numericRank != null
+        ? typeof deltaRank === 'number'
+          ? numericRank + deltaRank
+          : numericRank
+        : null;
+    const previousRank =
+      derivedPreviousRank != null && derivedPreviousRank > 0 ? derivedPreviousRank : null;
     const previousPlays = typeof plays === 'number' ? Math.max(0, plays - deltaPlays) : null;
     if (previousRank != null && previousPlays != null) {
-      const prevRaw = calculateWeekFormulaValue({ chart, chartType: effectiveType, rank: previousRank, plays: previousPlays });
+      const prevRaw = calculateWeekFormulaValue({
+        chart,
+        chartType: effectiveType,
+        rank: previousRank,
+        plays: previousPlays,
+      });
       previousValue = Number.isFinite(prevRaw) ? Math.round(prevRaw) : null;
     }
     if (previousValue != null && currentValue != null) {
       delta = currentValue - previousValue;
     }
     if (delta == null && typeof deltaPlays === 'number' && currentValue != null) {
-      const playsWeight = effectiveType === 'track' ? Number(chart.music_plays_weight || 0) : Number(chart.album_plays_weight || 0);
+      const playsWeight =
+        effectiveType === 'track'
+          ? Number(chart.music_plays_weight || 0)
+          : Number(chart.album_plays_weight || 0);
       const approxDelta = Math.round(deltaPlays * playsWeight);
       delta = approxDelta;
       if (previousValue == null) previousValue = currentValue - approxDelta;
@@ -287,7 +340,9 @@ export async function getUserPlaycountCached(args: {
     cacheUntil = d.endOf('day');
   }
 
-  const key = `pc:${username}:${artistName}:${chartType === 'album' ? entityName : ''}:${chartType === 'track' ? entityName : ''}`;
+  const key = `pc:${username}:${artistName}:${chartType === 'album' ? entityName : ''}:${
+    chartType === 'track' ? entityName : ''
+  }`;
   const cached = await getCached(key);
   if (cached !== null) return cached;
 
@@ -299,7 +354,9 @@ export async function getUserPlaycountCached(args: {
     track: chartType === 'track' ? entityName : undefined,
     enabled: true,
     cacheUntil: cacheUntil.toISOString(),
-  }).finally(() => { delete inflight[key]; });
+  }).finally(() => {
+    delete inflight[key];
+  });
   inflight[key] = p;
   return p;
 }
@@ -314,7 +371,9 @@ export async function getUserPlaycountFromCache(args: {
 }): Promise<number | null> {
   const { username, artistName, entityName, chartType, offline } = args;
   if (!username || offline) return null;
-  const key = `pc:${username}:${artistName}:${chartType === 'album' ? entityName : ''}:${chartType === 'track' ? entityName : ''}`;
+  const key = `pc:${username}:${artistName}:${chartType === 'album' ? entityName : ''}:${
+    chartType === 'track' ? entityName : ''
+  }`;
   const cached = await getCached(key);
   return cached;
 }

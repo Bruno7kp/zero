@@ -21,7 +21,6 @@ interface LayoutSectionProps {
   onShowCarouselChange: (show: boolean) => void;
 }
 
-
 export const LayoutSection: React.FC<LayoutSectionProps> = ({
   isMobile,
   viewType,
@@ -44,12 +43,14 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
     <Stack gap={6}>
       {!isMobile && (
         <Stack gap={2}>
-          <Text size="xs" c="dimmed">{t('charts.containerSizeLabel')}</Text>
+          <Text size="xs" c="dimmed">
+            {t('charts.containerSizeLabel')}
+          </Text>
           <SegmentedControl
             fullWidth
             size="xs"
             value={containerSize}
-            onChange={(v) => onContainerSizeChange(v as ContainerSize)}
+            onChange={v => onContainerSizeChange(v as ContainerSize)}
             data={[
               { label: 'MD', value: 'md' },
               { label: 'LG', value: 'lg' },
@@ -61,12 +62,14 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       )}
 
       <Stack gap={2}>
-        <Text size="xs" c="dimmed">{t('charts.fontScaleLabel') || 'Font size'}</Text>
+        <Text size="xs" c="dimmed">
+          {t('charts.fontScaleLabel') || 'Font size'}
+        </Text>
         <SegmentedControl
           fullWidth
           size="xs"
           value={String(fontScale)}
-          onChange={(v) => onFontScaleChange(Number(v))}
+          onChange={v => onFontScaleChange(Number(v))}
           data={[
             { label: 'A-', value: '-1' },
             { label: 'A', value: '0' },
@@ -77,12 +80,14 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
 
       {viewType === 'table' && (
         <Stack gap={2}>
-          <Text size="xs" c="dimmed">{t('charts.tableBackgroundLabel')}</Text>
+          <Text size="xs" c="dimmed">
+            {t('charts.tableBackgroundLabel')}
+          </Text>
           <SegmentedControl
             fullWidth
             size="xs"
             value={tableBackground}
-            onChange={(v) => onTableBackgroundChange(v as 'default' | 'transparent')}
+            onChange={v => onTableBackgroundChange(v as 'default' | 'transparent')}
             data={[
               { label: t('charts.tableBackground_default'), value: 'default' },
               { label: t('charts.tableBackground_transparent'), value: 'transparent' },
@@ -93,12 +98,14 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
 
       {viewType === 'list' && (
         <Stack gap={2}>
-          <Text size="xs" c="dimmed">{t('charts.listBackgroundLabel')}</Text>
+          <Text size="xs" c="dimmed">
+            {t('charts.listBackgroundLabel')}
+          </Text>
           <SegmentedControl
             fullWidth
             size="xs"
             value={listBackground}
-            onChange={(v) => onListBackgroundChange(v as 'default' | 'transparent')}
+            onChange={v => onListBackgroundChange(v as 'default' | 'transparent')}
             data={[
               { label: t('charts.listBackground_default'), value: 'default' },
               { label: t('charts.listBackground_transparent'), value: 'transparent' },
@@ -114,7 +121,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           label={t('charts.showDroppedItemsLabel')}
           description={t('charts.showDroppedItems_description')}
           checked={showDroppedItems}
-          onChange={(e) => onShowDroppedItemsChange(e.currentTarget.checked)}
+          onChange={e => onShowDroppedItemsChange(e.currentTarget.checked)}
           size="sm"
         />
       </Stack>
@@ -123,7 +130,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
         <Switch
           label={t('charts.settings.showCarousel')}
           checked={showCarousel}
-          onChange={(e) => onShowCarouselChange(e.currentTarget.checked)}
+          onChange={e => onShowCarouselChange(e.currentTarget.checked)}
           size="sm"
         />
       </Stack>

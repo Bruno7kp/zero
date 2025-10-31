@@ -17,7 +17,12 @@ export type BuildLiveColumnsArgs = {
   showVariation: boolean;
 };
 
-export function useLiveColumns({ chartType, showInlineImage, artistMode, showVariation }: BuildLiveColumnsArgs) {
+export function useLiveColumns({
+  chartType,
+  showInlineImage,
+  artistMode,
+  showVariation,
+}: BuildLiveColumnsArgs) {
   const { t } = useTranslation();
   const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
 
@@ -32,9 +37,9 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
         textAlign: 'center',
         render: ({ rank }) => <Text fw={600}>{rank}</Text>,
       },
-      ...(
-        showVariation
-          ? ([{
+      ...(showVariation
+        ? ([
+            {
               accessor: 'deltaRank',
               title: <IconArrowsDownUp size={18} stroke={2} style={{ verticalAlign: 'middle' }} />,
               width: rem(65),
@@ -43,7 +48,11 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
               render: ({ deltaRank }) => {
                 let cfg: any = badgeStylesRank;
                 if (badgeStylesRank.iconPosition === 'split') {
-                  cfg = { ...badgeStylesRank, iconPosition: 'split', splitTall: badgeStylesRank.splitTall !== false };
+                  cfg = {
+                    ...badgeStylesRank,
+                    iconPosition: 'split',
+                    splitTall: badgeStylesRank.splitTall !== false,
+                  };
                 } else if (badgeStylesRank.iconPosition === 'hidden') {
                   cfg = { ...badgeStylesRank, iconPosition: 'hidden', splitTall: false };
                 } else {
@@ -51,16 +60,25 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
                 }
                 return (
                   <Flex justify="center" align="center" style={{ width: '100%' }}>
-                    <DeltaBadge delta={deltaRank ?? '-'} cfg={cfg} kind="rank" textSize="md" columnContext noSidePadding contextView="table" />
+                    <DeltaBadge
+                      delta={deltaRank ?? '-'}
+                      cfg={cfg}
+                      kind="rank"
+                      textSize="md"
+                      columnContext
+                      noSidePadding
+                      contextView="table"
+                    />
                   </Flex>
                 );
               },
-            }] as DataTableColumn<LiveRow>[]) : ([] as DataTableColumn<LiveRow>[])
-      ),
+            },
+          ] as DataTableColumn<LiveRow>[])
+        : ([] as DataTableColumn<LiveRow>[])),
       {
         accessor: 'name',
         title: t('charts.titleLabel'),
-        render: (item) => (
+        render: item => (
           <Flex>
             {showInlineImage && (
               <Flex
@@ -84,7 +102,9 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
               </Flex>
             )}
             <Flex direction="column" justify="center" align="flex-start">
-              <Text fw={600} className="entity-name">{item.name}</Text>
+              <Text fw={600} className="entity-name">
+                {item.name}
+              </Text>
               {artistMode === 'under' && chartType !== 'artist' && !!item.artist && (
                 <Text size="sm">{item.artist}</Text>
               )}
@@ -93,20 +113,22 @@ export function useLiveColumns({ chartType, showInlineImage, artistMode, showVar
         ),
         width: 'auto',
       },
-      ...((chartType === 'artist' || artistMode !== 'column') ? [] : ([{
-        accessor: 'artist',
-        title: t('charts.artistLabel'),
-        render: (item: LiveRow) => (
-          <Text size="md">{item.artist || '-'}</Text>
-        ),
-        width: 'auto',
-      }] as DataTableColumn<LiveRow>[])),
+      ...(chartType === 'artist' || artistMode !== 'column'
+        ? []
+        : ([
+            {
+              accessor: 'artist',
+              title: t('charts.artistLabel'),
+              render: (item: LiveRow) => <Text size="md">{item.artist || '-'}</Text>,
+              width: 'auto',
+            },
+          ] as DataTableColumn<LiveRow>[])),
       {
         accessor: 'playcount',
         title: 'Plays',
         width: rem(80),
         textAlign: 'center',
-      }
+      },
     ];
     return cols;
   }, [badgeStylesRank, chartType, t, artistMode, showInlineImage, showVariation]);

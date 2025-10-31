@@ -7,30 +7,32 @@ import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 export const ChartLiveSummary = () => {
-    const { t } = useTranslation();
-    const theme = useMantineTheme();
-    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
-    return (
-        <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-            <Group>
-                <ThemeIcon variant="light" color="red" size="md">
-                    <IconFlame style={{ width: rem(20), height: rem(20) }} />
-                </ThemeIcon>
-                <Text fw={600} size="lg">{t('charts.live')}</Text>
-            </Group>
-            <Divider variant="dashed" size="sm" my="xs"/>
-            <Group justify="space-between">
-                <Button
-                    component={Link}
-                    to={`/live`}
-                    size="sm"
-                    fullWidth
-                    variant="light"
-                    aria-label={t('charts.viewLive')}
-                >
-                    {t('charts.viewLive')}
-                </Button>
-            </Group>
-        </Card>
-    );
+  const { t } = useTranslation();
+  const theme = useMantineTheme();
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+  return (
+    <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
+      <Group>
+        <ThemeIcon variant="light" color="red" size="md">
+          <IconFlame style={{ width: rem(20), height: rem(20) }} />
+        </ThemeIcon>
+        <Text fw={600} size="lg">
+          {t('charts.live')}
+        </Text>
+      </Group>
+      <Divider variant="dashed" size="sm" my="xs" />
+      <Group justify="space-between">
+        <Button
+          component={Link}
+          to={`/live`}
+          size="sm"
+          fullWidth
+          variant="light"
+          aria-label={t('charts.viewLive')}
+        >
+          {t('charts.viewLive')}
+        </Button>
+      </Group>
+    </Card>
+  );
 };

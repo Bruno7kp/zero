@@ -14,11 +14,17 @@ interface WeekPickerProps {
   disabled?: boolean;
 }
 
-export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, weeks, onSelect, disabled }) => {
+export const WeekPicker: React.FC<WeekPickerProps> = ({
+  inputValue,
+  locale,
+  weeks,
+  onSelect,
+  disabled,
+}) => {
   const [opened, setOpened] = React.useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
+
   const handleViewAllWeeks = () => {
     setOpened(false);
     navigate('/charts/weeks');
@@ -38,19 +44,24 @@ export const WeekPicker: React.FC<WeekPickerProps> = ({ inputValue, locale, week
           variant={inputValue ? 'filled' : 'default'}
           size="lg"
           m="xs"
-          onClick={() => { if (!disabled) setOpened(o => !o); }}
+          onClick={() => {
+            if (!disabled) setOpened(o => !o);
+          }}
           disabled={disabled}
         >
           <IconCalendar size={20} />
         </ActionIcon>
       </Popover.Target>
-      <Popover.Dropdown p={0} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Popover.Dropdown
+        p={0}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
         <Calendar
           key={inputValue ? dayjs(inputValue).format('YYYY-MM') : 'no-week'}
           locale={locale}
           defaultDate={inputValue || undefined}
           withCellSpacing={false}
-          getDayProps={(date) => {
+          getDayProps={date => {
             const dateStr = dayjs(date).format('YYYY-MM-DD');
             const isEnabled = weeks.includes(dateStr);
             const isSelected = !!inputValue && dayjs(inputValue).isSame(date, 'day');

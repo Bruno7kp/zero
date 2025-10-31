@@ -25,13 +25,15 @@ export const VariationsSection: React.FC<VariationsSectionProps> = ({
 
   return (
     <Stack gap={8}>
-      <Text size="xs" c="dimmed">{t('charts.rankVariationLocationLabel')}</Text>
+      <Text size="xs" c="dimmed">
+        {t('charts.rankVariationLocationLabel')}
+      </Text>
       {viewType === 'grid' ? (
         <SegmentedControl
           fullWidth
           size="xs"
           value={rankVariationLocation}
-          onChange={(v) => onRankLocationChange(v as any)}
+          onChange={v => onRankLocationChange(v as any)}
           data={[
             { label: t('charts.hide'), value: 'hidden' },
             { label: t('charts.rankVariationUnder'), value: 'under' },
@@ -43,7 +45,7 @@ export const VariationsSection: React.FC<VariationsSectionProps> = ({
           fullWidth
           size="xs"
           value={rankVariationLocation}
-          onChange={(v) => onRankLocationChange(v as any)}
+          onChange={v => onRankLocationChange(v as any)}
           data={[
             { label: t('charts.hide'), value: 'hidden' },
             { label: t('charts.rankVariationUnder'), value: 'under' },
@@ -54,12 +56,14 @@ export const VariationsSection: React.FC<VariationsSectionProps> = ({
 
       {viewType !== 'grid' && (
         <>
-          <Text size="xs" c="dimmed">{t('charts.playsVariationLocationLabel')}</Text>
+          <Text size="xs" c="dimmed">
+            {t('charts.playsVariationLocationLabel')}
+          </Text>
           <SegmentedControl
             fullWidth
             size="xs"
             value={playsVariationLocation}
-            onChange={(v) => onPlaysLocationChange(v as any)}
+            onChange={v => onPlaysLocationChange(v as any)}
             data={[
               { label: t('charts.hide'), value: 'hidden' },
               { label: t('charts.playsVariationUnder'), value: 'under' },
@@ -69,12 +73,14 @@ export const VariationsSection: React.FC<VariationsSectionProps> = ({
 
           {playsVariationLocation !== 'hidden' && (
             <>
-              <Text size="xs" c="dimmed">{t('charts.playsVariationDisplayLabel')}</Text>
+              <Text size="xs" c="dimmed">
+                {t('charts.playsVariationDisplayLabel')}
+              </Text>
               <SegmentedControl
                 size="xs"
                 fullWidth
                 value={playsVariationDisplay}
-                onChange={(value) => onPlaysDisplayChange(value as any)}
+                onChange={value => onPlaysDisplayChange(value as any)}
                 data={[
                   { label: t('charts.playsVariationDisplay_absolute'), value: 'absolute' },
                   { label: t('charts.playsVariationDisplay_percent'), value: 'percent' },

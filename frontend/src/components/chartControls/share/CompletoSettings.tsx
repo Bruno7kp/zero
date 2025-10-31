@@ -1,5 +1,15 @@
 import React from 'react';
-import { Radio, Stack, Text, Accordion, Flex, ColorInput, Switch, Checkbox, TextInput } from '@mantine/core';
+import {
+  Radio,
+  Stack,
+  Text,
+  Accordion,
+  Flex,
+  ColorInput,
+  Switch,
+  Checkbox,
+  TextInput,
+} from '@mantine/core';
 import { IconSettings, IconAlertCircle } from '@tabler/icons-react';
 import { COLOR_SWATCHES } from '../templates/utils/colorSwatches';
 
@@ -44,15 +54,25 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
     <Accordion.Item value="completo-settings">
       <Accordion.Control>
         <Flex direction="column" gap={2}>
-          <Flex align="center" gap={8}><IconSettings size={16} /><Text fw={600}>{t('charts.share.completoSettings', 'Completo Settings')}</Text></Flex>
-          <Text size="xs" c="dimmed">{t('charts.share.completoSettingsDescription', 'Customize background color')}</Text>
+          <Flex align="center" gap={8}>
+            <IconSettings size={16} />
+            <Text fw={600}>{t('charts.share.completoSettings', 'Completo Settings')}</Text>
+          </Flex>
+          <Text size="xs" c="dimmed">
+            {t('charts.share.completoSettingsDescription', 'Customize background color')}
+          </Text>
         </Flex>
       </Accordion.Control>
       <Accordion.Panel>
         <Stack gap="md">
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.completoTop', 'Top Count')}</Text>
-            <Radio.Group value={selectedCompletoTop} onChange={(value) => setSelectedCompletoTop(value)}>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.completoTop', 'Top Count')}
+            </Text>
+            <Radio.Group
+              value={selectedCompletoTop}
+              onChange={value => setSelectedCompletoTop(value)}
+            >
               <Stack gap="xs">
                 <Radio value="full" label={`Top ${chartData.length}`} />
                 {chartData.length > 10 && <Radio value="10" label="Top 10" />}
@@ -62,7 +82,9 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
             </Radio.Group>
           </div>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.backgroundColor', 'Background Color')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.backgroundColor', 'Background Color')}
+            </Text>
             <ColorInput
               value={selectedCompletoBackgroundColor}
               onChange={setSelectedCompletoBackgroundColor}
@@ -73,64 +95,102 @@ export const CompletoSettings: React.FC<CompletoSettingsProps> = ({
             />
           </div>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.showColoredIcons', 'Show Colored Icons')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.showColoredIcons', 'Show Colored Icons')}
+            </Text>
             <Switch
               checked={selectedCompletoShowColoredIcons}
-              onChange={(event) => setSelectedCompletoShowColoredIcons(event.currentTarget.checked)}
-              label={selectedCompletoShowColoredIcons ? t('common.show', 'Show') : t('common.hide', 'Hide')}
+              onChange={event => setSelectedCompletoShowColoredIcons(event.currentTarget.checked)}
+              label={
+                selectedCompletoShowColoredIcons
+                  ? t('common.show', 'Show')
+                  : t('common.hide', 'Hide')
+              }
             />
           </div>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.columns', 'Columns (max 2)')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.columns', 'Columns (max 2)')}
+            </Text>
             <Stack gap="xs">
               {[
                 { key: 'plays', label: t('charts.share.plays', 'Plays') },
                 { key: 'vendas', label: t('charts.share.sales', 'Sales') },
                 { key: 'peak', label: t('charts.share.peak', 'Peak') },
                 { key: 'last', label: t('charts.share.lastPosition', 'Last Position') },
-                { key: 'weeks', label: t('charts.share.weeks', 'Weeks') }
+                { key: 'weeks', label: t('charts.share.weeks', 'Weeks') },
               ].map(({ key, label }) => (
                 <Checkbox
                   key={key}
                   label={label}
                   checked={selectedCompletoColumns.includes(key)}
-                  onChange={(event) => {
+                  onChange={event => {
                     const checked = event.currentTarget.checked;
                     const maxColumns = 2;
                     if (checked && selectedCompletoColumns.length < maxColumns) {
                       setSelectedCompletoColumns([...selectedCompletoColumns, key]);
                     } else if (!checked) {
-                      setSelectedCompletoColumns(selectedCompletoColumns.filter(col => col !== key));
+                      setSelectedCompletoColumns(
+                        selectedCompletoColumns.filter(col => col !== key)
+                      );
                     }
                   }}
-                  disabled={!selectedCompletoColumns.includes(key) && selectedCompletoColumns.length >= 2}
+                  disabled={
+                    !selectedCompletoColumns.includes(key) && selectedCompletoColumns.length >= 2
+                  }
                 />
               ))}
             </Stack>
           </div>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.customHeaderImage', 'Custom Header Image')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.customHeaderImage', 'Custom Header Image')}
+            </Text>
             <TextInput
               value={selectedCompletoCustomHeaderImage}
-              onChange={(event) => setSelectedCompletoCustomHeaderImage(event.currentTarget.value)}
-              placeholder={t('charts.share.customHeaderImagePlaceholder', 'Leave empty to use first place image')}
-              description={t('charts.share.customHeaderImageDescription', 'Use a trusted URL (Spotify, Last.fm, Imgur, etc.)')}
-              error={selectedCompletoCustomHeaderImage && !isAllowedImageDomain(selectedCompletoCustomHeaderImage) 
-                ? t('charts.share.invalidImageDomain', 'Please use a trusted image domain')
-                : null}
-              rightSection={selectedCompletoCustomHeaderImage && !isAllowedImageDomain(selectedCompletoCustomHeaderImage) ? <IconAlertCircle size={16} color="red" /> : null}
+              onChange={event => setSelectedCompletoCustomHeaderImage(event.currentTarget.value)}
+              placeholder={t(
+                'charts.share.customHeaderImagePlaceholder',
+                'Leave empty to use first place image'
+              )}
+              description={t(
+                'charts.share.customHeaderImageDescription',
+                'Use a trusted URL (Spotify, Last.fm, Imgur, etc.)'
+              )}
+              error={
+                selectedCompletoCustomHeaderImage &&
+                !isAllowedImageDomain(selectedCompletoCustomHeaderImage)
+                  ? t('charts.share.invalidImageDomain', 'Please use a trusted image domain')
+                  : null
+              }
+              rightSection={
+                selectedCompletoCustomHeaderImage &&
+                !isAllowedImageDomain(selectedCompletoCustomHeaderImage) ? (
+                  <IconAlertCircle size={16} color="red" />
+                ) : null
+              }
             />
           </div>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.showCertification', 'Show Certification')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.showCertification', 'Show Certification')}
+            </Text>
             <Switch
               checked={selectedCompletoShowCert}
-              onChange={(event) => {
+              onChange={event => {
                 setSelectedCompletoShowCert(event.currentTarget.checked);
               }}
-              label={selectedCompletoShowCert ? t('charts.enabled', 'Enabled') : t('charts.disabled', 'Disabled')}
+              label={
+                selectedCompletoShowCert
+                  ? t('charts.enabled', 'Enabled')
+                  : t('charts.disabled', 'Disabled')
+              }
               disabled={chartType === 'artist'}
-              description={chartType === 'artist' ? t('charts.share.certNotAvailableForArtists', 'Not available for artist charts') : undefined}
+              description={
+                chartType === 'artist'
+                  ? t('charts.share.certNotAvailableForArtists', 'Not available for artist charts')
+                  : undefined
+              }
             />
           </div>
         </Stack>

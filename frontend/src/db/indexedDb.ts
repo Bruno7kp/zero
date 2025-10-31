@@ -2,7 +2,6 @@
 import Dexie from 'dexie';
 import type { Table } from 'dexie';
 
-
 export interface ChartData {
   id?: number;
   chartId: string; // id do chart, string para facilitar indexação
@@ -16,7 +15,6 @@ export interface ChartData {
   deltaRank?: number | string;
   deltaPlays?: number | string;
 }
-
 
 export interface ChartStats {
   chartId: string;
@@ -54,51 +52,61 @@ export class ZeroChartsDB extends Dexie {
 
   constructor() {
     super('ZeroChartsDB');
-    this.version(18).stores({
-      charts_data: `++id, chartId, chartType, entityId, week, rank, plays, name, artistName, [chartId+chartType], [chartId+chartType+week], [chartId+chartType+entityId], &[chartId+chartType+entityId+week], [artistName+chartType]`,
-      charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`,
-      playcount_cache: `key, expires`,
-      chart_weeks: `[chartId+week], chartId, week, status`
-    }).upgrade(async (tx) => {
-      // Idempotent conversion: if any legacy rows still have 'completed', map them.
-      try {
-        const table: any = tx.table('chart_weeks');
-        await table.toCollection().modify((row: any) => {
-          if (row.completed && !row.status) row.status = 'complete';
-          if (!row.status) row.status = 'partial';
-          delete row.completed;
-        });
-      } catch {/* ignore */}
-      // Add _running metadata to existing stats if missing
-      try {
-        const statsTable: any = tx.table('charts_stats');
-        await statsTable.toCollection().modify((row: any) => {
-          if (!row._running) {
-            // Best-effort infer lastWeek from chartRun
-            const lastWeek = Array.isArray(row.chartRun) && row.chartRun.length ? row.chartRun[row.chartRun.length - 1].week : null;
-            row._running = {
-              lastWeek,
-              lastRank: null,
-              weeksProcessed: Array.isArray(row.chartRun) ? row.chartRun.length : 0,
-              version: 2,
-              seqPeak: 0,
-              seqRank1: 0,
-              seqTop5: 0,
-              seqTop10: 0,
-              seqWithinCutoff: 0,
-            };
-          }
-        });
-      } catch {/* ignore stats upgrade */}
-    });
+    this.version(18)
+      .stores({
+        charts_data: `++id, chartId, chartType, entityId, week, rank, plays, name, artistName, [chartId+chartType], [chartId+chartType+week], [chartId+chartType+entityId], &[chartId+chartType+entityId+week], [artistName+chartType]`,
+        charts_stats: `&[chartId+chartType+entityId], chartId, chartType, entityId, peak, totals, sequences, [chartId+chartType]`,
+        playcount_cache: `key, expires`,
+        chart_weeks: `[chartId+week], chartId, week, status`,
+      })
+      .upgrade(async tx => {
+        // Idempotent conversion: if any legacy rows still have 'completed', map them.
+        try {
+          const table: any = tx.table('chart_weeks');
+          await table.toCollection().modify((row: any) => {
+            if (row.completed && !row.status) row.status = 'complete';
+            if (!row.status) row.status = 'partial';
+            delete row.completed;
+          });
+        } catch {
+          /* ignore */
+        }
+        // Add _running metadata to existing stats if missing
+        try {
+          const statsTable: any = tx.table('charts_stats');
+          await statsTable.toCollection().modify((row: any) => {
+            if (!row._running) {
+              // Best-effort infer lastWeek from chartRun
+              const lastWeek =
+                Array.isArray(row.chartRun) && row.chartRun.length
+                  ? row.chartRun[row.chartRun.length - 1].week
+                  : null;
+              row._running = {
+                lastWeek,
+                lastRank: null,
+                weeksProcessed: Array.isArray(row.chartRun) ? row.chartRun.length : 0,
+                version: 2,
+                seqPeak: 0,
+                seqRank1: 0,
+                seqTop5: 0,
+                seqTop10: 0,
+                seqWithinCutoff: 0,
+              };
+            }
+          });
+        } catch {
+          /* ignore stats upgrade */
+        }
+      });
   }
 }
 export const db = new ZeroChartsDB();
 
 // Basic open promise. Primary key change conflicts shouldn't happen now, but keep a safety reset.
-export const dbReady: Promise<void> = db.open()
+export const dbReady: Promise<void> = db
+  .open()
   .then(() => {})
-  .catch(async (e) => {
+  .catch(async e => {
     if (/UpgradeError/i.test(e?.name || '') && /primary key/i.test(e?.message || '')) {
       if (import.meta.env.MODE !== 'production') {
         console.warn('[Dexie] PK upgrade conflict (unexpected) – recreating DB', e);
@@ -113,4 +121,6 @@ export const dbReady: Promise<void> = db.open()
   });
 
 // Optional convenience function for callers wanting to ensure readiness on app bootstrap
-export async function ensureDbReady() { await dbReady; }
+export async function ensureDbReady() {
+  await dbReady;
+}

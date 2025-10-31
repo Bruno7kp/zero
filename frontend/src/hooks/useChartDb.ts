@@ -15,14 +15,26 @@ export function useChartDb() {
   }, []);
 
   // Busca dados de uma semana específica
-  const getChartDataByWeek = useCallback(async (chartId: string, chartType: string, week: string) => {
-    return db.charts_data.where(['chartId', 'chartType', 'week']).equals([chartId, chartType, week]).toArray();
-  }, []);
+  const getChartDataByWeek = useCallback(
+    async (chartId: string, chartType: string, week: string) => {
+      return db.charts_data
+        .where(['chartId', 'chartType', 'week'])
+        .equals([chartId, chartType, week])
+        .toArray();
+    },
+    []
+  );
 
   // Remove dados de uma semana específica para um tipo (usado para corrigir semanas parcialmente salvas de versões antigas)
-  const deleteChartDataByWeek = useCallback(async (chartId: string, chartType: string, week: string) => {
-    await db.charts_data.where(['chartId', 'chartType', 'week']).equals([chartId, chartType, week]).delete();
-  }, []);
+  const deleteChartDataByWeek = useCallback(
+    async (chartId: string, chartType: string, week: string) => {
+      await db.charts_data
+        .where(['chartId', 'chartType', 'week'])
+        .equals([chartId, chartType, week])
+        .delete();
+    },
+    []
+  );
 
   // Marca semana completa
   const markWeekComplete = useCallback(async (chartId: string, week: string) => {
@@ -39,13 +51,13 @@ export function useChartDb() {
 
   // Verifica se semana está marcada como completa
   const isWeekMarkedComplete = useCallback(async (chartId: string, week: string) => {
-    const row = await db.chart_weeks.get([chartId, week]) as ChartWeekRow | undefined;
+    const row = (await db.chart_weeks.get([chartId, week])) as ChartWeekRow | undefined;
     return row?.status === 'complete';
   }, []);
 
   // Recupera status bruto da semana
   const getWeekStatus = useCallback(async (chartId: string, week: string) => {
-    const row = await db.chart_weeks.get([chartId, week]) as ChartWeekRow | undefined;
+    const row = (await db.chart_weeks.get([chartId, week])) as ChartWeekRow | undefined;
     return row?.status; // undefined | 'partial' | 'complete'
   }, []);
 
@@ -86,11 +98,11 @@ export function useChartDb() {
     getChartData,
     getChartDataByWeek,
     deleteChartDataByWeek,
-  markWeekComplete,
-  markWeekPartial,
+    markWeekComplete,
+    markWeekPartial,
     isWeekMarkedComplete,
-  getWeekStatus,
-  getUnmarkedWeeks,
+    getWeekStatus,
+    getUnmarkedWeeks,
     saveChartStats,
     getChartStats,
     exportChartData,

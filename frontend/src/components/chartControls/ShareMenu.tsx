@@ -15,7 +15,17 @@ interface ShareMenuProps {
   disabled?: boolean;
 }
 
-export const ShareMenu: React.FC<ShareMenuProps> = ({ t, chartData, chartName, lastfmUsername, week, weekNumber, chartType, chart, disabled }) => {
+export const ShareMenu: React.FC<ShareMenuProps> = ({
+  t,
+  chartData,
+  chartName,
+  lastfmUsername,
+  week,
+  weekNumber,
+  chartType,
+  chart,
+  disabled,
+}) => {
   const [shareModalOpened, setShareModalOpened] = useState(false);
 
   return (

@@ -25,13 +25,21 @@ export function applyPlaysVariationDisplay(
   view: 'table' | 'list' | 'grid'
 ): ColumnConfig[] {
   if (view === 'grid') {
-    return cols.map(c => (c.key === 'deltaPlaysBadge' || c.key === 'deltaPercentPlaysBadge' || c.key === 'altPlaysVariation') ? { ...c, visible: false } : c);
+    return cols.map(c =>
+      c.key === 'deltaPlaysBadge' ||
+      c.key === 'deltaPercentPlaysBadge' ||
+      c.key === 'altPlaysVariation'
+        ? { ...c, visible: false }
+        : c
+    );
   }
   const loc = location || 'under';
   return cols.map(c => {
     if (c.key === 'altPlaysVariation') return { ...c, visible: loc === 'column' };
-    if (c.key === 'deltaPlaysBadge') return { ...c, visible: loc === 'under' && display === 'absolute' };
-    if (c.key === 'deltaPercentPlaysBadge') return { ...c, visible: loc === 'under' && display === 'percent' };
+    if (c.key === 'deltaPlaysBadge')
+      return { ...c, visible: loc === 'under' && display === 'absolute' };
+    if (c.key === 'deltaPercentPlaysBadge')
+      return { ...c, visible: loc === 'under' && display === 'percent' };
     return c;
   });
 }

@@ -16,7 +16,7 @@ import {
   useMantineTheme,
   Divider,
   Box,
-  Tooltip
+  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,7 @@ import {
   IconCalendarUp,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
-  IconSparkles
+  IconSparkles,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { useStatsPreferences } from '../hooks/useStatsPreferences';
@@ -83,68 +83,68 @@ const StatsPage: React.FC = () => {
       icon: IconChartBar,
       label: t('stats.sidebar.overview'),
       path: '/stats',
-      exact: true
+      exact: true,
     },
     { divider: true },
     {
       icon: IconCrown,
       label: t('stats.timesAtTopByArtist.title', { n: 1 }),
       path: '/stats/times_at_top_by_artist/1/track',
-      group: 'times_at_top_by_artist'
+      group: 'times_at_top_by_artist',
     },
     {
       icon: IconTrophy,
       label: t('stats.rank.title', { n: 1 }),
       path: '/stats/rank/1/track',
-      group: 'rank'
+      group: 'rank',
     },
     {
       icon: IconStar,
       label: t('stats.timesAtRank.title', { n: 1 }),
       path: '/stats/times_at_rank/1/track',
-      group: 'times_at_rank'
+      group: 'times_at_rank',
     },
     {
       icon: IconCalendarUp,
       label: t('stats.timesAtTop.title', { n: trackCutoff }),
       path: `/stats/times_at_top/${trackCutoff}/track`,
-      group: 'times_at_top'
+      group: 'times_at_top',
     },
     { divider: true },
     {
       icon: IconRocket,
       label: t('stats.debuts.title'),
       path: '/stats/debuts/all/track',
-      group: 'debuts'
+      group: 'debuts',
     },
     {
       icon: IconSparkles,
       label: t('stats.debutsAtOneByArtist.title', { n: 1 }),
       path: '/stats/debuts_at_one_by_artist/track',
-      group: 'debuts_at_one_by_artist'
+      group: 'debuts_at_one_by_artist',
     },
     {
       icon: IconHeadphones,
       label: t('stats.plays.title'),
       path: '/stats/plays/all/track',
-      group: 'plays'
+      group: 'plays',
     },
     { divider: true },
     {
       icon: IconFlame,
       label: t('stats.pak.title'),
       path: '/stats/pak',
-      group: 'pak'
+      group: 'pak',
     },
     {
       icon: IconCoin,
       label: t('stats.points.title'),
       path: '/stats/points/track',
-      group: 'points'
-    }
+      group: 'points',
+    },
   ];
 
-  const isActive = (item: typeof navItems[0]) => {
+  const isActive = (item: (typeof navItems)[0]) => {
     if (item.exact) {
       return location.pathname === item.path;
     }
@@ -165,7 +165,11 @@ const StatsPage: React.FC = () => {
 
   if (!chart) {
     return (
-      <Container size={isMobile ? '100%' : preferences.containerSize} py="xl" className="noPaddingMobile">
+      <Container
+        size={isMobile ? '100%' : preferences.containerSize}
+        py="xl"
+        className="noPaddingMobile"
+      >
         <Center>
           <Stack align="center" gap="md">
             <Text>{t('errors.selectActiveChart')}</Text>
@@ -190,15 +194,26 @@ const StatsPage: React.FC = () => {
           hiddenFrom="base"
           visibleFrom="md"
         >
-          <Card p={collapsed ? 'xs' : 'md'} style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
-            <Flex justify={collapsed ? 'center' : 'space-between'} align="center" mb={collapsed ? 0 : 'md'}>
+          <Card
+            p={collapsed ? 'xs' : 'md'}
+            style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
+          >
+            <Flex
+              justify={collapsed ? 'center' : 'space-between'}
+              align="center"
+              mb={collapsed ? 0 : 'md'}
+            >
               {/* Collapse button - desktop only */}
               <ActionIcon
                 variant="subtle"
                 onClick={toggleCollapsed}
                 aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
               >
-                {collapsed ? <IconLayoutSidebarLeftExpand size={18} /> : <IconLayoutSidebarLeftCollapse size={18} />}
+                {collapsed ? (
+                  <IconLayoutSidebarLeftExpand size={18} />
+                ) : (
+                  <IconLayoutSidebarLeftCollapse size={18} />
+                )}
               </ActionIcon>
 
               {/* Title - centered */}
@@ -240,7 +255,7 @@ const StatsPage: React.FC = () => {
                           },
                           section: {
                             marginRight: collapsed ? 0 : undefined,
-                          }
+                          },
                         }}
                       />
                     </Tooltip>
@@ -256,10 +271,7 @@ const StatsPage: React.FC = () => {
           <Card p="md" style={{ backgroundColor: bgColor }}>
             <Flex justify="space-between" align="center" mb={0}>
               <Title order={4}>{t('stats.sidebar.title')}</Title>
-              <ActionIcon
-                variant="subtle"
-                onClick={toggle}
-              >
+              <ActionIcon variant="subtle" onClick={toggle}>
                 <IconMenu2 size={18} />
               </ActionIcon>
             </Flex>
@@ -284,7 +296,7 @@ const StatsPage: React.FC = () => {
                       styles={{
                         root: {
                           borderRadius: 8,
-                        }
+                        },
                       }}
                     />
                   )
@@ -296,14 +308,16 @@ const StatsPage: React.FC = () => {
 
         {/* Main Content */}
         <Box style={{ flex: 1, minWidth: 0 }}>
-          <Suspense fallback={
-            <Center py="xl">
-              <Stack align="center" gap="md">
-                <Loader size="lg" />
-                <Text>{t('stats.loading')}</Text>
-              </Stack>
-            </Center>
-          }>
+          <Suspense
+            fallback={
+              <Center py="xl">
+                <Stack align="center" gap="md">
+                  <Loader size="lg" />
+                  <Text>{t('stats.loading')}</Text>
+                </Stack>
+              </Center>
+            }
+          >
             <Routes>
               <Route path="/" element={<StatsHome />} />
               <Route path="/rank/:rank/:type" element={<RankStats />} />
@@ -313,7 +327,10 @@ const StatsPage: React.FC = () => {
               <Route path="/plays/:position/:type" element={<PlaysStats />} />
               <Route path="/debuts/:position/:type" element={<DebutsStats />} />
               <Route path="/points/:type" element={<PointsStats />} />
-              <Route path="/times_at_top_by_artist/:rank/:type" element={<TimesAtTopByArtistStats />} />
+              <Route
+                path="/times_at_top_by_artist/:rank/:type"
+                element={<TimesAtTopByArtistStats />}
+              />
               <Route path="/debuts_at_one_by_artist/:type" element={<DebutsAtOneByArtistStats />} />
             </Routes>
           </Suspense>

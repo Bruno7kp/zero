@@ -11,13 +11,31 @@ interface ConfirmModalProps {
   onConfirm?: () => void;
 }
 
-export const ConfirmModal: React.FC<ConfirmModalProps> = ({ opened, onClose, title, message, confirmLabel = 'OK', cancelLabel = 'Cancel', onConfirm }) => {
+export const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  opened,
+  onClose,
+  title,
+  message,
+  confirmLabel = 'OK',
+  cancelLabel = 'Cancel',
+  onConfirm,
+}) => {
   return (
     <Modal opened={opened} onClose={onClose} title={title}>
       {message && <Text mb="md">{message}</Text>}
       <Group justify="flex-end">
-        <Button variant="default" onClick={onClose}>{cancelLabel}</Button>
-        <Button color="red" onClick={() => { onConfirm?.(); onClose(); }}>{confirmLabel}</Button>
+        <Button variant="default" onClick={onClose}>
+          {cancelLabel}
+        </Button>
+        <Button
+          color="red"
+          onClick={() => {
+            onConfirm?.();
+            onClose();
+          }}
+        >
+          {confirmLabel}
+        </Button>
       </Group>
     </Modal>
   );

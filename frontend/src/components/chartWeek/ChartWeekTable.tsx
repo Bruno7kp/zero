@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 // Função utilitária para capitalizar a primeira letra
 function capitalize(str: string) {
-    if (!str) return str;
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 import { ImageEditModal } from '../dialogs/ImageEditModal';
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,263 +29,381 @@ import { useStatsEmptyFallback } from '../chartTable/hooks/useStatsEmptyFallback
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 interface ChartWeekTableProps {
-    chart: any;
-    week: string;
-    type: string;
-    altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
-    clientId: string;
-    clientSecret: string;
+  chart: any;
+  week: string;
+  type: string;
+  altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
+  clientId: string;
+  clientSecret: string;
 }
 
-export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({ chart, week, type, altVariation, clientId, clientSecret }) => {
-    // Para edição de imagem
-    const [imageModalRow, setImageModalRow] = useState<any>(null);
-    const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
-    const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
-    const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
-    const data = useSelector((state: RootState) => state.charts.data);
-    const { safeDisplayedData } = useStableDisplayedData(data, week, type, chart?.id);
-    const statsMap = useSelector((state: RootState) => state.charts.statsMap);
-    // const loadingStats = useSelector((state: RootState) => state.charts.loadingStats); // no longer needed in table columns
-    const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
-    const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
-    const scaleSize = makeScaleSize(fontScale);
-    const compactScaleSize = useMemo(() => {
-        const compact = -2;
-        return makeScaleSize(compact);
-    }, []);
-    const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
-    const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
-    const dispatch = useDispatch<AppDispatch>();
-    const { t } = useTranslation();
-    
-    // Fetch dropped items
-    const droppedItems = useDroppedItems(`${chart?.id}`, type, week, safeDisplayedData, showDroppedItems);
-    useEffect(() => {
-        const mandatory = ['rank', 'name'];
-        mandatory.forEach(key => {
-            const col: any = columns.find((c: any) => c.key === key);
-            if (col && !col.visible) {
-                dispatch(updateColumn({ view: 'table', key, visible: true }));
-            }
-        });
-    }, [columns, dispatch]);
+export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({
+  chart,
+  week,
+  type,
+  altVariation,
+  clientId,
+  clientSecret,
+}) => {
+  // Para edição de imagem
+  const [imageModalRow, setImageModalRow] = useState<any>(null);
+  const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
+  const [imageForceUpdate, setImageForceUpdate] = useState<{ [entityId: string]: number }>({});
+  const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{
+    [entityId: string]: string | null;
+  }>({});
+  const data = useSelector((state: RootState) => state.charts.data);
+  const { safeDisplayedData } = useStableDisplayedData(data, week, type, chart?.id);
+  const statsMap = useSelector((state: RootState) => state.charts.statsMap);
+  // const loadingStats = useSelector((state: RootState) => state.charts.loadingStats); // no longer needed in table columns
+  const viewConfig = useSelector((state: RootState) => (state as any).columns?.views?.table);
+  const fontScale = (viewConfig?.settings as any)?.fontScale ?? 0;
+  const scaleSize = makeScaleSize(fontScale);
+  const compactScaleSize = useMemo(() => {
+    const compact = -2;
+    return makeScaleSize(compact);
+  }, []);
+  const columns = useMemo(() => viewConfig?.columns ?? [], [viewConfig?.columns]);
+  const showDroppedItems = (viewConfig?.settings as any)?.showDroppedItems || false;
+  const dispatch = useDispatch<AppDispatch>();
+  const { t } = useTranslation();
 
-    // Busca dados da semana
-    useEffect(() => {
-        if (!week) return;
-        dispatch(fetchChartData({ chartId: `${chart.id}`, chartType: type, week }));
-    }, [chart.id, week, type, dispatch]);
+  // Fetch dropped items
+  const droppedItems = useDroppedItems(
+    `${chart?.id}`,
+    type,
+    week,
+    safeDisplayedData,
+    showDroppedItems
+  );
+  useEffect(() => {
+    const mandatory = ['rank', 'name'];
+    mandatory.forEach(key => {
+      const col: any = columns.find((c: any) => c.key === key);
+      if (col && !col.visible) {
+        dispatch(updateColumn({ view: 'table', key, visible: true }));
+      }
+    });
+  }, [columns, dispatch]);
 
-    // Recalcula deltas (NEW/RE e variações) assim que os dados da semana chegam
-    useEffect(() => {
-        if (!data.length || !week) return;
-        dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
-    }, [data, week, chart.id, type, dispatch]);
+  // Busca dados da semana
+  useEffect(() => {
+    if (!week) return;
+    dispatch(fetchChartData({ chartId: `${chart.id}`, chartType: type, week }));
+  }, [chart.id, week, type, dispatch]);
 
-    useDeferredStats(dispatch, { chartId: `${chart.id}`, chartType: type, data, week }, columns as any[]);
+  // Recalcula deltas (NEW/RE e variações) assim que os dados da semana chegam
+  useEffect(() => {
+    if (!data.length || !week) return;
+    dispatch(computeWeekDeltas({ chartId: `${chart.id}`, chartType: type, week, rows: data }));
+  }, [data, week, chart.id, type, dispatch]);
 
-    // Refetch incremental quando usuário habilita colunas de stats após já ter carregado dados
-    // stats visibility handled inside useDeferredStats
+  useDeferredStats(
+    dispatch,
+    { chartId: `${chart.id}`, chartType: type, data, week },
+    columns as any[]
+  );
 
-    // Fallback: se colunas de stats visíveis mas statsMap continua vazio após pequeno intervalo, força uma nova tentativa
-    const triggerRefetch = useCallback(() => {
-        dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
-    }, [dispatch, chart.id, type, data, week]);
-    useStatsEmptyFallback(true, statsMap, data, week, triggerRefetch);
+  // Refetch incremental quando usuário habilita colunas de stats após já ter carregado dados
+  // stats visibility handled inside useDeferredStats
 
-    // Colunas dinâmicas
-    const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
-    const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
-    // Opção para mostrar/esconder badge delta
-    const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
-    const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
-    const showDeltaPercentPlaysBadge = columns.find((c: any) => c.key === 'deltaPercentPlaysBadge')?.visible;
-    const showAltPlaysVariationRedux = columns.find((c: any) => c.key === 'altPlaysVariation')?.visible;
-    const playsVariationLocation = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationLocation) || 'under') as 'hidden' | 'under' | 'column';
-    const showImage = columns.find((c: any) => c.key === 'image')?.visible;
-    const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
-    const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'table'));
-    const playsVariationDisplay = (useSelector((state: any) => state.columns?.views?.table?.settings?.playsVariationDisplay) || 'percent') as 'hidden' | 'absolute' | 'percent';
-    const peakCountStyle = (useSelector((state: any) => state.columns?.views?.table?.settings?.peakCountStyle) || 'noCount') as 'withCount' | 'noCount';
-    const showPeakCount = peakCountStyle === 'withCount';
-    const showFormulaInsteadOfPlays = (useSelector((state: any) => state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays) || false) as boolean;
-    const formulaName = capitalize(chart?.formula_name || t('charts.sales'));
-    // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
-    const filteredColumns = useMemo(() => {
-        const base = visibleColumns.filter((c: any) => c.isColumn);
-        // Hide certification and artist columns entirely for artist charts
-        return type === 'artist' ? base.filter((c: any) => c.key !== 'cert' && c.key !== 'artist') : base;
-    }, [visibleColumns, type]);
+  // Fallback: se colunas de stats visíveis mas statsMap continua vazio após pequeno intervalo, força uma nova tentativa
+  const triggerRefetch = useCallback(() => {
+    dispatch(fetchStatsMapIncremental({ chartId: `${chart.id}`, chartType: type, data, week }));
+  }, [dispatch, chart.id, type, data, week]);
+  useStatsEmptyFallback(true, statsMap, data, week, triggerRefetch);
 
-    // Stable caches for Peak/Weeks to avoid flicker
-    const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
-    const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
-    const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
-    useEffect(() => {
-        try {
-            const nextPeak = { ...lastPeakById };
-            const nextWeeks = { ...lastWeeksById };
-            const nextWeeksAtPeak = { ...lastWeeksAtPeakById };
-            let changed = false;
-            for (const [entityId, s] of Object.entries(statsMap || {})) {
-                const peak = (s as any)?.peak?.position;
-                if (peak != null && nextPeak[entityId] !== peak) { nextPeak[entityId] = peak; changed = true; }
-                const weeks = (s as any)?.totals?.withinCutoff;
-                if (weeks != null && nextWeeks[entityId] !== weeks) { nextWeeks[entityId] = weeks; changed = true; }
-                const weeksAtPeak = (s as any)?.peak?.weeksAtPeak;
-                if (weeksAtPeak != null && nextWeeksAtPeak[entityId] !== weeksAtPeak) { nextWeeksAtPeak[entityId] = weeksAtPeak; changed = true; }
-            }
-            if (changed) { setLastPeakById(nextPeak); setLastWeeksById(nextWeeks); setLastWeeksAtPeakById(nextWeeksAtPeak); }
-        } catch { /* noop */ }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [statsMap]);
+  // Colunas dinâmicas
+  const visibleColumns = useMemo(() => columns.filter((c: any) => c.visible), [columns]);
+  const showAltVariationRedux = columns.find((c: any) => c.key === 'altVariation')?.visible;
+  // Opção para mostrar/esconder badge delta
+  const showDeltaBadge = columns.find((c: any) => c.key === 'deltaRankBadge')?.visible;
+  const showDeltaPlaysBadge = columns.find((c: any) => c.key === 'deltaPlaysBadge')?.visible;
+  const showDeltaPercentPlaysBadge = columns.find(
+    (c: any) => c.key === 'deltaPercentPlaysBadge'
+  )?.visible;
+  const showAltPlaysVariationRedux = columns.find(
+    (c: any) => c.key === 'altPlaysVariation'
+  )?.visible;
+  const playsVariationLocation = (useSelector(
+    (state: any) => state.columns?.views?.table?.settings?.playsVariationLocation
+  ) || 'under') as 'hidden' | 'under' | 'column';
+  const showImage = columns.find((c: any) => c.key === 'image')?.visible;
+  const badgeStylesRank = useSelector((s: any) => selectResolvedBadge(s, 'rank', 'table'));
+  const badgeStylesPlays = useSelector((s: any) => selectResolvedBadge(s, 'plays', 'table'));
+  const playsVariationDisplay = (useSelector(
+    (state: any) => state.columns?.views?.table?.settings?.playsVariationDisplay
+  ) || 'percent') as 'hidden' | 'absolute' | 'percent';
+  const peakCountStyle = (useSelector(
+    (state: any) => state.columns?.views?.table?.settings?.peakCountStyle
+  ) || 'noCount') as 'withCount' | 'noCount';
+  const showPeakCount = peakCountStyle === 'withCount';
+  const showFormulaInsteadOfPlays = (useSelector(
+    (state: any) => state.columns?.views?.table?.settings?.showFormulaInsteadOfPlays
+  ) || false) as boolean;
+  const formulaName = capitalize(chart?.formula_name || t('charts.sales'));
+  // Remove badges e deltaPlays das colunas visíveis (não são colunas reais)
+  const filteredColumns = useMemo(() => {
+    const base = visibleColumns.filter((c: any) => c.isColumn);
+    // Hide certification and artist columns entirely for artist charts
+    return type === 'artist'
+      ? base.filter((c: any) => c.key !== 'cert' && c.key !== 'artist')
+      : base;
+  }, [visibleColumns, type]);
 
-    // Row expansion
-    // Exibe stats gerais (todas as semanas) ao expandir
-    const renderExpansion: DataTableRowExpansionProps<ChartData>['content'] = ({ record }) => (
-        <RowExpansionStats chartId={record.chartId} chartType={record.chartType} entityId={record.entityId} week={week} />
-    );
+  // Stable caches for Peak/Weeks to avoid flicker
+  const [lastPeakById, setLastPeakById] = useState<Record<string, number | null>>({});
+  const [lastWeeksById, setLastWeeksById] = useState<Record<string, number | null>>({});
+  const [lastWeeksAtPeakById, setLastWeeksAtPeakById] = useState<Record<string, number | null>>({});
+  useEffect(() => {
+    try {
+      const nextPeak = { ...lastPeakById };
+      const nextWeeks = { ...lastWeeksById };
+      const nextWeeksAtPeak = { ...lastWeeksAtPeakById };
+      let changed = false;
+      for (const [entityId, s] of Object.entries(statsMap || {})) {
+        const peak = (s as any)?.peak?.position;
+        if (peak != null && nextPeak[entityId] !== peak) {
+          nextPeak[entityId] = peak;
+          changed = true;
+        }
+        const weeks = (s as any)?.totals?.withinCutoff;
+        if (weeks != null && nextWeeks[entityId] !== weeks) {
+          nextWeeks[entityId] = weeks;
+          changed = true;
+        }
+        const weeksAtPeak = (s as any)?.peak?.weeksAtPeak;
+        if (weeksAtPeak != null && nextWeeksAtPeak[entityId] !== weeksAtPeak) {
+          nextWeeksAtPeak[entityId] = weeksAtPeak;
+          changed = true;
+        }
+      }
+      if (changed) {
+        setLastPeakById(nextPeak);
+        setLastWeeksById(nextWeeks);
+        setLastWeeksAtPeakById(nextWeeksAtPeak);
+      }
+    } catch {
+      /* noop */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statsMap]);
 
-    // Função utilitária para montar colunas, reduz duplicação
-    const getTableColumns = useCallback((isDropped: boolean) => { // <-- Wrapped in useCallback
-        const filtered = isDropped
-            ? filteredColumns.filter((c: any) =>
-                c.key !== 'deltaRankBadge' &&
-                c.key !== 'deltaPlaysBadge' &&
-                c.key !== 'deltaPercentPlaysBadge' &&
-                c.key !== 'altVariation' &&
-                c.key !== 'altPlaysVariation')
-            : filteredColumns;
-        const appliedScaleSize = isDropped ? compactScaleSize : scaleSize;
-        const nameImageSize = isDropped ? 32 : 40;
-        return buildTableColumns({
-            filteredColumns: filtered,
-            t,
-            showDeltaBadge: !isDropped && !!showDeltaBadge,
-            showDeltaPlaysBadge: !isDropped && !!showDeltaPlaysBadge,
-            showDeltaPercentPlaysBadge: !isDropped && !!showDeltaPercentPlaysBadge,
-            showImage: !!showImage,
-            statsMap,
-            clientId,
-            clientSecret,
-            imageForceUpdate,
-            lastImageUrlByEntityId,
-            type,
-            badgeStylesRank,
-            badgeStylesPlays,
-            showAltVariationRedux: !isDropped && !!showAltVariationRedux,
-            showAltPlaysVariationRedux: !isDropped && !!showAltPlaysVariationRedux,
-            playsVariationLocation,
-            playsVariationDisplay,
-            showPeakCount,
-            lastPeakById,
-            lastWeeksById,
-            lastWeeksAtPeakById,
-            altVariation,
-            chart,
-            viewSettings: viewConfig?.settings,
-            scaleSize: appliedScaleSize as any,
-            nameImageSize,
-            onNameImageChange: (row) => {
-                setImageForceUpdate(f => ({ ...f, [row.entityId]: Date.now() }));
-            },
-            onNameImageLoad: (row, url) => {
-                if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
-                    setLastImageUrlByEntityId(prev => ({ ...prev, [row.entityId]: url }));
-                }
-            },
-            showFormulaInsteadOfPlays,
-            formulaName,
-        });
-    }, [
-        filteredColumns, t, showDeltaBadge, showDeltaPlaysBadge, showDeltaPercentPlaysBadge,
-        showImage, statsMap, clientId, clientSecret, imageForceUpdate, lastImageUrlByEntityId,
-        type, badgeStylesRank, badgeStylesPlays, showAltVariationRedux, showAltPlaysVariationRedux,
-        playsVariationLocation, playsVariationDisplay, showPeakCount, lastPeakById,
-        lastWeeksById, lastWeeksAtPeakById, altVariation, chart, viewConfig?.settings,
-        scaleSize, compactScaleSize, showFormulaInsteadOfPlays, formulaName,
-    ]);
+  // Row expansion
+  // Exibe stats gerais (todas as semanas) ao expandir
+  const renderExpansion: DataTableRowExpansionProps<ChartData>['content'] = ({ record }) => (
+    <RowExpansionStats
+      chartId={record.chartId}
+      chartType={record.chartType}
+      entityId={record.entityId}
+      week={week}
+    />
+  );
 
-    const dtColumns = useMemo(() => getTableColumns(false), [
-        getTableColumns, // <-- Now only depends on getTableColumns
-    ]);
+  // Função utilitária para montar colunas, reduz duplicação
+  const getTableColumns = useCallback(
+    (isDropped: boolean) => {
+      // <-- Wrapped in useCallback
+      const filtered = isDropped
+        ? filteredColumns.filter(
+            (c: any) =>
+              c.key !== 'deltaRankBadge' &&
+              c.key !== 'deltaPlaysBadge' &&
+              c.key !== 'deltaPercentPlaysBadge' &&
+              c.key !== 'altVariation' &&
+              c.key !== 'altPlaysVariation'
+          )
+        : filteredColumns;
+      const appliedScaleSize = isDropped ? compactScaleSize : scaleSize;
+      const nameImageSize = isDropped ? 32 : 40;
+      return buildTableColumns({
+        filteredColumns: filtered,
+        t,
+        showDeltaBadge: !isDropped && !!showDeltaBadge,
+        showDeltaPlaysBadge: !isDropped && !!showDeltaPlaysBadge,
+        showDeltaPercentPlaysBadge: !isDropped && !!showDeltaPercentPlaysBadge,
+        showImage: !!showImage,
+        statsMap,
+        clientId,
+        clientSecret,
+        imageForceUpdate,
+        lastImageUrlByEntityId,
+        type,
+        badgeStylesRank,
+        badgeStylesPlays,
+        showAltVariationRedux: !isDropped && !!showAltVariationRedux,
+        showAltPlaysVariationRedux: !isDropped && !!showAltPlaysVariationRedux,
+        playsVariationLocation,
+        playsVariationDisplay,
+        showPeakCount,
+        lastPeakById,
+        lastWeeksById,
+        lastWeeksAtPeakById,
+        altVariation,
+        chart,
+        viewSettings: viewConfig?.settings,
+        scaleSize: appliedScaleSize as any,
+        nameImageSize,
+        onNameImageChange: row => {
+          setImageForceUpdate(f => ({ ...f, [row.entityId]: Date.now() }));
+        },
+        onNameImageLoad: (row, url) => {
+          if (row.entityId && url && lastImageUrlByEntityId[row.entityId] !== url) {
+            setLastImageUrlByEntityId(prev => ({ ...prev, [row.entityId]: url }));
+          }
+        },
+        showFormulaInsteadOfPlays,
+        formulaName,
+      });
+    },
+    [
+      filteredColumns,
+      t,
+      showDeltaBadge,
+      showDeltaPlaysBadge,
+      showDeltaPercentPlaysBadge,
+      showImage,
+      statsMap,
+      clientId,
+      clientSecret,
+      imageForceUpdate,
+      lastImageUrlByEntityId,
+      type,
+      badgeStylesRank,
+      badgeStylesPlays,
+      showAltVariationRedux,
+      showAltPlaysVariationRedux,
+      playsVariationLocation,
+      playsVariationDisplay,
+      showPeakCount,
+      lastPeakById,
+      lastWeeksById,
+      lastWeeksAtPeakById,
+      altVariation,
+      chart,
+      viewConfig?.settings,
+      scaleSize,
+      compactScaleSize,
+      showFormulaInsteadOfPlays,
+      formulaName,
+    ]
+  );
 
-    // legacy helper removed (logic centralized in DeltaBadge)
+  const dtColumns = useMemo(
+    () => getTableColumns(false),
+    [
+      getTableColumns, // <-- Now only depends on getTableColumns
+    ]
+  );
 
-    const useProgressive = safeDisplayedData.length > 120; // desativa para listas pequenas
-    const progressiveAll = useProgressiveReveal(safeDisplayedData, { initial: 40, step: 50, intervalMs: 24, adaptive: true, disableBelow: 250, targetDurationMs: 260 });
-    const progressive = useProgressive ? progressiveAll : { items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any;
-    const displayedRecords = progressive.items as ChartData[];
-    const showLoadingTail = useProgressive && !progressive.done;
+  // legacy helper removed (logic centralized in DeltaBadge)
 
-    const tableBgSetting = (useSelector((state: RootState) => (state as any).columns?.views?.table?.settings?.tableBackground) || 'default') as 'default' | 'transparent';
-    const theme = useMantineTheme();
-    const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
-    const paperProps = tableBgSetting === 'transparent'
-        ? { shadow: 'none' as const, bg: 'transparent' as const, style: { background: 'transparent' } }
-        : { shadow: 'xs' as const, style: { background: getCardBackgroundByMode(theme, themeMode) } };
+  const useProgressive = safeDisplayedData.length > 120; // desativa para listas pequenas
+  const progressiveAll = useProgressiveReveal(safeDisplayedData, {
+    initial: 40,
+    step: 50,
+    intervalMs: 24,
+    adaptive: true,
+    disableBelow: 250,
+    targetDurationMs: 260,
+  });
+  const progressive = useProgressive
+    ? progressiveAll
+    : ({ items: safeDisplayedData, done: true, total: safeDisplayedData.length } as any);
+  const displayedRecords = progressive.items as ChartData[];
+  const showLoadingTail = useProgressive && !progressive.done;
 
-    return (
+  const tableBgSetting = (useSelector(
+    (state: RootState) => (state as any).columns?.views?.table?.settings?.tableBackground
+  ) || 'default') as 'default' | 'transparent';
+  const theme = useMantineTheme();
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+  const paperProps =
+    tableBgSetting === 'transparent'
+      ? {
+          shadow: 'none' as const,
+          bg: 'transparent' as const,
+          style: { background: 'transparent' },
+        }
+      : { shadow: 'xs' as const, style: { background: getCardBackgroundByMode(theme, themeMode) } };
+
+  return (
+    <>
+      <Paper {...paperProps} p="md">
+        <DataTable
+          className="datatable-transparent"
+          columns={dtColumns}
+          records={displayedRecords}
+          rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true }}
+          highlightOnHover
+          minHeight={300}
+        />
+        {showLoadingTail && (
+          <Flex justify="center" py="sm">
+            <Text size="xs" c="dimmed">
+              Carregando {displayedRecords.length}/{progressive.total}…
+            </Text>
+          </Flex>
+        )}
+      </Paper>
+
+      {/* Dropped items section */}
+      {showDroppedItems && droppedItems.length > 0 && (
         <>
-            <Paper {...paperProps} p="md">
-                <DataTable
-                    className="datatable-transparent"
-                    columns={dtColumns}
-                    records={displayedRecords}
-                    rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
-                    highlightOnHover
-                    minHeight={300}
-                />
-                {showLoadingTail && (
-                    <Flex justify="center" py="sm">
-                        <Text size="xs" c="dimmed">Carregando {displayedRecords.length}/{progressive.total}…</Text>
-                    </Flex>
-                )}
-            </Paper>
-            
-            {/* Dropped items section */}
-            {showDroppedItems && droppedItems.length > 0 && (
-                <>
-                    <Divider mt="xl" label={t('charts.droppedItemsLabel', { count: droppedItems.length })} labelPosition="center" />
-                    <Paper shadow="none" bg="transparent" style={{ background: 'transparent' }} p="md">
-                        <DataTable
-                            className="datatable-transparent"
-                            style={{ background: 'transparent' }}
-                            columns={getTableColumns(true)}
-                            records={droppedItems.map(row => ({
-                                ...row,
-                                stats: {
-                                    peak: {
-                                        position: (statsMap[row.entityId]?.peak?.position != null ? statsMap[row.entityId]?.peak?.position : lastPeakById[row.entityId]) ?? undefined,
-                                        weeksAtPeak: (statsMap[row.entityId]?.peak?.weeksAtPeak != null ? statsMap[row.entityId]?.peak?.weeksAtPeak : lastWeeksAtPeakById[row.entityId]) ?? undefined,
-                                    },
-                                    totals: { withinCutoff: (statsMap[row.entityId]?.totals?.withinCutoff != null ? statsMap[row.entityId]?.totals?.withinCutoff : lastWeeksById[row.entityId]) ?? undefined },
-                                }
-                            }))}
-                            rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true, }}
-                            highlightOnHover
-                            minHeight={100}
-                        />
-                    </Paper>
-                </>
-            )}
-            
-            <ImageEditModal
-                opened={!!imageModalRow}
-                onClose={() => setImageModalRow(null)}
-                entityId={imageModalRow?.entityId || ''}
-                name={imageModalRow?.name || ''}
-                artistName={imageModalRow?.artistName}
-                imageUrl={imageModalUrl || ''}
-                type={type as 'artist' | 'album' | 'track'}
-                clientId={clientId}
-                clientSecret={clientSecret}
-                onImageChange={(url: string) => {
-                    setImageForceUpdate(f => ({ ...f, [imageModalRow.entityId]: Date.now() }));
-                    setImageModalUrl(url);
-                }}
+          <Divider
+            mt="xl"
+            label={t('charts.droppedItemsLabel', { count: droppedItems.length })}
+            labelPosition="center"
+          />
+          <Paper shadow="none" bg="transparent" style={{ background: 'transparent' }} p="md">
+            <DataTable
+              className="datatable-transparent"
+              style={{ background: 'transparent' }}
+              columns={getTableColumns(true)}
+              records={droppedItems.map(row => ({
+                ...row,
+                stats: {
+                  peak: {
+                    position:
+                      (statsMap[row.entityId]?.peak?.position != null
+                        ? statsMap[row.entityId]?.peak?.position
+                        : lastPeakById[row.entityId]) ?? undefined,
+                    weeksAtPeak:
+                      (statsMap[row.entityId]?.peak?.weeksAtPeak != null
+                        ? statsMap[row.entityId]?.peak?.weeksAtPeak
+                        : lastWeeksAtPeakById[row.entityId]) ?? undefined,
+                  },
+                  totals: {
+                    withinCutoff:
+                      (statsMap[row.entityId]?.totals?.withinCutoff != null
+                        ? statsMap[row.entityId]?.totals?.withinCutoff
+                        : lastWeeksById[row.entityId]) ?? undefined,
+                  },
+                },
+              }))}
+              rowExpansion={{ content: renderExpansion, trigger: 'click', allowMultiple: true }}
+              highlightOnHover
+              minHeight={100}
             />
+          </Paper>
         </>
-    );
+      )}
+
+      <ImageEditModal
+        opened={!!imageModalRow}
+        onClose={() => setImageModalRow(null)}
+        entityId={imageModalRow?.entityId || ''}
+        name={imageModalRow?.name || ''}
+        artistName={imageModalRow?.artistName}
+        imageUrl={imageModalUrl || ''}
+        type={type as 'artist' | 'album' | 'track'}
+        clientId={clientId}
+        clientSecret={clientSecret}
+        onImageChange={(url: string) => {
+          setImageForceUpdate(f => ({ ...f, [imageModalRow.entityId]: Date.now() }));
+          setImageModalUrl(url);
+        }}
+      />
+    </>
+  );
 };

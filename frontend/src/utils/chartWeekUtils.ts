@@ -12,7 +12,11 @@ dayjs.extend(timezone);
  * @param timezoneStr string do timezone (ex: 'America/Sao_Paulo')
  * @returns string[] datas (YYYY-MM-DD) de início de cada semana fechada
  */
-export function getClosedChartWeeks(startDate: string, dayOfWeek: number, timezoneStr: string): string[] {
+export function getClosedChartWeeks(
+  startDate: string,
+  dayOfWeek: number,
+  timezoneStr: string
+): string[] {
   let week = dayjs.tz(startDate, timezoneStr).startOf('day');
   const diff = (week.day() - dayOfWeek + 7) % 7;
   week = week.subtract(diff, 'day');

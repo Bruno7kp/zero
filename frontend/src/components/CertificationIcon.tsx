@@ -18,17 +18,30 @@ export interface CertificationIconProps {
   deferMs?: number; // lazy start delay
 }
 
-
-const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartType, totals, entity, entityId, username, size = 24, deferMs = 600 }) => {
+const CertificationIconBase: React.FC<CertificationIconProps> = ({
+  chart,
+  chartType,
+  totals,
+  entity,
+  entityId,
+  username,
+  size = 24,
+  deferMs = 600,
+}) => {
   const { t } = useTranslation();
   const { isOnline: online } = useOfflineStatus();
   const [result, setResult] = React.useState<CertificationResult | null>(null);
-  const sigRef = React.useRef<string>("");
+  const sigRef = React.useRef<string>('');
 
-  const pointsWeight = chartType === 'track' ? (chart?.music_points_weight || 0) : (chart?.album_points_weight || 0);
-  const playsWeight = chartType === 'track' ? (chart?.music_plays_weight || 0) : (chart?.album_plays_weight || 0);
+  const pointsWeight =
+    chartType === 'track' ? chart?.music_points_weight || 0 : chart?.album_points_weight || 0;
+  const playsWeight =
+    chartType === 'track' ? chart?.music_plays_weight || 0 : chart?.album_plays_weight || 0;
   const requirePoints = pointsWeight > 0;
-  const totalPointsVal = (totals && typeof (totals as any).totalPoints === 'number') ? (totals as any).totalPoints as number : undefined;
+  const totalPointsVal =
+    totals && typeof (totals as any).totalPoints === 'number'
+      ? ((totals as any).totalPoints as number)
+      : undefined;
   const hasPoints = typeof totalPointsVal === 'number';
 
   React.useEffect(() => {
@@ -57,9 +70,13 @@ const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartT
             });
             if (mounted && sigRef.current === sigDb) setResult(r);
           }
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       })();
-      return () => { mounted = false; };
+      return () => {
+        mounted = false;
+      };
     }
 
     // mark loading implicitly via null result; we don't render a placeholder
@@ -87,16 +104,39 @@ const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartT
         offline: !online,
         nextWeekDay: chart?.day_of_week,
       })
-        .then(r => { if (mounted && sigRef.current === sig) setResult(r); })
-        .finally(() => { /* noop */ });
+        .then(r => {
+          if (mounted && sigRef.current === sig) setResult(r);
+        })
+        .finally(() => {
+          /* noop */
+        });
     }, deferMs);
-    return () => { mounted = false; clearTimeout(timer); };
-  }, [chart, chartType, totals, totalPointsVal, entity, entityId, username, online, deferMs, requirePoints, hasPoints, pointsWeight, playsWeight]);
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+    };
+  }, [
+    chart,
+    chartType,
+    totals,
+    totalPointsVal,
+    entity,
+    entityId,
+    username,
+    online,
+    deferMs,
+    requirePoints,
+    hasPoints,
+    pointsWeight,
+    playsWeight,
+  ]);
 
   // Hide entirely when chart thresholds are not configured (handled in CertificationBadge too)
-  const gold = chartType === 'track' ? (chart?.music_gold_value || 0) : (chart?.album_gold_value || 0);
-  const platinum = chartType === 'track' ? (chart?.music_platinum_value || 0) : (chart?.album_platinum_value || 0);
-  const diamond = chartType === 'track' ? (chart?.music_diamond_value || 0) : (chart?.album_diamond_value || 0);
+  const gold = chartType === 'track' ? chart?.music_gold_value || 0 : chart?.album_gold_value || 0;
+  const platinum =
+    chartType === 'track' ? chart?.music_platinum_value || 0 : chart?.album_platinum_value || 0;
+  const diamond =
+    chartType === 'track' ? chart?.music_diamond_value || 0 : chart?.album_diamond_value || 0;
   if (gold === 0 && platinum === 0 && diamond === 0) return null;
 
   if (!result) {
@@ -119,8 +159,13 @@ const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartT
     }
     return 0;
   })();
-  const requiredForThisCert = Math.max(0, (baseThreshold || 0) * Math.max(1, result.multiplier || 1));
-  const label = `${result.multiplier > 1 ? result.multiplier + 'x ' : ''}${t('values.' + result.level)} — ${formatNumber(requiredForThisCert)} ${formulaName}`;
+  const requiredForThisCert = Math.max(
+    0,
+    (baseThreshold || 0) * Math.max(1, result.multiplier || 1)
+  );
+  const label = `${result.multiplier > 1 ? result.multiplier + 'x ' : ''}${t(
+    'values.' + result.level
+  )} — ${formatNumber(requiredForThisCert)} ${formulaName}`;
 
   return (
     <Tooltip label={label} color="dark" withArrow>
@@ -133,11 +178,21 @@ const CertificationIconBase: React.FC<CertificationIconProps> = ({ chart, chartT
 
 function propsAreEqual(prev: CertificationIconProps, next: CertificationIconProps) {
   const getWeights = (p: CertificationIconProps) => ({
-    points: p.chartType === 'track' ? (p.chart?.music_points_weight || 0) : (p.chart?.album_points_weight || 0),
-    plays: p.chartType === 'track' ? (p.chart?.music_plays_weight || 0) : (p.chart?.album_plays_weight || 0),
-    gold: p.chartType === 'track' ? (p.chart?.music_gold_value || 0) : (p.chart?.album_gold_value || 0),
-    platinum: p.chartType === 'track' ? (p.chart?.music_platinum_value || 0) : (p.chart?.album_platinum_value || 0),
-    diamond: p.chartType === 'track' ? (p.chart?.music_diamond_value || 0) : (p.chart?.album_diamond_value || 0),
+    points:
+      p.chartType === 'track'
+        ? p.chart?.music_points_weight || 0
+        : p.chart?.album_points_weight || 0,
+    plays:
+      p.chartType === 'track' ? p.chart?.music_plays_weight || 0 : p.chart?.album_plays_weight || 0,
+    gold: p.chartType === 'track' ? p.chart?.music_gold_value || 0 : p.chart?.album_gold_value || 0,
+    platinum:
+      p.chartType === 'track'
+        ? p.chart?.music_platinum_value || 0
+        : p.chart?.album_platinum_value || 0,
+    diamond:
+      p.chartType === 'track'
+        ? p.chart?.music_diamond_value || 0
+        : p.chart?.album_diamond_value || 0,
   });
   const wa = getWeights(prev);
   const wb = getWeights(next);
