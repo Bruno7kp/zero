@@ -5,6 +5,8 @@ import { db } from '../db/indexedDb';
 import type { ChartData } from '../db/indexedDb';
 import { Container, Text, Flex, Loader, Center, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
+import * as storage from '../utils/storage';
+import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
 import { ChartsWeeksTimeline } from '../components/weeks/ChartsWeeksTimeline.tsx';
 import { ChartsWeeksTableView } from '../components/weeks/ChartsWeeksTableView.tsx';
 import { ChartsWeeksGridView } from '../components/weeks/ChartsWeeksGridView.tsx';
@@ -35,78 +37,78 @@ export const ChartsWeeksListPage: React.FC = () => {
     const [searchFilter, setSearchFilter] = useState('');
     const [yearFilter, setYearFilter] = useState<string | null>(null);
     const [debouncedSearch] = useDebouncedValue(searchFilter, 500);
-    
+
     // Load view mode from localStorage
     const [viewMode, setViewMode] = useState<'timeline' | 'table' | 'grid'>(() => {
         try {
-            const saved = localStorage.getItem('chartsWeeksViewMode');
-            return (saved === 'timeline' || saved === 'table' || saved === 'grid') ? saved : 'timeline';
+            const saved = storage.get(KEYS.CHARTS_WEEKS_VIEW_MODE, [LEGACY_KEYS.CHARTS_WEEKS_VIEW_MODE]);
+            return (saved === 'timeline' || saved === 'table' || saved === 'grid') ? (saved as 'timeline' | 'table' | 'grid') : 'timeline';
         } catch {
             return 'table';
         }
     });
-    
+
     // Load type filter from localStorage
     const [typeFilter, setTypeFilter] = useState<string[]>(() => {
         try {
-            const saved = localStorage.getItem('chartsWeeksTypeFilter');
-            return saved ? JSON.parse(saved) : ['artist', 'album', 'track'];
+            const saved = storage.getJson<string[]>(KEYS.CHARTS_WEEKS_TYPE_FILTER, [LEGACY_KEYS.CHARTS_WEEKS_TYPE_FILTER]);
+            return saved ? saved : ['artist', 'album', 'track'];
         } catch {
             return ['artist', 'album', 'track'];
         }
     });
-    
+
     // Load items per page from localStorage
     const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
         try {
-            const saved = localStorage.getItem('chartsWeeksItemsPerPage');
+            const saved = storage.get(KEYS.CHARTS_WEEKS_ITEMS_PER_PAGE ?? 'chartsWeeksItemsPerPage', []);
             return saved ? parseInt(saved, 10) : 25;
         } catch {
             return 25;
         }
     });
-    
+
     // Load badge style from localStorage
     const [badgeStyle, setBadgeStyle] = useState<'glass' | 'solid'>(() => {
         try {
-            const saved = localStorage.getItem('chartsWeeksBadgeStyle');
-            return (saved === 'glass' || saved === 'solid') ? saved : 'glass';
+            const saved = storage.get(KEYS.CHARTS_WEEKS_BADGE_STYLE ?? 'chartsWeeksBadgeStyle', []);
+            return (saved === 'glass' || saved === 'solid') ? (saved as 'glass' | 'solid') : 'glass';
         } catch {
             return 'glass';
         }
     });
-    
+
     // Save view mode to localStorage when it changes
     useEffect(() => {
         try {
-            localStorage.setItem('chartsWeeksViewMode', viewMode);
+            storage.set(KEYS.CHARTS_WEEKS_VIEW_MODE, viewMode);
         } catch (e) {
             console.error('Failed to save view mode:', e);
         }
     }, [viewMode]);
-    
+
     // Save type filter to localStorage when it changes
     useEffect(() => {
         try {
-            localStorage.setItem('chartsWeeksTypeFilter', JSON.stringify(typeFilter));
+            storage.setJson(KEYS.CHARTS_WEEKS_TYPE_FILTER, typeFilter);
         } catch (e) {
             console.error('Failed to save type filter:', e);
         }
     }, [typeFilter]);
-    
+
     // Save items per page to localStorage when it changes
     useEffect(() => {
         try {
-            localStorage.setItem('chartsWeeksItemsPerPage', String(itemsPerPage));
+            storage.set(KEYS.CHARTS_WEEKS_ITEMS_PER_PAGE ?? 'chartsWeeksItemsPerPage', String(itemsPerPage));
         } catch (e) {
             console.error('Failed to save items per page:', e);
         }
     }, [itemsPerPage]);
-    
+
     // Save badge style to localStorage when it changes
     useEffect(() => {
         try {
-            localStorage.setItem('chartsWeeksBadgeStyle', badgeStyle);
+            storage.set(KEYS.CHARTS_WEEKS_BADGE_STYLE ?? 'chartsWeeksBadgeStyle', badgeStyle);
         } catch (e) {
             console.error('Failed to save badge style:', e);
         }
@@ -122,7 +124,7 @@ export const ChartsWeeksListPage: React.FC = () => {
             setLoading(true);
             try {
                 const chartId = `${chart.id}`;
-                
+
                 // Get all data for this chart
                 const allData = await db.charts_data
                     .where('chartId')
@@ -195,24 +197,24 @@ export const ChartsWeeksListPage: React.FC = () => {
             const search = debouncedSearch.toLowerCase();
             filtered = filtered.filter(w => {
                 let matches = false;
-                
+
                 if (typeFilter.includes('artist') && w.artistTop1) {
                     const artistName = w.artistTop1.name?.toLowerCase() || '';
                     if (artistName.includes(search)) matches = true;
                 }
-                
+
                 if (typeFilter.includes('album') && w.albumTop1) {
                     const albumName = w.albumTop1.name?.toLowerCase() || '';
                     const albumArtist = w.albumTop1.artistName?.toLowerCase() || '';
                     if (albumName.includes(search) || albumArtist.includes(search)) matches = true;
                 }
-                
+
                 if (typeFilter.includes('track') && w.trackTop1) {
                     const trackName = w.trackTop1.name?.toLowerCase() || '';
                     const trackArtist = w.trackTop1.artistName?.toLowerCase() || '';
                     if (trackName.includes(search) || trackArtist.includes(search)) matches = true;
                 }
-                
+
                 return matches;
             });
         }
@@ -252,7 +254,7 @@ export const ChartsWeeksListPage: React.FC = () => {
             <Flex direction="column" p="xs" gap="sm">
                 <ChartsWeeksHeader title={`${t('charts.allWeeks')}${chart ? ` - ${chart.name}` : ''}`} />
                 <Divider variant="solid" size="sm" my="md"/>
-                
+
                 <ChartsWeeksFilters
                     availableYears={availableYears}
                     searchFilter={searchFilter}
@@ -276,15 +278,15 @@ export const ChartsWeeksListPage: React.FC = () => {
 
                 {/* View based on selected mode */}
                 {viewMode === 'timeline' && (
-                    <ChartsWeeksTimeline 
-                        weeksData={filteredData} 
-                        themeMode={themeMode} 
+                    <ChartsWeeksTimeline
+                        weeksData={filteredData}
+                        themeMode={themeMode}
                         itemsPerPage={itemsPerPage}
                     />
                 )}
                 {viewMode === 'table' && (
-                    <ChartsWeeksTableView 
-                        weeksData={filteredData} 
+                    <ChartsWeeksTableView
+                        weeksData={filteredData}
                         chartId={chart?.id || 0}
                         itemsPerPage={itemsPerPage}
                         typeFilter={typeFilter}
@@ -292,8 +294,8 @@ export const ChartsWeeksListPage: React.FC = () => {
                     />
                 )}
                 {viewMode === 'grid' && (
-                    <ChartsWeeksGridView 
-                        weeksData={filteredData} 
+                    <ChartsWeeksGridView
+                        weeksData={filteredData}
                         itemsPerPage={itemsPerPage}
                         typeFilter={typeFilter}
                         badgeStyle={badgeStyle}

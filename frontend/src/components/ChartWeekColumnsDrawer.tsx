@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as storage from '../utils/storage';
 import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -50,27 +51,26 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     const storageKey = `chart_columns_${viewType}`; // legado (ainda lido para migração leve se necessário)
     // Carrega config persistida
     useEffect(() => {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                if (Array.isArray(parsed)) {
-                    parsed.forEach((col: any) => {
-                        dispatch(updateColumn({ view: viewType, key: col.key, visible: col.visible }));
-                    });
-                    onColumnsChange?.(parsed);
-                }
-            } catch { /* noop */ }
-        } else {
-            localStorage.setItem(storageKey, JSON.stringify(columns));
-        }
+        try {
+            const stored = storage.getJson<any[]>(storageKey, [storageKey]);
+            if (stored && Array.isArray(stored)) {
+                stored.forEach((col: any) => {
+                    dispatch(updateColumn({ view: viewType, key: col.key, visible: col.visible }));
+                });
+                onColumnsChange?.(stored);
+            } else {
+                storage.setJson(storageKey, columns);
+            }
+        } catch { /* noop */ }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewType]);
 
     // Persiste sempre que mudar
     useEffect(() => {
-        localStorage.setItem(storageKey, JSON.stringify(columns));
-        onColumnsChange?.(columns);
+        try {
+            storage.setJson(storageKey, columns);
+            onColumnsChange?.(columns);
+        } catch { /* noop */ }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [columns]);
 

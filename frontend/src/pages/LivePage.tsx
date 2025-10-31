@@ -11,6 +11,8 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 import 'dayjs/locale/pt-br';
 import { Link } from 'react-router-dom';
 import { db } from '../db/indexedDb';
+import * as storage from '../utils/storage';
+import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
 import LiveTitle from '../components/live/LiveTitle';
 import TypeSegmented from '../components/live/TypeSegmented';
 import PeriodAndToggle from '../components/live/PeriodAndToggle';
@@ -43,10 +45,9 @@ const LivePage = () => {
     const [endDate, setEndDate] = useState<string>('');
     const [lastSavedWeek, setLastSavedWeek] = useState<string | null>(null);
     // Live-only toggle to show/hide variation (delta). Persist locally.
-    const LIVE_VARIATION_KEY = 'live_showVariation';
     const [showVariation, setShowVariation] = useState<boolean>(() => {
         try {
-            const saved = localStorage.getItem(LIVE_VARIATION_KEY);
+            const saved = storage.get(KEYS.LIVE_VARIATION, [LEGACY_KEYS.LIVE_VARIATION]);
             if (saved === '0') return false;
             if (saved === '1') return true;
         } catch {
@@ -56,12 +57,12 @@ const LivePage = () => {
     });
     useEffect(() => {
         try {
-            localStorage.setItem(LIVE_VARIATION_KEY, showVariation ? '1' : '0');
+            storage.set(KEYS.LIVE_VARIATION, showVariation ? '1' : '0');
         } catch {
             // ignore localStorage write errors
         }
     }, [showVariation]);
-    
+
     const tableBgSetting = (useSelector((state: any) => state.columns?.views?.table?.settings?.tableBackground) || 'default') as 'default' | 'transparent';
     const paperProps = tableBgSetting === 'transparent' ? { shadow: 'none' as const, bg: 'transparent' as const } : { shadow: 'xs' as const };
     const artistMode: 'under' | 'column' = (useSelector((state: any) => state.columns?.views?.table?.settings?.artistDisplayMode) || 'under') as any;

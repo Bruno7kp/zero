@@ -13,6 +13,7 @@ import { ShareOptions } from './ShareOptions';
 import { fetchStatsMapIncremental } from '../../store/charts';
 import { removeStatsCacheEntry } from '../../store/chartsSlice';
 import { computeCertificationFromCache } from './utils/certificationFromCache';
+import * as storage from '../../utils/storage';
 
 // Lista de domínios permitidos para imagens (mesma lista do ImageEditModal)
 const ALLOWED_IMAGE_DOMAINS = [
@@ -56,16 +57,16 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   onClose,
 }) => {
   // Load saved settings from localStorage
-  const loadSavedSettings = () => {
-    try {
-      const saved = localStorage.getItem(`shareSettings_${chart?.id}_${chartType}`);
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  };
-
-  const savedSettings = loadSavedSettings();
+    // Load saved settings from storage util (per-chart dynamic key)
+    const storageKey = `shareSettings_${chart?.id}_${chartType}`;
+    const savedSettings = (() => {
+      try {
+        const s = storage.getJson<any>(storageKey, []);
+        return s || {};
+      } catch {
+        return {};
+      }
+    })();
 
   const [selectedType, setSelectedType] = useState<'grid' | 'stories' | 'stories2' | 'completo' | 'text'>(savedSettings.selectedType || 'stories2');
   const [selectedGridSize, setSelectedGridSize] = useState<3 | 4 | 5 | 6 | 7 | 8 | 9 | 10>(savedSettings.selectedGridSize || 3);
@@ -117,7 +118,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         selectedCompletoCustomHeaderImage,
         selectedCompletoShowCert,
       };
-      localStorage.setItem(`shareSettings_${chart.id}_${chartType}`, JSON.stringify(settings));
+  storage.setJson(`shareSettings_${chart.id}_${chartType}`, settings);
     }
   }, [
     chart?.id,
@@ -150,7 +151,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentImageType, setCurrentImageType] = useState<string>('');
-  
+
   // Cache dos dados enriquecidos para evitar reprocessamento
   const [enrichedDataCache, setEnrichedDataCache] = useState<any[] | null>(null);
   // Cache de certificações computadas
@@ -177,14 +178,14 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         // Always clear cache and reload to ensure fresh data
         const cacheKey = `${chart.id}_${chartType}_${week}`;
         dispatch(removeStatsCacheEntry(cacheKey));
-        dispatch(fetchStatsMapIncremental({ 
-          chartId: String(chart.id), 
-          chartType: String(chartType), 
-          data: chartData, 
-          week 
+        dispatch(fetchStatsMapIncremental({
+          chartId: String(chart.id),
+          chartType: String(chartType),
+          data: chartData,
+          week
         }) as any);
       }, 100);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [opened, chartData, week, chart?.id, chartType, dispatch]);
@@ -204,7 +205,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
 
     // Usar cache se disponível, caso contrário enriquecer os dados
     let enrichedData: any[];
-    
+
     if (enrichedDataCache) {
       // Usa o cache existente - muito mais rápido!
       enrichedData = enrichedDataCache;
@@ -214,12 +215,12 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
         const cached = await spotifyImagesDb.images.get(row.entityId);
         const imageUrl = cached?.imageUrl || null;
         const albumImage = imageUrl; // para compatibilidade
-        
+
         // Calcular stats localmente se não estiver disponível no statsMap
         let peak = null;
         let weeks = null;
         let totalPoints = null;
-        
+
         const existingStats = statsMap?.[row.entityId];
         if (existingStats?.peak?.position && existingStats?.totals?.withinCutoff) {
           peak = existingStats.peak.position;
@@ -239,12 +240,12 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
                 .where('[chartId+chartType+entityId+week]')
                 .between([chart.id.toString(), chartType, row.entityId, '0000'], [chart.id.toString(), chartType, row.entityId, week])
                 .toArray();
-              
+
               if (historicalData.length > 0) {
                 let minRank = Infinity;
                 let weeksCount = 0;
                 let pointsSum = 0;
-                
+
                 for (const hist of historicalData) {
                   if (hist.rank != null) {
                     weeksCount++;
@@ -257,7 +258,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
                     }
                   }
                 }
-                
+
                 peak = minRank === Infinity ? null : minRank;
                 weeks = weeksCount;
                 totalPoints = pointsSum;
@@ -267,22 +268,22 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
             console.error('Error calculating stats for', row.entityId, error);
           }
         }
-        
+
         return { ...row, imageUrl, albumImage, peak, weeks, totalPoints };
       }));
-      
+
       // Salva no cache para uso futuro
       setEnrichedDataCache(enrichedData);
-      
+
       // Computar certificações do cache apenas se showCert estiver habilitado e for tipo album/track
       if (selectedCompletoShowCert && chartType !== 'artist') {
         const certPromises = enrichedData.map(async (row) => {
           // totalPoints já vem calculado do enrichedData (soma de 101-rank de todas as semanas)
           const totalPoints = row.totalPoints || 0;
-          
+
           // Determinar o nome do artista corretamente
           const artistName = row.artist || row.artistName || '';
-          
+
           const cert = await computeCertificationFromCache({
             chart,
             chartType: chartType as 'album' | 'track',
@@ -291,10 +292,10 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
             artistName: artistName,
             username: lastfmUsername,
           });
-          
+
           return { entityId: row.entityId, cert };
         });
-        
+
         const certResults = await Promise.all(certPromises);
         const certMap: Record<string, any> = {};
         certResults.forEach(({ entityId, cert }) => {
@@ -302,7 +303,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
             certMap[entityId] = cert;
           }
         });
-        
+
         setCertificationsCache(certMap);
       }
     }
@@ -322,30 +323,30 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
     } else {
       topCount = selectedCompletoTop === "full" ? chartData.length : parseInt(selectedCompletoTop);
       // Validar a URL customizada antes de usar
-      const validCustomHeaderImage = selectedCompletoCustomHeaderImage && isAllowedImageDomain(selectedCompletoCustomHeaderImage) 
-        ? selectedCompletoCustomHeaderImage 
+      const validCustomHeaderImage = selectedCompletoCustomHeaderImage && isAllowedImageDomain(selectedCompletoCustomHeaderImage)
+        ? selectedCompletoCustomHeaderImage
         : '';
-      
+
       htmlForCanvas = selectedType === 'grid'
         ? generateGridHTML(enrichedData, selectedGridSize, selectedGridShowText, selectedGridShowVariationIcons)
         : selectedType === 'stories'
         ? generateStoriesHTML(enrichedData, selectedStoriesTop, week, chartType, chart, selectedStoriesHighlightColor, selectedStoriesPrimaryColor)
         : generateCompletoHTML(
-            enrichedData, 
-            week, 
-            weekNumber, 
-            chartType, 
-            selectedCompletoBackgroundColor, 
-            topCount, 
-            selectedCompletoShowColoredIcons, 
-            selectedCompletoColumns, 
-            chart, 
-            validCustomHeaderImage, 
-            certificationsCache, 
+            enrichedData,
+            week,
+            weekNumber,
+            chartType,
+            selectedCompletoBackgroundColor,
+            topCount,
+            selectedCompletoShowColoredIcons,
+            selectedCompletoColumns,
+            chart,
+            validCustomHeaderImage,
+            certificationsCache,
             selectedCompletoShowCert
           );
     }
-    
+
     const tempDiv = document.createElement('div');
     tempDiv.style.position = 'absolute';
     tempDiv.style.left = '-9999px';
@@ -362,7 +363,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       } else if (selectedType === 'completo') {
         options = { ...options, width: 950, backgroundColor: selectedCompletoBackgroundColor };
       }
-      
+
       const selector = selectedType === 'stories2' ? '.story' : selectedType === 'completo' ? '.chart-container' : '.poster';
       const canvas = await html2canvas(tempDiv.querySelector(selector) as HTMLElement, options);
       setPreviewImageUrl(canvas.toDataURL('image/png'));
@@ -383,18 +384,18 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
       setPreviewImageUrl(null);
       setCurrentImageType('');
       setIsLoading(true);
-      
+
       // Aguarda o modal estar completamente renderizado antes de gerar a imagem
       // Usa requestAnimationFrame para garantir que o navegador renderize primeiro
       const rafId = requestAnimationFrame(() => {
         const timeoutId = setTimeout(() => {
           generatePreviewImage();
         }, 200);
-        
+
         // Cleanup do timeout
         return () => clearTimeout(timeoutId);
       });
-      
+
       return () => {
         cancelAnimationFrame(rafId);
       };
@@ -481,7 +482,7 @@ export const ShareImageModal: React.FC<ShareImageModalProps> = ({
                 setPreviewImageUrl(null);
                 setIsLoading(true);
                 setCurrentImageType('');
-                
+
                 // Usa requestAnimationFrame + setTimeout para não travar a UI
                 requestAnimationFrame(() => {
                   setTimeout(() => {

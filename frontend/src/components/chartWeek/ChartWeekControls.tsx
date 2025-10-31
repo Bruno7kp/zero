@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
+import * as storage from '../../utils/storage';
+import { KEYS, LEGACY_KEYS } from '../../constants/storageKeys';
 import 'dayjs/locale/pt-br';
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -43,10 +45,13 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
     }, [reduxLanguage, i18n]);
 
     // Persistência do tipo de visualização
-    const VIEW_KEY = 'chartWeekView';
     const [view, setView] = React.useState<'table' | 'grid' | 'list'>(() => {
-        const saved = typeof window !== 'undefined' ? localStorage.getItem(VIEW_KEY) : null;
-        return (saved === 'table' || saved === 'grid' || saved === 'list') ? saved : 'table';
+        try {
+            const saved = storage.get(KEYS.CHART_WEEK_VIEW, [LEGACY_KEYS.CHART_WEEK_VIEW]);
+            return (saved === 'table' || saved === 'grid' || saved === 'list') ? (saved as 'table' | 'grid' | 'list') : 'table';
+        } catch {
+            return 'table';
+        }
     });
 
     // Se receber props controladas, sincroniza o estado local
@@ -58,7 +63,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
 
     const handleSetView = (v: 'table' | 'grid' | 'list') => {
         setView(v);
-        localStorage.setItem(VIEW_KEY, v);
+        try { storage.set(KEYS.CHART_WEEK_VIEW, v); } catch { /* ignore */ }
         if (propSetView) propSetView(v);
     };
     const localeMapping: Record<string, string> = { 'pt': 'pt-br' };
@@ -108,7 +113,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
     // Control drawer open from dropdown menu
     const [drawerOpened, setDrawerOpened] = React.useState(false);
     const isMobile = useIsMobile();
-    
+
     // Get chart data for sharing
     const chartData = useSelector((state: any) => state.charts.data);
     const chartName = chart?.name || t(topType, { week: weekNum });
@@ -125,7 +130,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
             onSetView={handleSetView}
         />
     );
-    
+
     // Share menu
     const shareMenu = (
         <ShareMenu
@@ -176,7 +181,7 @@ export const ChartWeekControls: React.FC<ChartWeekControlsProps> = ({ chart, wee
                     {isMobile && shareMenu}
                 </Flex>
             </Grid.Col>
-            
+
 
             {/* Direita: seleção de visualização (desktop) */}
             {!isMobile && (

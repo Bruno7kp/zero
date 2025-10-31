@@ -14,6 +14,7 @@ import GridAltVariationCorner from '../chartGrid/GridAltVariationCorner';
 import GridUnderRankVariation from '../chartGrid/GridUnderRankVariation';
 import GridItemRenderer from '../chartGrid/GridItemRenderer';
 import { useTranslation } from 'react-i18next';
+import * as storage from '../../utils/storage';
 import { calculateWeekFormulaValue } from '../../utils/certification';
 
 interface ChartWeekGridProps {
@@ -29,19 +30,16 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const dispatch = useDispatch<AppDispatch>();
     // Sincroniza colunas do grid com localStorage
     useEffect(() => {
-        const storageKey = 'chart_columns_grid';
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                if (Array.isArray(parsed)) {
-                    parsed.forEach((col: any) => {
-                        dispatch({ type: 'columns/updateColumn', payload: { view: 'grid', key: col.key, visible: col.visible } });
-                    });
-                }
-            } catch {
-                // Ignora JSON inválido no localStorage
+        try {
+            const storageKey = 'chart_columns_grid';
+            const stored = storage.getJson<any[]>(storageKey, []);
+            if (stored && Array.isArray(stored)) {
+                stored.forEach((col: any) => {
+                    dispatch({ type: 'columns/updateColumn', payload: { view: 'grid', key: col.key, visible: col.visible } });
+                });
             }
+        } catch {
+            // ignore
         }
     }, [dispatch]);
     const [lastImageUrlByEntityId, setLastImageUrlByEntityId] = useState<{ [entityId: string]: string | null }>({});
@@ -53,7 +51,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
     const showFormulaInsteadOfPlays = useSelector((state: any) => state.columns?.views?.grid?.settings?.showFormulaInsteadOfPlays) || false;
     const { t } = useTranslation();
     const formulaName = chart?.formula_name || t('charts.sales');
-    
+
     const renderUnderRankVariation = (value: any) => (
         <GridUnderRankVariation value={value} badgeStylesRank={badgeStylesRank} />
     );
@@ -312,7 +310,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                     <Text size="xs" c="dimmed">Carregando {visibleCards.length}/{progressive.total}…</Text>
                 </Box>
             )}
-            
+
             {/* Dropped items section */}
             {showDroppedItems && droppedItems.length > 0 && (
                 <>
@@ -386,7 +384,7 @@ export const ChartWeekGrid: React.FC<ChartWeekGridProps> = ({ chart, week, type,
                     </Grid>
                 </>
             )}
-            
+
             {/* Modal de imagem grande e edição */}
             <ImageEditModal
                 opened={imageModalOpen}

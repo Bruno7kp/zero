@@ -2,6 +2,8 @@ import React, { useMemo, useState, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ChartWeekControls } from '../components/chartWeek/ChartWeekControls';
+import * as storage from '../utils/storage';
+import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
 import { ChartWeekTable } from '../components/chartWeek/ChartWeekTable';
 import { ChartWeekGrid } from '../components/chartWeek/ChartWeekGrid';
 import { ChartWeekList } from '../components/chartWeek/ChartWeekList';
@@ -23,8 +25,12 @@ export const ChartsWeekPage: React.FC = () => {
     const charts = useSelector((state: any) => state.charts.charts);
     const activeChartId = useSelector((state: any) => state.charts.activeChartId);
     const [view, setView] = useState<'table' | 'grid' | 'list'>(() => {
-        const saved = typeof window !== 'undefined' ? localStorage.getItem('chartWeekView') : null;
-        return (saved === 'table' || saved === 'grid' || saved === 'list') ? saved : 'table';
+        try {
+            const saved = storage.get(KEYS.CHART_WEEK_VIEW, [LEGACY_KEYS.CHART_WEEK_VIEW]);
+            return (saved === 'table' || saved === 'grid' || saved === 'list') ? (saved as 'table' | 'grid' | 'list') : 'table';
+        } catch {
+            return 'table';
+        }
     });
     const chart = useMemo(() => charts.find((c: any) => c.id === activeChartId) || null, [charts, activeChartId]);
     const [selectedWeek, setSelectedWeek] = useState<string | undefined>(weekParam);

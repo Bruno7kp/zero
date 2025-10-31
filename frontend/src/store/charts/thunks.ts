@@ -4,6 +4,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { apiUrl } from '../../config';
 import { STATS_CACHE_STALE_GRACE_MS, STATS_CACHE_TTL_MS } from './defaults';
 import { computeMinimalStatsUntilWeek, entityRowsCache, upsertRunCache } from './utils';
+import { getToken } from '../../services/auth';
 
 export const fetchChartData = createAsyncThunk(
   'charts/fetchChartData',
@@ -417,7 +418,7 @@ export const fetchStatsMapIncremental = createAsyncThunk(
 
 export const fetchCharts = createAsyncThunk('charts/fetchCharts', async (_: void, { getState }) => {
   const st: any = getState();
-  const token = st.auth?.token || localStorage.getItem('user-token');
+  const token = getToken(st);
   const res = await fetch(apiUrl('/charts'), { headers: token ? { Authorization: `Bearer ${token}` } : {} });
   if (!res.ok) throw new Error('Erro ao buscar charts');
   return await res.json();
@@ -428,7 +429,7 @@ export const deleteChart = createAsyncThunk(
   async (chartId: number, { dispatch, getState, rejectWithValue }) => {
     try {
       const st: any = getState();
-      const token = st.auth?.token || localStorage.getItem('user-token');
+      const token = getToken(st);
       const res = await fetch(apiUrl(`/charts/${chartId}`), { method: 'DELETE', headers: token ? { Authorization: `Bearer ${token}` } : { 'Accept': 'application/json' } });
       if (!res.ok) {
         let msg = `Erro ao deletar chart (${res.status})`;
@@ -455,7 +456,7 @@ export const clearChartLocalData = createAsyncThunk('charts/clearChartLocalData'
 
 export const createChart = createAsyncThunk('charts/createChart', async (chartData: any, { dispatch, getState }) => {
   const st: any = getState();
-  const token = st.auth?.token || localStorage.getItem('user-token');
+  const token = getToken(st);
   const res = await fetch(apiUrl('/charts'), { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(chartData) });
   if (!res.ok) throw new Error('Erro ao criar chart');
   dispatch(fetchCharts());
@@ -464,7 +465,7 @@ export const createChart = createAsyncThunk('charts/createChart', async (chartDa
 
 export const updateChart = createAsyncThunk('charts/updateChart', async ({ chartId, chartData }: { chartId: number; chartData: any }, { dispatch, getState }) => {
   const st: any = getState();
-  const token = st.auth?.token || localStorage.getItem('user-token');
+  const token = getToken(st);
   const res = await fetch(apiUrl(`/charts/${chartId}`), { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(chartData) });
   if (!res.ok) throw new Error('Erro ao atualizar chart');
   dispatch(fetchCharts());

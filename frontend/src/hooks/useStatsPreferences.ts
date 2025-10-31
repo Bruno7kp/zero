@@ -1,5 +1,7 @@
 // Hook to manage stats page preferences in localStorage
 import { useState, useEffect } from 'react';
+import * as storage from '../utils/storage';
+import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
 
 export interface StatsPreferences {
   showImages: boolean;
@@ -19,15 +21,13 @@ const DEFAULT_PREFERENCES: StatsPreferences = {
   pageSize: 25
 };
 
-const STORAGE_KEY = 'stats-preferences';
+const STORAGE_KEY = KEYS.STATS_PREFERENCES;
 
 export function useStatsPreferences() {
   const [preferences, setPreferences] = useState<StatsPreferences>(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) };
-      }
+      const stored = storage.getJson<StatsPreferences>(STORAGE_KEY, [LEGACY_KEYS.STATS_PREFERENCES]);
+      if (stored) return { ...DEFAULT_PREFERENCES, ...stored };
     } catch (error) {
       console.error('Error loading stats preferences:', error);
     }
@@ -36,7 +36,7 @@ export function useStatsPreferences() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+      storage.setJson(STORAGE_KEY, preferences);
     } catch (error) {
       console.error('Error saving stats preferences:', error);
     }

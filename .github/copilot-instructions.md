@@ -134,4 +134,16 @@ If anything here is unclear or you want deeper examples (controller + test, Dexi
    - localStorage: usado para preferências leves (ver `frontend/src/hooks/useStatsPreferences`) e chaves de UI persistente. Verifique o hook citado para confirmar quais chaves são salvas.
    - Sempre considere a coerência: ao alterar formato de dados em IndexedDB, forneça transformação na migração para evitar divergência com o estado em localStorage.
 
+   - Uso centralizado do localStorage (IMPORTANTE):
+      - Não adicione chamadas diretas a `localStorage` em novos arquivos. Este repositório possui uma camada de abstração e um registro canônico de chaves para evitar chaves duplicadas e problemas de formato.
+      - Arquivos importantes:
+         - `frontend/src/utils/storage.ts` — helper central para leitura/gravação segura (JSON, fallback, remoção).
+         - `frontend/src/constants/storageKeys.ts` — registro único de chaves usadas no app (versões e mapeamento de chaves legadas).
+      - Como adicionar uma nova chave persistida (passos mínimos):
+         1. Adicione uma entrada em `storageKeys.ts` com nome claro e versão (ex.: `MY_FEATURE_PREFERENCES: 'zc.myFeature:v1'`).
+         2. No código, importe o helper e o key: `import storage from 'src/utils/storage'; import { MY_FEATURE_PREFERENCES } from 'src/constants/storageKeys';` e use `storage.getJson(MY_FEATURE_PREFERENCES)` / `storage.setJson(MY_FEATURE_PREFERENCES, value)`.
+         3. Se estiver migrando uma chave antiga, adicione o mapeamento em `LEGACY_KEYS` dentro de `storageKeys.ts` e trate a migração no helper ou num bloco de startup apropriado.
+         4. Adicione um teste/unitário simples (ou verifica manualmente) que confirma leitura/escrita e formato esperado.
+      - Motivo: centralizar evita colisões de nomes, facilita mudanças de formato (versão) e mantém compatibilidade com migrações do cliente.
+
 Esses pontos são críticos — alterar o schema do Dexie sem migração ou esquecer de adicionar chaves de tradução causa regressões facilmente.

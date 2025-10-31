@@ -1,12 +1,12 @@
 import type { ColumnsState, ViewConfig, ViewSettings } from './types';
 import { defaultColumns, cloneDefaults, DEFAULT_VIEW_SETTINGS } from './defaults';
 import { applyArtistDisplayMode, applyPlaysVariationDisplay, applyRankVariationMapping } from './mappings';
+import * as storage from '../../utils/storage';
 
 export const hydrateView = (view: 'table' | 'list' | 'grid'): ViewConfig => {
   try {
-    const raw = localStorage.getItem(`chart_columns_config_${view}`);
-    if (raw) {
-      const parsed = JSON.parse(raw);
+    const parsed = storage.getJson<any>(`chart_columns_config_${view}`, []);
+    if (parsed) {
       const savedCols: Array<{ key: string; visible: boolean }> = Array.isArray(parsed?.columns)
         ? parsed.columns
         : (parsed?.columns && typeof parsed.columns === 'object')
@@ -36,9 +36,8 @@ export const hydrateView = (view: 'table' | 'list' | 'grid'): ViewConfig => {
 
 export const migrateLegacyLocalStorage = (): Partial<ColumnsState> | null => {
   try {
-    const raw = localStorage.getItem('chart_columns_config');
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
+    const parsed = storage.getJson<any>('chart_columns_config', []);
+    if (!parsed) return null;
     let savedCols: Array<{ key: string; visible: boolean }> = [];
     if (Array.isArray(parsed?.columns)) savedCols = parsed.columns;
     else if (parsed?.columns && typeof parsed.columns === 'object') {
@@ -59,7 +58,7 @@ export const migrateLegacyLocalStorage = (): Partial<ColumnsState> | null => {
       'table'
     );
     if (tableSettings.artistDisplayMode) adjusted = applyArtistDisplayMode(adjusted, tableSettings.artistDisplayMode, 'table');
-    try { localStorage.removeItem('chart_columns_config'); } catch { /* ignore */ }
+    try { storage.remove('chart_columns_config'); } catch { /* ignore */ }
     return {
       views: {
         table: { columns: adjusted, settings: tableSettings },
@@ -86,9 +85,8 @@ export const defaultState = (): ColumnsState => {
 export const buildInitialState = (): ColumnsState => {
   const base = defaultState();
   try {
-    const raw = localStorage.getItem('columns.global');
-    if (raw) {
-      const parsed = JSON.parse(raw);
+    const parsed = storage.getJson<any>('columns.global', []);
+    if (parsed) {
       if (typeof parsed.showCarousel === 'boolean') base.showCarousel = parsed.showCarousel;
     }
   } catch { /* ignore */ }
@@ -101,13 +99,13 @@ export const persistView = (view: 'table' | 'list' | 'grid', cfg: ViewConfig) =>
       columns: cfg.columns.map(c => ({ key: c.key, visible: c.visible })),
       settings: cfg.settings,
     };
-    localStorage.setItem(`chart_columns_config_${view}`, JSON.stringify(toSave));
+    storage.setJson(`chart_columns_config_${view}`, toSave);
   } catch { /* noop */ }
 };
 
 export const persistGlobal = (state: ColumnsState) => {
   try {
-    localStorage.setItem('columns.global', JSON.stringify({ showCarousel: !!state.showCarousel }));
+    storage.setJson('columns.global', { showCarousel: !!state.showCarousel });
   } catch { /* noop */ }
 };
 
