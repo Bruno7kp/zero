@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import * as storage from '../utils/storage';
+// storage persistence for columns is centralized in the columns slice (redux-persist)
 import { Group, Button, Paper, Drawer, Divider, Flex, Box, Accordion, Text, ActionIcon, Tooltip } from '@mantine/core';
 import { setPreset, selectResolvedBadge, resetAll } from '../store/badgeStylesSlice';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -48,31 +48,11 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({ 
     };
     // Colunas obrigatórias (rank, name) exibidas como sempre visíveis (badge), sem toggle
 
-    const storageKey = `chart_columns_${viewType}`; // legado (ainda lido para migração leve se necessário)
-    // Carrega config persistida
+    // Notify parent when redux columns change. Persistence is handled by redux-persist
+    // and the columns slice itself (migration from legacy keys happens in state builder).
     useEffect(() => {
-        try {
-            const stored = storage.getJson<any[]>(storageKey, [storageKey]);
-            if (stored && Array.isArray(stored)) {
-                stored.forEach((col: any) => {
-                    dispatch(updateColumn({ view: viewType, key: col.key, visible: col.visible }));
-                });
-                onColumnsChange?.(stored);
-            } else {
-                storage.setJson(storageKey, columns);
-            }
-        } catch { /* noop */ }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [viewType]);
-
-    // Persiste sempre que mudar
-    useEffect(() => {
-        try {
-            storage.setJson(storageKey, columns);
-            onColumnsChange?.(columns);
-        } catch { /* noop */ }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [columns]);
+        onColumnsChange?.(columns);
+    }, [columns, onColumnsChange]);
 
     // Garante altVariation registrada (legado)
     useEffect(() => {

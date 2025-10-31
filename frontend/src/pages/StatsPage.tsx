@@ -1,11 +1,11 @@
 // Main stats page with sidebar and routing
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Container, 
-  Title, 
-  Text, 
-  Loader, 
+import {
+  Container,
+  Title,
+  Text,
+  Loader,
   Center,
   Stack,
   NavLink,
@@ -36,6 +36,8 @@ import {
   IconSparkles
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
+import { useStatsPreferences } from '../hooks/useStatsPreferences';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import CreateHeader from '../components/createChart/CreateHeader';
 
@@ -69,74 +71,74 @@ const StatsPage: React.FC = () => {
   const trackCutoff = chart?.music_cutoff || 100;
 
   // Navigation items
-  const navItems: Array<{ 
-    icon?: any; 
-    label?: string; 
+  const navItems: Array<{
+    icon?: any;
+    label?: string;
     path?: string;
     exact?: boolean;
     group?: string;
     divider?: boolean;
   }> = [
-    { 
-      icon: IconChartBar, 
-      label: t('stats.sidebar.overview'), 
+    {
+      icon: IconChartBar,
+      label: t('stats.sidebar.overview'),
       path: '/stats',
       exact: true
     },
     { divider: true },
-    { 
-      icon: IconCrown, 
-      label: t('stats.timesAtTopByArtist.title', { n: 1 }), 
+    {
+      icon: IconCrown,
+      label: t('stats.timesAtTopByArtist.title', { n: 1 }),
       path: '/stats/times_at_top_by_artist/1/track',
       group: 'times_at_top_by_artist'
     },
-    { 
-      icon: IconTrophy, 
-      label: t('stats.rank.title', { n: 1 }), 
+    {
+      icon: IconTrophy,
+      label: t('stats.rank.title', { n: 1 }),
       path: '/stats/rank/1/track',
       group: 'rank'
     },
-    { 
-      icon: IconStar, 
-      label: t('stats.timesAtRank.title', { n: 1 }), 
+    {
+      icon: IconStar,
+      label: t('stats.timesAtRank.title', { n: 1 }),
       path: '/stats/times_at_rank/1/track',
       group: 'times_at_rank'
     },
-    { 
-      icon: IconCalendarUp, 
-      label: t('stats.timesAtTop.title', { n: trackCutoff }), 
+    {
+      icon: IconCalendarUp,
+      label: t('stats.timesAtTop.title', { n: trackCutoff }),
       path: `/stats/times_at_top/${trackCutoff}/track`,
       group: 'times_at_top'
     },
     { divider: true },
-    { 
-      icon: IconRocket, 
-      label: t('stats.debuts.title'), 
+    {
+      icon: IconRocket,
+      label: t('stats.debuts.title'),
       path: '/stats/debuts/all/track',
       group: 'debuts'
     },
-    { 
-      icon: IconSparkles, 
-      label: t('stats.debutsAtOneByArtist.title', { n: 1 }), 
+    {
+      icon: IconSparkles,
+      label: t('stats.debutsAtOneByArtist.title', { n: 1 }),
       path: '/stats/debuts_at_one_by_artist/track',
       group: 'debuts_at_one_by_artist'
     },
-    { 
-      icon: IconHeadphones, 
-      label: t('stats.plays.title'), 
+    {
+      icon: IconHeadphones,
+      label: t('stats.plays.title'),
       path: '/stats/plays/all/track',
       group: 'plays'
     },
     { divider: true },
-    { 
-      icon: IconFlame, 
-      label: t('stats.pak.title'), 
+    {
+      icon: IconFlame,
+      label: t('stats.pak.title'),
       path: '/stats/pak',
       group: 'pak'
     },
-    { 
-      icon: IconCoin, 
-      label: t('stats.points.title'), 
+    {
+      icon: IconCoin,
+      label: t('stats.points.title'),
       path: '/stats/points/track',
       group: 'points'
     }
@@ -158,9 +160,12 @@ const StatsPage: React.FC = () => {
     return activeItem?.label || t('stats.title');
   };
 
+  const { preferences } = useStatsPreferences();
+  const isMobile = useIsMobile();
+
   if (!chart) {
     return (
-      <Container size="100%" py="xl" className="noPaddingMobile">
+      <Container size={isMobile ? '100%' : preferences.containerSize} py="xl" className="noPaddingMobile">
         <Center>
           <Stack align="center" gap="md">
             <Text>{t('errors.selectActiveChart')}</Text>
@@ -171,13 +176,13 @@ const StatsPage: React.FC = () => {
   }
 
   return (
-    <Container size="100%" className="noPaddingMobile">
+    <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
       <CreateHeader pageTitle={getPageTitle()} icon={IconChartBar} />
-      
+
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
-        <Box 
-          style={{ 
+        <Box
+          style={{
             flexShrink: 0,
             width: collapsed ? '55px' : '350px',
             transition: 'width 200ms ease',
@@ -188,14 +193,14 @@ const StatsPage: React.FC = () => {
           <Card p={collapsed ? 'xs' : 'md'} style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
             <Flex justify={collapsed ? 'center' : 'space-between'} align="center" mb={collapsed ? 0 : 'md'}>
               {/* Collapse button - desktop only */}
-              <ActionIcon 
-                variant="subtle" 
+              <ActionIcon
+                variant="subtle"
                 onClick={toggleCollapsed}
                 aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
               >
                 {collapsed ? <IconLayoutSidebarLeftExpand size={18} /> : <IconLayoutSidebarLeftCollapse size={18} />}
               </ActionIcon>
-              
+
               {/* Title - centered */}
               {!collapsed && (
                 <Title order={4} style={{ flex: 1, textAlign: 'center', marginLeft: -34 }}>
@@ -203,14 +208,14 @@ const StatsPage: React.FC = () => {
                 </Title>
               )}
             </Flex>
-            
+
             <ScrollArea.Autosize mah={600} type="auto">
               <Stack gap={0}>
-                {navItems.map((item, index) => 
+                {navItems.map((item, index) =>
                   item.divider ? (
                     <Divider key={index} my="xs" />
                   ) : (
-                    <Tooltip 
+                    <Tooltip
                       key={index}
                       label={item.label}
                       position="right"
@@ -251,17 +256,17 @@ const StatsPage: React.FC = () => {
           <Card p="md" style={{ backgroundColor: bgColor }}>
             <Flex justify="space-between" align="center" mb={0}>
               <Title order={4}>{t('stats.sidebar.title')}</Title>
-              <ActionIcon 
-                variant="subtle" 
+              <ActionIcon
+                variant="subtle"
                 onClick={toggle}
               >
                 <IconMenu2 size={18} />
               </ActionIcon>
             </Flex>
-            
+
             <ScrollArea.Autosize mah={600} type="auto">
               <Stack gap={0} display={opened ? 'flex' : 'none'}>
-                {navItems.map((item, index) => 
+                {navItems.map((item, index) =>
                   item.divider ? (
                     <Divider key={index} my="xs" />
                   ) : (

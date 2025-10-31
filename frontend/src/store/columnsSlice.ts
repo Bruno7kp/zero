@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_VIEW_SETTINGS, defaultColumns, cloneDefaults } from './columns/defaults';
 import { applyArtistDisplayMode, applyPlaysVariationDisplay, applyRankVariationMapping } from './columns/mappings';
-import { buildInitialState, ensureViews, persistView } from './columns/state';
+import { buildInitialState, ensureViews } from './columns/state';
 export type { ColumnsState, ColumnConfig, ViewConfig, ViewSettings } from './columns/types';
 export { DEFAULT_VIEW_SETTINGS as COLUMNS_DEFAULT_VIEW_SETTINGS, defaultColumns as COLUMNS_DEFAULT_COLUMNS } from './columns/defaults';
 
@@ -22,7 +22,7 @@ const columnsSlice = createSlice({
         }
         return { ...dc, visible: current.visible };
       });
-      persistView(view, viewConfig);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     resetColumns(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid' }>) {
       ensureViews(state as any);
@@ -45,19 +45,19 @@ const columnsSlice = createSlice({
       state.views[view].columns = applyRankVariationMapping(state.views[view].columns, state.views[view].settings.rankVariationLocation!, view);
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, state.views[view].settings.playsVariationDisplay || 'percent', state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation, view);
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, state.views[view].settings.artistDisplayMode || 'under', view);
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setPeakCountStyle(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; mode: 'withCount' | 'noCount' }>) {
       ensureViews(state as any);
       const { view, mode } = action.payload;
       state.views[view].settings.peakCountStyle = mode;
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setContainerSize(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; size: 'md' | 'lg' | 'xl' | '100%' }>) {
       ensureViews(state as any);
       const { view, size } = action.payload;
       state.views[view].settings.containerSize = size;
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setRankVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; location: 'under' | 'column' | 'hidden' | 'corner' }>) {
       ensureViews(state as any);
@@ -72,7 +72,7 @@ const columnsSlice = createSlice({
       // keep artist mapping consistent
       const artistMode = state.views[view].settings.artistDisplayMode || DEFAULT_VIEW_SETTINGS[view].artistDisplayMode || 'under';
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, artistMode, view);
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setPlaysVariationDisplay(state, action: PayloadAction<{ view: 'table' | 'list'; display: 'hidden' | 'absolute' | 'percent' }>) {
       ensureViews(state as any);
@@ -80,7 +80,7 @@ const columnsSlice = createSlice({
       state.views[view].settings.playsVariationDisplay = display;
       const playsLoc = state.views[view].settings.playsVariationLocation || DEFAULT_VIEW_SETTINGS[view].playsVariationLocation || 'under';
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, display, playsLoc, view);
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     // New: control plays variation visibility/placement for table/list
     setPlaysVariationLocation(state, action: PayloadAction<{ view: 'table' | 'list'; location: 'hidden' | 'under' | 'column' }>) {
@@ -90,53 +90,53 @@ const columnsSlice = createSlice({
       // Re-apply with current display option
       const disp = state.views[view].settings.playsVariationDisplay || DEFAULT_VIEW_SETTINGS[view].playsVariationDisplay || 'percent';
       state.views[view].columns = applyPlaysVariationDisplay(state.views[view].columns, disp, location, view);
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setTableBackground(state, action: PayloadAction<{ background: 'default' | 'transparent' }>) {
       ensureViews(state as any);
       state.views.table.settings.tableBackground = action.payload.background;
-      persistView('table', state.views.table);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setListBackground(state, action: PayloadAction<{ background: 'default' | 'transparent' }>) {
       ensureViews(state as any);
       state.views.list.settings.listBackground = action.payload.background;
-      persistView('list', state.views.list);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setArtistDisplayMode(state, action: PayloadAction<{ view: 'table'; mode: 'under' | 'column' }>) {
       ensureViews(state as any);
       const { view, mode } = action.payload;
       state.views[view].settings.artistDisplayMode = mode;
       state.views[view].columns = applyArtistDisplayMode(state.views[view].columns, mode, view);
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setFontScale(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; scale: -2 | -1 | 0 | 1 | 2 }>) {
       ensureViews(state as any);
       const { view, scale } = action.payload;
       state.views[view].settings.fontScale = scale;
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setListPeakWeeksCombined(state, action: PayloadAction<{ combined: boolean }>) {
       ensureViews(state as any);
       state.views.list.settings.listPeakWeeksCombined = action.payload.combined;
-      persistView('list', state.views.list);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setShowDroppedItems(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; show: boolean }>) {
       ensureViews(state as any);
       const { view, show } = action.payload;
       state.views[view].settings.showDroppedItems = show;
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setShowFormulaInsteadOfPlays(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; show: boolean }>) {
       ensureViews(state as any);
       const { view, show } = action.payload;
       state.views[view].settings.showFormulaInsteadOfPlays = show;
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
     setShowCarousel(state, action: PayloadAction<{ view: 'table' | 'list' | 'grid'; show: boolean }>) {
       ensureViews(state as any);
       const { view, show } = action.payload;
       state.views[view].settings.showCarousel = show;
-      persistView(view, state.views[view]);
+  // persistence is handled by redux-persist; avoid writing to localStorage here
     },
   },
   extraReducers: () => {}

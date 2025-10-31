@@ -12,7 +12,7 @@ import 'dayjs/locale/pt-br';
 import { Link } from 'react-router-dom';
 import { db } from '../db/indexedDb';
 import * as storage from '../utils/storage';
-import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
+import { KEYS } from '../constants/storageKeys';
 import LiveTitle from '../components/live/LiveTitle';
 import TypeSegmented from '../components/live/TypeSegmented';
 import PeriodAndToggle from '../components/live/PeriodAndToggle';
@@ -47,7 +47,7 @@ const LivePage = () => {
     // Live-only toggle to show/hide variation (delta). Persist locally.
     const [showVariation, setShowVariation] = useState<boolean>(() => {
         try {
-            const saved = storage.get(KEYS.LIVE_VARIATION, [LEGACY_KEYS.LIVE_VARIATION]);
+            const saved = storage.get(KEYS.LIVE_VARIATION);
             if (saved === '0') return false;
             if (saved === '1') return true;
         } catch {

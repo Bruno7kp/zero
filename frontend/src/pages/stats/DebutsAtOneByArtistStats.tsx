@@ -179,6 +179,8 @@ const DebutsAtOneByArtistStats: React.FC = () => {
         onTypeChange={handleTypeChange}
         showImages={preferences.showImages}
         onToggleImages={(value) => updatePreference('showImages', value)}
+  containerSize={preferences.containerSize}
+  onContainerSizeChange={(value) => updatePreference('containerSize', value)}
   fontSize={preferences.fontSize}
   onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}

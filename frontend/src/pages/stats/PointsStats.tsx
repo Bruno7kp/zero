@@ -199,6 +199,8 @@ const PointsStats: React.FC = () => {
         onToggleImages={(value) => updatePreference('showImages', value)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
+  containerSize={preferences.containerSize}
+  onContainerSizeChange={(value) => updatePreference('containerSize', value)}
   fontSize={preferences.fontSize}
   onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}

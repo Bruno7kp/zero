@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDebouncedValue } from '@mantine/hooks';
-import { useSelector } from 'react-redux';
 import { db } from '../db/indexedDb';
 import type { ChartData } from '../db/indexedDb';
 import { Container, Text, Flex, Loader, Center, Divider } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import * as storage from '../utils/storage';
-import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectChartsWeeks, updateChartsWeeks } from '../store/chartsWeeksSlice';
 import { ChartsWeeksTimeline } from '../components/weeks/ChartsWeeksTimeline.tsx';
 import { ChartsWeeksTableView } from '../components/weeks/ChartsWeeksTableView.tsx';
 import { ChartsWeeksGridView } from '../components/weeks/ChartsWeeksGridView.tsx';
@@ -38,81 +37,20 @@ export const ChartsWeeksListPage: React.FC = () => {
     const [yearFilter, setYearFilter] = useState<string | null>(null);
     const [debouncedSearch] = useDebouncedValue(searchFilter, 500);
 
-    // Load view mode from localStorage
-    const [viewMode, setViewMode] = useState<'timeline' | 'table' | 'grid'>(() => {
-        try {
-            const saved = storage.get(KEYS.CHARTS_WEEKS_VIEW_MODE, [LEGACY_KEYS.CHARTS_WEEKS_VIEW_MODE]);
-            return (saved === 'timeline' || saved === 'table' || saved === 'grid') ? (saved as 'timeline' | 'table' | 'grid') : 'timeline';
-        } catch {
-            return 'table';
-        }
-    });
+    const dispatch = useDispatch();
+    const chartsWeeks = useSelector((s: any) => selectChartsWeeks(s));
+    const viewMode = chartsWeeks.viewMode;
+    const typeFilter = chartsWeeks.typeFilter;
+    const itemsPerPage = chartsWeeks.itemsPerPage;
+    const badgeStyle = chartsWeeks.badgeStyle;
 
-    // Load type filter from localStorage
-    const [typeFilter, setTypeFilter] = useState<string[]>(() => {
-        try {
-            const saved = storage.getJson<string[]>(KEYS.CHARTS_WEEKS_TYPE_FILTER, [LEGACY_KEYS.CHARTS_WEEKS_TYPE_FILTER]);
-            return saved ? saved : ['artist', 'album', 'track'];
-        } catch {
-            return ['artist', 'album', 'track'];
-        }
-    });
+    // Legacy localStorage migration removed. Rely on redux-persist for persisted settings.
 
-    // Load items per page from localStorage
-    const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
-        try {
-            const saved = storage.get(KEYS.CHARTS_WEEKS_ITEMS_PER_PAGE ?? 'chartsWeeksItemsPerPage', []);
-            return saved ? parseInt(saved, 10) : 25;
-        } catch {
-            return 25;
-        }
-    });
-
-    // Load badge style from localStorage
-    const [badgeStyle, setBadgeStyle] = useState<'glass' | 'solid'>(() => {
-        try {
-            const saved = storage.get(KEYS.CHARTS_WEEKS_BADGE_STYLE ?? 'chartsWeeksBadgeStyle', []);
-            return (saved === 'glass' || saved === 'solid') ? (saved as 'glass' | 'solid') : 'glass';
-        } catch {
-            return 'glass';
-        }
-    });
-
-    // Save view mode to localStorage when it changes
-    useEffect(() => {
-        try {
-            storage.set(KEYS.CHARTS_WEEKS_VIEW_MODE, viewMode);
-        } catch (e) {
-            console.error('Failed to save view mode:', e);
-        }
-    }, [viewMode]);
-
-    // Save type filter to localStorage when it changes
-    useEffect(() => {
-        try {
-            storage.setJson(KEYS.CHARTS_WEEKS_TYPE_FILTER, typeFilter);
-        } catch (e) {
-            console.error('Failed to save type filter:', e);
-        }
-    }, [typeFilter]);
-
-    // Save items per page to localStorage when it changes
-    useEffect(() => {
-        try {
-            storage.set(KEYS.CHARTS_WEEKS_ITEMS_PER_PAGE ?? 'chartsWeeksItemsPerPage', String(itemsPerPage));
-        } catch (e) {
-            console.error('Failed to save items per page:', e);
-        }
-    }, [itemsPerPage]);
-
-    // Save badge style to localStorage when it changes
-    useEffect(() => {
-        try {
-            storage.set(KEYS.CHARTS_WEEKS_BADGE_STYLE ?? 'chartsWeeksBadgeStyle', badgeStyle);
-        } catch (e) {
-            console.error('Failed to save badge style:', e);
-        }
-    }, [badgeStyle]);
+    // Update handlers will dispatch into redux
+    const setViewMode = (v: 'timeline' | 'table' | 'grid') => dispatch(updateChartsWeeks({ key: 'viewMode', value: v }));
+    const setTypeFilter = (v: string[]) => dispatch(updateChartsWeeks({ key: 'typeFilter', value: v }));
+    const setItemsPerPage = (v: number) => dispatch(updateChartsWeeks({ key: 'itemsPerPage', value: v }));
+    const setBadgeStyle = (v: 'glass' | 'solid') => dispatch(updateChartsWeeks({ key: 'badgeStyle', value: v }));
 
 
     // Fetch all weeks and their #1s

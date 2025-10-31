@@ -3,6 +3,7 @@ import React from 'react';
 import { Group, Select, SegmentedControl, Center, ActionIcon, Menu, Checkbox, Flex, Divider, TextInput } from '@mantine/core';
 import { IconMicrophone, IconDisc, IconMusic, IconSettings, IconCalendar, IconHash, IconSearch, IconSortDescending, IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export interface StatsFiltersProps {
   year: string;
@@ -21,6 +22,8 @@ export interface StatsFiltersProps {
   onToggleArtistColumn?: (value: boolean) => void;
   fontSize?: 'xs' | 'sm' | 'md';
   onFontSizeChange?: (value: 'xs' | 'sm' | 'md') => void;
+  containerSize?: '100%' | 'md' | 'lg' | 'xl';
+  onContainerSizeChange?: (value: '100%' | 'md' | 'lg' | 'xl') => void;
   yearRange?: { minYear: number; maxYear: number };
   showTypeFilter?: boolean;
   showPositionFilter?: boolean;
@@ -29,6 +32,7 @@ export interface StatsFiltersProps {
   showImageToggle?: boolean;
   showArtistColumnToggle?: boolean;
   showFontSizeToggle?: boolean;
+  showContainerSizeToggle?: boolean;
   cutoff?: number;
   customFilters?: React.ReactNode;
   allowAllPosition?: boolean;
@@ -58,6 +62,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onToggleImages,
   showArtistColumn,
   onToggleArtistColumn,
+  containerSize,
+  onContainerSizeChange,
   fontSize,
   onFontSizeChange,
   yearRange,
@@ -77,10 +83,13 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onSearchChange,
   sortBy,
   onSortChange,
+  showContainerSizeToggle = true,
   showFontSizeToggle = true,
   sortOptions
 }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
+  const showContainer = showContainerSizeToggle && !isMobile;
 
   // Generate year options
   const yearOptions = React.useMemo(() => {
@@ -204,6 +213,26 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                       onChange={(event) => onToggleArtistColumn(event.currentTarget.checked)}
                     />
                   </Menu.Item>
+                )}
+
+                {showContainer && onContainerSizeChange && (
+                  <>
+                    <Divider my="xs" />
+                    <Menu.Label>{t('stats.filters.containerSize')}</Menu.Label>
+                    <Menu.Item>
+                      <SegmentedControl
+                        value={containerSize || 'xl'}
+                        onChange={(value) => onContainerSizeChange(value as '100%' | 'md' | 'lg' | 'xl')}
+                        data={[
+                          { label: 'MD', value: 'md' },
+                          { label: 'LG', value: 'lg' },
+                          { label: 'XL', value: 'xl' },
+                          { label: '100%', value: '100%' }
+                        ]}
+                        fullWidth
+                      />
+                    </Menu.Item>
+                  </>
                 )}
 
                 {showFontSizeToggle && onFontSizeChange && (

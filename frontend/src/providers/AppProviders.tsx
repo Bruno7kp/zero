@@ -7,7 +7,8 @@ import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 import { Provider } from 'react-redux';
-import { store } from '../store';
+import { store, persistor } from '../store';
+import { PersistGate } from 'redux-persist/integration/react';
 import { buildTheme } from '../theme/appTheme';
 import { useSelector } from 'react-redux';
 import type { ThemeMode } from '../theme/modes';
@@ -63,8 +64,10 @@ const ThemedProviders: React.FC<AppProvidersProps> = ({ children }) => {
 
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => (
     <Provider store={store}>
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-            <ThemedProviders>{children}</ThemedProviders>
-        </GoogleOAuthProvider>
+        <PersistGate persistor={persistor} loading={null}>
+            <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                <ThemedProviders>{children}</ThemedProviders>
+            </GoogleOAuthProvider>
+        </PersistGate>
     </Provider>
 );
