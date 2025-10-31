@@ -1,4 +1,4 @@
-// Artists with most simultaneous tracks in the same week
+// Most weeks until reaching #1
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -6,7 +6,6 @@ import {
   Loader,
   Center,
   Card,
-  Avatar,
   Text,
   Table,
   ScrollArea,
@@ -17,12 +16,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
-import { getArtistsWithMostSimultaneousItems, getYearRange } from '../../utils/statsQueries';
+import { getWeeksToFirstNumberOne, getYearRange } from '../../utils/statsQueries';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 
-const MostSimultaneousByArtistStats: React.FC = () => {
+const WeeksToNumberOneStats: React.FC = () => {
   const { t } = useTranslation();
   const { type: typeParam } = useParams();
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ const MostSimultaneousByArtistStats: React.FC = () => {
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('simultaneous-desc');
+  const [sortBy, setSortBy] = useState('weeks-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -56,14 +55,13 @@ const MostSimultaneousByArtistStats: React.FC = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const results = await getArtistsWithMostSimultaneousItems({
+        const results = await getWeeksToFirstNumberOne({
           chartId: String(chart.id),
-          chartType: type as 'track' | 'album',
-          year,
+          chartType: type,
         });
         setData(results);
       } catch (err) {
-        console.error('Error loading most simultaneous by artist', err);
+        console.error('Error loading weeks to #1 stats', err);
       } finally {
         setLoading(false);
       }
@@ -73,30 +71,34 @@ const MostSimultaneousByArtistStats: React.FC = () => {
 
   const handleTypeChange = (newType: string) => {
     setType(newType);
-    navigate(`/stats/most_simultaneous_by_artist/${newType}`);
+    navigate(`/stats/weeks_to_number_one/${newType}`);
   };
 
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return data;
     const q = searchQuery.toLowerCase();
-    return data.filter(item => item.artistName.toLowerCase().includes(q));
+    return data.filter(
+      item =>
+        item.name.toLowerCase().includes(q) ||
+        (item.artistName && item.artistName.toLowerCase().includes(q))
+    );
   }, [data, searchQuery]);
 
   const sortedData = React.useMemo(() => {
     const copy = [...filteredData];
     switch (sortBy) {
-      case 'simultaneous-desc':
-        return copy.sort((a, b) => b.maxSimultaneous - a.maxSimultaneous);
-      case 'simultaneous-asc':
-        return copy.sort((a, b) => a.maxSimultaneous - b.maxSimultaneous);
       case 'weeks-desc':
-        return copy.sort((a, b) => b.totalWeeks - a.totalWeeks);
+        return copy.sort((a, b) => b.weeksToFirstNumberOne - a.weeksToFirstNumberOne);
       case 'weeks-asc':
-        return copy.sort((a, b) => a.totalWeeks - b.totalWeeks);
+        return copy.sort((a, b) => a.weeksToFirstNumberOne - b.weeksToFirstNumberOne);
       case 'name-asc':
-        return copy.sort((a, b) => a.artistName.localeCompare(b.artistName));
+        return copy.sort((a, b) => a.name.localeCompare(b.name));
       case 'name-desc':
-        return copy.sort((a, b) => b.artistName.localeCompare(a.artistName));
+        return copy.sort((a, b) => b.name.localeCompare(a.name));
+      case 'artist-asc':
+        return copy.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
+      case 'artist-desc':
+        return copy.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
       default:
         return copy;
     }
@@ -111,15 +113,8 @@ const MostSimultaneousByArtistStats: React.FC = () => {
 
   const sortOptions = React.useMemo(
     () => [
-      {
-        value: 'simultaneous-desc',
-        label: t('stats.mostSimultaneousByArtist.sort.simultaneousDesc'),
-      },
-      {
-        value: 'simultaneous-asc',
-        label: t('stats.mostSimultaneousByArtist.sort.simultaneousAsc'),
-      },
-      { value: 'weeks-desc', label: t('stats.mostSimultaneousByArtist.sort.weeksDesc') },
+      { value: 'weeks-desc', label: t('stats.weeksToNumberOne.sort.weeksDesc') },
+      { value: 'weeks-asc', label: t('stats.weeksToNumberOne.sort.weeksAsc') },
       { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
       { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
     ],
@@ -173,19 +168,25 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
                     #
                   </Table.Th>
-                  <Table.Th>{t('charts.artist')}</Table.Th>
+                  <Table.Th>{t('stats.timesAtRank.columns.title')}</Table.Th>
+                  {preferences.showArtistColumn && type !== 'artist' && (
+                    <Table.Th>{t('charts.artist')}</Table.Th>
+                  )}
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.mostSimultaneousByArtist.columns.simultaneous')}
+                    {t('stats.weeksToNumberOne.columns.weeksToOne')}
                   </Table.Th>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.mostSimultaneousByArtist.columns.weeks')}
+                    {t('stats.weeksToNumberOne.columns.firstWeek')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.weeksToNumberOne.columns.weekReachedOne')}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {paginatedData.length === 0 ? (
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
+                    <Table.Td colSpan={6}>
                       <Text ta="center" py="xl">
                         {t('stats.noData')}
                       </Text>
@@ -195,32 +196,39 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                   paginatedData.map((record: any, index) => {
                     const displayRank = (page - 1) * preferences.pageSize + index + 1;
                     return (
-                      <Table.Tr key={record.artistName + index}>
+                      <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           {displayRank}
                         </Table.Td>
                         <Table.Td>
                           <Flex gap="sm" align="center">
-                            {preferences.showImages && (
-                              <Avatar
-                                src={undefined}
-                                alt={record.artistName}
-                                size={40}
-                                radius="md"
-                              />
-                            )}
                             <Box>
                               <Text fw={600} lineClamp={1}>
-                                {record.artistName}
+                                {record.name}
                               </Text>
+                              {type !== 'artist' &&
+                                record.artistName &&
+                                !preferences.showArtistColumn && (
+                                  <Text c="dimmed" size="sm" lineClamp={1}>
+                                    {record.artistName}
+                                  </Text>
+                                )}
                             </Box>
                           </Flex>
                         </Table.Td>
+                        {preferences.showArtistColumn && type !== 'artist' && (
+                          <Table.Td>
+                            <Text>{record.artistName}</Text>
+                          </Table.Td>
+                        )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.maxSimultaneous}</Text>
+                          <Text>{record.weeksToFirstNumberOne}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.totalWeeks}</Text>
+                          <Text>{record.firstWeek}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <Text>{record.weekReachedOne}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );
@@ -245,4 +253,4 @@ const MostSimultaneousByArtistStats: React.FC = () => {
   );
 };
 
-export default MostSimultaneousByArtistStats;
+export default WeeksToNumberOneStats;

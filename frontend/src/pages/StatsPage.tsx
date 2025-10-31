@@ -54,6 +54,7 @@ const TimesAtTopByArtistStats = lazy(() => import('./stats/TimesAtTopByArtistSta
 const DebutsAtOneByArtistStats = lazy(() => import('./stats/DebutsAtOneByArtistStats'));
 const LongestConsecutiveAtOneStats = lazy(() => import('./stats/LongestConsecutiveAtOneStats'));
 const MostSimultaneousByArtistStats = lazy(() => import('./stats/MostSimultaneousByArtistStats'));
+const WeeksToNumberOneStats = lazy(() => import('./stats/WeeksToNumberOneStats'));
 
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -142,6 +143,12 @@ const StatsPage: React.FC = () => {
       label: t('stats.plays.title'),
       path: '/stats/plays/all/track',
       group: 'plays',
+    },
+    {
+      icon: IconCalendarUp,
+      label: t('stats.weeksToNumberOne.title'),
+      path: '/stats/weeks_to_number_one/track',
+      group: 'weeks_to_number_one',
     },
     { divider: true },
     {
@@ -357,6 +364,7 @@ const StatsPage: React.FC = () => {
                 path="/most_simultaneous_by_artist/:type"
                 element={<MostSimultaneousByArtistStats />}
               />
+              <Route path="/weeks_to_number_one/:type" element={<WeeksToNumberOneStats />} />
             </Routes>
           </Suspense>
         </Box>

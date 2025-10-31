@@ -557,6 +557,84 @@ export async function getLongestConsecutiveAtOne(filters: StatsFilters & { rank?
 }
 
 /**
+ * For each entity that eventually reached #1, compute how many weeks passed from its
+ * first appearance on the chart to the first week it reached rank 1.
+ * Returns entries sorted by weeksToFirstNumberOne (desc).
+ */
+export async function getWeeksToFirstNumberOne(filters: StatsFilters): Promise<
+  Array<{
+    entityId: string;
+    name: string;
+    artistName?: string | null;
+    firstWeek: string;
+    weekReachedOne: string;
+    weeksToFirstNumberOne: number;
+  }>
+> {
+  const query = db.charts_data
+    .where('[chartId+chartType]')
+    .equals([filters.chartId, filters.chartType]);
+
+  let data = await query.toArray();
+
+  // Filter by year if specified (we only consider appearances within that year range)
+  if (filters.year && filters.year !== 'all') {
+    data = data.filter(item => item.week.startsWith(filters.year!));
+  }
+
+  // Group all weeks per entity (chronological)
+  const byEntity = new Map<
+    string,
+    { name: string; artistName?: string | null; weeks: Array<{ week: string; rank: number }> }
+  >();
+
+  data.forEach(item => {
+    if (!byEntity.has(item.entityId)) {
+      byEntity.set(item.entityId, { name: item.name, artistName: item.artistName, weeks: [] });
+    }
+    byEntity.get(item.entityId)!.weeks.push({ week: item.week, rank: item.rank });
+  });
+
+  const results: Array<{
+    entityId: string;
+    name: string;
+    artistName?: string | null;
+    firstWeek: string;
+    weekReachedOne: string;
+    weeksToFirstNumberOne: number;
+  }> = [];
+
+  for (const [entityId, info] of byEntity.entries()) {
+    // sort weeks
+    const weeksSorted = info.weeks.sort((a, b) => a.week.localeCompare(b.week));
+    if (weeksSorted.length === 0) continue;
+
+    const firstWeek = weeksSorted[0].week;
+    // find first week where rank === 1
+    const firstOne = weeksSorted.find(w => w.rank === 1);
+    if (!firstOne) continue; // never reached #1
+
+    // weeksToFirstNumberOne = index(firstOne) - index(firstWeek)
+    const indexFirst = 0; // firstWeek index is 0 after sorting
+    const indexOne = weeksSorted.findIndex(w => w.rank === 1);
+    const weeksToFirstNumberOne = Math.max(0, indexOne - indexFirst);
+
+    results.push({
+      entityId,
+      name: info.name,
+      artistName: info.artistName,
+      firstWeek,
+      weekReachedOne: firstOne.week,
+      weeksToFirstNumberOne,
+    });
+  }
+
+  return results.sort(
+    (a, b) => b.weeksToFirstNumberOne - a.weeksToFirstNumberOne || a.name.localeCompare(b.name)
+  );
+}
+
+/**
  * Get artists with the highest number of distinct items appearing simultaneously in the same week.
  * For each artist, compute the maximum number of distinct entityIds present in any single week.
  */

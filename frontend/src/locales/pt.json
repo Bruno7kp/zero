@@ -701,6 +701,19 @@
           "artistDesc": "Artista (Z-A)"
         }
       },
+      "weeksToNumberOne": {
+        "title": "Mais Semanas até Chegar em #1",
+        "description": "Itens que demoraram mais tempo (em semanas) desde a primeira aparição até alcançar #1 pela primeira vez",
+        "columns": {
+          "weeksToOne": "Semanas até #1",
+          "firstWeek": "Primeira semana",
+          "weekReachedOne": "Semana que alcançou #1"
+        },
+        "sort": {
+          "weeksDesc": "Semanas (maior para menor)",
+          "weeksAsc": "Semanas (menor para maior)"
+        }
+      },
       "plays": {
         "title": "Mais Reproduções em uma Semana",
         "titleArtist": "Mais Reproduções em uma Semana - Artistas",

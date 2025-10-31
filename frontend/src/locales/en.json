@@ -701,6 +701,19 @@
           "artistDesc": "Artist (Z-A)"
         }
       },
+      "weeksToNumberOne": {
+        "title": "Most Weeks Until Reaching #1",
+        "description": "Items that took the longest time (in weeks) from first appearance to first reach #1",
+        "columns": {
+          "weeksToOne": "Weeks to #1",
+          "firstWeek": "First week",
+          "weekReachedOne": "Week reached #1"
+        },
+        "sort": {
+          "weeksDesc": "Weeks (high to low)",
+          "weeksAsc": "Weeks (low to high)"
+        }
+      },
       "plays": {
         "title": "Most Plays in a Week",
         "titleArtist": "Most Plays in a Week - Artists",
