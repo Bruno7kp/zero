@@ -555,3 +555,73 @@ export async function getLongestConsecutiveAtOne(filters: StatsFilters & { rank?
 
   return results.sort((a, b) => b.longest - a.longest);
 }
+
+/**
+ * Get artists with the highest number of distinct items appearing simultaneously in the same week.
+ * For each artist, compute the maximum number of distinct entityIds present in any single week.
+ */
+export async function getArtistsWithMostSimultaneousItems(filters: {
+  chartId: string;
+  chartType: 'album' | 'track';
+  year?: string;
+}): Promise<
+  Array<{
+    artistName: string;
+    maxSimultaneous: number;
+    totalWeeks: number; // number of weeks artist had at least one item
+    sampleEntityId?: string | null;
+  }>
+> {
+  const query = db.charts_data
+    .where('[chartId+chartType]')
+    .equals([filters.chartId, filters.chartType]);
+
+  let data = await query.toArray();
+
+  // Filter by year if specified
+  if (filters.year && filters.year !== 'all') {
+    data = data.filter(item => item.week.startsWith(filters.year!));
+  }
+
+  // Map week -> artist -> set(entityId)
+  const weekArtistMap = new Map<string, Map<string, Set<string>>>();
+
+  data.forEach(item => {
+    if (!weekArtistMap.has(item.week)) weekArtistMap.set(item.week, new Map());
+    const artistMap = weekArtistMap.get(item.week)!;
+    const artist = item.artistName || 'Unknown';
+    if (!artistMap.has(artist)) artistMap.set(artist, new Set());
+    artistMap.get(artist)!.add(item.entityId);
+  });
+
+  // Aggregate per artist
+  const byArtist = new Map<
+    string,
+    { maxSimultaneous: number; totalWeeks: number; sampleEntityId?: string | null }
+  >();
+
+  for (const [, artistMap] of weekArtistMap.entries()) {
+    for (const [artistName, setOfEntities] of artistMap.entries()) {
+      const count = setOfEntities.size;
+      const sample = setOfEntities.values().next();
+      const sampleId = sample.done ? null : sample.value;
+
+      if (!byArtist.has(artistName)) {
+        byArtist.set(artistName, {
+          maxSimultaneous: count,
+          totalWeeks: 1,
+          sampleEntityId: sampleId,
+        });
+      } else {
+        const existing = byArtist.get(artistName)!;
+        existing.maxSimultaneous = Math.max(existing.maxSimultaneous, count);
+        existing.totalWeeks += 1;
+        if (!existing.sampleEntityId && sampleId) existing.sampleEntityId = sampleId;
+      }
+    }
+  }
+
+  return Array.from(byArtist.entries())
+    .map(([artistName, d]) => ({ artistName, ...d }))
+    .sort((a, b) => b.maxSimultaneous - a.maxSimultaneous || b.totalWeeks - a.totalWeeks);
+}

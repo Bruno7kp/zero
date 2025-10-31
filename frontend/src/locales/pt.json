@@ -826,6 +826,19 @@
         },
         "noData": "Nenhuma estreia encontrada"
       },
+      "mostSimultaneousByArtist": {
+        "title": "Artistas com Mais Músicas Simultâneas",
+        "description": "Artistas com o maior número de músicas distintas aparecendo na mesma semana",
+        "columns": {
+          "simultaneous": "Músicas Simultâneas",
+          "weeks": "Semanas"
+        },
+        "sort": {
+          "simultaneousDesc": "Simultâneas (maior para menor)",
+          "simultaneousAsc": "Simultâneas (menor para maior)",
+          "weeksDesc": "Semanas (maior para menor)"
+        }
+      },
       "loading": "Carregando estatísticas...",
       "noData": "Nenhum dado disponível",
       "itemsPerPage": "Itens por página",

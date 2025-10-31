@@ -53,6 +53,7 @@ const PointsStats = lazy(() => import('./stats/PointsStats'));
 const TimesAtTopByArtistStats = lazy(() => import('./stats/TimesAtTopByArtistStats'));
 const DebutsAtOneByArtistStats = lazy(() => import('./stats/DebutsAtOneByArtistStats'));
 const LongestConsecutiveAtOneStats = lazy(() => import('./stats/LongestConsecutiveAtOneStats'));
+const MostSimultaneousByArtistStats = lazy(() => import('./stats/MostSimultaneousByArtistStats'));
 
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -129,6 +130,12 @@ const StatsPage: React.FC = () => {
       label: t('stats.debutsAtOneByArtist.title', { n: 1 }),
       path: '/stats/debuts_at_one_by_artist/track',
       group: 'debuts_at_one_by_artist',
+    },
+    {
+      icon: IconHeadphones,
+      label: t('stats.mostSimultaneousByArtist.title'),
+      path: '/stats/most_simultaneous_by_artist/track',
+      group: 'most_simultaneous_by_artist',
     },
     {
       icon: IconHeadphones,
@@ -345,6 +352,10 @@ const StatsPage: React.FC = () => {
               <Route
                 path="/longest_consecutive_at_one/:type"
                 element={<LongestConsecutiveAtOneStats />}
+              />
+              <Route
+                path="/most_simultaneous_by_artist/:type"
+                element={<MostSimultaneousByArtistStats />}
               />
             </Routes>
           </Suspense>

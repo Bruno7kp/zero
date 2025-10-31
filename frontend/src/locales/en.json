@@ -826,6 +826,19 @@
         },
         "noData": "No debuts found"
       },
+      "mostSimultaneousByArtist": {
+        "title": "Artists with Most Simultaneous Tracks",
+        "description": "Artists with the largest number of distinct tracks appearing in the same week",
+        "columns": {
+          "simultaneous": "Simultaneous Tracks",
+          "weeks": "Weeks"
+        },
+        "sort": {
+          "simultaneousDesc": "Simultaneous (high to low)",
+          "simultaneousAsc": "Simultaneous (low to high)",
+          "weeksDesc": "Weeks (high to low)"
+        }
+      },
       "loading": "Loading statistics...",
       "noData": "No data available",
       "itemsPerPage": "Items per page",
