@@ -147,3 +147,13 @@ If anything here is unclear or you want deeper examples (controller + test, Dexi
       - Motivo: centralizar evita colisões de nomes, facilita mudanças de formato (versão) e mantém compatibilidade com migrações do cliente.
 
 Esses pontos são críticos — alterar o schema do Dexie sem migração ou esquecer de adicionar chaves de tradução causa regressões facilmente.
+
+   ### Recent frontend changes (Oct 2025)
+
+   - Renomeação de preferência: `tableSize` foi renomeado para `fontSize` — atualize traduções e consumidores quando tocar na UI relacionada a tabelas/grades.
+   - Nova preferência `containerSize`: opções suportadas `md`, `lg`, `xl`, `100%` (padrão: `xl`). A opção de "container size" foi escondida na UI para dispositivos móveis e o layout é forçado para `100%` em mobile.
+   - Persistência consolidada: várias preferências de UI (incluindo `statsPreferences`, `libraryFilters`, e as preferências de listas de semanas) foram migradas para Redux Toolkit + `redux-persist`. O código **não** depende mais de leituras ad-hoc de `localStorage` para essas preferências — prefira os slices e selectors em `frontend/src/store/`.
+   - Colunas/visualização: a persistência das configurações de colunas foi centralizada no slice `columns` — componentes não escrevem mais diretamente em `localStorage`.
+   - Formatação e ferramentas: adicionamos `.editorconfig`, uma configuração do Prettier em `frontend/.prettierrc` e um script `format` no `frontend/package.json` para padronizar o estilo. No backend há um script `composer format` que executa o Pint.
+
+   Nota rápida para agents: se você estiver escrevendo código que acessa preferências persistidas, leia/reutilize os slices existentes (ex.: `statsPreferences`, `columns`) e evite adicionar leituras diretas a `localStorage`. Para dados grandes/historicamente persistidos (charts, semanas) continue usando IndexedDB/Dexie e siga o fluxo de migração descrito acima.

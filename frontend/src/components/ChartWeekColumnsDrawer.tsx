@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 // storage persistence for columns is centralized in the columns slice (redux-persist)
 import {
   Group,
@@ -170,27 +170,35 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({
   const specialsAllowedForRank = viewType === 'table' && currentRankLocation === 'column';
   const allowSpecialsUI = badgeKind === 'rank' && specialsAllowedForRank;
   // Ordenação customizada para mostrar estilos básicos antes dos especiais
-  const order = [
-    'transparent',
-    'transparentIconOnly',
-    'transparentIcon',
-    'light',
-    'lightIconOnly',
-    'lightIcon',
-    'solid',
-    'solidIconOnly',
-    'solidIcon',
-    'maximalist',
-    'maximalistLight',
-  ];
+  const order = useMemo(
+    () => [
+      'transparent',
+      'transparentIconOnly',
+      'transparentIcon',
+      'light',
+      'lightIconOnly',
+      'lightIcon',
+      'solid',
+      'solidIconOnly',
+      'solidIcon',
+      'maximalist',
+      'maximalistLight',
+    ],
+    []
+  );
   const currentEntry = badgeStyles?.views?.[viewType]?.[
     viewType === 'grid' ? 'rank' : badgeKind
   ] || { preset: 'light' };
   // Saneamento de preset inválido e ajuste para grid / regras de especiais
+  // Extract complex badgePreset expressions into stable variables so eslint
+  // can statically check the dependency array.
+  const rankPreset = badgeStyles?.views?.[viewType]?.rank?.preset;
+  const playsPreset = badgeStyles?.views?.[viewType]?.plays?.preset;
+
   useEffect(() => {
     const allValid = order;
     const migrateKind = (kind: 'rank' | 'plays') => {
-      const preset = badgeStyles?.views?.[viewType]?.[kind]?.preset;
+      const preset = kind === 'rank' ? rankPreset : playsPreset;
       if (!preset) return;
       if (!allValid.includes(preset)) {
         dispatch(
@@ -235,13 +243,7 @@ export const ChartWeekColumnsDrawer: React.FC<ChartWeekColumnsDrawerProps> = ({
     };
     migrateKind('rank');
     migrateKind('plays');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    badgeStyles?.views?.[viewType]?.rank?.preset,
-    badgeStyles?.views?.[viewType]?.plays?.preset,
-    viewType,
-    currentRankLocation,
-  ]);
+  }, [rankPreset, playsPreset, viewType, currentRankLocation, dispatch, order]);
 
   // Se o usuário mudar a localização de variação para algo que invalida especiais, força fallback imediato
   useEffect(() => {
