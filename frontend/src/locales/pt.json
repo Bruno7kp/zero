@@ -683,6 +683,24 @@
           "artistDesc": "Artista (Z-A)"
         }
       },
+      "longestConsecutiveAtOne": {
+        "title": "Mais Semanas Consecutivas em #1",
+        "description": "Itens com as maiores sequências consecutivas em #1",
+        "columns": {
+          "rank": "#",
+          "image": "Imagem",
+          "title": "Título",
+          "longest": "Maior sequência"
+        },
+        "sort": {
+          "longestDesc": "Sequência (maior para menor)",
+          "longestAsc": "Sequência (menor para maior)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
+        }
+      },
       "plays": {
         "title": "Mais Reproduções em uma Semana",
         "titleArtist": "Mais Reproduções em uma Semana - Artistas",

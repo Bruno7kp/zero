@@ -683,6 +683,24 @@
           "artistDesc": "Artist (Z-A)"
         }
       },
+      "longestConsecutiveAtOne": {
+        "title": "Most Consecutive Weeks at #1",
+        "description": "Items with the longest consecutive runs at #1",
+        "columns": {
+          "rank": "#",
+          "image": "Image",
+          "title": "Title",
+          "longest": "Longest sequence"
+        },
+        "sort": {
+          "longestDesc": "Longest (high to low)",
+          "longestAsc": "Longest (low to high)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)"
+        }
+      },
       "plays": {
         "title": "Most Plays in a Week",
         "titleArtist": "Most Plays in a Week - Artists",

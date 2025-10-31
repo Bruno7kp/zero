@@ -500,3 +500,58 @@ export async function getArtistsWithMostDebutsAtOne(filters: {
     }))
     .sort((a, b) => b.itemsCount - a.itemsCount);
 }
+
+/**
+ * Get longest consecutive sequences at #1 for each entity
+ */
+export async function getLongestConsecutiveAtOne(filters: StatsFilters & { rank?: number }) {
+  const query = db.charts_data
+    .where('[chartId+chartType]')
+    .equals([filters.chartId, filters.chartType]);
+
+  let data = await query.toArray();
+
+  // Filter by year if specified
+  if (filters.year && filters.year !== 'all') {
+    data = data.filter(item => item.week.startsWith(filters.year!));
+  }
+
+  // Only consider rows where rank === 1 (or filters.rank if provided)
+  const rankToCheck = filters.rank ?? 1;
+  const rankRows = data.filter(item => item.rank === rankToCheck);
+
+  // Group by entityId
+  const byEntity = new Map<string, { name: string; artistName: string; weeks: string[] }>();
+  rankRows.forEach(item => {
+    if (!byEntity.has(item.entityId))
+      byEntity.set(item.entityId, { name: item.name, artistName: item.artistName, weeks: [] });
+    byEntity.get(item.entityId)!.weeks.push(item.week);
+  });
+
+  const results: Array<{ entityId: string; name: string; artistName: string; longest: number }> =
+    [];
+
+  for (const [entityId, info] of byEntity.entries()) {
+    const weeks = info.weeks.sort();
+    let longest = 0;
+    let current = 0;
+    let prevDate: number | null = null;
+
+    for (const w of weeks) {
+      const d = new Date(w).getTime();
+      if (prevDate == null) {
+        current = 1;
+      } else {
+        // consecutive week if exactly 7 days apart
+        if (d - prevDate === 7 * 86400000) current++;
+        else current = 1;
+      }
+      if (current > longest) longest = current;
+      prevDate = d;
+    }
+
+    results.push({ entityId, name: info.name, artistName: info.artistName, longest });
+  }
+
+  return results.sort((a, b) => b.longest - a.longest);
+}

@@ -52,6 +52,7 @@ const DebutsStats = lazy(() => import('./stats/DebutsStats'));
 const PointsStats = lazy(() => import('./stats/PointsStats'));
 const TimesAtTopByArtistStats = lazy(() => import('./stats/TimesAtTopByArtistStats'));
 const DebutsAtOneByArtistStats = lazy(() => import('./stats/DebutsAtOneByArtistStats'));
+const LongestConsecutiveAtOneStats = lazy(() => import('./stats/LongestConsecutiveAtOneStats'));
 
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -108,6 +109,12 @@ const StatsPage: React.FC = () => {
       icon: IconCalendarUp,
       label: t('stats.timesAtTop.title', { n: trackCutoff }),
       path: `/stats/times_at_top/${trackCutoff}/track`,
+      group: 'times_at_top',
+    },
+    {
+      icon: IconCalendarUp,
+      label: t('stats.longestConsecutiveAtOne.title'),
+      path: '/stats/longest_consecutive_at_one/track',
       group: 'times_at_top',
     },
     { divider: true },
@@ -335,6 +342,10 @@ const StatsPage: React.FC = () => {
                 element={<TimesAtTopByArtistStats />}
               />
               <Route path="/debuts_at_one_by_artist/:type" element={<DebutsAtOneByArtistStats />} />
+              <Route
+                path="/longest_consecutive_at_one/:type"
+                element={<LongestConsecutiveAtOneStats />}
+              />
             </Routes>
           </Suspense>
         </Box>
