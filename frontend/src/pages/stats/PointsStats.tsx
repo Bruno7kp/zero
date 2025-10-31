@@ -1,10 +1,10 @@
 // Points Accumulators stats
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Stack, 
-  Text, 
-  Loader, 
+import {
+  Stack,
+  Text,
+  Loader,
   Center,
   Card,
   Avatar,
@@ -34,10 +34,10 @@ const ImageCell: React.FC<{ entityId: string; name: string; artistName: string; 
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
   });
-  
+
   return (
-    <Avatar 
-      src={imageUrl} 
+    <Avatar
+      src={imageUrl}
       alt={name}
       size={40}
       radius="md"
@@ -112,9 +112,9 @@ const PointsStats: React.FC = () => {
   // Filter data by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return data;
-    
+
     const query = searchQuery.toLowerCase();
-    return data.filter(item => 
+    return data.filter(item =>
       item.name.toLowerCase().includes(query) ||
       (item.artistName && item.artistName.toLowerCase().includes(query))
     );
@@ -123,7 +123,7 @@ const PointsStats: React.FC = () => {
   // Sort data
   const sortedData = React.useMemo(() => {
     const sorted = [...filteredData];
-    
+
     switch (sortBy) {
       case 'points-desc':
         return sorted.sort((a, b) => b.totalPoints - a.totalPoints);
@@ -199,8 +199,8 @@ const PointsStats: React.FC = () => {
         onToggleImages={(value) => updatePreference('showImages', value)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+  fontSize={preferences.fontSize}
+  onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         pageSize={preferences.pageSize}
@@ -249,34 +249,34 @@ const PointsStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
-                            {preferences.showImages && <ImageCell 
+                            {preferences.showImages && <ImageCell
                               entityId={record.entityId}
                               name={record.name}
                               artistName={record.artistName}
                               type={type}
                             />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
                               {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
-                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
+                                <Text c="dimmed" size={preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weeksOnChart}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.weeksOnChart}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.totalPoints.toLocaleString()}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.totalPoints.toLocaleString()}</Text>
                         </Table.Td>
                       </Table.Tr>
                     );
@@ -287,11 +287,11 @@ const PointsStats: React.FC = () => {
           </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}

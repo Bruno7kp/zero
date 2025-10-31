@@ -6,7 +6,7 @@ import { KEYS, LEGACY_KEYS } from '../constants/storageKeys';
 export interface StatsPreferences {
   showImages: boolean;
   showArtistColumn: boolean;
-  tableSize: 'xs' | 'sm' | 'md';
+  fontSize: 'xs' | 'sm' | 'md';
   showSales: boolean;
   peakOnly: boolean;
   pageSize: number;
@@ -15,7 +15,7 @@ export interface StatsPreferences {
 const DEFAULT_PREFERENCES: StatsPreferences = {
   showImages: true,
   showArtistColumn: false,
-  tableSize: 'sm',
+  fontSize: 'sm',
   showSales: false,
   peakOnly: false,
   pageSize: 25
@@ -26,8 +26,17 @@ const STORAGE_KEY = KEYS.STATS_PREFERENCES;
 export function useStatsPreferences() {
   const [preferences, setPreferences] = useState<StatsPreferences>(() => {
     try {
-      const stored = storage.getJson<StatsPreferences>(STORAGE_KEY, [LEGACY_KEYS.STATS_PREFERENCES]);
-      if (stored) return { ...DEFAULT_PREFERENCES, ...stored };
+      // Read stored preferences (may be legacy shape)
+      const storedRaw = storage.getJson<any>(STORAGE_KEY, [LEGACY_KEYS.STATS_PREFERENCES]);
+      if (storedRaw) {
+        // Migrate legacy `tableSize` -> `fontSize` if present
+        const migrated = { ...storedRaw } as any;
+        if (!migrated.fontSize && migrated.tableSize) {
+          migrated.fontSize = migrated.tableSize;
+          // It's okay to keep tableSize in the transient object; we'll persist the migrated shape below via effect
+        }
+        return { ...DEFAULT_PREFERENCES, ...migrated } as StatsPreferences;
+      }
     } catch (error) {
       console.error('Error loading stats preferences:', error);
     }

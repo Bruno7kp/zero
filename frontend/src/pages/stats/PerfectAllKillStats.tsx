@@ -1,8 +1,8 @@
 // Perfect All Kill stats - shows weeks where artists achieved PAK
 import React, { useState, useEffect } from 'react';
-import { 
-  Stack, 
-  Loader, 
+import {
+  Stack,
+  Loader,
   Center,
   Card,
   Avatar,
@@ -40,10 +40,10 @@ const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, nam
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
   });
-  
+
   return (
-    <Avatar 
-      src={imageUrl} 
+    <Avatar
+      src={imageUrl}
       alt={name}
       size={40}
       radius="md"
@@ -100,20 +100,20 @@ const PerfectAllKillStats: React.FC = () => {
         );
         // Sort by week descending (most recent first)
         results.sort((a, b) => b.week.localeCompare(a.week));
-        
+
         // Get all weeks for calculating week numbers
         const allWeeks = await db.charts_data
           .where('chartId')
           .equals(String(chart.id))
           .toArray();
         const uniqueWeeks = [...new Set(allWeeks.map((w: ChartData) => w.week))].sort();
-        
+
         // Add weekNumber to each result (1 = oldest week, N = newest week)
         const resultsWithWeekNumber = results.map(item => ({
           ...item,
           weekNumber: uniqueWeeks.indexOf(item.week) + 1
         }));
-        
+
         setData(resultsWithWeekNumber);
       } catch (error) {
         console.error('Error loading PAK stats:', error);
@@ -143,9 +143,9 @@ const PerfectAllKillStats: React.FC = () => {
   // Filter data by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return dataWithOccurrence;
-    
+
     const query = searchQuery.toLowerCase();
-    return dataWithOccurrence.filter(item => 
+    return dataWithOccurrence.filter(item =>
       item.artistName.toLowerCase().includes(query) ||
       item.albumName.toLowerCase().includes(query) ||
       item.trackName.toLowerCase().includes(query)
@@ -155,7 +155,7 @@ const PerfectAllKillStats: React.FC = () => {
   // Sort data
   const sortedData = React.useMemo(() => {
     const sorted = [...filteredData];
-    
+
     switch (sortBy) {
       case 'week-desc':
         return sorted.sort((a, b) => b.week.localeCompare(a.week));
@@ -219,13 +219,13 @@ const PerfectAllKillStats: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <StatsFilters
+  <StatsFilters
         year={year}
         onYearChange={setYear}
         showImages={preferences.showImages}
         onToggleImages={(value) => updatePreference('showImages', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+  fontSize={preferences.fontSize}
+  onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showTypeFilter={false}
         showSalesToggle={false}
@@ -270,25 +270,25 @@ const PerfectAllKillStats: React.FC = () => {
                     <Table.Tr key={`${record.week}-${record.artistEntityId}`}>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <Tooltip label={dateRange} withArrow>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
                         </Tooltip>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
                         <Flex gap="sm" wrap="nowrap" align="center">
                           {preferences.showImages && <ImageCell entityId={record.artistEntityId} name={record.artistName} />}
                           <Box style={{ flex: 1, minWidth: 0 }}>
-                            <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Box>
                         </Flex>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text lineClamp={1} size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.albumName}</Text>
+                        <Text lineClamp={1} size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.albumName}</Text>
                       </Table.Td>
                       <Table.Td style={{ verticalAlign: 'middle' }}>
-                        <Text lineClamp={1} size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.trackName}</Text>
+                        <Text lineClamp={1} size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.trackName}</Text>
                       </Table.Td>
                       <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
+                        <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
                       </Table.Td>
                       <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
                         <Button
@@ -308,11 +308,11 @@ const PerfectAllKillStats: React.FC = () => {
           </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}

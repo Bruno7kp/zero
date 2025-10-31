@@ -1,9 +1,9 @@
 // All #Ns stat page - shows weeks where items reached a specific rank
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Stack, 
-  Loader, 
+import {
+  Stack,
+  Loader,
   Center,
   Card,
   Avatar,
@@ -40,10 +40,10 @@ const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
   });
-  
+
   return (
-    <Avatar 
-      src={imageUrl} 
+    <Avatar
+      src={imageUrl}
       alt={record.name}
       size={40}
       radius="md"
@@ -64,7 +64,7 @@ const RankStats: React.FC = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('week-desc');
-  
+
   // Use stats preferences hook
   const { preferences, updatePreference } = useStatsPreferences();
 
@@ -88,7 +88,7 @@ const RankStats: React.FC = () => {
   // Get weight values for sales calculation
   const getWeights = React.useCallback((chartType: string) => {
     if (!chart) return { weightPlays: 1, weightPoints: 0 };
-    
+
     if (chartType === 'track') {
       return {
         weightPlays: chart.music_plays_weight || 1,
@@ -126,7 +126,7 @@ const RankStats: React.FC = () => {
           rank,
           year: year === 'all' ? undefined : year
         });
-        
+
         // If peakOnly is enabled, filter items that had peak at this rank
         let filteredResults = results;
         if (preferences.peakOnly) {
@@ -135,7 +135,7 @@ const RankStats: React.FC = () => {
             .where('[chartId+chartType]')
             .equals([String(chart.id), type])
             .toArray();
-          
+
           // Calculate peak for each entity
           const peakByEntity = new Map<string, number>();
           allData.forEach(item => {
@@ -144,27 +144,27 @@ const RankStats: React.FC = () => {
               peakByEntity.set(item.entityId, item.rank);
             }
           });
-          
+
           // Filter only items where peak equals the selected rank
           filteredResults = results.filter(item => peakByEntity.get(item.entityId) === rank);
         }
-        
+
         // Sort by week descending (most recent first)
         filteredResults.sort((a, b) => b.week.localeCompare(a.week));
-        
+
         // Get all weeks for calculating week numbers
         const allWeeks = await db.charts_data
           .where('[chartId+chartType]')
           .equals([String(chart.id), type])
           .toArray();
         const uniqueWeeks = [...new Set(allWeeks.map(w => w.week))].sort();
-        
+
         // Add weekNumber to each result (1 = oldest week, N = newest week)
         const resultsWithWeekNumber = filteredResults.map(item => ({
           ...item,
           weekNumber: uniqueWeeks.indexOf(item.week) + 1
         }));
-        
+
         setData(resultsWithWeekNumber);
       } catch (error) {
         console.error('Error loading rank stats:', error);
@@ -204,7 +204,7 @@ const RankStats: React.FC = () => {
   // Filter by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery) return dataWithOccurrence;
-    
+
     const lowerQuery = searchQuery.toLowerCase();
     return dataWithOccurrence.filter(item => {
       const nameMatch = item.name.toLowerCase().includes(lowerQuery);
@@ -217,7 +217,7 @@ const RankStats: React.FC = () => {
   const sortedData = React.useMemo(() => {
     const sorted = [...filteredData];
     const weights = getWeights(type);
-    
+
     switch (sortBy) {
       case 'week-desc':
         return sorted.sort((a, b) => b.week.localeCompare(a.week));
@@ -299,7 +299,7 @@ const RankStats: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <StatsFilters
+  <StatsFilters
         year={year}
         onYearChange={setYear}
         type={type}
@@ -314,8 +314,8 @@ const RankStats: React.FC = () => {
         onToggleImages={(value) => updatePreference('showImages', value)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+  fontSize={preferences.fontSize}
+  onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showPositionFilter={true}
         showPeakOnlyToggle={true}
@@ -375,34 +375,34 @@ const RankStats: React.FC = () => {
                       <Table.Tr key={`${record.week}-${record.entityId}`}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Tooltip label={dateRange} withArrow>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
                           </Tooltip>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
                             {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
                               {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
-                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
+                                <Text c="dimmed" size={preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.occurrence}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.plays.toLocaleString()}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.plays.toLocaleString()}</Text>
                         </Table.Td>
                         {preferences.showSales && (
                           <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{Math.round(sales).toLocaleString()}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{Math.round(sales).toLocaleString()}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
@@ -424,11 +424,11 @@ const RankStats: React.FC = () => {
           </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}

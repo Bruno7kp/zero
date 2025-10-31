@@ -19,8 +19,8 @@ export interface StatsFiltersProps {
   onToggleImages?: (value: boolean) => void;
   showArtistColumn?: boolean;
   onToggleArtistColumn?: (value: boolean) => void;
-  tableSize?: 'xs' | 'sm' | 'md';
-  onTableSizeChange?: (value: 'xs' | 'sm' | 'md') => void;
+  fontSize?: 'xs' | 'sm' | 'md';
+  onFontSizeChange?: (value: 'xs' | 'sm' | 'md') => void;
   yearRange?: { minYear: number; maxYear: number };
   showTypeFilter?: boolean;
   showPositionFilter?: boolean;
@@ -28,7 +28,7 @@ export interface StatsFiltersProps {
   showPeakOnlyToggle?: boolean;
   showImageToggle?: boolean;
   showArtistColumnToggle?: boolean;
-  showTableSizeToggle?: boolean;
+  showFontSizeToggle?: boolean;
   cutoff?: number;
   customFilters?: React.ReactNode;
   allowAllPosition?: boolean;
@@ -58,8 +58,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onToggleImages,
   showArtistColumn,
   onToggleArtistColumn,
-  tableSize,
-  onTableSizeChange,
+  fontSize,
+  onFontSizeChange,
   yearRange,
   showTypeFilter = true,
   showPositionFilter = false,
@@ -67,7 +67,6 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   showPeakOnlyToggle = false,
   showImageToggle = true,
   showArtistColumnToggle = true,
-  showTableSizeToggle = true,
   cutoff = 100,
   customFilters,
   allowAllPosition = false,
@@ -78,6 +77,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onSearchChange,
   sortBy,
   onSortChange,
+  showFontSizeToggle = true,
   sortOptions
 }) => {
   const { t } = useTranslation();
@@ -92,6 +92,12 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
     }
     return [{ value: 'all', label: t('stats.filters.allYears') }, ...years];
   }, [yearRange, t]);
+
+  // Sorted sortOptions by label to present alphabetical options in the Select
+  const sortedSortOptions = React.useMemo(() => {
+    if (!sortOptions) return sortOptions;
+    return [...sortOptions].sort((a, b) => a.label.localeCompare(b.label));
+  }, [sortOptions]);
 
   return (
     <Flex direction="column" gap="md" mb="md">
@@ -145,8 +151,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             />
           )}
 
-          {(showSalesToggle || showPeakOnlyToggle || showImageToggle || showArtistColumnToggle || showTableSizeToggle) &&
-          (onToggleSales || onTogglePeakOnly || onToggleImages || onToggleArtistColumn || onTableSizeChange) && (
+          {(showSalesToggle || showPeakOnlyToggle || showImageToggle || showArtistColumnToggle || showFontSizeToggle) &&
+          (onToggleSales || onTogglePeakOnly || onToggleImages || onToggleArtistColumn || onFontSizeChange) && (
             <Menu shadow="md" width={300} closeOnItemClick={false}>
               <Menu.Target>
                 <ActionIcon variant="subtle" size="lg" aria-label={t('stats.filters.settings')}>
@@ -176,7 +182,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                   </Menu.Item>
                 )}
 
-                {(showSalesToggle || showPeakOnlyToggle) && (showImageToggle || showArtistColumnToggle || showTableSizeToggle) && (
+                {(showSalesToggle || showPeakOnlyToggle) && (showImageToggle || showArtistColumnToggle || showFontSizeToggle) && (
                   <Divider my="xs" />
                 )}
 
@@ -200,14 +206,14 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                   </Menu.Item>
                 )}
 
-                {showTableSizeToggle && onTableSizeChange && (
+                {showFontSizeToggle && onFontSizeChange && (
                   <>
                     <Divider my="xs" />
-                    <Menu.Label>{t('stats.filters.tableSize')}</Menu.Label>
+                    <Menu.Label>{t('stats.filters.fontSize')}</Menu.Label>
                     <Menu.Item>
                       <SegmentedControl
-                        value={tableSize || 'sm'}
-                        onChange={(value) => onTableSizeChange(value as 'xs' | 'sm' | 'md')}
+                        value={fontSize || 'sm'}
+                        onChange={(value) => onFontSizeChange(value as 'xs' | 'sm' | 'md')}
                         data={[
                           { label: 'A-', value: 'xs' },
                           { label: 'A', value: 'sm' },
@@ -273,7 +279,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             leftSection={<IconSortDescending size={16} />}
             value={sortBy}
             onChange={(value) => value && onSortChange(value)}
-            data={sortOptions}
+            data={sortedSortOptions}
             placeholder={t('stats.filters.sortBy')}
             style={{ flex: '0 1 250px', minWidth: 150 }}
           />

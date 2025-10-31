@@ -1,10 +1,10 @@
 // Artists with most debuts at #1 stats
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Stack, 
-  Text, 
-  Loader, 
+import {
+  Stack,
+  Text,
+  Loader,
   Center,
   Card,
   Avatar,
@@ -36,10 +36,10 @@ const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
   });
-  
+
   return (
-    <Avatar 
-      src={imageUrl} 
+    <Avatar
+      src={imageUrl}
       alt={artistName}
       size={40}
       radius="md"
@@ -129,9 +129,9 @@ const DebutsAtOneByArtistStats: React.FC = () => {
   // Filter data by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return data;
-    
+
     const query = searchQuery.toLowerCase();
-    return data.filter(item => 
+    return data.filter(item =>
       item.artistName.toLowerCase().includes(query)
     );
   }, [data, searchQuery]);
@@ -172,15 +172,15 @@ const DebutsAtOneByArtistStats: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <StatsFilters
+  <StatsFilters
         year={year}
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
         showImages={preferences.showImages}
         onToggleImages={(value) => updatePreference('showImages', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+  fontSize={preferences.fontSize}
+  onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         hideArtistType={true}
@@ -232,24 +232,24 @@ const DebutsAtOneByArtistStats: React.FC = () => {
                 <Table.Tbody>
                   {paginatedData.map((record, index) => {
                     const displayRank = (page - 1) * preferences.pageSize + index + 1;
-                    
+
                     return (
                       <Table.Tr key={record.artistName}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
                             {preferences.showImages && <ImageCell artistName={record.artistName} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>
                                 {record.artistName}
                               </Text>
                             </Box>
                           </Flex>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>
                             {record.itemsCount}
                           </Text>
                         </Table.Td>
@@ -261,11 +261,11 @@ const DebutsAtOneByArtistStats: React.FC = () => {
             </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}

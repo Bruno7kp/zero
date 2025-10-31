@@ -1,10 +1,10 @@
 // Most Plays in a Week stats
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Stack, 
+import {
+  Stack,
   Text,
-  Loader, 
+  Loader,
   Center,
   Select,
   Card,
@@ -41,10 +41,10 @@ const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET
   });
-  
+
   return (
-    <Avatar 
-      src={imageUrl} 
+    <Avatar
+      src={imageUrl}
       alt={record.name}
       size={40}
       radius="md"
@@ -87,7 +87,7 @@ const PlaysStats: React.FC = () => {
   // Get weight values for sales calculation
   const getWeights = React.useCallback((chartType: string) => {
     if (!chart) return { weightPlays: 1, weightPoints: 0 };
-    
+
     if (chartType === 'track') {
       return {
         weightPlays: chart.music_plays_weight || 1,
@@ -131,20 +131,20 @@ const PlaysStats: React.FC = () => {
         }
 
         const results = await getHighestPlays(filters);
-        
+
         // Get all weeks for calculating week numbers
         const allWeeks = await db.charts_data
           .where('[chartId+chartType]')
           .equals([String(chart.id), type])
           .toArray();
         const uniqueWeeks = [...new Set(allWeeks.map((w: ChartData) => w.week))].sort();
-        
+
         // Add weekNumber to each result (1 = oldest week, N = newest week)
         const resultsWithWeekNumber = results.map(item => ({
           ...item,
           weekNumber: uniqueWeeks.indexOf(item.week) + 1
         }));
-        
+
         setData(resultsWithWeekNumber);
       } catch (error) {
         console.error('Error loading plays stats:', error);
@@ -171,9 +171,9 @@ const PlaysStats: React.FC = () => {
   // Filter data by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return data;
-    
+
     const query = searchQuery.toLowerCase();
-    return data.filter(item => 
+    return data.filter(item =>
       item.name.toLowerCase().includes(query) ||
       (item.artistName && item.artistName.toLowerCase().includes(query))
     );
@@ -183,7 +183,7 @@ const PlaysStats: React.FC = () => {
   const sortedData = React.useMemo(() => {
     const sorted = [...filteredData];
     const weights = getWeights(type);
-    
+
     switch (sortBy) {
       case 'week-desc':
         return sorted.sort((a, b) => b.week.localeCompare(a.week));
@@ -275,7 +275,7 @@ const PlaysStats: React.FC = () => {
   }
 
   const cutoff = getCutoff(type);
-  
+
   // Generate position options from 1 to cutoff
   const positionOptions = [
     { value: 'all', label: t('stats.filters.all') },
@@ -287,7 +287,7 @@ const PlaysStats: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <StatsFilters
+  <StatsFilters
         year={year}
         onYearChange={setYear}
         type={type}
@@ -298,8 +298,8 @@ const PlaysStats: React.FC = () => {
         onToggleImages={(value) => updatePreference('showImages', value)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+  fontSize={preferences.fontSize}
+  onFontSizeChange={(value) => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         pageSize={preferences.pageSize}
         onPageSizeChange={(value) => updatePreference('pageSize', value)}
@@ -367,38 +367,38 @@ const PlaysStats: React.FC = () => {
                     return (
                       <Table.Tr key={`${record.week}-${record.entityId}`}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
                             {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
+                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
                               {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
-                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
+                                <Text c="dimmed" size={preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
                               )}
                             </Box>
                           </Flex>
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.plays.toLocaleString()}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.plays.toLocaleString()}</Text>
                         </Table.Td>
                         {preferences.showSales && (
                           <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{Math.round(sales).toLocaleString()}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{Math.round(sales).toLocaleString()}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.rank}</Text>
+                          <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.rank}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           <Tooltip label={dateRange} withArrow>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
+                            <Text size={preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md'}>{record.weekNumber}</Text>
                           </Tooltip>
                         </Table.Td>
                         <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
@@ -420,11 +420,11 @@ const PlaysStats: React.FC = () => {
           </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}

@@ -568,7 +568,7 @@
         "peakOnly": "Peak only",
         "showImages": "Show images",
         "showArtistColumn": "Separate artist column",
-        "tableSize": "Table size",
+  "fontSize": "Font size",
         "small": "Small",
         "medium": "Medium",
         "large": "Large",

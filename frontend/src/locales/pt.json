@@ -568,7 +568,7 @@
         "peakOnly": "Apenas picos",
         "showImages": "Mostrar imagens",
         "showArtistColumn": "Coluna de artista separada",
-        "tableSize": "Tamanho da tabela",
+  "fontSize": "Tamanho da fonte",
         "small": "Pequeno",
         "medium": "Médio",
         "large": "Grande",
