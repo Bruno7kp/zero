@@ -1,7 +1,7 @@
 // Shared filters component for stats pages
 import React from 'react';
 import { Group, Select, SegmentedControl, Center, ActionIcon, Menu, Checkbox, Flex, Divider, TextInput } from '@mantine/core';
-import { IconMicrophone, IconDisc, IconMusic, IconSettings, IconCalendar, IconHash, IconSearch, IconSortDescending } from '@tabler/icons-react';
+import { IconMicrophone, IconDisc, IconMusic, IconSettings, IconCalendar, IconHash, IconSearch, IconSortDescending, IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 export interface StatsFiltersProps {
@@ -85,7 +85,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   // Generate year options
   const yearOptions = React.useMemo(() => {
     if (!yearRange) return [{ value: 'all', label: t('stats.filters.allYears') }];
-    
+
     const years = [];
     for (let y = yearRange.maxYear; y >= yearRange.minYear; y--) {
       years.push({ value: String(y), label: String(y) });
@@ -132,19 +132,20 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
         <Group gap="xs" wrap="nowrap">
           {onPageSizeChange && (
             <Select
+                leftSection={<IconFilter size={16} />}
               value={String(pageSize || 25)}
               onChange={(value) => value && onPageSizeChange(Number(value))}
               data={[
-                { value: '10', label: `10 ${t('stats.filters.perPage')}` },
-                { value: '25', label: `25 ${t('stats.filters.perPage')}` },
-                { value: '50', label: `50 ${t('stats.filters.perPage')}` },
-                { value: '100', label: `100 ${t('stats.filters.perPage')}` },
+                { value: '10', label: `10` },
+                { value: '25', label: `25` },
+                { value: '50', label: `50` },
+                { value: '100', label: `100` },
               ]}
-              style={{ minWidth: 120 }}
+              style={{ width: 100 }}
             />
           )}
 
-          {(showSalesToggle || showPeakOnlyToggle || showImageToggle || showArtistColumnToggle || showTableSizeToggle) && 
+          {(showSalesToggle || showPeakOnlyToggle || showImageToggle || showArtistColumnToggle || showTableSizeToggle) &&
           (onToggleSales || onTogglePeakOnly || onToggleImages || onToggleArtistColumn || onTableSizeChange) && (
             <Menu shadow="md" width={300} closeOnItemClick={false}>
               <Menu.Target>
@@ -154,7 +155,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Label>{t('stats.filters.displayOptions')}</Menu.Label>
-                
+
                 {showSalesToggle && onToggleSales && (
                   <Menu.Item>
                     <Checkbox
@@ -164,7 +165,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                     />
                   </Menu.Item>
                 )}
-                
+
                 {showPeakOnlyToggle && onTogglePeakOnly && (
                   <Menu.Item>
                     <Checkbox
@@ -174,11 +175,11 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                     />
                   </Menu.Item>
                 )}
-                
+
                 {(showSalesToggle || showPeakOnlyToggle) && (showImageToggle || showArtistColumnToggle || showTableSizeToggle) && (
                   <Divider my="xs" />
                 )}
-                
+
                 {showImageToggle && onToggleImages && (
                   <Menu.Item>
                     <Checkbox
@@ -188,7 +189,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                     />
                   </Menu.Item>
                 )}
-                
+
                 {showArtistColumnToggle && onToggleArtistColumn && (
                   <Menu.Item>
                     <Checkbox
@@ -198,7 +199,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                     />
                   </Menu.Item>
                 )}
-                
+
                 {showTableSizeToggle && onTableSizeChange && (
                   <>
                     <Divider my="xs" />
@@ -266,8 +267,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
         )}
 
         {customFilters}
-        
-        {onSortChange && sortOptions && sortOptions.length > 0 && (
+
+        {onSortChange && sortOptions && sortOptions.length > 1 && (
           <Select
             leftSection={<IconSortDescending size={16} />}
             value={sortBy}

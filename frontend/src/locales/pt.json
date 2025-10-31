@@ -765,7 +765,9 @@
           "positionDesc": "Posição (melhor para pior)",
           "positionAsc": "Posição (pior para melhor)",
           "nameAsc": "Nome (A-Z)",
-          "nameDesc": "Nome (Z-A)"
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
         }
       },
       "timesAtTopByArtist": {
