@@ -1,5 +1,6 @@
 // Most consecutive weeks at #1
 import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Stack,
@@ -13,7 +14,9 @@ import {
   Pagination,
   Box,
   Flex,
+  Select,
 } from '@mantine/core';
+import { IconArrowBarUp } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
@@ -49,6 +52,8 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  // Default to Top 1 (behaviour consistent with other stats)
+  const [position, setPosition] = useState<number>(1);
   const [sortBy, setSortBy] = useState('longest-desc');
 
   const charts = useSelector((state: any) => state.charts.charts);
@@ -66,6 +71,16 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
     loadYearRange();
   }, [chart, type]);
 
+  const getCutoff = (chartType: string) => {
+    if (!chart) return 100;
+    const cutoffMap: any = {
+      artist: chart.artist_cutoff || 100,
+      album: chart.album_cutoff || 100,
+      track: chart.music_cutoff || 100,
+    };
+    return cutoffMap[chartType] || 100;
+  };
+
   useEffect(() => {
     if (!chart) return;
     const loadData = async () => {
@@ -75,7 +90,10 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
           chartId: String(chart.id),
           chartType: type,
           year,
-        });
+          // interpret selected position as top-N (<=) filter
+          position: typeof position === 'number' ? position : undefined,
+          positionOperator: typeof position === 'number' ? 'lte' : undefined,
+        } as any);
         setData(results);
       } catch (err) {
         console.error('Error loading longest consecutive at #1 stats', err);
@@ -84,7 +102,7 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
       }
     };
     loadData();
-  }, [chart, type, year]);
+  }, [chart, type, year, position]);
 
   const handleTypeChange = (newType: string) => {
     setType(newType);
@@ -101,6 +119,25 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
     );
   }, [data, searchQuery]);
 
+  React.useEffect(() => setPage(1), [searchQuery, sortBy, preferences.pageSize]);
+
+  const sortOptions = React.useMemo(
+    () => [
+      { value: 'longest-desc', label: t('stats.timesAtRank.sort.timesDesc') },
+      { value: 'longest-asc', label: t('stats.timesAtRank.sort.timesAsc') },
+      { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
+      { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
+      { value: 'artist-asc', label: t('stats.timesAtTop.sort.artistAsc') },
+      { value: 'artist-desc', label: t('stats.timesAtTop.sort.artistDesc') },
+      { value: 'startWeek-desc', label: t('stats.longestConsecutiveAtOne.sort.startWeekDesc') },
+      { value: 'startWeek-asc', label: t('stats.longestConsecutiveAtOne.sort.startWeekAsc') },
+      { value: 'endWeek-desc', label: t('stats.longestConsecutiveAtOne.sort.endWeekDesc') },
+      { value: 'endWeek-asc', label: t('stats.longestConsecutiveAtOne.sort.endWeekAsc') },
+    ],
+    [t]
+  );
+
+  // Extend sorting to support start/end week ordering
   const sortedData = React.useMemo(() => {
     const copy = [...filteredData];
     switch (sortBy) {
@@ -108,6 +145,14 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
         return copy.sort((a, b) => b.longest - a.longest);
       case 'longest-asc':
         return copy.sort((a, b) => a.longest - b.longest);
+      case 'startWeek-desc':
+        return copy.sort((a, b) => (b.startWeek || '').localeCompare(a.startWeek || ''));
+      case 'startWeek-asc':
+        return copy.sort((a, b) => (a.startWeek || '').localeCompare(b.startWeek || ''));
+      case 'endWeek-desc':
+        return copy.sort((a, b) => (b.endWeek || '').localeCompare(a.endWeek || ''));
+      case 'endWeek-asc':
+        return copy.sort((a, b) => (a.endWeek || '').localeCompare(b.endWeek || ''));
       case 'name-asc':
         return copy.sort((a, b) => a.name.localeCompare(b.name));
       case 'name-desc':
@@ -126,20 +171,6 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
     return sortedData.slice(start, start + preferences.pageSize);
   }, [sortedData, page, preferences.pageSize]);
 
-  React.useEffect(() => setPage(1), [searchQuery, sortBy, preferences.pageSize]);
-
-  const sortOptions = React.useMemo(
-    () => [
-      { value: 'longest-desc', label: t('stats.timesAtRank.sort.timesDesc') },
-      { value: 'longest-asc', label: t('stats.timesAtRank.sort.timesAsc') },
-      { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
-      { value: 'artist-asc', label: t('stats.timesAtTop.sort.artistAsc') },
-      { value: 'artist-desc', label: t('stats.timesAtTop.sort.artistDesc') },
-    ],
-    [t]
-  );
-
   if (!chart) {
     return (
       <Center py="xl">
@@ -155,6 +186,23 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
         onYearChange={setYear}
         type={type}
         onTypeChange={handleTypeChange}
+        showPositionFilter={false}
+        cutoff={getCutoff(type)}
+        customFilters={
+          <Select
+            value={String(position)}
+            onChange={value => {
+              if (value) setPosition(Number(value));
+            }}
+            data={Array.from({ length: getCutoff(type) }, (_, i) => ({
+              value: String(i + 1),
+              label: `Top ${i + 1}`,
+            }))}
+            style={{ minWidth: 140 }}
+            leftSection={<IconArrowBarUp size={16} />}
+            searchable
+          />
+        }
         showImages={preferences.showImages}
         onToggleImages={v => updatePreference('showImages', v)}
         showArtistColumn={preferences.showArtistColumn}
@@ -300,30 +348,64 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                           </Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {record.startWeek || '-'}
-                          </Text>
+                          {record.startWeek ? (
+                            <Text
+                              component="a"
+                              onClick={() => navigate(`/charts/week/${record.startWeek}/${type}`)}
+                              style={{ cursor: 'pointer' }}
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              {dayjs(record.startWeek).format('YYYY.MM.DD')}
+                            </Text>
+                          ) : (
+                            <Text
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              -
+                            </Text>
+                          )}
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {record.endWeek || '-'}
-                          </Text>
+                          {record.endWeek ? (
+                            <Text
+                              component="a"
+                              onClick={() => navigate(`/charts/week/${record.endWeek}/${type}`)}
+                              style={{ cursor: 'pointer' }}
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              {dayjs(record.endWeek).format('YYYY.MM.DD')}
+                            </Text>
+                          ) : (
+                            <Text
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              -
+                            </Text>
+                          )}
                         </Table.Td>
                       </Table.Tr>
                     );

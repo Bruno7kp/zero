@@ -15,6 +15,10 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import dayjs from 'dayjs';
+import { Avatar } from '@mantine/core';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import StatsFilters from '../../components/stats/StatsFilters';
 import { getWeeksToFirstNumberOne, getYearRange } from '../../utils/statsQueries';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
@@ -40,6 +44,24 @@ const WeeksToNumberOneStats: React.FC = () => {
   const chart = charts.find((c: any) => c.id === activeChartId);
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
+
+  // Image cell component (hooks must be called in component scope)
+  const ImageCell: React.FC<{ entityId: string; name: string; artist?: string }> = ({
+    entityId,
+    name,
+    artist,
+  }) => {
+    const { imageUrl } = useSpotifyImage({
+      entityId,
+      name,
+      artist: artist || name,
+      type: 'track' as any,
+      clientId: SPOTIFY_TOKEN,
+      clientSecret: SPOTIFY_SECRET,
+    });
+
+    return <Avatar src={imageUrl} alt={name} size={40} radius="md" />;
+  };
 
   useEffect(() => {
     if (!chart) return;
@@ -99,6 +121,42 @@ const WeeksToNumberOneStats: React.FC = () => {
         return copy.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
       case 'artist-desc':
         return copy.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
+      case 'firstWeek-desc':
+        return copy.sort((a, b) => {
+          const A = dayjs(a.firstWeek);
+          const B = dayjs(b.firstWeek);
+          if (!A.isValid() && !B.isValid()) return 0;
+          if (!A.isValid()) return 1;
+          if (!B.isValid()) return -1;
+          return B.valueOf() - A.valueOf();
+        });
+      case 'firstWeek-asc':
+        return copy.sort((a, b) => {
+          const A = dayjs(a.firstWeek);
+          const B = dayjs(b.firstWeek);
+          if (!A.isValid() && !B.isValid()) return 0;
+          if (!A.isValid()) return 1;
+          if (!B.isValid()) return -1;
+          return A.valueOf() - B.valueOf();
+        });
+      case 'weekReachedOne-desc':
+        return copy.sort((a, b) => {
+          const A = dayjs(a.weekReachedOne);
+          const B = dayjs(b.weekReachedOne);
+          if (!A.isValid() && !B.isValid()) return 0;
+          if (!A.isValid()) return 1;
+          if (!B.isValid()) return -1;
+          return B.valueOf() - A.valueOf();
+        });
+      case 'weekReachedOne-asc':
+        return copy.sort((a, b) => {
+          const A = dayjs(a.weekReachedOne);
+          const B = dayjs(b.weekReachedOne);
+          if (!A.isValid() && !B.isValid()) return 0;
+          if (!A.isValid()) return 1;
+          if (!B.isValid()) return -1;
+          return A.valueOf() - B.valueOf();
+        });
       default:
         return copy;
     }
@@ -115,6 +173,10 @@ const WeeksToNumberOneStats: React.FC = () => {
     () => [
       { value: 'weeks-desc', label: t('stats.weeksToNumberOne.sort.weeksDesc') },
       { value: 'weeks-asc', label: t('stats.weeksToNumberOne.sort.weeksAsc') },
+      { value: 'firstWeek-desc', label: t('stats.weeksToNumberOne.sort.firstWeekDesc') },
+      { value: 'firstWeek-asc', label: t('stats.weeksToNumberOne.sort.firstWeekAsc') },
+      { value: 'weekReachedOne-desc', label: t('stats.weeksToNumberOne.sort.weekReachedOneDesc') },
+      { value: 'weekReachedOne-asc', label: t('stats.weeksToNumberOne.sort.weekReachedOneAsc') },
       { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
       { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
     ],
@@ -202,18 +264,25 @@ const WeeksToNumberOneStats: React.FC = () => {
                         </Table.Td>
                         <Table.Td>
                           <Flex gap="sm" align="center">
+                            {preferences.showImages && (
+                              <ImageCell
+                                entityId={record.entityId}
+                                name={record.name}
+                                artist={record.artistName}
+                              />
+                            )}
                             <Box>
-                              <Text fw={600} lineClamp={1}>
-                                {record.name}
-                              </Text>
-                              {type !== 'artist' &&
-                                record.artistName &&
-                                !preferences.showArtistColumn && (
-                                  <Text c="dimmed" size="sm" lineClamp={1}>
-                                    {record.artistName}
+                                  <Text fw={600} lineClamp={1}>
+                                    {record.name}
                                   </Text>
-                                )}
-                            </Box>
+                                  {type !== 'artist' &&
+                                    record.artistName &&
+                                    !preferences.showArtistColumn && (
+                                      <Text c="dimmed" size="sm" lineClamp={1}>
+                                        {record.artistName}
+                                      </Text>
+                                    )}
+                                </Box>
                           </Flex>
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
@@ -225,10 +294,46 @@ const WeeksToNumberOneStats: React.FC = () => {
                           <Text>{record.weeksToFirstNumberOne}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.firstWeek}</Text>
+                          {record.firstWeek ? (
+                            (() => {
+                              const parsed = dayjs(record.firstWeek);
+                              if (parsed.isValid()) {
+                                return (
+                                  <Text
+                                    component="a"
+                                    onClick={() => navigate(`/charts/week/${record.firstWeek}/${type}`)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {parsed.format('YYYY.MM.DD')}
+                                  </Text>
+                                );
+                              }
+                              return <Text>-</Text>;
+                            })()
+                          ) : (
+                            <Text>-</Text>
+                          )}
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.weekReachedOne}</Text>
+                          {record.weekReachedOne ? (
+                            (() => {
+                              const parsed = dayjs(record.weekReachedOne);
+                              if (parsed.isValid()) {
+                                return (
+                                  <Text
+                                    component="a"
+                                    onClick={() => navigate(`/charts/week/${record.weekReachedOne}/${type}`)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {parsed.format('YYYY.MM.DD')}
+                                  </Text>
+                                );
+                              }
+                              return <Text>-</Text>;
+                            })()
+                          ) : (
+                            <Text>-</Text>
+                          )}
                         </Table.Td>
                       </Table.Tr>
                     );

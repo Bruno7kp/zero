@@ -516,9 +516,23 @@ export async function getLongestConsecutiveAtOne(filters: StatsFilters & { rank?
     data = data.filter(item => item.week.startsWith(filters.year!));
   }
 
-  // Only consider rows where rank === 1 (or filters.rank if provided)
-  const rankToCheck = filters.rank ?? 1;
-  const rankRows = data.filter(item => item.rank === rankToCheck);
+  // Determine which rows count for the sequence:
+  // - If filters.position is provided, support positionOperator (eq | lte).
+  //   For this page we commonly use positionOperator === 'lte' to mean "top N".
+  // - Otherwise, fall back to filters.rank (or default to 1).
+  let rankRows: ChartData[] = [];
+  if (typeof (filters as any).position === 'number') {
+    const pos = (filters as any).position as number;
+    const op = (filters as any).positionOperator || 'lte';
+    if (op === 'lte') {
+      rankRows = data.filter(item => item.rank <= pos);
+    } else {
+      rankRows = data.filter(item => item.rank === pos);
+    }
+  } else {
+    const rankToCheck = filters.rank ?? 1;
+    rankRows = data.filter(item => item.rank === rankToCheck);
+  }
 
   // Group by entityId
   const byEntity = new Map<string, { name: string; artistName: string; weeks: string[] }>();
@@ -669,12 +683,14 @@ export async function getArtistsWithMostSimultaneousItems(filters: {
   chartId: string;
   chartType: 'album' | 'track';
   year?: string;
+  topN?: number; // optional: consider only ranks <= topN
 }): Promise<
   Array<{
     artistName: string;
     maxSimultaneous: number;
     totalWeeks: number; // number of weeks artist had at least one item
     sampleEntityId?: string | null;
+    sampleWeek?: string | null;
   }>
 > {
   const query = db.charts_data
@@ -686,6 +702,11 @@ export async function getArtistsWithMostSimultaneousItems(filters: {
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
     data = data.filter(item => item.week.startsWith(filters.year!));
+  }
+
+  // If topN is provided, only consider rows with rank <= topN
+  if (typeof filters.topN === 'number') {
+    data = data.filter(item => item.rank <= filters.topN!);
   }
 
   // Map week -> artist -> set(entityId)
@@ -702,10 +723,15 @@ export async function getArtistsWithMostSimultaneousItems(filters: {
   // Aggregate per artist
   const byArtist = new Map<
     string,
-    { maxSimultaneous: number; totalWeeks: number; sampleEntityId?: string | null }
+    {
+      maxSimultaneous: number;
+      totalWeeks: number;
+      sampleEntityId?: string | null;
+      sampleWeek?: string | null;
+    }
   >();
 
-  for (const [, artistMap] of weekArtistMap.entries()) {
+  for (const [week, artistMap] of weekArtistMap.entries()) {
     for (const [artistName, setOfEntities] of artistMap.entries()) {
       const count = setOfEntities.size;
       const sample = setOfEntities.values().next();
@@ -716,10 +742,15 @@ export async function getArtistsWithMostSimultaneousItems(filters: {
           maxSimultaneous: count,
           totalWeeks: 1,
           sampleEntityId: sampleId,
+          sampleWeek: sampleId ? week : null,
         });
       } else {
         const existing = byArtist.get(artistName)!;
-        existing.maxSimultaneous = Math.max(existing.maxSimultaneous, count);
+        if (count > existing.maxSimultaneous) {
+          existing.maxSimultaneous = count;
+          existing.sampleEntityId = sampleId;
+          existing.sampleWeek = sampleId ? week : null;
+        }
         existing.totalWeeks += 1;
         if (!existing.sampleEntityId && sampleId) existing.sampleEntityId = sampleId;
       }

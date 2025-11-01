@@ -700,7 +700,11 @@
           "nameAsc": "Nome (A-Z)",
           "nameDesc": "Nome (Z-A)",
           "artistAsc": "Artista (A-Z)",
-          "artistDesc": "Artista (Z-A)"
+          "artistDesc": "Artista (Z-A)",
+          "startWeekDesc": "Semana inicial (mais recente primeiro)",
+          "startWeekAsc": "Semana inicial (mais antiga primeiro)",
+          "endWeekDesc": "Semana final (mais recente primeiro)",
+          "endWeekAsc": "Semana final (mais antiga primeiro)"
         }
       },
       "weeksToNumberOne": {
@@ -714,6 +718,10 @@
         "sort": {
           "weeksDesc": "Semanas (maior para menor)",
           "weeksAsc": "Semanas (menor para maior)"
+          ,"firstWeekDesc": "Primeira semana (mais recente primeiro)",
+          "firstWeekAsc": "Primeira semana (mais antiga primeiro)",
+          "weekReachedOneDesc": "Semana que alcançou #1 (mais recente primeiro)",
+          "weekReachedOneAsc": "Semana que alcançou #1 (mais antiga primeiro)"
         }
       },
       "plays": {
@@ -863,7 +871,10 @@
         "title": "Artistas com Mais Músicas Simultâneas",
         "description": "Artistas com o maior número de músicas distintas aparecendo na mesma semana",
         "columns": {
-          "simultaneous": "Músicas Simultâneas",
+          "simultaneous": "Simultâneas",
+          "simultaneousTracks": "Músicas Simultâneas",
+          "simultaneousAlbums": "Álbuns Simultâneos",
+          "sampleWeek": "Semana amostra",
           "weeks": "Semanas"
         },
         "sort": {

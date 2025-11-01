@@ -1,6 +1,7 @@
 // Artists with most simultaneous tracks in the same week
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import {
   Stack,
   Loader,
@@ -13,7 +14,11 @@ import {
   Pagination,
   Box,
   Flex,
+  Select,
 } from '@mantine/core';
+import { IconArrowBarUp } from '@tabler/icons-react';
+import { useSpotifyImage } from '../../hooks/useSpotifyImage';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
@@ -35,6 +40,7 @@ const MostSimultaneousByArtistStats: React.FC = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('simultaneous-desc');
+  const [topN, setTopN] = useState<number | undefined>(undefined);
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -56,10 +62,12 @@ const MostSimultaneousByArtistStats: React.FC = () => {
     const loadData = async () => {
       setLoading(true);
       try {
+        const effectiveTopN = typeof topN === 'number' ? topN : undefined;
         const results = await getArtistsWithMostSimultaneousItems({
           chartId: String(chart.id),
           chartType: type as 'track' | 'album',
           year,
+          topN: effectiveTopN,
         });
         setData(results);
       } catch (err) {
@@ -69,7 +77,7 @@ const MostSimultaneousByArtistStats: React.FC = () => {
       }
     };
     loadData();
-  }, [chart, type, year]);
+  }, [chart, type, year, topN]);
 
   const handleTypeChange = (newType: string) => {
     setType(newType);
@@ -134,6 +142,32 @@ const MostSimultaneousByArtistStats: React.FC = () => {
     );
   }
 
+  // chart cutoff helper (mirrors TimesAtTopByArtist implementation)
+  const getCutoff = (chartType: string) => {
+    if (!chart) return 100;
+    const cutoffMap: any = {
+      album: chart.album_cutoff || 100,
+      track: chart.music_cutoff || 100,
+    };
+    return cutoffMap[chartType] || 100;
+  };
+
+  const cutoff = getCutoff(type);
+
+  // Image cell using hook must be a component (hooks can't be called conditionally)
+  const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
+    const { imageUrl } = useSpotifyImage({
+      entityId: `artist-${artistName}-`,
+      name: artistName,
+      artist: artistName,
+      type: 'artist',
+      clientId: SPOTIFY_TOKEN,
+      clientSecret: SPOTIFY_SECRET,
+    });
+
+    return <Avatar src={imageUrl} alt={artistName} size={40} radius="md" />;
+  };
+
   return (
     <Stack gap="md">
       <StatsFilters
@@ -143,6 +177,8 @@ const MostSimultaneousByArtistStats: React.FC = () => {
         onTypeChange={handleTypeChange}
         showImages={preferences.showImages}
         onToggleImages={v => updatePreference('showImages', v)}
+        // this stat is artist-scoped, do not show artist in the segmented control
+        hideArtistType={true}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={v => updatePreference('showArtistColumn', v)}
         containerSize={preferences.containerSize}
@@ -158,6 +194,21 @@ const MostSimultaneousByArtistStats: React.FC = () => {
         sortBy={sortBy}
         onSortChange={setSortBy}
         sortOptions={sortOptions}
+        customFilters={
+          <Select
+            value={String(topN ?? cutoff)}
+            onChange={value => {
+              if (value) setTopN(Number(value));
+            }}
+            data={Array.from({ length: cutoff }, (_, i) => ({
+              value: String(i + 1),
+              label: `Top ${i + 1}`,
+            }))}
+            style={{ minWidth: 140 }}
+            leftSection={<IconArrowBarUp size={16} />}
+            searchable
+          />
+        }
       />
 
       {loading ? (
@@ -175,11 +226,14 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                   </Table.Th>
                   <Table.Th>{t('charts.artist')}</Table.Th>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.mostSimultaneousByArtist.columns.simultaneous')}
+                    {type === 'album'
+                      ? t('stats.mostSimultaneousByArtist.columns.simultaneousAlbums')
+                      : t('stats.mostSimultaneousByArtist.columns.simultaneousTracks')}
                   </Table.Th>
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.mostSimultaneousByArtist.columns.weeks')}
+                    {t('stats.mostSimultaneousByArtist.columns.sampleWeek')}
                   </Table.Th>
+                  {/* removed numeric 'weeks' column per request; keep only sampleWeek (date) */}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -201,14 +255,7 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                         </Table.Td>
                         <Table.Td>
                           <Flex gap="sm" align="center">
-                            {preferences.showImages && (
-                              <Avatar
-                                src={undefined}
-                                alt={record.artistName}
-                                size={40}
-                                radius="md"
-                              />
-                            )}
+                            {preferences.showImages && <ImageCell artistName={record.artistName} />}
                             <Box>
                               <Text fw={600} lineClamp={1}>
                                 {record.artistName}
@@ -220,8 +267,31 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                           <Text>{record.maxSimultaneous}</Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.totalWeeks}</Text>
+                          {record.sampleWeek ? (
+                            (() => {
+                              const parsed = dayjs(record.sampleWeek);
+                              if (parsed.isValid()) {
+                                return (
+                                  <Text
+                                    component="a"
+                                    onClick={() =>
+                                      navigate(`/charts/week/${record.sampleWeek}/${type}`)
+                                    }
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {parsed.format('YYYY.MM.DD')}
+                                  </Text>
+                                );
+                              }
+                              // If not a valid date (e.g., a plain week number), don't show numeric week
+                              return <Text>-</Text>;
+                            })()
+                          ) : (
+                            <Text>-</Text>
+                          )}
                         </Table.Td>
+
+                        {/* numeric totalWeeks column removed; only sampleWeek (date) remains */}
                       </Table.Tr>
                     );
                   })
