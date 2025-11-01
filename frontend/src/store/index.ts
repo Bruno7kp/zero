@@ -11,13 +11,28 @@ import authReducer from './authSlice';
 import columnsReducer from './columnsSlice';
 import syncReducer from './syncSlice';
 import notificationsReducer from './notificationsSlice';
+import statsPreferencesReducer from './statsPreferencesSlice';
+import libraryFiltersReducer from './libraryFiltersSlice';
+import chartsWeeksReducer from './chartsWeeksSlice';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['charts', 'lang', 'theme', 'i18n', 'columns', 'sync', 'badgeStyles', 'notifications'],
+  whitelist: [
+    'charts',
+    'lang',
+    'theme',
+    'i18n',
+    'columns',
+    'sync',
+    'badgeStyles',
+    'notifications',
+    'statsPreferences',
+    'libraryFilters',
+    'chartsWeeks',
+  ],
 };
 
 const rootReducer = combineReducers({
@@ -27,6 +42,9 @@ const rootReducer = combineReducers({
   i18n: i18nReducer,
   auth: authReducer,
   columns: columnsReducer,
+  libraryFilters: libraryFiltersReducer,
+  chartsWeeks: chartsWeeksReducer,
+  statsPreferences: statsPreferencesReducer,
   badgeStyles: badgeStylesReducer,
   sync: syncReducer,
   notifications: notificationsReducer,

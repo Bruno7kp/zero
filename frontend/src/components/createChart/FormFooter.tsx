@@ -13,7 +13,7 @@ const FormFooter: React.FC<Props> = ({ isOnline, error, isSubmitting, buttonLabe
   const { t } = useTranslation();
   return (
     <Grid.Col span={12}>
-      {(!isOnline) && (
+      {!isOnline && (
         <Alert color="yellow" title={t('errors.warning')} mb="sm" variant="light">
           {t('errors.offlineAction')}
         </Alert>

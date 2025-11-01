@@ -44,7 +44,6 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState<string | null>(null);
 
-
   const baseEntityId = entityId; // sem sufixo de bust para cache consistente
   const { imageUrl } = useSpotifyImage({
     entityId: baseEntityId + (forceUpdate ? `_${forceUpdate}` : ''),
@@ -88,7 +87,13 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
           <img
             src={fallbackImage}
             alt={name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', borderRadius }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              cursor: 'pointer',
+              borderRadius,
+            }}
             onClick={e => {
               e.stopPropagation();
               setModalOpen(true);
@@ -116,7 +121,7 @@ export const SpotifyImageWithModal: React.FC<SpotifyImageWithModalProps> = ({
         type={type}
         clientId={clientId}
         clientSecret={clientSecret}
-  onImageChange={(url: string) => {
+        onImageChange={(url: string) => {
           if (onImageChange) onImageChange(url);
           setModalUrl(url);
         }}

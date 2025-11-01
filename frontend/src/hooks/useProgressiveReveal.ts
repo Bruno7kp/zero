@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 interface ProgressiveRevealOptions {
-  initial?: number;       // Quantidade inicial mostrada (pode ser recalculada se muito grande ou pequena)
-  step?: number;          // Quantidade adicionada a cada iteração (base)
-  intervalMs?: number;    // Intervalo entre batches
-  adaptive?: boolean;     // Ajuste dinâmico de step
-  maxStep?: number;       // Limite superior de step
-  minStep?: number;       // Limite inferior de step
-  disableBelow?: number;  // Se total <= disableBelow, desativa progressive e mostra tudo
+  initial?: number; // Quantidade inicial mostrada (pode ser recalculada se muito grande ou pequena)
+  step?: number; // Quantidade adicionada a cada iteração (base)
+  intervalMs?: number; // Intervalo entre batches
+  adaptive?: boolean; // Ajuste dinâmico de step
+  maxStep?: number; // Limite superior de step
+  minStep?: number; // Limite inferior de step
+  disableBelow?: number; // Se total <= disableBelow, desativa progressive e mostra tudo
   targetDurationMs?: number; // Tenta completar dentro desse tempo aproximado
 }
 
@@ -52,9 +52,12 @@ export function useProgressiveReveal<T>(items: T[], opts: ProgressiveRevealOptio
     // Ajusta initial dinamicamente: para listas muito grandes, começa com ~30% cap limitado
     let dynamicInitial = initial;
     if (initial < 1) dynamicInitial = 1; // sanity
-    if (items.length > 800 && initial < 150) dynamicInitial = Math.min(150, Math.max(initial, Math.round(items.length * 0.18)));
-    else if (items.length > 500 && initial < 120) dynamicInitial = Math.min(120, Math.max(initial, Math.round(items.length * 0.22)));
-    else if (items.length > 300 && initial < 100) dynamicInitial = Math.min(100, Math.max(initial, Math.round(items.length * 0.28)));
+    if (items.length > 800 && initial < 150)
+      dynamicInitial = Math.min(150, Math.max(initial, Math.round(items.length * 0.18)));
+    else if (items.length > 500 && initial < 120)
+      dynamicInitial = Math.min(120, Math.max(initial, Math.round(items.length * 0.22)));
+    else if (items.length > 300 && initial < 100)
+      dynamicInitial = Math.min(100, Math.max(initial, Math.round(items.length * 0.28)));
 
     setVisible(Math.min(dynamicInitial, items.length));
 
@@ -103,7 +106,7 @@ export function useProgressiveReveal<T>(items: T[], opts: ProgressiveRevealOptio
       cancelledRef.current = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   // Se itens atual ficou vazio, devolve a versão anterior para evitar flicker abrupto

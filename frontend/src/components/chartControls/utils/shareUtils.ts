@@ -42,7 +42,9 @@ export const generatePlainTextChart = (
 
   const headerWeek = weekNumber
     ? t('charts.share.weekNumberLabel', { defaultValue: 'Week {{num}}', num: weekNumber })
-    : (week ? t('charts.share.weekLabelFallback', { defaultValue: week, week }) : '');
+    : week
+    ? t('charts.share.weekLabelFallback', { defaultValue: week, week })
+    : '';
 
   const header = typeLabel
     ? `${chartName} :: ${typeLabel}${headerWeek ? ` - ${headerWeek}` : ''}`
@@ -51,21 +53,22 @@ export const generatePlainTextChart = (
   lines.push(header);
 
   // Column headers with separator
-  const nameColumnLabel = chartType === 'artist'
-    ? t('charts.share.artistColumn', 'Artista')
-    : t('charts.share.nameArtist', 'Nome | Artista');
+  const nameColumnLabel =
+    chartType === 'artist'
+      ? t('charts.share.artistColumn', 'Artista')
+      : t('charts.share.nameArtist', 'Nome | Artista');
 
   const headers = [
     t('charts.share.position', 'Posição'),
     nameColumnLabel,
     t('charts.share.plays', 'Reproduções'),
     t('charts.share.peak', 'Pico'),
-    t('charts.share.weeks', 'Semanas')
+    t('charts.share.weeks', 'Semanas'),
   ];
   lines.push(headers.join(' | '));
 
   // Data rows
-  chartData.forEach((row) => {
+  chartData.forEach(row => {
     const deltaRank = row.deltaRank;
     let deltaStr = '';
 
@@ -86,14 +89,14 @@ export const generatePlainTextChart = (
     const deltaPlaysRaw = parseNumeric(row.deltaPlays) || 0;
     const playsValue = parseNumeric(row.plays) ?? 0;
     const previousPlays = playsValue - deltaPlaysRaw;
-    const percentChange = previousPlays > 0 && deltaPlaysRaw !== 0
-      ? (deltaPlaysRaw / previousPlays) * 100
-      : null;
+    const percentChange =
+      previousPlays > 0 && deltaPlaysRaw !== 0 ? (deltaPlaysRaw / previousPlays) * 100 : null;
     const playsParts: string[] = [formatInteger(playsValue)];
     if (deltaPlaysRaw !== 0) {
-      const percentLabel = percentChange !== null
-        ? `${deltaPlaysRaw > 0 ? '+' : ''}${percentChange.toFixed(0)}%`
-        : `${deltaPlaysRaw > 0 ? '+' : '-'}${formatInteger(Math.abs(deltaPlaysRaw))}`;
+      const percentLabel =
+        percentChange !== null
+          ? `${deltaPlaysRaw > 0 ? '+' : ''}${percentChange.toFixed(0)}%`
+          : `${deltaPlaysRaw > 0 ? '+' : '-'}${formatInteger(Math.abs(deltaPlaysRaw))}`;
       playsParts.push(`(${percentLabel})`);
     }
     const playsStr = playsParts.join(' ');
@@ -110,7 +113,7 @@ export const generatePlainTextChart = (
       nameArtist,
       playsStr,
       peakValue !== null && peakValue !== undefined ? `${peakValue}` : '',
-      weeksValue !== null && weeksValue !== undefined ? `${weeksValue}` : ''
+      weeksValue !== null && weeksValue !== undefined ? `${weeksValue}` : '',
     ];
 
     lines.push(rowData.join(' | '));

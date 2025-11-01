@@ -15,7 +15,7 @@ interface GridItemRendererProps {
   showPeak: boolean;
   showPlays: boolean;
   showTotalWeeks: boolean;
-  scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
+  scaleSize: (s: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   onOpenModal: (row: ChartData) => void;
   imageForceUpdate: number | undefined;
   lastImageUrl?: string | null;
@@ -23,10 +23,12 @@ interface GridItemRendererProps {
   onImageLoad: (url: string) => void;
   renderUnderRankVariation: (deltaValue: any) => React.ReactNode;
   cornerOverlay?: React.ReactNode;
-  stats: {
-    peak?: { position?: number | null; weeksAtPeak?: number | null } | null;
-    totals?: { withinCutoff?: number | null } | null;
-  } | undefined;
+  stats:
+    | {
+        peak?: { position?: number | null; weeksAtPeak?: number | null } | null;
+        totals?: { withinCutoff?: number | null } | null;
+      }
+    | undefined;
   showPeakCount: boolean;
   colSpan?: { base: number; xs?: number; sm?: number; md?: number; lg?: number };
   isDropped?: boolean;

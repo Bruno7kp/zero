@@ -5,10 +5,13 @@ import { fetchStatsMapIncremental } from '../../../store/charts';
 export function useDeferredStats(
   dispatch: AppDispatch,
   params: { chartId: string; chartType: string; data: any[]; week?: string },
-  columns: any[],
+  columns: any[]
 ) {
   const wantsStats = useMemo(
-    () => columns.some((c: any) => (c.key === 'peak' || c.key === 'totalWeeks' || c.key === 'cert') && c.visible),
+    () =>
+      columns.some(
+        (c: any) => (c.key === 'peak' || c.key === 'totalWeeks' || c.key === 'cert') && c.visible
+      ),
     [columns]
   );
 
@@ -17,13 +20,15 @@ export function useDeferredStats(
     if (!data.length || !week) return;
     if (!wantsStats) return;
     let cancelled = false;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const id = setTimeout(() => {
-        if (cancelled) return;
-        dispatch(fetchStatsMapIncremental({ chartId: `${chartId}`, chartType, data, week }));
-      }, 600);
-      (window as any).__tableStatsTimer = id;
-    }));
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const id = setTimeout(() => {
+          if (cancelled) return;
+          dispatch(fetchStatsMapIncremental({ chartId: `${chartId}`, chartType, data, week }));
+        }, 600);
+        (window as any).__tableStatsTimer = id;
+      })
+    );
     return () => {
       cancelled = true;
       if ((window as any).__tableStatsTimer) clearTimeout((window as any).__tableStatsTimer);

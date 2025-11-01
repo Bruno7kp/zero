@@ -105,16 +105,16 @@ export const bee: MantineColorsTuple = [
 ];
 
 export const mediumblue: MantineColorsTuple = [
-  "#e6f7ff", // [0] muito claro
-  "#cceeff", // [1]
-  "#99ddff", // [2]
-  "#66ccff", // [3]
-  "#3abdfb", // [4]
-  "#28bbf8", // [5] cor principal
-  "#0fa3e1", // [6]
-  "#0988be", // [7]
-  "#066c99", // [8]
-  "#044a66"  // [9] mais escuro
+  '#e6f7ff', // [0] muito claro
+  '#cceeff', // [1]
+  '#99ddff', // [2]
+  '#66ccff', // [3]
+  '#3abdfb', // [4]
+  '#28bbf8', // [5] cor principal
+  '#0fa3e1', // [6]
+  '#0988be', // [7]
+  '#066c99', // [8]
+  '#044a66', // [9] mais escuro
 ];
 
 export const palettes = { forest, ruby, cobalt, honey, bee, cherry, lazuli, grass, mediumblue };

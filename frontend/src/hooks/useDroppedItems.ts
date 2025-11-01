@@ -27,10 +27,7 @@ export function useDroppedItems(
         // Get all weeks for this chart before current week
         const allWeeks = await db.charts_data
           .where('[chartId+chartType+week]')
-          .between(
-            [chartId, chartType, '0000'],
-            [chartId, chartType, currentWeek]
-          )
+          .between([chartId, chartType, '0000'], [chartId, chartType, currentWeek])
           .toArray();
 
         if (cancelled) return;
@@ -57,14 +54,12 @@ export function useDroppedItems(
 
         // Get items from previous week
         const previousWeekData = weekMap.get(previousWeek) || [];
-        
+
         // Get entity IDs from current week
         const currentEntityIds = new Set(currentData.map(item => item.entityId));
 
         // Find items that were in previous week but not in current week
-        const dropped = previousWeekData.filter(
-          item => !currentEntityIds.has(item.entityId)
-        );
+        const dropped = previousWeekData.filter(item => !currentEntityIds.has(item.entityId));
 
         // Sort by rank from previous week (best rank first)
         const sortedDropped = dropped.sort((a, b) => {

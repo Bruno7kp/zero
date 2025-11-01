@@ -105,7 +105,7 @@
       "showDroppedItemsLabel": "Mostrar saídas",
       "showDroppedItems_description": "Exibe artistas/álbuns/músicas que estavam na semana anterior mas saíram na atual",
       "droppedItemsLabel": "Saídas ({{count}})",
-        "share": {
+      "share": {
         "title": "Compartilhar",
         "shareChartTitle": "Compartilhar chart",
         "preview": "Prévia",
@@ -568,7 +568,8 @@
         "peakOnly": "Apenas picos",
         "showImages": "Mostrar imagens",
         "showArtistColumn": "Coluna de artista separada",
-        "tableSize": "Tamanho da tabela",
+        "containerSize": "Tamanho do container",
+        "fontSize": "Tamanho da fonte",
         "small": "Pequeno",
         "medium": "Médio",
         "large": "Grande",
@@ -682,6 +683,47 @@
           "artistDesc": "Artista (Z-A)"
         }
       },
+      "longestConsecutiveAtOne": {
+        "title": "Mais Semanas Consecutivas em #1",
+        "description": "Itens com as maiores sequências consecutivas em #1",
+        "columns": {
+          "rank": "#",
+          "image": "Imagem",
+          "title": "Título",
+          "longest": "Maior sequência",
+          "startWeek": "Semana inicial",
+          "endWeek": "Semana final"
+        },
+        "sort": {
+          "longestDesc": "Sequência (maior para menor)",
+          "longestAsc": "Sequência (menor para maior)",
+          "nameAsc": "Nome (A-Z)",
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)",
+          "startWeekDesc": "Semana inicial (mais recente primeiro)",
+          "startWeekAsc": "Semana inicial (mais antiga primeiro)",
+          "endWeekDesc": "Semana final (mais recente primeiro)",
+          "endWeekAsc": "Semana final (mais antiga primeiro)"
+        }
+      },
+      "weeksToNumberOne": {
+        "title": "Mais Semanas até Chegar em #1",
+        "description": "Itens que demoraram mais tempo (em semanas) desde a primeira aparição até alcançar #1 pela primeira vez",
+        "columns": {
+          "weeksToOne": "Semanas até #1",
+          "firstWeek": "Primeira semana",
+          "weekReachedOne": "Semana que alcançou #1"
+        },
+        "sort": {
+          "weeksDesc": "Semanas (maior para menor)",
+          "weeksAsc": "Semanas (menor para maior)",
+          "firstWeekDesc": "Primeira semana (mais recente primeiro)",
+          "firstWeekAsc": "Primeira semana (mais antiga primeiro)",
+          "weekReachedOneDesc": "Semana que alcançou #1 (mais recente primeiro)",
+          "weekReachedOneAsc": "Semana que alcançou #1 (mais antiga primeiro)"
+        }
+      },
       "plays": {
         "title": "Mais Reproduções em uma Semana",
         "titleArtist": "Mais Reproduções em uma Semana - Artistas",
@@ -765,7 +807,27 @@
           "positionDesc": "Posição (melhor para pior)",
           "positionAsc": "Posição (pior para melhor)",
           "nameAsc": "Nome (A-Z)",
-          "nameDesc": "Nome (Z-A)"
+          "nameDesc": "Nome (Z-A)",
+          "artistAsc": "Artista (A-Z)",
+          "artistDesc": "Artista (Z-A)"
+        }
+      },
+      "mostSales": {
+        "title": "Mais Vendas",
+        "description": "Top 100 músicas do usuário no Last.fm combinado com pontos de estabilidade para estimar vendas. Filtrado apenas nas 100 músicas do usuário.",
+        "columns": {
+          "plays": "Reproduções",
+          "points": "Pontos",
+          "sales": "Vendas"
+        },
+        "sort": {
+          "salesDesc": "Vendas (maior para menor)",
+          "salesAsc": "Vendas (menor para maior)",
+          "playsDesc": "Reproduções (maior para menor)",
+          "pointsDesc": "Pontos (maior para menor)"
+        },
+        "tooltip": {
+          "top100": "Esta tabela é construída a partir das 100 principais músicas do usuário no Last.fm; apenas essas 100 músicas são consideradas."
         }
       },
       "timesAtTopByArtist": {
@@ -804,6 +866,22 @@
           "itemsDesc": "Quantidade de estreias"
         },
         "noData": "Nenhuma estreia encontrada"
+      },
+      "mostSimultaneousByArtist": {
+        "title": "Artistas com Mais Músicas Simultâneas",
+        "description": "Artistas com o maior número de músicas distintas aparecendo na mesma semana",
+        "columns": {
+          "simultaneous": "Simultâneas",
+          "simultaneousTracks": "Músicas Simultâneas",
+          "simultaneousAlbums": "Álbuns Simultâneos",
+          "sampleWeek": "Semana amostra",
+          "weeks": "Semanas"
+        },
+        "sort": {
+          "simultaneousDesc": "Simultâneas (maior para menor)",
+          "simultaneousAsc": "Simultâneas (menor para maior)",
+          "weeksDesc": "Semanas (maior para menor)"
+        }
       },
       "loading": "Carregando estatísticas...",
       "noData": "Nenhum dado disponível",

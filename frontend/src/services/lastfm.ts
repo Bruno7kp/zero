@@ -5,243 +5,429 @@ const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 
 // Interfaces para os dados formatados
 export interface FormattedChartItem {
-    rank: number;
-    name: string;
-    artist?: string; // Opcional para tracks e albums
-    playcount: number;
+  rank: number;
+  name: string;
+  artist?: string; // Opcional para tracks e albums
+  playcount: number;
 }
 
 // Interfaces para a resposta bruta da API
 interface LastFmResponse {
-    weeklyartistchart?: {
-        artist: {
-            name: string;
-            playcount: string;
-            '@attr': { rank: string };
-        }[];
-    };
-    weeklytrackchart?: {
-        track: {
-            name: string;
-            playcount: string;
-            artist: { '#text': string };
-            '@attr': { rank: string };
-        }[];
-    };
-    weeklyalbumchart?: {
-        album: {
-            name: string;
-            playcount: string;
-            artist: { '#text': string };
-            '@attr': { rank: string };
-        }[];
-    };
-    topartists?: {
-        artist: any[] | any;
-        '@attr': { total: string };
-    };
-    topalbums?: {
-        album: any[] | any;
-        '@attr': { total: string };
-    };
-    toptracks?: {
-        track: any[] | any;
-        '@attr': { total: string };
-    };
-    track?: any;
-    album?: any;
-    artist?: any;
+  weeklyartistchart?: {
+    artist: {
+      name: string;
+      playcount: string;
+      '@attr': { rank: string };
+    }[];
+  };
+  weeklytrackchart?: {
+    track: {
+      name: string;
+      playcount: string;
+      artist: { '#text': string };
+      '@attr': { rank: string };
+    }[];
+  };
+  weeklyalbumchart?: {
+    album: {
+      name: string;
+      playcount: string;
+      artist: { '#text': string };
+      '@attr': { rank: string };
+    }[];
+  };
+  topartists?: {
+    artist: any[] | any;
+    '@attr': { total: string };
+  };
+  topalbums?: {
+    album: any[] | any;
+    '@attr': { total: string };
+  };
+  toptracks?: {
+    track: any[] | any;
+    '@attr': { total: string };
+  };
+  track?: any;
+  album?: any;
+  artist?: any;
 }
 
 // Generic fetch. For methods that need 'username' (track.getInfo / album.getInfo) we pass a flag.
 class LastFmApiError extends Error {
-        code?: number;
-        httpStatus?: number;
-        constructor(message: string, opts: { code?: number; httpStatus?: number } = {}) {
-                super(message);
-                this.name = 'LastFmApiError';
-                this.code = opts.code;
-                this.httpStatus = opts.httpStatus;
-        }
+  code?: number;
+  httpStatus?: number;
+  constructor(message: string, opts: { code?: number; httpStatus?: number } = {}) {
+    super(message);
+    this.name = 'LastFmApiError';
+    this.code = opts.code;
+    this.httpStatus = opts.httpStatus;
+  }
 }
 
 const fetchLastFmApi = async (
-    method: string,
-    user: string,
-    from?: string,
-    to?: string,
-    extra: Record<string, string> = {},
-    useUsernameParam: boolean = false
+  method: string,
+  user: string,
+  from?: string,
+  to?: string,
+  extra: Record<string, string> = {},
+  useUsernameParam: boolean = false
 ): Promise<LastFmResponse> => {
-    const base: Record<string, string> = {
-        method,
-        api_key: LASTFM_API_KEY,
-        format: 'json',
-        ...(from ? { from } : {}),
-        ...(to ? { to } : {}),
-        ...extra,
-    };
-    if (user) {
-        if (useUsernameParam) base.username = user;
-        else base.user = user;
-    }
-    const params = new URLSearchParams(base);
-    const lurl = `${LASTFM_API_URL}?${params.toString()}`;
-    const response = await fetch(lurl);
-    if (!response.ok) {
-        throw new LastFmApiError(`[LASTFM][HTTP:${response.status}] ${response.statusText}`, { httpStatus: response.status });
-    }
-    const json = await response.json();
-    if ((json as any)?.error) {
-        // Last.fm error codes (e.g., 6 user not found, 29 rate limit, etc.)
-        const code = (json as any).error;
-        const msg = (json as any).message || 'Error';
-        throw new LastFmApiError(`[LASTFM][CODE:${code}] ${msg}`, { code });
-    }
-    return json;
+  const base: Record<string, string> = {
+    method,
+    api_key: LASTFM_API_KEY,
+    format: 'json',
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
+    ...extra,
+  };
+  if (user) {
+    if (useUsernameParam) base.username = user;
+    else base.user = user;
+  }
+  const params = new URLSearchParams(base);
+  const lurl = `${LASTFM_API_URL}?${params.toString()}`;
+  const response = await fetch(lurl);
+  if (!response.ok) {
+    throw new LastFmApiError(`[LASTFM][HTTP:${response.status}] ${response.statusText}`, {
+      httpStatus: response.status,
+    });
+  }
+  const json = await response.json();
+  if ((json as any)?.error) {
+    // Last.fm error codes (e.g., 6 user not found, 29 rate limit, etc.)
+    const code = (json as any).error;
+    const msg = (json as any).message || 'Error';
+    throw new LastFmApiError(`[LASTFM][CODE:${code}] ${msg}`, { code });
+  }
+  return json;
 };
 
-
-export const getWeeklyArtistChart = async (user: string, from: string, to: string, limit: number): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklyartistchart', user, from, to, { limit: String(limit) });
-    const artists = data?.weeklyartistchart?.artist;
-    if (!artists) {
-        return [];
-    }
-    return artists.map(artist => ({
-        rank: parseInt(artist['@attr'].rank, 10),
-        name: artist.name,
-        playcount: parseInt(artist.playcount, 10),
-    }));
+export const getWeeklyArtistChart = async (
+  user: string,
+  from: string,
+  to: string,
+  limit: number
+): Promise<FormattedChartItem[]> => {
+  const data = await fetchLastFmApi('user.getweeklyartistchart', user, from, to, {
+    limit: String(limit),
+  });
+  const artists = data?.weeklyartistchart?.artist;
+  if (!artists) {
+    return [];
+  }
+  return artists.map(artist => ({
+    rank: parseInt(artist['@attr'].rank, 10),
+    name: artist.name,
+    playcount: parseInt(artist.playcount, 10),
+  }));
 };
 
-
-export const getWeeklyTrackChart = async (user: string, from: string, to: string, limit: number): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklytrackchart', user, from, to, { limit: String(limit) });
-    const tracks = data?.weeklytrackchart?.track;
-    if (!tracks) {
-        return [];
-    }
-    return tracks.map(track => ({
-        rank: parseInt(track['@attr'].rank, 10),
-        name: track.name,
-        artist: track.artist['#text'],
-        playcount: parseInt(track.playcount, 10),
-    }));
+export const getWeeklyTrackChart = async (
+  user: string,
+  from: string,
+  to: string,
+  limit: number
+): Promise<FormattedChartItem[]> => {
+  const data = await fetchLastFmApi('user.getweeklytrackchart', user, from, to, {
+    limit: String(limit),
+  });
+  const tracks = data?.weeklytrackchart?.track;
+  if (!tracks) {
+    return [];
+  }
+  return tracks.map(track => ({
+    rank: parseInt(track['@attr'].rank, 10),
+    name: track.name,
+    artist: track.artist['#text'],
+    playcount: parseInt(track.playcount, 10),
+  }));
 };
 
-
-export const getWeeklyAlbumChart = async (user: string, from: string, to: string, limit: number): Promise<FormattedChartItem[]> => {
-    const data = await fetchLastFmApi('user.getweeklyalbumchart', user, from, to, { limit: String(limit) });
-    const albums = data?.weeklyalbumchart?.album;
-    if (!albums) {
-        return [];
-    }
-    return albums.map(album => ({
-        rank: parseInt(album['@attr'].rank, 10),
-        name: album.name,
-        artist: album.artist['#text'],
-        playcount: parseInt(album.playcount, 10),
-    }));
+export const getWeeklyAlbumChart = async (
+  user: string,
+  from: string,
+  to: string,
+  limit: number
+): Promise<FormattedChartItem[]> => {
+  const data = await fetchLastFmApi('user.getweeklyalbumchart', user, from, to, {
+    limit: String(limit),
+  });
+  const albums = data?.weeklyalbumchart?.album;
+  if (!albums) {
+    return [];
+  }
+  return albums.map(album => ({
+    rank: parseInt(album['@attr'].rank, 10),
+    name: album.name,
+    artist: album.artist['#text'],
+    playcount: parseInt(album.playcount, 10),
+  }));
 };
 
 export const getTrackInfo = async (user: string, artist: string, track: string) => {
-    // Primeiro tenta sem autocorrect para manter consistência; se não vier userplaycount tenta com autocorrect=1
-    let data = await fetchLastFmApi('track.getInfo', user, undefined, undefined, { artist, track, autocorrect: '0' }, true);
-    if (!data?.track?.userplaycount) {
-        try {
-            data = await fetchLastFmApi('track.getInfo', user, undefined, undefined, { artist, track, autocorrect: '1' }, true);
-        } catch {/* ignore fallback error */}
+  // Primeiro tenta sem autocorrect para manter consistência; se não vier userplaycount tenta com autocorrect=1
+  let data = await fetchLastFmApi(
+    'track.getInfo',
+    user,
+    undefined,
+    undefined,
+    { artist, track, autocorrect: '0' },
+    true
+  );
+  if (!data?.track?.userplaycount) {
+    try {
+      data = await fetchLastFmApi(
+        'track.getInfo',
+        user,
+        undefined,
+        undefined,
+        { artist, track, autocorrect: '1' },
+        true
+      );
+    } catch {
+      /* ignore fallback error */
     }
-    return data?.track;
+  }
+  return data?.track;
 };
 
 export const getAlbumInfo = async (user: string, artist: string, album: string) => {
-    let data = await fetchLastFmApi('album.getInfo', user, undefined, undefined, { artist, album }, true);
-    if (!data?.album?.userplaycount) {
-        try {
-            data = await fetchLastFmApi('album.getInfo', user, undefined, undefined, { artist, album, autocorrect: '1' }, true);
-        } catch {/* ignore */}
+  let data = await fetchLastFmApi(
+    'album.getInfo',
+    user,
+    undefined,
+    undefined,
+    { artist, album },
+    true
+  );
+  if (!data?.album?.userplaycount) {
+    try {
+      data = await fetchLastFmApi(
+        'album.getInfo',
+        user,
+        undefined,
+        undefined,
+        { artist, album, autocorrect: '1' },
+        true
+      );
+    } catch {
+      /* ignore */
     }
-    return data?.album;
+  }
+  return data?.album;
 };
 
 export const getArtistInfo = async (user: string, artist: string) => {
-    // Try without autocorrect first; fallback with autocorrect=1 if missing userplaycount
-    let data = await fetchLastFmApi('artist.getInfo', user, undefined, undefined, { artist, autocorrect: '0' }, true);
-    if (!data?.artist?.stats?.userplaycount) {
-        try {
-            data = await fetchLastFmApi('artist.getInfo', user, undefined, undefined, { artist, autocorrect: '1' }, true);
-        } catch { /* ignore */ }
+  // Try without autocorrect first; fallback with autocorrect=1 if missing userplaycount
+  let data = await fetchLastFmApi(
+    'artist.getInfo',
+    user,
+    undefined,
+    undefined,
+    { artist, autocorrect: '0' },
+    true
+  );
+  if (!data?.artist?.stats?.userplaycount) {
+    try {
+      data = await fetchLastFmApi(
+        'artist.getInfo',
+        user,
+        undefined,
+        undefined,
+        { artist, autocorrect: '1' },
+        true
+      );
+    } catch {
+      /* ignore */
     }
-    return (data as any)?.artist;
+  }
+  return (data as any)?.artist;
 };
 
 // Temporary cache for user.gettop* results (session storage)
 interface TopCacheEntry {
-    items: any[];
-    total: number;
+  items: any[];
+  total: number;
 }
 
-export const getUserTopArtists = async (username: string, limit: number, page: number, period: string = 'overall'): Promise<{ items: any[]; total: number }> => {
-    const key = `top:${username}:artists:${limit}:${page}:${period}`;
-    const cached = sessionStorage.getItem(key);
-    if (cached) {
-        return JSON.parse(cached);
-    }
-    const data = await fetchLastFmApi('user.gettopartists', username, undefined, undefined, { limit: String(limit), page: String(page), period });
-    const topartists = data?.topartists;
-    let items: any[] = [];
-    let total = 0;
-    if (topartists) {
-        const attr = topartists['@attr'];
-        total = parseInt(attr?.total || '0', 10);
-        const artists = topartists.artist;
-        items = Array.isArray(artists) ? artists : (artists ? [artists] : []);
-    }
-    const entry: TopCacheEntry = { items, total };
-    sessionStorage.setItem(key, JSON.stringify(entry));
-    return entry;
+export const getUserTopArtists = async (
+  username: string,
+  limit: number,
+  page: number,
+  period: string = 'overall'
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:artists:${limit}:${page}:${period}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettopartists', username, undefined, undefined, {
+    limit: String(limit),
+    page: String(page),
+    period,
+  });
+  const topartists = data?.topartists;
+  let items: any[] = [];
+  let total = 0;
+  if (topartists) {
+    const attr = topartists['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const artists = topartists.artist;
+    items = Array.isArray(artists) ? artists : artists ? [artists] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
 };
 
-export const getUserTopAlbums = async (username: string, limit: number, page: number, period: string = 'overall'): Promise<{ items: any[]; total: number }> => {
-    const key = `top:${username}:albums:${limit}:${page}:${period}`;
-    const cached = sessionStorage.getItem(key);
-    if (cached) {
-        return JSON.parse(cached);
-    }
-    const data = await fetchLastFmApi('user.gettopalbums', username, undefined, undefined, { limit: String(limit), page: String(page), period });
-    const topalbums = data?.topalbums;
-    let items: any[] = [];
-    let total = 0;
-    if (topalbums) {
-        const attr = topalbums['@attr'];
-        total = parseInt(attr?.total || '0', 10);
-        const albums = topalbums.album;
-        items = Array.isArray(albums) ? albums : (albums ? [albums] : []);
-    }
-    const entry: TopCacheEntry = { items, total };
-    sessionStorage.setItem(key, JSON.stringify(entry));
-    return entry;
+// Range-based variants: fetch top items constrained to a from-to unix timestamp range (useful to request a specific year)
+export const getUserTopArtistsForRange = async (
+  username: string,
+  limit: number,
+  page: number,
+  from?: string,
+  to?: string
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:artists:${limit}:${page}:range:${from || ''}:${to || ''}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettopartists', username, from, to, {
+    limit: String(limit),
+    page: String(page),
+  });
+  const topartists = data?.topartists;
+  let items: any[] = [];
+  let total = 0;
+  if (topartists) {
+    const attr = topartists['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const artists = topartists.artist;
+    items = Array.isArray(artists) ? artists : artists ? [artists] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
 };
 
-export const getUserTopTracks = async (username: string, limit: number, page: number, period: string = 'overall'): Promise<{ items: any[]; total: number }> => {
-    const key = `top:${username}:tracks:${limit}:${page}:${period}`;
-    const cached = sessionStorage.getItem(key);
-    if (cached) {
-        return JSON.parse(cached);
-    }
-    const data = await fetchLastFmApi('user.gettoptracks', username, undefined, undefined, { limit: String(limit), page: String(page), period });
-    const toptracks = data?.toptracks;
-    let items: any[] = [];
-    let total = 0;
-    if (toptracks) {
-        const attr = toptracks['@attr'];
-        total = parseInt(attr?.total || '0', 10);
-        const tracks = toptracks.track;
-        items = Array.isArray(tracks) ? tracks : (tracks ? [tracks] : []);
-    }
-    const entry: TopCacheEntry = { items, total };
-    sessionStorage.setItem(key, JSON.stringify(entry));
-    return entry;
+export const getUserTopAlbums = async (
+  username: string,
+  limit: number,
+  page: number,
+  period: string = 'overall'
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:albums:${limit}:${page}:${period}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettopalbums', username, undefined, undefined, {
+    limit: String(limit),
+    page: String(page),
+    period,
+  });
+  const topalbums = data?.topalbums;
+  let items: any[] = [];
+  let total = 0;
+  if (topalbums) {
+    const attr = topalbums['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const albums = topalbums.album;
+    items = Array.isArray(albums) ? albums : albums ? [albums] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
+};
+
+export const getUserTopAlbumsForRange = async (
+  username: string,
+  limit: number,
+  page: number,
+  from?: string,
+  to?: string
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:albums:${limit}:${page}:range:${from || ''}:${to || ''}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettopalbums', username, from, to, {
+    limit: String(limit),
+    page: String(page),
+  });
+  const topalbums = data?.topalbums;
+  let items: any[] = [];
+  let total = 0;
+  if (topalbums) {
+    const attr = topalbums['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const albums = topalbums.album;
+    items = Array.isArray(albums) ? albums : albums ? [albums] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
+};
+
+export const getUserTopTracks = async (
+  username: string,
+  limit: number,
+  page: number,
+  period: string = 'overall'
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:tracks:${limit}:${page}:${period}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettoptracks', username, undefined, undefined, {
+    limit: String(limit),
+    page: String(page),
+    period,
+  });
+  const toptracks = data?.toptracks;
+  let items: any[] = [];
+  let total = 0;
+  if (toptracks) {
+    const attr = toptracks['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const tracks = toptracks.track;
+    items = Array.isArray(tracks) ? tracks : tracks ? [tracks] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
+};
+
+export const getUserTopTracksForRange = async (
+  username: string,
+  limit: number,
+  page: number,
+  from?: string,
+  to?: string
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:tracks:${limit}:${page}:range:${from || ''}:${to || ''}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettoptracks', username, from, to, {
+    limit: String(limit),
+    page: String(page),
+  });
+  const toptracks = data?.toptracks;
+  let items: any[] = [];
+  let total = 0;
+  if (toptracks) {
+    const attr = toptracks['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const tracks = toptracks.track;
+    items = Array.isArray(tracks) ? tracks : tracks ? [tracks] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
 };

@@ -1,213 +1,41 @@
-import { useState, useEffect, useMemo } from 'react';
-
-type LibraryType = 'artist' | 'album' | 'track';
-type ViewMode = 'table' | 'grid';
+import { useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import { selectLibraryFilters, updateLibraryFilter } from '../store/libraryFiltersSlice';
 
 export const useLibraryFilters = () => {
-    // Load preferences from localStorage
-    const [selectedType, setSelectedType] = useState<LibraryType>(() => {
-        try {
-            const saved = localStorage.getItem('libraryType');
-            return (saved === 'artist' || saved === 'album' || saved === 'track') ? saved : 'artist';
-        } catch {
-            return 'artist';
-        }
-    });
+  const dispatch = useDispatch<AppDispatch>();
+  const state = useSelector((s: RootState) => selectLibraryFilters(s));
 
-    const [viewMode, setViewMode] = useState<ViewMode>(() => {
-        try {
-            const saved = localStorage.getItem('libraryViewMode');
-            return (saved === 'table' || saved === 'grid') ? saved : 'grid'; // Default to grid since table is removed
-        } catch {
-            return 'grid';
-        }
-    });
+  // Legacy localStorage migration removed. Redux-persist handles persistence.
 
-    const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
-        try {
-            const saved = localStorage.getItem('libraryItemsPerPage');
-            return saved ? parseInt(saved, 10) : 25;
-        } catch {
-            return 25;
-        }
-    });
+  const setField = <K extends keyof typeof state>(key: K, value: any) => {
+    dispatch(updateLibraryFilter({ key, value } as any));
+  };
 
-    const [search, setSearch] = useState<string>(() => {
-        try {
-            const saved = localStorage.getItem('librarySearch');
-            return saved || '';
-        } catch {
-            return '';
-        }
-    });
+  const stats = useMemo(() => ({ total: 0, number1s: 0, inChart: 0 }), []);
 
-    const [badgeStyle, setBadgeStyle] = useState<'glass' | 'solid'>(() => {
-        try {
-            const saved = localStorage.getItem('libraryBadgeStyle');
-            return (saved === 'glass' || saved === 'solid') ? saved : 'glass';
-        } catch {
-            return 'glass';
-        }
-    });
-
-    const [visibleColumns, setVisibleColumns] = useState<{
-        points: boolean;
-        peak: boolean;
-        weeks: boolean;
-        sales: boolean;
-        cert: boolean;
-    }>(() => {
-        try {
-            const saved = localStorage.getItem('libraryVisibleColumns');
-            return saved ? JSON.parse(saved) : {
-                points: true,
-                peak: true,
-                weeks: true,
-                sales: false,
-                cert: false,
-            };
-        } catch {
-            return {
-                points: true,
-                peak: true,
-                weeks: true,
-                sales: false,
-                cert: false,
-            };
-        }
-    });
-
-    const [page, setPage] = useState(1);
-
-    const [showGridPlays, setShowGridPlays] = useState<boolean>(() => {
-        try {
-            const saved = localStorage.getItem('libraryShowGridPlays');
-            return saved ? JSON.parse(saved) : true; // Default to true
-        } catch {
-            return true;
-        }
-    });
-
-    const [showGridPeak, setShowGridPeak] = useState<boolean>(() => {
-        try {
-            const saved = localStorage.getItem('libraryShowGridPeak');
-            return saved ? JSON.parse(saved) : true; // Default to true
-        } catch {
-            return true;
-        }
-    });
-
-    const [showGridPosition, setShowGridPosition] = useState<boolean>(() => {
-        try {
-            const saved = localStorage.getItem('libraryShowGridPosition');
-            return saved ? JSON.parse(saved) : false; // Default to false
-        } catch {
-            return false;
-        }
-    });
-
-    // Save preferences to localStorage
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryType', selectedType);
-        } catch (e) {
-            console.error('Failed to save library type:', e);
-        }
-    }, [selectedType]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryViewMode', viewMode);
-        } catch (e) {
-            console.error('Failed to save view mode:', e);
-        }
-    }, [viewMode]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryItemsPerPage', String(itemsPerPage));
-        } catch (e) {
-            console.error('Failed to save items per page:', e);
-        }
-    }, [itemsPerPage]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('librarySearch', search);
-        } catch (e) {
-            console.error('Failed to save search:', e);
-        }
-    }, [search]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryBadgeStyle', badgeStyle);
-        } catch (e) {
-            console.error('Failed to save badge style:', e);
-        }
-    }, [badgeStyle]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryVisibleColumns', JSON.stringify(visibleColumns));
-        } catch (e) {
-            console.error('Failed to save visible columns:', e);
-        }
-    }, [visibleColumns]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryShowGridPlays', JSON.stringify(showGridPlays));
-        } catch (e) {
-            console.error('Failed to save show grid plays:', e);
-        }
-    }, [showGridPlays]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryShowGridPeak', JSON.stringify(showGridPeak));
-        } catch (e) {
-            console.error('Failed to save show grid peak:', e);
-        }
-    }, [showGridPeak]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem('libraryShowGridPosition', JSON.stringify(showGridPosition));
-        } catch (e) {
-            console.error('Failed to save show grid position:', e);
-        }
-    }, [showGridPosition]);
-
-    // Reset page when type or search changes - handled by components using this hook
-
-    // Calculate stats for header
-    const stats = useMemo(() => {
-        // This will be calculated in the component using the data from useLibraryData
-        return { total: 0, number1s: 0, inChart: 0 };
-    }, []);
-
-    return {
-        selectedType,
-        setSelectedType,
-        viewMode,
-        setViewMode,
-        itemsPerPage,
-        setItemsPerPage,
-        search,
-        setSearch,
-        badgeStyle,
-        setBadgeStyle,
-        visibleColumns,
-        setVisibleColumns,
-        showGridPlays,
-        setShowGridPlays,
-        showGridPeak,
-        setShowGridPeak,
-        showGridPosition,
-        setShowGridPosition,
-        page,
-        setPage,
-        stats,
-    };
+  return {
+    selectedType: state.selectedType,
+    setSelectedType: (v: any) => setField('selectedType', v),
+    viewMode: state.viewMode,
+    setViewMode: (v: any) => setField('viewMode', v),
+    itemsPerPage: state.itemsPerPage,
+    setItemsPerPage: (v: number) => setField('itemsPerPage', v),
+    search: state.search,
+    setSearch: (v: string) => setField('search', v),
+    badgeStyle: state.badgeStyle,
+    setBadgeStyle: (v: any) => setField('badgeStyle', v),
+    visibleColumns: state.visibleColumns,
+    setVisibleColumns: (v: any) => setField('visibleColumns', v),
+    showGridPlays: state.showGridPlays,
+    setShowGridPlays: (v: boolean) => setField('showGridPlays', v),
+    showGridPeak: state.showGridPeak,
+    setShowGridPeak: (v: boolean) => setField('showGridPeak', v),
+    showGridPosition: state.showGridPosition,
+    setShowGridPosition: (v: boolean) => setField('showGridPosition', v),
+    page: state.page,
+    setPage: (p: number) => setField('page', p),
+    stats,
+  };
 };

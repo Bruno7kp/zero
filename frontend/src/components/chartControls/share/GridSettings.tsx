@@ -27,13 +27,23 @@ export const GridSettings: React.FC<GridSettingsProps> = ({
     <Accordion.Item value="grid-settings">
       <Accordion.Control>
         <Flex direction="column" gap={2}>
-          <Flex align="center" gap={8}><IconGridDots size={16} /><Text fw={600}>{t('charts.share.gridSize', 'Grid Size')}</Text></Flex>
-          <Text size="xs" c="dimmed">{t('charts.share.gridSizeDescription', 'Select the grid dimensions')}</Text>
+          <Flex align="center" gap={8}>
+            <IconGridDots size={16} />
+            <Text fw={600}>{t('charts.share.gridSize', 'Grid Size')}</Text>
+          </Flex>
+          <Text size="xs" c="dimmed">
+            {t('charts.share.gridSizeDescription', 'Select the grid dimensions')}
+          </Text>
         </Flex>
       </Accordion.Control>
       <Accordion.Panel>
         <Stack gap="md">
-          <Radio.Group value={selectedGridSize.toString()} onChange={(value) => setSelectedGridSize(parseInt(value) as 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10)}>
+          <Radio.Group
+            value={selectedGridSize.toString()}
+            onChange={value =>
+              setSelectedGridSize(parseInt(value) as 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10)
+            }
+          >
             <Stack gap="xs">
               {chartData.length >= 9 && <Radio value="3" label="3x3" />}
               {chartData.length >= 16 && <Radio value="4" label="4x4" />}
@@ -46,19 +56,25 @@ export const GridSettings: React.FC<GridSettingsProps> = ({
             </Stack>
           </Radio.Group>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.showGridText', 'Show Text')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.showGridText', 'Show Text')}
+            </Text>
             <Switch
               checked={selectedGridShowText}
-              onChange={(event) => setSelectedGridShowText(event.currentTarget.checked)}
+              onChange={event => setSelectedGridShowText(event.currentTarget.checked)}
               label={selectedGridShowText ? t('common.show', 'Show') : t('common.hide', 'Hide')}
             />
           </div>
           <div>
-            <Text size="sm" fw={500} mb="xs">{t('charts.share.showGridVariationIcons', 'Show Variation Icons')}</Text>
+            <Text size="sm" fw={500} mb="xs">
+              {t('charts.share.showGridVariationIcons', 'Show Variation Icons')}
+            </Text>
             <Switch
               checked={selectedGridShowVariationIcons}
-              onChange={(event) => setSelectedGridShowVariationIcons(event.currentTarget.checked)}
-              label={selectedGridShowVariationIcons ? t('common.show', 'Show') : t('common.hide', 'Hide')}
+              onChange={event => setSelectedGridShowVariationIcons(event.currentTarget.checked)}
+              label={
+                selectedGridShowVariationIcons ? t('common.show', 'Show') : t('common.hide', 'Hide')
+              }
             />
           </div>
         </Stack>

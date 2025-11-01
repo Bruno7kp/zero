@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+public
+frontend/dist
+frontend/node_modules
+**/*.lock
+**/yarn.lock

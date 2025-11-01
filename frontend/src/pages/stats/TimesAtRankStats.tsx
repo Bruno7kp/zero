@@ -1,9 +1,9 @@
 // Times at Rank #N stats - shows who maintained a specific position for most weeks
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Stack, 
-  Loader, 
+import {
+  Stack,
+  Loader,
   Center,
   Card,
   Avatar,
@@ -12,7 +12,7 @@ import {
   ScrollArea,
   Pagination,
   Box,
-  Flex
+  Flex,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -33,17 +33,10 @@ const ImageCell: React.FC<{ record: any; type: string }> = ({ record, type }) =>
     artist: record.artistName,
     type: type as 'artist' | 'album' | 'track',
     clientId: SPOTIFY_TOKEN,
-    clientSecret: SPOTIFY_SECRET
+    clientSecret: SPOTIFY_SECRET,
   });
-  
-  return (
-    <Avatar 
-      src={imageUrl} 
-      alt={record.name}
-      size={40}
-      radius="md"
-    />
-  );
+
+  return <Avatar src={imageUrl} alt={record.name} size={40} radius="md" />;
 };
 
 const TimesAtRankStats: React.FC = () => {
@@ -51,12 +44,14 @@ const TimesAtRankStats: React.FC = () => {
   const { rank: rankParam, type: typeParam } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<Array<{
-    entityId: string;
-    name: string;
-    artistName: string;
-    count: number;
-  }>>([]);
+  const [data, setData] = useState<
+    Array<{
+      entityId: string;
+      name: string;
+      artistName: string;
+      count: number;
+    }>
+  >([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [rank, setRank] = useState(Number(rankParam) || 1);
@@ -78,7 +73,7 @@ const TimesAtRankStats: React.FC = () => {
     const cutoffMap: any = {
       artist: chart.artist_cutoff || 100,
       album: chart.album_cutoff || 100,
-      track: chart.music_cutoff || 100
+      track: chart.music_cutoff || 100,
     };
     return cutoffMap[chartType] || 100;
   };
@@ -104,9 +99,9 @@ const TimesAtRankStats: React.FC = () => {
           chartId: String(chart.id),
           chartType: type,
           rank,
-          year: year === 'all' ? undefined : year
+          year: year === 'all' ? undefined : year,
         });
-        
+
         // If peakOnly is enabled, filter items that had peak at this rank
         let filteredResults = results;
         if (preferences.peakOnly) {
@@ -115,7 +110,7 @@ const TimesAtRankStats: React.FC = () => {
             .where('[chartId+chartType]')
             .equals([String(chart.id), type])
             .toArray();
-          
+
           // Calculate peak for each entity
           const peakByEntity = new Map<string, number>();
           allData.forEach(item => {
@@ -124,11 +119,11 @@ const TimesAtRankStats: React.FC = () => {
               peakByEntity.set(item.entityId, item.rank);
             }
           });
-          
+
           // Filter only items where peak equals the selected rank
           filteredResults = results.filter(item => peakByEntity.get(item.entityId) === rank);
         }
-        
+
         setData(filteredResults);
       } catch (error) {
         console.error('Error loading times at rank stats:', error);
@@ -153,18 +148,19 @@ const TimesAtRankStats: React.FC = () => {
   // Filter data by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return data;
-    
+
     const query = searchQuery.toLowerCase();
-    return data.filter(item => 
-      item.name.toLowerCase().includes(query) ||
-      (item.artistName && item.artistName.toLowerCase().includes(query))
+    return data.filter(
+      item =>
+        item.name.toLowerCase().includes(query) ||
+        (item.artistName && item.artistName.toLowerCase().includes(query))
     );
   }, [data, searchQuery]);
 
   // Sort data
   const sortedData = React.useMemo(() => {
     const sorted = [...filteredData];
-    
+
     switch (sortBy) {
       case 'position-desc':
         return sorted; // Already sorted by position implicitly (higher rank = better)
@@ -207,10 +203,12 @@ const TimesAtRankStats: React.FC = () => {
       //{ value: 'position-asc', label: t('stats.timesAtRank.sort.positionAsc') },
       { value: 'name-asc', label: t('stats.timesAtRank.sort.nameAsc') },
       { value: 'name-desc', label: t('stats.timesAtRank.sort.nameDesc') },
-      ...(type !== 'artist' && preferences.showArtistColumn ? [
-        { value: 'artist-asc', label: t('stats.timesAtRank.sort.artistAsc') },
-        { value: 'artist-desc', label: t('stats.timesAtRank.sort.artistDesc') },
-      ] : []),
+      ...(type !== 'artist' && preferences.showArtistColumn
+        ? [
+            { value: 'artist-asc', label: t('stats.timesAtRank.sort.artistAsc') },
+            { value: 'artist-desc', label: t('stats.timesAtRank.sort.artistDesc') },
+          ]
+        : []),
     ];
   }, [t, type, preferences.showArtistColumn]);
 
@@ -234,20 +232,22 @@ const TimesAtRankStats: React.FC = () => {
         position={rank}
         onPositionChange={handlePositionChange}
         peakOnly={preferences.peakOnly}
-        onTogglePeakOnly={(value) => updatePreference('peakOnly', value)}
+        onTogglePeakOnly={value => updatePreference('peakOnly', value)}
         showImages={preferences.showImages}
-        onToggleImages={(value) => updatePreference('showImages', value)}
+        onToggleImages={value => updatePreference('showImages', value)}
         showArtistColumn={preferences.showArtistColumn}
-        onToggleArtistColumn={(value) => updatePreference('showArtistColumn', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+        onToggleArtistColumn={value => updatePreference('showArtistColumn', value)}
+        containerSize={preferences.containerSize}
+        onContainerSizeChange={value => updatePreference('containerSize', value)}
+        fontSize={preferences.fontSize}
+        onFontSizeChange={value => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         showPeakOnlyToggle={true}
         showPositionFilter={true}
         cutoff={cutoff}
         pageSize={preferences.pageSize}
-        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        onPageSizeChange={value => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
@@ -263,24 +263,34 @@ const TimesAtRankStats: React.FC = () => {
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
             <Table highlightOnHover>
-                <Table.Thead>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    #
+                  </Table.Th>
+                  <Table.Th>{t('stats.timesAtRank.columns.title')}</Table.Th>
+                  {preferences.showArtistColumn && type !== 'artist' && (
+                    <Table.Th>{t('charts.artist')}</Table.Th>
+                  )}
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.timesAtRank.columns.times', { n: rank })}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.length === 0 ? (
                   <Table.Tr>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                    <Table.Th>{t('stats.timesAtRank.columns.title')}</Table.Th>
-                    {preferences.showArtistColumn && type !== 'artist' && <Table.Th>{t('charts.artist')}</Table.Th>}
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.timesAtRank.columns.times', { n: rank })}</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {paginatedData.length === 0 ? (
-                    <Table.Tr>
-                      <Table.Td colSpan={
+                    <Table.Td
+                      colSpan={
                         1 + // rank
                         1 + // title
                         (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
                         1 // times
-                      }>
-                      <Text ta="center" py="xl">{t('stats.noData')}</Text>
+                      }
+                    >
+                      <Text ta="center" py="xl">
+                        {t('stats.noData')}
+                      </Text>
                     </Table.Td>
                   </Table.Tr>
                 ) : (
@@ -290,26 +300,83 @@ const TimesAtRankStats: React.FC = () => {
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {displayRank}
+                          </Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
                             {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.name}</Text>
-                              {type !== 'artist' && record.artistName && !preferences.showArtistColumn && (
-                                <Text c="dimmed" size={preferences.tableSize === 'xs' ? 'xs' : preferences.tableSize === 'md' ? 'md' : 'sm'} lineClamp={1}>{record.artistName}</Text>
-                              )}
+                              <Text
+                                fw={600}
+                                lineClamp={1}
+                                className="entity-name"
+                                size={
+                                  preferences.fontSize === 'xs'
+                                    ? 'sm'
+                                    : preferences.fontSize === 'md'
+                                    ? 'lg'
+                                    : 'md'
+                                }
+                              >
+                                {record.name}
+                              </Text>
+                              {type !== 'artist' &&
+                                record.artistName &&
+                                !preferences.showArtistColumn && (
+                                  <Text
+                                    c="dimmed"
+                                    size={
+                                      preferences.fontSize === 'xs'
+                                        ? 'xs'
+                                        : preferences.fontSize === 'md'
+                                        ? 'md'
+                                        : 'sm'
+                                    }
+                                    lineClamp={1}
+                                  >
+                                    {record.artistName}
+                                  </Text>
+                                )}
                             </Box>
                           </Flex>
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.artistName}</Text>
+                            <Text
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              {record.artistName}
+                            </Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{record.count}</Text>
+                          <Text
+                            size={
+                              preferences.fontSize === 'xs'
+                                ? 'sm'
+                                : preferences.fontSize === 'md'
+                                ? 'lg'
+                                : 'md'
+                            }
+                          >
+                            {record.count}
+                          </Text>
                         </Table.Td>
                       </Table.Tr>
                     );
@@ -320,11 +387,11 @@ const TimesAtRankStats: React.FC = () => {
           </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}
@@ -335,4 +402,3 @@ const TimesAtRankStats: React.FC = () => {
 };
 
 export default TimesAtRankStats;
-

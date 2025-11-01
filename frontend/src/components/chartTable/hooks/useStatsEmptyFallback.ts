@@ -5,7 +5,7 @@ export function useStatsEmptyFallback(
   statsMap: any,
   data: any[],
   week: string | undefined,
-  trigger: () => void,
+  trigger: () => void
 ) {
   useEffect(() => {
     if (!enabled || !data.length || !week) return;

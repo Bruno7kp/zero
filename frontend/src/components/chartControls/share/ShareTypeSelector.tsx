@@ -17,12 +17,17 @@ export const ShareTypeSelector: React.FC<ShareTypeSelectorProps> = ({
     <Accordion.Item value="type">
       <Accordion.Control>
         <Flex direction="column" gap={2}>
-          <Flex align="center" gap={8}><IconShare size={16} /><Text fw={600}>{t('charts.share.selectType', 'Select Type')}</Text></Flex>
-          <Text size="xs" c="dimmed">{t('charts.share.selectTypeDescription', 'Choose the format for sharing your chart')}</Text>
+          <Flex align="center" gap={8}>
+            <IconShare size={16} />
+            <Text fw={600}>{t('charts.share.selectType', 'Select Type')}</Text>
+          </Flex>
+          <Text size="xs" c="dimmed">
+            {t('charts.share.selectTypeDescription', 'Choose the format for sharing your chart')}
+          </Text>
         </Flex>
       </Accordion.Control>
       <Accordion.Panel>
-        <Radio.Group value={selectedType} onChange={(value) => setSelectedType(value as any)}>
+        <Radio.Group value={selectedType} onChange={value => setSelectedType(value as any)}>
           <Stack gap="xs">
             <Radio value="stories2" label={t('charts.share.stories2', 'Stories Pro')} />
             <Radio value="completo" label={t('charts.share.completo', 'Complete')} />

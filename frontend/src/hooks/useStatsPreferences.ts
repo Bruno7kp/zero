@@ -1,61 +1,34 @@
-// Hook to manage stats page preferences in localStorage
-import { useState, useEffect } from 'react';
-
-export interface StatsPreferences {
-  showImages: boolean;
-  showArtistColumn: boolean;
-  tableSize: 'xs' | 'sm' | 'md';
-  showSales: boolean;
-  peakOnly: boolean;
-  pageSize: number;
-}
-
-const DEFAULT_PREFERENCES: StatsPreferences = {
-  showImages: true,
-  showArtistColumn: false,
-  tableSize: 'sm',
-  showSales: false,
-  peakOnly: false,
-  pageSize: 25
-};
-
-const STORAGE_KEY = 'stats-preferences';
+// Hook backed by Redux to manage stats page preferences
+// Hook backed by Redux to manage stats page preferences
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import type { StatsPreferences as SliceStatsPreferences } from '../store/statsPreferencesSlice';
+import {
+  updatePreference as updatePreferenceAction,
+  resetPreferences as resetPreferencesAction,
+  selectStatsPreferences,
+} from '../store/statsPreferencesSlice';
 
 export function useStatsPreferences() {
-  const [preferences, setPreferences] = useState<StatsPreferences>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) };
-      }
-    } catch (error) {
-      console.error('Error loading stats preferences:', error);
-    }
-    return DEFAULT_PREFERENCES;
-  });
+  const dispatch = useDispatch<AppDispatch>();
+  const preferences = useSelector((state: RootState) => selectStatsPreferences(state));
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
-    } catch (error) {
-      console.error('Error saving stats preferences:', error);
-    }
-  }, [preferences]);
+  // Legacy localStorage migration removed. We rely on redux-persist for
+  // persisted preferences. If users had previous preferences stored under
+  // the older localStorage key they will fall back to defaults.
 
-  const updatePreference = <K extends keyof StatsPreferences>(
+  const updatePreference = <K extends keyof SliceStatsPreferences>(
     key: K,
-    value: StatsPreferences[K]
+    value: SliceStatsPreferences[K]
   ) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+    dispatch(updatePreferenceAction({ key, value } as any));
   };
 
-  const resetPreferences = () => {
-    setPreferences(DEFAULT_PREFERENCES);
-  };
+  const reset = () => dispatch(resetPreferencesAction());
 
   return {
     preferences,
     updatePreference,
-    resetPreferences
+    resetPreferences: reset,
   };
 }

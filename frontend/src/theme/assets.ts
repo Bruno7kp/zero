@@ -20,7 +20,7 @@ export function getToggleIconId(mode: ThemeMode, scheme?: 'light' | 'dark'): The
 export function getThemeAssets(mode: ThemeMode, scheme?: 'light' | 'dark'): ThemeAssets {
   const effective = scheme || toMantineColorScheme(mode);
   return {
-      logoSrc: getLogoSrc(mode),
-      toggleIconId: themeIconByMode(mode, effective),
+    logoSrc: getLogoSrc(mode),
+    toggleIconId: themeIconByMode(mode, effective),
   };
 }

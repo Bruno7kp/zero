@@ -8,10 +8,23 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { useTranslation } from 'react-i18next';
 
-export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { chartId: string, chartType: string, entityId: string, week?: string }) {
+export function ChartItemStatsLoader({
+  chartId,
+  chartType,
+  entityId,
+  week,
+}: {
+  chartId: string;
+  chartType: string;
+  entityId: string;
+  week?: string;
+}) {
   const [geralStats, setGeralStats] = React.useState<any | null>(null);
   const [loading, setLoading] = React.useState(false);
-  const [entityMeta, setEntityMeta] = React.useState<{ name: string; artistName: string }>({ name: '', artistName: '' });
+  const [entityMeta, setEntityMeta] = React.useState<{ name: string; artistName: string }>({
+    name: '',
+    artistName: '',
+  });
   const { t } = useTranslation();
   const charts = useSelector((s: RootState) => s.charts.charts);
   // When stats revalidation/incremental requests run, re-run this loader
@@ -42,7 +55,7 @@ export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { c
         const lastWeek = stats?._running?.lastWeek;
         if (lastWeek) {
           const newer = await db.charts_data
-            .where(['chartId','chartType','entityId'])
+            .where(['chartId', 'chartType', 'entityId'])
             .equals([chartId, chartType, entityId])
             .filter(r => r.week > lastWeek)
             .sortBy('week');
@@ -52,17 +65,32 @@ export function ChartItemStatsLoader({ chartId, chartType, entityId, week }: { c
           if (newer.length) stats = await db.charts_stats.get([chartId, chartType, entityId]);
         }
       }
-      const one = await db.charts_data.where(['chartId','chartType','entityId']).equals([chartId, chartType, entityId]).first();
+      const one = await db.charts_data
+        .where(['chartId', 'chartType', 'entityId'])
+        .equals([chartId, chartType, entityId])
+        .first();
       if (mounted) {
         setGeralStats(stats);
         setEntityMeta({ name: one?.name || '', artistName: one?.artistName || '' });
       }
-    })()
-      .finally(() => { if (mounted) setLoading(false); });
-    return () => { mounted = false; };
-  // Also rerun whenever a new stats incremental request is triggered (after edits/save)
+    })().finally(() => {
+      if (mounted) setLoading(false);
+    });
+    return () => {
+      mounted = false;
+    };
+    // Also rerun whenever a new stats incremental request is triggered (after edits/save)
   }, [chartId, chartType, entityId, cutoff, statsRequestId, statsBump]);
 
   if (loading || !geralStats) return <Text size="sm">{t('charts.stats.loading')}</Text>;
-  return <ChartItemStats stats={geralStats} highlightWeek={week} chartId={chartId} chartType={chartType} entityName={entityMeta.name} entityArtistName={entityMeta.artistName} />;
+  return (
+    <ChartItemStats
+      stats={geralStats}
+      highlightWeek={week}
+      chartId={chartId}
+      chartType={chartType}
+      entityName={entityMeta.name}
+      entityArtistName={entityMeta.artistName}
+    />
+  );
 }

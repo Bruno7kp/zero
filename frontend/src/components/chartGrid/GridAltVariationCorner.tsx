@@ -10,9 +10,14 @@ interface GridAltVariationCornerProps {
   altVariation?: (row: ChartData, index: number) => string | number | false | null | undefined;
 }
 
-export const GridAltVariationCorner: React.FC<GridAltVariationCornerProps> = ({ row, idx, badgeStylesRank, altVariation }) => {
+export const GridAltVariationCorner: React.FC<GridAltVariationCornerProps> = ({
+  row,
+  idx,
+  badgeStylesRank,
+  altVariation,
+}) => {
   const raw: any = altVariation ? altVariation(row, idx) : undefined;
-  const value: any = (raw || raw === 0) ? (raw === '-' ? undefined : raw) : undefined;
+  const value: any = raw || raw === 0 ? (raw === '-' ? undefined : raw) : undefined;
   let cfg: any = badgeStylesRank;
   if (cfg?.iconPosition === 'split') {
     // grid overlay stays compact; disable tall split

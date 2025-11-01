@@ -15,7 +15,10 @@ type Props = {
 const LiveTable: React.FC<Props> = ({ columns, records, paperProps }) => {
   const theme = useMantineTheme();
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
-  const bgStyle = paperProps?.bg === 'transparent' ? { background: 'transparent' } : { background: getCardBackgroundByMode(theme, themeMode) };
+  const bgStyle =
+    paperProps?.bg === 'transparent'
+      ? { background: 'transparent' }
+      : { background: getCardBackgroundByMode(theme, themeMode) };
   return (
     <Paper {...paperProps} p="md" style={{ ...(paperProps as any), ...bgStyle }}>
       <DataTable

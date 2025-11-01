@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { spotifyImagesDb } from '../db/spotifyImagesDb';
 import { SpotifyApiManager } from '../services/SpotifyApi';
 
-
 interface UseSpotifyImageOptions {
   entityId: string;
   name: string;
@@ -13,7 +12,14 @@ interface UseSpotifyImageOptions {
   clientSecret: string;
 }
 
-export function useSpotifyImage({ entityId, name, artist, type, clientId, clientSecret }: UseSpotifyImageOptions) {
+export function useSpotifyImage({
+  entityId,
+  name,
+  artist,
+  type,
+  clientId,
+  clientSecret,
+}: UseSpotifyImageOptions) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   // Mantém a última imagem válida até a nova ser carregada (em estado, para não acessar refs no render)
@@ -64,10 +70,12 @@ export function useSpotifyImage({ entityId, name, artist, type, clientId, client
       setLoading(false);
     }
     if (entityId && name && clientId && clientSecret) fetchImage();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [entityId, name, artist, type, clientId, clientSecret]);
 
   // Retorna a última imagem válida enquanto está carregando (evita flicker)
-  const effectiveUrl = loading ? (imageUrl ?? lastValidImageUrl) : imageUrl;
+  const effectiveUrl = loading ? imageUrl ?? lastValidImageUrl : imageUrl;
   return { imageUrl: effectiveUrl, loading };
 }

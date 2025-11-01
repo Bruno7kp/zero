@@ -21,9 +21,14 @@ function bootstrap(row: any, cutoff: number) {
     chartType: row.chartType,
     entityId: row.entityId,
     peak: { position: rank, weeksAtPeak: 1, longestSequenceAtPeak: 1, weeksToPeak: 0 },
-    sequences: { rank1: rank === 1 ? 1 : 0, top5: rank <= 5 ? 1 : 0, top10: rank <= 10 ? 1 : 0, withinCutoff: inside ? 1 : 0 },
+    sequences: {
+      rank1: rank === 1 ? 1 : 0,
+      top5: rank <= 5 ? 1 : 0,
+      top10: rank <= 10 ? 1 : 0,
+      withinCutoff: inside ? 1 : 0,
+    },
     totals: {
-      totalPoints: inside ? (101 - rank) : 0,
+      totalPoints: inside ? 101 - rank : 0,
       totalPlays: row.plays || 0,
       top5: rank <= 5 ? 1 : 0,
       top10: rank <= 10 ? 1 : 0,
@@ -31,7 +36,7 @@ function bootstrap(row: any, cutoff: number) {
       appearances: 1,
       sumRanks: rank,
     },
-    chartRun: [ { week: row.week, position: rank, plays: row.plays || 0 } ],
+    chartRun: [{ week: row.week, position: rank, plays: row.plays || 0 }],
     _running: {
       lastWeek: row.week,
       lastRank: rank,
@@ -42,7 +47,7 @@ function bootstrap(row: any, cutoff: number) {
       seqTop5: rank <= 5 ? 1 : 0,
       seqTop10: rank <= 10 ? 1 : 0,
       seqWithinCutoff: inside ? 1 : 0,
-    }
+    },
   };
 }
 
@@ -69,9 +74,13 @@ export async function applyWeekToFullStats(row: any, opts: IncrementalApplyOptio
   }
   const lastWeekDate = r.lastWeek ? new Date(r.lastWeek).getTime() : null;
   const weekDate = new Date(row.week).getTime();
-  const gap = lastWeekDate != null && (weekDate - lastWeekDate !== 7 * 86400000);
+  const gap = lastWeekDate != null && weekDate - lastWeekDate !== 7 * 86400000;
   if (gap) {
-    r.seqPeak = 0; r.seqRank1 = 0; r.seqTop5 = 0; r.seqTop10 = 0; r.seqWithinCutoff = 0;
+    r.seqPeak = 0;
+    r.seqRank1 = 0;
+    r.seqTop5 = 0;
+    r.seqTop10 = 0;
+    r.seqWithinCutoff = 0;
   }
   const rank: number = row.rank;
   const inside = rank <= cutoff;
@@ -79,7 +88,7 @@ export async function applyWeekToFullStats(row: any, opts: IncrementalApplyOptio
   stats.totals.appearances += 1;
   stats.totals.sumRanks += rank;
   if (inside) {
-    stats.totals.totalPoints += (101 - rank);
+    stats.totals.totalPoints += 101 - rank;
     stats.totals.withinCutoff += 1;
     if (rank <= 10) stats.totals.top10 += 1;
     if (rank <= 5) stats.totals.top5 += 1;
@@ -102,10 +111,22 @@ export async function applyWeekToFullStats(row: any, opts: IncrementalApplyOptio
     r.seqPeak = 0; // quebra de sequência
   }
   // Sequências
-  if (rank === 1) { r.seqRank1++; stats.sequences.rank1 = Math.max(stats.sequences.rank1, r.seqRank1); } else r.seqRank1 = 0;
-  if (rank <= 5) { r.seqTop5++; stats.sequences.top5 = Math.max(stats.sequences.top5, r.seqTop5); } else r.seqTop5 = 0;
-  if (rank <= 10) { r.seqTop10++; stats.sequences.top10 = Math.max(stats.sequences.top10, r.seqTop10); } else r.seqTop10 = 0;
-  if (inside) { r.seqWithinCutoff++; stats.sequences.withinCutoff = Math.max(stats.sequences.withinCutoff, r.seqWithinCutoff); } else r.seqWithinCutoff = 0;
+  if (rank === 1) {
+    r.seqRank1++;
+    stats.sequences.rank1 = Math.max(stats.sequences.rank1, r.seqRank1);
+  } else r.seqRank1 = 0;
+  if (rank <= 5) {
+    r.seqTop5++;
+    stats.sequences.top5 = Math.max(stats.sequences.top5, r.seqTop5);
+  } else r.seqTop5 = 0;
+  if (rank <= 10) {
+    r.seqTop10++;
+    stats.sequences.top10 = Math.max(stats.sequences.top10, r.seqTop10);
+  } else r.seqTop10 = 0;
+  if (inside) {
+    r.seqWithinCutoff++;
+    stats.sequences.withinCutoff = Math.max(stats.sequences.withinCutoff, r.seqWithinCutoff);
+  } else r.seqWithinCutoff = 0;
   // Finaliza
   r.lastWeek = row.week;
   r.lastRank = rank;
@@ -120,8 +141,16 @@ export async function applyWeekToFullStats(row: any, opts: IncrementalApplyOptio
 }
 
 // Rebuild completo (fallback retroativo)
-export async function rebuildFullStats(chartId: string, chartType: string, entityId: string, cutoff: number) {
-  const rows = await db.charts_data.where(['chartId','chartType','entityId']).equals([chartId, chartType, entityId]).sortBy('week');
+export async function rebuildFullStats(
+  chartId: string,
+  chartType: string,
+  entityId: string,
+  cutoff: number
+) {
+  const rows = await db.charts_data
+    .where(['chartId', 'chartType', 'entityId'])
+    .equals([chartId, chartType, entityId])
+    .sortBy('week');
   if (!rows.length) return null;
   let stats: any = null;
   for (const row of rows) {
@@ -145,8 +174,12 @@ export async function applyBatchWeeks(rows: any[], cutoff: number) {
   }
   const toPut: any[] = [];
   for (const key of Object.keys(byKey)) {
-    const list = byKey[key].sort((a,b)=>a.week.localeCompare(b.week));
-    let stats: any = await db.charts_stats.get([list[0].chartId, list[0].chartType, list[0].entityId]);
+    const list = byKey[key].sort((a, b) => a.week.localeCompare(b.week));
+    let stats: any = await db.charts_stats.get([
+      list[0].chartId,
+      list[0].chartType,
+      list[0].entityId,
+    ]);
     for (const row of list) {
       stats = await applyWeekToFullStats(row, { cutoff, persist: false });
     }

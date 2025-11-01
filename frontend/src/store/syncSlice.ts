@@ -18,16 +18,13 @@ const initialState: SyncState = {
 // Placeholder util to derive weeks cached for a chart
 // (Removed weeks caching logic – weeks already stored locally)
 
-export const syncCharts = createAsyncThunk(
-  'sync/full',
-  async (_: void, { dispatch, getState }) => {
-    if (!navigator.onLine) return { skipped: true };
-    await dispatch(fetchCharts());
-    const state: any = getState();
-    const charts = state.charts.charts || [];
-    return { chartsCount: charts.length };
-  }
-);
+export const syncCharts = createAsyncThunk('sync/full', async (_: void, { dispatch, getState }) => {
+  if (!navigator.onLine) return { skipped: true };
+  await dispatch(fetchCharts());
+  const state: any = getState();
+  const charts = state.charts.charts || [];
+  return { chartsCount: charts.length };
+});
 
 const syncSlice = createSlice({
   name: 'sync',
@@ -36,11 +33,11 @@ const syncSlice = createSlice({
     clearSyncState(state) {
       state.lastFullChartsSync = null;
       state.chartsCount = 0;
-    }
+    },
   },
   extraReducers: builder => {
     builder
-      .addCase(syncCharts.pending, (state) => {
+      .addCase(syncCharts.pending, state => {
         state.syncing = true;
         state.error = null;
       })
@@ -55,7 +52,7 @@ const syncSlice = createSlice({
         state.syncing = false;
         state.error = action.error.message || 'Unknown error';
       });
-  }
+  },
 });
 
 export const { clearSyncState } = syncSlice.actions;

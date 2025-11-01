@@ -134,11 +134,7 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
     <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box style={{ flex: 1, overflowY: 'auto', overscrollBehavior: 'contain' }}>
         <Accordion multiple variant="separated" radius="md">
-          <ShareTypeSelector
-            t={t}
-            selectedType={selectedType}
-            setSelectedType={setSelectedType}
-          />
+          <ShareTypeSelector t={t} selectedType={selectedType} setSelectedType={setSelectedType} />
 
           {selectedType === 'grid' && (
             <GridSettings
@@ -180,7 +176,9 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
               selectedStories2ListWrapBackgroundType={selectedStories2ListWrapBackgroundType}
               setSelectedStories2ListWrapBackgroundType={setSelectedStories2ListWrapBackgroundType}
               selectedStories2ListWrapBackgroundColor={selectedStories2ListWrapBackgroundColor}
-              setSelectedStories2ListWrapBackgroundColor={setSelectedStories2ListWrapBackgroundColor}
+              setSelectedStories2ListWrapBackgroundColor={
+                setSelectedStories2ListWrapBackgroundColor
+              }
               selectedStories2ShowAlbumCovers={selectedStories2ShowAlbumCovers}
               setSelectedStories2ShowAlbumCovers={setSelectedStories2ShowAlbumCovers}
               selectedStories2ShowColoredIcons={selectedStories2ShowColoredIcons}
@@ -222,19 +220,52 @@ export const ShareOptions: React.FC<ShareOptionsProps> = ({
             variant="light"
             mt="md"
           >
-            {isLoading ? t('charts.share.generating', 'Generating...') : t('charts.share.updatePreview', 'Update Preview')}
+            {isLoading
+              ? t('charts.share.generating', 'Generating...')
+              : t('charts.share.updatePreview', 'Update Preview')}
           </Button>
         )}
 
         <Button
-          leftSection={selectedType === 'text' ? (clipboard.copied ? <IconCheck size={16} /> : <IconCopy size={16} />) : <IconDownload size={16} />}
-          onClick={selectedType === 'text' ? () => clipboard.copy(generatePlainTextChart(t, chartData, chartName, week, weekNumber, chartType, statsMap)) : handleDownload}
+          leftSection={
+            selectedType === 'text' ? (
+              clipboard.copied ? (
+                <IconCheck size={16} />
+              ) : (
+                <IconCopy size={16} />
+              )
+            ) : (
+              <IconDownload size={16} />
+            )
+          }
+          onClick={
+            selectedType === 'text'
+              ? () =>
+                  clipboard.copy(
+                    generatePlainTextChart(
+                      t,
+                      chartData,
+                      chartName,
+                      week,
+                      weekNumber,
+                      chartType,
+                      statsMap
+                    )
+                  )
+              : handleDownload
+          }
           fullWidth
           disabled={selectedType !== 'text' && (!previewImageUrl || isLoading)}
           color={selectedType === 'text' && clipboard.copied ? 'teal' : 'blue'}
           mt="md"
         >
-          {selectedType === 'text' ? (clipboard.copied ? t('common.copied', 'Copied!') : t('common.copy', 'Copy')) : (isLoading ? t('charts.share.generatingImage', 'Generating image...') : t('charts.share.download', 'Download'))}
+          {selectedType === 'text'
+            ? clipboard.copied
+              ? t('common.copied', 'Copied!')
+              : t('common.copy', 'Copy')
+            : isLoading
+            ? t('charts.share.generatingImage', 'Generating image...')
+            : t('charts.share.download', 'Download')}
         </Button>
       </Box>
     </Box>

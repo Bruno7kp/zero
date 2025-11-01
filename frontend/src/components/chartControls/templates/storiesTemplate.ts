@@ -15,14 +15,20 @@ export const generateStoriesHTML = (
 
   const escapeHtml = (str: string | undefined) => {
     if (!str) return '';
-    return str.replace(/[&<>"']/g, (m) => {
+    return str.replace(/[&<>"']/g, m => {
       switch (m) {
-        case '&': return '&amp;';
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '"': return '&quot;';
-        case "'": return '&#39;';
-        default: return m;
+        case '&':
+          return '&amp;';
+        case '<':
+          return '&lt;';
+        case '>':
+          return '&gt;';
+        case '"':
+          return '&quot;';
+        case "'":
+          return '&#39;';
+        default:
+          return m;
       }
     });
   };
@@ -43,7 +49,10 @@ export const generateStoriesHTML = (
     const endDate = new Date(week);
     const startDate = new Date(endDate);
     startDate.setDate(endDate.getDate() - 6);
-    const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    const formatDate = (d: Date) =>
+      `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(
+        d.getDate()
+      ).padStart(2, '0')}`;
     dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
   }
 
@@ -291,7 +300,7 @@ export const generateStoriesHTML = (
           <div class="headerRow"><div>#</div><div></div><div></div><div>${typeLabel}</div><div>Last</div></div>
   `;
 
-  data.forEach((row) => {
+  data.forEach(row => {
     const imageUrl = row.imageUrl || row.albumImage || '';
     const deltaRank = row.deltaRank;
     let moveHtml = '';
@@ -299,21 +308,26 @@ export const generateStoriesHTML = (
     const isFirstPlace = row.rank === 1;
 
     if (deltaRank === 'NEW') {
-      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="8" x2="9" y2="16"></line><line x1="9" y1="8" x2="15" y2="16"></line><line x1="15" y1="8" x2="15" y2="16"></line></svg></div>';
+      moveHtml =
+        '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="9" y1="8" x2="9" y2="16"></line><line x1="9" y1="8" x2="15" y2="16"></line><line x1="15" y1="8" x2="15" y2="16"></line></svg></div>';
       //moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#13b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></div>';
       lastPosition = '—';
     } else if (deltaRank === 'RE') {
-      moveHtml = '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8.5" y1="8" x2="8.5" y2="16"></line><path d="M 8.5 8 L 13.5 8 C 16 8 16 12 13.5 12 L 8.5 12" /><line x1="13.5" y1="12" x2="16" y2="16"></line></svg></div>';
+      moveHtml =
+        '<div class="arrow same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8.5" y1="8" x2="8.5" y2="16"></line><path d="M 8.5 8 L 13.5 8 C 16 8 16 12 13.5 12 L 8.5 12" /><line x1="13.5" y1="12" x2="16" y2="16"></line></svg></div>';
       lastPosition = '—';
     } else if (typeof deltaRank === 'number') {
       const prevRank = row.rank + deltaRank;
       lastPosition = prevRank > 0 ? prevRank.toString() : '—';
       if (deltaRank > 0) {
-        moveHtml = '<span class="arrow up" title="Up"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#4dff87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg></span>';
+        moveHtml =
+          '<span class="arrow up" title="Up"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#4dff87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg></span>';
       } else if (deltaRank < 0) {
-        moveHtml = '<span class="arrow down" title="Down"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg></span>';
+        moveHtml =
+          '<span class="arrow down" title="Down"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg></span>';
       } else {
-        moveHtml = '<span class="arrow same" title="Same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></span>';
+        moveHtml =
+          '<span class="arrow same" title="Same"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffbf4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg></span>';
       }
     } else {
       moveHtml = '';
@@ -323,10 +337,18 @@ export const generateStoriesHTML = (
     html += `
       <div class="row${isFirstPlace ? ' highlight' : ''}">
         <div class="rank">${row.rank}</div>
-        <div class="thumb">${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(row.name)}" crossorigin="anonymous" onerror="this.style.display='none'" />` : '<span>IMG</span>'}</div>
+        <div class="thumb">${
+          imageUrl
+            ? `<img src="${imageUrl}" alt="${escapeHtml(
+                row.name
+              )}" crossorigin="anonymous" onerror="this.style.display='none'" />`
+            : '<span>IMG</span>'
+        }</div>
         <div class="move">${moveHtml}</div>
         <div class="name">
-          <span class="main-name ${row.artistName ? '' : 'artist-only'}">${escapeHtml(row.name)}</span>
+          <span class="main-name ${row.artistName ? '' : 'artist-only'}">${escapeHtml(
+      row.name
+    )}</span>
           ${row.artistName ? `<span class="artist-name">${escapeHtml(row.artistName)}</span>` : ''}
         </div>
         <div class="last">${lastPosition}</div>

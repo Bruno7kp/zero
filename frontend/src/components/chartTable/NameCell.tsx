@@ -14,7 +14,7 @@ interface NameCellProps {
   lastImageUrl?: string | null;
   onImageChange: () => void;
   onImageLoad: (url: string) => void;
-  scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
+  scaleSize: (s: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   imageSize?: number;
 }
 
@@ -61,8 +61,12 @@ export const NameCell: React.FC<NameCellProps> = ({
         </Flex>
       )}
       <Flex direction="column" justify="center" align="flex-start">
-        <Text fw={600} size={scaleSize('md')} className="entity-name">{row.name}</Text>
-        {artistMode === 'under' && row.artistName && <Text size={scaleSize('sm')}>{row.artistName}</Text>}
+        <Text fw={600} size={scaleSize('md')} className="entity-name">
+          {row.name}
+        </Text>
+        {artistMode === 'under' && row.artistName && (
+          <Text size={scaleSize('sm')}>{row.artistName}</Text>
+        )}
       </Flex>
     </Flex>
   );

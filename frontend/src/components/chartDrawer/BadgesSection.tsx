@@ -33,35 +33,59 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
   const { colorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
 
-  const groups: string[][] = useMemo(() => (
-    viewType === 'grid'
-      ? [
-          ['transparent','transparentIconOnly','transparentIcon'],
-          ['solid','solidIconOnly','solidIcon']
-        ]
-      : [
-          ['transparent','transparentIconOnly','transparentIcon'],
-          ['light','lightIconOnly','lightIcon'],
-          ['solid','solidIconOnly','solidIcon'],
-          allowSpecialsUI ? ['maximalist','maximalistLight'] : []
-        ].filter(g => g.length)
-  ), [viewType, allowSpecialsUI]);
+  const groups: string[][] = useMemo(
+    () =>
+      viewType === 'grid'
+        ? [
+            ['transparent', 'transparentIconOnly', 'transparentIcon'],
+            ['solid', 'solidIconOnly', 'solidIcon'],
+          ]
+        : [
+            ['transparent', 'transparentIconOnly', 'transparentIcon'],
+            ['light', 'lightIconOnly', 'lightIcon'],
+            ['solid', 'solidIconOnly', 'solidIcon'],
+            allowSpecialsUI ? ['maximalist', 'maximalistLight'] : [],
+          ].filter(g => g.length),
+    [viewType, allowSpecialsUI]
+  );
 
   const presetVisualLabel = (k: string) => {
-    const baseKey = k.startsWith('transparent') ? 'transparent' : k.startsWith('light') ? 'light' : k.startsWith('solid') ? 'solid' : k;
+    const baseKey = k.startsWith('transparent')
+      ? 'transparent'
+      : k.startsWith('light')
+      ? 'light'
+      : k.startsWith('solid')
+      ? 'solid'
+      : k;
     const rawText = t(`charts.badgeStyles.preset_${baseKey}` as any);
     const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     const baseText = cap(rawText);
     if (baseKey === 'maximalist') {
-      return <Flex align="center" justify="center" style={{ width: '100%' }}>{cap(rawText)}</Flex>;
+      return (
+        <Flex align="center" justify="center" style={{ width: '100%' }}>
+          {cap(rawText)}
+        </Flex>
+      );
     }
     if (k.endsWith('IconOnly')) {
-      return <Flex align="center" justify="center" style={{ width: '100%' }}><IconCaretUpFilled size={12} /></Flex>;
+      return (
+        <Flex align="center" justify="center" style={{ width: '100%' }}>
+          <IconCaretUpFilled size={12} />
+        </Flex>
+      );
     }
     if (k.endsWith('Icon')) {
-      return <Flex align="center" gap={4} justify="center" style={{ width: '100%' }}><IconCaretUpFilled size={12} /> <span>{baseText}</span></Flex>;
+      return (
+        <Flex align="center" gap={4} justify="center" style={{ width: '100%' }}>
+          <IconCaretUpFilled size={12} /> <span>{baseText}</span>
+        </Flex>
+      );
     }
-    return <Flex align="center" justify="center" style={{ width: '100%' }}>{baseText}</Flex>;
+    return (
+      <Flex align="center" justify="center" style={{ width: '100%' }}>
+        {baseText}
+      </Flex>
+    );
   };
 
   const trackBg = colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[1];
@@ -69,7 +93,11 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
   const activeColor = colorScheme === 'dark' ? theme.white : theme.black;
   const inactiveColor = colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.dark[6];
   const focusRing = theme.colors.blue[5];
-  const segmentStyle = (active: boolean, _hovered: boolean, focused: boolean): React.CSSProperties => ({
+  const segmentStyle = (
+    active: boolean,
+    _hovered: boolean,
+    focused: boolean
+  ): React.CSSProperties => ({
     flex: 1,
     cursor: 'pointer',
     padding: '4px 10px',
@@ -87,17 +115,21 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
     transition: 'background .12s ease, color .12s ease, box-shadow .12s ease',
     minWidth: 0,
     outline: 'none',
-    boxShadow: focused ? `0 0 0 2px ${focusRing}` : 'none'
+    boxShadow: focused ? `0 0 0 2px ${focusRing}` : 'none',
   });
 
   return (
     <Stack gap={6}>
       {allowKindSelect && (
         <>
-          <Text size="xs" c="dimmed">{t('charts.badgeStyles.kindSelectLabel')}</Text>
+          <Text size="xs" c="dimmed">
+            {t('charts.badgeStyles.kindSelectLabel')}
+          </Text>
           <Box>
-            <Flex style={{ width: '100%', background: trackBg, borderRadius: 999, padding: 2, gap: 2 }}>
-              {(['rank','plays'] as const).map((k) => (
+            <Flex
+              style={{ width: '100%', background: trackBg, borderRadius: 999, padding: 2, gap: 2 }}
+            >
+              {(['rank', 'plays'] as const).map(k => (
                 <Box
                   key={k}
                   style={segmentStyle(badgeKind === k, false, false)}
@@ -106,7 +138,9 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                   aria-pressed={badgeKind === k}
                   tabIndex={0}
                 >
-                  {k === 'rank' ? t('charts.badgeStyles.kindRank') : t('charts.badgeStyles.kindPlays')}
+                  {k === 'rank'
+                    ? t('charts.badgeStyles.kindRank')
+                    : t('charts.badgeStyles.kindPlays')}
                 </Box>
               ))}
             </Flex>
@@ -114,13 +148,17 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
         </>
       )}
 
-      <Text size="xs" c="dimmed">{t('charts.badgeStyles.presetsTitle')}</Text>
+      <Text size="xs" c="dimmed">
+        {t('charts.badgeStyles.presetsTitle')}
+      </Text>
 
       <Stack gap={8}>
         {groups.map((g, i) => (
           <Flex key={i} direction="column" style={{ width: '100%' }}>
-            <Flex style={{ width: '100%', background: trackBg, borderRadius: 999, padding: 2, gap: 2 }}>
-              {g.map((k) => {
+            <Flex
+              style={{ width: '100%', background: trackBg, borderRadius: 999, padding: 2, gap: 2 }}
+            >
+              {g.map(k => {
                 const active = k === selectedPreset;
                 return (
                   <Box
@@ -141,7 +179,11 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
       </Stack>
 
       <Flex justify="center" mb="lg">
-        <BadgeStylePreview kind={viewType === 'grid' ? 'rank' : badgeKind} rankCfg={resolvedRank} playsCfg={resolvedPlays} />
+        <BadgeStylePreview
+          kind={viewType === 'grid' ? 'rank' : badgeKind}
+          rankCfg={resolvedRank}
+          playsCfg={resolvedPlays}
+        />
       </Flex>
     </Stack>
   );

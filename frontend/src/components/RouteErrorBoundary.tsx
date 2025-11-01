@@ -8,7 +8,10 @@ interface RouteErrorBoundaryState {
   info?: any;
 }
 
-export class RouteErrorBoundary extends React.Component<React.PropsWithChildren, RouteErrorBoundaryState> {
+export class RouteErrorBoundary extends React.Component<
+  React.PropsWithChildren,
+  RouteErrorBoundaryState
+> {
   state: RouteErrorBoundaryState = { hasError: false };
 
   static getDerivedStateFromError(error: Error): RouteErrorBoundaryState {
@@ -32,15 +35,29 @@ export class RouteErrorBoundary extends React.Component<React.PropsWithChildren,
       return (
         <Stack p="lg">
           <Title order={3} fw={600}>
-            <IconAlertTriangle style={{ verticalAlign: 'middle', marginRight: 8 }} /> Something went wrong
+            <IconAlertTriangle style={{ verticalAlign: 'middle', marginRight: 8 }} /> Something went
+            wrong
           </Title>
-          <Alert color="red" variant="light" title="Runtime error" icon={<IconAlertTriangle size={18} />}> 
+          <Alert
+            color="red"
+            variant="light"
+            title="Runtime error"
+            icon={<IconAlertTriangle size={18} />}
+          >
             <Stack gap={6}>
               <Code block>{this.state.error?.message || 'Unknown error'}</Code>
               {this.state.error?.stack && (
-                <Code block style={{ maxHeight: 220, overflow: 'auto' }}>{this.state.error.stack}</Code>
+                <Code block style={{ maxHeight: 220, overflow: 'auto' }}>
+                  {this.state.error.stack}
+                </Code>
               )}
-              <Button leftSection={<IconReload size={16} />} onClick={this.reset} variant="light" size="xs" maw={160}>
+              <Button
+                leftSection={<IconReload size={16} />}
+                onClick={this.reset}
+                variant="light"
+                size="xs"
+                maw={160}
+              >
                 Retry render
               </Button>
             </Stack>

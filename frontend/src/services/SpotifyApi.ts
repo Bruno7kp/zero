@@ -42,7 +42,7 @@ export class SpotifyApi {
     const url = `${this.baseUrl}/search?${params.toString()}`;
     const res = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
+        Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json',
       },
     });
@@ -52,7 +52,6 @@ export class SpotifyApi {
     return res.json();
   }
 }
-
 
 export class SpotifyApiManager {
   private tokenManager: SpotifyTokenManager;

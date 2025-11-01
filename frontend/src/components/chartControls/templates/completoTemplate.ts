@@ -22,14 +22,20 @@ export const generateCompletoHTML = (
 
   const escapeHtml = (str: string | undefined) => {
     if (!str) return '';
-    return str.replace(/[&<>"']/g, (m) => {
+    return str.replace(/[&<>"']/g, m => {
       switch (m) {
-        case '&': return '&amp;';
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '"': return '&quot;';
-        case "'": return '&#39;';
-        default: return m;
+        case '&':
+          return '&amp;';
+        case '<':
+          return '&lt;';
+        case '>':
+          return '&gt;';
+        case '"':
+          return '&quot;';
+        case "'":
+          return '&#39;';
+        default:
+          return m;
       }
     });
   };
@@ -56,7 +62,10 @@ export const generateCompletoHTML = (
     const endDate = new Date(week);
     const startDate = new Date(endDate);
     startDate.setDate(endDate.getDate() - 6);
-    const formatDate = (d: Date) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    const formatDate = (d: Date) =>
+      `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(
+        d.getDate()
+      ).padStart(2, '0')}`;
     dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
   }
 
@@ -87,15 +96,21 @@ export const generateCompletoHTML = (
   // Function to calculate sales based on chart formula
   const calculateSales = (row: any): number => {
     if (!chart) return 0;
-    
+
     const effectiveType = _chartType === 'track' ? 'track' : 'album';
-    const pointsWeight = effectiveType === 'track' ? Number(chart?.music_points_weight || 0) : Number(chart?.album_points_weight || 0);
-    const playsWeight = effectiveType === 'track' ? Number(chart?.music_plays_weight || 0) : Number(chart?.album_plays_weight || 0);
-    
+    const pointsWeight =
+      effectiveType === 'track'
+        ? Number(chart?.music_points_weight || 0)
+        : Number(chart?.album_points_weight || 0);
+    const playsWeight =
+      effectiveType === 'track'
+        ? Number(chart?.music_plays_weight || 0)
+        : Number(chart?.album_plays_weight || 0);
+
     const stabilityPoints = row.rank != null && row.rank > 0 ? Math.max(0, 101 - row.rank) : 0;
     const safePlays = typeof row.plays === 'number' ? row.plays : 0;
     const raw = stabilityPoints * pointsWeight + safePlays * playsWeight;
-    
+
     return Number.isFinite(raw) ? Math.round(raw) : 0;
   };
 
@@ -104,7 +119,7 @@ export const generateCompletoHTML = (
     if (!showCert || _chartType === 'artist' || !certificationsData) {
       return '';
     }
-    
+
     const cert = certificationsData[row.entityId];
     if (!cert || !cert.level) {
       return '';
@@ -144,7 +159,11 @@ export const generateCompletoHTML = (
       .chart-header {
         position: relative;
         height: 250px;
-        ${topImage ? `background-image: url("${topImage}");` : `background-color: ${backgroundColor};`}
+        ${
+          topImage
+            ? `background-image: url("${topImage}");`
+            : `background-color: ${backgroundColor};`
+        }
         background-size: cover;
         background-position: center 30%;
         padding: 20px;
@@ -386,7 +405,13 @@ export const generateCompletoHTML = (
           </div>
           <h1 class="chart-title">TOP ${topCount} ${typeLabel}</h1>
         </div>
-        ${userText || dateRange ? `<div class="chart-dates">${userText ? `<span class="chart-user">${userText}</span>` : ''}<span class="chart-date">${dateRange}</span></div>` : ''}
+        ${
+          userText || dateRange
+            ? `<div class="chart-dates">${
+                userText ? `<span class="chart-user">${userText}</span>` : ''
+              }<span class="chart-date">${dateRange}</span></div>`
+            : ''
+        }
       </div>
       <div class="chart-grid">
   `;
@@ -394,11 +419,11 @@ export const generateCompletoHTML = (
   // Function to generate stats HTML based on selected columns
   const generateStatsHTML = (row: any): string => {
     let statsHTML = '';
-    
+
     // Add certification first if enabled
     if (showCert && _chartType !== 'artist') {
       const certHTML = renderCertification(row);
-      
+
       if (certHTML) {
         statsHTML += `
           <div class="stat-cert">
@@ -407,11 +432,11 @@ export const generateCompletoHTML = (
         `;
       }
     }
-    
+
     selectedColumns.forEach(column => {
       let label = '';
       let value = '';
-      
+
       switch (column) {
         case 'plays':
           label = 'plays';
@@ -441,7 +466,7 @@ export const generateCompletoHTML = (
           value = row.weeks ? row.weeks.toString() : '—';
           break;
       }
-      
+
       statsHTML += `
         <div class="stat">
           <span class="stat-label">${label}</span>
@@ -449,28 +474,33 @@ export const generateCompletoHTML = (
         </div>
       `;
     });
-    
+
     return statsHTML;
   };
 
   // Function to generate trend icon
   const getTrendIcon = (deltaRank: any) => {
     let trendClass = 'move-stable';
-    let trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+    let trendIcon =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
 
     if (deltaRank === 'NEW') {
       trendClass = showColoredIcons ? 'new-entry' : 'neutral';
-      trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+      trendIcon =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
     } else if (deltaRank === 'RE') {
       trendClass = showColoredIcons ? 're-entry' : 'neutral'; // Using new-entry for reentry as well
-      trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
+      trendIcon =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
     } else if (typeof deltaRank === 'number') {
       if (deltaRank > 0) {
         trendClass = showColoredIcons ? 'move-up' : 'neutral';
-        trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
+        trendIcon =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
       } else if (deltaRank < 0) {
         trendClass = showColoredIcons ? 'move-down' : 'neutral';
-        trendIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>';
+        trendIcon =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>';
       } else {
         trendClass = 'neutral';
       }
@@ -483,7 +513,7 @@ export const generateCompletoHTML = (
 
   // Generate column 1
   html += '<div class="chart-column">';
-  column1.forEach((row) => {
+  column1.forEach(row => {
     const imageUrl = row.imageUrl || row.albumImage || '';
     const { trendClass, trendIcon } = getTrendIcon(row.deltaRank);
 
@@ -493,10 +523,16 @@ export const generateCompletoHTML = (
           <div class="song-rank">${row.rank}</div>
           <div class="icon-wrapper ${trendClass}">${trendIcon}</div>
         </div>
-        <img src="${imageUrl}" alt="${escapeHtml(row.name)}" class="song-cover" crossorigin="anonymous" onerror="this.style.display='none'" />
+        <img src="${imageUrl}" alt="${escapeHtml(
+      row.name
+    )}" class="song-cover" crossorigin="anonymous" onerror="this.style.display='none'" />
         <div class="song-info">
           <p class="song-title">${escapeHtml(truncateText(row.name, 30))}</p>
-          ${row.artistName ? `<p class="song-artist">${escapeHtml(truncateText(row.artistName, 30))}</p>` : ''}
+          ${
+            row.artistName
+              ? `<p class="song-artist">${escapeHtml(truncateText(row.artistName, 30))}</p>`
+              : ''
+          }
         </div>
         <div class="song-stats">
           ${generateStatsHTML(row)}
@@ -508,7 +544,7 @@ export const generateCompletoHTML = (
 
   // Generate column 2
   html += '<div class="chart-column">';
-  column2.forEach((row) => {
+  column2.forEach(row => {
     const imageUrl = row.imageUrl || row.albumImage || '';
     const { trendClass, trendIcon } = getTrendIcon(row.deltaRank);
 
@@ -518,10 +554,16 @@ export const generateCompletoHTML = (
           <div class="song-rank">${row.rank}</div>
           <div class="icon-wrapper ${trendClass}">${trendIcon}</div>
         </div>
-        <img src="${imageUrl}" alt="${escapeHtml(row.name)}" class="song-cover" crossorigin="anonymous" onerror="this.style.display='none'" />
+        <img src="${imageUrl}" alt="${escapeHtml(
+      row.name
+    )}" class="song-cover" crossorigin="anonymous" onerror="this.style.display='none'" />
         <div class="song-info">
           <p class="song-title">${escapeHtml(truncateText(row.name, 30))}</p>
-          ${row.artistName ? `<p class="song-artist">${escapeHtml(truncateText(row.artistName, 30))}</p>` : ''}
+          ${
+            row.artistName
+              ? `<p class="song-artist">${escapeHtml(truncateText(row.artistName, 30))}</p>`
+              : ''
+          }
         </div>
         <div class="song-stats">
           ${generateStatsHTML(row)}

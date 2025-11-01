@@ -1,11 +1,11 @@
 // Main stats page with sidebar and routing
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Container, 
-  Title, 
-  Text, 
-  Loader, 
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
+import {
+  Container,
+  Title,
+  Text,
+  Loader,
   Center,
   Stack,
   NavLink,
@@ -16,7 +16,7 @@ import {
   useMantineTheme,
   Divider,
   Box,
-  Tooltip
+  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -31,11 +31,17 @@ import {
   IconCrown,
   IconMenu2,
   IconCalendarUp,
+  IconBoxMultiple1,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
-  IconSparkles
+  IconSparkles,
+  IconMusicPlus,
+  IconStairsUp,
+  IconCoins,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
+import { useStatsPreferences } from '../hooks/useStatsPreferences';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import CreateHeader from '../components/createChart/CreateHeader';
 
@@ -48,15 +54,18 @@ const TimesAtTopStats = lazy(() => import('./stats/TimesAtTopStats'));
 const PlaysStats = lazy(() => import('./stats/PlaysStats'));
 const DebutsStats = lazy(() => import('./stats/DebutsStats'));
 const PointsStats = lazy(() => import('./stats/PointsStats'));
+const MostSalesStats = lazy(() => import('./stats/MostSalesStats'));
 const TimesAtTopByArtistStats = lazy(() => import('./stats/TimesAtTopByArtistStats'));
 const DebutsAtOneByArtistStats = lazy(() => import('./stats/DebutsAtOneByArtistStats'));
+const LongestConsecutiveAtOneStats = lazy(() => import('./stats/LongestConsecutiveAtOneStats'));
+const MostSimultaneousByArtistStats = lazy(() => import('./stats/MostSimultaneousByArtistStats'));
+const WeeksToNumberOneStats = lazy(() => import('./stats/WeeksToNumberOneStats'));
 
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
   const [opened, { toggle }] = useDisclosure(false);
-  const [collapsed, { toggle: toggleCollapsed }] = useDisclosure(false);
+  // collapsed state is persisted via stats preferences
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
   const bgColor = getCardBackgroundByMode(theme, themeMode);
@@ -69,80 +78,104 @@ const StatsPage: React.FC = () => {
   const trackCutoff = chart?.music_cutoff || 100;
 
   // Navigation items
-  const navItems: Array<{ 
-    icon?: any; 
-    label?: string; 
+  const navItems: Array<{
+    icon?: any;
+    label?: string;
     path?: string;
     exact?: boolean;
     group?: string;
     divider?: boolean;
   }> = [
-    { 
-      icon: IconChartBar, 
-      label: t('stats.sidebar.overview'), 
+    {
+      icon: IconChartBar,
+      label: t('stats.sidebar.overview'),
       path: '/stats',
-      exact: true
+      exact: true,
     },
     { divider: true },
-    { 
-      icon: IconCrown, 
-      label: t('stats.timesAtTopByArtist.title', { n: 1 }), 
+    {
+      icon: IconCrown,
+      label: t('stats.timesAtTopByArtist.title', { n: 1 }),
       path: '/stats/times_at_top_by_artist/1/track',
-      group: 'times_at_top_by_artist'
+      group: 'times_at_top_by_artist',
     },
-    { 
-      icon: IconTrophy, 
-      label: t('stats.rank.title', { n: 1 }), 
+    {
+      icon: IconTrophy,
+      label: t('stats.rank.title', { n: 1 }),
       path: '/stats/rank/1/track',
-      group: 'rank'
+      group: 'rank',
     },
-    { 
-      icon: IconStar, 
-      label: t('stats.timesAtRank.title', { n: 1 }), 
+    {
+      icon: IconStar,
+      label: t('stats.timesAtRank.title', { n: 1 }),
       path: '/stats/times_at_rank/1/track',
-      group: 'times_at_rank'
+      group: 'times_at_rank',
     },
-    { 
-      icon: IconCalendarUp, 
-      label: t('stats.timesAtTop.title', { n: trackCutoff }), 
+    {
+      icon: IconCalendarUp,
+      label: t('stats.timesAtTop.title', { n: trackCutoff }),
       path: `/stats/times_at_top/${trackCutoff}/track`,
-      group: 'times_at_top'
+      group: 'times_at_top',
+    },
+    {
+      icon: IconBoxMultiple1,
+      label: t('stats.longestConsecutiveAtOne.title'),
+      path: '/stats/longest_consecutive_at_one/track',
+      group: 'longest_consecutive_at_one',
     },
     { divider: true },
-    { 
-      icon: IconRocket, 
-      label: t('stats.debuts.title'), 
+    {
+      icon: IconRocket,
+      label: t('stats.debuts.title'),
       path: '/stats/debuts/all/track',
-      group: 'debuts'
+      group: 'debuts',
     },
-    { 
-      icon: IconSparkles, 
-      label: t('stats.debutsAtOneByArtist.title', { n: 1 }), 
+    {
+      icon: IconSparkles,
+      label: t('stats.debutsAtOneByArtist.title', { n: 1 }),
       path: '/stats/debuts_at_one_by_artist/track',
-      group: 'debuts_at_one_by_artist'
+      group: 'debuts_at_one_by_artist',
     },
-    { 
-      icon: IconHeadphones, 
-      label: t('stats.plays.title'), 
+    {
+      icon: IconMusicPlus,
+      label: t('stats.mostSimultaneousByArtist.title'),
+      path: '/stats/most_simultaneous_by_artist/track',
+      group: 'most_simultaneous_by_artist',
+    },
+    {
+      icon: IconHeadphones,
+      label: t('stats.plays.title'),
       path: '/stats/plays/all/track',
-      group: 'plays'
+      group: 'plays',
+    },
+    {
+      icon: IconStairsUp,
+      label: t('stats.weeksToNumberOne.title'),
+      path: '/stats/weeks_to_number_one/track',
+      group: 'weeks_to_number_one',
     },
     { divider: true },
-    { 
-      icon: IconFlame, 
-      label: t('stats.pak.title'), 
+    {
+      icon: IconFlame,
+      label: t('stats.pak.title'),
       path: '/stats/pak',
-      group: 'pak'
+      group: 'pak',
     },
-    { 
-      icon: IconCoin, 
-      label: t('stats.points.title'), 
+    {
+      icon: IconCoins,
+      label: t('stats.points.title'),
       path: '/stats/points/track',
-      group: 'points'
-    }
+      group: 'points',
+    },
+    {
+      icon: IconCoin,
+      label: t('stats.mostSales.title'),
+      path: '/stats/most_sales/track',
+      group: 'most_sales',
+    },
   ];
 
-  const isActive = (item: typeof navItems[0]) => {
+  const isActive = (item: (typeof navItems)[0]) => {
     if (item.exact) {
       return location.pathname === item.path;
     }
@@ -158,9 +191,25 @@ const StatsPage: React.FC = () => {
     return activeItem?.label || t('stats.title');
   };
 
+  // Get page icon based on current route
+  const getPageIcon = () => {
+    const activeItem = navItems.find(item => !item.divider && isActive(item));
+    return activeItem?.icon || IconChartBar;
+  };
+
+  const { preferences, updatePreference } = useStatsPreferences();
+  const isMobile = useIsMobile();
+
+  const collapsed = preferences.collapsed;
+  const toggleCollapsed = () => updatePreference('collapsed', !collapsed);
+
   if (!chart) {
     return (
-      <Container size="100%" py="xl" className="noPaddingMobile">
+      <Container
+        size={isMobile ? '100%' : preferences.containerSize}
+        py="xl"
+        className="noPaddingMobile"
+      >
         <Center>
           <Stack align="center" gap="md">
             <Text>{t('errors.selectActiveChart')}</Text>
@@ -171,13 +220,13 @@ const StatsPage: React.FC = () => {
   }
 
   return (
-    <Container size="100%" className="noPaddingMobile">
-      <CreateHeader pageTitle={getPageTitle()} icon={IconChartBar} />
-      
+    <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
+      <CreateHeader pageTitle={getPageTitle()} icon={getPageIcon()} />
+
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
-        <Box 
-          style={{ 
+        <Box
+          style={{
             flexShrink: 0,
             width: collapsed ? '55px' : '350px',
             transition: 'width 200ms ease',
@@ -185,17 +234,28 @@ const StatsPage: React.FC = () => {
           hiddenFrom="base"
           visibleFrom="md"
         >
-          <Card p={collapsed ? 'xs' : 'md'} style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}>
-            <Flex justify={collapsed ? 'center' : 'space-between'} align="center" mb={collapsed ? 0 : 'md'}>
+          <Card
+            p={collapsed ? 'xs' : 'md'}
+            style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
+          >
+            <Flex
+              justify={collapsed ? 'center' : 'space-between'}
+              align="center"
+              mb={collapsed ? 0 : 'md'}
+            >
               {/* Collapse button - desktop only */}
-              <ActionIcon 
-                variant="subtle" 
+              <ActionIcon
+                variant="subtle"
                 onClick={toggleCollapsed}
                 aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
               >
-                {collapsed ? <IconLayoutSidebarLeftExpand size={18} /> : <IconLayoutSidebarLeftCollapse size={18} />}
+                {collapsed ? (
+                  <IconLayoutSidebarLeftExpand size={18} />
+                ) : (
+                  <IconLayoutSidebarLeftCollapse size={18} />
+                )}
               </ActionIcon>
-              
+
               {/* Title - centered */}
               {!collapsed && (
                 <Title order={4} style={{ flex: 1, textAlign: 'center', marginLeft: -34 }}>
@@ -203,14 +263,14 @@ const StatsPage: React.FC = () => {
                 </Title>
               )}
             </Flex>
-            
-            <ScrollArea.Autosize mah={600} type="auto">
+
+            <ScrollArea.Autosize mah={700} type="auto">
               <Stack gap={0}>
-                {navItems.map((item, index) => 
+                {navItems.map((item, index) =>
                   item.divider ? (
                     <Divider key={index} my="xs" />
                   ) : (
-                    <Tooltip 
+                    <Tooltip
                       key={index}
                       label={item.label}
                       position="right"
@@ -218,14 +278,11 @@ const StatsPage: React.FC = () => {
                       withArrow
                     >
                       <NavLink
+                        component={Link}
+                        to={item.path!}
                         active={isActive(item)}
                         label={collapsed ? undefined : item.label!}
                         leftSection={<item.icon size={18} />}
-                        onClick={() => {
-                          if (item.path) {
-                            navigate(item.path);
-                          }
-                        }}
                         styles={{
                           root: {
                             justifyContent: collapsed ? 'center' : 'flex-start',
@@ -235,7 +292,7 @@ const StatsPage: React.FC = () => {
                           },
                           section: {
                             marginRight: collapsed ? 0 : undefined,
-                          }
+                          },
                         }}
                       />
                     </Tooltip>
@@ -251,35 +308,40 @@ const StatsPage: React.FC = () => {
           <Card p="md" style={{ backgroundColor: bgColor }}>
             <Flex justify="space-between" align="center" mb={0}>
               <Title order={4}>{t('stats.sidebar.title')}</Title>
-              <ActionIcon 
-                variant="subtle" 
-                onClick={toggle}
-              >
+              <ActionIcon variant="subtle" onClick={toggle}>
                 <IconMenu2 size={18} />
               </ActionIcon>
             </Flex>
-            
-            <ScrollArea.Autosize mah={600} type="auto">
+
+            <ScrollArea.Autosize mah={700} type="auto">
               <Stack gap={0} display={opened ? 'flex' : 'none'}>
-                {navItems.map((item, index) => 
+                {navItems.map((item, index) =>
                   item.divider ? (
                     <Divider key={index} my="xs" />
                   ) : (
                     <NavLink
                       key={index}
+                      component={Link}
+                      to={item.path!}
                       active={isActive(item)}
                       label={item.label!}
                       leftSection={<item.icon size={18} />}
-                      onClick={() => {
-                        if (item.path) {
-                          navigate(item.path);
+                      onClick={e => {
+                        // Close only on regular left-click navigation; keep open for new-tab actions
+                        if (
+                          e.button === 0 &&
+                          !e.ctrlKey &&
+                          !e.metaKey &&
+                          !e.shiftKey &&
+                          !e.altKey
+                        ) {
                           toggle();
                         }
                       }}
                       styles={{
                         root: {
                           borderRadius: 8,
-                        }
+                        },
                       }}
                     />
                   )
@@ -291,14 +353,16 @@ const StatsPage: React.FC = () => {
 
         {/* Main Content */}
         <Box style={{ flex: 1, minWidth: 0 }}>
-          <Suspense fallback={
-            <Center py="xl">
-              <Stack align="center" gap="md">
-                <Loader size="lg" />
-                <Text>{t('stats.loading')}</Text>
-              </Stack>
-            </Center>
-          }>
+          <Suspense
+            fallback={
+              <Center py="xl">
+                <Stack align="center" gap="md">
+                  <Loader size="lg" />
+                  <Text>{t('stats.loading')}</Text>
+                </Stack>
+              </Center>
+            }
+          >
             <Routes>
               <Route path="/" element={<StatsHome />} />
               <Route path="/rank/:rank/:type" element={<RankStats />} />
@@ -308,8 +372,21 @@ const StatsPage: React.FC = () => {
               <Route path="/plays/:position/:type" element={<PlaysStats />} />
               <Route path="/debuts/:position/:type" element={<DebutsStats />} />
               <Route path="/points/:type" element={<PointsStats />} />
-              <Route path="/times_at_top_by_artist/:rank/:type" element={<TimesAtTopByArtistStats />} />
+              <Route
+                path="/times_at_top_by_artist/:rank/:type"
+                element={<TimesAtTopByArtistStats />}
+              />
               <Route path="/debuts_at_one_by_artist/:type" element={<DebutsAtOneByArtistStats />} />
+              <Route
+                path="/longest_consecutive_at_one/:type"
+                element={<LongestConsecutiveAtOneStats />}
+              />
+              <Route
+                path="/most_simultaneous_by_artist/:type"
+                element={<MostSimultaneousByArtistStats />}
+              />
+              <Route path="/most_sales/:type" element={<MostSalesStats />} />
+              <Route path="/weeks_to_number_one/:type" element={<WeeksToNumberOneStats />} />
             </Routes>
           </Suspense>
         </Box>

@@ -105,7 +105,7 @@
       "showDroppedItemsLabel": "Show dropouts",
       "showDroppedItems_description": "Display artists/albums/tracks that were in previous week but dropped out",
       "droppedItemsLabel": "Dropouts ({{count}})",
-        "share": {
+      "share": {
         "title": "Share",
         "shareChartTitle": "Share chart",
         "preview": "Preview",
@@ -568,7 +568,8 @@
         "peakOnly": "Peak only",
         "showImages": "Show images",
         "showArtistColumn": "Separate artist column",
-        "tableSize": "Table size",
+        "containerSize": "Container size",
+        "fontSize": "Font size",
         "small": "Small",
         "medium": "Medium",
         "large": "Large",
@@ -682,6 +683,47 @@
           "artistDesc": "Artist (Z-A)"
         }
       },
+      "longestConsecutiveAtOne": {
+        "title": "Most Consecutive Weeks at #1",
+        "description": "Items with the longest consecutive runs at #1",
+        "columns": {
+          "rank": "#",
+          "image": "Image",
+          "title": "Title",
+          "longest": "Longest sequence",
+          "startWeek": "Start week",
+          "endWeek": "End week"
+        },
+        "sort": {
+          "longestDesc": "Longest (high to low)",
+          "longestAsc": "Longest (low to high)",
+          "nameAsc": "Name (A-Z)",
+          "nameDesc": "Name (Z-A)",
+          "artistAsc": "Artist (A-Z)",
+          "artistDesc": "Artist (Z-A)",
+          "startWeekDesc": "Start week (newest first)",
+          "startWeekAsc": "Start week (oldest first)",
+          "endWeekDesc": "End week (newest first)",
+          "endWeekAsc": "End week (oldest first)"
+        }
+      },
+      "weeksToNumberOne": {
+        "title": "Most Weeks Until Reaching #1",
+        "description": "Items that took the longest time (in weeks) from first appearance to first reach #1",
+        "columns": {
+          "weeksToOne": "Weeks to #1",
+          "firstWeek": "First week",
+          "weekReachedOne": "Week reached #1"
+        },
+        "sort": {
+          "weeksDesc": "Weeks (high to low)",
+          "weeksAsc": "Weeks (low to high)",
+          "firstWeekDesc": "First week (newest first)",
+          "firstWeekAsc": "First week (oldest first)",
+          "weekReachedOneDesc": "Week reached #1 (newest first)",
+          "weekReachedOneAsc": "Week reached #1 (oldest first)"
+        }
+      },
       "plays": {
         "title": "Most Plays in a Week",
         "titleArtist": "Most Plays in a Week - Artists",
@@ -770,6 +812,24 @@
           "artistDesc": "Artist (Z-A)"
         }
       },
+      "mostSales": {
+        "title": "Most Sales",
+        "description": "Top 100 tracks from Last.fm combined with stability points to estimate sales. Filtered to the user's top 100 tracks.",
+        "columns": {
+          "plays": "Plays",
+          "points": "Points",
+          "sales": "Sales"
+        },
+        "sort": {
+          "salesDesc": "Sales (high to low)",
+          "salesAsc": "Sales (low to high)",
+          "playsDesc": "Plays (high to low)",
+          "pointsDesc": "Points (high to low)"
+        },
+        "tooltip": {
+          "top100": "This table is built from the user's top 100 tracks on Last.fm; only those 100 tracks are considered."
+        }
+      },
       "timesAtTopByArtist": {
         "title": "Artists with Most #{{n}}s",
         "titleAlbum": "Artists with Most Albums at #{{n}}",
@@ -806,6 +866,22 @@
           "itemsDesc": "Debuts count"
         },
         "noData": "No debuts found"
+      },
+      "mostSimultaneousByArtist": {
+        "title": "Artists with Most Simultaneous Tracks",
+        "description": "Artists with the largest number of distinct tracks appearing in the same week",
+        "columns": {
+          "simultaneous": "Simultaneous",
+          "simultaneousTracks": "Simultaneous Tracks",
+          "simultaneousAlbums": "Simultaneous Albums",
+          "sampleWeek": "Sample week",
+          "weeks": "Weeks"
+        },
+        "sort": {
+          "simultaneousDesc": "Simultaneous (high to low)",
+          "simultaneousAsc": "Simultaneous (low to high)",
+          "weeksDesc": "Weeks (high to low)"
+        }
       },
       "loading": "Loading statistics...",
       "noData": "No data available",

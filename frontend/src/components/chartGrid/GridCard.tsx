@@ -1,7 +1,20 @@
 import React from 'react';
-import { Card, Text, Badge, Box, ActionIcon, Group, useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import {
+  Card,
+  Text,
+  Badge,
+  Box,
+  ActionIcon,
+  Group,
+  useMantineTheme,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { getCardBackgroundByMode, getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import {
+  getCardBackgroundByMode,
+  getSecondaryCardBackgroundByMode,
+  type ThemeMode,
+} from '../../theme/modes';
 import { IconPlus } from '@tabler/icons-react';
 import type { ChartData } from '../../db/indexedDb';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
@@ -19,7 +32,7 @@ export interface GridCardProps {
   showPeak: boolean;
   showPlays: boolean;
   showTotalWeeks: boolean;
-  scaleSize: (s: 'xs'|'sm'|'md'|'lg'|'xl') => 'xs'|'sm'|'md'|'lg'|'xl';
+  scaleSize: (s: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   onOpenModal: (row: ChartData) => void;
   imageForceUpdate: number | undefined;
   lastImageUrl?: string | null;
@@ -30,10 +43,12 @@ export interface GridCardProps {
   // Optional corner overlay
   cornerOverlay?: React.ReactNode;
   // Stats area
-  stats: {
-    peak?: { position?: number | null; weeksAtPeak?: number | null } | null;
-    totals?: { withinCutoff?: number | null } | null;
-  } | undefined;
+  stats:
+    | {
+        peak?: { position?: number | null; weeksAtPeak?: number | null } | null;
+        totals?: { withinCutoff?: number | null } | null;
+      }
+    | undefined;
   showPeakCount: boolean;
   isDropped?: boolean;
   badgeStylesRank: BadgeStyleConfig;
@@ -89,31 +104,59 @@ export const GridCard: React.FC<GridCardProps> = ({
   };
 
   // Dropped items styling: smaller sizes and transparent background
-  const droppedScaleSize = (s: 'xs'|'sm'|'md'|'lg'|'xl'): 'xs'|'sm'|'md'|'lg'|'xl' => {
+  const droppedScaleSize = (
+    s: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  ): 'xs' | 'sm' | 'md' | 'lg' | 'xl' => {
     if (!isDropped) return scaleSize(s);
-    const sizeMap: Record<string, 'xs'|'sm'|'md'|'lg'|'xl'> = {
-      'xl': 'md',
-      'lg': 'sm',
-      'md': 'xs',
-      'sm': 'xs',
-      'xs': 'xs',
+    const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
+      xl: 'md',
+      lg: 'sm',
+      md: 'xs',
+      sm: 'xs',
+      xs: 'xs',
     };
     return sizeMap[scaleSize(s)];
   };
 
-  const cardBackground = isDropped ? getSecondaryCardBackgroundByMode(theme, themeMode) : getCardBackgroundByMode(theme, themeMode);
+  const cardBackground = isDropped
+    ? getSecondaryCardBackgroundByMode(theme, themeMode)
+    : getCardBackgroundByMode(theme, themeMode);
   const rankBadgeSize = isDropped ? 'lg' : 'xl';
   const rankBadgeFontSize = isDropped ? 24 : 32;
   const rankBadgeMinWidth = isDropped ? 32 : 40;
   const isTransparentRankBadge = badgeStylesRank.variant === 'transparent';
-  const rankBadgeVariant = isTransparentRankBadge ? 'filled' : (badgeStylesRank.variant === 'outline' ? 'outline' : badgeStylesRank.variant);
+  const rankBadgeVariant = isTransparentRankBadge
+    ? 'filled'
+    : badgeStylesRank.variant === 'outline'
+    ? 'outline'
+    : badgeStylesRank.variant;
   const frostedBackground = getFrostedBackground();
   const rankBadgeColor = row.rank === 1 ? 'lazuli' : deltaColor;
   const opacity = isDropped ? 0 : 1;
 
   return (
-  <Card shadow="sm" radius="md" p={0} style={{ height: '100%', display: 'flex', flexDirection: 'column', background: cardBackground }}>
-      <Box style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'transparent', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
+    <Card
+      shadow="sm"
+      radius="md"
+      p={0}
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: cardBackground,
+      }}
+    >
+      <Box
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '1/1',
+          background: 'transparent',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-start',
+        }}
+      >
         {rankVariationLocation === 'corner' && cornerOverlay}
         <ActionIcon
           size="sm"
@@ -142,21 +185,31 @@ export const GridCard: React.FC<GridCardProps> = ({
             borderTopLeftRadius: 0,
             borderBottomRightRadius: 0,
             borderBottomLeftRadius: 0,
-            ...(isTransparentRankBadge ? {
-              background: frostedBackground,
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              color: theme.white,
-              '@supports not (backdropFilter: blur(8px))': {
-                background: frostedBackground.replace(/0\.\d+\)$/, '0.95)')
-              }
-            } : {
-              backdropFilter: undefined,
-              WebkitBackdropFilter: undefined,
-            })
+            ...(isTransparentRankBadge
+              ? {
+                  background: frostedBackground,
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  color: theme.white,
+                  '@supports not (backdropFilter: blur(8px))': {
+                    background: frostedBackground.replace(/0\.\d+\)$/, '0.95)'),
+                  },
+                }
+              : {
+                  backdropFilter: undefined,
+                  WebkitBackdropFilter: undefined,
+                }),
           }}
         >
-          <Box component="span" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
+          <Box
+            component="span"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              lineHeight: 1,
+            }}
+          >
             <span>{row.rank}</span>
             {rankVariationLocation === 'under' ? renderUnderRankVariation(deltaValue) : null}
           </Box>
@@ -180,25 +233,73 @@ export const GridCard: React.FC<GridCardProps> = ({
           />
         )}
       </Box>
-      <Box px="sm" py={8} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 64 }}>
-        <Text fw={600} size={droppedScaleSize('md')} className="entity-name" lineClamp={2} style={{ width: '100%', textAlign: 'center' }}>{row.name}</Text>
-        {row.artistName && <Text size={droppedScaleSize('sm')} c="dimmed" lineClamp={1} style={{ width: '100%', textAlign: 'center' }}>{row.artistName}</Text>}
+      <Box
+        px="sm"
+        py={8}
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 64,
+        }}
+      >
+        <Text
+          fw={600}
+          size={droppedScaleSize('md')}
+          className="entity-name"
+          lineClamp={2}
+          style={{ width: '100%', textAlign: 'center' }}
+        >
+          {row.name}
+        </Text>
+        {row.artistName && (
+          <Text
+            size={droppedScaleSize('sm')}
+            c="dimmed"
+            lineClamp={1}
+            style={{ width: '100%', textAlign: 'center' }}
+          >
+            {row.artistName}
+          </Text>
+        )}
       </Box>
       {(showPlays || showPeak || showTotalWeeks) && (
-        <Group px="sm" pb="sm" style={{ minHeight: 36, width: '100%', justifyContent: 'space-between', gap: 4, display: 'flex' }}>
+        <Group
+          px="sm"
+          pb="sm"
+          style={{
+            minHeight: 36,
+            width: '100%',
+            justifyContent: 'space-between',
+            gap: 4,
+            display: 'flex',
+          }}
+        >
           {showPeak && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={droppedScaleSize('xs')} c="dimmed">{t('charts.peak')}</Text>
+              <Text size={droppedScaleSize('xs')} c="dimmed">
+                {t('charts.peak')}
+              </Text>
               {(() => {
                 const display = stats?.peak?.position ?? undefined;
                 const hasStats = !!stats;
                 const liveCount = stats?.peak?.weeksAtPeak;
-                const renderedCountAtOne = display === 1
-                  ? (hasStats ? Math.max(1, (liveCount as number) ?? 1) : 1)
-                  : null;
+                const renderedCountAtOne =
+                  display === 1 ? (hasStats ? Math.max(1, (liveCount as number) ?? 1) : 1) : null;
                 return (
-                  <Text fw={600} size={droppedScaleSize('sm')} className={display === 1 ? 'peak' : undefined} style={{ transition: 'color 120ms ease' }}>
-                    {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                  <Text
+                    fw={600}
+                    size={droppedScaleSize('sm')}
+                    className={display === 1 ? 'peak' : undefined}
+                    style={{ transition: 'color 120ms ease' }}
+                  >
+                    {display != null ? (
+                      display
+                    ) : (
+                      <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>
+                    )}
                     {showPeakCount && display === 1 && renderedCountAtOne != null && (
                       <span
                         style={{
@@ -217,20 +318,36 @@ export const GridCard: React.FC<GridCardProps> = ({
           )}
           {showPlays && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={droppedScaleSize('xs')} tt="capitalize" c="dimmed">{showFormulaInsteadOfPlays && formulaName ? formulaName : 'Plays'}</Text>
+              <Text size={droppedScaleSize('xs')} tt="capitalize" c="dimmed">
+                {showFormulaInsteadOfPlays && formulaName ? formulaName : 'Plays'}
+              </Text>
               <Text fw={600} size={droppedScaleSize('sm')}>
-                {formatNumber((showFormulaInsteadOfPlays && formulaValue != null ? Math.floor(formulaValue) : row.plays) as any)}
+                {formatNumber(
+                  (showFormulaInsteadOfPlays && formulaValue != null
+                    ? Math.floor(formulaValue)
+                    : row.plays) as any
+                )}
               </Text>
             </Box>
           )}
           {showTotalWeeks && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
-              <Text size={droppedScaleSize('xs')} c="dimmed">{t('charts.weeks')}</Text>
+              <Text size={droppedScaleSize('xs')} c="dimmed">
+                {t('charts.weeks')}
+              </Text>
               {(() => {
                 const display = stats?.totals?.withinCutoff ?? undefined;
                 return (
-                  <Text fw={600} size={droppedScaleSize('sm')} style={{ transition: 'color 120ms ease' }}>
-                    {display != null ? display : <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>}
+                  <Text
+                    fw={600}
+                    size={droppedScaleSize('sm')}
+                    style={{ transition: 'color 120ms ease' }}
+                  >
+                    {display != null ? (
+                      display
+                    ) : (
+                      <span style={{ opacity: 0, display: 'inline-block', minWidth: 10 }}>0</span>
+                    )}
                   </Text>
                 );
               })()}

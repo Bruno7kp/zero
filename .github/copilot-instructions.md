@@ -75,307 +75,139 @@ ZeroCharts is a full-stack web application for creating and tracking personalize
    docker compose exec app php artisan migrate --force
    ```
 
-5. **Access the application**:
-   - Backend API: http://localhost:8081/api
-   - Frontend dev: http://localhost:5173
-   - Nginx proxy: http://localhost:8088
-
-### Environment Variables
-
-**Backend** (`backend/.env`):
-- `APP_URL`: Should include port 8081 in dev (e.g., http://localhost:8081)
-- `DB_CONNECTION=mysql`, `DB_HOST=db`, `DB_DATABASE=zerocharts_db`
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`
-- `QUEUE_CONNECTION=database`
-- `SESSION_DRIVER=database`
-
-**Frontend** (`frontend/.env`):
-- `VITE_API_BASE_URL=http://localhost:8081/api`
-- `VITE_GOOGLE_CLIENT_ID`: Google OAuth client ID
-
-## Coding Standards
-
-### Backend (Laravel/PHP)
-
-- Follow Laravel conventions and PSR-12 standards
-- Use Laravel Pint for code formatting (future: enable in CI)
-- Controllers in `app/Http/Controllers`
-- Models in `app/Models`
-- API routes in `routes/api.php`
-- Migrations in `database/migrations`
-- Tests in `tests/` (PHPUnit)
-- Use type hints and return types
-- Use dependency injection via constructor
-
-### Frontend (React/TypeScript)
-
-- Use TypeScript for all new code
-- Follow React hooks patterns (functional components)
-- Components in `src/components/`
-- Pages in `src/pages/`
-- Redux slices in `src/store/`
-- Database logic in `src/db/` (Dexie)
-- Utilities in `src/utils/`
-- Hooks in `src/hooks/`
-- Translations in `src/locales/`
-
-**TypeScript Rules**:
-- `@typescript-eslint/no-explicit-any`: Currently disabled (temporary)
-- Unused vars ignored if prefixed with `_`
-- `prefer-const`: warning (not error)
-
-**React Patterns**:
-- Use functional components with hooks
-- Use Redux Toolkit for global state
-- Use Mantine components for UI
-- Use i18next for translations
-
-### File Organization
-
-- Keep business logic separate from UI components
-- Use service/helper functions for reusable code
-- Database migrations should be idempotent
-- Always increment Dexie version when changing schema
-
-## Building and Testing
-
-### Backend
-
-**Install dependencies**:
-```bash
-cd backend
-composer install
-```
-
-**Run tests**:
-```bash
-cd backend
-php artisan test
-# Or with Docker:
-docker compose exec app php artisan test
-```
-
-**Lint** (currently disabled in CI, can be enabled with Laravel Pint):
-```bash
-cd backend
-./vendor/bin/pint
-```
-
-**Key artisan commands**:
-- `php artisan migrate` - Run migrations
-- `php artisan tinker` - Laravel REPL
-- `php artisan config:cache` - Cache configuration
-- `php artisan route:cache` - Cache routes
-- `php artisan queue:work` - Process queue jobs
-
-### Frontend
-
-**Install dependencies**:
-```bash
-cd frontend
-npm ci
-```
-
-**Development server**:
-```bash
-cd frontend
-npm run dev
-```
+## GitHub Copilot / AI Agent Instructions — ZeroCharts (concise)
+
+Purpose: help AI contributors be productive quickly by listing the repo's architecture, local workflows, and project-specific conventions.
+
+- Monorepo: `backend/` (Laravel 12, PHP 8.2+), `frontend/` (React 19 + Vite + TypeScript), `docker/` and top-level compose files. Key entrypoints: `backend/routes/api.php`, `frontend/src/main.tsx`.
+
+- Local dev quick commands (preferred):
+   - Start services: `docker compose up -d --build` (dev compose: `docker-compose.yml`).
+   - Backend tests (local): `docker compose exec app php artisan test` or locally `cd backend && php artisan test`.
+   - Frontend dev: `cd frontend && npm ci && npm run dev` (port 5173). Backend API: http://localhost:8081/api. Nginx proxy: http://localhost:8088.
+
+- Where to look first:
+   - API routes and controllers: `backend/routes/api.php`, `backend/app/Http/Controllers/`.
+   - Domain models: `backend/app/Models/` (e.g. `Chart.php`, `User.php`).
+   - Frontend pages: `frontend/src/pages/` (stats pages like `DebutsAtOneByArtistStats.tsx` show patterns for hooks, Mantine UI, and Spotify image usage).
+   - Frontend data layer: `frontend/src/db/` (Dexie migrations), `frontend/src/store/` (Redux slices), `frontend/src/services/` (API wrappers like `SpotifyApi`).
+
+- Project-specific conventions (do not invent alternatives):
+   - Frontend: TypeScript-only; hooks + functional components; Mantine for UI; Redux Toolkit for global state. Follow existing slice patterns in `src/store/` and Dexie versioning in `src/db/` when changing schema.
+   - Backend: follow Laravel conventions (routes → controllers → models). Use dependency injection and keep logic out of controllers when possible.
+   - IndexedDB: any schema change must increment the Dexie DB version and include migration transforms under `frontend/src/db/`.
+
+   - Code comments and inline documentation: write comments in English. UI strings and translations must continue to use the `frontend/src/locales/*` files (en/pt). This helps cross-team readability and tooling that processes comments or generates docs.
+
+- Integration points & important env vars:
+   - Google OAuth: backend `.env` keys `GOOGLE_CLIENT_ID`/`SECRET` and callback URL.
+   - Frontend: `VITE_API_BASE_URL` (default `http://localhost:8081/api`) and `VITE_GOOGLE_CLIENT_ID`.
+   - Spotify helpers reference credentials in `frontend/src/services/SpotifyApi` (`SPOTIFY_TOKEN`, `SPOTIFY_SECRET`).
+
+   - Sales calculation (standardized):
+      - Sales (the "formula" used across the app) is defined as a linear combination of two measures:
+         - Plays (from Last.fm or cached playcount) multiplied by a plays weight.
+         - Stability points: per-week value derived from rank (101 - rank, minimum 0) summed across all weeks for the entity, multiplied by a points weight.
+      - Canonical formula: sales = plays * playsWeight + stabilityPoints * pointsWeight.
+      - Chart-level weights are stored on the chart model/config and accessed as `music_plays_weight` / `music_points_weight` (or album variants). Use those values when computing sales or certifications.
+      - Implementation notes for contributors/AI:
+         1. When asked to compute "sales" or certificates, always state explicitly which weights you used and whether plays came from Last.fm (user playcount) or from local week data.
+         2. For stats that rely on the user's Top 100 (or other Last.fm endpoints), compute plays from Last.fm first (with caching) and then join with the chart stabilityPoints computed from `charts_data` (IndexedDB). If a track has no match in `charts_data`, use stabilityPoints = 0 and annotate the row.
+         3. Prefer using `calculateWeekFormulaValue` / `computeCertification` (in `frontend/src/utils/certification.ts`) for weekly formula logic and `getPointsAccumulators` (in `frontend/src/utils/statsQueries.ts`) for aggregated stability points per entity.
+         4. Document clearly in UI tooltips when a stat is limited to Last.fm Top N (e.g., Top 100) so users understand the filter.
+
+            5. Artist-level sales handling:
+                - When computing sales for `chartType === 'artist'`, use the same formula and weight fields as albums (i.e. `album_plays_weight` and `album_points_weight`) unless explicit `artist_*` weights are provided on the chart. This ensures consistency across entity types even when artists do not have dedicated certification thresholds.
+                - Compute stability points for artists the same way (sum of max(0, 101 - rank) across relevant weeks for the artist chart rows).
+                - Always return a numeric sales value for artists. If the chart does not define certification thresholds for artists (gold/platinum/diamond), report the sales number and set the certification level to `none` (do not fail).
+                - In UI/tooling and in AI responses, explicitly state that artist sales used the album-formula weights and whether certification thresholds existed; if thresholds are missing, note that certification was not applied.
+
+- Small contract for common changes:
+   - Add API endpoint: edit `backend/routes/api.php` → new controller in `backend/app/Http/Controllers/` → add tests in `backend/tests/Feature/` → run `php artisan test`.
+   - Add frontend page: add component in `frontend/src/pages/` → register route in router (check `main.tsx`) → add translations in `frontend/src/locales/` → follow Mantine patterns used by other pages.
+
+- Tests & CI: backend tests run with SQLite in CI; frontend CI runs lint + build (build includes type-check). Run tests locally before opening PRs.
+
+- Edge cases for AI code changes:
+   - Don't change Dexie schema without a migration and version bump — this will break clients.
+   - Keep API route shapes stable for the frontend; if changing response shapes, update frontend services and add an adapter where needed.
+   - When touching authentication/session behavior, prefer small, reversible changes and add tests.
+
+If anything here is unclear or you want deeper examples (controller + test, Dexie migration example, or an example PR), tell me which area to expand and I'll add a focused snippet and test.
+
+### Dexie migrations, traduções e armazenamento (importante)
+
+- Migração Dexie (IndexedDB): sempre que alterar o schema em `frontend/src/db/` incremente a versão do banco e adicione um bloco de migração. Exemplo padrão:
+   1. Atualize a inicialização do DB: `db.version(X).stores({...})` onde X é um inteiro maior.
+   2. Use `db.version(X).upgrade(async tx => { /* transformar dados existentes */ })` para mover/transformar registros.
+   3. Teste localmente abrindo o devtools -> Application -> IndexedDB para validar que os dados migraram.
+
+- Traduções (`frontend/src/locales/en.json` e `frontend/src/locales/pt.json`):
+   - Sempre crie chaves correspondentes nas duas línguas ao adicionar textos novos. Exemplo:
+      - em `en.json`: "stats.newFeature.title": "My new stat"
+      - em `pt.json`: "stats.newFeature.title": "Minha nova estatística"
+   - Procure por padrões nos arquivos existentes (namespaces como `stats.`) e reutilize chaves quando fizer sentido.
+   - Atualize componentes usando `t('stats.newFeature.title')` (veja `frontend/src/pages/` para exemplos como `DebutsAtOneByArtistStats.tsx`).
+
+- Onde os dados ficam armazenados:
+   - IndexedDB (via Dexie): principal armazenamento para dados de charts, stats e semanas. Código em `frontend/src/db/` (tabelas principais como `charts_data`, `charts_stats`, `chart_weeks`).
+   - localStorage: usado para preferências leves (ver `frontend/src/hooks/useStatsPreferences`) e chaves de UI persistente. Verifique o hook citado para confirmar quais chaves são salvas.
+   - Sempre considere a coerência: ao alterar formato de dados em IndexedDB, forneça transformação na migração para evitar divergência com o estado em localStorage.
+
+   - Uso centralizado do localStorage (IMPORTANTE):
+      - Não adicione chamadas diretas a `localStorage` em novos arquivos. Este repositório possui uma camada de abstração e um registro canônico de chaves para evitar chaves duplicadas e problemas de formato.
+      - Arquivos importantes:
+         - `frontend/src/utils/storage.ts` — helper central para leitura/gravação segura (JSON, fallback, remoção).
+         - `frontend/src/constants/storageKeys.ts` — registro único de chaves usadas no app (versões e mapeamento de chaves legadas).
+      - Como adicionar uma nova chave persistida (passos mínimos):
+         1. Adicione uma entrada em `storageKeys.ts` com nome claro e versão (ex.: `MY_FEATURE_PREFERENCES: 'zc.myFeature:v1'`).
+         2. No código, importe o helper e o key: `import storage from 'src/utils/storage'; import { MY_FEATURE_PREFERENCES } from 'src/constants/storageKeys';` e use `storage.getJson(MY_FEATURE_PREFERENCES)` / `storage.setJson(MY_FEATURE_PREFERENCES, value)`.
+         3. Se estiver migrando uma chave antiga, adicione o mapeamento em `LEGACY_KEYS` dentro de `storageKeys.ts` e trate a migração no helper ou num bloco de startup apropriado.
+         4. Adicione um teste/unitário simples (ou verifica manualmente) que confirma leitura/escrita e formato esperado.
+      - Motivo: centralizar evita colisões de nomes, facilita mudanças de formato (versão) e mantém compatibilidade com migrações do cliente.
+
+Esses pontos são críticos — alterar o schema do Dexie sem migração ou esquecer de adicionar chaves de tradução causa regressões facilmente.
+
+   ### Recent frontend changes (Oct 2025)
+
+   - Renomeação de preferência: `tableSize` foi renomeado para `fontSize` — atualize traduções e consumidores quando tocar na UI relacionada a tabelas/grades.
+   - Nova preferência `containerSize`: opções suportadas `md`, `lg`, `xl`, `100%` (padrão: `xl`). A opção de "container size" foi escondida na UI para dispositivos móveis e o layout é forçado para `100%` em mobile.
+   - Persistência consolidada: várias preferências de UI (incluindo `statsPreferences`, `libraryFilters`, e as preferências de listas de semanas) foram migradas para Redux Toolkit + `redux-persist`. O código **não** depende mais de leituras ad-hoc de `localStorage` para essas preferências — prefira os slices e selectors em `frontend/src/store/`.
+   - Colunas/visualização: a persistência das configurações de colunas foi centralizada no slice `columns` — componentes não escrevem mais diretamente em `localStorage`.
+   - Formatação e ferramentas: adicionamos `.editorconfig`, uma configuração do Prettier em `frontend/.prettierrc` e um script `format` no `frontend/package.json` para padronizar o estilo. No backend há um script `composer format` que executa o Pint.
+
+   Nota rápida para agents: se você estiver escrevendo código que acessa preferências persistidas, leia/reutilize os slices existentes (ex.: `statsPreferences`, `columns`) e evite adicionar leituras diretas a `localStorage`. Para dados grandes/historicamente persistidos (charts, semanas) continue usando IndexedDB/Dexie e siga o fluxo de migração descrito acima.
 
-**Build for production**:
-```bash
-cd frontend
-npm run build
-```
+   ### Commit messages — Gitflow + Conventional Commits
 
-**Lint**:
-```bash
-cd frontend
-npm run lint
-```
+   Estamos usando o modelo de branches Gitflow na equipe. Para manter histórico consistente e facilitar leitura/automação, peça ao gerador de mensagens de commit (ou escreva manualmente) para seguir um formato baseado em Conventional Commits combinado com o prefixo do branch.
 
-**Type checking** (done during build):
-```bash
-cd frontend
-npm run build
-```
+   Regras rápidas:
+   - Cabeçalho: `<type>(<scope>): <short summary>` — mantenha <= 72 caracteres.
+   - `type` sugerido (mapa de branch → type):
+      - `feature/*` → `feat`
+      - `hotfix/*` ou `bugfix/*` → `fix`
+      - `release/*` → `chore` (ou `release` quando aplicável)
+      - `docs/*` → `docs`
+      - `refactor/*` → `refactor`
+      - `test/*` → `test`
+      - `ci/*` → `ci`
+      - `build/*` → `build`
+      - `style/*` → `style`
 
-## CI/CD Pipeline
+   Exemplos:
+   - feat(stats): persist sidebar collapsed state  (branch: `feature/stats-persist-collapsed`)
+   - fix(api): return 404 when chart not found           (branch: `hotfix/api-chart-404`)
+   - chore(release): bump backend to 1.2.0               (branch: `release/1.2.0`)
 
-### Workflow (`.github/workflows/ci.yml`)
+   Corpo (opcional): detalhe o que foi feito e por quê. Use bullets quando útil.
 
-Triggers on push to `main` and `refactor` branches, and on pull requests to `main`.
+   Footer (opcional): referências a issues/tickets. Ex.: `Refs: ISSUE_ID` ou `Closes: ISSUE_ID`.
 
-**Jobs**:
-1. **backend-tests**: Runs PHP tests with SQLite
-2. **frontend-build**: Runs lint and build
-3. **docker-images**: Builds and pushes Docker images to ghcr.io
+   Diretivas para geradores/AI:
+   - Gere a mensagem em português ou inglês conforme o idioma do PR, mas mantenha o cabeçalho curto e em inglês quando possível (padrão do repo é inglês nas chaves).
+   - Inclua o escopo quando claro (`stats`, `charts`, `api`, `frontend`, `backend`).
+   - Use o tipo que corresponde ao branch atual — o gerador deve inspecionar o nome do branch e mapear para o `type` correto.
+   - Garanta o imperativo no resumo (por ex. "persist" em vez de "persisted"/"persisting").
 
-### Branch Strategy
-
-- `main`: Production branch - stable, approved code only
-  - Generates Docker tags: `:main`, `:sha-<short>`, and `:latest` (when it's the default branch)
-- `refactor`: Staging/integration branch
-  - Generates Docker tags: `:refactor`, `:sha-<short>`
-- Feature branches: Create PRs to `refactor` for staging, then to `main` for production
-
-### Docker Images
-
-Two images are built and pushed to GitHub Container Registry:
-- `ghcr.io/{owner}/{repo}-backend`: PHP-FPM backend
-- `ghcr.io/{owner}/{repo}-web`: Nginx + built frontend SPA
-
-The actual image names are dynamically determined from the repository owner and name.
-
-## API Structure
-
-### Key Endpoints
-
-- `/api/auth/google` - OAuth login
-- `/api/auth/google/callback` - OAuth callback
-- `/api/health` - Health check endpoint
-- All API routes defined in `backend/routes/api.php`
-
-### Authentication
-
-- Uses Laravel Sanctum for API token authentication
-- Google OAuth via Laravel Socialite
-- Sessions stored in database
-
-## Database
-
-### Backend (Laravel)
-
-- MySQL 8.0 in production/development
-- SQLite for testing
-- Migrations in `database/migrations`
-- Seeders in `database/seeders`
-
-### Frontend (IndexedDB)
-
-- Dexie wrapper for IndexedDB
-- Stores chart data, stats, and week status
-- Tables: `charts_data`, `charts_stats`, `chart_weeks`
-- Week status: `complete` or `partial`
-- Schema migrations handled via Dexie version upgrades
-
-## Key Features
-
-### Charts System
-
-- Weekly chart synchronization with Last.fm
-- Track, album, and artist charts
-- Delta calculations (rank and plays changes)
-- NEW/RE (re-entry) detection
-- Peak tracking and consecutive week counts
-- Configurable certification system (Gold/Platinum/Diamond)
-
-### Offline Support
-
-- IndexedDB caching for offline access
-- Partial/complete week tracking
-- Local statistics calculation
-- Sync status indicators
-
-### Internationalization
-
-- English (en) and Portuguese (pt) supported
-- i18next for translations
-- Language detection from browser
-- Translation files in `frontend/src/locales/`
-
-## Common Tasks
-
-### Adding a New API Endpoint
-
-1. Add route in `backend/routes/api.php`
-2. Create controller method in `backend/app/Http/Controllers`
-3. Add request validation if needed
-4. Update tests in `backend/tests/`
-
-### Adding a New Frontend Page
-
-1. Create page component in `frontend/src/pages/`
-2. Add route in main router configuration
-3. Add translations in `frontend/src/locales/en.json` and `pt.json`
-4. Import and use Mantine components for UI
-
-### Database Changes
-
-**Backend**:
-1. Create migration: `php artisan make:migration <name>`
-2. Write up/down methods
-3. Run migration: `php artisan migrate`
-
-**Frontend (IndexedDB)**:
-1. Update `frontend/src/db/` schema
-2. Increment Dexie version
-3. Add migration transformation if needed
-
-## Deployment
-
-### Production Checklist
-
-**Backend**:
-- Set `APP_ENV=production`
-- Set `APP_DEBUG=false`
-- Configure `APP_URL` to production domain
-- Generate `APP_KEY` if new instance
-- Run `php artisan migrate --force`
-- Cache config: `php artisan config:cache route:cache view:cache`
-- Setup queue worker: `php artisan queue:work --tries=3` (adjust retry count as needed)
-
-**Frontend**:
-- Set `VITE_API_BASE_URL` to production API URL (or `/api` if same domain)
-- Build: `npm run build`
-- Serve `dist/` via nginx or CDN
-
-### Docker Compose
-
-Production: `docker-compose.prod.yml`
-Development: `docker-compose.yml`
-
-## Security
-
-- Never commit `.env` files or secrets
-- Google OAuth credentials must be configured in Google Console
-- Callback URL must match `GOOGLE_CALLBACK_URL` in backend `.env`
-- Use HTTPS in production
-- Keep dependencies updated
-
-## Contributing
-
-- Follow existing code style and conventions
-- Run linters before committing
-- Write tests for new features
-- Update documentation if needed
-- Create PRs to `refactor` branch first for staging
-
-## Troubleshooting
-
-### Docker Issues
-
-- If containers don't start: `docker compose down -v && docker compose up -d --build`
-- Check logs: `docker compose logs -f <service>`
-- Rebuild specific service: `docker compose up -d --build <service>`
-
-### Backend Issues
-
-- Clear cache: `php artisan cache:clear config:clear route:clear view:clear`
-- Reset database: `php artisan migrate:fresh`
-- Check logs: `storage/logs/laravel.log`
-
-### Frontend Issues
-
-- Clear node_modules: `rm -rf node_modules package-lock.json && npm install`
-- Clear browser cache and IndexedDB
-- Check browser console for errors
-
-## Additional Notes
-
-- The project uses port 8081 for backend API in development
-- Nginx proxy on port 8088 serves both backend and frontend in Docker setup
-- Frontend Vite dev server runs on port 5173
-- Database password and other secrets should be configured in `.env` files
-- CI runs on both `main` and `refactor` branches
-- Use `--no-pager` with git commands to avoid hanging in scripts
+   Se quiser, posso adicionar um gancho de `commit-msg` (husky + commitlint) e um `commitizen` adapter para forçar esse padrão automaticamente — diga se quer que eu coloque isso no repositório.

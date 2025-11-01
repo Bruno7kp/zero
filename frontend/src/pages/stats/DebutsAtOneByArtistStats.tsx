@@ -1,10 +1,10 @@
 // Artists with most debuts at #1 stats
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Stack, 
-  Text, 
-  Loader, 
+import {
+  Stack,
+  Text,
+  Loader,
   Center,
   Card,
   Avatar,
@@ -13,7 +13,7 @@ import {
   Pagination,
   Flex,
   Select,
-  Box
+  Box,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -34,17 +34,10 @@ const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
     artist: artistName,
     type: 'artist',
     clientId: SPOTIFY_TOKEN,
-    clientSecret: SPOTIFY_SECRET
+    clientSecret: SPOTIFY_SECRET,
   });
-  
-  return (
-    <Avatar 
-      src={imageUrl} 
-      alt={artistName}
-      size={40}
-      radius="md"
-    />
-  );
+
+  return <Avatar src={imageUrl} alt={artistName} size={40} radius="md" />;
 };
 
 const DebutsAtOneByArtistStats: React.FC = () => {
@@ -52,10 +45,12 @@ const DebutsAtOneByArtistStats: React.FC = () => {
   const { type: typeParam } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<Array<{
-    artistName: string;
-    itemsCount: number;
-  }>>([]);
+  const [data, setData] = useState<
+    Array<{
+      artistName: string;
+      itemsCount: number;
+    }>
+  >([]);
   const [year, setYear] = useState('all');
   const [type, setType] = useState<'album' | 'track'>((typeParam as 'album' | 'track') || 'track');
   const [rank, setRank] = useState(1);
@@ -76,7 +71,7 @@ const DebutsAtOneByArtistStats: React.FC = () => {
     if (!chart) return 100;
     const cutoffMap: any = {
       album: chart.album_cutoff || 100,
-      track: chart.music_cutoff || 100
+      track: chart.music_cutoff || 100,
     };
     return cutoffMap[chartType] || 100;
   };
@@ -102,7 +97,7 @@ const DebutsAtOneByArtistStats: React.FC = () => {
           chartId: String(chart.id),
           chartType: type,
           rank,
-          year: year === 'all' ? undefined : year
+          year: year === 'all' ? undefined : year,
         });
         setData(results);
       } catch (error) {
@@ -129,11 +124,9 @@ const DebutsAtOneByArtistStats: React.FC = () => {
   // Filter data by search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery.trim()) return data;
-    
+
     const query = searchQuery.toLowerCase();
-    return data.filter(item => 
-      item.artistName.toLowerCase().includes(query)
-    );
+    return data.filter(item => item.artistName.toLowerCase().includes(query));
   }, [data, searchQuery]);
 
   // Sort data (already sorted by items count)
@@ -154,9 +147,7 @@ const DebutsAtOneByArtistStats: React.FC = () => {
 
   // Sort options
   const sortOptions = React.useMemo(() => {
-    return [
-      { value: 'items', label: t('stats.debutsAtOneByArtist.sort.itemsDesc') },
-    ];
+    return [{ value: 'items', label: t('stats.debutsAtOneByArtist.sort.itemsDesc') }];
   }, [t]);
 
   if (!chart) {
@@ -178,30 +169,32 @@ const DebutsAtOneByArtistStats: React.FC = () => {
         type={type}
         onTypeChange={handleTypeChange}
         showImages={preferences.showImages}
-        onToggleImages={(value) => updatePreference('showImages', value)}
-        tableSize={preferences.tableSize}
-        onTableSizeChange={(value) => updatePreference('tableSize', value)}
+        onToggleImages={value => updatePreference('showImages', value)}
+        containerSize={preferences.containerSize}
+        onContainerSizeChange={value => updatePreference('containerSize', value)}
+        fontSize={preferences.fontSize}
+        onFontSizeChange={value => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
         showSalesToggle={false}
         hideArtistType={true}
         pageSize={preferences.pageSize}
-        onPageSizeChange={(value) => updatePreference('pageSize', value)}
+        onPageSizeChange={value => updatePreference('pageSize', value)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
-        onSortChange={(value) => setSortBy(value as 'items')}
+        onSortChange={value => setSortBy(value as 'items')}
         sortOptions={sortOptions}
         customFilters={
           <Select
             value={String(rank)}
-            onChange={(value) => {
+            onChange={value => {
               if (value) {
                 handleRankChange(Number(value));
               }
             }}
             data={Array.from({ length: cutoff }, (_, i) => ({
               value: String(i + 1),
-              label: `Top ${i + 1}`
+              label: `Top ${i + 1}`,
             }))}
             style={{ minWidth: 120 }}
             leftSection={<IconArrowBarUp size={16} />}
@@ -221,51 +214,84 @@ const DebutsAtOneByArtistStats: React.FC = () => {
       ) : (
         <Card withBorder style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
           <ScrollArea>
-              <Table highlightOnHover>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>#</Table.Th>
-                    <Table.Th>{t('stats.debutsAtOneByArtist.columns.artist')}</Table.Th>
-                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('stats.debutsAtOneByArtist.columns.debuts', { type: typeLabel })}</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {paginatedData.map((record, index) => {
-                    const displayRank = (page - 1) * preferences.pageSize + index + 1;
-                    
-                    return (
-                      <Table.Tr key={record.artistName}>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>{displayRank}</Text>
-                        </Table.Td>
-                        <Table.Td style={{ verticalAlign: 'middle' }}>
-                          <Flex gap="sm" wrap="nowrap" align="center">
-                            {preferences.showImages && <ImageCell artistName={record.artistName} />}
-                            <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} className="entity-name" size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>
-                                {record.artistName}
-                              </Text>
-                            </Box>
-                          </Flex>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text size={preferences.tableSize === 'xs' ? 'sm' : preferences.tableSize === 'md' ? 'lg' : 'md'}>
-                            {record.itemsCount}
-                          </Text>
-                        </Table.Td>
-                      </Table.Tr>
-                    );
-                  })}
-                </Table.Tbody>
-              </Table>
-            </ScrollArea>
+            <Table highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    #
+                  </Table.Th>
+                  <Table.Th>{t('stats.debutsAtOneByArtist.columns.artist')}</Table.Th>
+                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {t('stats.debutsAtOneByArtist.columns.debuts', { type: typeLabel })}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {paginatedData.map((record, index) => {
+                  const displayRank = (page - 1) * preferences.pageSize + index + 1;
+
+                  return (
+                    <Table.Tr key={record.artistName}>
+                      <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <Text
+                          size={
+                            preferences.fontSize === 'xs'
+                              ? 'sm'
+                              : preferences.fontSize === 'md'
+                              ? 'lg'
+                              : 'md'
+                          }
+                        >
+                          {displayRank}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td style={{ verticalAlign: 'middle' }}>
+                        <Flex gap="sm" wrap="nowrap" align="center">
+                          {preferences.showImages && <ImageCell artistName={record.artistName} />}
+                          <Box style={{ flex: 1, minWidth: 0 }}>
+                            <Text
+                              fw={600}
+                              lineClamp={1}
+                              className="entity-name"
+                              size={
+                                preferences.fontSize === 'xs'
+                                  ? 'sm'
+                                  : preferences.fontSize === 'md'
+                                  ? 'lg'
+                                  : 'md'
+                              }
+                            >
+                              {record.artistName}
+                            </Text>
+                          </Box>
+                        </Flex>
+                      </Table.Td>
+                      <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <Text
+                          size={
+                            preferences.fontSize === 'xs'
+                              ? 'sm'
+                              : preferences.fontSize === 'md'
+                              ? 'lg'
+                              : 'md'
+                          }
+                        >
+                          {record.itemsCount}
+                        </Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  );
+                })}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
           {sortedData.length > preferences.pageSize && (
             <Box mt="md" style={{ display: 'flex', justifyContent: 'center' }}>
-              <Pagination 
-                total={Math.ceil(sortedData.length / preferences.pageSize)} 
-                value={page} 
-                onChange={setPage} 
-                size="sm" 
+              <Pagination
+                total={Math.ceil(sortedData.length / preferences.pageSize)}
+                value={page}
+                onChange={setPage}
+                size="sm"
               />
             </Box>
           )}

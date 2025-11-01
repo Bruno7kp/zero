@@ -1,0 +1,46 @@
+export const KEYS = {
+  STATS_PREFERENCES: 'zc.stats-preferences:v1',
+  LIBRARY_TYPE: 'zc.library.type:v1',
+  LIBRARY_VIEW_MODE: 'zc.library.viewMode:v1',
+  LIBRARY_ITEMS_PER_PAGE: 'zc.library.itemsPerPage:v1',
+  LIBRARY_SEARCH: 'zc.library.search:v1',
+  LIBRARY_BADGE_STYLE: 'zc.library.badgeStyle:v1',
+  LIBRARY_VISIBLE_COLUMNS: 'zc.library.visibleColumns:v1',
+  LIBRARY_SHOW_GRID_PLAYS: 'zc.library.showGridPlays:v1',
+  LIBRARY_SHOW_GRID_PEAK: 'zc.library.showGridPeak:v1',
+  LIBRARY_SHOW_GRID_POSITION: 'zc.library.showGridPosition:v1',
+  USER_TOKEN: 'zc.user-token:v1',
+  CHARTS_WEEKS_VIEW_MODE: 'zc.chartsWeeks.viewMode:v1',
+  CHARTS_WEEKS_TYPE_FILTER: 'zc.chartsWeeks.typeFilter:v1',
+  CHART_WEEK_VIEW: 'zc.chartWeek.view:v1',
+  LIVE_VARIATION: 'zc.live.showVariation:v1',
+  CHARTS_WEEKS_ITEMS_PER_PAGE: 'zc.chartsWeeks.itemsPerPage:v1',
+  CHARTS_WEEKS_BADGE_STYLE: 'zc.chartsWeeks.badgeStyle:v1',
+  USER_DATA: 'zc.user-data:v1',
+  I18NEXT_LANG: 'zc.i18nextLng:v1',
+};
+
+// Legacy keys used previously in the codebase. Use as fallbacks when migrating.
+export const LEGACY_KEYS = {
+  STATS_PREFERENCES: 'stats-preferences',
+  LIBRARY_TYPE: 'libraryType',
+  LIBRARY_VIEW_MODE: 'libraryViewMode',
+  LIBRARY_ITEMS_PER_PAGE: 'libraryItemsPerPage',
+  LIBRARY_SEARCH: 'librarySearch',
+  LIBRARY_BADGE_STYLE: 'libraryBadgeStyle',
+  LIBRARY_VISIBLE_COLUMNS: 'libraryVisibleColumns',
+  LIBRARY_SHOW_GRID_PLAYS: 'libraryShowGridPlays',
+  LIBRARY_SHOW_GRID_PEAK: 'libraryShowGridPeak',
+  LIBRARY_SHOW_GRID_POSITION: 'libraryShowGridPosition',
+  USER_TOKEN: 'user-token',
+  CHARTS_WEEKS_VIEW_MODE: 'chartsWeeksViewMode',
+  CHARTS_WEEKS_TYPE_FILTER: 'chartsWeeksTypeFilter',
+  CHART_WEEK_VIEW: 'chartWeekView',
+  LIVE_VARIATION: 'live_showVariation',
+  CHARTS_WEEKS_ITEMS_PER_PAGE: 'chartsWeeksItemsPerPage',
+  CHARTS_WEEKS_BADGE_STYLE: 'chartsWeeksBadgeStyle',
+  USER_DATA: 'user-data',
+  I18NEXT_LANG: 'i18nextLng',
+};
+
+export default KEYS;
