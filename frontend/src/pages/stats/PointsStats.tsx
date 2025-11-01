@@ -171,8 +171,8 @@ const PointsStats: React.FC = () => {
       { value: 'weeks-asc', label: t('stats.points.sort.weeksAsc') },
       //{ value: 'position-desc', label: t('stats.points.sort.positionDesc') },
       //{ value: 'position-asc', label: t('stats.points.sort.positionAsc') },
-      { value: 'name-asc', label: t('stats.points.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.points.sort.nameDesc') },
+      // { value: 'name-asc', label: t('stats.points.sort.nameAsc') },
+      // { value: 'name-desc', label: t('stats.points.sort.nameDesc') },
       ...(type !== 'artist' && preferences.showArtistColumn
         ? [
             { value: 'artist-asc', label: t('stats.points.sort.artistAsc') },

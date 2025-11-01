@@ -201,8 +201,8 @@ const TimesAtRankStats: React.FC = () => {
       { value: 'times-asc', label: t('stats.timesAtRank.sort.timesAsc') },
       //{ value: 'position-desc', label: t('stats.timesAtRank.sort.positionDesc') },
       //{ value: 'position-asc', label: t('stats.timesAtRank.sort.positionAsc') },
-      { value: 'name-asc', label: t('stats.timesAtRank.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.timesAtRank.sort.nameDesc') },
+      // { value: 'name-asc', label: t('stats.timesAtRank.sort.nameAsc') },
+      // { value: 'name-desc', label: t('stats.timesAtRank.sort.nameDesc') },
       ...(type !== 'artist' && preferences.showArtistColumn
         ? [
             { value: 'artist-asc', label: t('stats.timesAtRank.sort.artistAsc') },

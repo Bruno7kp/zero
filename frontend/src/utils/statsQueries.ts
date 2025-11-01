@@ -616,12 +616,8 @@ export async function getWeeksToFirstNumberOne(filters: StatsFilters): Promise<
     .where('[chartId+chartType]')
     .equals([filters.chartId, filters.chartType]);
 
-  let data = await query.toArray();
-
-  // Filter by year if specified (we only consider appearances within that year range)
-  if (filters.year && filters.year !== 'all') {
-    data = data.filter(item => item.week.startsWith(filters.year!));
-  }
+  const data = await query.toArray();
+  const targetYear = filters.year && filters.year !== 'all' ? filters.year : null;
 
   // Group all weeks per entity (chronological)
   const byEntity = new Map<
@@ -651,21 +647,21 @@ export async function getWeeksToFirstNumberOne(filters: StatsFilters): Promise<
     if (weeksSorted.length === 0) continue;
 
     const firstWeek = weeksSorted[0].week;
-    // find first week where rank === 1
-    const firstOne = weeksSorted.find(w => w.rank === 1);
-    if (!firstOne) continue; // never reached #1
+    const indexOne = weeksSorted.findIndex(w => w.rank === 1);
+    if (indexOne === -1) continue; // never reached #1
+
+    const weekReachedOne = weeksSorted[indexOne].week;
+    if (targetYear && !weekReachedOne.startsWith(targetYear)) continue;
 
     // weeksToFirstNumberOne = index(firstOne) - index(firstWeek)
-    const indexFirst = 0; // firstWeek index is 0 after sorting
-    const indexOne = weeksSorted.findIndex(w => w.rank === 1);
-    const weeksToFirstNumberOne = Math.max(0, indexOne - indexFirst);
+    const weeksToFirstNumberOne = Math.max(0, indexOne);
 
     results.push({
       entityId,
       name: info.name,
       artistName: info.artistName,
       firstWeek,
-      weekReachedOne: firstOne.week,
+      weekReachedOne,
       weeksToFirstNumberOne,
     });
   }

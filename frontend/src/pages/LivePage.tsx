@@ -44,7 +44,7 @@ const LivePage = () => {
   const [chartData, setChartData] = useState<LiveRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [chartType, setChartType] = useState<string>('artist');
+  const [chartType, setChartType] = useState<string>('track');
   const [chartName, setChartName] = useState<string>('');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');

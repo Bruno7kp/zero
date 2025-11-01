@@ -568,6 +568,8 @@
         "peakOnly": "Apenas picos",
         "showImages": "Mostrar imagens",
         "showArtistColumn": "Coluna de artista separada",
+        "showWeekColumn": "Mostrar número da semana",
+        "showPositionColumn": "Mostrar posição no chart",
         "containerSize": "Tamanho do container",
         "fontSize": "Tamanho da fonte",
         "small": "Pequeno",

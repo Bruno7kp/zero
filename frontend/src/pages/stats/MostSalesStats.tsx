@@ -62,6 +62,10 @@ const MostSalesStats: React.FC = () => {
   const chart = charts.find((c: any) => c.id === activeChartId);
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
+  const primaryTextSize =
+    preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md';
+  const secondaryTextSize =
+    preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm';
 
   useEffect(() => {
     if (!chart) return;
@@ -367,7 +371,7 @@ const MostSalesStats: React.FC = () => {
                 {paginatedData.length === 0 ? (
                   <Table.Tr>
                     <Table.Td colSpan={1 + 1 + (artistColumnVisible ? 1 : 0) + 3}>
-                      <Text ta="center" py="xl">
+                      <Text ta="center" py="xl" size={primaryTextSize}>
                         {t('stats.noData')}
                       </Text>
                     </Table.Td>
@@ -379,37 +383,17 @@ const MostSalesStats: React.FC = () => {
                     return (
                       <Table.Tr key={rowKey}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {displayRank}
+                          <Text size={primaryTextSize}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td>
                           <Flex gap="sm" align="center">
                             {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text
-                                fw={600}
-                                lineClamp={1}
-                                size={
-                                  preferences.fontSize === 'xs'
-                                    ? 'sm'
-                                    : preferences.fontSize === 'md'
-                                    ? 'lg'
-                                    : 'md'
-                                }
-                              >
+                              <Text fw={600} lineClamp={1} size={primaryTextSize}>
                                 {record.name}
                               </Text>
                               {!artistColumnVisible && type !== 'artist' && record.artist && (
-                                <Text
-                                  c="dimmed"
-                                  size={
-                                    preferences.fontSize === 'xs'
-                                      ? 'xs'
-                                      : preferences.fontSize === 'md'
-                                      ? 'md'
-                                      : 'sm'
-                                  }
-                                  lineClamp={1}
-                                >
+                                <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
                                   {record.artist}
                                 </Text>
                               )}
@@ -418,17 +402,25 @@ const MostSalesStats: React.FC = () => {
                         </Table.Td>
                         {artistColumnVisible && (
                           <Table.Td>
-                            <Text lineClamp={1}>{record.artist}</Text>
+                            <Text lineClamp={1} size={primaryTextSize}>
+                              {record.artist}
+                            </Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'right' }}>
-                          {numFmt.format(Math.round(record.plays))}
+                          <Text size={primaryTextSize}>
+                            {numFmt.format(Math.round(record.plays))}
+                          </Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'right' }}>
-                          {numFmt.format(Math.round(record.points))}
+                          <Text size={primaryTextSize}>
+                            {numFmt.format(Math.round(record.points))}
+                          </Text>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'right' }}>
-                          {numFmt.format(Math.round(record.sales))}
+                          <Text size={primaryTextSize}>
+                            {numFmt.format(Math.round(record.sales))}
+                          </Text>
                         </Table.Td>
                       </Table.Tr>
                     );

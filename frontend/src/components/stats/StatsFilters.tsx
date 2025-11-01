@@ -41,6 +41,10 @@ export interface StatsFiltersProps {
   onToggleImages?: (value: boolean) => void;
   showArtistColumn?: boolean;
   onToggleArtistColumn?: (value: boolean) => void;
+  showWeekColumn?: boolean;
+  onToggleWeekColumn?: (value: boolean) => void;
+  showPositionColumn?: boolean;
+  onTogglePositionColumn?: (value: boolean) => void;
   fontSize?: 'xs' | 'sm' | 'md';
   onFontSizeChange?: (value: 'xs' | 'sm' | 'md') => void;
   containerSize?: '100%' | 'md' | 'lg' | 'xl';
@@ -52,6 +56,8 @@ export interface StatsFiltersProps {
   showPeakOnlyToggle?: boolean;
   showImageToggle?: boolean;
   showArtistColumnToggle?: boolean;
+  showWeekColumnToggle?: boolean;
+  showPositionColumnToggle?: boolean;
   showFontSizeToggle?: boolean;
   showContainerSizeToggle?: boolean;
   cutoff?: number;
@@ -83,6 +89,10 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   onToggleImages,
   showArtistColumn,
   onToggleArtistColumn,
+  showWeekColumn,
+  onToggleWeekColumn,
+  showPositionColumn,
+  onTogglePositionColumn,
   containerSize,
   onContainerSizeChange,
   fontSize,
@@ -94,6 +104,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   showPeakOnlyToggle = false,
   showImageToggle = true,
   showArtistColumnToggle = true,
+  showWeekColumnToggle = true,
+  showPositionColumnToggle = true,
   cutoff = 100,
   customFilters,
   allowAllPosition = false,
@@ -111,6 +123,62 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const showContainer = showContainerSizeToggle && !isMobile;
+
+  const typeControl =
+    showTypeFilter && type && onTypeChange ? (
+      <SegmentedControl
+        value={type}
+        withItemsBorders={false}
+        onChange={onTypeChange}
+        data={
+          hideArtistType
+            ? [
+                {
+                  label: (
+                    <Center>
+                      <IconDisc size={18} />
+                    </Center>
+                  ),
+                  value: 'album',
+                },
+                {
+                  label: (
+                    <Center>
+                      <IconMusic size={18} />
+                    </Center>
+                  ),
+                  value: 'track',
+                },
+              ]
+            : [
+                {
+                  label: (
+                    <Center>
+                      <IconMicrophone size={18} />
+                    </Center>
+                  ),
+                  value: 'artist',
+                },
+                {
+                  label: (
+                    <Center>
+                      <IconDisc size={18} />
+                    </Center>
+                  ),
+                  value: 'album',
+                },
+                {
+                  label: (
+                    <Center>
+                      <IconMusic size={18} />
+                    </Center>
+                  ),
+                  value: 'track',
+                },
+              ]
+        }
+      />
+    ) : null;
 
   // Generate year options
   const yearOptions = React.useMemo(() => {
@@ -130,7 +198,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   }, [sortOptions]);
 
   return (
-    <Flex direction="column" gap="md" mb="md">
+    <Flex direction="column" gap="md" mb="xs">
       {/* First row - Year (left), Type (center), Items per page + Settings (right) */}
       <Flex gap="md" wrap="wrap" justify="space-between" align="center">
         {/* Left - Year */}
@@ -141,63 +209,6 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
           data={yearOptions}
           style={{ minWidth: 150, flex: '0 0 auto' }}
         />
-
-        {/* Center - Type SegmentedControl */}
-        {showTypeFilter && type && onTypeChange && (
-          <SegmentedControl
-            value={type}
-            withItemsBorders={false}
-            onChange={onTypeChange}
-            data={
-              hideArtistType
-                ? [
-                    {
-                      label: (
-                        <Center>
-                          <IconDisc size={18} />
-                        </Center>
-                      ),
-                      value: 'album',
-                    },
-                    {
-                      label: (
-                        <Center>
-                          <IconMusic size={18} />
-                        </Center>
-                      ),
-                      value: 'track',
-                    },
-                  ]
-                : [
-                    {
-                      label: (
-                        <Center>
-                          <IconMicrophone size={18} />
-                        </Center>
-                      ),
-                      value: 'artist',
-                    },
-                    {
-                      label: (
-                        <Center>
-                          <IconDisc size={18} />
-                        </Center>
-                      ),
-                      value: 'album',
-                    },
-                    {
-                      label: (
-                        <Center>
-                          <IconMusic size={18} />
-                        </Center>
-                      ),
-                      value: 'track',
-                    },
-                  ]
-            }
-            style={{ flex: '0 0 auto' }}
-          />
-        )}
 
         {/* Right - Items per page + Settings */}
         <Group gap="xs" wrap="nowrap">
@@ -220,11 +231,15 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
             showPeakOnlyToggle ||
             showImageToggle ||
             showArtistColumnToggle ||
+            showWeekColumnToggle ||
+            showPositionColumnToggle ||
             showFontSizeToggle) &&
             (onToggleSales ||
               onTogglePeakOnly ||
               onToggleImages ||
               onToggleArtistColumn ||
+              onToggleWeekColumn ||
+              onTogglePositionColumn ||
               onFontSizeChange) && (
               <Menu shadow="md" width={300} closeOnItemClick={false}>
                 <Menu.Target>
@@ -276,6 +291,26 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
                         label={t('stats.filters.showArtistColumn')}
                         checked={showArtistColumn || false}
                         onChange={event => onToggleArtistColumn(event.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  )}
+
+                  {showWeekColumnToggle && onToggleWeekColumn && (
+                    <Menu.Item>
+                      <Checkbox
+                        label={t('stats.filters.showWeekColumn')}
+                        checked={showWeekColumn !== false}
+                        onChange={event => onToggleWeekColumn(event.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  )}
+
+                  {showPositionColumnToggle && onTogglePositionColumn && (
+                    <Menu.Item>
+                      <Checkbox
+                        label={t('stats.filters.showPositionColumn')}
+                        checked={showPositionColumn !== false}
+                        onChange={event => onTogglePositionColumn(event.currentTarget.checked)}
                       />
                     </Menu.Item>
                   )}
@@ -382,6 +417,8 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
           />
         )}
       </Group>
+
+      {typeControl && <Center>{typeControl}</Center>}
     </Flex>
   );
 };

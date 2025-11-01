@@ -5,6 +5,8 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 export interface StatsPreferences {
   showImages: boolean;
   showArtistColumn: boolean;
+  showWeekColumn: boolean;
+  showPositionColumn: boolean;
   fontSize: 'xs' | 'sm' | 'md';
   containerSize: '100%' | 'md' | 'lg' | 'xl';
   // whether the stats sidebar is collapsed (desktop)
@@ -17,6 +19,8 @@ export interface StatsPreferences {
 export const DEFAULT_PREFERENCES: StatsPreferences = {
   showImages: true,
   showArtistColumn: false,
+  showWeekColumn: true,
+  showPositionColumn: true,
   fontSize: 'sm',
   containerSize: 'xl',
   collapsed: false,

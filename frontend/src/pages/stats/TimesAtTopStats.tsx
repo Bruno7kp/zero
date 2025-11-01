@@ -179,8 +179,8 @@ const TimesAtTopStats: React.FC = () => {
       { value: 'times-asc', label: t('stats.timesAtTop.sort.timesAsc') },
       //{ value: 'position-desc', label: t('stats.timesAtTop.sort.positionDesc') },
       //{ value: 'position-asc', label: t('stats.timesAtTop.sort.positionAsc') },
-      { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
+      // { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
+      // { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
       ...(type !== 'artist' && preferences.showArtistColumn
         ? [
             { value: 'artist-asc', label: t('stats.timesAtTop.sort.artistAsc') },
