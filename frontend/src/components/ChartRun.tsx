@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Text, Button, Stack, Badge, Popover } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export interface ChartRunProps {
   run: Array<{ week: string; position: number; plays: number }>;
@@ -13,7 +13,6 @@ export interface ChartRunProps {
 export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartType }) => {
   const [openedKey, setOpenedKey] = React.useState<string | null>(null);
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const autoCloseRef = React.useRef<number | null>(null);
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -136,11 +135,6 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
             const badgeClass = `chart-run-badge ${isPeak ? 'chart-run-peak' : ''} ${
               isHighlighted ? 'chart-run-highlighted' : ''
             }`;
-            const handleNavigate = (e: React.MouseEvent) => {
-              e.stopPropagation();
-              navigate(`/charts/week/${point.week}/${routeType}`);
-              setOpenedKey(null);
-            };
             return (
               <Popover
                 key={point.week}
@@ -181,7 +175,12 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
                     <Text size="10px">
                       {point.plays} {t('charts.stats.playsLabel')}
                     </Text>
-                    <Button size="compact-xs" variant="light" onClick={handleNavigate}>
+                    <Button
+                      size="compact-xs"
+                      variant="light"
+                      component={Link}
+                      to={`/charts/week/${point.week}/${routeType}`}
+                    >
                       {t('charts.stats.showWeek')}
                     </Button>
                   </Stack>

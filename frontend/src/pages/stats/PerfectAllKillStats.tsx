@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { IconChevronRight } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import StatsFilters from '../../components/stats/StatsFilters';
@@ -46,7 +46,6 @@ const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, nam
 
 const PerfectAllKillStats: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<
     Array<{
@@ -353,7 +352,8 @@ const PerfectAllKillStats: React.FC = () => {
                           size="xs"
                           variant="light"
                           px={6}
-                          onClick={() => navigate(`/charts/week/${record.week}/artist`)}
+                          component={Link}
+                          to={`/charts/week/${record.week}/artist`}
                         >
                           <IconChevronRight size={16} />
                         </Button>

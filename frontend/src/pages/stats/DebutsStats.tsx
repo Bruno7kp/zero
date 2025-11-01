@@ -1,6 +1,6 @@
 // Best Debuts stats - ordered by playcount
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Stack,
   Loader,
@@ -524,7 +524,8 @@ const DebutsStats: React.FC = () => {
                             size="xs"
                             variant="light"
                             px={6}
-                            onClick={() => navigate(`/charts/week/${record.week}/${type}`)}
+                            component={Link}
+                            to={`/charts/week/${record.week}/${type}`}
                           >
                             <IconChevronRight size={16} />
                           </Button>

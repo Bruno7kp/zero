@@ -1,6 +1,6 @@
 // Artists with most simultaneous tracks in the same week
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import {
   Stack,
@@ -273,11 +273,8 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                               if (parsed.isValid()) {
                                 return (
                                   <Text
-                                    component="a"
-                                    onClick={() =>
-                                      navigate(`/charts/week/${record.sampleWeek}/${type}`)
-                                    }
-                                    style={{ cursor: 'pointer' }}
+                                    component={Link}
+                                    to={`/charts/week/${record.sampleWeek}/${type}`}
                                   >
                                     {parsed.format('YYYY.MM.DD')}
                                   </Text>

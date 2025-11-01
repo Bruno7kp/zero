@@ -1,7 +1,7 @@
 // Most consecutive weeks at #1
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Stack,
   Loader,
@@ -350,9 +350,8 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           {record.startWeek ? (
                             <Text
-                              component="a"
-                              onClick={() => navigate(`/charts/week/${record.startWeek}/${type}`)}
-                              style={{ cursor: 'pointer' }}
+                              component={Link}
+                              to={`/charts/week/${record.startWeek}/${type}`}
                               size={
                                 preferences.fontSize === 'xs'
                                   ? 'sm'
@@ -380,9 +379,8 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                           {record.endWeek ? (
                             <Text
-                              component="a"
-                              onClick={() => navigate(`/charts/week/${record.endWeek}/${type}`)}
-                              style={{ cursor: 'pointer' }}
+                              component={Link}
+                              to={`/charts/week/${record.endWeek}/${type}`}
                               size={
                                 preferences.fontSize === 'xs'
                                   ? 'sm'

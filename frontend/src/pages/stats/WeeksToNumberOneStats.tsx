@@ -1,6 +1,6 @@
 // Most weeks until reaching #1
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Stack,
   Loader,
@@ -300,11 +300,8 @@ const WeeksToNumberOneStats: React.FC = () => {
                               if (parsed.isValid()) {
                                 return (
                                   <Text
-                                    component="a"
-                                    onClick={() =>
-                                      navigate(`/charts/week/${record.firstWeek}/${type}`)
-                                    }
-                                    style={{ cursor: 'pointer' }}
+                                    component={Link}
+                                    to={`/charts/week/${record.firstWeek}/${type}`}
                                   >
                                     {parsed.format('YYYY.MM.DD')}
                                   </Text>
@@ -323,11 +320,8 @@ const WeeksToNumberOneStats: React.FC = () => {
                               if (parsed.isValid()) {
                                 return (
                                   <Text
-                                    component="a"
-                                    onClick={() =>
-                                      navigate(`/charts/week/${record.weekReachedOne}/${type}`)
-                                    }
-                                    style={{ cursor: 'pointer' }}
+                                    component={Link}
+                                    to={`/charts/week/${record.weekReachedOne}/${type}`}
                                   >
                                     {parsed.format('YYYY.MM.DD')}
                                   </Text>

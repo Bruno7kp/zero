@@ -1,6 +1,6 @@
 // Main stats page with sidebar and routing
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import {
   Container,
   Title,
@@ -35,6 +35,9 @@ import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
   IconSparkles,
+  IconMusicPlus,
+  IconStairsUp,
+  IconCoins,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { useStatsPreferences } from '../hooks/useStatsPreferences';
@@ -60,7 +63,6 @@ const WeeksToNumberOneStats = lazy(() => import('./stats/WeeksToNumberOneStats')
 
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
   const [opened, { toggle }] = useDisclosure(false);
   // collapsed state is persisted via stats preferences
@@ -135,7 +137,7 @@ const StatsPage: React.FC = () => {
       group: 'debuts_at_one_by_artist',
     },
     {
-      icon: IconHeadphones,
+      icon: IconMusicPlus,
       label: t('stats.mostSimultaneousByArtist.title'),
       path: '/stats/most_simultaneous_by_artist/track',
       group: 'most_simultaneous_by_artist',
@@ -147,7 +149,7 @@ const StatsPage: React.FC = () => {
       group: 'plays',
     },
     {
-      icon: IconCalendarUp,
+      icon: IconStairsUp,
       label: t('stats.weeksToNumberOne.title'),
       path: '/stats/weeks_to_number_one/track',
       group: 'weeks_to_number_one',
@@ -160,7 +162,7 @@ const StatsPage: React.FC = () => {
       group: 'pak',
     },
     {
-      icon: IconCoin,
+      icon: IconCoins,
       label: t('stats.points.title'),
       path: '/stats/points/track',
       group: 'points',
@@ -189,6 +191,12 @@ const StatsPage: React.FC = () => {
     return activeItem?.label || t('stats.title');
   };
 
+  // Get page icon based on current route
+  const getPageIcon = () => {
+    const activeItem = navItems.find(item => !item.divider && isActive(item));
+    return activeItem?.icon || IconChartBar;
+  };
+
   const { preferences, updatePreference } = useStatsPreferences();
   const isMobile = useIsMobile();
 
@@ -213,7 +221,7 @@ const StatsPage: React.FC = () => {
 
   return (
     <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
-      <CreateHeader pageTitle={getPageTitle()} icon={IconChartBar} />
+      <CreateHeader pageTitle={getPageTitle()} icon={getPageIcon()} />
 
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
@@ -256,7 +264,7 @@ const StatsPage: React.FC = () => {
               )}
             </Flex>
 
-            <ScrollArea.Autosize mah={600} type="auto">
+            <ScrollArea.Autosize mah={700} type="auto">
               <Stack gap={0}>
                 {navItems.map((item, index) =>
                   item.divider ? (
@@ -270,14 +278,11 @@ const StatsPage: React.FC = () => {
                       withArrow
                     >
                       <NavLink
+                        component={Link}
+                        to={item.path!}
                         active={isActive(item)}
                         label={collapsed ? undefined : item.label!}
                         leftSection={<item.icon size={18} />}
-                        onClick={() => {
-                          if (item.path) {
-                            navigate(item.path);
-                          }
-                        }}
                         styles={{
                           root: {
                             justifyContent: collapsed ? 'center' : 'flex-start',
@@ -308,7 +313,7 @@ const StatsPage: React.FC = () => {
               </ActionIcon>
             </Flex>
 
-            <ScrollArea.Autosize mah={600} type="auto">
+            <ScrollArea.Autosize mah={700} type="auto">
               <Stack gap={0} display={opened ? 'flex' : 'none'}>
                 {navItems.map((item, index) =>
                   item.divider ? (
@@ -316,12 +321,20 @@ const StatsPage: React.FC = () => {
                   ) : (
                     <NavLink
                       key={index}
+                      component={Link}
+                      to={item.path!}
                       active={isActive(item)}
                       label={item.label!}
                       leftSection={<item.icon size={18} />}
-                      onClick={() => {
-                        if (item.path) {
-                          navigate(item.path);
+                      onClick={e => {
+                        // Close only on regular left-click navigation; keep open for new-tab actions
+                        if (
+                          e.button === 0 &&
+                          !e.ctrlKey &&
+                          !e.metaKey &&
+                          !e.shiftKey &&
+                          !e.altKey
+                        ) {
                           toggle();
                         }
                       }}

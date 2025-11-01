@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { ChartData } from '../../db/indexedDb';
@@ -180,7 +180,7 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({
 }) => {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(weeksData.length / itemsPerPage);
-  const navigate = useNavigate();
+
   // Modal state
   const [imageModalRow, setImageModalRow] = useState<ChartData | null>(null);
   const [imageModalUrl, setImageModalUrl] = useState<string>('');
@@ -334,7 +334,8 @@ export const ChartsWeeksGridView: React.FC<ChartsWeeksGridViewProps> = ({
                       size="xs"
                       variant="light"
                       px={6}
-                      onClick={() => navigate(`/charts/week/${weekData.week}/artist`)}
+                      component={Link}
+                      to={`/charts/week/${weekData.week}/artist`}
                     >
                       <IconChevronRight size={16} />
                     </Button>

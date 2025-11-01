@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { ChartData } from '../../db/indexedDb';
 import dayjs from 'dayjs';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
@@ -93,7 +93,7 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({
   themeMode = 'dark',
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+
   const [page, setPage] = useState(1);
   const theme = useMantineTheme();
   const [imageModalRow, setImageModalRow] = useState<ChartData | null>(null);
@@ -206,9 +206,8 @@ export const ChartsWeeksTableView: React.FC<ChartsWeeksTableViewProps> = ({
                         size="xs"
                         variant="light"
                         px={6}
-                        onClick={() =>
-                          navigate(`/charts/week/${weekData.week}/${firstSelectedType}`)
-                        }
+                        component={Link}
+                        to={`/charts/week/${weekData.week}/${firstSelectedType}`}
                       >
                         <IconChevronRight size={16} />
                       </Button>

@@ -3,7 +3,7 @@ import { Grid, Text, Box, ActionIcon, Flex } from '@mantine/core';
 import { IconMicrophone, IconDisc, IconMusic, IconChevronRight } from '@tabler/icons-react';
 import { SpotifyImageWithModal } from '../../SpotifyImageWithModal';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../../services/SpotifyApi';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../../db/indexedDb';
 
@@ -31,7 +31,6 @@ export const ChartWeekCardItem: React.FC<ChartWeekCardItemProps> = React.memo(
     formulaLabel,
     chart,
   }) => {
-    const navigate = useNavigate();
     const { t } = useTranslation();
     const [plays, setPlays] = useState<number | null>(null);
     const [rank, setRank] = useState<number | null>(null);
@@ -150,7 +149,8 @@ export const ChartWeekCardItem: React.FC<ChartWeekCardItemProps> = React.memo(
         <Grid.Col span="content">
           <ActionIcon
             variant="light"
-            onClick={() => navigate(`/charts/week/${week}/${type}`)}
+            component={Link}
+            to={`/charts/week/${week}/${type}`}
             aria-label={t('charts.view')}
             size="sm"
           >
