@@ -554,7 +554,43 @@
         "title": "Statistics",
         "overview": "Overview",
         "collapse": "Collapse sidebar",
-        "expand": "Expand sidebar"
+        "expand": "Expand sidebar",
+        "viewVisualizations": "Graphs",
+        "viewTables": "Back to tables"
+      },
+      "visualizations": {
+        "sidebar": {
+          "title": "Visualizations",
+          "overview": "Graphs",
+          "timeline": "Weekly #1 timeline",
+          "rankDominance": "Dominance at #1"
+        },
+        "actions": {
+          "viewDetail": "View details"
+        },
+        "overview": {
+          "subtitle": "Quick previews of recent highlights",
+          "latestNumberOnePlays": "Latest #1s",
+          "latestNumberOnePlaysDescription": "Showing who led in the last weeks",
+          "latestNumberOneTooltip": "Last weeks at #1",
+          "rankDominance": "Leaders at #1",
+          "rankDominanceDescription": "Who spent the most weeks at #1",
+          "tipsTitle": "Tips",
+          "tipsDescription": "Use the visualizations sidebar to dive deeper. Current layout width: {{container}}"
+        },
+        "timeline": {
+          "windowLabel": "Window: last {{weeks}} weeks",
+          "axisBottom": "Week",
+          "axisLeft": "Plays",
+          "tooltipPlays": "{{value}} plays"
+        },
+        "rankLeaders": {
+          "rankLabel": "Rank threshold",
+          "limitLabel": "Show top",
+          "limitOption": "Top {{count}}",
+          "axisBottom": "Weeks at rank",
+          "tooltipWeeks": "{{count}} week(s)"
+        }
       },
       "filters": {
         "year": "Year",
