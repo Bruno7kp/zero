@@ -717,8 +717,8 @@
         },
         "sort": {
           "weeksDesc": "Semanas (maior para menor)",
-          "weeksAsc": "Semanas (menor para maior)"
-          ,"firstWeekDesc": "Primeira semana (mais recente primeiro)",
+          "weeksAsc": "Semanas (menor para maior)",
+          "firstWeekDesc": "Primeira semana (mais recente primeiro)",
           "firstWeekAsc": "Primeira semana (mais antiga primeiro)",
           "weekReachedOneDesc": "Semana que alcançou #1 (mais recente primeiro)",
           "weekReachedOneAsc": "Semana que alcançou #1 (mais antiga primeiro)"
@@ -813,12 +813,12 @@
         }
       },
       "mostSales": {
-        "title": "Mais Vendas (Top 100 por reproduções)",
+        "title": "Mais Vendas",
         "description": "Top 100 músicas do usuário no Last.fm combinado com pontos de estabilidade para estimar vendas. Filtrado apenas nas 100 músicas do usuário.",
         "columns": {
           "plays": "Reproduções",
-          "points": "Pontos de Estabilidade",
-          "sales": "Vendas Estimadas"
+          "points": "Pontos",
+          "sales": "Vendas"
         },
         "sort": {
           "salesDesc": "Vendas (maior para menor)",

@@ -272,17 +272,17 @@ const WeeksToNumberOneStats: React.FC = () => {
                               />
                             )}
                             <Box>
-                                  <Text fw={600} lineClamp={1}>
-                                    {record.name}
+                              <Text fw={600} lineClamp={1}>
+                                {record.name}
+                              </Text>
+                              {type !== 'artist' &&
+                                record.artistName &&
+                                !preferences.showArtistColumn && (
+                                  <Text c="dimmed" size="sm" lineClamp={1}>
+                                    {record.artistName}
                                   </Text>
-                                  {type !== 'artist' &&
-                                    record.artistName &&
-                                    !preferences.showArtistColumn && (
-                                      <Text c="dimmed" size="sm" lineClamp={1}>
-                                        {record.artistName}
-                                      </Text>
-                                    )}
-                                </Box>
+                                )}
+                            </Box>
                           </Flex>
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
@@ -301,7 +301,9 @@ const WeeksToNumberOneStats: React.FC = () => {
                                 return (
                                   <Text
                                     component="a"
-                                    onClick={() => navigate(`/charts/week/${record.firstWeek}/${type}`)}
+                                    onClick={() =>
+                                      navigate(`/charts/week/${record.firstWeek}/${type}`)
+                                    }
                                     style={{ cursor: 'pointer' }}
                                   >
                                     {parsed.format('YYYY.MM.DD')}
@@ -322,7 +324,9 @@ const WeeksToNumberOneStats: React.FC = () => {
                                 return (
                                   <Text
                                     component="a"
-                                    onClick={() => navigate(`/charts/week/${record.weekReachedOne}/${type}`)}
+                                    onClick={() =>
+                                      navigate(`/charts/week/${record.weekReachedOne}/${type}`)
+                                    }
                                     style={{ cursor: 'pointer' }}
                                   >
                                     {parsed.format('YYYY.MM.DD')}

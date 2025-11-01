@@ -281,6 +281,37 @@ export const getUserTopArtists = async (
   return entry;
 };
 
+// Range-based variants: fetch top items constrained to a from-to unix timestamp range (useful to request a specific year)
+export const getUserTopArtistsForRange = async (
+  username: string,
+  limit: number,
+  page: number,
+  from?: string,
+  to?: string
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:artists:${limit}:${page}:range:${from || ''}:${to || ''}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettopartists', username, from, to, {
+    limit: String(limit),
+    page: String(page),
+  });
+  const topartists = data?.topartists;
+  let items: any[] = [];
+  let total = 0;
+  if (topartists) {
+    const attr = topartists['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const artists = topartists.artist;
+    items = Array.isArray(artists) ? artists : artists ? [artists] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
+};
+
 export const getUserTopAlbums = async (
   username: string,
   limit: number,
@@ -311,6 +342,36 @@ export const getUserTopAlbums = async (
   return entry;
 };
 
+export const getUserTopAlbumsForRange = async (
+  username: string,
+  limit: number,
+  page: number,
+  from?: string,
+  to?: string
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:albums:${limit}:${page}:range:${from || ''}:${to || ''}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettopalbums', username, from, to, {
+    limit: String(limit),
+    page: String(page),
+  });
+  const topalbums = data?.topalbums;
+  let items: any[] = [];
+  let total = 0;
+  if (topalbums) {
+    const attr = topalbums['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const albums = topalbums.album;
+    items = Array.isArray(albums) ? albums : albums ? [albums] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
+};
+
 export const getUserTopTracks = async (
   username: string,
   limit: number,
@@ -326,6 +387,36 @@ export const getUserTopTracks = async (
     limit: String(limit),
     page: String(page),
     period,
+  });
+  const toptracks = data?.toptracks;
+  let items: any[] = [];
+  let total = 0;
+  if (toptracks) {
+    const attr = toptracks['@attr'];
+    total = parseInt(attr?.total || '0', 10);
+    const tracks = toptracks.track;
+    items = Array.isArray(tracks) ? tracks : tracks ? [tracks] : [];
+  }
+  const entry: TopCacheEntry = { items, total };
+  sessionStorage.setItem(key, JSON.stringify(entry));
+  return entry;
+};
+
+export const getUserTopTracksForRange = async (
+  username: string,
+  limit: number,
+  page: number,
+  from?: string,
+  to?: string
+): Promise<{ items: any[]; total: number }> => {
+  const key = `top:${username}:tracks:${limit}:${page}:range:${from || ''}:${to || ''}`;
+  const cached = sessionStorage.getItem(key);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  const data = await fetchLastFmApi('user.gettoptracks', username, from, to, {
+    limit: String(limit),
+    page: String(page),
   });
   const toptracks = data?.toptracks;
   let items: any[] = [];
