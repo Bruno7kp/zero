@@ -586,9 +586,10 @@
         },
         "rankLeaders": {
           "rankLabel": "Rank threshold",
+          "topNLabel": "Top N",
           "limitLabel": "Show top",
           "limitOption": "Top {{count}}",
-          "axisBottom": "Weeks at rank",
+          "axisBottom": "Weeks in top",
           "tooltipWeeks": "{{count}} week(s)"
         }
       },

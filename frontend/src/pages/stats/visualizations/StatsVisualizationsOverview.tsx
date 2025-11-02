@@ -20,7 +20,7 @@ import MiniBarWithImage from '../../../components/visualizations/MiniBarWithImag
 import { db } from '../../../db/indexedDb';
 import { getTimesAtRank } from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
-import { useStatsPreferences } from '../../../hooks/useStatsPreferences';
+import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
 
 const LATEST_NUMBER_ONE_COUNT = 8;
@@ -36,7 +36,7 @@ interface RankLeaderPreview {
 const StatsVisualizationsOverview: React.FC = () => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
-  const { preferences } = useStatsPreferences();
+  const { preferences } = useVisualizationPreferences();
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);

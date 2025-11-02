@@ -5,24 +5,23 @@ import {
   Loader,
   Center,
   Text,
-  Select,
-  NumberInput,
-  Flex,
   useMantineTheme,
   useComputedColorScheme,
-  Image,
-  Group,
+  RangeSlider,
+  Select,
 } from '@mantine/core';
 import { ResponsiveBar } from '@nivo/bar';
 import type { BarDatum } from '@nivo/bar';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import StatsFilters from '../../../components/stats/StatsFilters';
-import { useStatsPreferences } from '../../../hooks/useStatsPreferences';
-import { getTimesAtRank, getYearRange } from '../../../utils/statsQueries';
+import VisualizationFilters from '../../../components/stats/VisualizationFilters';
+import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
+import { getTimesInTopN, getAllWeeks, getYearRange } from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
 import { getColorForName } from '../../../utils/colorHash';
+
+import { IconArrowBarUp } from '@tabler/icons-react';
 
 interface RankLeaderDatum extends BarDatum {
   entity: string;
@@ -33,14 +32,12 @@ interface RankLeaderDatum extends BarDatum {
   barColor: string;
 }
 
-const LIMIT_OPTIONS = [5, 10, 15, 20];
-
 const TopRankLeadersChart: React.FC = () => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
   const computedColorScheme = useComputedColorScheme('dark');
   const isDark = computedColorScheme === 'dark';
-  const { preferences, updatePreference } = useStatsPreferences();
+  const { preferences, updatePreference } = useVisualizationPreferences();
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -53,10 +50,12 @@ const TopRankLeadersChart: React.FC = () => {
     null
   );
   const [type, setType] = React.useState<'track' | 'album' | 'artist'>('track');
-  const [rank, setRank] = React.useState<number>(1);
-  const [limit, setLimit] = React.useState<number>(10);
+  const [topN, setTopN] = React.useState<number>(1);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [data, setData] = React.useState<RankLeaderDatum[]>([]);
+  const [allWeeks, setAllWeeks] = React.useState<string[]>([]);
+  const [filteredWeeks, setFilteredWeeks] = React.useState<string[]>([]);
+  const [weekRange, setWeekRange] = React.useState<[number, number]>([0, 0]);
 
   const cutoff = React.useMemo(() => {
     if (!chart) return 100;
@@ -66,20 +65,35 @@ const TopRankLeadersChart: React.FC = () => {
   }, [chart, type]);
 
   React.useEffect(() => {
-    if (!chart) return;
+    if (!chart) {
+      setAllWeeks([]);
+      setYearRange(null);
+      return;
+    }
 
     let mounted = true;
 
-    const loadRange = async () => {
+    const loadMetadata = async () => {
       try {
-        const range = await getYearRange(String(chart.id), type);
-        if (mounted) setYearRange(range);
+        const [weeks, range] = await Promise.all([
+          getAllWeeks(String(chart.id), type),
+          getYearRange(String(chart.id), type),
+        ]);
+
+        if (!mounted) return;
+        const weeksList = Array.isArray(weeks) ? weeks : [];
+        setAllWeeks(weeksList);
+        setYearRange(range ?? null);
       } catch (error) {
-        console.warn('[visualizations] failed to compute year range', error);
+        console.warn('[visualizations] failed to load metadata for rank leaders', error);
+        if (mounted) {
+          setAllWeeks([]);
+          setYearRange(null);
+        }
       }
     };
 
-    loadRange();
+    loadMetadata();
 
     return () => {
       mounted = false;
@@ -87,39 +101,96 @@ const TopRankLeadersChart: React.FC = () => {
   }, [chart, type]);
 
   React.useEffect(() => {
-    if (!chart) return;
+    if (!allWeeks.length) {
+      setFilteredWeeks([]);
+      return;
+    }
+
+    const weeks =
+      year === 'all' ? allWeeks : allWeeks.filter(week => week.startsWith(String(year)));
+
+    setFilteredWeeks(prev => {
+      if (prev.length === weeks.length && prev.every((item, index) => item === weeks[index])) {
+        return prev;
+      }
+      return weeks;
+    });
+  }, [allWeeks, year]);
+
+  React.useEffect(() => {
+    if (!filteredWeeks.length) {
+      setWeekRange([0, 0]);
+      return;
+    }
+
+    setWeekRange([0, filteredWeeks.length - 1]);
+  }, [filteredWeeks]);
+
+  React.useEffect(() => {
+    if (!chart) {
+      setData([]);
+      return;
+    }
+
+    if (!filteredWeeks.length) {
+      setData([]);
+      return;
+    }
 
     let mounted = true;
 
     const loadData = async () => {
       setLoading(true);
       try {
-        const results = await getTimesAtRank({
+        const maxIndex = filteredWeeks.length - 1;
+        const startIndex = Math.min(Math.max(weekRange[0], 0), maxIndex);
+        const endIndex = Math.min(Math.max(weekRange[1], 0), maxIndex);
+        const fromIndex = Math.min(startIndex, endIndex);
+        const toIndex = Math.max(startIndex, endIndex);
+
+        const weekStart = filteredWeeks[fromIndex];
+        const weekEnd = filteredWeeks[toIndex];
+
+        const results = await getTimesInTopN({
           chartId: String(chart.id),
           chartType: type,
-          rank,
+          topN,
           year: year === 'all' ? undefined : year,
+          weekStart,
+          weekEnd,
         });
 
         if (!mounted) return;
-        const primarySlice = results.slice(0, 40);
-        const images = await fetchSpotifyImagesBatch(
-          primarySlice.map(item => ({
-            entityId: item.entityId,
-            name: item.name,
-            artistName: item.artistName,
-            type,
-          }))
-        );
 
         const normalized: RankLeaderDatum[] = results.map(item => ({
           entity: item.name,
           artistName: item.artistName ?? '',
           count: item.count,
           entityId: item.entityId,
-          imageUrl: images[item.entityId] ?? '',
+          imageUrl: '',
           barColor: getColorForName(item.artistName || item.name || item.entityId),
         }));
+
+        const primarySlice = normalized.slice(0, 100);
+        if (primarySlice.length) {
+          const images = await fetchSpotifyImagesBatch(
+            primarySlice.map(item => ({
+              entityId: item.entityId,
+              name: item.entity,
+              artistName: item.artistName,
+              type,
+            }))
+          );
+
+          if (!mounted) return;
+
+          normalized.forEach(entry => {
+            if (images[entry.entityId]) {
+              entry.imageUrl = images[entry.entityId];
+            }
+          });
+        }
+
         setData(normalized);
       } catch (error) {
         console.error('[visualizations] failed to load rank leaders', error);
@@ -134,12 +205,27 @@ const TopRankLeadersChart: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [chart, type, rank, year]);
+  }, [chart, type, topN, filteredWeeks, weekRange, year]);
 
   const limitedData = React.useMemo(
-    () => data.slice(0, limit).map(item => ({ ...item })),
-    [data, limit]
+    () =>
+      data
+        .slice(0, 50)
+        .map(item => ({ ...item }))
+        .reverse(),
+    [data]
   );
+
+  const sliderMarks = React.useMemo(() => {
+    if (filteredWeeks.length <= 1) return undefined;
+    return [
+      { value: 0, label: filteredWeeks[0] },
+      {
+        value: filteredWeeks.length - 1,
+        label: filteredWeeks[filteredWeeks.length - 1],
+      },
+    ];
+  }, [filteredWeeks]);
 
   if (!chart) {
     return (
@@ -151,59 +237,45 @@ const TopRankLeadersChart: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <StatsFilters
+      <VisualizationFilters
         year={year}
         onYearChange={setYear}
         type={type}
-        onTypeChange={value => {
-          if (value === 'album' || value === 'track' || value === 'artist') {
-            setType(value);
-          }
-        }}
-        showImages={preferences.showImages}
-        onToggleImages={value => updatePreference('showImages', value)}
+        onTypeChange={setType}
         containerSize={preferences.containerSize}
         onContainerSizeChange={value => updatePreference('containerSize', value)}
-        fontSize={preferences.fontSize}
-        onFontSizeChange={value => updatePreference('fontSize', value)}
         yearRange={yearRange || undefined}
-        showSalesToggle={false}
-        showPeakOnlyToggle={false}
-        showImageToggle={false}
-        showArtistColumnToggle={false}
-        showWeekColumnToggle={false}
-        showPositionColumnToggle={false}
-        showFontSizeToggle
-        showContainerSizeToggle
+        inlineFilters={
+          <Select
+            aria-label={t('stats.visualizations.rankLeaders.topNLabel')}
+            value={String(topN)}
+            onChange={value => {
+              if (value) setTopN(Number(value));
+            }}
+            data={Array.from({ length: cutoff }, (_, index) => ({
+              value: String(index + 1),
+              label: t('stats.visualizations.rankLeaders.limitOption', { count: index + 1 }),
+            }))}
+            leftSection={<IconArrowBarUp size={16} />}
+            searchable
+            w={140}
+          />
+        }
         customFilters={
-          <Flex gap="sm" wrap="wrap">
-            <NumberInput
-              label={t('stats.visualizations.rankLeaders.rankLabel')}
-              value={rank}
-              min={1}
-              max={cutoff}
-              onChange={value => {
-                if (typeof value === 'number' && !Number.isNaN(value)) {
-                  setRank(Math.min(Math.max(value, 1), cutoff));
-                }
-              }}
+          filteredWeeks.length > 0 ? (
+            <RangeSlider
+              label={value => filteredWeeks[Math.round(value)] || ''}
+              min={0}
+              max={Math.max(filteredWeeks.length - 1, 0)}
+              value={weekRange}
+              onChange={value => setWeekRange([Math.round(value[0]), Math.round(value[1])])}
               size="sm"
-              w={120}
+              w="100%"
+              marks={sliderMarks}
+              step={1}
+              disabled={filteredWeeks.length <= 1}
             />
-            <Select
-              label={t('stats.visualizations.rankLeaders.limitLabel')}
-              data={LIMIT_OPTIONS.map(option => ({
-                label: t('stats.visualizations.rankLeaders.limitOption', { count: option }),
-                value: String(option),
-              }))}
-              value={String(limit)}
-              onChange={value => {
-                if (value) setLimit(Number(value));
-              }}
-              size="sm"
-              w={160}
-            />
-          </Flex>
+          ) : null
         }
       />
 
@@ -222,7 +294,7 @@ const TopRankLeadersChart: React.FC = () => {
               data={limitedData}
               keys={['count']}
               indexBy="entity"
-              margin={{ top: 20, right: 20, bottom: 20, left: 180 }}
+              margin={{ top: 20, right: 60, bottom: 20, left: 180 }}
               layout="horizontal"
               padding={0.3}
               colors={({ data: datum }) =>
@@ -236,14 +308,54 @@ const TopRankLeadersChart: React.FC = () => {
                 legend: t('stats.visualizations.rankLeaders.axisBottom'),
                 legendOffset: 40,
                 legendPosition: 'middle',
+                tickValues: 5,
               }}
               axisLeft={{
                 tickSize: 0,
                 tickPadding: 6,
+                tickValues: limitedData.length > 20 ? 10 : undefined,
+                renderTick: ({ textAnchor, textBaseline, value, x, y }) => (
+                  <g transform={`translate(${x},${y})`}>
+                    <text
+                      alignmentBaseline={textBaseline as any}
+                      textAnchor={textAnchor as any}
+                      style={{
+                        fill: isDark ? theme.white : theme.black,
+                        fontSize: 12,
+                      }}
+                    >
+                      {value}
+                    </text>
+                  </g>
+                ),
               }}
-              enableLabel
-              labelTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
-              tooltip={({ indexValue, value, color }) => {
+              enableLabel={false}
+              borderRadius={6}
+              layers={[
+                'grid',
+                'axes',
+                'bars',
+                ({ bars }) => {
+                  return bars.map(bar => {
+                    const datum = limitedData.find(item => item.entity === bar.data.indexValue);
+                    if (!datum?.imageUrl) return null;
+
+                    return (
+                      <image
+                        key={`${bar.key}-image`}
+                        href={datum.imageUrl}
+                        x={bar.x + bar.width + 5}
+                        y={bar.y + bar.height / 2 - 16}
+                        width={32}
+                        height={32}
+                        style={{ borderRadius: 4 }}
+                      />
+                    );
+                  });
+                },
+                'legends',
+              ]}
+              tooltip={({ indexValue, value }) => {
                 const datum = limitedData.find(item => item.entity === indexValue);
 
                 return (
@@ -257,31 +369,17 @@ const TopRankLeadersChart: React.FC = () => {
                       minWidth: 180,
                     }}
                   >
-                    <Group gap="sm" wrap="nowrap" align="flex-start">
-                      {datum?.imageUrl ? (
-                        <Image
-                          src={datum.imageUrl}
-                          alt={String(indexValue)}
-                          width={36}
-                          height={36}
-                          radius="sm"
-                          style={{ flexShrink: 0 }}
-                        />
-                      ) : null}
-                      <div style={{ flex: 1 }}>
-                        <strong style={{ color: datum?.barColor || color }}>
-                          {String(indexValue)}
-                        </strong>
-                        {datum?.artistName && datum.artistName !== datum.entity && (
-                          <div>{datum.artistName}</div>
-                        )}
-                        <div>
-                          {t('stats.visualizations.rankLeaders.tooltipWeeks', {
-                            count: Number(value),
-                          })}
-                        </div>
-                      </div>
-                    </Group>
+                    <div>
+                      <strong>{String(indexValue)}</strong>
+                    </div>
+                    {datum?.artistName && datum.artistName !== datum.entity && (
+                      <div>{datum.artistName}</div>
+                    )}
+                    <div>
+                      {t('stats.visualizations.rankLeaders.tooltipWeeks', {
+                        count: Number(value),
+                      })}
+                    </div>
                   </div>
                 );
               }}

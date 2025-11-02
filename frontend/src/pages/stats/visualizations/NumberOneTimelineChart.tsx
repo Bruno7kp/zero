@@ -13,13 +13,13 @@ import { ResponsiveBar } from '@nivo/bar';
 import type { BarTooltipProps } from '@nivo/bar';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import StatsFilters from '../../../components/stats/StatsFilters';
+import VisualizationFilters from '../../../components/stats/VisualizationFilters';
 import { db } from '../../../db/indexedDb';
 import { getYearRange } from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
 import { getColorForName } from '../../../utils/colorHash';
-import { useStatsPreferences } from '../../../hooks/useStatsPreferences';
+import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
 
 interface NumberOneBarDatum {
   week: string;
@@ -45,7 +45,7 @@ const NumberOneTimelineChart: React.FC = () => {
   const chart = charts.find((c: any) => c.id === activeChartId);
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
   const cardBg = getCardBackgroundByMode(theme, themeMode);
-  const { preferences, updatePreference } = useStatsPreferences();
+  const { preferences, updatePreference } = useVisualizationPreferences();
 
   const [year, setYear] = React.useState<string>('all');
   const [yearRange, setYearRange] = React.useState<{ minYear: number; maxYear: number } | null>(
@@ -232,29 +232,14 @@ const NumberOneTimelineChart: React.FC = () => {
 
   return (
     <Stack gap="md">
-      <StatsFilters
+      <VisualizationFilters
         year={year}
         onYearChange={setYear}
         yearRange={yearRange || undefined}
         type={chartType}
-        onTypeChange={value => {
-          if (value === 'track' || value === 'album' || value === 'artist') {
-            setChartType(value);
-          }
-        }}
+        onTypeChange={value => setChartType(value)}
         containerSize={preferences.containerSize}
         onContainerSizeChange={value => updatePreference('containerSize', value)}
-        fontSize={preferences.fontSize}
-        onFontSizeChange={value => updatePreference('fontSize', value)}
-        showTypeFilter
-        showSalesToggle={false}
-        showPeakOnlyToggle={false}
-        showImageToggle={false}
-        showArtistColumnToggle={false}
-        showWeekColumnToggle={false}
-        showPositionColumnToggle={false}
-        showFontSizeToggle
-        showContainerSizeToggle
       />
 
       <Card withBorder p="lg" style={{ background: cardBg }}>

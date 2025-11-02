@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useDisclosure } from '@mantine/hooks';
 import { useSelector } from 'react-redux';
 import CreateHeader from '../../../components/createChart/CreateHeader';
-import { useStatsPreferences } from '../../../hooks/useStatsPreferences';
+import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 
@@ -51,7 +51,7 @@ const StatsVisualizationsPage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const theme = useMantineTheme();
-  const { preferences, updatePreference } = useStatsPreferences();
+  const { preferences, updatePreference } = useVisualizationPreferences();
   const [opened, { toggle }] = useDisclosure(false);
   const isMobile = useIsMobile();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;

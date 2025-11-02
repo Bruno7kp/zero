@@ -106,7 +106,9 @@ export async function getTimesAtRank(filters: StatsFilters & { rank: number }): 
 /**
  * Get times each entity appeared in top N positions
  */
-export async function getTimesInTopN(filters: StatsFilters & { topN: number }): Promise<
+export async function getTimesInTopN(
+  filters: StatsFilters & { topN: number; weekStart?: string; weekEnd?: string }
+): Promise<
   Array<{
     entityId: string;
     name: string;
@@ -126,6 +128,14 @@ export async function getTimesInTopN(filters: StatsFilters & { topN: number }): 
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
     data = data.filter(item => item.week.startsWith(filters.year!));
+  }
+
+  // Filter by week range if specified
+  if (filters.weekStart) {
+    data = data.filter(item => item.week >= filters.weekStart!);
+  }
+  if (filters.weekEnd) {
+    data = data.filter(item => item.week <= filters.weekEnd!);
   }
 
   const grouped = new Map<string, { name: string; artistName: string; count: number }>();

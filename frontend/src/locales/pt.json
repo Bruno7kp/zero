@@ -586,9 +586,10 @@
         },
         "rankLeaders": {
           "rankLabel": "Limite de posição",
-          "limitLabel": "Mostrar topo",
+          "topNLabel": "Top N",
+          "limitLabel": "Mostrar top",
           "limitOption": "Top {{count}}",
-          "axisBottom": "Semanas no topo",
+          "axisBottom": "Semanas no top",
           "tooltipWeeks": "{{count}} semana(s)"
         }
       },

@@ -12,6 +12,7 @@ import columnsReducer from './columnsSlice';
 import syncReducer from './syncSlice';
 import notificationsReducer from './notificationsSlice';
 import statsPreferencesReducer from './statsPreferencesSlice';
+import visualizationsPreferencesReducer from './visualizationsPreferencesSlice';
 import libraryFiltersReducer from './libraryFiltersSlice';
 import chartsWeeksReducer from './chartsWeeksSlice';
 import { persistStore, persistReducer } from 'redux-persist';
@@ -30,6 +31,7 @@ const persistConfig = {
     'badgeStyles',
     'notifications',
     'statsPreferences',
+    'visualizationsPreferences',
     'libraryFilters',
     'chartsWeeks',
   ],
@@ -45,6 +47,7 @@ const rootReducer = combineReducers({
   libraryFilters: libraryFiltersReducer,
   chartsWeeks: chartsWeeksReducer,
   statsPreferences: statsPreferencesReducer,
+  visualizationsPreferences: visualizationsPreferencesReducer,
   badgeStyles: badgeStylesReducer,
   sync: syncReducer,
   notifications: notificationsReducer,
