@@ -9,6 +9,8 @@ import {
   useComputedColorScheme,
   RangeSlider,
   Select,
+  Group,
+  ActionIcon,
 } from '@mantine/core';
 import { ResponsiveBar } from '@nivo/bar';
 import type { BarDatum } from '@nivo/bar';
@@ -21,7 +23,7 @@ import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
 import { getColorForName } from '../../../utils/colorHash';
 
-import { IconArrowBarUp } from '@tabler/icons-react';
+import { IconArrowBarUp, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 
 interface RankLeaderDatum extends BarDatum {
   entity: string;
@@ -56,6 +58,17 @@ const TopRankLeadersChart: React.FC = () => {
   const [allWeeks, setAllWeeks] = React.useState<string[]>([]);
   const [filteredWeeks, setFilteredWeeks] = React.useState<string[]>([]);
   const [weekRange, setWeekRange] = React.useState<[number, number]>([0, 0]);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
+  const playIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const isPlayingRef = React.useRef(false);
+
+  const clearPlayInterval = React.useCallback(() => {
+    if (playIntervalRef.current) {
+      clearInterval(playIntervalRef.current);
+      playIntervalRef.current = null;
+    }
+  }, []);
 
   const cutoff = React.useMemo(() => {
     if (!chart) return 100;
@@ -101,6 +114,14 @@ const TopRankLeadersChart: React.FC = () => {
   }, [chart, type]);
 
   React.useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  React.useEffect(() => {
+    setHasLoadedOnce(false);
+  }, [chart?.id, type]);
+
+  React.useEffect(() => {
     if (!allWeeks.length) {
       setFilteredWeeks([]);
       return;
@@ -120,11 +141,31 @@ const TopRankLeadersChart: React.FC = () => {
   React.useEffect(() => {
     if (!filteredWeeks.length) {
       setWeekRange([0, 0]);
+      if (isPlayingRef.current) {
+        setIsPlaying(false);
+        isPlayingRef.current = false;
+        clearPlayInterval();
+      }
       return;
     }
 
-    setWeekRange([0, filteredWeeks.length - 1]);
-  }, [filteredWeeks]);
+    setWeekRange(current => {
+      const maxIndex = Math.max(filteredWeeks.length - 1, 0);
+
+      if (current[0] === 0 && current[1] === 0 && maxIndex > 0) {
+        return [0, maxIndex];
+      }
+
+      const normalizedStart = Math.min(Math.max(Math.round(current[0]), 0), maxIndex);
+      const normalizedEnd = Math.min(Math.max(Math.round(current[1]), normalizedStart), maxIndex);
+
+      if (normalizedStart === current[0] && normalizedEnd === current[1]) {
+        return current;
+      }
+
+      return [normalizedStart, normalizedEnd];
+    });
+  }, [filteredWeeks, clearPlayInterval]);
 
   React.useEffect(() => {
     if (!chart) {
@@ -192,9 +233,13 @@ const TopRankLeadersChart: React.FC = () => {
         }
 
         setData(normalized);
+        setHasLoadedOnce(true);
       } catch (error) {
         console.error('[visualizations] failed to load rank leaders', error);
-        if (mounted) setData([]);
+        if (mounted) {
+          setData([]);
+          setHasLoadedOnce(true);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -207,6 +252,50 @@ const TopRankLeadersChart: React.FC = () => {
     };
   }, [chart, type, topN, filteredWeeks, weekRange, year]);
 
+  React.useEffect(() => {
+    if (!isPlaying || filteredWeeks.length <= 1) {
+      clearPlayInterval();
+      return;
+    }
+
+    clearPlayInterval();
+
+    playIntervalRef.current = setInterval(() => {
+      let reachedEnd = false;
+      setWeekRange(prev => {
+        const maxIndex = filteredWeeks.length - 1;
+        if (maxIndex <= 0) {
+          return [0, 0];
+        }
+
+        const startIndex = Math.min(Math.max(Math.round(prev[0]), 0), maxIndex);
+        const endIndex = Math.min(Math.max(Math.round(prev[1]), 0), maxIndex);
+
+        if (endIndex >= maxIndex) {
+          reachedEnd = true;
+          return [startIndex, maxIndex];
+        }
+
+        const nextEnd = Math.min(endIndex + 1, maxIndex);
+        return [startIndex, nextEnd];
+      });
+
+      if (reachedEnd) {
+        setIsPlaying(false);
+        isPlayingRef.current = false;
+        clearPlayInterval();
+      }
+    }, 700);
+
+    return clearPlayInterval;
+  }, [isPlaying, filteredWeeks, clearPlayInterval]);
+
+  React.useEffect(() => {
+    return () => {
+      clearPlayInterval();
+    };
+  }, [clearPlayInterval]);
+
   const limitedData = React.useMemo(
     () =>
       data
@@ -215,6 +304,42 @@ const TopRankLeadersChart: React.FC = () => {
         .reverse(),
     [data]
   );
+
+  const handleSliderChange = React.useCallback(
+    (value: [number, number]) => {
+      if (isPlaying) {
+        setIsPlaying(false);
+        clearPlayInterval();
+      }
+
+      setWeekRange([Math.round(value[0]), Math.round(value[1])]);
+    },
+    [isPlaying, clearPlayInterval]
+  );
+
+  const handleTogglePlay = React.useCallback(() => {
+    if (filteredWeeks.length <= 1) return;
+
+    if (isPlaying) {
+      setIsPlaying(false);
+      clearPlayInterval();
+      return;
+    }
+
+    setWeekRange(prev => {
+      const maxIndex = filteredWeeks.length - 1;
+      const startIndex = Math.min(Math.max(Math.round(prev[0]), 0), maxIndex);
+      const endIndex = Math.min(Math.max(Math.round(prev[1]), 0), maxIndex);
+
+      if (endIndex >= maxIndex) {
+        return [startIndex, startIndex];
+      }
+
+      return [startIndex, endIndex];
+    });
+
+    setIsPlaying(true);
+  }, [filteredWeeks.length, isPlaying, clearPlayInterval]);
 
   const sliderMarks = React.useMemo(() => {
     if (filteredWeeks.length <= 1) return undefined;
@@ -263,24 +388,40 @@ const TopRankLeadersChart: React.FC = () => {
         }
         customFilters={
           filteredWeeks.length > 0 ? (
-            <RangeSlider
-              label={value => filteredWeeks[Math.round(value)] || ''}
-              min={0}
-              max={Math.max(filteredWeeks.length - 1, 0)}
-              value={weekRange}
-              onChange={value => setWeekRange([Math.round(value[0]), Math.round(value[1])])}
-              size="sm"
-              w="100%"
-              marks={sliderMarks}
-              step={1}
-              disabled={filteredWeeks.length <= 1}
-            />
+            <Group gap="sm" align="center" wrap="nowrap">
+              <ActionIcon
+                variant="default"
+                size="lg"
+                onClick={handleTogglePlay}
+                aria-label={isPlaying ? 'Pause autoplay' : 'Play autoplay'}
+                disabled={filteredWeeks.length <= 1}
+              >
+                {isPlaying ? (
+                  <IconPlayerPauseFilled size={18} />
+                ) : (
+                  <IconPlayerPlayFilled size={18} />
+                )}
+              </ActionIcon>
+              <div style={{ flex: 1, paddingTop: 8, paddingBottom: 4 }}>
+                <RangeSlider
+                  label={value => filteredWeeks[Math.round(value)] || ''}
+                  min={0}
+                  max={Math.max(filteredWeeks.length - 1, 0)}
+                  value={weekRange}
+                  onChange={handleSliderChange}
+                  size="sm"
+                  marks={sliderMarks}
+                  step={1}
+                  disabled={filteredWeeks.length <= 1}
+                />
+              </div>
+            </Group>
           ) : null
         }
       />
 
       <Card withBorder p="lg" style={{ background: cardBg }}>
-        {loading ? (
+        {loading && !hasLoadedOnce ? (
           <Center py="xl">
             <Loader size="lg" />
           </Center>
