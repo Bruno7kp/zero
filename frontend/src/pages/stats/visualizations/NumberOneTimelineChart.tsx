@@ -133,18 +133,6 @@ const NumberOneTimelineChart: React.FC = () => {
         }
 
         if (!mounted) return;
-        let images: Record<string, string> = {};
-
-        if (entries.length) {
-          images = await fetchSpotifyImagesBatch(
-            entries.map(item => ({
-              entityId: item.entityId,
-              name: item.name,
-              artistName: item.artistName,
-              type: chartType,
-            }))
-          );
-        }
 
         const normalized: NumberOneBarDatum[] = entries.map(item => ({
           week: item.week,
@@ -152,15 +140,49 @@ const NumberOneTimelineChart: React.FC = () => {
           name: item.name,
           artistName: item.artistName,
           entityId: item.entityId,
-          imageUrl: images[item.entityId],
+          imageUrl: '',
         }));
 
-        setData(normalized);
+        setData(prev => {
+          const imageMap = new Map(prev.map(entry => [entry.entityId, entry.imageUrl]));
+          return normalized.map(entry => ({
+            ...entry,
+            imageUrl: imageMap.get(entry.entityId) ?? entry.imageUrl ?? '',
+          }));
+        });
+
+        if (mounted) setLoading(false);
+
+        if (!entries.length) {
+          return;
+        }
+
+        fetchSpotifyImagesBatch(
+          entries.map(item => ({
+            entityId: item.entityId,
+            name: item.name,
+            artistName: item.artistName,
+            type: chartType,
+          }))
+        )
+          .then(images => {
+            if (!mounted) return;
+            setData(prev =>
+              prev.map(entry => ({
+                ...entry,
+                imageUrl: images[entry.entityId] ?? entry.imageUrl,
+              }))
+            );
+          })
+          .catch(imageError => {
+            console.warn('[visualizations] failed to load number-one timeline images', imageError);
+          });
       } catch (error) {
         console.error('[visualizations] failed to load number-one timeline', error);
-        if (mounted) setData([]);
-      } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setData([]);
+          setLoading(false);
+        }
       }
     };
 
