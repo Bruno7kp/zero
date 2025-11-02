@@ -262,7 +262,7 @@ const NumberOneTimelineChart: React.FC = () => {
                 data={coloredData}
                 keys={['plays']}
                 indexBy="week"
-                margin={{ top: 60, right: 30, bottom: 90, left: 60 }}
+                margin={{ top: 60, right: 30, bottom: 60, left: 50 }}
                 padding={0.25}
                 colors={({ data: datum }) =>
                   (datum as NumberOneBarDatum).barColor ?? theme.colors.blue[6]
@@ -273,14 +273,10 @@ const NumberOneTimelineChart: React.FC = () => {
                   tickRotation: 0,
                   tickValues,
                   format: value => `${String(value).slice(5, 7)}/${String(value).slice(0, 4)}`,
-                  legend: t('stats.visualizations.timeline.axisBottom'),
-                  legendOffset: 60,
                 }}
                 axisLeft={{
                   tickSize: 0,
                   tickPadding: 10,
-                  legend: t('stats.visualizations.timeline.axisLeft'),
-                  legendOffset: -50,
                 }}
                 valueScale={{ type: 'linear' }}
                 indexScale={{ type: 'band', round: true }}
