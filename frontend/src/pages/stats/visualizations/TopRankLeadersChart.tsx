@@ -25,6 +25,8 @@ import { getColorForName } from '../../../utils/colorHash';
 
 import { IconArrowBarUp, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 
+const MAX_RANK_LABEL_LENGTH = 28;
+
 interface RankLeaderDatum extends BarDatum {
   entity: string;
   artistName: string;
@@ -62,6 +64,12 @@ const TopRankLeadersChart: React.FC = () => {
   const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false);
   const playIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const isPlayingRef = React.useRef(false);
+  const previousYearRef = React.useRef<string>('all');
+
+  const truncateLabel = (value: string) => {
+    if (value.length <= MAX_RANK_LABEL_LENGTH) return value;
+    return `${value.slice(0, Math.max(MAX_RANK_LABEL_LENGTH - 3, 1))}...`;
+  };
 
   const clearPlayInterval = React.useCallback(() => {
     if (playIntervalRef.current) {
@@ -168,6 +176,24 @@ const TopRankLeadersChart: React.FC = () => {
   }, [filteredWeeks, clearPlayInterval]);
 
   React.useEffect(() => {
+    if (!filteredWeeks.length) {
+      previousYearRef.current = year;
+      return;
+    }
+
+    if (previousYearRef.current !== year) {
+      previousYearRef.current = year;
+      const maxIndex = Math.max(filteredWeeks.length - 1, 0);
+      setWeekRange([0, maxIndex]);
+      if (isPlayingRef.current) {
+        setIsPlaying(false);
+        isPlayingRef.current = false;
+        clearPlayInterval();
+      }
+    }
+  }, [year, filteredWeeks, clearPlayInterval]);
+
+  React.useEffect(() => {
     if (!chart) {
       setData([]);
       return;
@@ -212,28 +238,39 @@ const TopRankLeadersChart: React.FC = () => {
           barColor: getColorForName(item.artistName || item.name || item.entityId),
         }));
 
+        setData(prev => {
+          const imageMap = new Map(prev.map(entry => [entry.entityId, entry.imageUrl]));
+          return normalized.map(entry => ({
+            ...entry,
+            imageUrl: imageMap.get(entry.entityId) ?? entry.imageUrl,
+          }));
+        });
+
+        setHasLoadedOnce(true);
+
         const primarySlice = normalized.slice(0, 100);
         if (primarySlice.length) {
-          const images = await fetchSpotifyImagesBatch(
+          fetchSpotifyImagesBatch(
             primarySlice.map(item => ({
               entityId: item.entityId,
               name: item.entity,
               artistName: item.artistName,
               type,
             }))
-          );
-
-          if (!mounted) return;
-
-          normalized.forEach(entry => {
-            if (images[entry.entityId]) {
-              entry.imageUrl = images[entry.entityId];
-            }
-          });
+          )
+            .then(images => {
+              if (!mounted) return;
+              setData(prev =>
+                prev.map(entry => ({
+                  ...entry,
+                  imageUrl: images[entry.entityId] ?? entry.imageUrl,
+                }))
+              );
+            })
+            .catch(imageError => {
+              console.warn('[visualizations] failed to load rank leaders images', imageError);
+            });
         }
-
-        setData(normalized);
-        setHasLoadedOnce(true);
       } catch (error) {
         console.error('[visualizations] failed to load rank leaders', error);
         if (mounted) {
@@ -453,19 +490,20 @@ const TopRankLeadersChart: React.FC = () => {
               }}
               axisLeft={{
                 tickSize: 0,
-                tickPadding: 6,
+                tickPadding: 10,
                 tickValues: limitedData.length > 20 ? 10 : undefined,
                 renderTick: ({ textAnchor, textBaseline, value, x, y }) => (
                   <g transform={`translate(${x},${y})`}>
                     <text
                       alignmentBaseline={textBaseline as any}
                       textAnchor={textAnchor as any}
+                      dx={-8}
                       style={{
                         fill: isDark ? theme.white : theme.black,
                         fontSize: 12,
                       }}
                     >
-                      {value}
+                      {truncateLabel(String(value))}
                     </text>
                   </g>
                 ),
