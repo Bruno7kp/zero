@@ -15,14 +15,20 @@ import {
   Box,
   Flex,
   Select,
+  Tooltip,
+  Button,
 } from '@mantine/core';
-import { IconArrowBarUp } from '@tabler/icons-react';
+import { IconArrowBarUp, IconChevronRight } from '@tabler/icons-react';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
-import { getArtistsWithMostSimultaneousItems, getYearRange } from '../../utils/statsQueries';
+import {
+  getArtistsWithMostSimultaneousItems,
+  getYearRange,
+  getAllWeeks,
+} from '../../utils/statsQueries';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -48,6 +54,9 @@ const MostSimultaneousByArtistStats: React.FC = () => {
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
+  const primaryTextSize =
+    preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md';
+
   useEffect(() => {
     if (!chart) return;
     const loadYearRange = async () => {
@@ -69,7 +78,12 @@ const MostSimultaneousByArtistStats: React.FC = () => {
           year,
           topN: effectiveTopN,
         });
-        setData(results);
+        const weeks = await getAllWeeks(String(chart.id), type);
+        const resultsWithWeekNumber = results.map(item => ({
+          ...item,
+          sampleWeekNumber: item.sampleWeek ? weeks.indexOf(item.sampleWeek) + 1 : null,
+        }));
+        setData(resultsWithWeekNumber);
       } catch (err) {
         console.error('Error loading most simultaneous by artist', err);
       } finally {
@@ -128,8 +142,8 @@ const MostSimultaneousByArtistStats: React.FC = () => {
         label: t('stats.mostSimultaneousByArtist.sort.simultaneousAsc'),
       },
       { value: 'weeks-desc', label: t('stats.mostSimultaneousByArtist.sort.weeksDesc') },
-      { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
+      // { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
+      // { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
     ],
     [t]
   );
@@ -181,6 +195,10 @@ const MostSimultaneousByArtistStats: React.FC = () => {
         hideArtistType={true}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={v => updatePreference('showArtistColumn', v)}
+        showWeekColumn={preferences.showWeekColumn}
+        onToggleWeekColumn={v => updatePreference('showWeekColumn', v)}
+        showPositionColumn={preferences.showPositionColumn}
+        onTogglePositionColumn={v => updatePreference('showPositionColumn', v)}
         containerSize={preferences.containerSize}
         onContainerSizeChange={v => updatePreference('containerSize', v)}
         fontSize={preferences.fontSize}
@@ -230,17 +248,27 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                       ? t('stats.mostSimultaneousByArtist.columns.simultaneousAlbums')
                       : t('stats.mostSimultaneousByArtist.columns.simultaneousTracks')}
                   </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.mostSimultaneousByArtist.columns.sampleWeek')}
-                  </Table.Th>
-                  {/* removed numeric 'weeks' column per request; keep only sampleWeek (date) */}
+                  {preferences.showWeekColumn && (
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t('common.week')}
+                    </Table.Th>
+                  )}
+                  {preferences.showWeekColumn && <Table.Th style={{ width: 1 }}></Table.Th>}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {paginatedData.length === 0 ? (
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
-                      <Text ta="center" py="xl">
+                    <Table.Td
+                      colSpan={
+                        1 + // # column
+                        1 + // artist
+                        1 + // simultaneous count
+                        (preferences.showWeekColumn ? 1 : 0) +
+                        (preferences.showWeekColumn ? 1 : 0)
+                      }
+                    >
+                      <Text ta="center" py="xl" size={primaryTextSize}>
                         {t('stats.noData')}
                       </Text>
                     </Table.Td>
@@ -248,47 +276,56 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                 ) : (
                   paginatedData.map((record: any, index) => {
                     const displayRank = (page - 1) * preferences.pageSize + index + 1;
+                    const weekStart = record.sampleWeek ? dayjs(record.sampleWeek) : null;
+                    const weekEnd = weekStart ? weekStart.add(6, 'day') : null;
+                    const dateRange =
+                      weekStart && weekStart.isValid() && weekEnd && weekEnd.isValid()
+                        ? `${weekStart.format('DD/MM/YYYY')} - ${weekEnd.format('DD/MM/YYYY')}`
+                        : undefined;
                     return (
                       <Table.Tr key={record.artistName + index}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {displayRank}
+                          <Text size={primaryTextSize}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td>
                           <Flex gap="sm" align="center">
                             {preferences.showImages && <ImageCell artistName={record.artistName} />}
-                            <Box>
-                              <Text fw={600} lineClamp={1}>
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                              <Text fw={600} lineClamp={1} size={primaryTextSize}>
                                 {record.artistName}
                               </Text>
                             </Box>
                           </Flex>
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.maxSimultaneous}</Text>
+                          <Text size={primaryTextSize}>{record.maxSimultaneous}</Text>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {record.sampleWeek ? (
-                            (() => {
-                              const parsed = dayjs(record.sampleWeek);
-                              if (parsed.isValid()) {
-                                return (
-                                  <Text
-                                    component={Link}
-                                    to={`/charts/week/${record.sampleWeek}/${type}`}
-                                  >
-                                    {parsed.format('YYYY.MM.DD')}
-                                  </Text>
-                                );
-                              }
-                              // If not a valid date (e.g., a plain week number), don't show numeric week
-                              return <Text>-</Text>;
-                            })()
-                          ) : (
-                            <Text>-</Text>
-                          )}
-                        </Table.Td>
-
-                        {/* numeric totalWeeks column removed; only sampleWeek (date) remains */}
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            {record.sampleWeek && dateRange ? (
+                              <Tooltip label={dateRange} withArrow>
+                                <Text size={primaryTextSize}>{record.sampleWeekNumber ?? '-'}</Text>
+                              </Tooltip>
+                            ) : (
+                              <Text size={primaryTextSize}>-</Text>
+                            )}
+                          </Table.Td>
+                        )}
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
+                            {record.sampleWeek ? (
+                              <Button
+                                size="xs"
+                                variant="light"
+                                px={6}
+                                component={Link}
+                                to={`/charts/week/${record.sampleWeek}/${type}`}
+                              >
+                                <IconChevronRight size={16} />
+                              </Button>
+                            ) : null}
+                          </Table.Td>
+                        )}
                       </Table.Tr>
                     );
                   })

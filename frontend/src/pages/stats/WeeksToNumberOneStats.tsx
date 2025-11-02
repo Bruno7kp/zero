@@ -12,15 +12,18 @@ import {
   Pagination,
   Box,
   Flex,
+  Avatar,
+  Tooltip,
+  Button,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
-import { Avatar } from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import StatsFilters from '../../components/stats/StatsFilters';
-import { getWeeksToFirstNumberOne, getYearRange } from '../../utils/statsQueries';
+import { getWeeksToFirstNumberOne, getYearRange, getAllWeeks } from '../../utils/statsQueries';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -44,6 +47,11 @@ const WeeksToNumberOneStats: React.FC = () => {
   const chart = charts.find((c: any) => c.id === activeChartId);
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
+
+  const primaryTextSize =
+    preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md';
+  const secondaryTextSize =
+    preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm';
 
   // Image cell component (hooks must be called in component scope)
   const ImageCell: React.FC<{ entityId: string; name: string; artist?: string }> = ({
@@ -80,8 +88,14 @@ const WeeksToNumberOneStats: React.FC = () => {
         const results = await getWeeksToFirstNumberOne({
           chartId: String(chart.id),
           chartType: type,
+          year: year === 'all' ? undefined : year,
         });
-        setData(results);
+        const weeks = await getAllWeeks(String(chart.id), type);
+        const resultsWithWeekNumber = results.map(item => ({
+          ...item,
+          weekReachedOneNumber: item.weekReachedOne ? weeks.indexOf(item.weekReachedOne) + 1 : null,
+        }));
+        setData(resultsWithWeekNumber);
       } catch (err) {
         console.error('Error loading weeks to #1 stats', err);
       } finally {
@@ -121,24 +135,6 @@ const WeeksToNumberOneStats: React.FC = () => {
         return copy.sort((a, b) => (a.artistName || '').localeCompare(b.artistName || ''));
       case 'artist-desc':
         return copy.sort((a, b) => (b.artistName || '').localeCompare(a.artistName || ''));
-      case 'firstWeek-desc':
-        return copy.sort((a, b) => {
-          const A = dayjs(a.firstWeek);
-          const B = dayjs(b.firstWeek);
-          if (!A.isValid() && !B.isValid()) return 0;
-          if (!A.isValid()) return 1;
-          if (!B.isValid()) return -1;
-          return B.valueOf() - A.valueOf();
-        });
-      case 'firstWeek-asc':
-        return copy.sort((a, b) => {
-          const A = dayjs(a.firstWeek);
-          const B = dayjs(b.firstWeek);
-          if (!A.isValid() && !B.isValid()) return 0;
-          if (!A.isValid()) return 1;
-          if (!B.isValid()) return -1;
-          return A.valueOf() - B.valueOf();
-        });
       case 'weekReachedOne-desc':
         return copy.sort((a, b) => {
           const A = dayjs(a.weekReachedOne);
@@ -173,12 +169,10 @@ const WeeksToNumberOneStats: React.FC = () => {
     () => [
       { value: 'weeks-desc', label: t('stats.weeksToNumberOne.sort.weeksDesc') },
       { value: 'weeks-asc', label: t('stats.weeksToNumberOne.sort.weeksAsc') },
-      { value: 'firstWeek-desc', label: t('stats.weeksToNumberOne.sort.firstWeekDesc') },
-      { value: 'firstWeek-asc', label: t('stats.weeksToNumberOne.sort.firstWeekAsc') },
       { value: 'weekReachedOne-desc', label: t('stats.weeksToNumberOne.sort.weekReachedOneDesc') },
       { value: 'weekReachedOne-asc', label: t('stats.weeksToNumberOne.sort.weekReachedOneAsc') },
-      { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
+      // { value: 'name-asc', label: t('stats.timesAtTop.sort.nameAsc') },
+      // { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
     ],
     [t]
   );
@@ -202,6 +196,10 @@ const WeeksToNumberOneStats: React.FC = () => {
         onToggleImages={v => updatePreference('showImages', v)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={v => updatePreference('showArtistColumn', v)}
+        showWeekColumn={preferences.showWeekColumn}
+        onToggleWeekColumn={v => updatePreference('showWeekColumn', v)}
+        showPositionColumn={preferences.showPositionColumn}
+        onTogglePositionColumn={v => updatePreference('showPositionColumn', v)}
         containerSize={preferences.containerSize}
         onContainerSizeChange={v => updatePreference('containerSize', v)}
         fontSize={preferences.fontSize}
@@ -237,19 +235,28 @@ const WeeksToNumberOneStats: React.FC = () => {
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
                     {t('stats.weeksToNumberOne.columns.weeksToOne')}
                   </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.weeksToNumberOne.columns.firstWeek')}
-                  </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.weeksToNumberOne.columns.weekReachedOne')}
-                  </Table.Th>
+                  {preferences.showWeekColumn && (
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t('stats.weeksToNumberOne.columns.weekReachedOne')}
+                    </Table.Th>
+                  )}
+                  {preferences.showWeekColumn && <Table.Th style={{ width: 1 }}></Table.Th>}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {paginatedData.length === 0 ? (
                   <Table.Tr>
-                    <Table.Td colSpan={6}>
-                      <Text ta="center" py="xl">
+                    <Table.Td
+                      colSpan={
+                        1 + // # column
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 +
+                        (preferences.showWeekColumn ? 1 : 0) +
+                        (preferences.showWeekColumn ? 1 : 0)
+                      }
+                    >
+                      <Text ta="center" py="xl" size={primaryTextSize}>
                         {t('stats.noData')}
                       </Text>
                     </Table.Td>
@@ -257,10 +264,16 @@ const WeeksToNumberOneStats: React.FC = () => {
                 ) : (
                   paginatedData.map((record: any, index) => {
                     const displayRank = (page - 1) * preferences.pageSize + index + 1;
+                    const weekStart = record.weekReachedOne ? dayjs(record.weekReachedOne) : null;
+                    const weekEnd = weekStart ? weekStart.add(6, 'day') : null;
+                    const dateRange =
+                      weekStart && weekStart.isValid() && weekEnd && weekEnd.isValid()
+                        ? `${weekStart.format('DD/MM/YYYY')} - ${weekEnd.format('DD/MM/YYYY')}`
+                        : undefined;
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {displayRank}
+                          <Text size={primaryTextSize}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td>
                           <Flex gap="sm" align="center">
@@ -271,14 +284,14 @@ const WeeksToNumberOneStats: React.FC = () => {
                                 artist={record.artistName}
                               />
                             )}
-                            <Box>
-                              <Text fw={600} lineClamp={1}>
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                              <Text fw={600} lineClamp={1} size={primaryTextSize}>
                                 {record.name}
                               </Text>
                               {type !== 'artist' &&
                                 record.artistName &&
                                 !preferences.showArtistColumn && (
-                                  <Text c="dimmed" size="sm" lineClamp={1}>
+                                  <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
                                     {record.artistName}
                                   </Text>
                                 )}
@@ -287,52 +300,40 @@ const WeeksToNumberOneStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text>{record.artistName}</Text>
+                            <Text size={primaryTextSize}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text>{record.weeksToFirstNumberOne}</Text>
+                          <Text size={primaryTextSize}>{record.weeksToFirstNumberOne}</Text>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {record.firstWeek ? (
-                            (() => {
-                              const parsed = dayjs(record.firstWeek);
-                              if (parsed.isValid()) {
-                                return (
-                                  <Text
-                                    component={Link}
-                                    to={`/charts/week/${record.firstWeek}/${type}`}
-                                  >
-                                    {parsed.format('YYYY.MM.DD')}
-                                  </Text>
-                                );
-                              }
-                              return <Text>-</Text>;
-                            })()
-                          ) : (
-                            <Text>-</Text>
-                          )}
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {record.weekReachedOne ? (
-                            (() => {
-                              const parsed = dayjs(record.weekReachedOne);
-                              if (parsed.isValid()) {
-                                return (
-                                  <Text
-                                    component={Link}
-                                    to={`/charts/week/${record.weekReachedOne}/${type}`}
-                                  >
-                                    {parsed.format('YYYY.MM.DD')}
-                                  </Text>
-                                );
-                              }
-                              return <Text>-</Text>;
-                            })()
-                          ) : (
-                            <Text>-</Text>
-                          )}
-                        </Table.Td>
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            {record.weekReachedOne && dateRange ? (
+                              <Tooltip label={dateRange} withArrow>
+                                <Text size={primaryTextSize}>
+                                  {record.weekReachedOneNumber ?? '-'}
+                                </Text>
+                              </Tooltip>
+                            ) : (
+                              <Text size={primaryTextSize}>-</Text>
+                            )}
+                          </Table.Td>
+                        )}
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
+                            {record.weekReachedOne ? (
+                              <Button
+                                size="xs"
+                                variant="light"
+                                px={6}
+                                component={Link}
+                                to={`/charts/week/${record.weekReachedOne}/${type}`}
+                              >
+                                <IconChevronRight size={16} />
+                              </Button>
+                            ) : null}
+                          </Table.Td>
+                        )}
                       </Table.Tr>
                     );
                   })

@@ -22,6 +22,9 @@ import { useTranslation } from 'react-i18next';
 
 // Lazy load StatsPage for better performance
 const StatsPage = lazy(() => import('./pages/StatsPage'));
+const StatsVisualizationsPage = lazy(
+  () => import('./pages/stats/visualizations/StatsVisualizationsPage')
+);
 
 // Componente para proteger rotas. Redireciona para o login se não estiver autenticado.
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -144,6 +147,24 @@ function App() {
           element={
             <ProtectedRoute>
               <CreateChartPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="stats/visualizations/*"
+          element={
+            <ProtectedRoute>
+              <Suspense
+                fallback={
+                  <Center style={{ height: '50vh' }}>
+                    <Flex direction="column" align="center" gap="md">
+                      <Loader size="xl" />
+                    </Flex>
+                  </Center>
+                }
+              >
+                <StatsVisualizationsPage />
+              </Suspense>
             </ProtectedRoute>
           }
         />

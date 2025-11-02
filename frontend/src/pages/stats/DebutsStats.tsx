@@ -68,6 +68,11 @@ const DebutsStats: React.FC = () => {
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
+  const primaryTextSize =
+    preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md';
+  const secondaryTextSize =
+    preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm';
+
   // Get chart cutoff for type
   const getCutoff = (chartType: string) => {
     if (!chart) return 100;
@@ -235,8 +240,8 @@ const DebutsStats: React.FC = () => {
     const baseOptions = [
       { value: 'week-desc', label: t('stats.debuts.sort.weekDesc') },
       { value: 'week-asc', label: t('stats.debuts.sort.weekAsc') },
-      { value: 'name-asc', label: t('stats.debuts.sort.nameAsc') },
-      { value: 'name-desc', label: t('stats.debuts.sort.nameDesc') },
+      // { value: 'name-asc', label: t('stats.debuts.sort.nameAsc') },
+      // { value: 'name-desc', label: t('stats.debuts.sort.nameDesc') },
     ];
 
     if (type !== 'artist' && preferences.showArtistColumn) {
@@ -286,6 +291,10 @@ const DebutsStats: React.FC = () => {
         onToggleImages={value => updatePreference('showImages', value)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={value => updatePreference('showArtistColumn', value)}
+        showWeekColumn={preferences.showWeekColumn}
+        onToggleWeekColumn={value => updatePreference('showWeekColumn', value)}
+        showPositionColumn={preferences.showPositionColumn}
+        onTogglePositionColumn={value => updatePreference('showPositionColumn', value)}
         containerSize={preferences.containerSize}
         onContainerSizeChange={value => updatePreference('containerSize', value)}
         fontSize={preferences.fontSize}
@@ -343,18 +352,22 @@ const DebutsStats: React.FC = () => {
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
                     {t('stats.debuts.columns.plays')}
                   </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.debuts.columns.position')}
-                  </Table.Th>
+                  {preferences.showPositionColumn && (
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t('stats.debuts.columns.position')}
+                    </Table.Th>
+                  )}
                   {preferences.showSales && (
                     <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
                       {t('stats.debuts.columns.sales')}
                     </Table.Th>
                   )}
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('charts.weekNumber')}
-                  </Table.Th>
-                  <Table.Th style={{ width: 1 }}></Table.Th>
+                  {preferences.showWeekColumn && (
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t('charts.weekNumber')}
+                    </Table.Th>
+                  )}
+                  {preferences.showWeekColumn && <Table.Th style={{ width: 1 }}></Table.Th>}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -362,17 +375,17 @@ const DebutsStats: React.FC = () => {
                   <Table.Tr>
                     <Table.Td
                       colSpan={
-                        1 + // rank
+                        1 + // # column
                         1 + // title
                         (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
                         1 + // plays
-                        1 + // position
+                        (preferences.showPositionColumn ? 1 : 0) +
                         (preferences.showSales ? 1 : 0) +
-                        1 + // week
-                        1 // button
+                        (preferences.showWeekColumn ? 1 : 0) +
+                        (preferences.showWeekColumn ? 1 : 0)
                       }
                     >
-                      <Text ta="center" py="xl">
+                      <Text ta="center" py="xl" size={primaryTextSize}>
                         {t('stats.noData')}
                       </Text>
                     </Table.Td>
@@ -398,17 +411,7 @@ const DebutsStats: React.FC = () => {
                     return (
                       <Table.Tr key={`${record.week}-${record.entityId}`}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {displayRank}
-                          </Text>
+                          <Text size={primaryTextSize}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
@@ -418,30 +421,14 @@ const DebutsStats: React.FC = () => {
                                 fw={600}
                                 lineClamp={1}
                                 className="entity-name"
-                                size={
-                                  preferences.fontSize === 'xs'
-                                    ? 'sm'
-                                    : preferences.fontSize === 'md'
-                                    ? 'lg'
-                                    : 'md'
-                                }
+                                size={primaryTextSize}
                               >
                                 {record.name}
                               </Text>
                               {type !== 'artist' &&
                                 record.artistName &&
                                 !preferences.showArtistColumn && (
-                                  <Text
-                                    c="dimmed"
-                                    size={
-                                      preferences.fontSize === 'xs'
-                                        ? 'xs'
-                                        : preferences.fontSize === 'md'
-                                        ? 'md'
-                                        : 'sm'
-                                    }
-                                    lineClamp={1}
-                                  >
+                                  <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
                                     {record.artistName}
                                   </Text>
                                 )}
@@ -450,86 +437,42 @@ const DebutsStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              {record.artistName}
-                            </Text>
+                            <Text size={primaryTextSize}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {record.plays.toLocaleString()}
-                          </Text>
+                          <Text size={primaryTextSize}>{record.plays.toLocaleString()}</Text>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {record.rank}
-                          </Text>
-                        </Table.Td>
+                        {preferences.showPositionColumn && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            <Text size={primaryTextSize}>{record.rank}</Text>
+                          </Table.Td>
+                        )}
                         {preferences.showSales && (
                           <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            <Text
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              {Math.round(sales).toLocaleString()}
-                            </Text>
+                            <Text size={primaryTextSize}>{Math.round(sales).toLocaleString()}</Text>
                           </Table.Td>
                         )}
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Tooltip label={dateRange} withArrow>
-                            <Text
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            <Tooltip label={dateRange} withArrow>
+                              <Text size={primaryTextSize}>{record.weekNumber}</Text>
+                            </Tooltip>
+                          </Table.Td>
+                        )}
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
+                            <Button
+                              size="xs"
+                              variant="light"
+                              px={6}
+                              component={Link}
+                              to={`/charts/week/${record.week}/${type}`}
                             >
-                              {record.weekNumber}
-                            </Text>
-                          </Tooltip>
-                        </Table.Td>
-                        <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
-                          <Button
-                            size="xs"
-                            variant="light"
-                            px={6}
-                            component={Link}
-                            to={`/charts/week/${record.week}/${type}`}
-                          >
-                            <IconChevronRight size={16} />
-                          </Button>
-                        </Table.Td>
+                              <IconChevronRight size={16} />
+                            </Button>
+                          </Table.Td>
+                        )}
                       </Table.Tr>
                     );
                   })

@@ -38,6 +38,7 @@ import {
   IconMusicPlus,
   IconStairsUp,
   IconCoins,
+  IconGraph,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { useStatsPreferences } from '../hooks/useStatsPreferences';
@@ -90,6 +91,12 @@ const StatsPage: React.FC = () => {
       icon: IconChartBar,
       label: t('stats.sidebar.overview'),
       path: '/stats',
+      exact: true,
+    },
+    {
+      icon: IconGraph,
+      label: t('stats.sidebar.viewVisualizations'),
+      path: '/stats/visualizations',
       exact: true,
     },
     { divider: true },

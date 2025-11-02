@@ -15,12 +15,14 @@ import {
   Box,
   Flex,
   Select,
+  Tooltip,
+  Button,
 } from '@mantine/core';
-import { IconArrowBarUp } from '@tabler/icons-react';
+import { IconArrowBarUp, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import StatsFilters from '../../components/stats/StatsFilters';
-import { getLongestConsecutiveAtOne, getYearRange } from '../../utils/statsQueries';
+import { getLongestConsecutiveAtOne, getYearRange, getAllWeeks } from '../../utils/statsQueries';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
@@ -62,6 +64,11 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
 
+  const primaryTextSize =
+    preferences.fontSize === 'xs' ? 'sm' : preferences.fontSize === 'md' ? 'lg' : 'md';
+  const secondaryTextSize =
+    preferences.fontSize === 'xs' ? 'xs' : preferences.fontSize === 'md' ? 'md' : 'sm';
+
   useEffect(() => {
     if (!chart) return;
     const loadYearRange = async () => {
@@ -73,7 +80,7 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
 
   const getCutoff = (chartType: string) => {
     if (!chart) return 100;
-    const cutoffMap: any = {
+    const cutoffMap: Record<string, number> = {
       artist: chart.artist_cutoff || 100,
       album: chart.album_cutoff || 100,
       track: chart.music_cutoff || 100,
@@ -90,17 +97,24 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
           chartId: String(chart.id),
           chartType: type,
           year,
-          // interpret selected position as top-N (<=) filter
           position: typeof position === 'number' ? position : undefined,
           positionOperator: typeof position === 'number' ? 'lte' : undefined,
         } as any);
-        setData(results);
+
+        const weeks = await getAllWeeks(String(chart.id), type);
+        const resultsWithWeekNumber = results.map(item => ({
+          ...item,
+          endWeekNumber: item.endWeek ? weeks.indexOf(item.endWeek) + 1 : null,
+        }));
+
+        setData(resultsWithWeekNumber);
       } catch (err) {
         console.error('Error loading longest consecutive at #1 stats', err);
       } finally {
         setLoading(false);
       }
     };
+
     loadData();
   }, [chart, type, year, position]);
 
@@ -129,15 +143,12 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
       { value: 'name-desc', label: t('stats.timesAtTop.sort.nameDesc') },
       { value: 'artist-asc', label: t('stats.timesAtTop.sort.artistAsc') },
       { value: 'artist-desc', label: t('stats.timesAtTop.sort.artistDesc') },
-      { value: 'startWeek-desc', label: t('stats.longestConsecutiveAtOne.sort.startWeekDesc') },
-      { value: 'startWeek-asc', label: t('stats.longestConsecutiveAtOne.sort.startWeekAsc') },
       { value: 'endWeek-desc', label: t('stats.longestConsecutiveAtOne.sort.endWeekDesc') },
       { value: 'endWeek-asc', label: t('stats.longestConsecutiveAtOne.sort.endWeekAsc') },
     ],
     [t]
   );
 
-  // Extend sorting to support start/end week ordering
   const sortedData = React.useMemo(() => {
     const copy = [...filteredData];
     switch (sortBy) {
@@ -145,10 +156,6 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
         return copy.sort((a, b) => b.longest - a.longest);
       case 'longest-asc':
         return copy.sort((a, b) => a.longest - b.longest);
-      case 'startWeek-desc':
-        return copy.sort((a, b) => (b.startWeek || '').localeCompare(a.startWeek || ''));
-      case 'startWeek-asc':
-        return copy.sort((a, b) => (a.startWeek || '').localeCompare(b.startWeek || ''));
       case 'endWeek-desc':
         return copy.sort((a, b) => (b.endWeek || '').localeCompare(a.endWeek || ''));
       case 'endWeek-asc':
@@ -207,6 +214,10 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
         onToggleImages={v => updatePreference('showImages', v)}
         showArtistColumn={preferences.showArtistColumn}
         onToggleArtistColumn={v => updatePreference('showArtistColumn', v)}
+        showWeekColumn={preferences.showWeekColumn}
+        onToggleWeekColumn={v => updatePreference('showWeekColumn', v)}
+        showPositionColumn={preferences.showPositionColumn}
+        onTogglePositionColumn={v => updatePreference('showPositionColumn', v)}
         containerSize={preferences.containerSize}
         onContainerSizeChange={v => updatePreference('containerSize', v)}
         fontSize={preferences.fontSize}
@@ -242,12 +253,12 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                   <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
                     {t('stats.longestConsecutiveAtOne.columns.longest')}
                   </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.longestConsecutiveAtOne.columns.startWeek')}
-                  </Table.Th>
-                  <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {t('stats.longestConsecutiveAtOne.columns.endWeek')}
-                  </Table.Th>
+                  {preferences.showWeekColumn && (
+                    <Table.Th style={{ width: 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t('stats.longestConsecutiveAtOne.columns.endWeek')}
+                    </Table.Th>
+                  )}
+                  {preferences.showWeekColumn && <Table.Th style={{ width: 1 }}></Table.Th>}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -255,10 +266,15 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                   <Table.Tr>
                     <Table.Td
                       colSpan={
-                        1 + 1 + (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) + 3
+                        1 + // # column
+                        1 + // title
+                        (preferences.showArtistColumn && type !== 'artist' ? 1 : 0) +
+                        1 +
+                        (preferences.showWeekColumn ? 1 : 0) +
+                        (preferences.showWeekColumn ? 1 : 0)
                       }
                     >
-                      <Text ta="center" py="xl">
+                      <Text ta="center" py="xl" size={primaryTextSize}>
                         {t('stats.noData')}
                       </Text>
                     </Table.Td>
@@ -266,20 +282,17 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                 ) : (
                   paginatedData.map((record: any, index) => {
                     const displayRank = (page - 1) * preferences.pageSize + index + 1;
+                    const weekStart = record.endWeek ? dayjs(record.endWeek) : null;
+                    const weekEnd = weekStart ? weekStart.add(6, 'day') : null;
+                    const dateRange =
+                      weekStart && weekStart.isValid() && weekEnd && weekEnd.isValid()
+                        ? `${weekStart.format('DD/MM/YYYY')} - ${weekEnd.format('DD/MM/YYYY')}`
+                        : undefined;
+
                     return (
                       <Table.Tr key={record.entityId}>
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {displayRank}
-                          </Text>
+                          <Text size={primaryTextSize}>{displayRank}</Text>
                         </Table.Td>
                         <Table.Td style={{ verticalAlign: 'middle' }}>
                           <Flex gap="sm" wrap="nowrap" align="center">
@@ -289,30 +302,14 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                                 fw={600}
                                 lineClamp={1}
                                 className="entity-name"
-                                size={
-                                  preferences.fontSize === 'xs'
-                                    ? 'sm'
-                                    : preferences.fontSize === 'md'
-                                    ? 'lg'
-                                    : 'md'
-                                }
+                                size={primaryTextSize}
                               >
                                 {record.name}
                               </Text>
                               {type !== 'artist' &&
                                 record.artistName &&
                                 !preferences.showArtistColumn && (
-                                  <Text
-                                    c="dimmed"
-                                    size={
-                                      preferences.fontSize === 'xs'
-                                        ? 'xs'
-                                        : preferences.fontSize === 'md'
-                                        ? 'md'
-                                        : 'sm'
-                                    }
-                                    lineClamp={1}
-                                  >
+                                  <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
                                     {record.artistName}
                                   </Text>
                                 )}
@@ -321,90 +318,38 @@ const LongestConsecutiveAtOneStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              {record.artistName}
-                            </Text>
+                            <Text size={primaryTextSize}>{record.artistName}</Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          <Text
-                            size={
-                              preferences.fontSize === 'xs'
-                                ? 'sm'
-                                : preferences.fontSize === 'md'
-                                ? 'lg'
-                                : 'md'
-                            }
-                          >
-                            {record.longest}
-                          </Text>
+                          <Text size={primaryTextSize}>{record.longest}</Text>
                         </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {record.startWeek ? (
-                            <Text
-                              component={Link}
-                              to={`/charts/week/${record.startWeek}/${type}`}
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              {dayjs(record.startWeek).format('YYYY.MM.DD')}
-                            </Text>
-                          ) : (
-                            <Text
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              -
-                            </Text>
-                          )}
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                          {record.endWeek ? (
-                            <Text
-                              component={Link}
-                              to={`/charts/week/${record.endWeek}/${type}`}
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              {dayjs(record.endWeek).format('YYYY.MM.DD')}
-                            </Text>
-                          ) : (
-                            <Text
-                              size={
-                                preferences.fontSize === 'xs'
-                                  ? 'sm'
-                                  : preferences.fontSize === 'md'
-                                  ? 'lg'
-                                  : 'md'
-                              }
-                            >
-                              -
-                            </Text>
-                          )}
-                        </Table.Td>
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            {record.endWeek && dateRange ? (
+                              <Tooltip label={dateRange} withArrow>
+                                <Text size={primaryTextSize}>{record.endWeekNumber ?? '-'}</Text>
+                              </Tooltip>
+                            ) : (
+                              <Text size={primaryTextSize}>-</Text>
+                            )}
+                          </Table.Td>
+                        )}
+                        {preferences.showWeekColumn && (
+                          <Table.Td style={{ width: 1, whiteSpace: 'nowrap' }}>
+                            {record.endWeek ? (
+                              <Button
+                                size="xs"
+                                variant="light"
+                                px={6}
+                                component={Link}
+                                to={`/charts/week/${record.endWeek}/${type}`}
+                              >
+                                <IconChevronRight size={16} />
+                              </Button>
+                            ) : null}
+                          </Table.Td>
+                        )}
                       </Table.Tr>
                     );
                   })

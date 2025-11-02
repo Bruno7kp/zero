@@ -554,7 +554,44 @@
         "title": "Estatísticas",
         "overview": "Visão Geral",
         "collapse": "Recolher menu",
-        "expand": "Expandir menu"
+        "expand": "Expandir menu",
+        "viewVisualizations": "Gráficos",
+        "viewTables": "Voltar para tabelas"
+      },
+      "visualizations": {
+        "sidebar": {
+          "title": "Visualizações",
+          "overview": "Gráficos",
+          "timeline": "Linha do tempo de #1",
+          "rankDominance": "Dominância no #1"
+        },
+        "actions": {
+          "viewDetail": "Ver detalhes"
+        },
+        "overview": {
+          "subtitle": "Pré-visualizações rápidas dos destaques recentes",
+          "latestNumberOnePlays": "Últimos #1s",
+          "latestNumberOnePlaysDescription": "Mostrando quem liderou nas últimas semanas",
+          "latestNumberOneTooltip": "Semanas recentes em #1",
+          "rankDominance": "Líderes no #1",
+          "rankDominanceDescription": "Quem passou mais semanas no topo",
+          "tipsTitle": "Dicas",
+          "tipsDescription": "Use o menu de visualizações para explorar mais. Largura atual do layout: {{container}}"
+        },
+        "timeline": {
+          "windowLabel": "Janela: últimas {{weeks}} semanas",
+          "axisBottom": "Semana",
+          "axisLeft": "Plays",
+          "tooltipPlays": "{{value}} plays"
+        },
+        "rankLeaders": {
+          "rankLabel": "Limite de posição",
+          "topNLabel": "Top N",
+          "limitLabel": "Mostrar top",
+          "limitOption": "Top {{count}}",
+          "axisBottom": "Semanas no top",
+          "tooltipWeeks": "{{count}} semana(s)"
+        }
       },
       "filters": {
         "year": "Ano",
@@ -568,6 +605,8 @@
         "peakOnly": "Apenas picos",
         "showImages": "Mostrar imagens",
         "showArtistColumn": "Coluna de artista separada",
+        "showWeekColumn": "Mostrar número da semana",
+        "showPositionColumn": "Mostrar posição no chart",
         "containerSize": "Tamanho do container",
         "fontSize": "Tamanho da fonte",
         "small": "Pequeno",
