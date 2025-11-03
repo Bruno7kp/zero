@@ -3,12 +3,13 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface VisualizationsPreferences {
   containerSize: '100%' | 'md' | 'lg' | 'xl';
-  collapsed: boolean;
+  // Removed - now using shared statsPreferences for sidebar state
+  // collapsed: boolean;
+  // sidebarMode: 'fixed' | 'speedDial';
 }
 
 export const DEFAULT_VISUALIZATIONS_PREFERENCES: VisualizationsPreferences = {
   containerSize: 'xl',
-  collapsed: false,
 };
 
 const visualizationsPreferencesSlice = createSlice({

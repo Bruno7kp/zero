@@ -553,12 +553,13 @@
       "sidebar": {
         "title": "Statistics",
         "overview": "Overview",
-        "collapse": "Collapse sidebar",
-        "expand": "Expand sidebar",
+        "collapse": "Show only icons",
+        "expand": "Show icons and text",
         "viewVisualizations": "Graphs",
         "viewTables": "Back to tables",
-        "hideCollapsed": "Hide sidebar",
-        "showCollapsed": "Show sidebar"
+        "toggleSpeedDial": "Toggle floating menu",
+        "openSpeedDial": "Open menu",
+        "closeSpeedDial": "Close menu"
       },
       "visualizations": {
         "sidebar": {
