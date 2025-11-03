@@ -53,68 +53,127 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
   const sidebarMode = preferences.sidebarMode;
   const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
 
-  const toggleCollapsed = () => {
+  const toggleCollapsed = React.useCallback(() => {
     updatePreference('collapsed', !collapsed);
-  };
+  }, [collapsed, updatePreference]);
 
-  const toggleSidebarMode = () => {
+  const toggleSidebarMode = React.useCallback(() => {
     const newMode = sidebarMode === 'fixed' ? 'speedDial' : 'fixed';
     updatePreference('sidebarMode', newMode);
     if (newMode === 'speedDial') {
       setSpeedDialOpen(false);
     }
-  };
+  }, [sidebarMode, updatePreference]);
 
-  const isActive = (item: NavItem) => {
+  const isActive = React.useCallback((item: NavItem) => {
     if (item.exact) {
       return currentPath === item.path;
     }
     if (!item.group) return false;
     const pathParts = currentPath.split('/');
     return pathParts.some(part => part === item.group);
-  };
+  }, [currentPath]);
 
-  const renderNavItems = (isMobile = false, isSpeedDial = false) => (
-    <Stack gap={0}>
-      {navItems.map((item, index) =>
-        item.divider ? (
-          <Divider key={`divider-${index}`} my="xs" />
-        ) : (
-          <Tooltip
-            key={item.path || index}
-            label={item.label}
-            position="right"
-            disabled={!collapsed || isMobile}
-            withArrow
-            zIndex={isSpeedDial ? 1001 : undefined}
-          >
-            <NavLink
-              component={Link}
-              to={item.path!}
-              active={isActive(item)}
-              label={collapsed && !isMobile ? undefined : item.label!}
-              leftSection={item.icon ? <item.icon size={18} /> : undefined}
-              onClick={() => {
-                // Don't close speed dial menu when clicking links
-                // User can close it manually or by clicking outside
-              }}
-              styles={{
-                root: {
-                  justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',
-                  paddingLeft: collapsed && !isMobile ? 8 : undefined,
-                  paddingRight: collapsed && !isMobile ? 8 : undefined,
-                  borderRadius: 8,
-                },
-                section: {
-                  marginRight: collapsed && !isMobile ? 0 : undefined,
-                },
-              }}
-            />
+  // Render sidebar content - memoized to avoid recreating on each render
+  const renderSidebarContent = React.useCallback((isSpeedDial: boolean = false) => (
+    <>
+      {/* Header with title and controls */}
+      <Flex
+        justify={collapsed ? 'center' : 'space-between'}
+        align="center"
+        mb={collapsed ? 0 : 'md'}
+      >
+        {!collapsed && (
+          <>
+            <Tooltip label={t('stats.sidebar.collapse')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+              <ActionIcon
+                variant="subtle"
+                onClick={toggleCollapsed}
+                aria-label={t('stats.sidebar.collapse')}
+              >
+                <IconLayoutSidebarLeftCollapse size={18} />
+              </ActionIcon>
+            </Tooltip>
+            <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
+              {title}
+            </Title>
+            <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+              <ActionIcon
+                variant="light"
+                onClick={toggleSidebarMode}
+                aria-label={t('stats.sidebar.toggleSpeedDial')}
+              >
+                <IconMenu2 size={18} />
+              </ActionIcon>
+            </Tooltip>
+          </>
+        )}
+      </Flex>
+
+      {/* Navigation items */}
+      <ScrollArea.Autosize mah={isSpeedDial ? 500 : 700} type="hover" scrollbarSize={4}>
+        <Stack gap={0}>
+          {navItems.map((item, index) =>
+            item.divider ? (
+              <Divider key={`divider-${index}`} my="xs" />
+            ) : (
+              <Tooltip
+                key={item.path || index}
+                label={item.label}
+                position="right"
+                disabled={!collapsed}
+                withArrow
+                zIndex={isSpeedDial ? 1001 : undefined}
+              >
+                <NavLink
+                  component={Link}
+                  to={item.path!}
+                  active={isActive(item)}
+                  label={collapsed ? undefined : item.label!}
+                  leftSection={item.icon ? <item.icon size={18} /> : undefined}
+                  styles={{
+                    root: {
+                      justifyContent: collapsed ? 'center' : 'flex-start',
+                      paddingLeft: collapsed ? 8 : undefined,
+                      paddingRight: collapsed ? 8 : undefined,
+                      borderRadius: 8,
+                    },
+                    section: {
+                      marginRight: collapsed ? 0 : undefined,
+                    },
+                  }}
+                />
+              </Tooltip>
+            )
+          )}
+        </Stack>
+      </ScrollArea.Autosize>
+
+      {/* Bottom controls - only shown when collapsed */}
+      {collapsed && (
+        <Flex direction="column" gap="xs" mt="md" pt="md" style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}>
+          <Tooltip label={t('stats.sidebar.expand')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+            <ActionIcon
+              variant="subtle"
+              onClick={toggleCollapsed}
+              aria-label={t('stats.sidebar.expand')}
+            >
+              <IconLayoutSidebarLeftExpand size={18} />
+            </ActionIcon>
           </Tooltip>
-        )
+          <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+            <ActionIcon
+              variant="light"
+              onClick={toggleSidebarMode}
+              aria-label={t('stats.sidebar.toggleSpeedDial')}
+            >
+              <IconMenu2 size={18} />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
       )}
-    </Stack>
-  );
+    </>
+  ), [collapsed, navItems, isActive, t, title, toggleCollapsed, toggleSidebarMode, theme.colors.gray]);
 
   // Desktop sidebar - fixed mode
   if (sidebarMode === 'fixed') {
@@ -132,59 +191,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
           p={collapsed ? 'xs' : 'md'}
           style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
         >
-          <Flex
-            justify={collapsed ? 'center' : 'space-between'}
-            align="center"
-            mb={collapsed ? 0 : 'md'}
-          >
-            {!collapsed && (
-              <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
-                {title}
-              </Title>
-            )}
-          </Flex>
-
-          <ScrollArea.Autosize mah={700} type="auto" scrollbarSize={6}>
-            {renderNavItems()}
-          </ScrollArea.Autosize>
-
-          {/* Bottom controls */}
-          <Flex direction="column" gap="xs" mt="md" pt="md" style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}>
-            <Tooltip label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')} withArrow>
-              <ActionIcon
-                variant="subtle"
-                onClick={toggleCollapsed}
-                aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
-                fullWidth
-              >
-                {collapsed ? (
-                  <IconLayoutSidebarLeftExpand size={18} />
-                ) : (
-                  <Flex align="center" gap="xs" justify="center">
-                    <IconLayoutSidebarLeftCollapse size={18} />
-                    <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.collapse')}</span>
-                  </Flex>
-                )}
-              </ActionIcon>
-            </Tooltip>
-            <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow>
-              <ActionIcon
-                variant="light"
-                onClick={toggleSidebarMode}
-                aria-label={t('stats.sidebar.toggleSpeedDial')}
-                fullWidth
-              >
-                {collapsed ? (
-                  <IconMenu2 size={18} />
-                ) : (
-                  <Flex align="center" gap="xs" justify="center">
-                    <IconMenu2 size={18} />
-                    <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.toggleSpeedDial')}</span>
-                  </Flex>
-                )}
-              </ActionIcon>
-            </Tooltip>
-          </Flex>
+          {renderSidebarContent(false)}
         </Card>
       </Box>
     );
@@ -224,59 +231,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
             visibleFrom="md"
           >
             <Card p={collapsed ? 'xs' : 'md'} shadow="xl" style={{ backgroundColor: bgColor }}>
-              <Flex
-                justify={collapsed ? 'center' : 'space-between'}
-                align="center"
-                mb={collapsed ? 0 : 'md'}
-              >
-                {!collapsed && (
-                  <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
-                    {title}
-                  </Title>
-                )}
-              </Flex>
-
-              <ScrollArea.Autosize mah={500} type="auto" scrollbarSize={6}>
-                {renderNavItems(false, true)}
-              </ScrollArea.Autosize>
-
-              {/* Bottom controls */}
-              <Flex direction="column" gap="xs" mt="md" pt="md" style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}>
-                <Tooltip label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')} withArrow zIndex={1001}>
-                  <ActionIcon
-                    variant="subtle"
-                    onClick={toggleCollapsed}
-                    aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
-                    fullWidth
-                  >
-                    {collapsed ? (
-                      <IconLayoutSidebarLeftExpand size={18} />
-                    ) : (
-                      <Flex align="center" gap="xs" justify="center">
-                        <IconLayoutSidebarLeftCollapse size={18} />
-                        <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.collapse')}</span>
-                      </Flex>
-                    )}
-                  </ActionIcon>
-                </Tooltip>
-                <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow zIndex={1001}>
-                  <ActionIcon
-                    variant="light"
-                    onClick={toggleSidebarMode}
-                    aria-label={t('stats.sidebar.toggleSpeedDial')}
-                    fullWidth
-                  >
-                    {collapsed ? (
-                      <IconMenu2 size={18} />
-                    ) : (
-                      <Flex align="center" gap="xs" justify="center">
-                        <IconMenu2 size={18} />
-                        <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.toggleSpeedDial')}</span>
-                      </Flex>
-                    )}
-                  </ActionIcon>
-                </Tooltip>
-              </Flex>
+              {renderSidebarContent(true)}
             </Card>
           </Box>
         )}
