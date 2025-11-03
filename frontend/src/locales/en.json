@@ -556,7 +556,9 @@
         "collapse": "Collapse sidebar",
         "expand": "Expand sidebar",
         "viewVisualizations": "Graphs",
-        "viewTables": "Back to tables"
+        "viewTables": "Back to tables",
+        "hideCollapsed": "Hide sidebar",
+        "showCollapsed": "Show sidebar"
       },
       "visualizations": {
         "sidebar": {

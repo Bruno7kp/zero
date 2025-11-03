@@ -39,6 +39,8 @@ import {
   IconStairsUp,
   IconCoins,
   IconGraph,
+  IconChevronDown,
+  IconChevronUp,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { useStatsPreferences } from '../hooks/useStatsPreferences';
@@ -208,7 +210,20 @@ const StatsPage: React.FC = () => {
   const isMobile = useIsMobile();
 
   const collapsed = preferences.collapsed;
-  const toggleCollapsed = () => updatePreference('collapsed', !collapsed);
+  const sidebarHidden = preferences.sidebarHidden;
+
+  const toggleCollapsed = () => {
+    if (sidebarHidden) {
+      updatePreference('sidebarHidden', false);
+    }
+    updatePreference('collapsed', !collapsed);
+  };
+
+  React.useEffect(() => {
+    if (!collapsed && sidebarHidden) {
+      updatePreference('sidebarHidden', false);
+    }
+  }, [collapsed, sidebarHidden, updatePreference]);
 
   if (!chart) {
     return (
@@ -229,86 +244,118 @@ const StatsPage: React.FC = () => {
   return (
     <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
       <CreateHeader pageTitle={getPageTitle()} icon={getPageIcon()} />
+      {collapsed && sidebarHidden && (
+        <Box hiddenFrom="base" visibleFrom="md" mb="sm">
+          <Flex justify="flex-start">
+            <Tooltip label={t('stats.sidebar.showCollapsed')} withArrow>
+              <ActionIcon
+                variant="light"
+                color="blue"
+                radius="xl"
+                onClick={() => updatePreference('sidebarHidden', false)}
+                aria-label={t('stats.sidebar.showCollapsed')}
+              >
+                <IconChevronDown size={18} />
+              </ActionIcon>
+            </Tooltip>
+          </Flex>
+        </Box>
+      )}
 
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
-        <Box
-          style={{
-            flexShrink: 0,
-            width: collapsed ? '55px' : '350px',
-            transition: 'width 200ms ease',
-          }}
-          hiddenFrom="base"
-          visibleFrom="md"
-        >
-          <Card
-            p={collapsed ? 'xs' : 'md'}
-            style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
+        {!sidebarHidden && (
+          <Box
+            style={{
+              flexShrink: 0,
+              width: collapsed ? '55px' : '350px',
+              transition: 'width 200ms ease',
+            }}
+            hiddenFrom="base"
+            visibleFrom="md"
           >
-            <Flex
-              justify={collapsed ? 'center' : 'space-between'}
-              align="center"
-              mb={collapsed ? 0 : 'md'}
+            <Card
+              p={collapsed ? 'xs' : 'md'}
+              style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
             >
-              {/* Collapse button - desktop only */}
-              <ActionIcon
-                variant="subtle"
-                onClick={toggleCollapsed}
-                aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
+              <Flex
+                justify={collapsed ? 'center' : 'space-between'}
+                align="center"
+                mb={collapsed ? 0 : 'md'}
               >
-                {collapsed ? (
-                  <IconLayoutSidebarLeftExpand size={18} />
-                ) : (
-                  <IconLayoutSidebarLeftCollapse size={18} />
-                )}
-              </ActionIcon>
-
-              {/* Title - centered */}
-              {!collapsed && (
-                <Title order={4} style={{ flex: 1, textAlign: 'center', marginLeft: -34 }}>
-                  {t('stats.sidebar.title')}
-                </Title>
-              )}
-            </Flex>
-
-            <ScrollArea.Autosize mah={700} type="auto">
-              <Stack gap={0}>
-                {navItems.map((item, index) =>
-                  item.divider ? (
-                    <Divider key={index} my="xs" />
+                {/* Collapse button - desktop only */}
+                <ActionIcon
+                  variant="subtle"
+                  onClick={toggleCollapsed}
+                  aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
+                >
+                  {collapsed ? (
+                    <IconLayoutSidebarLeftExpand size={18} />
                   ) : (
-                    <Tooltip
-                      key={index}
-                      label={item.label}
-                      position="right"
-                      disabled={!collapsed}
-                      withArrow
-                    >
-                      <NavLink
-                        component={Link}
-                        to={item.path!}
-                        active={isActive(item)}
-                        label={collapsed ? undefined : item.label!}
-                        leftSection={<item.icon size={18} />}
-                        styles={{
-                          root: {
-                            justifyContent: collapsed ? 'center' : 'flex-start',
-                            paddingLeft: collapsed ? 8 : undefined,
-                            paddingRight: collapsed ? 8 : undefined,
-                            borderRadius: 8,
-                          },
-                          section: {
-                            marginRight: collapsed ? 0 : undefined,
-                          },
-                        }}
-                      />
-                    </Tooltip>
-                  )
+                    <IconLayoutSidebarLeftCollapse size={18} />
+                  )}
+                </ActionIcon>
+
+                {/* Title - centered */}
+                {!collapsed && (
+                  <Title order={4} style={{ flex: 1, textAlign: 'center', marginLeft: -34 }}>
+                    {t('stats.sidebar.title')}
+                  </Title>
                 )}
-              </Stack>
-            </ScrollArea.Autosize>
-          </Card>
-        </Box>
+              </Flex>
+
+              <ScrollArea.Autosize mah={700} type="auto">
+                <Stack gap={0}>
+                  {navItems.map((item, index) =>
+                    item.divider ? (
+                      <Divider key={index} my="xs" />
+                    ) : (
+                      <Tooltip
+                        key={index}
+                        label={item.label}
+                        position="right"
+                        disabled={!collapsed}
+                        withArrow
+                      >
+                        <NavLink
+                          component={Link}
+                          to={item.path!}
+                          active={isActive(item)}
+                          label={collapsed ? undefined : item.label!}
+                          leftSection={<item.icon size={18} />}
+                          styles={{
+                            root: {
+                              justifyContent: collapsed ? 'center' : 'flex-start',
+                              paddingLeft: collapsed ? 8 : undefined,
+                              paddingRight: collapsed ? 8 : undefined,
+                              borderRadius: 8,
+                            },
+                            section: {
+                              marginRight: collapsed ? 0 : undefined,
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                    )
+                  )}
+                </Stack>
+              </ScrollArea.Autosize>
+              {collapsed && (
+                <Flex justify="center" mt="sm">
+                  <Tooltip label={t('stats.sidebar.hideCollapsed')} withArrow>
+                    <ActionIcon
+                      variant="subtle"
+                      onClick={() => updatePreference('sidebarHidden', true)}
+                      aria-label={t('stats.sidebar.hideCollapsed')}
+                    >
+                      <IconChevronUp size={18} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Flex>
+              )}
+            </Card>
+          </Box>
+        )}
 
         {/* Mobile Sidebar */}
         <Box hiddenFrom="md" style={{ width: '100%' }}>

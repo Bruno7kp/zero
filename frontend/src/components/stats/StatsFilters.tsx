@@ -198,7 +198,7 @@ const StatsFilters: React.FC<StatsFiltersProps> = ({
   }, [sortOptions]);
 
   return (
-    <Flex direction="column" gap="md" mb="xs">
+    <Flex direction="column" gap="md" mb={0}>
       {/* First row - Year (left), Type (center), Items per page + Settings (right) */}
       <Flex gap="md" wrap="wrap" justify="space-between" align="center">
         {/* Left - Year */}

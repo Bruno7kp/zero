@@ -11,6 +11,8 @@ export interface StatsPreferences {
   containerSize: '100%' | 'md' | 'lg' | 'xl';
   // whether the stats sidebar is collapsed (desktop)
   collapsed: boolean;
+  // whether the collapsed sidebar is temporarily hidden
+  sidebarHidden: boolean;
   showSales: boolean;
   peakOnly: boolean;
   pageSize: number;
@@ -24,6 +26,7 @@ export const DEFAULT_PREFERENCES: StatsPreferences = {
   fontSize: 'sm',
   containerSize: 'xl',
   collapsed: false,
+  sidebarHidden: false,
   showSales: false,
   peakOnly: false,
   pageSize: 25,
