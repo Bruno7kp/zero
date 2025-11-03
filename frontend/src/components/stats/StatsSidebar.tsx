@@ -74,7 +74,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
     return pathParts.some(part => part === item.group);
   };
 
-  const renderNavItems = (isMobile = false) => (
+  const renderNavItems = (isMobile = false, isSpeedDial = false) => (
     <Stack gap={0}>
       {navItems.map((item, index) =>
         item.divider ? (
@@ -86,6 +86,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
             position="right"
             disabled={!collapsed || isMobile}
             withArrow
+            zIndex={isSpeedDial ? 1001 : undefined}
           >
             <NavLink
               component={Link}
@@ -94,9 +95,8 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
               label={collapsed && !isMobile ? undefined : item.label!}
               leftSection={item.icon ? <item.icon size={18} /> : undefined}
               onClick={() => {
-                if (sidebarMode === 'speedDial' && !isMobile) {
-                  setSpeedDialOpen(false);
-                }
+                // Don't close speed dial menu when clicking links
+                // User can close it manually or by clicking outside
               }}
               styles={{
                 root: {
@@ -144,7 +144,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
             )}
           </Flex>
 
-          <ScrollArea.Autosize mah={700} type="auto">
+          <ScrollArea.Autosize mah={700} type="auto" scrollbarSize={6}>
             {renderNavItems()}
           </ScrollArea.Autosize>
 
@@ -160,9 +160,9 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
                 {collapsed ? (
                   <IconLayoutSidebarLeftExpand size={18} />
                 ) : (
-                  <Flex align="center" gap="xs">
+                  <Flex align="center" gap="xs" justify="center">
                     <IconLayoutSidebarLeftCollapse size={18} />
-                    {!collapsed && <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.collapse')}</span>}
+                    <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.collapse')}</span>
                   </Flex>
                 )}
               </ActionIcon>
@@ -177,7 +177,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
                 {collapsed ? (
                   <IconMenu2 size={18} />
                 ) : (
-                  <Flex align="center" gap="xs">
+                  <Flex align="center" gap="xs" justify="center">
                     <IconMenu2 size={18} />
                     <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.toggleSpeedDial')}</span>
                   </Flex>
@@ -236,13 +236,13 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
                 )}
               </Flex>
 
-              <ScrollArea.Autosize mah={500} type="auto">
-                {renderNavItems()}
+              <ScrollArea.Autosize mah={500} type="auto" scrollbarSize={6}>
+                {renderNavItems(false, true)}
               </ScrollArea.Autosize>
 
               {/* Bottom controls */}
               <Flex direction="column" gap="xs" mt="md" pt="md" style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}>
-                <Tooltip label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')} withArrow>
+                <Tooltip label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')} withArrow zIndex={1001}>
                   <ActionIcon
                     variant="subtle"
                     onClick={toggleCollapsed}
@@ -252,14 +252,14 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
                     {collapsed ? (
                       <IconLayoutSidebarLeftExpand size={18} />
                     ) : (
-                      <Flex align="center" gap="xs">
+                      <Flex align="center" gap="xs" justify="center">
                         <IconLayoutSidebarLeftCollapse size={18} />
-                        {!collapsed && <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.collapse')}</span>}
+                        <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.collapse')}</span>
                       </Flex>
                     )}
                   </ActionIcon>
                 </Tooltip>
-                <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow>
+                <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow zIndex={1001}>
                   <ActionIcon
                     variant="light"
                     onClick={toggleSidebarMode}
@@ -269,7 +269,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
                     {collapsed ? (
                       <IconMenu2 size={18} />
                     ) : (
-                      <Flex align="center" gap="xs">
+                      <Flex align="center" gap="xs" justify="center">
                         <IconMenu2 size={18} />
                         <span style={{ fontSize: '0.875rem' }}>{t('stats.sidebar.toggleSpeedDial')}</span>
                       </Flex>
