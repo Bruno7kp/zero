@@ -552,13 +552,14 @@
       },
       "sidebar": {
         "title": "Estatísticas",
-        "overview": "Visão Geral",
-        "collapse": "Recolher menu",
-        "expand": "Expandir menu",
+        "overview": "Visão geral",
+        "collapse": "Mostrar apenas ícones",
+        "expand": "Mostrar ícones e texto",
         "viewVisualizations": "Gráficos",
         "viewTables": "Voltar para tabelas",
-        "hideCollapsed": "Ocultar barra lateral",
-        "showCollapsed": "Mostrar barra lateral"
+        "toggleSpeedDial": "Alternar menu flutuante",
+        "openSpeedDial": "Abrir menu",
+        "closeSpeedDial": "Fechar menu"
       },
       "visualizations": {
         "sidebar": {

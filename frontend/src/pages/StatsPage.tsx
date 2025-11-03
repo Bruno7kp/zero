@@ -3,22 +3,12 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import {
   Container,
-  Title,
   Text,
   Loader,
   Center,
   Stack,
-  NavLink,
-  ScrollArea,
-  Card,
-  Flex,
-  ActionIcon,
-  useMantineTheme,
-  Divider,
   Box,
-  Tooltip,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import {
   IconChartBar,
@@ -29,27 +19,22 @@ import {
   IconRocket,
   IconCoin,
   IconCrown,
-  IconMenu2,
   IconCalendarUp,
   IconBoxMultiple1,
-  IconLayoutSidebarLeftCollapse,
-  IconLayoutSidebarLeftExpand,
   IconSparkles,
   IconMusicPlus,
   IconStairsUp,
   IconCoins,
   IconGraph,
-  IconChevronDown,
-  IconChevronUp,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { useStatsPreferences } from '../hooks/useStatsPreferences';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import CreateHeader from '../components/createChart/CreateHeader';
+import StatsSidebar, { type NavItem } from '../components/stats/StatsSidebar';
 
 // Lazy load stat components for performance
-const StatsHome = lazy(() => import('./stats/StatsHome'));
+const StatsVisualizationsOverview = lazy(() => import('./stats/visualizations/StatsVisualizationsOverview'));
 const RankStats = lazy(() => import('./stats/RankStats'));
 const PerfectAllKillStats = lazy(() => import('./stats/PerfectAllKillStats'));
 const TimesAtRankStats = lazy(() => import('./stats/TimesAtRankStats'));
@@ -67,11 +52,8 @@ const WeeksToNumberOneStats = lazy(() => import('./stats/WeeksToNumberOneStats')
 const StatsPage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const [opened, { toggle }] = useDisclosure(false);
-  // collapsed state is persisted via stats preferences
-  const theme = useMantineTheme();
-  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
-  const bgColor = getCardBackgroundByMode(theme, themeMode);
+  const { preferences } = useStatsPreferences();
+  const isMobile = useIsMobile();
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -81,14 +63,7 @@ const StatsPage: React.FC = () => {
   const trackCutoff = chart?.music_cutoff || 100;
 
   // Navigation items
-  const navItems: Array<{
-    icon?: any;
-    label?: string;
-    path?: string;
-    exact?: boolean;
-    group?: string;
-    divider?: boolean;
-  }> = [
+  const navItems: NavItem[] = [
     {
       icon: IconChartBar,
       label: t('stats.sidebar.overview'),
@@ -184,12 +159,11 @@ const StatsPage: React.FC = () => {
     },
   ];
 
-  const isActive = (item: (typeof navItems)[0]) => {
+  const isActive = (item: NavItem) => {
     if (item.exact) {
       return location.pathname === item.path;
     }
-    // Match the group more precisely to avoid false positives
-    // e.g., times_at_top_by_artist shouldn't match times_at_top
+    if (!item.group) return false;
     const pathParts = location.pathname.split('/');
     return pathParts.some(part => part === item.group);
   };
@@ -205,25 +179,6 @@ const StatsPage: React.FC = () => {
     const activeItem = navItems.find(item => !item.divider && isActive(item));
     return activeItem?.icon || IconChartBar;
   };
-
-  const { preferences, updatePreference } = useStatsPreferences();
-  const isMobile = useIsMobile();
-
-  const collapsed = preferences.collapsed;
-  const sidebarHidden = preferences.sidebarHidden;
-
-  const toggleCollapsed = () => {
-    if (sidebarHidden) {
-      updatePreference('sidebarHidden', false);
-    }
-    updatePreference('collapsed', !collapsed);
-  };
-
-  React.useEffect(() => {
-    if (!collapsed && sidebarHidden) {
-      updatePreference('sidebarHidden', false);
-    }
-  }, [collapsed, sidebarHidden, updatePreference]);
 
   if (!chart) {
     return (
@@ -244,168 +199,20 @@ const StatsPage: React.FC = () => {
   return (
     <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
       <CreateHeader pageTitle={getPageTitle()} icon={getPageIcon()} />
-      {collapsed && sidebarHidden && (
-        <Box hiddenFrom="base" visibleFrom="md" mb="sm">
-          <Flex justify="flex-start">
-            <Tooltip label={t('stats.sidebar.showCollapsed')} withArrow>
-              <ActionIcon
-                variant="light"
-                color="blue"
-                radius="xl"
-                onClick={() => updatePreference('sidebarHidden', false)}
-                aria-label={t('stats.sidebar.showCollapsed')}
-              >
-                <IconChevronDown size={18} />
-              </ActionIcon>
-            </Tooltip>
-          </Flex>
-        </Box>
-      )}
 
-      <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
-        {/* Sidebar */}
-        {!sidebarHidden && (
-          <Box
-            style={{
-              flexShrink: 0,
-              width: collapsed ? '55px' : '350px',
-              transition: 'width 200ms ease',
-            }}
-            hiddenFrom="base"
-            visibleFrom="md"
-          >
-            <Card
-              p={collapsed ? 'xs' : 'md'}
-              style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
-            >
-              <Flex
-                justify={collapsed ? 'center' : 'space-between'}
-                align="center"
-                mb={collapsed ? 0 : 'md'}
-              >
-                {/* Collapse button - desktop only */}
-                <ActionIcon
-                  variant="subtle"
-                  onClick={toggleCollapsed}
-                  aria-label={collapsed ? t('stats.sidebar.expand') : t('stats.sidebar.collapse')}
-                >
-                  {collapsed ? (
-                    <IconLayoutSidebarLeftExpand size={18} />
-                  ) : (
-                    <IconLayoutSidebarLeftCollapse size={18} />
-                  )}
-                </ActionIcon>
-
-                {/* Title - centered */}
-                {!collapsed && (
-                  <Title order={4} style={{ flex: 1, textAlign: 'center', marginLeft: -34 }}>
-                    {t('stats.sidebar.title')}
-                  </Title>
-                )}
-              </Flex>
-
-              <ScrollArea.Autosize mah={700} type="auto">
-                <Stack gap={0}>
-                  {navItems.map((item, index) =>
-                    item.divider ? (
-                      <Divider key={index} my="xs" />
-                    ) : (
-                      <Tooltip
-                        key={index}
-                        label={item.label}
-                        position="right"
-                        disabled={!collapsed}
-                        withArrow
-                      >
-                        <NavLink
-                          component={Link}
-                          to={item.path!}
-                          active={isActive(item)}
-                          label={collapsed ? undefined : item.label!}
-                          leftSection={<item.icon size={18} />}
-                          styles={{
-                            root: {
-                              justifyContent: collapsed ? 'center' : 'flex-start',
-                              paddingLeft: collapsed ? 8 : undefined,
-                              paddingRight: collapsed ? 8 : undefined,
-                              borderRadius: 8,
-                            },
-                            section: {
-                              marginRight: collapsed ? 0 : undefined,
-                            },
-                          }}
-                        />
-                      </Tooltip>
-                    )
-                  )}
-                </Stack>
-              </ScrollArea.Autosize>
-              {collapsed && (
-                <Flex justify="center" mt="sm">
-                  <Tooltip label={t('stats.sidebar.hideCollapsed')} withArrow>
-                    <ActionIcon
-                      variant="subtle"
-                      onClick={() => updatePreference('sidebarHidden', true)}
-                      aria-label={t('stats.sidebar.hideCollapsed')}
-                    >
-                      <IconChevronUp size={18} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Flex>
-              )}
-            </Card>
-          </Box>
+      <Box display={{ base: 'flex', md: 'flex' }} style={{ gap: 'var(--mantine-spacing-md)', flexDirection: isMobile ? 'column' : 'row' }}>
+        {!isMobile && (
+          <StatsSidebar 
+            navItems={navItems} 
+            currentPath={location.pathname}
+            title={t('stats.sidebar.title')}
+          />
         )}
 
-        {/* Mobile Sidebar */}
-        <Box hiddenFrom="md" style={{ width: '100%' }}>
-          <Card p="md" style={{ backgroundColor: bgColor }}>
-            <Flex justify="space-between" align="center" mb={0}>
-              <Title order={4}>{t('stats.sidebar.title')}</Title>
-              <ActionIcon variant="subtle" onClick={toggle}>
-                <IconMenu2 size={18} />
-              </ActionIcon>
-            </Flex>
+        {isMobile && (
+          <MobileSidebar navItems={navItems} currentPath={location.pathname} />
+        )}
 
-            <ScrollArea.Autosize mah={700} type="auto">
-              <Stack gap={0} display={opened ? 'flex' : 'none'}>
-                {navItems.map((item, index) =>
-                  item.divider ? (
-                    <Divider key={index} my="xs" />
-                  ) : (
-                    <NavLink
-                      key={index}
-                      component={Link}
-                      to={item.path!}
-                      active={isActive(item)}
-                      label={item.label!}
-                      leftSection={<item.icon size={18} />}
-                      onClick={e => {
-                        // Close only on regular left-click navigation; keep open for new-tab actions
-                        if (
-                          e.button === 0 &&
-                          !e.ctrlKey &&
-                          !e.metaKey &&
-                          !e.shiftKey &&
-                          !e.altKey
-                        ) {
-                          toggle();
-                        }
-                      }}
-                      styles={{
-                        root: {
-                          borderRadius: 8,
-                        },
-                      }}
-                    />
-                  )
-                )}
-              </Stack>
-            </ScrollArea.Autosize>
-          </Card>
-        </Box>
-
-        {/* Main Content */}
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense
             fallback={
@@ -418,7 +225,7 @@ const StatsPage: React.FC = () => {
             }
           >
             <Routes>
-              <Route path="/" element={<StatsHome />} />
+              <Route path="/" element={<StatsVisualizationsOverview />} />
               <Route path="/rank/:rank/:type" element={<RankStats />} />
               <Route path="/pak" element={<PerfectAllKillStats />} />
               <Route path="/times_at_rank/:rank/:type" element={<TimesAtRankStats />} />
@@ -444,8 +251,80 @@ const StatsPage: React.FC = () => {
             </Routes>
           </Suspense>
         </Box>
-      </Flex>
+      </Box>
     </Container>
+  );
+};
+
+const MobileSidebar: React.FC<{ navItems: NavItem[]; currentPath: string }> = ({ navItems, currentPath }) => {
+  const { t } = useTranslation();
+  const [opened, setOpened] = React.useState(false);
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
+  
+  const isActive = (item: NavItem) => {
+    if (item.exact) {
+      return currentPath === item.path;
+    }
+    if (!item.group) return false;
+    const pathParts = currentPath.split('/');
+    return pathParts.some(part => part === item.group);
+  };
+
+  return (
+    <Box>
+      <Box
+        p="md"
+        style={{
+          backgroundColor: themeMode === 'dark' ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-0)',
+          borderRadius: 'var(--mantine-radius-md)',
+          border: '1px solid var(--mantine-color-dark-4)',
+        }}
+      >
+        <Box onClick={() => setOpened(!opened)} style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text fw={500}>{t('stats.sidebar.title')}</Text>
+          <Box>{opened ? '▲' : '▼'}</Box>
+        </Box>
+
+        {opened && (
+          <Stack gap={0} mt="md">
+            {navItems.map((item, index) =>
+              item.divider ? (
+                <Box key={index} style={{ height: 1, backgroundColor: 'var(--mantine-color-dark-4)', margin: '8px 0' }} />
+              ) : (
+                <Box
+                  key={index}
+                  component={Link}
+                  to={item.path!}
+                  p="sm"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    color: isActive(item) ? 'var(--mantine-color-blue-6)' : 'inherit',
+                    backgroundColor: isActive(item) ? 'var(--mantine-color-blue-1)' : 'transparent',
+                  }}
+                  onClick={(e: React.MouseEvent) => {
+                    if (
+                      !(e as any).ctrlKey &&
+                      !(e as any).metaKey &&
+                      !(e as any).shiftKey &&
+                      !(e as any).altKey
+                    ) {
+                      setOpened(false);
+                    }
+                  }}
+                >
+                  {item.icon && <item.icon size={18} />}
+                  <Text size="sm">{item.label}</Text>
+                </Box>
+              )
+            )}
+          </Stack>
+        )}
+      </Box>
+    </Box>
   );
 };
 

@@ -1,6 +1,7 @@
 // Utilities for querying statistics from IndexedDB
 import { db } from '../db/indexedDb';
 import type { ChartData } from '../db/indexedDb';
+import dayjs from 'dayjs';
 
 export interface StatsFilters {
   chartId: string;
@@ -663,8 +664,11 @@ export async function getWeeksToFirstNumberOne(filters: StatsFilters): Promise<
     const weekReachedOne = weeksSorted[indexOne].week;
     if (targetYear && !weekReachedOne.startsWith(targetYear)) continue;
 
-    // weeksToFirstNumberOne = index(firstOne) - index(firstWeek)
-    const weeksToFirstNumberOne = Math.max(0, indexOne);
+    // Calculate weeks based on date difference, not chart presence
+    // Each week represents 7 days, so we count how many 7-day periods passed
+    const firstWeekDate = dayjs(firstWeek);
+    const weekReachedOneDate = dayjs(weekReachedOne);
+    const weeksToFirstNumberOne = Math.max(0, Math.floor(weekReachedOneDate.diff(firstWeekDate, 'week')));
 
     results.push({
       entityId,
