@@ -1,6 +1,6 @@
 // Main stats page with sidebar and routing
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, useLocation, Link } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import {
   Container,
   Text,
@@ -32,6 +32,7 @@ import { useStatsPreferences } from '../hooks/useStatsPreferences';
 import { useIsMobile } from '../hooks/useIsMobile';
 import CreateHeader from '../components/createChart/CreateHeader';
 import StatsSidebar, { type NavItem } from '../components/stats/StatsSidebar';
+import { MobileSidebar } from '../components/stats/MobileSidebar';
 
 // Lazy load stat components for performance
 const StatsVisualizationsOverview = lazy(() => import('./stats/visualizations/StatsVisualizationsOverview'));
@@ -210,7 +211,7 @@ const StatsPage: React.FC = () => {
         )}
 
         {isMobile && (
-          <MobileSidebar navItems={navItems} currentPath={location.pathname} />
+          <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.sidebar.title')} />
         )}
 
         <Box style={{ flex: 1, minWidth: 0 }}>
@@ -253,78 +254,6 @@ const StatsPage: React.FC = () => {
         </Box>
       </Box>
     </Container>
-  );
-};
-
-const MobileSidebar: React.FC<{ navItems: NavItem[]; currentPath: string }> = ({ navItems, currentPath }) => {
-  const { t } = useTranslation();
-  const [opened, setOpened] = React.useState(false);
-  const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
-  
-  const isActive = (item: NavItem) => {
-    if (item.exact) {
-      return currentPath === item.path;
-    }
-    if (!item.group) return false;
-    const pathParts = currentPath.split('/');
-    return pathParts.some(part => part === item.group);
-  };
-
-  return (
-    <Box>
-      <Box
-        p="md"
-        style={{
-          backgroundColor: themeMode === 'dark' ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-0)',
-          borderRadius: 'var(--mantine-radius-md)',
-          border: '1px solid var(--mantine-color-dark-4)',
-        }}
-      >
-        <Box onClick={() => setOpened(!opened)} style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text fw={500}>{t('stats.sidebar.title')}</Text>
-          <Box>{opened ? '▲' : '▼'}</Box>
-        </Box>
-
-        {opened && (
-          <Stack gap={0} mt="md">
-            {navItems.map((item, index) =>
-              item.divider ? (
-                <Box key={index} style={{ height: 1, backgroundColor: 'var(--mantine-color-dark-4)', margin: '8px 0' }} />
-              ) : (
-                <Box
-                  key={index}
-                  component={Link}
-                  to={item.path!}
-                  p="sm"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    color: isActive(item) ? 'var(--mantine-color-blue-6)' : 'inherit',
-                    backgroundColor: isActive(item) ? 'var(--mantine-color-blue-1)' : 'transparent',
-                  }}
-                  onClick={(e: React.MouseEvent) => {
-                    if (
-                      !(e as any).ctrlKey &&
-                      !(e as any).metaKey &&
-                      !(e as any).shiftKey &&
-                      !(e as any).altKey
-                    ) {
-                      setOpened(false);
-                    }
-                  }}
-                >
-                  {item.icon && <item.icon size={18} />}
-                  <Text size="sm">{item.label}</Text>
-                </Box>
-              )
-            )}
-          </Stack>
-        )}
-      </Box>
-    </Box>
   );
 };
 
