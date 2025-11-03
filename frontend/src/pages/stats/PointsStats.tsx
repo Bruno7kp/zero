@@ -57,9 +57,10 @@ const PointsStats: React.FC = () => {
       weeksOnChart: number;
     }>
   >([]);
-  const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const { preferences, updatePreference } = useStatsPreferences();
+  const year = preferences.selectedYear;
+  const setYear = (newYear: string) => updatePreference('selectedYear', newYear);
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -160,7 +161,7 @@ const PointsStats: React.FC = () => {
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, preferences.pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize, year]);
 
   // Sort options
   const sortOptions = React.useMemo(() => {

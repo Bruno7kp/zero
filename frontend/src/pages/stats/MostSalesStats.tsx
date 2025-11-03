@@ -48,9 +48,10 @@ const MostSalesStats: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Array<any>>([]);
   const [loadingError, setLoadingError] = useState<string | null>(null);
-  const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'track');
   const { preferences, updatePreference } = useStatsPreferences();
+  const year = preferences.selectedYear;
+  const setYear = (newYear: string) => updatePreference('selectedYear', newYear);
   const navigate = useNavigate();
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
@@ -281,7 +282,7 @@ const MostSalesStats: React.FC = () => {
     return <Avatar src={imageUrl ?? undefined} alt={record.name} size={40} radius="md" />;
   };
 
-  React.useEffect(() => setPage(1), [searchQuery, sortBy, preferences.pageSize]);
+  React.useEffect(() => setPage(1), [searchQuery, sortBy, preferences.pageSize, year]);
 
   const sortOptions = React.useMemo(
     () => [

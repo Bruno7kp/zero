@@ -51,12 +51,13 @@ const DebutsStats: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ChartData[]>([]);
-  const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [position, setPosition] = useState<number | 'all'>(
     positionParam === 'all' ? 'all' : Number(positionParam) || 1
   );
   const { preferences, updatePreference } = useStatsPreferences();
+  const year = preferences.selectedYear;
+  const setYear = (newYear: string) => updatePreference('selectedYear', newYear);
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -233,7 +234,7 @@ const DebutsStats: React.FC = () => {
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, preferences.pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize, year, position]);
 
   // Dynamic sort options
   const sortOptions = React.useMemo(() => {

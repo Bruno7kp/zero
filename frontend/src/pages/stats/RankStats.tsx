@@ -50,7 +50,6 @@ const RankStats: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ChartData[]>([]);
-  const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [rank, setRank] = useState(Number(rankParam) || 1);
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
@@ -60,6 +59,8 @@ const RankStats: React.FC = () => {
 
   // Use stats preferences hook
   const { preferences, updatePreference } = useStatsPreferences();
+  const year = preferences.selectedYear;
+  const setYear = (newYear: string) => updatePreference('selectedYear', newYear);
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -266,7 +267,7 @@ const RankStats: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, preferences.pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize, year, rank, preferences.peakOnly]);
 
   // Sort options
   const sortOptions = React.useMemo(

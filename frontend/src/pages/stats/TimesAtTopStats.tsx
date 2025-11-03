@@ -53,10 +53,11 @@ const TimesAtTopStats: React.FC = () => {
       count: number;
     }>
   >([]);
-  const [year, setYear] = useState('all');
   const [type, setType] = useState(typeParam || 'artist');
   const [topN, setTopN] = useState(Number(topNParam) || 10);
   const { preferences, updatePreference } = useStatsPreferences();
+  const year = preferences.selectedYear;
+  const setYear = (newYear: string) => updatePreference('selectedYear', newYear);
   const [yearRange, setYearRange] = useState<{ minYear: number; maxYear: number } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -170,7 +171,7 @@ const TimesAtTopStats: React.FC = () => {
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [searchQuery, sortBy, preferences.pageSize]);
+  }, [searchQuery, sortBy, preferences.pageSize, year, topN]);
 
   // Sort options
   const sortOptions = React.useMemo(() => {
