@@ -87,57 +87,42 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
   // Render sidebar content - used for both fixed and drawer modes
   const renderSidebarContent = React.useCallback((isInDrawer: boolean = false) => (
     <>
-      {/* Header with title and controls */}
-      <Flex
-        justify={collapsed && !isInDrawer ? 'center' : 'space-between'}
-        align="center"
-        mb={collapsed && !isInDrawer ? 0 : 'md'}
-      >
-        {/* For drawer: pin button on left, title in center, nothing on right (close is in drawer header) */}
-        {/* For fixed collapsed: just centered controls at bottom */}
-        {/* For fixed full: collapse on left, title in center, unpin on right */}
-        {isInDrawer ? (
-          <>
-            <Tooltip label={t('stats.sidebar.pinSidebar')} withArrow>
-              <ActionIcon
-                variant="light"
-                onClick={pinSidebar}
-                aria-label={t('stats.sidebar.pinSidebar')}
-              >
-                <IconPin size={18} />
-              </ActionIcon>
-            </Tooltip>
-            <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
-              {title}
-            </Title>
-            <Box style={{ width: 36 }} /> {/* Spacer for symmetry */}
-          </>
-        ) : !collapsed ? (
-          <>
-            <Tooltip label={t('stats.sidebar.collapse')} withArrow>
-              <ActionIcon
-                variant="subtle"
-                onClick={toggleCollapsed}
-                aria-label={t('stats.sidebar.collapse')}
-              >
-                <IconLayoutSidebarLeftCollapse size={18} />
-              </ActionIcon>
-            </Tooltip>
-            <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
-              {title}
-            </Title>
-            <Tooltip label={t('stats.sidebar.unpinSidebar')} withArrow>
-              <ActionIcon
-                variant="light"
-                onClick={unpinSidebar}
-                aria-label={t('stats.sidebar.unpinSidebar')}
-              >
-                <IconPinFilled size={18} />
-              </ActionIcon>
-            </Tooltip>
-          </>
-        ) : null}
-      </Flex>
+      {/* Header with title and controls - only for fixed mode */}
+      {!isInDrawer && (
+        <Flex
+          justify={collapsed ? 'center' : 'space-between'}
+          align="center"
+          mb={collapsed ? 0 : 'md'}
+        >
+          {/* For fixed collapsed: just centered controls at bottom */}
+          {/* For fixed full: collapse on left, title in center, unpin on right */}
+          {!collapsed && (
+            <>
+              <Tooltip label={t('stats.sidebar.collapse')} withArrow>
+                <ActionIcon
+                  variant="subtle"
+                  onClick={toggleCollapsed}
+                  aria-label={t('stats.sidebar.collapse')}
+                >
+                  <IconLayoutSidebarLeftCollapse size={18} />
+                </ActionIcon>
+              </Tooltip>
+              <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
+                {title}
+              </Title>
+              <Tooltip label={t('stats.sidebar.unpinSidebar')} withArrow>
+                <ActionIcon
+                  variant="light"
+                  onClick={unpinSidebar}
+                  aria-label={t('stats.sidebar.unpinSidebar')}
+                >
+                  <IconPinFilled size={18} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
+        </Flex>
+      )}
 
       {/* Navigation items */}
       <ScrollArea.Autosize mah={isInDrawer ? 'calc(100vh - 200px)' : 700} type="hover" scrollbarSize={4}>
@@ -201,7 +186,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
         </Flex>
       )}
     </>
-  ), [collapsed, navItems, isActive, t, title, toggleCollapsed, unpinSidebar, pinSidebar, theme.colors.gray]);
+  ), [collapsed, navItems, isActive, t, title, toggleCollapsed, unpinSidebar, theme.colors.gray]);
 
   // Desktop sidebar - fixed mode
   if (sidebarMode === 'fixed') {
@@ -226,21 +211,36 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
   }
 
   // Drawer mode - controlled from parent
+  // Custom header for drawer with pin button on left
+  const drawerHeader = (
+    <Flex justify="space-between" align="center" mb="md">
+      <Tooltip label={t('stats.sidebar.pinSidebar')} withArrow>
+        <ActionIcon
+          variant="light"
+          onClick={pinSidebar}
+          aria-label={t('stats.sidebar.pinSidebar')}
+        >
+          <IconPin size={18} />
+        </ActionIcon>
+      </Tooltip>
+    </Flex>
+  );
+
   return (
     <Drawer
       opened={drawerOpened}
       onClose={onDrawerClose || (() => {})}
       position="left"
       size="350px"
-      title=""
+      title={title}
       styles={{
-        header: { display: 'none' }, // We'll use custom header inside content
         body: { padding: 'md' },
         content: { backgroundColor: bgColor },
       }}
       hiddenFrom="base"
       visibleFrom="md"
     >
+      {drawerHeader}
       {renderSidebarContent(true)}
     </Drawer>
   );
