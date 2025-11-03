@@ -202,17 +202,15 @@ const StatsPage: React.FC = () => {
       <CreateHeader pageTitle={getPageTitle()} icon={getPageIcon()} />
 
       <Box display={{ base: 'flex', md: 'flex' }} style={{ gap: 'var(--mantine-spacing-md)', flexDirection: isMobile ? 'column' : 'row' }}>
-        {!isMobile && (
-          <StatsSidebar 
-            navItems={navItems} 
-            currentPath={location.pathname}
-            title={t('stats.sidebar.title')}
-          />
-        )}
+        {/* Desktop Sidebar - Mantine handles visibility */}
+        <StatsSidebar 
+          navItems={navItems} 
+          currentPath={location.pathname}
+          title={t('stats.sidebar.title')}
+        />
 
-        {isMobile && (
-          <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.sidebar.title')} />
-        )}
+        {/* Mobile Sidebar - Mantine handles visibility */}
+        <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.sidebar.title')} />
 
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense

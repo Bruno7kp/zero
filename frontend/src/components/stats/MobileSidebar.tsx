@@ -1,9 +1,10 @@
 // Mobile sidebar component shared by stats pages
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Text, Stack } from '@mantine/core';
+import { Box, Text, Stack, useMantineTheme } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import type { NavItem } from './StatsSidebar';
+import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 interface MobileSidebarProps {
   navItems: NavItem[];
@@ -13,7 +14,9 @@ interface MobileSidebarProps {
 
 export const MobileSidebar: React.FC<MobileSidebarProps> = ({ navItems, currentPath, title }) => {
   const [opened, setOpened] = React.useState(false);
-  const themeMode = useSelector((state: any) => state.theme?.value || 'dark');
+  const theme = useMantineTheme();
+  const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
+  const bgColor = getCardBackgroundByMode(theme, themeMode);
 
   const isActive = (item: NavItem) => {
     if (item.exact) {
@@ -25,13 +28,13 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ navItems, currentP
   };
 
   return (
-    <Box>
+    <Box hiddenFrom="md">
       <Box
         p="md"
         style={{
-          backgroundColor: themeMode === 'dark' ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-0)',
+          backgroundColor: bgColor,
           borderRadius: 'var(--mantine-radius-md)',
-          border: '1px solid var(--mantine-color-dark-4)',
+          border: `1px solid ${theme.colors.dark[4]}`,
         }}
       >
         <Box onClick={() => setOpened(!opened)} style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

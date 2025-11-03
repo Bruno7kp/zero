@@ -77,17 +77,15 @@ const StatsVisualizationsPage: React.FC = () => {
       <CreateHeader pageTitle={headerTitle} icon={headerIcon} />
 
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
-        {!isMobile && (
-          <StatsSidebar
-            navItems={navItems}
-            currentPath={location.pathname}
-            title={t('stats.visualizations.sidebar.title')}
-          />
-        )}
+        {/* Desktop Sidebar - Mantine handles visibility */}
+        <StatsSidebar
+          navItems={navItems}
+          currentPath={location.pathname}
+          title={t('stats.visualizations.sidebar.title')}
+        />
 
-        {isMobile && (
-          <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.visualizations.sidebar.title')} />
-        )}
+        {/* Mobile Sidebar - Mantine handles visibility */}
+        <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.visualizations.sidebar.title')} />
 
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense
