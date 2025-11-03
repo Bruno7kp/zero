@@ -1,14 +1,7 @@
 // Main stats page with sidebar and routing
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import {
-  Container,
-  Text,
-  Loader,
-  Center,
-  Stack,
-  Box,
-} from '@mantine/core';
+import { Container, Text, Loader, Center, Stack, Box } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import {
   IconChartBar,
@@ -35,7 +28,9 @@ import StatsSidebar, { type NavItem } from '../components/stats/StatsSidebar';
 import { MobileSidebar } from '../components/stats/MobileSidebar';
 
 // Lazy load stat components for performance
-const StatsVisualizationsOverview = lazy(() => import('./stats/visualizations/StatsVisualizationsOverview'));
+const StatsVisualizationsOverview = lazy(
+  () => import('./stats/visualizations/StatsVisualizationsOverview')
+);
 const RankStats = lazy(() => import('./stats/RankStats'));
 const PerfectAllKillStats = lazy(() => import('./stats/PerfectAllKillStats'));
 const TimesAtRankStats = lazy(() => import('./stats/TimesAtRankStats'));
@@ -200,18 +195,20 @@ const StatsPage: React.FC = () => {
 
   return (
     <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
-      <CreateHeader 
-        pageTitle={getPageTitle()} 
-        icon={getPageIcon()} 
-        showDrawerToggle={preferences.sidebarMode === 'drawer'}
-        onDrawerToggle={() => setDrawerOpened(!drawerOpened)}
+      <CreateHeader
+        pageTitle={getPageTitle()}
+        icon={getPageIcon()}
+        onDrawerToggle={() => setDrawerOpened(prev => !prev)}
         drawerToggleLabel={t('stats.sidebar.toggleDrawer')}
       />
 
-      <Box display={{ base: 'flex', md: 'flex' }} style={{ gap: 'var(--mantine-spacing-md)', flexDirection: isMobile ? 'column' : 'row' }}>
+      <Box
+        display={{ base: 'flex', md: 'flex' }}
+        style={{ gap: 'var(--mantine-spacing-md)', flexDirection: isMobile ? 'column' : 'row' }}
+      >
         {/* Desktop Sidebar - Mantine handles visibility */}
-        <StatsSidebar 
-          navItems={navItems} 
+        <StatsSidebar
+          navItems={navItems}
           currentPath={location.pathname}
           title={t('stats.sidebar.title')}
           drawerOpened={drawerOpened}
@@ -219,7 +216,11 @@ const StatsPage: React.FC = () => {
         />
 
         {/* Mobile Sidebar - Mantine handles visibility */}
-        <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.sidebar.title')} />
+        <MobileSidebar
+          navItems={navItems}
+          currentPath={location.pathname}
+          title={t('stats.sidebar.title')}
+        />
 
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense

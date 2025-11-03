@@ -11,8 +11,8 @@ export interface StatsPreferences {
   containerSize: '100%' | 'md' | 'lg' | 'xl';
   // whether the stats sidebar is collapsed (desktop) - shows only icons vs icons+text (used in fixed mode)
   collapsed: boolean;
-  // sidebar mode: 'fixed' = always visible, 'drawer' = sliding panel
-  sidebarMode: 'fixed' | 'drawer';
+  // desktop fixed sidebar enabled flag
+  fixedSidebarEnabled: boolean;
   showSales: boolean;
   peakOnly: boolean;
   pageSize: number;
@@ -28,7 +28,7 @@ export const DEFAULT_PREFERENCES: StatsPreferences = {
   fontSize: 'sm',
   containerSize: 'xl',
   collapsed: false,
-  sidebarMode: 'fixed',
+  fixedSidebarEnabled: true,
   showSales: false,
   peakOnly: false,
   pageSize: 25,

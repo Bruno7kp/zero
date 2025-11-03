@@ -560,8 +560,8 @@
         "toggleDrawer": "Toggle menu",
         "openDrawer": "Open menu",
         "closeDrawer": "Close menu",
-        "pinSidebar": "Pin sidebar",
-        "unpinSidebar": "Unpin sidebar"
+        "enableFixedSidebar": "Enable fixed sidebar",
+        "disableFixedSidebar": "Disable fixed sidebar"
       },
       "visualizations": {
         "sidebar": {

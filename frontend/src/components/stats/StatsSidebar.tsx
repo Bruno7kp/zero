@@ -43,12 +43,12 @@ interface StatsSidebarProps {
   onDrawerClose?: () => void;
 }
 
-const StatsSidebar: React.FC<StatsSidebarProps> = ({ 
-  navItems, 
-  currentPath, 
+const StatsSidebar: React.FC<StatsSidebarProps> = ({
+  navItems,
+  currentPath,
   title,
   drawerOpened = false,
-  onDrawerClose
+  onDrawerClose,
 }) => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
@@ -57,192 +57,246 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
   const { preferences, updatePreference } = useStatsPreferences();
 
   const collapsed = preferences.collapsed;
-  const sidebarMode = preferences.sidebarMode;
+  const fixedSidebarEnabled =
+    typeof preferences.fixedSidebarEnabled === 'boolean' ? preferences.fixedSidebarEnabled : true;
 
   const toggleCollapsed = React.useCallback(() => {
     updatePreference('collapsed', !collapsed);
   }, [collapsed, updatePreference]);
 
-  const pinSidebar = React.useCallback(() => {
-    updatePreference('sidebarMode', 'fixed');
-    // Keep current collapsed state when pinning
+  const enableFixedSidebar = React.useCallback(() => {
+    updatePreference('fixedSidebarEnabled', true);
     if (onDrawerClose) {
       onDrawerClose();
     }
   }, [updatePreference, onDrawerClose]);
 
-  const unpinSidebar = React.useCallback(() => {
-    updatePreference('sidebarMode', 'drawer');
+  const disableFixedSidebar = React.useCallback(() => {
+    updatePreference('fixedSidebarEnabled', false);
   }, [updatePreference]);
 
-  const isActive = React.useCallback((item: NavItem) => {
-    if (item.exact) {
-      return currentPath === item.path;
-    }
-    if (!item.group) return false;
-    const pathParts = currentPath.split('/');
-    return pathParts.some(part => part === item.group);
-  }, [currentPath]);
+  const isActive = React.useCallback(
+    (item: NavItem) => {
+      if (item.exact) {
+        return currentPath === item.path;
+      }
+      if (!item.group) return false;
+      const pathParts = currentPath.split('/');
+      return pathParts.some(part => part === item.group);
+    },
+    [currentPath]
+  );
 
   // Render sidebar content - used for both fixed and drawer modes
-  const renderSidebarContent = React.useCallback((isInDrawer: boolean = false) => (
-    <>
-      {/* Header with title and controls - only for fixed mode */}
-      {!isInDrawer && (
-        <Flex
-          justify={collapsed ? 'center' : 'space-between'}
-          align="center"
-          mb={collapsed ? 0 : 'md'}
-        >
-          {/* For fixed collapsed: just centered controls at bottom */}
-          {/* For fixed full: collapse on left, title in center, unpin on right */}
-          {!collapsed && (
-            <>
-              <Tooltip label={t('stats.sidebar.collapse')} withArrow>
-                <ActionIcon
-                  variant="subtle"
-                  onClick={toggleCollapsed}
-                  aria-label={t('stats.sidebar.collapse')}
-                >
-                  <IconLayoutSidebarLeftCollapse size={18} />
-                </ActionIcon>
-              </Tooltip>
-              <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
-                {title}
-              </Title>
-              <Tooltip label={t('stats.sidebar.unpinSidebar')} withArrow>
-                <ActionIcon
-                  variant="light"
-                  onClick={unpinSidebar}
-                  aria-label={t('stats.sidebar.unpinSidebar')}
-                >
-                  <IconPinFilled size={18} />
-                </ActionIcon>
-              </Tooltip>
-            </>
-          )}
-        </Flex>
-      )}
+  const handleDrawerNavClick = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      if (!onDrawerClose) {
+        return;
+      }
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+      onDrawerClose();
+    },
+    [onDrawerClose]
+  );
 
-      {/* Navigation items */}
-      <ScrollArea.Autosize mah={isInDrawer ? 'calc(100vh - 200px)' : 700} type="hover" scrollbarSize={4}>
-        <Stack gap={0}>
-          {navItems.map((item, index) =>
-            item.divider ? (
-              <Divider key={`divider-${index}`} my="xs" />
-            ) : (
-              <Tooltip
-                key={item.path || index}
-                label={item.label}
-                position="right"
-                disabled={!collapsed || isInDrawer}
-                withArrow
+  const renderSidebarContent = React.useCallback(
+    (isInDrawer: boolean = false) => (
+      <>
+        {/* Header with title and controls - only for fixed mode */}
+        {!isInDrawer && (
+          <Flex
+            justify={collapsed ? 'center' : 'space-between'}
+            align="center"
+            mb={collapsed ? 0 : 'md'}
+          >
+            {/* For fixed collapsed: just centered controls at bottom */}
+            {/* For fixed full: collapse on left, title in center, unpin on right */}
+            {!collapsed && (
+              <>
+                <Tooltip label={t('stats.sidebar.collapse')} withArrow>
+                  <ActionIcon
+                    variant="subtle"
+                    onClick={toggleCollapsed}
+                    aria-label={t('stats.sidebar.collapse')}
+                  >
+                    <IconLayoutSidebarLeftCollapse size={18} />
+                  </ActionIcon>
+                </Tooltip>
+                <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
+                  {title}
+                </Title>
+                <Tooltip label={t('stats.sidebar.disableFixedSidebar')} withArrow>
+                  <ActionIcon
+                    variant="light"
+                    onClick={disableFixedSidebar}
+                    aria-label={t('stats.sidebar.disableFixedSidebar')}
+                  >
+                    <IconPinFilled size={18} />
+                  </ActionIcon>
+                </Tooltip>
+              </>
+            )}
+          </Flex>
+        )}
+
+        {/* Navigation items */}
+        <ScrollArea.Autosize
+          mah={isInDrawer ? '100%' : 700}
+          type="hover"
+          scrollbarSize={4}
+          style={isInDrawer ? { flex: 1 } : undefined}
+        >
+          <Stack gap={0}>
+            {navItems.map((item, index) =>
+              item.divider ? (
+                <Divider key={`divider-${index}`} my="xs" />
+              ) : (
+                <Tooltip
+                  key={item.path || index}
+                  label={item.label}
+                  position="right"
+                  disabled={!collapsed || isInDrawer}
+                  withArrow
+                >
+                  <NavLink
+                    component={Link}
+                    to={item.path!}
+                    active={isActive(item)}
+                    label={collapsed && !isInDrawer ? undefined : item.label!}
+                    leftSection={item.icon ? <item.icon size={18} /> : undefined}
+                    onClick={isInDrawer ? handleDrawerNavClick : undefined}
+                    styles={{
+                      root: {
+                        justifyContent: collapsed && !isInDrawer ? 'center' : 'flex-start',
+                        paddingLeft: collapsed && !isInDrawer ? 8 : undefined,
+                        paddingRight: collapsed && !isInDrawer ? 8 : undefined,
+                        borderRadius: 8,
+                      },
+                      section: {
+                        marginRight: collapsed && !isInDrawer ? 0 : undefined,
+                      },
+                    }}
+                  />
+                </Tooltip>
+              )
+            )}
+          </Stack>
+        </ScrollArea.Autosize>
+
+        {/* Bottom controls - only shown when collapsed in fixed mode */}
+        {collapsed && !isInDrawer && (
+          <Flex
+            direction="column"
+            align={collapsed ? 'center' : 'initial'}
+            gap="xs"
+            mt="md"
+            pt="md"
+            style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}
+          >
+            <Tooltip label={t('stats.sidebar.expand')} withArrow>
+              <ActionIcon
+                variant="subtle"
+                onClick={toggleCollapsed}
+                aria-label={t('stats.sidebar.expand')}
               >
-                <NavLink
-                  component={Link}
-                  to={item.path!}
-                  active={isActive(item)}
-                  label={collapsed && !isInDrawer ? undefined : item.label!}
-                  leftSection={item.icon ? <item.icon size={18} /> : undefined}
-                  styles={{
-                    root: {
-                      justifyContent: collapsed && !isInDrawer ? 'center' : 'flex-start',
-                      paddingLeft: collapsed && !isInDrawer ? 8 : undefined,
-                      paddingRight: collapsed && !isInDrawer ? 8 : undefined,
-                      borderRadius: 8,
-                    },
-                    section: {
-                      marginRight: collapsed && !isInDrawer ? 0 : undefined,
-                    },
-                  }}
-                />
-              </Tooltip>
-            )
-          )}
-        </Stack>
-      </ScrollArea.Autosize>
+                <IconLayoutSidebarLeftExpand size={18} />
+              </ActionIcon>
+            </Tooltip>
+          </Flex>
+        )}
+      </>
+    ),
+    [
+      collapsed,
+      navItems,
+      isActive,
+      t,
+      title,
+      toggleCollapsed,
+      disableFixedSidebar,
+      theme.colors.gray,
+      handleDrawerNavClick,
+    ]
+  );
 
-      {/* Bottom controls - only shown when collapsed in fixed mode */}
-      {collapsed && !isInDrawer && (
-        <Flex direction="column" gap="xs" mt="md" pt="md" style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}>
-          <Tooltip label={t('stats.sidebar.expand')} withArrow>
-            <ActionIcon
-              variant="subtle"
-              onClick={toggleCollapsed}
-              aria-label={t('stats.sidebar.expand')}
-            >
-              <IconLayoutSidebarLeftExpand size={18} />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label={t('stats.sidebar.unpinSidebar')} withArrow>
-            <ActionIcon
-              variant="light"
-              onClick={unpinSidebar}
-              aria-label={t('stats.sidebar.unpinSidebar')}
-            >
-              <IconPinFilled size={18} />
-            </ActionIcon>
-          </Tooltip>
-        </Flex>
-      )}
-    </>
-  ), [collapsed, navItems, isActive, t, title, toggleCollapsed, unpinSidebar, theme.colors.gray]);
-
-  // Desktop sidebar - fixed mode
-  if (sidebarMode === 'fixed') {
-    return (
-      <Box
-        style={{
-          flexShrink: 0,
-          width: collapsed ? '55px' : '350px',
-          transition: 'width 200ms ease',
-        }}
-        hiddenFrom="base"
-        visibleFrom="md"
+  const drawerTitle = (
+    <Flex align="center" justify="center" style={{ position: 'relative', width: '100%' }}>
+      <Tooltip
+        label={
+          fixedSidebarEnabled
+            ? t('stats.sidebar.disableFixedSidebar')
+            : t('stats.sidebar.enableFixedSidebar')
+        }
+        withArrow
       >
-        <Card
-          p={collapsed ? 'xs' : 'md'}
-          style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
-        >
-          {renderSidebarContent(false)}
-        </Card>
-      </Box>
-    );
-  }
-
-  // Drawer mode - controlled from parent
-  // Custom header for drawer with pin button on left
-  const drawerHeader = (
-    <Flex justify="space-between" align="center" mb="md">
-      <Tooltip label={t('stats.sidebar.pinSidebar')} withArrow>
         <ActionIcon
           variant="light"
-          onClick={pinSidebar}
-          aria-label={t('stats.sidebar.pinSidebar')}
+          onClick={fixedSidebarEnabled ? disableFixedSidebar : enableFixedSidebar}
+          aria-label={
+            fixedSidebarEnabled
+              ? t('stats.sidebar.disableFixedSidebar')
+              : t('stats.sidebar.enableFixedSidebar')
+          }
+          style={{ position: 'absolute', left: 0 }}
         >
-          <IconPin size={18} />
+          {fixedSidebarEnabled ? <IconPinFilled size={18} /> : <IconPin size={18} />}
         </ActionIcon>
       </Tooltip>
+      <Title order={5} style={{ width: '100%', textAlign: 'center', margin: 0 }}>
+        {title}
+      </Title>
     </Flex>
   );
 
   return (
-    <Drawer
-      opened={drawerOpened}
-      onClose={onDrawerClose ?? (() => {})}
-      position="left"
-      size="350px"
-      title={title}
-      styles={{
-        body: { padding: 'md' },
-        content: { backgroundColor: bgColor },
-      }}
-      hiddenFrom="base"
-      visibleFrom="md"
-    >
-      {drawerHeader}
-      {renderSidebarContent(true)}
-    </Drawer>
+    <>
+      {fixedSidebarEnabled && (
+        <Box
+          style={{
+            flexShrink: 0,
+            width: collapsed ? '55px' : '350px',
+            transition: 'width 200ms ease',
+          }}
+          visibleFrom="md"
+        >
+          <Card
+            p={collapsed ? 'xs' : 'md'}
+            style={{ backgroundColor: bgColor, position: 'sticky', top: 70 }}
+          >
+            {renderSidebarContent(false)}
+          </Card>
+        </Box>
+      )}
+
+      <Drawer
+        opened={drawerOpened}
+        onClose={onDrawerClose ?? (() => {})}
+        position="left"
+        size="350px"
+        title={drawerTitle}
+        styles={{
+          header: { justifyContent: 'center', position: 'relative' },
+          title: { width: '100%', display: 'flex', justifyContent: 'center' },
+          close: { position: 'absolute', right: 'var(--mantine-spacing-sm)' },
+          body: { padding: 'md', height: '100%', display: 'flex', flexDirection: 'column' },
+          content: { backgroundColor: bgColor },
+        }}
+        visibleFrom="md"
+      >
+        <Flex direction="column" style={{ height: '100%' }}>
+          {renderSidebarContent(true)}
+        </Flex>
+      </Drawer>
+    </>
   );
 };
 

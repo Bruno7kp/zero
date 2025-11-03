@@ -1,24 +1,10 @@
 import React, { Suspense, lazy } from 'react';
-import {
-  Container,
-  Flex,
-  Box,
-  Center,
-  Loader,
-  Text,
-  Stack,
-} from '@mantine/core';
-import {
-  IconGraph,
-  IconTimeline,
-  IconCrown,
-  IconChartBar,
-} from '@tabler/icons-react';
+import { Container, Flex, Box, Center, Loader, Text, Stack } from '@mantine/core';
+import { IconGraph, IconTimeline, IconCrown, IconChartBar } from '@tabler/icons-react';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateHeader from '../../../components/createChart/CreateHeader';
 import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
-import { useStatsPreferences } from '../../../hooks/useStatsPreferences';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 import StatsSidebar, { type NavItem } from '../../../components/stats/StatsSidebar';
 import { MobileSidebar } from '../../../components/stats/MobileSidebar';
@@ -31,7 +17,6 @@ const StatsVisualizationsPage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { preferences: vizPreferences } = useVisualizationPreferences();
-  const { preferences: statsPreferences } = useStatsPreferences();
   const isMobile = useIsMobile();
   const [drawerOpened, setDrawerOpened] = React.useState(false);
 
@@ -77,11 +62,10 @@ const StatsVisualizationsPage: React.FC = () => {
 
   return (
     <Container size={isMobile ? '100%' : vizPreferences.containerSize} className="noPaddingMobile">
-      <CreateHeader 
-        pageTitle={headerTitle} 
+      <CreateHeader
+        pageTitle={headerTitle}
         icon={headerIcon}
-        showDrawerToggle={statsPreferences.sidebarMode === 'drawer'}
-        onDrawerToggle={() => setDrawerOpened(!drawerOpened)}
+        onDrawerToggle={() => setDrawerOpened(prev => !prev)}
         drawerToggleLabel={t('stats.sidebar.toggleDrawer')}
       />
 
@@ -96,7 +80,11 @@ const StatsVisualizationsPage: React.FC = () => {
         />
 
         {/* Mobile Sidebar - Mantine handles visibility */}
-        <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.visualizations.sidebar.title')} />
+        <MobileSidebar
+          navItems={navItems}
+          currentPath={location.pathname}
+          title={t('stats.visualizations.sidebar.title')}
+        />
 
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense

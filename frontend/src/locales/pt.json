@@ -560,8 +560,8 @@
         "toggleDrawer": "Alternar menu",
         "openDrawer": "Abrir menu",
         "closeDrawer": "Fechar menu",
-        "pinSidebar": "Fixar barra lateral",
-        "unpinSidebar": "Desfixar barra lateral"
+        "enableFixedSidebar": "Ativar barra lateral fixa",
+        "disableFixedSidebar": "Desativar barra lateral fixa"
       },
       "visualizations": {
         "sidebar": {
