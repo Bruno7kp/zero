@@ -31,7 +31,8 @@ const CreateHeader: React.FC<Props> = ({
               size="lg"
               onClick={onDrawerToggle}
               aria-label={drawerToggleLabel}
-              style={{ position: 'absolute', left: 0 }}
+              pos="absolute"
+              left={0}
               hiddenFrom="base"
               visibleFrom="md"
             >

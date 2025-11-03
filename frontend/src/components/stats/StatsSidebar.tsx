@@ -65,7 +65,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
 
   const pinSidebar = React.useCallback(() => {
     updatePreference('sidebarMode', 'fixed');
-    updatePreference('collapsed', false); // Default to full when pinning
+    // Keep current collapsed state when pinning
     if (onDrawerClose) {
       onDrawerClose();
     }
@@ -229,7 +229,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
   return (
     <Drawer
       opened={drawerOpened}
-      onClose={onDrawerClose || (() => {})}
+      onClose={onDrawerClose ?? (() => {})}
       position="left"
       size="350px"
       title={title}
