@@ -1,19 +1,6 @@
 import React, { Suspense, lazy } from 'react';
-import {
-  Container,
-  Flex,
-  Box,
-  Center,
-  Loader,
-  Text,
-  Stack,
-} from '@mantine/core';
-import {
-  IconGraph,
-  IconTimeline,
-  IconCrown,
-  IconChartBar,
-} from '@tabler/icons-react';
+import { Container, Flex, Box, Center, Loader, Text, Stack } from '@mantine/core';
+import { IconGraph, IconTimeline, IconCrown, IconChartBar } from '@tabler/icons-react';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateHeader from '../../../components/createChart/CreateHeader';
@@ -31,6 +18,7 @@ const StatsVisualizationsPage: React.FC = () => {
   const location = useLocation();
   const { preferences: vizPreferences } = useVisualizationPreferences();
   const isMobile = useIsMobile();
+  const [drawerOpened, setDrawerOpened] = React.useState(false);
 
   const navItems: NavItem[] = [
     {
@@ -74,7 +62,12 @@ const StatsVisualizationsPage: React.FC = () => {
 
   return (
     <Container size={isMobile ? '100%' : vizPreferences.containerSize} className="noPaddingMobile">
-      <CreateHeader pageTitle={headerTitle} icon={headerIcon} />
+      <CreateHeader
+        pageTitle={headerTitle}
+        icon={headerIcon}
+        onDrawerToggle={() => setDrawerOpened(prev => !prev)}
+        drawerToggleLabel={t('stats.sidebar.toggleDrawer')}
+      />
 
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Desktop Sidebar - Mantine handles visibility */}
@@ -82,10 +75,16 @@ const StatsVisualizationsPage: React.FC = () => {
           navItems={navItems}
           currentPath={location.pathname}
           title={t('stats.visualizations.sidebar.title')}
+          drawerOpened={drawerOpened}
+          onDrawerClose={() => setDrawerOpened(false)}
         />
 
         {/* Mobile Sidebar - Mantine handles visibility */}
-        <MobileSidebar navItems={navItems} currentPath={location.pathname} title={t('stats.visualizations.sidebar.title')} />
+        <MobileSidebar
+          navItems={navItems}
+          currentPath={location.pathname}
+          title={t('stats.visualizations.sidebar.title')}
+        />
 
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Suspense
