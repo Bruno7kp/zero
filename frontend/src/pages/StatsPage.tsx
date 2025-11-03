@@ -55,6 +55,7 @@ const StatsPage: React.FC = () => {
   const location = useLocation();
   const { preferences } = useStatsPreferences();
   const isMobile = useIsMobile();
+  const [drawerOpened, setDrawerOpened] = React.useState(false);
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -199,7 +200,13 @@ const StatsPage: React.FC = () => {
 
   return (
     <Container size={isMobile ? '100%' : preferences.containerSize} className="noPaddingMobile">
-      <CreateHeader pageTitle={getPageTitle()} icon={getPageIcon()} />
+      <CreateHeader 
+        pageTitle={getPageTitle()} 
+        icon={getPageIcon()} 
+        showDrawerToggle={preferences.sidebarMode === 'drawer'}
+        onDrawerToggle={() => setDrawerOpened(!drawerOpened)}
+        drawerToggleLabel={t('stats.sidebar.toggleDrawer')}
+      />
 
       <Box display={{ base: 'flex', md: 'flex' }} style={{ gap: 'var(--mantine-spacing-md)', flexDirection: isMobile ? 'column' : 'row' }}>
         {/* Desktop Sidebar - Mantine handles visibility */}
@@ -207,6 +214,8 @@ const StatsPage: React.FC = () => {
           navItems={navItems} 
           currentPath={location.pathname}
           title={t('stats.sidebar.title')}
+          drawerOpened={drawerOpened}
+          onDrawerClose={() => setDrawerOpened(false)}
         />
 
         {/* Mobile Sidebar - Mantine handles visibility */}

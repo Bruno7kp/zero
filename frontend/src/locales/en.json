@@ -557,9 +557,11 @@
         "expand": "Show icons and text",
         "viewVisualizations": "Graphs",
         "viewTables": "Back to tables",
-        "toggleSpeedDial": "Toggle floating menu",
-        "openSpeedDial": "Open menu",
-        "closeSpeedDial": "Close menu"
+        "toggleDrawer": "Toggle menu",
+        "openDrawer": "Open menu",
+        "closeDrawer": "Close menu",
+        "pinSidebar": "Pin sidebar",
+        "unpinSidebar": "Unpin sidebar"
       },
       "visualizations": {
         "sidebar": {

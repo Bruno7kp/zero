@@ -9,10 +9,10 @@ export interface StatsPreferences {
   showPositionColumn: boolean;
   fontSize: 'xs' | 'sm' | 'md';
   containerSize: '100%' | 'md' | 'lg' | 'xl';
-  // whether the stats sidebar is collapsed (desktop) - shows only icons vs icons+text
+  // whether the stats sidebar is collapsed (desktop) - shows only icons vs icons+text (used in fixed mode)
   collapsed: boolean;
-  // sidebar mode: 'fixed' = always visible, 'speedDial' = floating button that shows sidebar on click
-  sidebarMode: 'fixed' | 'speedDial';
+  // sidebar mode: 'fixed' = always visible, 'drawer' = sliding panel
+  sidebarMode: 'fixed' | 'drawer';
   showSales: boolean;
   peakOnly: boolean;
   pageSize: number;

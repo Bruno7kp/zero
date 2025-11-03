@@ -557,9 +557,11 @@
         "expand": "Mostrar ícones e texto",
         "viewVisualizations": "Gráficos",
         "viewTables": "Voltar para tabelas",
-        "toggleSpeedDial": "Alternar menu flutuante",
-        "openSpeedDial": "Abrir menu",
-        "closeSpeedDial": "Fechar menu"
+        "toggleDrawer": "Alternar menu",
+        "openDrawer": "Abrir menu",
+        "closeDrawer": "Fechar menu",
+        "pinSidebar": "Fixar barra lateral",
+        "unpinSidebar": "Desfixar barra lateral"
       },
       "visualizations": {
         "sidebar": {

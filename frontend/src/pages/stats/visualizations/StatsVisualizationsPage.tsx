@@ -18,6 +18,7 @@ import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateHeader from '../../../components/createChart/CreateHeader';
 import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
+import { useStatsPreferences } from '../../../hooks/useStatsPreferences';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 import StatsSidebar, { type NavItem } from '../../../components/stats/StatsSidebar';
 import { MobileSidebar } from '../../../components/stats/MobileSidebar';
@@ -30,7 +31,9 @@ const StatsVisualizationsPage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { preferences: vizPreferences } = useVisualizationPreferences();
+  const { preferences: statsPreferences } = useStatsPreferences();
   const isMobile = useIsMobile();
+  const [drawerOpened, setDrawerOpened] = React.useState(false);
 
   const navItems: NavItem[] = [
     {
@@ -74,7 +77,13 @@ const StatsVisualizationsPage: React.FC = () => {
 
   return (
     <Container size={isMobile ? '100%' : vizPreferences.containerSize} className="noPaddingMobile">
-      <CreateHeader pageTitle={headerTitle} icon={headerIcon} />
+      <CreateHeader 
+        pageTitle={headerTitle} 
+        icon={headerIcon}
+        showDrawerToggle={statsPreferences.sidebarMode === 'drawer'}
+        onDrawerToggle={() => setDrawerOpened(!drawerOpened)}
+        drawerToggleLabel={t('stats.sidebar.toggleDrawer')}
+      />
 
       <Flex gap="md" direction={{ base: 'column', md: 'row' }}>
         {/* Desktop Sidebar - Mantine handles visibility */}
@@ -82,6 +91,8 @@ const StatsVisualizationsPage: React.FC = () => {
           navItems={navItems}
           currentPath={location.pathname}
           title={t('stats.visualizations.sidebar.title')}
+          drawerOpened={drawerOpened}
+          onDrawerClose={() => setDrawerOpened(false)}
         />
 
         {/* Mobile Sidebar - Mantine handles visibility */}

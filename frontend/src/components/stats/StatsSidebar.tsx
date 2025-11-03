@@ -12,15 +12,14 @@ import {
   Title,
   Box,
   Flex,
-  Affix,
-  Transition,
+  Drawer,
   useMantineTheme,
 } from '@mantine/core';
 import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
-  IconMenu2,
-  IconX,
+  IconPin,
+  IconPinFilled,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -40,9 +39,17 @@ interface StatsSidebarProps {
   navItems: NavItem[];
   currentPath: string;
   title: string;
+  drawerOpened?: boolean;
+  onDrawerClose?: () => void;
 }
 
-const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, title }) => {
+const StatsSidebar: React.FC<StatsSidebarProps> = ({ 
+  navItems, 
+  currentPath, 
+  title,
+  drawerOpened = false,
+  onDrawerClose
+}) => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
@@ -51,19 +58,22 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
 
   const collapsed = preferences.collapsed;
   const sidebarMode = preferences.sidebarMode;
-  const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
 
   const toggleCollapsed = React.useCallback(() => {
     updatePreference('collapsed', !collapsed);
   }, [collapsed, updatePreference]);
 
-  const toggleSidebarMode = React.useCallback(() => {
-    const newMode = sidebarMode === 'fixed' ? 'speedDial' : 'fixed';
-    updatePreference('sidebarMode', newMode);
-    if (newMode === 'speedDial') {
-      setSpeedDialOpen(false);
+  const pinSidebar = React.useCallback(() => {
+    updatePreference('sidebarMode', 'fixed');
+    updatePreference('collapsed', false); // Default to full when pinning
+    if (onDrawerClose) {
+      onDrawerClose();
     }
-  }, [sidebarMode, updatePreference]);
+  }, [updatePreference, onDrawerClose]);
+
+  const unpinSidebar = React.useCallback(() => {
+    updatePreference('sidebarMode', 'drawer');
+  }, [updatePreference]);
 
   const isActive = React.useCallback((item: NavItem) => {
     if (item.exact) {
@@ -74,18 +84,37 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
     return pathParts.some(part => part === item.group);
   }, [currentPath]);
 
-  // Render sidebar content - memoized to avoid recreating on each render
-  const renderSidebarContent = React.useCallback((isSpeedDial: boolean = false) => (
+  // Render sidebar content - used for both fixed and drawer modes
+  const renderSidebarContent = React.useCallback((isInDrawer: boolean = false) => (
     <>
       {/* Header with title and controls */}
       <Flex
-        justify={collapsed ? 'center' : 'space-between'}
+        justify={collapsed && !isInDrawer ? 'center' : 'space-between'}
         align="center"
-        mb={collapsed ? 0 : 'md'}
+        mb={collapsed && !isInDrawer ? 0 : 'md'}
       >
-        {!collapsed && (
+        {/* For drawer: pin button on left, title in center, nothing on right (close is in drawer header) */}
+        {/* For fixed collapsed: just centered controls at bottom */}
+        {/* For fixed full: collapse on left, title in center, unpin on right */}
+        {isInDrawer ? (
           <>
-            <Tooltip label={t('stats.sidebar.collapse')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+            <Tooltip label={t('stats.sidebar.pinSidebar')} withArrow>
+              <ActionIcon
+                variant="light"
+                onClick={pinSidebar}
+                aria-label={t('stats.sidebar.pinSidebar')}
+              >
+                <IconPin size={18} />
+              </ActionIcon>
+            </Tooltip>
+            <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
+              {title}
+            </Title>
+            <Box style={{ width: 36 }} /> {/* Spacer for symmetry */}
+          </>
+        ) : !collapsed ? (
+          <>
+            <Tooltip label={t('stats.sidebar.collapse')} withArrow>
               <ActionIcon
                 variant="subtle"
                 onClick={toggleCollapsed}
@@ -97,21 +126,21 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
             <Title order={4} style={{ flex: 1, textAlign: 'center' }}>
               {title}
             </Title>
-            <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+            <Tooltip label={t('stats.sidebar.unpinSidebar')} withArrow>
               <ActionIcon
                 variant="light"
-                onClick={toggleSidebarMode}
-                aria-label={t('stats.sidebar.toggleSpeedDial')}
+                onClick={unpinSidebar}
+                aria-label={t('stats.sidebar.unpinSidebar')}
               >
-                <IconMenu2 size={18} />
+                <IconPinFilled size={18} />
               </ActionIcon>
             </Tooltip>
           </>
-        )}
+        ) : null}
       </Flex>
 
       {/* Navigation items */}
-      <ScrollArea.Autosize mah={isSpeedDial ? 500 : 700} type="hover" scrollbarSize={4}>
+      <ScrollArea.Autosize mah={isInDrawer ? 'calc(100vh - 200px)' : 700} type="hover" scrollbarSize={4}>
         <Stack gap={0}>
           {navItems.map((item, index) =>
             item.divider ? (
@@ -121,25 +150,24 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
                 key={item.path || index}
                 label={item.label}
                 position="right"
-                disabled={!collapsed}
+                disabled={!collapsed || isInDrawer}
                 withArrow
-                zIndex={isSpeedDial ? 1001 : undefined}
               >
                 <NavLink
                   component={Link}
                   to={item.path!}
                   active={isActive(item)}
-                  label={collapsed ? undefined : item.label!}
+                  label={collapsed && !isInDrawer ? undefined : item.label!}
                   leftSection={item.icon ? <item.icon size={18} /> : undefined}
                   styles={{
                     root: {
-                      justifyContent: collapsed ? 'center' : 'flex-start',
-                      paddingLeft: collapsed ? 8 : undefined,
-                      paddingRight: collapsed ? 8 : undefined,
+                      justifyContent: collapsed && !isInDrawer ? 'center' : 'flex-start',
+                      paddingLeft: collapsed && !isInDrawer ? 8 : undefined,
+                      paddingRight: collapsed && !isInDrawer ? 8 : undefined,
                       borderRadius: 8,
                     },
                     section: {
-                      marginRight: collapsed ? 0 : undefined,
+                      marginRight: collapsed && !isInDrawer ? 0 : undefined,
                     },
                   }}
                 />
@@ -149,10 +177,10 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
         </Stack>
       </ScrollArea.Autosize>
 
-      {/* Bottom controls - only shown when collapsed */}
-      {collapsed && (
+      {/* Bottom controls - only shown when collapsed in fixed mode */}
+      {collapsed && !isInDrawer && (
         <Flex direction="column" gap="xs" mt="md" pt="md" style={{ borderTop: `1px solid ${theme.colors.gray[7]}` }}>
-          <Tooltip label={t('stats.sidebar.expand')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+          <Tooltip label={t('stats.sidebar.expand')} withArrow>
             <ActionIcon
               variant="subtle"
               onClick={toggleCollapsed}
@@ -161,19 +189,19 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
               <IconLayoutSidebarLeftExpand size={18} />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label={t('stats.sidebar.toggleSpeedDial')} withArrow zIndex={isSpeedDial ? 1001 : undefined}>
+          <Tooltip label={t('stats.sidebar.unpinSidebar')} withArrow>
             <ActionIcon
               variant="light"
-              onClick={toggleSidebarMode}
-              aria-label={t('stats.sidebar.toggleSpeedDial')}
+              onClick={unpinSidebar}
+              aria-label={t('stats.sidebar.unpinSidebar')}
             >
-              <IconMenu2 size={18} />
+              <IconPinFilled size={18} />
             </ActionIcon>
           </Tooltip>
         </Flex>
       )}
     </>
-  ), [collapsed, navItems, isActive, t, title, toggleCollapsed, toggleSidebarMode, theme.colors.gray]);
+  ), [collapsed, navItems, isActive, t, title, toggleCollapsed, unpinSidebar, pinSidebar, theme.colors.gray]);
 
   // Desktop sidebar - fixed mode
   if (sidebarMode === 'fixed') {
@@ -197,46 +225,24 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ navItems, currentPath, titl
     );
   }
 
-  // Desktop sidebar - speed dial mode
+  // Drawer mode - controlled from parent
   return (
-    <>
-      {/* Speed dial button */}
-      <Affix position={{ bottom: 20, left: 20 }} hiddenFrom="base" visibleFrom="md">
-        <ActionIcon
-          size="xl"
-          radius="xl"
-          variant="filled"
-          color="blue"
-          onClick={() => setSpeedDialOpen(!speedDialOpen)}
-          aria-label={speedDialOpen ? t('stats.sidebar.closeSpeedDial') : t('stats.sidebar.openSpeedDial')}
-        >
-          {speedDialOpen ? <IconX size={24} /> : <IconMenu2 size={24} />}
-        </ActionIcon>
-      </Affix>
-
-      {/* Floating sidebar */}
-      <Transition mounted={speedDialOpen} transition="slide-right" duration={200}>
-        {styles => (
-          <Box
-            style={{
-              ...styles,
-              position: 'fixed',
-              bottom: 80,
-              left: 20,
-              zIndex: 1000,
-              width: collapsed ? '55px' : '350px',
-              maxHeight: 'calc(100vh - 150px)',
-            }}
-            hiddenFrom="base"
-            visibleFrom="md"
-          >
-            <Card p={collapsed ? 'xs' : 'md'} shadow="xl" style={{ backgroundColor: bgColor }}>
-              {renderSidebarContent(true)}
-            </Card>
-          </Box>
-        )}
-      </Transition>
-    </>
+    <Drawer
+      opened={drawerOpened}
+      onClose={onDrawerClose || (() => {})}
+      position="left"
+      size="350px"
+      title=""
+      styles={{
+        header: { display: 'none' }, // We'll use custom header inside content
+        body: { padding: 'md' },
+        content: { backgroundColor: bgColor },
+      }}
+      hiddenFrom="base"
+      visibleFrom="md"
+    >
+      {renderSidebarContent(true)}
+    </Drawer>
   );
 };
 
