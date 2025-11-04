@@ -98,6 +98,12 @@ const LATEST_NUMBER_ONE_COUNT = 8;
 const NUMBER_ONE_HISTORY_COUNT = 15;
 const TOP_DEBUTS_COUNT = 5;
 const TOP_PLAYS_COUNT = 5;
+const CHART_TYPES: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
+const TOP_POINTS_RANGES = [
+  [0, 2],
+  [3, 5],
+  [6, 8],
+] as const;
 
 interface RankLeaderPreview {
   id: string;
@@ -270,13 +276,11 @@ const StatsVisualizationsOverview: React.FC = () => {
           chartType: 'artist',
         });
         const topPointsArtists = pointsData.slice(0, 10);
-        const randomRanges = [[0, 2], [3, 5], [6, 8]];
-        const randomRange = randomRanges[Math.floor(Math.random() * randomRanges.length)];
+        const randomRange = TOP_POINTS_RANGES[Math.floor(Math.random() * TOP_POINTS_RANGES.length)];
         const selectedPoints = topPointsArtists.slice(randomRange[0], randomRange[1] + 1);
 
         // Biggest Debuts - random type
-        const debutTypes: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
-        const randomDebutType = debutTypes[Math.floor(Math.random() * debutTypes.length)];
+        const randomDebutType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
         const debuts = await getBestDebuts({
           chartId,
           chartType: randomDebutType,
@@ -284,8 +288,7 @@ const StatsVisualizationsOverview: React.FC = () => {
         const topDebuts = debuts.slice(0, TOP_DEBUTS_COUNT);
 
         // Highest Plays - random type
-        const playsTypes: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
-        const randomPlaysType = playsTypes[Math.floor(Math.random() * playsTypes.length)];
+        const randomPlaysType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
         const playsData = await getHighestPlays({
           chartId,
           chartType: randomPlaysType,
