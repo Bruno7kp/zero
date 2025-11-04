@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Flex, Button, Title, Text, Skeleton } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { Card, Flex, Button, Text, Skeleton, Divider, ThemeIcon, Group, rem } from '@mantine/core';
+import { IconArrowRight, IconTimeline } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import MiniNumberOneBars from '../../visualizations/MiniNumberOneBars';
@@ -25,16 +25,16 @@ export const LatestNumberOneCard: React.FC<LatestNumberOneCardProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Card withBorder p="lg" style={{ background: cardBg }}>
-      <Flex align="center" gap="md" mb="sm">
-        <div style={{ flex: 1 }}>
-          <Title order={4}>{t('stats.visualizations.overview.latestNumberOnePlays')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('stats.visualizations.overview.latestNumberOnePlaysDescription', {
-              weeks: numberOneTrend.length,
-            })}
+    <Card shadow="md" p="md" style={{ background: cardBg }}>
+      <Group justify="space-between">
+        <Group>
+          <ThemeIcon variant="light" size="md">
+            <IconTimeline style={{ width: rem(20), height: rem(20) }} />
+          </ThemeIcon>
+          <Text fw={600} size="lg">
+            {t('stats.visualizations.overview.latestNumberOnePlays')}
           </Text>
-        </div>
+        </Group>
         <Button
           variant="light"
           size="xs"
@@ -44,7 +44,8 @@ export const LatestNumberOneCard: React.FC<LatestNumberOneCardProps> = ({
         >
           {t('stats.visualizations.actions.viewDetail')}
         </Button>
-      </Flex>
+      </Group>
+      <Divider variant="dashed" size="sm" my="xs" />
       {loading ? (
         <Skeleton height={140} radius="md" />
       ) : numberOneTrend.length === 0 ? (

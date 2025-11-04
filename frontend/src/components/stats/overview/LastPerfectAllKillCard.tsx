@@ -1,6 +1,18 @@
 import React from 'react';
-import { Card, Flex, Button, Title, Text, Skeleton, Grid, Avatar } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import {
+  Card,
+  Flex,
+  Button,
+  Text,
+  Skeleton,
+  Avatar,
+  Divider,
+  Group,
+  ThemeIcon,
+  SimpleGrid,
+  rem,
+} from '@mantine/core';
+import { IconArrowRight, IconFlame } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -12,6 +24,8 @@ interface LastPerfectAllKillCardProps {
     albumName: string;
     trackName: string;
     artistImageUrl?: string;
+    albumImageUrl?: string;
+    trackImageUrl?: string;
     week: string;
   } | null;
 }
@@ -24,14 +38,16 @@ export const LastPerfectAllKillCard: React.FC<LastPerfectAllKillCardProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Card withBorder p="lg" style={{ background: cardBg }}>
-      <Flex align="center" gap="md" mb="sm">
-        <div style={{ flex: 1 }}>
-          <Title order={4}>{t('stats.visualizations.overview.lastPerfectAllKill')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('stats.visualizations.overview.lastPerfectAllKillDescription')}
+    <Card shadow="md" p="md" style={{ background: cardBg }}>
+      <Group justify="space-between">
+        <Group>
+          <ThemeIcon variant="light" size="md">
+            <IconFlame style={{ width: rem(20), height: rem(20) }} />
+          </ThemeIcon>
+          <Text fw={600} size="lg">
+            {t('stats.visualizations.overview.lastPerfectAllKill')}
           </Text>
-        </div>
+        </Group>
         <Button
           variant="light"
           size="xs"
@@ -41,7 +57,8 @@ export const LastPerfectAllKillCard: React.FC<LastPerfectAllKillCardProps> = ({
         >
           {t('stats.visualizations.actions.viewDetail')}
         </Button>
-      </Flex>
+      </Group>
+      <Divider variant="dashed" size="sm" my="xs" />
       {loading ? (
         <Skeleton height={100} radius="md" />
       ) : !lastPAK ? (
@@ -51,27 +68,28 @@ export const LastPerfectAllKillCard: React.FC<LastPerfectAllKillCardProps> = ({
           </Text>
         </Flex>
       ) : (
-        <Grid gutter="md" align="center">
-          <Grid.Col span="auto">
-            <Avatar src={lastPAK.artistImageUrl} alt={lastPAK.artistName} size={80} radius="md" />
-          </Grid.Col>
-          <Grid.Col span={8}>
-            <Flex direction="column" gap={4}>
-              <Text fw={600} size="md">
+        <>
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md" verticalSpacing="md">
+            <Flex direction="column" align="center" gap={8}>
+              <Avatar src={lastPAK.artistImageUrl} alt={lastPAK.artistName} size={80} radius="md" />
+              <Text fw={600} size="sm" ta="center">
                 {lastPAK.artistName}
               </Text>
-              <Text size="sm" c="dimmed">
+            </Flex>
+            <Flex direction="column" align="center" gap={8}>
+              <Avatar src={lastPAK.albumImageUrl} alt={lastPAK.albumName} size={80} radius="md" />
+              <Text fw={600} size="sm" ta="center">
                 {lastPAK.albumName}
               </Text>
-              <Text size="sm" c="dimmed">
+            </Flex>
+            <Flex direction="column" align="center" gap={8}>
+              <Avatar src={lastPAK.trackImageUrl} alt={lastPAK.trackName} size={80} radius="md" />
+              <Text fw={600} size="sm" ta="center">
                 {lastPAK.trackName}
               </Text>
-              <Text size="xs" c="dimmed" mt={4}>
-                {lastPAK.week.replace(/-/g, '.')}
-              </Text>
             </Flex>
-          </Grid.Col>
-        </Grid>
+          </SimpleGrid>
+        </>
       )}
     </Card>
   );

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Stack,
-  Alert,
-  Anchor,
-  Text,
-  useMantineTheme,
-} from '@mantine/core';
+import { Stack, Alert, Anchor, Text, useMantineTheme } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -14,9 +8,15 @@ import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } f
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { db } from '../../../db/indexedDb';
-import { getTimesAtRank, getPerfectAllKills, getPointsAccumulators, getBestDebuts, getHighestPlays } from '../../../utils/statsQueries';
+import {
+  getTimesAtRank,
+  getPerfectAllKills,
+  getPointsAccumulators,
+  getBestDebuts,
+  getHighestPlays,
+} from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
-import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
+import { fetchSpotifyImagesBatch, type SpotifyEntityType } from '../../../utils/spotifyImageLoader';
 import { ChartSyncProgress } from '../../../components/chartPage/ChartSyncProgress';
 import { ChartWeekTop1Summary } from '../../../components/chartPage/ChartWeekTop1Summary';
 import { ChartLiveSummary } from '../../../components/chartPage/ChartLiveSummary';
@@ -99,12 +99,6 @@ const NUMBER_ONE_HISTORY_COUNT = 15;
 const TOP_DEBUTS_COUNT = 5;
 const TOP_PLAYS_COUNT = 5;
 const CHART_TYPES: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
-const TOP_POINTS_RANGES = [
-  [0, 2],
-  [3, 5],
-  [6, 8],
-] as const;
-
 interface RankLeaderPreview {
   id: string;
   value: number;
@@ -152,33 +146,47 @@ const StatsVisualizationsOverview: React.FC = () => {
     albumName: string;
     trackName: string;
     artistImageUrl?: string;
+    albumImageUrl?: string;
+    trackImageUrl?: string;
     week: string;
   } | null>(null);
-  const [topPoints, setTopPoints] = React.useState<Array<{
-    name: string;
-    totalPoints: number;
-    entityId: string;
-    rank: number;
-  }>>([]);
-  const [biggestDebuts, setBiggestDebuts] = React.useState<Array<{
-    name: string;
-    artistName?: string;
-    plays: number;
-    entityId: string;
-  }>>([]);
-  const [debutsChartType, setDebutsChartType] = React.useState<'artist' | 'album' | 'track'>('track');
-  const [highestPlays, setHighestPlays] = React.useState<Array<{
-    name: string;
-    artistName?: string;
-    plays: number;
-    entityId: string;
-  }>>([]);
+  const [topPoints, setTopPoints] = React.useState<
+    Array<{
+      type: SpotifyEntityType;
+      name: string;
+      artistName: string;
+      totalPoints: number;
+      entityId: string;
+      imageUrl?: string;
+    }>
+  >([]);
+  const [biggestDebuts, setBiggestDebuts] = React.useState<
+    Array<{
+      name: string;
+      artistName?: string;
+      plays: number;
+      entityId: string;
+    }>
+  >([]);
+  const [debutsChartType, setDebutsChartType] = React.useState<'artist' | 'album' | 'track'>(
+    'track'
+  );
+  const [highestPlays, setHighestPlays] = React.useState<
+    Array<{
+      name: string;
+      artistName?: string;
+      plays: number;
+      entityId: string;
+    }>
+  >([]);
   const [playsChartType, setPlaysChartType] = React.useState<'artist' | 'album' | 'track'>('track');
-  const [numberOneHistory, setNumberOneHistory] = React.useState<Array<{
-    week: string;
-    artistName: string;
-    plays: number;
-  }>>([]);
+  const [numberOneHistory, setNumberOneHistory] = React.useState<
+    Array<{
+      week: string;
+      artistName: string;
+      plays: number;
+    }>
+  >([]);
 
   React.useEffect(() => {
     setCardOrder(prev => {
@@ -257,27 +265,105 @@ const StatsVisualizationsOverview: React.FC = () => {
         // Last Perfect All Kill
         const paks = await getPerfectAllKills(chartId);
         const latestPAK = paks.length > 0 ? paks[paks.length - 1] : null;
-        let pakImage: string | undefined;
+        let pakImages: Record<string, string | undefined> = {};
         if (latestPAK) {
-          const pakImages = await fetchSpotifyImagesBatch([
+          const imageRequests: Array<{
+            entityId: string;
+            name: string;
+            artistName?: string;
+            type: SpotifyEntityType;
+          }> = [
             {
               entityId: latestPAK.artistEntityId,
               name: latestPAK.artistName,
               artistName: latestPAK.artistName,
               type: 'artist',
             },
-          ]);
-          pakImage = pakImages[latestPAK.artistEntityId];
+          ];
+
+          if (latestPAK.albumEntityId) {
+            imageRequests.push({
+              entityId: latestPAK.albumEntityId,
+              name: latestPAK.albumName,
+              artistName: latestPAK.artistName,
+              type: 'album',
+            });
+          }
+
+          if (latestPAK.trackEntityId) {
+            imageRequests.push({
+              entityId: latestPAK.trackEntityId,
+              name: latestPAK.trackName,
+              artistName: latestPAK.artistName,
+              type: 'track',
+            });
+          }
+
+          pakImages = await fetchSpotifyImagesBatch(imageRequests);
         }
 
-        // Most Points - get top 10 and select random 3-position range
-        const pointsData = await getPointsAccumulators({
-          chartId,
-          chartType: 'artist',
-        });
-        const topPointsArtists = pointsData.slice(0, 10);
-        const randomRange = TOP_POINTS_RANGES[Math.floor(Math.random() * TOP_POINTS_RANGES.length)];
-        const selectedPoints = topPointsArtists.slice(randomRange[0], randomRange[1] + 1);
+        // Most Points - top artist, album, and track
+        const [artistPoints, albumPoints, trackPoints] = await Promise.all([
+          getPointsAccumulators({
+            chartId,
+            chartType: 'artist',
+          }),
+          getPointsAccumulators({
+            chartId,
+            chartType: 'album',
+          }),
+          getPointsAccumulators({
+            chartId,
+            chartType: 'track',
+          }),
+        ]);
+
+        const topPointsCandidates: Array<{
+          type: SpotifyEntityType;
+          name: string;
+          artistName: string;
+          totalPoints: number;
+          entityId: string;
+        }> = [];
+
+        if (artistPoints[0]) {
+          topPointsCandidates.push({
+            type: 'artist',
+            name: artistPoints[0].name,
+            artistName: artistPoints[0].artistName,
+            totalPoints: artistPoints[0].totalPoints,
+            entityId: artistPoints[0].entityId,
+          });
+        }
+
+        if (albumPoints[0]) {
+          topPointsCandidates.push({
+            type: 'album',
+            name: albumPoints[0].name,
+            artistName: albumPoints[0].artistName,
+            totalPoints: albumPoints[0].totalPoints,
+            entityId: albumPoints[0].entityId,
+          });
+        }
+
+        if (trackPoints[0]) {
+          topPointsCandidates.push({
+            type: 'track',
+            name: trackPoints[0].name,
+            artistName: trackPoints[0].artistName,
+            totalPoints: trackPoints[0].totalPoints,
+            entityId: trackPoints[0].entityId,
+          });
+        }
+
+        const topPointsImages = await fetchSpotifyImagesBatch(
+          topPointsCandidates.map(entity => ({
+            entityId: entity.entityId,
+            name: entity.name,
+            artistName: entity.artistName,
+            type: entity.type,
+          }))
+        );
 
         // Biggest Debuts - random type
         const randomDebutType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
@@ -299,7 +385,7 @@ const StatsVisualizationsOverview: React.FC = () => {
         const historyData = rankOne.slice(-NUMBER_ONE_HISTORY_COUNT);
 
         if (!mounted) return;
-        
+
         setNumberOneTrend(
           lastNumberOnes.map(item => ({
             week: item.week,
@@ -309,7 +395,7 @@ const StatsVisualizationsOverview: React.FC = () => {
             imageUrl: lastImages[item.entityId],
           }))
         );
-        
+
         setRankLeaders(
           topLeaders.map(entity => ({
             id: entity.name,
@@ -326,18 +412,22 @@ const StatsVisualizationsOverview: React.FC = () => {
                 artistName: latestPAK.artistName,
                 albumName: latestPAK.albumName,
                 trackName: latestPAK.trackName,
-                artistImageUrl: pakImage,
+                artistImageUrl: pakImages[latestPAK.artistEntityId],
+                albumImageUrl: latestPAK.albumEntityId
+                  ? pakImages[latestPAK.albumEntityId]
+                  : undefined,
+                trackImageUrl: latestPAK.trackEntityId
+                  ? pakImages[latestPAK.trackEntityId]
+                  : undefined,
                 week: latestPAK.week,
               }
             : null
         );
 
         setTopPoints(
-          selectedPoints.map((entity, index) => ({
-            name: entity.name,
-            totalPoints: entity.totalPoints,
-            entityId: entity.entityId,
-            rank: randomRange[0] + index + 1,
+          topPointsCandidates.map(entity => ({
+            ...entity,
+            imageUrl: topPointsImages[entity.entityId],
           }))
         );
 
@@ -437,12 +527,7 @@ const StatsVisualizationsOverview: React.FC = () => {
       />
     ),
     'last-pak': (
-      <LastPerfectAllKillCard
-        key="last-pak"
-        loading={loading}
-        cardBg={cardBg}
-        lastPAK={lastPAK}
-      />
+      <LastPerfectAllKillCard key="last-pak" loading={loading} cardBg={cardBg} lastPAK={lastPAK} />
     ),
     'most-points': (
       <MostPointsCard
@@ -450,12 +535,12 @@ const StatsVisualizationsOverview: React.FC = () => {
         loading={loading}
         cardBg={cardBg}
         topArtists={topPoints.map(item => ({
-          type: 'artist' as const,
+          type: item.type,
           name: item.name,
-          artistName: item.name,
+          artistName: item.artistName,
           entityId: item.entityId,
           totalPoints: item.totalPoints,
-          rank: item.rank,
+          imageUrl: item.imageUrl,
         }))}
       />
     ),

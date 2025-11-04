@@ -1,5 +1,14 @@
 import React from 'react';
-import { Card, Flex, Button, Title, Text, Skeleton, useMantineTheme, useComputedColorScheme } from '@mantine/core';
+import {
+  Card,
+  Flex,
+  Button,
+  Title,
+  Text,
+  Skeleton,
+  useMantineTheme,
+  useComputedColorScheme,
+} from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';

@@ -584,6 +584,11 @@
           "lastPerfectAllKillDescription": "Último artista a alcançar PAK",
           "mostPoints": "Mais Pontos",
           "mostPointsDescription": "Top artistas por total de pontos",
+          "mostPointsLabels": {
+            "artist": "Artista com mais pontos",
+            "album": "Álbum com mais pontos",
+            "track": "Música com mais pontos"
+          },
           "biggestDebuts": "Maiores Estreias",
           "biggestDebutsDescription": "Top 5 melhores primeiras aparições",
           "highestPlaysInWeek": "Maiores Reproduções em uma Semana",

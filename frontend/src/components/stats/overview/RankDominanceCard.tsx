@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Flex, Button, Title, Text, Skeleton } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { Card, Flex, Button, Text, Skeleton, Group, rem, ThemeIcon, Divider } from '@mantine/core';
+import { IconArrowRight, IconCrown } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import MiniBarWithImage from '../../visualizations/MiniBarWithImage';
@@ -27,14 +27,16 @@ export const RankDominanceCard: React.FC<RankDominanceCardProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Card withBorder p="lg" style={{ background: cardBg }}>
-      <Flex align="center" gap="md" mb="sm">
-        <div style={{ flex: 1 }}>
-          <Title order={4}>{t('stats.visualizations.overview.rankDominance')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('stats.visualizations.overview.rankDominanceDescription')}
+    <Card shadow="md" p="md" style={{ background: cardBg }}>
+      <Group justify="space-between">
+        <Group>
+          <ThemeIcon variant="light" size="md">
+            <IconCrown style={{ width: rem(20), height: rem(20) }} />
+          </ThemeIcon>
+          <Text fw={600} size="lg">
+            {t('stats.visualizations.overview.rankDominance')}
           </Text>
-        </div>
+        </Group>
         <Button
           variant="light"
           size="xs"
@@ -44,7 +46,8 @@ export const RankDominanceCard: React.FC<RankDominanceCardProps> = ({
         >
           {t('stats.visualizations.actions.viewDetail')}
         </Button>
-      </Flex>
+      </Group>
+      <Divider variant="dashed" size="sm" my="xs" />
       {loading ? (
         <Skeleton height={160} radius="md" />
       ) : rankLeaders.length === 0 ? (
