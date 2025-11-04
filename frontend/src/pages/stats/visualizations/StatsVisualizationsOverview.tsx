@@ -27,8 +27,6 @@ import {
   MostPointsCard,
   BiggestDebutsCard,
   HighestPlaysInWeekCard,
-  NumberOneHistoryCard,
-  PlaysHistoryCard,
 } from '../../../components/stats/overview';
 import Masonry from 'react-masonry-css';
 import storage from '../../../utils/storage';
@@ -44,8 +42,6 @@ const CARD_IDS = [
   'most-points',
   'biggest-debuts',
   'highest-plays',
-  'number-one-history',
-  'plays-history',
 ] as const;
 
 type CardId = (typeof CARD_IDS)[number];
@@ -95,7 +91,6 @@ const SortableCard: React.FC<{ id: CardId; children: React.ReactNode }> = ({ id,
 };
 
 const LATEST_NUMBER_ONE_COUNT = 8;
-const NUMBER_ONE_HISTORY_COUNT = 15;
 const TOP_DEBUTS_COUNT = 8;
 const TOP_PLAYS_COUNT = 8;
 const CHART_TYPES: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
@@ -182,14 +177,6 @@ const StatsVisualizationsOverview: React.FC = () => {
     }>
   >([]);
   const [playsChartType, setPlaysChartType] = React.useState<'artist' | 'album' | 'track'>('track');
-  const [numberOneHistory, setNumberOneHistory] = React.useState<
-    Array<{
-      week: string;
-      artistName: string;
-      plays: number;
-    }>
-  >([]);
-
   React.useEffect(() => {
     setCardOrder(prev => {
       const normalized = normalizeCardOrder(prev);
@@ -403,9 +390,6 @@ const StatsVisualizationsOverview: React.FC = () => {
             )
           : {};
 
-        // Number One History - last 15 weeks
-        const historyData = rankOne.slice(-NUMBER_ONE_HISTORY_COUNT);
-
         if (!mounted) return;
 
         setNumberOneTrend(
@@ -474,14 +458,6 @@ const StatsVisualizationsOverview: React.FC = () => {
           }))
         );
         setPlaysChartType(randomPlaysType);
-
-        setNumberOneHistory(
-          historyData.map(item => ({
-            week: item.week,
-            artistName: item.artistName || item.name,
-            plays: item.plays,
-          }))
-        );
       } catch (error) {
         console.error('[visualizations] Failed to load overview data', error);
         if (mounted) {
@@ -491,7 +467,6 @@ const StatsVisualizationsOverview: React.FC = () => {
           setTopPoints([]);
           setBiggestDebuts([]);
           setHighestPlays([]);
-          setNumberOneHistory([]);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -584,22 +559,6 @@ const StatsVisualizationsOverview: React.FC = () => {
         cardBg={cardBg}
         highestPlays={highestPlays}
         chartType={playsChartType}
-      />
-    ),
-    'number-one-history': (
-      <NumberOneHistoryCard
-        key="number-one-history"
-        loading={loading}
-        cardBg={cardBg}
-        history={numberOneHistory}
-      />
-    ),
-    'plays-history': (
-      <PlaysHistoryCard
-        key="plays-history"
-        loading={loading}
-        cardBg={cardBg}
-        history={numberOneHistory}
       />
     ),
   };

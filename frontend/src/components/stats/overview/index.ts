@@ -4,5 +4,3 @@ export { LastPerfectAllKillCard } from './LastPerfectAllKillCard';
 export { MostPointsCard } from './MostPointsCard';
 export { BiggestDebutsCard } from './BiggestDebutsCard';
 export { HighestPlaysInWeekCard } from './HighestPlaysInWeekCard';
-export { NumberOneHistoryCard } from './NumberOneHistoryCard';
-export { PlaysHistoryCard } from './PlaysHistoryCard';
