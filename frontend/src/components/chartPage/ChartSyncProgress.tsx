@@ -13,7 +13,6 @@ import {
   Badge,
   useMantineTheme,
 } from '@mantine/core';
-import { Link } from 'react-router-dom';
 import { useChartDb } from '../../hooks/useChartDb';
 import {
   getWeeklyArtistChart,
@@ -26,7 +25,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
-import { IconRefresh, IconSettings, IconAlertCircle } from '@tabler/icons-react';
+import { IconRefresh, IconAlertCircle } from '@tabler/icons-react';
 import { useOfflineStatus } from '../../hooks/useOfflineStatus';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
@@ -268,9 +267,6 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
             {t('charts.sync')}
           </Text>
         </Group>
-        <Button component={Link} to="/settings" size="xs" variant="subtle">
-          <IconSettings style={{ width: rem(16), height: rem(16) }} />
-        </Button>
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />
       <Group justify="space-between" align="center" mb="xs">

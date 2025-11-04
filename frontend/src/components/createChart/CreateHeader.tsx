@@ -1,6 +1,8 @@
 import React from 'react';
 import { Divider, Flex, rem, ThemeIcon, Title, ActionIcon, Tooltip } from '@mantine/core';
-import { IconPlaylist, IconMenu2 } from '@tabler/icons-react';
+import { IconPlaylist, IconMenu2, IconSettings } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
+import { t } from 'i18next';
 
 type Props = {
   pageTitle: string;
@@ -50,6 +52,20 @@ const CreateHeader: React.FC<Props> = ({
           </ThemeIcon>
           {pageTitle}
         </Title>
+
+        <Tooltip label={t('settings.title')} withArrow>
+          <ActionIcon
+            variant="subtle"
+            size="lg"
+            component={Link}
+            to="/settings"
+            pos="absolute"
+            right={toggleOffset}
+            visibleFrom="md"
+          >
+            <IconSettings size={20} />
+          </ActionIcon>
+        </Tooltip>
       </Flex>
       <Divider variant="solid" size="sm" my="md" />
     </Flex>
