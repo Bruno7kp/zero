@@ -1,33 +1,35 @@
 import React from 'react';
 import {
-  Card,
   Stack,
-  Text,
-  Loader,
-  Center,
-  Flex,
-  Button,
-  Title,
-  useMantineTheme,
   Alert,
   Anchor,
+  Text,
+  useMantineTheme,
 } from '@mantine/core';
-import { IconArrowRight, IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import MiniNumberOneBars from '../../../components/visualizations/MiniNumberOneBars';
-import MiniBarWithImage from '../../../components/visualizations/MiniBarWithImage';
 import { db } from '../../../db/indexedDb';
-import { getTimesAtRank } from '../../../utils/statsQueries';
+import { getTimesAtRank, getPerfectAllKills, getPointsAccumulators, getBestDebuts, getHighestPlays } from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
 import { ChartSyncProgress } from '../../../components/chartPage/ChartSyncProgress';
 import { ChartWeekTop1Summary } from '../../../components/chartPage/ChartWeekTop1Summary';
 import { ChartLiveSummary } from '../../../components/chartPage/ChartLiveSummary';
+import {
+  LatestNumberOneCard,
+  RankDominanceCard,
+  LastPerfectAllKillCard,
+  MostPointsCard,
+  BiggestDebutsCard,
+  HighestPlaysInWeekCard,
+  NumberOneHistoryCard,
+  PlaysHistoryCard,
+} from '../../../components/stats/overview';
 import Masonry from 'react-masonry-css';
 import storage from '../../../utils/storage';
 import KEYS from '../../../constants/storageKeys';
@@ -38,6 +40,12 @@ const CARD_IDS = [
   'live-summary',
   'latest-number-one',
   'rank-dominance',
+  'last-pak',
+  'most-points',
+  'biggest-debuts',
+  'highest-plays',
+  'number-one-history',
+  'plays-history',
 ] as const;
 
 type CardId = (typeof CARD_IDS)[number];
@@ -87,6 +95,9 @@ const SortableCard: React.FC<{ id: CardId; children: React.ReactNode }> = ({ id,
 };
 
 const LATEST_NUMBER_ONE_COUNT = 8;
+const NUMBER_ONE_HISTORY_COUNT = 15;
+const TOP_DEBUTS_COUNT = 5;
+const TOP_PLAYS_COUNT = 5;
 
 interface RankLeaderPreview {
   id: string;
@@ -130,6 +141,38 @@ const StatsVisualizationsOverview: React.FC = () => {
     }>
   >([]);
   const [rankLeaders, setRankLeaders] = React.useState<RankLeaderPreview[]>([]);
+  const [lastPAK, setLastPAK] = React.useState<{
+    artistName: string;
+    albumName: string;
+    trackName: string;
+    artistImageUrl?: string;
+    week: string;
+  } | null>(null);
+  const [topPoints, setTopPoints] = React.useState<Array<{
+    name: string;
+    totalPoints: number;
+    entityId: string;
+    rank: number;
+  }>>([]);
+  const [biggestDebuts, setBiggestDebuts] = React.useState<Array<{
+    name: string;
+    artistName?: string;
+    plays: number;
+    entityId: string;
+  }>>([]);
+  const [debutsChartType, setDebutsChartType] = React.useState<'artist' | 'album' | 'track'>('track');
+  const [highestPlays, setHighestPlays] = React.useState<Array<{
+    name: string;
+    artistName?: string;
+    plays: number;
+    entityId: string;
+  }>>([]);
+  const [playsChartType, setPlaysChartType] = React.useState<'artist' | 'album' | 'track'>('track');
+  const [numberOneHistory, setNumberOneHistory] = React.useState<Array<{
+    week: string;
+    artistName: string;
+    plays: number;
+  }>>([]);
 
   React.useEffect(() => {
     setCardOrder(prev => {
@@ -170,6 +213,7 @@ const StatsVisualizationsOverview: React.FC = () => {
       try {
         const chartId = String(chart.id);
 
+        // Latest Number Ones
         const rankOneCollection = db.charts_data
           .where('[chartId+chartType]')
           .equals([chartId, 'track'])
@@ -187,6 +231,7 @@ const StatsVisualizationsOverview: React.FC = () => {
           }))
         );
 
+        // Rank Leaders
         const leaders = await getTimesAtRank({
           chartId,
           chartType: 'track',
@@ -203,7 +248,55 @@ const StatsVisualizationsOverview: React.FC = () => {
           }))
         );
 
+        // Last Perfect All Kill
+        const paks = await getPerfectAllKills(chartId);
+        const latestPAK = paks.length > 0 ? paks[paks.length - 1] : null;
+        let pakImage: string | undefined;
+        if (latestPAK) {
+          const pakImages = await fetchSpotifyImagesBatch([
+            {
+              entityId: latestPAK.artistEntityId,
+              name: latestPAK.artistName,
+              artistName: latestPAK.artistName,
+              type: 'artist',
+            },
+          ]);
+          pakImage = pakImages[latestPAK.artistEntityId];
+        }
+
+        // Most Points - get top 10 and select random 3-position range
+        const pointsData = await getPointsAccumulators({
+          chartId,
+          chartType: 'artist',
+        });
+        const topPointsArtists = pointsData.slice(0, 10);
+        const randomRanges = [[0, 2], [3, 5], [6, 8]];
+        const randomRange = randomRanges[Math.floor(Math.random() * randomRanges.length)];
+        const selectedPoints = topPointsArtists.slice(randomRange[0], randomRange[1] + 1);
+
+        // Biggest Debuts - random type
+        const debutTypes: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
+        const randomDebutType = debutTypes[Math.floor(Math.random() * debutTypes.length)];
+        const debuts = await getBestDebuts({
+          chartId,
+          chartType: randomDebutType,
+        });
+        const topDebuts = debuts.slice(0, TOP_DEBUTS_COUNT);
+
+        // Highest Plays - random type
+        const playsTypes: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
+        const randomPlaysType = playsTypes[Math.floor(Math.random() * playsTypes.length)];
+        const playsData = await getHighestPlays({
+          chartId,
+          chartType: randomPlaysType,
+        });
+        const topPlaysData = playsData.slice(0, TOP_PLAYS_COUNT);
+
+        // Number One History - last 15 weeks
+        const historyData = rankOne.slice(-NUMBER_ONE_HISTORY_COUNT);
+
         if (!mounted) return;
+        
         setNumberOneTrend(
           lastNumberOnes.map(item => ({
             week: item.week,
@@ -213,6 +306,7 @@ const StatsVisualizationsOverview: React.FC = () => {
             imageUrl: lastImages[item.entityId],
           }))
         );
+        
         setRankLeaders(
           topLeaders.map(entity => ({
             id: entity.name,
@@ -222,11 +316,65 @@ const StatsVisualizationsOverview: React.FC = () => {
             imageUrl: images[entity.entityId],
           }))
         );
+
+        setLastPAK(
+          latestPAK
+            ? {
+                artistName: latestPAK.artistName,
+                albumName: latestPAK.albumName,
+                trackName: latestPAK.trackName,
+                artistImageUrl: pakImage,
+                week: latestPAK.week,
+              }
+            : null
+        );
+
+        setTopPoints(
+          selectedPoints.map((entity, index) => ({
+            name: entity.name,
+            totalPoints: entity.totalPoints,
+            entityId: entity.entityId,
+            rank: randomRange[0] + index + 1,
+          }))
+        );
+
+        setBiggestDebuts(
+          topDebuts.map(item => ({
+            name: item.name,
+            artistName: item.artistName,
+            plays: item.plays,
+            entityId: item.entityId,
+          }))
+        );
+        setDebutsChartType(randomDebutType);
+
+        setHighestPlays(
+          topPlaysData.map(item => ({
+            name: item.name,
+            artistName: item.artistName,
+            plays: item.plays,
+            entityId: item.entityId,
+          }))
+        );
+        setPlaysChartType(randomPlaysType);
+
+        setNumberOneHistory(
+          historyData.map(item => ({
+            week: item.week,
+            artistName: item.artistName || item.name,
+            plays: item.plays,
+          }))
+        );
       } catch (error) {
         console.error('[visualizations] Failed to load overview data', error);
         if (mounted) {
           setNumberOneTrend([]);
           setRankLeaders([]);
+          setLastPAK(null);
+          setTopPoints([]);
+          setBiggestDebuts([]);
+          setHighestPlays([]);
+          setNumberOneHistory([]);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -257,85 +405,6 @@ const StatsVisualizationsOverview: React.FC = () => {
     );
   }
 
-  const latestNumberOneCard = (
-    <Card key="latest-number-one" withBorder p="lg" style={{ background: cardBg }}>
-      <Flex align="center" gap="md" mb="sm">
-        <div style={{ flex: 1 }}>
-          <Title order={4}>{t('stats.visualizations.overview.latestNumberOnePlays')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('stats.visualizations.overview.latestNumberOnePlaysDescription', {
-              weeks: numberOneTrend.length,
-            })}
-          </Text>
-        </div>
-        <Button
-          variant="light"
-          size="xs"
-          component={Link}
-          to="/stats/visualizations/number-one-timeline"
-          rightSection={<IconArrowRight size={14} />}
-        >
-          {t('stats.visualizations.actions.viewDetail')}
-        </Button>
-      </Flex>
-      {loading ? (
-        <Center py="xl">
-          <Loader size="lg" />
-        </Center>
-      ) : (
-        <MiniNumberOneBars
-          items={numberOneTrend.map(item => ({
-            id: item.week,
-            value: item.plays,
-            imageUrl: item.imageUrl,
-            subtitle: `${item.name}${item.artistName ? ` • ${item.artistName}` : ''}`,
-            colorKey: item.artistName || item.name,
-          }))}
-          tooltipTitle={t('stats.visualizations.overview.latestNumberOneTooltip')}
-          height={140}
-        />
-      )}
-    </Card>
-  );
-
-  const rankDominanceCard = (
-    <Card key="rank-dominance" withBorder p="lg" style={{ background: cardBg }}>
-      <Flex align="center" gap="md" mb="sm">
-        <div style={{ flex: 1 }}>
-          <Title order={4}>{t('stats.visualizations.overview.rankDominance')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('stats.visualizations.overview.rankDominanceDescription')}
-          </Text>
-        </div>
-        <Button
-          variant="light"
-          size="xs"
-          component={Link}
-          to="/stats/visualizations/top-rank-leaders"
-          rightSection={<IconArrowRight size={14} />}
-        >
-          {t('stats.visualizations.actions.viewDetail')}
-        </Button>
-      </Flex>
-      {loading ? (
-        <Center py="xl">
-          <Loader size="lg" />
-        </Center>
-      ) : (
-        <MiniBarWithImage
-          items={rankLeaders.map(item => ({
-            id: item.id,
-            value: item.value,
-            imageUrl: item.imageUrl,
-            subtitle: item.artistName,
-            colorKey: item.artistName,
-          }))}
-          height={160}
-        />
-      )}
-    </Card>
-  );
-
   const cardsById: Record<CardId, React.ReactNode> = {
     'sync-progress': (
       <ChartSyncProgress
@@ -348,8 +417,79 @@ const StatsVisualizationsOverview: React.FC = () => {
       <ChartWeekTop1Summary key="top1-summary" chartId={`${chart.id}`} refreshKey={refreshKey} />
     ),
     'live-summary': <ChartLiveSummary key="live-summary" />,
-    'latest-number-one': latestNumberOneCard,
-    'rank-dominance': rankDominanceCard,
+    'latest-number-one': (
+      <LatestNumberOneCard
+        key="latest-number-one"
+        loading={loading}
+        cardBg={cardBg}
+        numberOneTrend={numberOneTrend}
+      />
+    ),
+    'rank-dominance': (
+      <RankDominanceCard
+        key="rank-dominance"
+        loading={loading}
+        cardBg={cardBg}
+        rankLeaders={rankLeaders}
+      />
+    ),
+    'last-pak': (
+      <LastPerfectAllKillCard
+        key="last-pak"
+        loading={loading}
+        cardBg={cardBg}
+        lastPAK={lastPAK}
+      />
+    ),
+    'most-points': (
+      <MostPointsCard
+        key="most-points"
+        loading={loading}
+        cardBg={cardBg}
+        topArtists={topPoints.map(item => ({
+          type: 'artist' as const,
+          name: item.name,
+          artistName: item.name,
+          entityId: item.entityId,
+          totalPoints: item.totalPoints,
+          rank: item.rank,
+        }))}
+      />
+    ),
+    'biggest-debuts': (
+      <BiggestDebutsCard
+        key="biggest-debuts"
+        loading={loading}
+        cardBg={cardBg}
+        debuts={biggestDebuts}
+        chartType={debutsChartType}
+      />
+    ),
+    'highest-plays': (
+      <HighestPlaysInWeekCard
+        key="highest-plays"
+        loading={loading}
+        cardBg={cardBg}
+        highestPlays={highestPlays}
+        chartType={playsChartType}
+      />
+    ),
+    'number-one-history': (
+      <NumberOneHistoryCard
+        key="number-one-history"
+        loading={loading}
+        cardBg={cardBg}
+        history={numberOneHistory}
+      />
+    ),
+    'plays-history': (
+      <PlaysHistoryCard
+        key="plays-history"
+        loading={loading}
+        cardBg={cardBg}
+        history={numberOneHistory}
+      />
+    ),
   };
 
   return (
