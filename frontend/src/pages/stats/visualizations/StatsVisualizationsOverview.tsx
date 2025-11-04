@@ -3,15 +3,16 @@ import {
   Card,
   Stack,
   Text,
-  SimpleGrid,
   Loader,
   Center,
   Flex,
   Button,
   Title,
   useMantineTheme,
+  Alert,
+  Anchor,
 } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { IconArrowRight, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -20,8 +21,11 @@ import MiniBarWithImage from '../../../components/visualizations/MiniBarWithImag
 import { db } from '../../../db/indexedDb';
 import { getTimesAtRank } from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
-import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
+import { ChartSyncProgress } from '../../../components/chartPage/ChartSyncProgress';
+import { ChartWeekTop1Summary } from '../../../components/chartPage/ChartWeekTop1Summary';
+import { ChartLiveSummary } from '../../../components/chartPage/ChartLiveSummary';
+import Masonry from 'react-masonry-css';
 
 const LATEST_NUMBER_ONE_COUNT = 8;
 
@@ -36,12 +40,21 @@ interface RankLeaderPreview {
 const StatsVisualizationsOverview: React.FC = () => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
-  const { preferences } = useVisualizationPreferences();
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
   const chart = charts.find((c: any) => c.id === activeChartId);
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
   const cardBg = getCardBackgroundByMode(theme, themeMode);
+  const [refreshKey, setRefreshKey] = React.useState(0);
+  const breakpointColumns = React.useMemo(
+    () => ({
+      default: 2,
+      1100: 2,
+      700: 1,
+      500: 1,
+    }),
+    []
+  );
 
   const [loading, setLoading] = React.useState(false);
   const [numberOneTrend, setNumberOneTrend] = React.useState<
@@ -136,25 +149,49 @@ const StatsVisualizationsOverview: React.FC = () => {
 
   if (!chart) {
     return (
-      <Center py="xl">
-        <Text>{t('errors.selectActiveChart')}</Text>
-      </Center>
+      <Stack gap="lg">
+        <Alert icon={<IconInfoCircle />} title={t('errors.warning')}>
+          <Text>{t('errors.selectActiveChart')}</Text>
+          {activeChartId === null && (
+            <Text mt="sm">
+              <Anchor component={Link} to="/settings">
+                {t('errors.noActiveChart')}
+              </Anchor>
+            </Text>
+          )}
+        </Alert>
+      </Stack>
     );
   }
 
   return (
     <Stack gap="lg">
-      <Text c="dimmed">{t('stats.visualizations.overview.subtitle')}</Text>
+      <Masonry
+        breakpointCols={breakpointColumns}
+        className="masonry-grid"
+        columnClassName="masonry-column"
+      >
+        <ChartSyncProgress
+          key="sync-progress"
+          chart={chart}
+          onSyncComplete={() => setRefreshKey(previous => previous + 1)}
+        />
 
-      {loading ? (
-        <Center py="xl">
-          <Loader size="lg" />
-        </Center>
-      ) : (
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-          <Card withBorder p="lg" style={{ background: cardBg }}>
-            <Flex justify="space-between" align="center" mb="sm">
-              <div>
+        <ChartWeekTop1Summary key="top1-summary" chartId={`${chart.id}`} refreshKey={refreshKey} />
+        <ChartLiveSummary key="live-summary" />
+
+        {loading ? (
+          <Card key="visualizations-loading" withBorder p="lg" style={{ background: cardBg }}>
+            <Center py="xl">
+              <Loader size="lg" />
+            </Center>
+          </Card>
+        ) : null}
+
+        {!loading && (
+          <Card key="latest-number-one" withBorder p="lg" style={{ background: cardBg }}>
+            <Flex align="center" gap="md" mb="sm">
+              <div style={{ flex: 1 }}>
                 <Title order={4}>{t('stats.visualizations.overview.latestNumberOnePlays')}</Title>
                 <Text size="sm" c="dimmed">
                   {t('stats.visualizations.overview.latestNumberOnePlaysDescription', {
@@ -184,10 +221,12 @@ const StatsVisualizationsOverview: React.FC = () => {
               height={140}
             />
           </Card>
+        )}
 
-          <Card withBorder p="lg" style={{ background: cardBg }}>
-            <Flex justify="space-between" align="center" mb="sm">
-              <div>
+        {!loading && (
+          <Card key="rank-dominance" withBorder p="lg" style={{ background: cardBg }}>
+            <Flex align="center" gap="md" mb="sm">
+              <div style={{ flex: 1 }}>
                 <Title order={4}>{t('stats.visualizations.overview.rankDominance')}</Title>
                 <Text size="sm" c="dimmed">
                   {t('stats.visualizations.overview.rankDominanceDescription')}
@@ -214,19 +253,8 @@ const StatsVisualizationsOverview: React.FC = () => {
               height={160}
             />
           </Card>
-        </SimpleGrid>
-      )}
-
-      <Card withBorder p="lg" style={{ background: cardBg }}>
-        <Stack gap="xs">
-          <Title order={4}>{t('stats.visualizations.overview.tipsTitle')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('stats.visualizations.overview.tipsDescription', {
-              container: preferences.containerSize,
-            })}
-          </Text>
-        </Stack>
-      </Card>
+        )}
+      </Masonry>
     </Stack>
   );
 };

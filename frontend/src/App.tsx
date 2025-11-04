@@ -7,7 +7,6 @@ import ForumPage from './pages/ForumPage';
 import LivePage from './pages/LivePage';
 import ProfilePage from './pages/ProfilePage';
 import LibraryPage from './pages/LibraryPage';
-import ChartsPage from './pages/ChartsPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
 import ChartsWeeksListPage from './pages/ChartsWeeksListPage.tsx';
 import SettingsPage from './pages/SettingsPage';
@@ -72,7 +71,7 @@ function App() {
           path="charts"
           element={
             <ProtectedRoute>
-              <ChartsPage />
+              <Navigate to="/stats" replace />
             </ProtectedRoute>
           }
         />

@@ -200,6 +200,7 @@ const StatsPage: React.FC = () => {
         icon={getPageIcon()}
         onDrawerToggle={() => setDrawerOpened(prev => !prev)}
         drawerToggleLabel={t('stats.sidebar.toggleDrawer')}
+        isSidebarVisible={preferences.fixedSidebarEnabled}
       />
 
       <Box

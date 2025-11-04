@@ -1,7 +1,14 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
-import { selectLibraryFilters, updateLibraryFilter } from '../store/libraryFiltersSlice';
+import {
+  selectLibraryFilters,
+  updateLibraryFilter,
+  type LibraryType,
+  type ViewMode,
+  type VisibleColumns,
+  type LibraryFiltersState,
+} from '../store/libraryFiltersSlice';
 
 export const useLibraryFilters = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -9,33 +16,42 @@ export const useLibraryFilters = () => {
 
   // Legacy localStorage migration removed. Redux-persist handles persistence.
 
-  const setField = <K extends keyof typeof state>(key: K, value: any) => {
-    dispatch(updateLibraryFilter({ key, value } as any));
-  };
+  const setField = useCallback(
+    <K extends keyof typeof state>(key: K, value: (typeof state)[K]) => {
+      dispatch(updateLibraryFilter({ key, value } as any));
+    },
+    [dispatch]
+  );
 
   const stats = useMemo(() => ({ total: 0, number1s: 0, inChart: 0 }), []);
 
   return {
     selectedType: state.selectedType,
-    setSelectedType: (v: any) => setField('selectedType', v),
+    setSelectedType: useCallback((v: LibraryType) => setField('selectedType', v), [setField]),
     viewMode: state.viewMode,
-    setViewMode: (v: any) => setField('viewMode', v),
+    setViewMode: useCallback((v: ViewMode) => setField('viewMode', v), [setField]),
     itemsPerPage: state.itemsPerPage,
-    setItemsPerPage: (v: number) => setField('itemsPerPage', v),
+    setItemsPerPage: useCallback((v: number) => setField('itemsPerPage', v), [setField]),
     search: state.search,
-    setSearch: (v: string) => setField('search', v),
+    setSearch: useCallback((v: string) => setField('search', v), [setField]),
     badgeStyle: state.badgeStyle,
-    setBadgeStyle: (v: any) => setField('badgeStyle', v),
+    setBadgeStyle: useCallback(
+      (v: LibraryFiltersState['badgeStyle']) => setField('badgeStyle', v),
+      [setField]
+    ),
     visibleColumns: state.visibleColumns,
-    setVisibleColumns: (v: any) => setField('visibleColumns', v),
+    setVisibleColumns: useCallback(
+      (v: VisibleColumns) => setField('visibleColumns', v),
+      [setField]
+    ),
     showGridPlays: state.showGridPlays,
-    setShowGridPlays: (v: boolean) => setField('showGridPlays', v),
+    setShowGridPlays: useCallback((v: boolean) => setField('showGridPlays', v), [setField]),
     showGridPeak: state.showGridPeak,
-    setShowGridPeak: (v: boolean) => setField('showGridPeak', v),
+    setShowGridPeak: useCallback((v: boolean) => setField('showGridPeak', v), [setField]),
     showGridPosition: state.showGridPosition,
-    setShowGridPosition: (v: boolean) => setField('showGridPosition', v),
+    setShowGridPosition: useCallback((v: boolean) => setField('showGridPosition', v), [setField]),
     page: state.page,
-    setPage: (p: number) => setField('page', p),
+    setPage: useCallback((p: number) => setField('page', p), [setField]),
     stats,
   };
 };

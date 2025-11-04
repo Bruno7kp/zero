@@ -8,6 +8,7 @@ type Props = {
   onDrawerToggle?: () => void;
   showDrawerToggle?: boolean;
   drawerToggleLabel?: string;
+  isSidebarVisible?: boolean;
 };
 
 const CreateHeader: React.FC<Props> = ({
@@ -16,12 +17,14 @@ const CreateHeader: React.FC<Props> = ({
   onDrawerToggle,
   showDrawerToggle = true,
   drawerToggleLabel = 'Toggle menu',
+  isSidebarVisible = true,
 }) => {
   const IconComponent = CustomIcon || IconPlaylist;
   const canShowToggle = Boolean(onDrawerToggle) && showDrawerToggle;
+  const toggleOffset = isSidebarVisible ? rem(11) : 0;
 
   return (
-    <Flex direction="column" p="xs" gap="sm">
+    <Flex direction="column" py="xs" gap="sm">
       <Flex justify="center" align="center" gap="sm" pos="relative">
         {/* Drawer toggle button - positioned at far left */}
         {canShowToggle && (
@@ -32,7 +35,7 @@ const CreateHeader: React.FC<Props> = ({
               onClick={onDrawerToggle}
               aria-label={drawerToggleLabel}
               pos="absolute"
-              left={0}
+              left={toggleOffset}
               visibleFrom="md"
             >
               <IconMenu2 size={20} />
