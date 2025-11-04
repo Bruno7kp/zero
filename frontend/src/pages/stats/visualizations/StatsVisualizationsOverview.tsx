@@ -96,8 +96,8 @@ const SortableCard: React.FC<{ id: CardId; children: React.ReactNode }> = ({ id,
 
 const LATEST_NUMBER_ONE_COUNT = 8;
 const NUMBER_ONE_HISTORY_COUNT = 15;
-const TOP_DEBUTS_COUNT = 5;
-const TOP_PLAYS_COUNT = 5;
+const TOP_DEBUTS_COUNT = 8;
+const TOP_PLAYS_COUNT = 8;
 const CHART_TYPES: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
 interface RankLeaderPreview {
   id: string;
@@ -166,6 +166,7 @@ const StatsVisualizationsOverview: React.FC = () => {
       artistName?: string;
       plays: number;
       entityId: string;
+      imageUrl?: string;
     }>
   >([]);
   const [debutsChartType, setDebutsChartType] = React.useState<'artist' | 'album' | 'track'>(
@@ -177,6 +178,7 @@ const StatsVisualizationsOverview: React.FC = () => {
       artistName?: string;
       plays: number;
       entityId: string;
+      imageUrl?: string;
     }>
   >([]);
   const [playsChartType, setPlaysChartType] = React.useState<'artist' | 'album' | 'track'>('track');
@@ -372,6 +374,16 @@ const StatsVisualizationsOverview: React.FC = () => {
           chartType: randomDebutType,
         });
         const topDebuts = debuts.slice(0, TOP_DEBUTS_COUNT);
+        const debutsImages = topDebuts.length
+          ? await fetchSpotifyImagesBatch(
+              topDebuts.map(item => ({
+                entityId: item.entityId,
+                name: item.name,
+                artistName: item.artistName,
+                type: randomDebutType,
+              }))
+            )
+          : {};
 
         // Highest Plays - random type
         const randomPlaysType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
@@ -380,6 +392,16 @@ const StatsVisualizationsOverview: React.FC = () => {
           chartType: randomPlaysType,
         });
         const topPlaysData = playsData.slice(0, TOP_PLAYS_COUNT);
+        const playsImages = topPlaysData.length
+          ? await fetchSpotifyImagesBatch(
+              topPlaysData.map(item => ({
+                entityId: item.entityId,
+                name: item.name,
+                artistName: item.artistName,
+                type: randomPlaysType,
+              }))
+            )
+          : {};
 
         // Number One History - last 15 weeks
         const historyData = rankOne.slice(-NUMBER_ONE_HISTORY_COUNT);
@@ -437,6 +459,7 @@ const StatsVisualizationsOverview: React.FC = () => {
             artistName: item.artistName,
             plays: item.plays,
             entityId: item.entityId,
+            imageUrl: debutsImages[item.entityId],
           }))
         );
         setDebutsChartType(randomDebutType);
@@ -447,6 +470,7 @@ const StatsVisualizationsOverview: React.FC = () => {
             artistName: item.artistName,
             plays: item.plays,
             entityId: item.entityId,
+            imageUrl: playsImages[item.entityId],
           }))
         );
         setPlaysChartType(randomPlaysType);

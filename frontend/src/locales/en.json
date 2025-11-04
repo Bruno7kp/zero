@@ -51,6 +51,7 @@
       "titleLabel": "Title",
       "artistLabel": "Artist",
       "playsLabel": "Plays",
+      "playLabel": "Play",
       "showFormulaInsteadOfPlays": "Show formula value instead of plays",
       "deltaPlaysLabel": "Plays change",
       "deltaPercentPlaysLabel": "Plays % change",

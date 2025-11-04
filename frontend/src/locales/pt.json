@@ -51,6 +51,7 @@
       "titleLabel": "Título",
       "artistLabel": "Artista",
       "playsLabel": "Plays: Reproduções",
+      "playLabel": "Reprodução",
       "showFormulaInsteadOfPlays": "Mostrar valor da fórmula no lugar das reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
       "deltaPercentPlaysLabel": "Variação % de reproduções",
