@@ -7,6 +7,9 @@ import ForumPage from './pages/ForumPage';
 import LivePage from './pages/LivePage';
 import ProfilePage from './pages/ProfilePage';
 import LibraryPage from './pages/LibraryPage';
+import ArtistDetailPage from './pages/ArtistDetailPage';
+import AlbumDetailPage from './pages/AlbumDetailPage';
+import TrackDetailPage from './pages/TrackDetailPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
 import ChartsWeeksListPage from './pages/ChartsWeeksListPage.tsx';
 import SettingsPage from './pages/SettingsPage';
@@ -112,6 +115,30 @@ function App() {
           element={
             <ProtectedRoute>
               <LibraryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="library/music/:artist"
+          element={
+            <ProtectedRoute>
+              <ArtistDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="library/music/:artist/:album"
+          element={
+            <ProtectedRoute>
+              <AlbumDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="library/music/:artist/_/:track"
+          element={
+            <ProtectedRoute>
+              <TrackDetailPage />
             </ProtectedRoute>
           }
         />

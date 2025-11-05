@@ -542,7 +542,25 @@
       "showPlays": "Show plays",
       "glassBadge": "Glass background",
       "showPeak": "Show peak",
-      "showPosition": "Show position"
+      "showPosition": "Show position",
+      "detail": {
+        "artist": "Artist",
+        "album": "Album",
+        "track": "Track",
+        "chartRun": "Chart Run",
+        "overview": "Overview",
+        "peakPosition": "Peak Position",
+        "totalWeeks": "Total Weeks",
+        "weeksAtPeak": "Weeks at Peak",
+        "firstAppearance": "First Appearance",
+        "lastAppearance": "Last Appearance",
+        "totalPlays": "Total Plays",
+        "sales": "Sales",
+        "certification": "Certification",
+        "loading": "Loading...",
+        "notFound": "Item not found in chart",
+        "backToLibrary": "Back to Library"
+      }
     },
     "stats": {
       "title": "Statistics",

@@ -542,7 +542,25 @@
       "showPlays": "Mostrar reproduções",
       "glassBadge": "Fundo transparente",
       "showPeak": "Mostrar pico",
-      "showPosition": "Mostrar posição"
+      "showPosition": "Mostrar posição",
+      "detail": {
+        "artist": "Artista",
+        "album": "Álbum",
+        "track": "Música",
+        "chartRun": "Trajetória no Chart",
+        "overview": "Visão Geral",
+        "peakPosition": "Posição de Pico",
+        "totalWeeks": "Total de Semanas",
+        "weeksAtPeak": "Semanas no Pico",
+        "firstAppearance": "Primeira Aparição",
+        "lastAppearance": "Última Aparição",
+        "totalPlays": "Total de Reproduções",
+        "sales": "Vendas",
+        "certification": "Certificação",
+        "loading": "Carregando...",
+        "notFound": "Item não encontrado no chart",
+        "backToLibrary": "Voltar para Biblioteca"
+      }
     },
     "stats": {
       "title": "Estatísticas",
