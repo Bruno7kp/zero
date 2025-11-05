@@ -13,7 +13,6 @@ import {
 } from '@mantine/core';
 import { ChartWeekTop1Summary } from '../components/chartPage/ChartWeekTop1Summary';
 import { ChartSyncProgress } from '../components/chartPage/ChartSyncProgress';
-import { ChartLiveSummary } from '../components/chartPage/ChartLiveSummary';
 import { IconInfoCircle, IconListNumbers } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -78,7 +77,6 @@ const ChartsPage = () => {
               onSyncComplete={() => setRefreshKey(k => k + 1)}
             />
             <ChartWeekTop1Summary chartId={`${activeChart.id}`} refreshKey={refreshKey} />
-            <ChartLiveSummary />
           </Masonry>
         )}
         {activeChartId === null && renderError()}

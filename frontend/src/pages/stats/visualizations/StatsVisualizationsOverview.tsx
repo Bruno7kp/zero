@@ -19,7 +19,6 @@ import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { fetchSpotifyImagesBatch, type SpotifyEntityType } from '../../../utils/spotifyImageLoader';
 import { ChartSyncProgress } from '../../../components/chartPage/ChartSyncProgress';
 import { ChartWeekTop1Summary } from '../../../components/chartPage/ChartWeekTop1Summary';
-import { ChartLiveSummary } from '../../../components/chartPage/ChartLiveSummary';
 import {
   LatestNumberOneCard,
   RankDominanceCard,
@@ -35,7 +34,6 @@ import KEYS from '../../../constants/storageKeys';
 const CARD_IDS = [
   'sync-progress',
   'top1-summary',
-  'live-summary',
   'latest-number-one',
   'rank-dominance',
   'last-pak',
@@ -508,7 +506,6 @@ const StatsVisualizationsOverview: React.FC = () => {
     'top1-summary': (
       <ChartWeekTop1Summary key="top1-summary" chartId={`${chart.id}`} refreshKey={refreshKey} />
     ),
-    'live-summary': <ChartLiveSummary key="live-summary" />,
     'latest-number-one': (
       <LatestNumberOneCard
         key="latest-number-one"

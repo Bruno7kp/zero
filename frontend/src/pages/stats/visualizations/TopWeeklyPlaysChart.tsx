@@ -8,7 +8,6 @@ import {
   useMantineTheme,
   useComputedColorScheme,
   RangeSlider,
-  Select,
   Group,
   ActionIcon,
 } from '@mantine/core';
@@ -18,25 +17,25 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import VisualizationFilters from '../../../components/stats/VisualizationFilters';
 import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
-import { getTimesInTopN, getAllWeeks, getYearRange } from '../../../utils/statsQueries';
+import { getHighestPlays, getAllWeeks, getYearRange } from '../../../utils/statsQueries';
 import { getCardBackgroundByMode, type ThemeMode } from '../../../theme/modes';
 import { fetchSpotifyImagesBatch } from '../../../utils/spotifyImageLoader';
 import { getColorForName } from '../../../utils/colorHash';
+import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 
-import { IconArrowBarUp, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
+const MAX_LABEL_LENGTH = 28;
 
-const MAX_RANK_LABEL_LENGTH = 28;
-
-interface RankLeaderDatum extends BarDatum {
+interface WeeklyPlaysDatum extends BarDatum {
   entity: string;
   artistName: string;
-  count: number;
+  plays: number;
+  week: string;
   entityId: string;
   imageUrl: string;
   barColor: string;
 }
 
-const TopRankLeadersChart: React.FC = () => {
+const TopWeeklyPlaysChart: React.FC = () => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
   const computedColorScheme = useComputedColorScheme('dark');
@@ -54,9 +53,8 @@ const TopRankLeadersChart: React.FC = () => {
     null
   );
   const [type, setType] = React.useState<'track' | 'album' | 'artist'>('track');
-  const [topN, setTopN] = React.useState<number>(1);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [data, setData] = React.useState<RankLeaderDatum[]>([]);
+  const [data, setData] = React.useState<WeeklyPlaysDatum[]>([]);
   const [allWeeks, setAllWeeks] = React.useState<string[]>([]);
   const [filteredWeeks, setFilteredWeeks] = React.useState<string[]>([]);
   const [weekRange, setWeekRange] = React.useState<[number, number]>([0, 0]);
@@ -66,10 +64,10 @@ const TopRankLeadersChart: React.FC = () => {
   const isPlayingRef = React.useRef(false);
   const previousYearRef = React.useRef<string>('all');
 
-  const truncateLabel = (value: string) => {
-    if (value.length <= MAX_RANK_LABEL_LENGTH) return value;
-    return `${value.slice(0, Math.max(MAX_RANK_LABEL_LENGTH - 3, 1))}...`;
-  };
+  const truncateLabel = React.useCallback((value: string) => {
+    if (value.length <= MAX_LABEL_LENGTH) return value;
+    return `${value.slice(0, Math.max(MAX_LABEL_LENGTH - 3, 1))}...`;
+  }, []);
 
   const clearPlayInterval = React.useCallback(() => {
     if (playIntervalRef.current) {
@@ -77,13 +75,6 @@ const TopRankLeadersChart: React.FC = () => {
       playIntervalRef.current = null;
     }
   }, []);
-
-  const cutoff = React.useMemo(() => {
-    if (!chart) return 100;
-    if (type === 'album') return chart.album_cutoff || 100;
-    if (type === 'artist') return chart.artist_cutoff || 100;
-    return chart.music_cutoff || 100;
-  }, [chart, type]);
 
   React.useEffect(() => {
     if (!chart) {
@@ -106,7 +97,7 @@ const TopRankLeadersChart: React.FC = () => {
         setAllWeeks(weeksList);
         setYearRange(range ?? null);
       } catch (error) {
-        console.warn('[visualizations] failed to load metadata for rank leaders', error);
+        console.warn('[visualizations] failed to load metadata for weekly plays', error);
         if (mounted) {
           setAllWeeks([]);
           setYearRange(null);
@@ -218,10 +209,9 @@ const TopRankLeadersChart: React.FC = () => {
         const weekStart = filteredWeeks[fromIndex];
         const weekEnd = filteredWeeks[toIndex];
 
-        const results = await getTimesInTopN({
+        const rows = await getHighestPlays({
           chartId: String(chart.id),
           chartType: type,
-          topN,
           year: year === 'all' ? undefined : year,
           weekStart,
           weekEnd,
@@ -229,14 +219,37 @@ const TopRankLeadersChart: React.FC = () => {
 
         if (!mounted) return;
 
-        const normalized: RankLeaderDatum[] = results.map(item => ({
-          entity: item.name,
-          artistName: item.artistName ?? '',
-          count: item.count,
-          entityId: item.entityId,
-          imageUrl: '',
-          barColor: getColorForName(item.artistName || item.name || item.entityId),
-        }));
+        const grouped = new Map<
+          string,
+          {
+            entity: string;
+            artistName: string;
+            plays: number;
+            week: string;
+            entityId: string;
+          }
+        >();
+
+        rows.forEach(item => {
+          const existing = grouped.get(item.entityId);
+          if (!existing || item.plays > existing.plays) {
+            grouped.set(item.entityId, {
+              entity: item.name,
+              artistName: item.artistName ?? '',
+              plays: item.plays,
+              week: item.week,
+              entityId: item.entityId,
+            });
+          }
+        });
+
+        const normalized: WeeklyPlaysDatum[] = Array.from(grouped.values())
+          .sort((a, b) => b.plays - a.plays)
+          .map(entry => ({
+            ...entry,
+            imageUrl: '',
+            barColor: getColorForName(entry.artistName || entry.entity || entry.entityId),
+          }));
 
         setData(prev => {
           const imageMap = new Map(prev.map(entry => [entry.entityId, entry.imageUrl]));
@@ -268,11 +281,11 @@ const TopRankLeadersChart: React.FC = () => {
               );
             })
             .catch(imageError => {
-              console.warn('[visualizations] failed to load rank leaders images', imageError);
+              console.warn('[visualizations] failed to load weekly plays images', imageError);
             });
         }
       } catch (error) {
-        console.error('[visualizations] failed to load rank leaders', error);
+        console.error('[visualizations] failed to load weekly plays', error);
         if (mounted) {
           setData([]);
           setHasLoadedOnce(true);
@@ -287,7 +300,7 @@ const TopRankLeadersChart: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [chart, type, topN, filteredWeeks, weekRange, year]);
+  }, [chart, type, filteredWeeks, weekRange, year]);
 
   React.useEffect(() => {
     if (!isPlaying || filteredWeeks.length <= 1) {
@@ -407,22 +420,6 @@ const TopRankLeadersChart: React.FC = () => {
         containerSize={preferences.containerSize}
         onContainerSizeChange={value => updatePreference('containerSize', value)}
         yearRange={yearRange || undefined}
-        inlineFilters={
-          <Select
-            aria-label={t('stats.visualizations.rankLeaders.topNLabel')}
-            value={String(topN)}
-            onChange={value => {
-              if (value) setTopN(Number(value));
-            }}
-            data={Array.from({ length: cutoff }, (_, index) => ({
-              value: String(index + 1),
-              label: t('stats.visualizations.rankLeaders.limitOption', { count: index + 1 }),
-            }))}
-            leftSection={<IconArrowBarUp size={16} />}
-            searchable
-            w={140}
-          />
-        }
         customFilters={
           filteredWeeks.length > 0 ? (
             <Group gap="sm" align="center" wrap="nowrap">
@@ -470,21 +467,21 @@ const TopRankLeadersChart: React.FC = () => {
           <div style={{ height: Math.max(320, limitedData.length * 32) }}>
             <ResponsiveBar
               data={limitedData}
-              keys={['count']}
+              keys={['plays']}
               indexBy="entity"
-              margin={{ top: 20, right: 60, bottom: 20, left: 180 }}
+              margin={{ top: 20, right: 80, bottom: 20, left: 200 }}
               layout="horizontal"
               padding={0.3}
               theme={{ tooltip: { container: { zIndex: 1000 } } }}
               colors={({ data: datum }) =>
-                (datum as RankLeaderDatum).barColor || theme.colors.blue[6]
+                (datum as WeeklyPlaysDatum).barColor || theme.colors.blue[6]
               }
               enableGridX
               enableGridY={false}
               axisBottom={{
                 tickSize: 0,
                 tickPadding: 12,
-                legend: t('stats.visualizations.rankLeaders.axisBottom'),
+                legend: t('stats.visualizations.weeklyPlays.axisBottom'),
                 legendOffset: 40,
                 legendPosition: 'middle',
                 tickValues: 5,
@@ -546,7 +543,7 @@ const TopRankLeadersChart: React.FC = () => {
                       padding: '8px 12px',
                       borderRadius: 6,
                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
-                      minWidth: 180,
+                      minWidth: 220,
                     }}
                   >
                     <div>
@@ -556,8 +553,13 @@ const TopRankLeadersChart: React.FC = () => {
                       <div>{datum.artistName}</div>
                     )}
                     <div>
-                      {t('stats.visualizations.rankLeaders.tooltipWeeks', {
+                      {t('stats.visualizations.weeklyPlays.tooltipPlays', {
                         count: Number(value),
+                      })}
+                    </div>
+                    <div>
+                      {t('stats.visualizations.weeklyPlays.tooltipWeek', {
+                        week: datum?.week ?? '-',
                       })}
                     </div>
                   </div>
@@ -573,4 +575,4 @@ const TopRankLeadersChart: React.FC = () => {
   );
 };
 
-export default TopRankLeadersChart;
+export default TopWeeklyPlaysChart;
