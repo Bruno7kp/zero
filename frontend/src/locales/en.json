@@ -569,7 +569,10 @@
           "title": "Visualizations",
           "overview": "Graphs",
           "timeline": "Weekly #1 timeline",
-          "rankDominance": "Dominance at #1"
+          "rankDominance": "Dominance at #1",
+          "positionsScatter": "Position Scatter",
+          "chartRun": "Chart Run",
+          "weeklyPlaysStream": "Weekly Plays Stream"
         },
         "actions": {
           "viewDetail": "View details"
@@ -614,6 +617,31 @@
           "limitOption": "Top {{count}}",
           "axisBottom": "Weeks in top",
           "tooltipWeeks": "{{count}} week(s)"
+        },
+        "scatter": {
+          "modeLabel": "Display mode",
+          "positionMode": "Position",
+          "playsMode": "Plays",
+          "selectEntitiesLabel": "Select entities (max 10)",
+          "selectArtistsLabel": "Select artists (max 10)",
+          "axisBottomWeek": "Week",
+          "axisLeftPosition": "Position",
+          "axisLeftPlays": "Plays",
+          "tooltipPosition": "Position: {{position}}",
+          "tooltipPlays": "Plays: {{plays}}",
+          "tooltipWeek": "Week: {{week}}",
+          "defaultSelectionNote": "Showing top 10 by chart points"
+        },
+        "bump": {
+          "selectEntitiesLabel": "Select entities (max 10)",
+          "axisBottom": "Week",
+          "axisLeft": "Position",
+          "defaultSelectionNote": "Showing top 10 from last week"
+        },
+        "stream": {
+          "axisBottom": "Week",
+          "axisLeft": "Plays",
+          "description": "Weekly plays for entities that reached top 5"
         }
       },
       "filters": {

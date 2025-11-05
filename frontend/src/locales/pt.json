@@ -569,7 +569,10 @@
           "title": "Visualizações",
           "overview": "Gráficos",
           "timeline": "Linha do tempo de #1",
-          "rankDominance": "Dominância no #1"
+          "rankDominance": "Dominância no #1",
+          "positionsScatter": "Dispersão de Posições",
+          "chartRun": "Trajetória no Chart",
+          "weeklyPlaysStream": "Fluxo de Reproduções Semanais"
         },
         "actions": {
           "viewDetail": "Ver detalhes"
@@ -614,6 +617,31 @@
           "limitOption": "Top {{count}}",
           "axisBottom": "Semanas no top",
           "tooltipWeeks": "{{count}} semana(s)"
+        },
+        "scatter": {
+          "modeLabel": "Modo de exibição",
+          "positionMode": "Posição",
+          "playsMode": "Reproduções",
+          "selectEntitiesLabel": "Selecionar entidades (máx. 10)",
+          "selectArtistsLabel": "Selecionar artistas (máx. 10)",
+          "axisBottomWeek": "Semana",
+          "axisLeftPosition": "Posição",
+          "axisLeftPlays": "Reproduções",
+          "tooltipPosition": "Posição: {{position}}",
+          "tooltipPlays": "Reproduções: {{plays}}",
+          "tooltipWeek": "Semana: {{week}}",
+          "defaultSelectionNote": "Mostrando top 10 por pontos de chart"
+        },
+        "bump": {
+          "selectEntitiesLabel": "Selecionar entidades (máx. 10)",
+          "axisBottom": "Semana",
+          "axisLeft": "Posição",
+          "defaultSelectionNote": "Mostrando top 10 da última semana"
+        },
+        "stream": {
+          "axisBottom": "Semana",
+          "axisLeft": "Reproduções",
+          "description": "Reproduções semanais para entidades que alcançaram o top 5"
         }
       },
       "filters": {

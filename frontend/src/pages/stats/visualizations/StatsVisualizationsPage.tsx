@@ -1,6 +1,14 @@
 import React, { Suspense, lazy } from 'react';
 import { Container, Flex, Box, Center, Loader, Text, Stack } from '@mantine/core';
-import { IconGraph, IconTimeline, IconCrown, IconChartBar } from '@tabler/icons-react';
+import {
+  IconGraph,
+  IconTimeline,
+  IconCrown,
+  IconChartBar,
+  IconChartDots,
+  IconTrendingUp,
+  IconWaveSine,
+} from '@tabler/icons-react';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateHeader from '../../../components/createChart/CreateHeader';
@@ -13,6 +21,9 @@ import { MobileSidebar } from '../../../components/stats/MobileSidebar';
 const StatsVisualizationsOverview = lazy(() => import('./StatsVisualizationsOverview'));
 const NumberOneTimelineChart = lazy(() => import('./NumberOneTimelineChart'));
 const TopRankLeadersChart = lazy(() => import('./TopRankLeadersChart'));
+const PositionsScatterChart = lazy(() => import('./PositionsScatterChart'));
+const ChartRunBumpChart = lazy(() => import('./ChartRunBumpChart'));
+const WeeklyPlaysStreamChart = lazy(() => import('./WeeklyPlaysStreamChart'));
 
 const StatsVisualizationsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -47,6 +58,24 @@ const StatsVisualizationsPage: React.FC = () => {
       label: t('stats.visualizations.sidebar.rankDominance'),
       path: '/stats/visualizations/top-rank-leaders',
       group: 'top-rank-leaders',
+    },
+    {
+      icon: IconChartDots,
+      label: t('stats.visualizations.sidebar.positionsScatter'),
+      path: '/stats/visualizations/positions-scatter',
+      group: 'positions-scatter',
+    },
+    {
+      icon: IconTrendingUp,
+      label: t('stats.visualizations.sidebar.chartRun'),
+      path: '/stats/visualizations/chart-run',
+      group: 'chart-run',
+    },
+    {
+      icon: IconWaveSine,
+      label: t('stats.visualizations.sidebar.weeklyPlaysStream'),
+      path: '/stats/visualizations/weekly-plays-stream',
+      group: 'weekly-plays-stream',
     },
   ];
 
@@ -104,6 +133,9 @@ const StatsVisualizationsPage: React.FC = () => {
               <Route index element={<StatsVisualizationsOverview />} />
               <Route path="number-one-timeline" element={<NumberOneTimelineChart />} />
               <Route path="top-rank-leaders" element={<TopRankLeadersChart />} />
+              <Route path="positions-scatter" element={<PositionsScatterChart />} />
+              <Route path="chart-run" element={<ChartRunBumpChart />} />
+              <Route path="weekly-plays-stream" element={<WeeklyPlaysStreamChart />} />
               <Route path="*" element={<StatsVisualizationsOverview />} />
             </Routes>
           </Suspense>
