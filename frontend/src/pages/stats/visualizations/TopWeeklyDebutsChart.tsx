@@ -412,7 +412,11 @@ const TopWeeklyDebutsChart: React.FC = () => {
                 aria-label={isPlaying ? 'Pause autoplay' : 'Play autoplay'}
                 disabled={filteredWeeks.length <= 1}
               >
-                {isPlaying ? <IconPlayerPauseFilled size={18} /> : <IconPlayerPlayFilled size={18} />}
+                {isPlaying ? (
+                  <IconPlayerPauseFilled size={18} />
+                ) : (
+                  <IconPlayerPlayFilled size={18} />
+                )}
               </ActionIcon>
               <div style={{ flex: 1, paddingTop: 8, paddingBottom: 4 }}>
                 <RangeSlider
