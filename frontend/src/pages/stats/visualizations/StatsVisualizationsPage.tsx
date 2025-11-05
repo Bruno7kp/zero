@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Container, Flex, Box, Center, Loader, Text, Stack } from '@mantine/core';
-import { IconGraph, IconTimeline, IconCrown, IconChartBar } from '@tabler/icons-react';
+import { IconGraph, IconTimeline, IconCrown, IconChartBar, IconCoins } from '@tabler/icons-react';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateHeader from '../../../components/createChart/CreateHeader';
@@ -13,6 +13,7 @@ import { MobileSidebar } from '../../../components/stats/MobileSidebar';
 const StatsVisualizationsOverview = lazy(() => import('./StatsVisualizationsOverview'));
 const NumberOneTimelineChart = lazy(() => import('./NumberOneTimelineChart'));
 const TopRankLeadersChart = lazy(() => import('./TopRankLeadersChart'));
+const TopPointsLeadersChart = lazy(() => import('./TopPointsLeadersChart'));
 
 const StatsVisualizationsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -47,6 +48,12 @@ const StatsVisualizationsPage: React.FC = () => {
       label: t('stats.visualizations.sidebar.rankDominance'),
       path: '/stats/visualizations/top-rank-leaders',
       group: 'top-rank-leaders',
+    },
+    {
+      icon: IconCoins,
+      label: t('stats.visualizations.sidebar.pointsDominance'),
+      path: '/stats/visualizations/top-points-leaders',
+      group: 'top-points-leaders',
     },
   ];
 
@@ -104,6 +111,7 @@ const StatsVisualizationsPage: React.FC = () => {
               <Route index element={<StatsVisualizationsOverview />} />
               <Route path="number-one-timeline" element={<NumberOneTimelineChart />} />
               <Route path="top-rank-leaders" element={<TopRankLeadersChart />} />
+              <Route path="top-points-leaders" element={<TopPointsLeadersChart />} />
               <Route path="*" element={<StatsVisualizationsOverview />} />
             </Routes>
           </Suspense>

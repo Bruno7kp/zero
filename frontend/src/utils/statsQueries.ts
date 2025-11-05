@@ -9,6 +9,8 @@ export interface StatsFilters {
   year?: string;
   position?: number;
   positionOperator?: 'eq' | 'lte';
+  weekStart?: string;
+  weekEnd?: string;
 }
 
 /**
@@ -249,6 +251,14 @@ export async function getPointsAccumulators(filters: StatsFilters): Promise<
   // Filter by year if specified
   if (filters.year && filters.year !== 'all') {
     data = data.filter(item => item.week.startsWith(filters.year!));
+  }
+
+  // Filter by week range if specified
+  if (filters.weekStart) {
+    data = data.filter(item => item.week >= filters.weekStart!);
+  }
+  if (filters.weekEnd) {
+    data = data.filter(item => item.week <= filters.weekEnd!);
   }
 
   const grouped = new Map<
@@ -668,7 +678,10 @@ export async function getWeeksToFirstNumberOne(filters: StatsFilters): Promise<
     // Each week represents 7 days, so we count how many 7-day periods passed
     const firstWeekDate = dayjs(firstWeek);
     const weekReachedOneDate = dayjs(weekReachedOne);
-    const weeksToFirstNumberOne = Math.max(0, Math.floor(weekReachedOneDate.diff(firstWeekDate, 'week')));
+    const weeksToFirstNumberOne = Math.max(
+      0,
+      Math.floor(weekReachedOneDate.diff(firstWeekDate, 'week'))
+    );
 
     results.push({
       entityId,

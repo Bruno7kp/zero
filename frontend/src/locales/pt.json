@@ -569,7 +569,8 @@
           "title": "Visualizações",
           "overview": "Gráficos",
           "timeline": "Linha do tempo de #1",
-          "rankDominance": "Dominância no #1"
+          "rankDominance": "Dominância no #1",
+          "pointsDominance": "Mais pontos"
         },
         "actions": {
           "viewDetail": "Ver detalhes"
@@ -614,6 +615,11 @@
           "limitOption": "Top {{count}}",
           "axisBottom": "Semanas no top",
           "tooltipWeeks": "{{count}} semana(s)"
+        },
+        "pointsLeaders": {
+          "axisBottom": "Total de pontos",
+          "tooltipPoints": "{{count}} ponto(s)",
+          "tooltipWeeks": "{{count}} semana(s) no chart"
         }
       },
       "filters": {
