@@ -542,7 +542,45 @@
       "showPlays": "Show plays",
       "glassBadge": "Glass background",
       "showPeak": "Show peak",
-      "showPosition": "Show position"
+      "showPosition": "Show position",
+      "detail": {
+        "artist": "Artist",
+        "album": "Album",
+        "track": "Track",
+        "chartRun": "Chart Run",
+        "overview": "Overview",
+        "peakPosition": "Peak Position",
+        "totalWeeks": "Total Weeks",
+        "weeksAtPeak": "Weeks at Peak",
+        "firstAppearance": "First Appearance",
+        "lastAppearance": "Last Appearance",
+        "totalPlays": "Total Plays",
+        "sales": "Sales",
+        "certification": "Certification",
+        "loading": "Loading...",
+        "notFound": "Item not found in chart",
+        "backToLibrary": "Back to Library",
+        "sections": {
+          "albumsTitle": "Albums",
+          "tracksTitle": "Tracks",
+          "viewAllAlbums": "View all albums",
+          "viewAllTracks": "View all tracks",
+          "emptyAlbums": "This artist has no charted albums yet.",
+          "emptyTracks": "This artist has no charted tracks yet.",
+          "columnEntity": "Title",
+          "columnPoints": "Points",
+          "columnWeeks": "Weeks",
+          "columnPeak": "Peak",
+          "columnPlays": "Plays",
+          "meta": "{{points}} pts • {{weeks}} weeks • {{plays}} plays • peak #{{peak}}",
+          "backToArtist": "Back to artist"
+        },
+        "chartRunTabs": {
+          "timeline": "Timeline",
+          "line": "Line chart",
+          "waffle": "Waffle"
+        }
+      }
     },
     "stats": {
       "title": "Statistics",
