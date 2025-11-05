@@ -559,7 +559,12 @@
         "certification": "Certificação",
         "loading": "Carregando...",
         "notFound": "Item não encontrado no chart",
-        "backToLibrary": "Voltar para Biblioteca"
+        "backToLibrary": "Voltar para Biblioteca",
+        "chartRunTabs": {
+          "timeline": "Linha do tempo",
+          "line": "Gráfico de linha",
+          "waffle": "Mosaico"
+        }
       }
     },
     "stats": {
