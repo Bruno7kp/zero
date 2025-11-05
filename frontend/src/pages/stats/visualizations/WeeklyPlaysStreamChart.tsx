@@ -269,7 +269,9 @@ const WeeklyPlaysStreamChart: React.FC = () => {
                   <Text size="xs" fw={600}>
                     {layer.id}
                   </Text>
-                  <Text size="xs">{layer.value} plays</Text>
+                  <Text size="xs">
+                    {t('stats.visualizations.scatter.tooltipPlays', { plays: layer.value })}
+                  </Text>
                 </div>
               )}
               theme={{

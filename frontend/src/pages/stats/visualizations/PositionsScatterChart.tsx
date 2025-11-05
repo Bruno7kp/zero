@@ -38,6 +38,8 @@ interface ScatterSerie {
 
 type DisplayMode = 'position' | 'plays';
 
+const DEFAULT_CHART_TYPE: 'track' | 'album' | 'artist' = 'artist';
+
 const PositionsScatterChart: React.FC = () => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
@@ -55,7 +57,9 @@ const PositionsScatterChart: React.FC = () => {
     null
   );
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [chartType, setChartType] = React.useState<'track' | 'album' | 'artist'>('artist');
+  const [chartType, setChartType] = React.useState<'track' | 'album' | 'artist'>(
+    DEFAULT_CHART_TYPE
+  );
   const [displayMode, setDisplayMode] = React.useState<DisplayMode>('position');
   const [data, setData] = React.useState<ScatterSerie[]>([]);
   const [availableEntities, setAvailableEntities] = React.useState<
@@ -370,7 +374,7 @@ const PositionsScatterChart: React.FC = () => {
                 legend: t('stats.visualizations.scatter.axisBottomWeek'),
                 legendPosition: 'middle',
                 legendOffset: 60,
-                tickValues: data[0]?.data.length > 20 ? 10 : undefined,
+                tickValues: data.length > 0 && data[0]?.data.length > 20 ? 10 : undefined,
               }}
               axisLeft={{
                 tickSize: 5,

@@ -31,6 +31,8 @@ interface BumpSerie {
   color?: string;
 }
 
+const DEFAULT_CHART_TYPE: 'track' | 'album' | 'artist' = 'track';
+
 const ChartRunBumpChart: React.FC = () => {
   const { t } = useTranslation();
   const theme = useMantineTheme();
@@ -48,7 +50,9 @@ const ChartRunBumpChart: React.FC = () => {
     null
   );
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [chartType, setChartType] = React.useState<'track' | 'album' | 'artist'>('track');
+  const [chartType, setChartType] = React.useState<'track' | 'album' | 'artist'>(
+    DEFAULT_CHART_TYPE
+  );
   const [data, setData] = React.useState<BumpSerie[]>([]);
   const [availableEntities, setAvailableEntities] = React.useState<
     Array<{ value: string; label: string }>
@@ -311,7 +315,7 @@ const ChartRunBumpChart: React.FC = () => {
                 legend: t('stats.visualizations.bump.axisBottom'),
                 legendPosition: 'middle',
                 legendOffset: 60,
-                tickValues: data[0]?.data.length > 20 ? 10 : undefined,
+                tickValues: data.length > 0 && data[0]?.data.length > 20 ? 10 : undefined,
               }}
               axisLeft={{
                 tickSize: 5,
