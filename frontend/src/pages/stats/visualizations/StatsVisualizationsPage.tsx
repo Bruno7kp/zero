@@ -7,7 +7,7 @@ import {
   IconChartBar,
   IconCoins,
   IconHeadphones,
-  IconSparkles,
+  IconRocket,
 } from '@tabler/icons-react';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -72,7 +72,7 @@ const StatsVisualizationsPage: React.FC = () => {
       group: 'top-weekly-plays',
     },
     {
-      icon: IconSparkles,
+      icon: IconRocket,
       label: t('stats.visualizations.sidebar.weeklyDebuts'),
       path: '/stats/visualizations/top-weekly-debuts',
       group: 'top-weekly-debuts',
