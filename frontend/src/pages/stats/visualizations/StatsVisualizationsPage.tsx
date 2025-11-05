@@ -7,6 +7,7 @@ import {
   IconChartBar,
   IconCoins,
   IconHeadphones,
+  IconSparkles,
 } from '@tabler/icons-react';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,7 @@ const NumberOneTimelineChart = lazy(() => import('./NumberOneTimelineChart'));
 const TopRankLeadersChart = lazy(() => import('./TopRankLeadersChart'));
 const TopPointsLeadersChart = lazy(() => import('./TopPointsLeadersChart'));
 const TopWeeklyPlaysChart = lazy(() => import('./TopWeeklyPlaysChart'));
+const TopWeeklyDebutsChart = lazy(() => import('./TopWeeklyDebutsChart'));
 
 const StatsVisualizationsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -68,6 +70,12 @@ const StatsVisualizationsPage: React.FC = () => {
       label: t('stats.visualizations.sidebar.weeklyPlays'),
       path: '/stats/visualizations/top-weekly-plays',
       group: 'top-weekly-plays',
+    },
+    {
+      icon: IconSparkles,
+      label: t('stats.visualizations.sidebar.weeklyDebuts'),
+      path: '/stats/visualizations/top-weekly-debuts',
+      group: 'top-weekly-debuts',
     },
   ];
 
@@ -127,6 +135,7 @@ const StatsVisualizationsPage: React.FC = () => {
               <Route path="top-rank-leaders" element={<TopRankLeadersChart />} />
               <Route path="top-points-leaders" element={<TopPointsLeadersChart />} />
               <Route path="top-weekly-plays" element={<TopWeeklyPlaysChart />} />
+              <Route path="top-weekly-debuts" element={<TopWeeklyDebutsChart />} />
               <Route path="*" element={<StatsVisualizationsOverview />} />
             </Routes>
           </Suspense>

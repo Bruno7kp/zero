@@ -227,6 +227,14 @@ export async function getBestDebuts(filters: StatsFilters): Promise<ChartData[]>
     debuts = debuts.filter(item => item.week.startsWith(filters.year!));
   }
 
+  // Filter by week range if specified
+  if (filters.weekStart) {
+    debuts = debuts.filter(item => item.week >= filters.weekStart!);
+  }
+  if (filters.weekEnd) {
+    debuts = debuts.filter(item => item.week <= filters.weekEnd!);
+  }
+
   // Filter by position if specified
   if (filters.position && filters.positionOperator === 'eq') {
     debuts = debuts.filter(item => item.rank === filters.position);

@@ -571,7 +571,8 @@
           "timeline": "Linha do tempo de #1",
           "rankDominance": "Dominância no #1",
           "pointsDominance": "Mais pontos",
-          "weeklyPlays": "Mais Reproduções em uma Semana"
+          "weeklyPlays": "Mais Reproduções em uma Semana",
+          "weeklyDebuts": "Maiores Debuts em uma Semana"
         },
         "actions": {
           "viewDetail": "Ver detalhes"
@@ -626,6 +627,12 @@
           "axisBottom": "Reproduções na semana",
           "tooltipPlays": "{{count}} reproduções",
           "tooltipWeek": "Semana: {{week}}"
+        },
+        "weeklyDebuts": {
+          "axisBottom": "Reproduções na semana de estreia",
+          "tooltipPlays": "{{count}} reproduções",
+          "tooltipWeek": "Semana: {{week}}",
+          "tooltipRank": "Posição de estreia: #{{rank}}"
         }
       },
       "filters": {

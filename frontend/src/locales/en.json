@@ -571,7 +571,8 @@
           "timeline": "Weekly #1 timeline",
           "rankDominance": "Dominance at #1",
           "pointsDominance": "Most points",
-          "weeklyPlays": "Highest weekly plays"
+          "weeklyPlays": "Highest weekly plays",
+          "weeklyDebuts": "Biggest weekly debuts"
         },
         "actions": {
           "viewDetail": "View details"
@@ -626,6 +627,12 @@
           "axisBottom": "Plays in week",
           "tooltipPlays": "{{count}} play(s)",
           "tooltipWeek": "Week: {{week}}"
+        },
+        "weeklyDebuts": {
+          "axisBottom": "Plays on debut week",
+          "tooltipPlays": "{{count}} play(s)",
+          "tooltipWeek": "Week: {{week}}",
+          "tooltipRank": "Debut rank: #{{rank}}"
         }
       },
       "filters": {
