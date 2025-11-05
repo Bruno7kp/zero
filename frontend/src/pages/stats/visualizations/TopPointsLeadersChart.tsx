@@ -432,7 +432,7 @@ const TopPointsLeadersChart: React.FC = () => {
         }
       />
 
-      <Card withBorder p="lg" style={{ background: cardBg }}>
+      <Card withBorder p="lg" style={{ background: cardBg, overflow: 'visible' }}>
         {loading && !hasLoadedOnce ? (
           <Center py="xl">
             <Loader size="lg" />
@@ -450,6 +450,7 @@ const TopPointsLeadersChart: React.FC = () => {
               margin={{ top: 20, right: 60, bottom: 20, left: 180 }}
               layout="horizontal"
               padding={0.3}
+              theme={{ tooltip: { container: { zIndex: 1000 } } }}
               colors={({ data: datum }) =>
                 (datum as PointsLeaderDatum).barColor || theme.colors.blue[6]
               }

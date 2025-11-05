@@ -454,7 +454,7 @@ const TopWeeklyPlaysChart: React.FC = () => {
         }
       />
 
-      <Card withBorder p="lg" style={{ background: cardBg }}>
+      <Card withBorder p="lg" style={{ background: cardBg, overflow: 'visible' }}>
         {loading && !hasLoadedOnce ? (
           <Center py="xl">
             <Loader size="lg" />
@@ -472,6 +472,7 @@ const TopWeeklyPlaysChart: React.FC = () => {
               margin={{ top: 20, right: 80, bottom: 20, left: 200 }}
               layout="horizontal"
               padding={0.3}
+              theme={{ tooltip: { container: { zIndex: 1000 } } }}
               colors={({ data: datum }) =>
                 (datum as WeeklyPlaysDatum).barColor || theme.colors.blue[6]
               }
