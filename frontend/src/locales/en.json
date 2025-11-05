@@ -570,7 +570,8 @@
           "overview": "Graphs",
           "timeline": "Weekly #1 timeline",
           "rankDominance": "Dominance at #1",
-          "pointsDominance": "Most points"
+          "pointsDominance": "Most points",
+          "weeklyPlays": "Highest weekly plays"
         },
         "actions": {
           "viewDetail": "View details"
@@ -620,6 +621,11 @@
           "axisBottom": "Total points",
           "tooltipPoints": "{{count}} point(s)",
           "tooltipWeeks": "{{count}} week(s) on chart"
+        },
+        "weeklyPlays": {
+          "axisBottom": "Plays in week",
+          "tooltipPlays": "{{count}} play(s)",
+          "tooltipWeek": "Week: {{week}}"
         }
       },
       "filters": {

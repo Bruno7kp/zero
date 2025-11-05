@@ -186,6 +186,14 @@ export async function getHighestPlays(filters: StatsFilters): Promise<ChartData[
     data = data.filter(item => item.week.startsWith(filters.year!));
   }
 
+  // Filter by week range if specified
+  if (filters.weekStart) {
+    data = data.filter(item => item.week >= filters.weekStart!);
+  }
+  if (filters.weekEnd) {
+    data = data.filter(item => item.week <= filters.weekEnd!);
+  }
+
   // Sort by plays descending
   return data.sort((a, b) => b.plays - a.plays);
 }

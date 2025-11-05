@@ -570,7 +570,8 @@
           "overview": "Gráficos",
           "timeline": "Linha do tempo de #1",
           "rankDominance": "Dominância no #1",
-          "pointsDominance": "Mais pontos"
+          "pointsDominance": "Mais pontos",
+          "weeklyPlays": "Mais Reproduções em uma Semana"
         },
         "actions": {
           "viewDetail": "Ver detalhes"
@@ -620,6 +621,11 @@
           "axisBottom": "Total de pontos",
           "tooltipPoints": "{{count}} ponto(s)",
           "tooltipWeeks": "{{count}} semana(s) no chart"
+        },
+        "weeklyPlays": {
+          "axisBottom": "Reproduções na semana",
+          "tooltipPlays": "{{count}} reproduções",
+          "tooltipWeek": "Semana: {{week}}"
         }
       },
       "filters": {
