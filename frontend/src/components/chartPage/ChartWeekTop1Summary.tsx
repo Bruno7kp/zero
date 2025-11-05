@@ -11,6 +11,8 @@ import {
   rem,
   ThemeIcon,
   useMantineTheme,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import {
@@ -19,6 +21,7 @@ import {
   IconMusic,
   IconChevronRight,
   IconListNumbers,
+  IconFlame,
 } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -100,13 +103,27 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({
   if (!weekStr || !top1 || top1.length === 0) {
     return (
       <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-        <Group>
-          <ThemeIcon variant="light" size="md">
-            <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
-          </ThemeIcon>
-          <Text fw={600} size="lg">
-            {t('charts.lastWeek')}
-          </Text>
+        <Group justify="space-between" align="center">
+          <Group gap="sm" align="center">
+            <ThemeIcon variant="light" size="md">
+              <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
+            </ThemeIcon>
+            <Text fw={600} size="lg">
+              {t('charts.lastWeek')}
+            </Text>
+          </Group>
+          <Tooltip label={t('charts.viewLive')} withArrow>
+            <ActionIcon
+              component={Link}
+              to="/live"
+              variant="light"
+              color="red"
+              size="lg"
+              aria-label={t('charts.viewLive')}
+            >
+              <IconFlame size={18} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
         <Divider variant="dashed" size="sm" my="xs" />
         <Flex direction="column" gap="md">
@@ -120,13 +137,27 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({
 
   return (
     <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-      <Group>
-        <ThemeIcon variant="light" size="md">
-          <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
-        </ThemeIcon>
-        <Text fw={600} size="lg">
-          {t('charts.lastWeek')}
-        </Text>
+      <Group justify="space-between" align="center">
+        <Group gap="sm" align="center">
+          <ThemeIcon variant="light" size="md">
+            <IconListNumbers style={{ width: rem(20), height: rem(20) }} />
+          </ThemeIcon>
+          <Text fw={600} size="lg">
+            {t('charts.lastWeek')}
+          </Text>
+        </Group>
+        <Tooltip label={t('charts.viewLive')} withArrow>
+          <ActionIcon
+            component={Link}
+            to="/live"
+            variant="light"
+            color="red"
+            size="lg"
+            aria-label={t('charts.viewLive')}
+          >
+            <IconFlame size={18} />
+          </ActionIcon>
+        </Tooltip>
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />
       <Flex direction="column" gap="md">
