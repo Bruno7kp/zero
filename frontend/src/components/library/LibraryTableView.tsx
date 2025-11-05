@@ -11,6 +11,7 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
@@ -19,6 +20,7 @@ import { CertificationIcon } from '../CertificationIcon';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
 import { db } from '../../db/indexedDb';
 import { getUserPlaycountFromCache } from '../../utils/certification';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 interface LibraryTableViewProps {
   items: LibraryItem[];
@@ -155,6 +157,7 @@ const TableRow: React.FC<TableRowProps> = ({
   forceUpdate = 0,
   onImageChange,
 }) => {
+  const navigate = useNavigate();
   const [loadingPlaycount, setLoadingPlaycount] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [playcount, setPlaycount] = useState<number | undefined>(item.playcount);
@@ -256,9 +259,23 @@ const TableRow: React.FC<TableRowProps> = ({
     setModalOpen(true);
   };
 
+  const handleRowClick = () => {
+    // Navigate to detail page
+    const artistSlug = encodeLastFmSlug(item.artistName || item.name);
+    const nameSlug = encodeLastFmSlug(item.name);
+    
+    if (type === 'artist') {
+      navigate(`/library/music/${artistSlug}`);
+    } else if (type === 'album') {
+      navigate(`/library/music/${artistSlug}/${nameSlug}`);
+    } else if (type === 'track') {
+      navigate(`/library/music/${artistSlug}/_/${nameSlug}`);
+    }
+  };
+
   return (
     <>
-      <Table.Tr>
+      <Table.Tr style={{ cursor: 'pointer' }} onClick={handleRowClick}>
         <Table.Td style={{ textAlign: 'center' }}>
           <Text size="sm">{(page - 1) * itemsPerPage + index + 1}</Text>
         </Table.Td>
@@ -269,7 +286,10 @@ const TableRow: React.FC<TableRowProps> = ({
               alt={item.name}
               size={40}
               radius="sm"
-              onClick={handleClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClick();
+              }}
               style={{ cursor: 'pointer' }}
             />
             <div

@@ -11,11 +11,13 @@ import {
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import type { LibraryItem } from '../../pages/LibraryPage';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 interface LibraryGridViewProps {
   items: LibraryItem[];
@@ -102,6 +104,7 @@ const GridItem: React.FC<GridItemProps> = ({
 }) => {
   const theme = useMantineTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -115,8 +118,26 @@ const GridItem: React.FC<GridItemProps> = ({
     clientSecret: SPOTIFY_SECRET,
   });
 
-  const handleClick = () => {
-    setModalOpen(true);
+  const handleClick = (e: React.MouseEvent) => {
+    // Check if the click is with a modifier key (ctrl, cmd, etc.)
+    const isModifiedClick = e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0;
+    
+    if (isModifiedClick) {
+      // Allow browser to handle modified clicks (e.g., open in new tab)
+      return;
+    }
+
+    // Navigate to detail page
+    const artistSlug = encodeLastFmSlug(item.artistName || item.name);
+    const nameSlug = encodeLastFmSlug(item.name);
+    
+    if (type === 'artist') {
+      navigate(`/library/music/${artistSlug}`);
+    } else if (type === 'album') {
+      navigate(`/library/music/${artistSlug}/${nameSlug}`);
+    } else if (type === 'track') {
+      navigate(`/library/music/${artistSlug}/_/${nameSlug}`);
+    }
   };
 
   // Show badge if item has peaked in the chart and showPeak is enabled
