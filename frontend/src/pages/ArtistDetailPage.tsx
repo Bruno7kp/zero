@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   Container,
@@ -16,10 +16,12 @@ import {
   Badge,
   Tabs,
   Box,
+  Anchor,
+  Table,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconArrowLeft, IconMicrophone } from '@tabler/icons-react';
-import { decodeLastFmSlug } from '../utils/urlEncoding';
+import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import { useEntityStats } from '../hooks/useEntityStats';
 import { useSpotifyImage } from '../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
@@ -28,6 +30,7 @@ import EntityChartRun from '../components/library/EntityChartRun';
 import EntityWaffleRun from '../components/library/EntityWaffleRun';
 import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
+import { useArtistEntities } from '../hooks/useArtistEntities';
 
 export const ArtistDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -85,6 +88,21 @@ export const ArtistDetailPage: React.FC = () => {
     >
       {t('library.detail.backToLibrary')}
     </Button>
+  );
+
+  const artistDisplayName = stats?.name || artistName;
+  const artistSlug = artistDisplayName ? encodeLastFmSlug(artistDisplayName) : '';
+  const { loading: albumsLoading, entities: topAlbums } = useArtistEntities(
+    chart,
+    'album',
+    artistDisplayName,
+    { limit: 10 }
+  );
+  const { loading: tracksLoading, entities: topTracks } = useArtistEntities(
+    chart,
+    'track',
+    artistDisplayName,
+    { limit: 10 }
   );
 
   if (!chart) {
@@ -264,6 +282,128 @@ export const ArtistDetailPage: React.FC = () => {
             </Tabs>
           </Card>
         )}
+
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Group justify="space-between" align="center" mb="md">
+            <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
+            {artistSlug && (
+              <Button
+                component={Link}
+                to={`/library/music/${artistSlug}/+albums`}
+                variant="light"
+                size="xs"
+                disabled={!topAlbums.length}
+              >
+                {t('library.detail.sections.viewAllAlbums')}
+              </Button>
+            )}
+          </Group>
+          {albumsLoading ? (
+            <Center py="lg">
+              <Loader size="sm" />
+            </Center>
+          ) : topAlbums.length === 0 ? (
+            <Text size="sm" c="dimmed">
+              {t('library.detail.sections.emptyAlbums')}
+            </Text>
+          ) : (
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {topAlbums.map((album, index) => (
+                  <Table.Tr key={album.entityId || `${album.name}-${index}`}>
+                    <Table.Td>{index + 1}</Table.Td>
+                    <Table.Td>
+                      <Anchor
+                        component={Link}
+                        to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
+                        fw={600}
+                        size="sm"
+                        c="white"
+                      >
+                        {album.name}
+                      </Anchor>
+                    </Table.Td>
+                    <Table.Td>{album.points.toLocaleString()}</Table.Td>
+                    <Table.Td>{album.weeks.toLocaleString()}</Table.Td>
+                    <Table.Td>#{album.peak}</Table.Td>
+                    <Table.Td>{album.totalPlays.toLocaleString()}</Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          )}
+        </Card>
+
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Group justify="space-between" align="center" mb="md">
+            <Title order={3}>{t('library.detail.sections.tracksTitle')}</Title>
+            {artistSlug && (
+              <Button
+                component={Link}
+                to={`/library/music/${artistSlug}/+tracks`}
+                variant="light"
+                size="xs"
+                disabled={!topTracks.length}
+              >
+                {t('library.detail.sections.viewAllTracks')}
+              </Button>
+            )}
+          </Group>
+          {tracksLoading ? (
+            <Center py="lg">
+              <Loader size="sm" />
+            </Center>
+          ) : topTracks.length === 0 ? (
+            <Text size="sm" c="dimmed">
+              {t('library.detail.sections.emptyTracks')}
+            </Text>
+          ) : (
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
+                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {topTracks.map((track, index) => (
+                  <Table.Tr key={track.entityId || `${track.name}-${index}`}>
+                    <Table.Td>{index + 1}</Table.Td>
+                    <Table.Td>
+                      <Anchor
+                        component={Link}
+                        to={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
+                        fw={600}
+                        size="sm"
+                        c="white"
+                      >
+                        {track.name}
+                      </Anchor>
+                    </Table.Td>
+                    <Table.Td>{track.points.toLocaleString()}</Table.Td>
+                    <Table.Td>{track.weeks.toLocaleString()}</Table.Td>
+                    <Table.Td>#{track.peak}</Table.Td>
+                    <Table.Td>{track.totalPlays.toLocaleString()}</Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          )}
+        </Card>
       </Stack>
 
       <ImageEditModal

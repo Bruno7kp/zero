@@ -8,6 +8,8 @@ import LivePage from './pages/LivePage';
 import ProfilePage from './pages/ProfilePage';
 import LibraryPage from './pages/LibraryPage';
 import ArtistDetailPage from './pages/ArtistDetailPage';
+import ArtistAlbumsPage from './pages/ArtistAlbumsPage';
+import ArtistTracksPage from './pages/ArtistTracksPage';
 import AlbumDetailPage from './pages/AlbumDetailPage';
 import TrackDetailPage from './pages/TrackDetailPage';
 import ChartsWeekPage from './pages/ChartsWeekPage';
@@ -123,6 +125,22 @@ function App() {
           element={
             <ProtectedRoute>
               <ArtistDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="library/music/:artist/+albums"
+          element={
+            <ProtectedRoute>
+              <ArtistAlbumsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="library/music/:artist/+tracks"
+          element={
+            <ProtectedRoute>
+              <ArtistTracksPage />
             </ProtectedRoute>
           }
         />

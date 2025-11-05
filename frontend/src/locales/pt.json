@@ -560,6 +560,21 @@
         "loading": "Carregando...",
         "notFound": "Item não encontrado no chart",
         "backToLibrary": "Voltar para Biblioteca",
+        "sections": {
+          "albumsTitle": "Álbuns",
+          "tracksTitle": "Músicas",
+          "viewAllAlbums": "Ver todos os álbuns",
+          "viewAllTracks": "Ver todas as músicas",
+          "emptyAlbums": "Este artista ainda não teve álbuns no chart.",
+          "emptyTracks": "Este artista ainda não teve músicas no chart.",
+          "columnEntity": "Título",
+          "columnPoints": "Pontos",
+          "columnWeeks": "Semanas",
+          "columnPeak": "Pico",
+          "columnPlays": "Reproduções",
+          "meta": "{{points}} pts • {{weeks}} semanas • {{plays}} reproduções • pico #{{peak}}",
+          "backToArtist": "Voltar para o artista"
+        },
         "chartRunTabs": {
           "timeline": "Linha do tempo",
           "line": "Gráfico de linha",
