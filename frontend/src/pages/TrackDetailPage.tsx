@@ -66,15 +66,6 @@ export const TrackDetailPage: React.FC = () => {
   // Prepare chart data for visualization
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
-  const chartRunLatestWeek = useMemo(() => {
-    for (let index = chartRun.length - 1; index >= 0; index -= 1) {
-      const entry = chartRun[index];
-      if (typeof entry?.position === 'number') {
-        return entry.week;
-      }
-    }
-    return undefined;
-  }, [chartRun]);
 
   const timelineRun = useMemo(
     () =>
@@ -267,11 +258,7 @@ export const TrackDetailPage: React.FC = () => {
 
               <Tabs.Panel value="timeline">
                 <Box mt="md">
-                  <ChartRun
-                    run={timelineRun}
-                    chartType="track"
-                    highlightWeek={chartRunLatestWeek}
-                  />
+                  <ChartRun run={timelineRun} chartType="track" />
                 </Box>
               </Tabs.Panel>
               <Tabs.Panel value="line">

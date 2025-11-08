@@ -68,15 +68,6 @@ export const ArtistDetailPage: React.FC = () => {
   // Prepare chart data for visualization
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
-  const chartRunLatestWeek = useMemo(() => {
-    for (let index = chartRun.length - 1; index >= 0; index -= 1) {
-      const entry = chartRun[index];
-      if (typeof entry?.position === 'number') {
-        return entry.week;
-      }
-    }
-    return undefined;
-  }, [chartRun]);
 
   const timelineRun = useMemo(
     () =>
@@ -273,11 +264,7 @@ export const ArtistDetailPage: React.FC = () => {
 
               <Tabs.Panel value="timeline">
                 <Box mt="md">
-                  <ChartRun
-                    run={timelineRun}
-                    chartType="artist"
-                    highlightWeek={chartRunLatestWeek}
-                  />
+                  <ChartRun run={timelineRun} chartType="artist" />
                 </Box>
               </Tabs.Panel>
               <Tabs.Panel value="line">
@@ -339,7 +326,6 @@ export const ArtistDetailPage: React.FC = () => {
                         to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
                         fw={600}
                         size="sm"
-                        c="white"
                       >
                         {album.name}
                       </Anchor>
@@ -400,7 +386,6 @@ export const ArtistDetailPage: React.FC = () => {
                         to={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
                         fw={600}
                         size="sm"
-                        c="white"
                       >
                         {track.name}
                       </Anchor>
