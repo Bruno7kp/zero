@@ -31,6 +31,7 @@ import EntityWaffleRun from '../components/library/EntityWaffleRun';
 import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { useArtistEntities } from '../hooks/useArtistEntities';
+import { StatsBox } from '../components/StatsBox';
 
 export const ArtistDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -160,13 +161,13 @@ export const ArtistDetailPage: React.FC = () => {
             <Avatar
               src={effectiveImageUrl}
               alt={artistName}
-              size={120}
+              size={250}
               radius="md"
               onClick={() => setImageModalOpen(true)}
               style={{ cursor: 'pointer' }}
             />
             <Stack gap="xs" style={{ flex: 1 }}>
-              <Title order={2}>{stats.name}</Title>
+              <Title order={1}>{stats.name}</Title>
               <Group gap="xs">
                 <Badge color="blue" variant="light">
                   {t('library.detail.artist')}
@@ -176,71 +177,43 @@ export const ArtistDetailPage: React.FC = () => {
           </Group>
         </Card>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Title order={3} mb="md">
-            {t('library.detail.overview')}
-          </Title>
+        <Card shadow="sm" padding={0} radius="md" bg={'transparent'}>
           <Grid>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.peakPosition')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  #{stats.peak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalWeeks')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalWeeks}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.weeksAtPeak')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.weeksAtPeak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalPlays')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalPlays.toLocaleString()}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.firstAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.firstAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.lastAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.lastAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
+            <StatsBox
+              label={t('library.detail.peakPosition')}
+              value={stats.peak != null ? stats.peak : '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              color="blue"
+              format="plain"
+              valueClassName={stats.peak === 1 ? 'peak' : undefined}
+            />
+            <StatsBox
+              label={t('library.detail.weeksAtPeak')}
+              value={stats.weeksAtPeak ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.totalWeeks')}
+              value={stats.totalWeeks ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.totalPlays')}
+              value={stats.totalPlays ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.firstAppearance')}
+              value={stats.firstAppearance || '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              format="plain"
+            />
+            <StatsBox
+              label={t('library.detail.lastAppearance')}
+              value={stats.lastAppearance || '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              format="plain"
+            />
           </Grid>
         </Card>
 
@@ -308,18 +281,26 @@ export const ArtistDetailPage: React.FC = () => {
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>#</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>#</Table.Th>
                   <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPoints')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnWeeks')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPeak')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPlays')}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {topAlbums.map((album, index) => (
                   <Table.Tr key={album.entityId || `${album.name}-${index}`}>
-                    <Table.Td>{index + 1}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
                     <Table.Td>
                       <Anchor
                         component={Link}
@@ -330,10 +311,21 @@ export const ArtistDetailPage: React.FC = () => {
                         {album.name}
                       </Anchor>
                     </Table.Td>
-                    <Table.Td>{album.points.toLocaleString()}</Table.Td>
-                    <Table.Td>{album.weeks.toLocaleString()}</Table.Td>
-                    <Table.Td>#{album.peak}</Table.Td>
-                    <Table.Td>{album.totalPlays.toLocaleString()}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.points.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.weeks.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td
+                      style={{ textAlign: 'center' }}
+                      className={album.peak === 1 ? 'peak' : undefined}
+                    >
+                      {album.peak}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.totalPlays.toLocaleString()}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -368,18 +360,26 @@ export const ArtistDetailPage: React.FC = () => {
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>#</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>#</Table.Th>
                   <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPoints')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnWeeks')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPeak')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPlays')}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {topTracks.map((track, index) => (
                   <Table.Tr key={track.entityId || `${track.name}-${index}`}>
-                    <Table.Td>{index + 1}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
                     <Table.Td>
                       <Anchor
                         component={Link}
@@ -390,10 +390,21 @@ export const ArtistDetailPage: React.FC = () => {
                         {track.name}
                       </Anchor>
                     </Table.Td>
-                    <Table.Td>{track.points.toLocaleString()}</Table.Td>
-                    <Table.Td>{track.weeks.toLocaleString()}</Table.Td>
-                    <Table.Td>#{track.peak}</Table.Td>
-                    <Table.Td>{track.totalPlays.toLocaleString()}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.points.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.weeks.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td
+                      style={{ textAlign: 'center' }}
+                      className={track.peak === 1 ? 'peak' : undefined}
+                    >
+                      {track.peak}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.totalPlays.toLocaleString()}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>

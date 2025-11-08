@@ -28,6 +28,7 @@ import EntityChartRun from '../components/library/EntityChartRun';
 import EntityWaffleRun from '../components/library/EntityWaffleRun';
 import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
+import { StatsBox } from '../components/StatsBox';
 
 export const TrackDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -143,13 +144,13 @@ export const TrackDetailPage: React.FC = () => {
             <Avatar
               src={effectiveImageUrl}
               alt={trackName}
-              size={120}
+              size={250}
               radius="md"
               onClick={() => setImageModalOpen(true)}
               style={{ cursor: 'pointer' }}
             />
             <Stack gap="xs" style={{ flex: 1 }}>
-              <Title order={2}>{stats.name}</Title>
+              <Title order={1}>{stats.name}</Title>
               {stats.artistName && (
                 <Text
                   size="lg"
@@ -170,71 +171,43 @@ export const TrackDetailPage: React.FC = () => {
           </Group>
         </Card>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Title order={3} mb="md">
-            {t('library.detail.overview')}
-          </Title>
+        <Card shadow="sm" padding={0} radius="md" bg={'transparent'}>
           <Grid>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.peakPosition')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  #{stats.peak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalWeeks')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalWeeks}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.weeksAtPeak')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.weeksAtPeak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalPlays')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalPlays.toLocaleString()}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.firstAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.firstAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.lastAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.lastAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
+            <StatsBox
+              label={t('library.detail.peakPosition')}
+              value={stats.peak != null ? stats.peak : '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              color="blue"
+              format="plain"
+              valueClassName={stats.peak === 1 ? 'peak' : undefined}
+            />
+            <StatsBox
+              label={t('library.detail.totalWeeks')}
+              value={stats.totalWeeks ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.weeksAtPeak')}
+              value={stats.weeksAtPeak ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.totalPlays')}
+              value={stats.totalPlays ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.firstAppearance')}
+              value={stats.firstAppearance || '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              format="plain"
+            />
+            <StatsBox
+              label={t('library.detail.lastAppearance')}
+              value={stats.lastAppearance || '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              format="plain"
+            />
           </Grid>
         </Card>
 

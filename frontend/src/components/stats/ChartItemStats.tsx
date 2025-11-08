@@ -1,6 +1,5 @@
 import React from 'react';
-import { Paper, Grid, Text, Card, Divider, Group, ThemeIcon, rem } from '@mantine/core';
-import { formatNumber } from '../../utils/format';
+import { Paper, Grid, Text, Group, ThemeIcon, rem } from '@mantine/core';
 import { CertificationBadge } from '../CertificationBadge';
 import { useOfflineStatus } from '../../hooks/useOfflineStatus';
 import { getUserPlaycountCached } from '../../utils/certification';
@@ -14,6 +13,7 @@ import {
   IconChartBar,
   IconTimeline,
 } from '@tabler/icons-react';
+import { StatsBox } from '../StatsBox';
 
 export interface ChartItemStatsProps {
   stats: any;
@@ -89,7 +89,12 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
             }
           />
         )}
-        <StatBox label={t('charts.stats.points')} value={totals.totalPoints ?? 0} />
+        <StatsBox
+          label={t('charts.stats.points')}
+          value={totals.totalPoints ?? 0}
+          color="blue"
+          span={{ base: 4, sm: 2 }}
+        />
         {['album', 'track'].includes(chartType) &&
           (() => {
             const gold =
@@ -131,15 +136,29 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
             </Text>
           </Group>
         </Grid.Col>
-        <StatBox
+        <StatsBox
           label={t('charts.stats.top1')}
           value={peak.position && parseInt(peak.position) === 1 ? peak.weeksAtPeak : 0}
+          color="blue"
+          span={{ base: 4, sm: 2 }}
         />
-        <StatBox label={t('charts.stats.top5')} value={totals.top5 ?? 0} />
-        <StatBox label={t('charts.stats.top10')} value={totals.top10 ?? 0} />
-        <StatBox
+        <StatsBox
+          label={t('charts.stats.top5')}
+          value={totals.top5 ?? 0}
+          color="blue"
+          span={{ base: 4, sm: 2 }}
+        />
+        <StatsBox
+          label={t('charts.stats.top10')}
+          value={totals.top10 ?? 0}
+          color="blue"
+          span={{ base: 4, sm: 2 }}
+        />
+        <StatsBox
           label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
           value={totals.withinCutoff ?? 0}
+          color="blue"
+          span={{ base: 4, sm: 2 }}
         />
       </Grid>
       {full && (
@@ -154,46 +173,35 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
               </Text>
             </Group>
           </Grid.Col>
-          <StatBox label={t('charts.stats.top1')} value={sequences.rank1 ?? 0} />
-          <StatBox label={t('charts.stats.top5')} value={sequences.top5 ?? 0} />
-          <StatBox label={t('charts.stats.top10')} value={sequences.top10 ?? 0} />
-          <StatBox
+          <StatsBox
+            label={t('charts.stats.top1')}
+            value={sequences.rank1 ?? 0}
+            color="blue"
+            span={{ base: 4, sm: 2 }}
+          />
+          <StatsBox
+            label={t('charts.stats.top5')}
+            value={sequences.top5 ?? 0}
+            color="blue"
+            span={{ base: 4, sm: 2 }}
+          />
+          <StatsBox
+            label={t('charts.stats.top10')}
+            value={sequences.top10 ?? 0}
+            color="blue"
+            span={{ base: 4, sm: 2 }}
+          />
+          <StatsBox
             label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
             value={sequences.withinCutoff ?? 0}
+            color="blue"
+            span={{ base: 4, sm: 2 }}
           />
         </Grid>
       )}
     </Paper>
   );
 };
-
-interface StatBoxProps {
-  label: string;
-  value: number;
-  sub?: string;
-  color?: string; // optional accent color for value (defaults to blue)
-}
-
-const StatBox: React.FC<StatBoxProps> = ({ label, value, sub, color }) => (
-  <Grid.Col span={{ base: 4, sm: 2 }}>
-    <Card p="sm" withBorder style={{ textAlign: 'center' }}>
-      <Text fw={600} tt="uppercase" size="xs" ta="center">
-        {label}
-      </Text>
-      <Divider my="xs" variant="dashed" size="sm" />
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 4 }}>
-        <Text fw={600} size="xl" c={color || 'blue'} style={{ lineHeight: 1 }}>
-          {formatNumber(value)}
-        </Text>
-        {sub && (
-          <Text size="xs" c="dimmed" style={{ lineHeight: 1 }}>
-            {sub}
-          </Text>
-        )}
-      </div>
-    </Card>
-  </Grid.Col>
-);
 
 // Lazy Last.fm plays box: fetches user playcount on expand/modal only, de-duplicated and cached
 function LastfmPlaysBox({
@@ -236,11 +244,12 @@ function LastfmPlaysBox({
   }, [chart?.lastfm_username, chart?.day_of_week, artistName, entityName, chartType, isOnline]);
 
   return (
-    <StatBox
+    <StatsBox
       label={t('charts.stats.plays', { defaultValue: 'Plays' })}
       value={plays == null ? 0 : plays}
       sub={plays == null ? '…' : undefined}
-      color={undefined}
+      color="blue"
+      span={{ base: 4, sm: 2 }}
     />
   );
 }
