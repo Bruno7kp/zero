@@ -576,9 +576,15 @@
           "backToArtist": "Voltar para o artista"
         },
         "chartRunTabs": {
-          "timeline": "Linha do tempo",
+          "timeline": "Chart Run",
           "line": "Gráfico de linha",
           "waffle": "Mosaico"
+        },
+        "waffleTooltip": {
+          "positionTitle": "#{{position}}",
+          "plays": "{{plays}} reproduções",
+          "outTitle": "Fora do chart",
+          "outDescription": "Nesta semana o item ficou fora do chart."
         }
       }
     },

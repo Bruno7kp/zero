@@ -68,15 +68,26 @@ export const ArtistDetailPage: React.FC = () => {
   // Prepare chart data for visualization
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
-  const chartRunLatestWeek = chartRun.length > 0 ? chartRun[chartRun.length - 1]?.week : undefined;
+  const chartRunLatestWeek = useMemo(() => {
+    for (let index = chartRun.length - 1; index >= 0; index -= 1) {
+      const entry = chartRun[index];
+      if (typeof entry?.position === 'number') {
+        return entry.week;
+      }
+    }
+    return undefined;
+  }, [chartRun]);
+
   const timelineRun = useMemo(
     () =>
-      chartRun.map(item => ({
-        week: item.week,
-        position: item.position ?? cutoff + 1,
-        plays: item.plays,
-      })),
-    [chartRun, cutoff]
+      chartRun
+        .filter(item => typeof item.position === 'number')
+        .map(item => ({
+          week: item.week,
+          position: item.position as number,
+          plays: item.plays,
+        })),
+    [chartRun]
   );
   const handleBack = () => navigate('/library');
   const headerBackButton = (
