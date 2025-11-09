@@ -310,11 +310,3 @@ a:focus,
   text-decoration-color: var(--mantine-color-blue-6) !important;
   text-decoration-thickness: 2px !important;
 }
-
-:root[data-mantine-color-scheme='dark'] a {
-  color: #ffffff !important;
-}
-
-:root:not([data-mantine-color-scheme='dark']) a {
-  color: #000000 !important;
-}

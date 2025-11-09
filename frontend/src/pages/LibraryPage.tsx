@@ -102,7 +102,7 @@ export const LibraryPage: React.FC = () => {
 
   return (
     <Container className="noPaddingMobile">
-      <CreateHeader pageTitle={t('library.title')} />
+      <CreateHeader pageTitle={t('library.title')} showSettings={false} />
       <Flex direction="column" gap="md">
         <LibraryFilters
           selectedType={selectedType}

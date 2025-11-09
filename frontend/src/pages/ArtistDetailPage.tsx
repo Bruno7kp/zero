@@ -17,6 +17,8 @@ import {
   Table,
   Text,
   Title,
+  useMantineTheme,
+  useComputedColorScheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconArrowLeft, IconMicrophone } from '@tabler/icons-react';
@@ -41,6 +43,9 @@ type RootState = {
 
 export const ArtistDetailPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useMantineTheme();
+  const colorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
+  const anchorColor = colorScheme === 'dark' ? theme.white : theme.black;
   const { artist } = useParams<{ artist: string }>();
   const navigate = useNavigate();
   const charts = useSelector((state: RootState) => state.charts.charts);
@@ -340,6 +345,7 @@ export const ArtistDetailPage: React.FC = () => {
                         to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
                         fw={600}
                         size="sm"
+                        c={anchorColor}
                       >
                         {album.name}
                       </Anchor>
@@ -419,6 +425,7 @@ export const ArtistDetailPage: React.FC = () => {
                         to={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
                         fw={600}
                         size="sm"
+                        c={anchorColor}
                       >
                         {track.name}
                       </Anchor>
