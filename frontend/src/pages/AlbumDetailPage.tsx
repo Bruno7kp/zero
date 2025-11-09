@@ -132,7 +132,7 @@ export const AlbumDetailPage: React.FC = () => {
   return (
     <Container className="noPaddingMobile">
       <CreateHeader
-        pageTitle={albumName}
+        pageTitle={t('library.detail.album')}
         icon={IconDisc}
         leftSection={headerBackButton}
         showSettings={false}
@@ -171,14 +171,12 @@ export const AlbumDetailPage: React.FC = () => {
           </Group>
         </Card>
 
-        <Card shadow="sm" padding={0} radius="md" bg={'transparent'}>
+        <Card shadow="sm" padding={0} radius="md" bg="transparent">
           <Grid>
             <StatsBox
               label={t('library.detail.peakPosition')}
               value={stats.peak != null ? stats.peak : '—'}
               span={{ base: 12, sm: 6, md: 3 }}
-              color="blue"
-              format="plain"
               valueClassName={stats.peak === 1 ? 'peak' : undefined}
             />
             <StatsBox
@@ -187,26 +185,14 @@ export const AlbumDetailPage: React.FC = () => {
               span={{ base: 12, sm: 6, md: 3 }}
             />
             <StatsBox
-              label={t('library.detail.weeksAtPeak')}
-              value={stats.weeksAtPeak ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
               label={t('library.detail.totalPlays')}
               value={stats.totalPlays ?? 0}
               span={{ base: 12, sm: 6, md: 3 }}
             />
             <StatsBox
-              label={t('library.detail.firstAppearance')}
-              value={stats.firstAppearance || '—'}
+              label={t('charts.stats.points')}
+              value={stats.totalPoints ?? 0}
               span={{ base: 12, sm: 6, md: 3 }}
-              format="plain"
-            />
-            <StatsBox
-              label={t('library.detail.lastAppearance')}
-              value={stats.lastAppearance || '—'}
-              span={{ base: 12, sm: 6, md: 3 }}
-              format="plain"
             />
           </Grid>
         </Card>

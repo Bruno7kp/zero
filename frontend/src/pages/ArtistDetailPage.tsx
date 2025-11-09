@@ -1,23 +1,23 @@
 import React, { useMemo, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
-  Container,
-  Title,
-  Text,
-  Card,
-  Grid,
-  Stack,
-  Button,
-  Loader,
-  Center,
-  Group,
+  Anchor,
   Avatar,
   Badge,
-  Tabs,
   Box,
-  Anchor,
+  Button,
+  Card,
+  Center,
+  Container,
+  Grid,
+  Group,
+  Loader,
+  Stack,
+  Tabs,
   Table,
+  Text,
+  Title,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconArrowLeft, IconMicrophone } from '@tabler/icons-react';
@@ -33,29 +33,34 @@ import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { useArtistEntities } from '../hooks/useArtistEntities';
 import { StatsBox } from '../components/StatsBox';
 
+type RootState = {
+  charts: {
+    charts: any[];
+    activeChartId: number | null;
+  };
+};
+
 export const ArtistDetailPage: React.FC = () => {
   const { t } = useTranslation();
   const { artist } = useParams<{ artist: string }>();
   const navigate = useNavigate();
-  const charts = useSelector((state: any) => state.charts.charts);
-  const activeChartId = useSelector((state: any) => state.charts.activeChartId);
+  const charts = useSelector((state: RootState) => state.charts.charts);
+  const activeChartId = useSelector((state: RootState) => state.charts.activeChartId);
+
   const chart = useMemo(
     () => charts.find((c: any) => c.id === activeChartId) || null,
     [charts, activeChartId]
   );
 
-  // Decode the artist name from URL
   const artistName = artist ? decodeLastFmSlug(artist) : '';
   const entityId = `artist-${artistName}-`;
 
-  // Fetch stats
   const { loading, stats, error } = useEntityStats(chart, 'artist', entityId);
   const cutoff = chart?.artist_cutoff || chart?.music_cutoff || 100;
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
 
-  // Fetch Spotify image
   const { imageUrl } = useSpotifyImage({
     entityId,
     name: artistName,
@@ -64,9 +69,8 @@ export const ArtistDetailPage: React.FC = () => {
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET,
   });
-  const effectiveImageUrl = customImageUrl ?? imageUrl ?? undefined;
 
-  // Prepare chart data for visualization
+  const effectiveImageUrl = customImageUrl ?? imageUrl ?? undefined;
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
 
@@ -81,6 +85,7 @@ export const ArtistDetailPage: React.FC = () => {
         })),
     [chartRun]
   );
+
   const handleBack = () => navigate('/library');
   const headerBackButton = (
     <Button
@@ -95,6 +100,7 @@ export const ArtistDetailPage: React.FC = () => {
 
   const artistDisplayName = stats?.name || artistName;
   const artistSlug = artistDisplayName ? encodeLastFmSlug(artistDisplayName) : '';
+
   const { loading: albumsLoading, entities: topAlbums } = useArtistEntities(
     chart,
     'album',
@@ -149,7 +155,7 @@ export const ArtistDetailPage: React.FC = () => {
   return (
     <Container className="noPaddingMobile">
       <CreateHeader
-        pageTitle={artistName}
+        pageTitle={t('library.detail.artist')}
         icon={IconMicrophone}
         leftSection={headerBackButton}
         showSettings={false}
@@ -161,7 +167,7 @@ export const ArtistDetailPage: React.FC = () => {
             <Avatar
               src={effectiveImageUrl}
               alt={artistName}
-              size={250}
+              size={200}
               radius="md"
               onClick={() => setImageModalOpen(true)}
               style={{ cursor: 'pointer' }}
@@ -177,20 +183,13 @@ export const ArtistDetailPage: React.FC = () => {
           </Group>
         </Card>
 
-        <Card shadow="sm" padding={0} radius="md" bg={'transparent'}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder bg="transparent">
           <Grid>
             <StatsBox
               label={t('library.detail.peakPosition')}
-              value={stats.peak != null ? stats.peak : '—'}
+              value={stats.peak ?? '—'}
               span={{ base: 12, sm: 6, md: 3 }}
-              color="blue"
-              format="plain"
               valueClassName={stats.peak === 1 ? 'peak' : undefined}
-            />
-            <StatsBox
-              label={t('library.detail.weeksAtPeak')}
-              value={stats.weeksAtPeak ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
             />
             <StatsBox
               label={t('library.detail.totalWeeks')}
@@ -203,16 +202,9 @@ export const ArtistDetailPage: React.FC = () => {
               span={{ base: 12, sm: 6, md: 3 }}
             />
             <StatsBox
-              label={t('library.detail.firstAppearance')}
-              value={stats.firstAppearance || '—'}
+              label={t('charts.stats.points')}
+              value={stats.totalPoints ?? 0}
               span={{ base: 12, sm: 6, md: 3 }}
-              format="plain"
-            />
-            <StatsBox
-              label={t('library.detail.lastAppearance')}
-              value={stats.lastAppearance || '—'}
-              span={{ base: 12, sm: 6, md: 3 }}
-              format="plain"
             />
           </Grid>
         </Card>
@@ -298,7 +290,7 @@ export const ArtistDetailPage: React.FC = () => {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {topAlbums.map((album, index) => (
+                {topAlbums.map((album: any, index: number) => (
                   <Table.Tr key={album.entityId || `${album.name}-${index}`}>
                     <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
                     <Table.Td>
@@ -377,7 +369,7 @@ export const ArtistDetailPage: React.FC = () => {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {topTracks.map((track, index) => (
+                {topTracks.map((track: any, index: number) => (
                   <Table.Tr key={track.entityId || `${track.name}-${index}`}>
                     <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
                     <Table.Td>
