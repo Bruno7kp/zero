@@ -144,7 +144,7 @@ export const ArtistDetailPage: React.FC = () => {
             {t('library.detail.backToLibrary')}
           </Button>
           <Center>
-            <Text>{error || t('library.detail.notFound')}</Text>
+            <Text>{error || t('errors.entityNotFound')}</Text>
           </Center>
         </Stack>
       </Container>
@@ -193,7 +193,7 @@ export const ArtistDetailPage: React.FC = () => {
             <Avatar
               src={effectiveImageUrl}
               alt={artistName}
-              size={200}
+              size={170}
               radius="md"
               onClick={() => setImageModalOpen(true)}
               style={{ cursor: 'pointer' }}
@@ -204,7 +204,7 @@ export const ArtistDetailPage: React.FC = () => {
           </Group>
         </Card>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder bg="transparent">
+        <Card shadow="sm" padding={0} radius="md" bg="transparent">
           <Grid>
             <StatsBox
               label={t('library.detail.peakPosition')}

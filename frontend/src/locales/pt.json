@@ -401,6 +401,7 @@
       "noActiveChart": "Clique aqui para selecionar um chart",
       "dataError": "Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.",
       "noTop1Data": "Nenhum dado encontrado. Sincronize as semanas para visualizar os #1s da última semana.",
+      "entityNotFound": "Página não encontrada.",
       "noData": {
         "title": "Sem dados",
         "description": "Nenhum dado de chart disponível para a semana atual."

@@ -28,6 +28,7 @@ import EntityWaffleRun from '../components/library/EntityWaffleRun';
 import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { StatsBox } from '../components/StatsBox';
+import { CertificationBadge } from '../components/CertificationBadge';
 
 export const AlbumDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -121,7 +122,7 @@ export const AlbumDetailPage: React.FC = () => {
             {t('library.detail.backToLibrary')}
           </Button>
           <Center>
-            <Text>{error || t('library.detail.notFound')}</Text>
+            <Text>{error || t('errors.entityNotFound')}</Text>
           </Center>
         </Stack>
       </Container>
@@ -154,6 +155,10 @@ export const AlbumDetailPage: React.FC = () => {
     withinCutoff: chartTotals.withinCutoff ?? fallbackTotals.withinCutoff,
   };
   const top1Weeks = stats.peak === 1 ? stats.weeksAtPeak ?? 0 : 0;
+  const certificationTotals = {
+    totalPoints: stats.totalPoints ?? 0,
+    totalPlays: stats.totalPlays ?? 0,
+  };
 
   return (
     <Container className="noPaddingMobile">
@@ -166,27 +171,55 @@ export const AlbumDetailPage: React.FC = () => {
 
       <Stack gap="md">
         <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group wrap="nowrap" gap="lg">
+          <Group wrap="nowrap" align="stretch" gap="lg">
             <Avatar
               src={effectiveImageUrl}
               alt={albumName}
-              size={250}
+              size={170}
               radius="md"
               onClick={() => setImageModalOpen(true)}
-              style={{ cursor: 'pointer' }}
+              style={{
+                cursor: 'pointer',
+                flexShrink: 0,
+                alignSelf: 'flex-start',
+              }}
             />
-            <Stack gap="xs" style={{ flex: 1 }}>
-              <Title order={1}>{stats.name}</Title>
-              {stats.artistName && (
-                <Text
-                  size="lg"
-                  c="dimmed"
-                  component={Link}
-                  to={`/library/music/${encodeLastFmSlug(stats.artistName)}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  {stats.artistName}
-                </Text>
+
+            <Stack
+              gap="md"
+              justify="space-between"
+              style={{
+                flex: 1,
+              }}
+            >
+              <Stack gap={4}>
+                <Title order={1}>{stats.name}</Title>
+                {stats.artistName && (
+                  <Text
+                    size="lg"
+                    c="dimmed"
+                    component={Link}
+                    to={`/library/music/${encodeLastFmSlug(stats.artistName)}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {stats.artistName}
+                  </Text>
+                )}
+              </Stack>
+
+              {chart && (
+                <CertificationBadge
+                  chart={chart}
+                  chartType="album"
+                  totals={certificationTotals}
+                  entity={{
+                    name: stats.name,
+                    artistName: stats.artistName,
+                  }}
+                  username={chart?.lastfm_username}
+                  dayOfWeek={chart?.day_of_week}
+                  variant="icon"
+                />
               )}
             </Stack>
           </Group>

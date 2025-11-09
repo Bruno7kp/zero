@@ -401,6 +401,7 @@
       "noActiveChart": "Click here to select a chart",
       "dataError": "An error occurred while loading data. Try again later.",
       "noTop1Data": "No data found. Sync the weeks to view last week's #1s.",
+      "entityNotFound": "Page not found.",
       "noData": {
         "title": "No data",
         "description": "No chart data available for the current week."
