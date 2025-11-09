@@ -1,5 +1,6 @@
 // Hook for fetching entity statistics from IndexedDB
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../db/indexedDb';
 import type { ChartStats } from '../db/indexedDb';
 import { getUserPlaycountCached } from '../utils/certification';
@@ -37,6 +38,7 @@ export function useEntityStats(
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<EntityStats | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
   // Dexie stores compound keys as strings, normalise inputs to avoid mismatches
   const normalizedChartId = chart?.id != null ? String(chart.id) : undefined;
   const normalizedEntityId = entityId != null ? String(entityId) : undefined;
@@ -67,7 +69,7 @@ export function useEntityStats(
           .toArray();
 
         if (chartData.length === 0) {
-          setError('Entity not found');
+          setError(t('errors.entityNotFound'));
           setStats(null);
           setLoading(false);
           return;
@@ -173,7 +175,7 @@ export function useEntityStats(
     }
 
     fetchStats();
-  }, [normalizedChartId, chartType, normalizedEntityId, username, offline, nextWeekDay]);
+  }, [normalizedChartId, chartType, normalizedEntityId, username, offline, nextWeekDay, t]);
 
   return { loading, stats, error };
 }

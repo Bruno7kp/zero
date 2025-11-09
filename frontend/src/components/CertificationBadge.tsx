@@ -24,6 +24,7 @@ interface Props {
   entity: { name: string; artistName: string };
   username?: string;
   dayOfWeek?: number; // next calculation day (chart.day_of_week?)
+  variant?: 'full' | 'icon';
 }
 
 export const CertificationBadge: React.FC<Props> = ({
@@ -32,6 +33,8 @@ export const CertificationBadge: React.FC<Props> = ({
   totals,
   entity,
   username,
+  dayOfWeek,
+  variant = 'full',
 }) => {
   const { t } = useTranslation();
   const { isOnline: online } = useOfflineStatus();
@@ -41,6 +44,12 @@ export const CertificationBadge: React.FC<Props> = ({
   const lastForceTokenRef = React.useRef(0);
   const playsWeight =
     chartType === 'track' ? chart.music_plays_weight || 0 : chart.album_plays_weight || 0;
+  const effectiveDayOfWeek = dayOfWeek ?? chart?.day_of_week ?? null;
+
+  const handleManualReload = React.useCallback(() => {
+    if (!online || loading) return;
+    setForceReloadToken(v => v + 1);
+  }, [online, loading]);
 
   // Memoize only the primitive values that actually affect the computation to avoid effect loops
   const computeDeps = React.useMemo(
@@ -48,7 +57,7 @@ export const CertificationBadge: React.FC<Props> = ({
       chartType,
       username: username || '',
       online,
-      dayOfWeek: chart?.day_of_week ?? null,
+      dayOfWeek: effectiveDayOfWeek,
       pointsWeight:
         chartType === 'track' ? chart.music_points_weight || 0 : chart.album_points_weight || 0,
       playsWeight:
@@ -67,7 +76,7 @@ export const CertificationBadge: React.FC<Props> = ({
       chartType,
       username,
       online,
-      chart?.day_of_week,
+      effectiveDayOfWeek,
       chart?.music_points_weight,
       chart?.album_points_weight,
       chart?.music_plays_weight,
@@ -153,6 +162,28 @@ export const CertificationBadge: React.FC<Props> = ({
   };
 
   if (!result) {
+    if (variant === 'icon') {
+      const iconNode = (
+        <ThemeIcon
+          size={52}
+          radius="xl"
+          variant="transparent"
+          onClick={handleManualReload}
+          style={{ cursor: online && !loading ? 'pointer' : 'default' }}
+        >
+          {loading ? <Loader size="sm" /> : <MetalVinylDisc level="none" size={50} />}
+        </ThemeIcon>
+      );
+
+      if (!online && playsWeight > 0) {
+        return <Tooltip label={t('charts.stats.needOnlineForCert')}>{iconNode}</Tooltip>;
+      }
+      if (playsWeight > 0 && !username) {
+        return <Tooltip label="Last.fm username ausente no chart">{iconNode}</Tooltip>;
+      }
+      return iconNode;
+    }
+
     if (!online && playsWeight > 0) {
       return (
         <Card p="sm" withBorder>
@@ -201,6 +232,48 @@ export const CertificationBadge: React.FC<Props> = ({
   const formulaName = chart.formula_name || 'Sales';
 
   const nextPct = nextTarget ? Math.min(100, (totalFormula / nextTarget) * 100) : 100;
+
+  if (variant === 'icon') {
+    const levelLabel =
+      level !== 'none'
+        ? `${multiplier > 1 ? `${multiplier}x ` : ''}${t('values.' + level)}`
+        : t('charts.stats.noCert');
+    const valueLabel = t('charts.stats.currentValue', {
+      value: formatNumber(Math.floor(totalFormula)),
+      unit: formulaName,
+    });
+    const iconElement = (
+      <Tooltip label={t('charts.stats.reload')} position="top">
+        <ThemeIcon
+          size={52}
+          radius="xl"
+          variant="transparent"
+          onClick={handleManualReload}
+          style={{ cursor: online && !loading ? 'pointer' : 'default' }}
+        >
+          {loading ? (
+            <Loader size="sm" />
+          ) : (
+            <MetalVinylDisc level={(level as any) || 'none'} size={50} />
+          )}
+        </ThemeIcon>
+      </Tooltip>
+    );
+
+    return (
+      <Group wrap="nowrap" align="center" gap="sm">
+        {iconElement}
+        <Stack gap={0} justify="center" style={{ flex: 'unset' }}>
+          <Text fw={600} size="sm">
+            {levelLabel}
+          </Text>
+          <Text size="xs" c="dimmed">
+            {valueLabel}
+          </Text>
+        </Stack>
+      </Group>
+    );
+  }
 
   return (
     <Card p="sm" style={{ backgroundColor: 'transparent' }} shadow="none">

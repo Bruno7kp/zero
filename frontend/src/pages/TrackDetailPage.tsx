@@ -13,7 +13,6 @@ import {
   Center,
   Group,
   Avatar,
-  Badge,
   Tabs,
   Box,
 } from '@mantine/core';
@@ -28,6 +27,8 @@ import EntityChartRun from '../components/library/EntityChartRun';
 import EntityWaffleRun from '../components/library/EntityWaffleRun';
 import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
+import { StatsBox } from '../components/StatsBox';
+import { CertificationBadge } from '../components/CertificationBadge';
 
 export const TrackDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -66,15 +67,17 @@ export const TrackDetailPage: React.FC = () => {
   // Prepare chart data for visualization
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
-  const chartRunLatestWeek = chartRun.length > 0 ? chartRun[chartRun.length - 1]?.week : undefined;
+
   const timelineRun = useMemo(
     () =>
-      chartRun.map(item => ({
-        week: item.week,
-        position: item.position ?? cutoff + 1,
-        plays: item.plays,
-      })),
-    [chartRun, cutoff]
+      chartRun
+        .filter(item => typeof item.position === 'number')
+        .map(item => ({
+          week: item.week,
+          position: item.position as number,
+          plays: item.plays,
+        })),
+    [chartRun]
   );
   const handleBack = () => navigate('/library');
   const headerBackButton = (
@@ -119,17 +122,48 @@ export const TrackDetailPage: React.FC = () => {
             {t('library.detail.backToLibrary')}
           </Button>
           <Center>
-            <Text>{error || t('library.detail.notFound')}</Text>
+            <Text>{error || t('errors.entityNotFound')}</Text>
           </Center>
         </Stack>
       </Container>
     );
   }
 
+  const fallbackTotals = (() => {
+    const summary = { top5: 0, top10: 0, withinCutoff: 0 };
+    chartRun.forEach(entry => {
+      if (typeof entry.position !== 'number') return;
+      const pos = entry.position;
+      if (pos <= 5) summary.top5 += 1;
+      if (pos <= 10) summary.top10 += 1;
+      if (cutoff != null) {
+        if (pos <= cutoff) summary.withinCutoff += 1;
+      } else {
+        summary.withinCutoff += 1;
+      }
+    });
+    return summary;
+  })();
+
+  const chartTotals =
+    ((stats.stats as Record<string, any> | undefined)?.totals as
+      | Record<string, number>
+      | undefined) ?? {};
+  const totals = {
+    top5: chartTotals.top5 ?? fallbackTotals.top5,
+    top10: chartTotals.top10 ?? fallbackTotals.top10,
+    withinCutoff: chartTotals.withinCutoff ?? fallbackTotals.withinCutoff,
+  };
+  const top1Weeks = stats.peak === 1 ? stats.weeksAtPeak ?? 0 : 0;
+  const certificationTotals = {
+    totalPoints: stats.totalPoints ?? 0,
+    totalPlays: stats.totalPlays ?? 0,
+  };
+
   return (
     <Container className="noPaddingMobile">
       <CreateHeader
-        pageTitle={trackName}
+        pageTitle={t('library.detail.track')}
         icon={IconMusic}
         leftSection={headerBackButton}
         showSettings={false}
@@ -137,102 +171,103 @@ export const TrackDetailPage: React.FC = () => {
 
       <Stack gap="md">
         <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group wrap="nowrap" gap="lg">
+          <Group wrap="nowrap" align="stretch" gap="lg">
             <Avatar
               src={effectiveImageUrl}
               alt={trackName}
-              size={120}
+              size={170}
               radius="md"
               onClick={() => setImageModalOpen(true)}
-              style={{ cursor: 'pointer' }}
+              style={{
+                cursor: 'pointer',
+                flexShrink: 0,
+                alignSelf: 'flex-start',
+              }}
             />
-            <Stack gap="xs" style={{ flex: 1 }}>
-              <Title order={2}>{stats.name}</Title>
-              {stats.artistName && (
-                <Text
-                  size="lg"
-                  c="dimmed"
-                  component={Link}
-                  to={`/library/music/${encodeLastFmSlug(stats.artistName)}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  {stats.artistName}
-                </Text>
+
+            <Stack
+              gap="md"
+              justify="space-between"
+              style={{
+                flex: 1,
+              }}
+            >
+              <Stack gap={4}>
+                <Title order={1}>{stats.name}</Title>
+                {stats.artistName && (
+                  <Text
+                    size="lg"
+                    c="dimmed"
+                    component={Link}
+                    to={`/library/music/${encodeLastFmSlug(stats.artistName)}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {stats.artistName}
+                  </Text>
+                )}
+              </Stack>
+
+              {chart && (
+                <CertificationBadge
+                  chart={chart}
+                  chartType="track"
+                  totals={certificationTotals}
+                  entity={{
+                    name: stats.name,
+                    artistName: stats.artistName,
+                  }}
+                  username={chart?.lastfm_username}
+                  dayOfWeek={chart?.day_of_week}
+                  variant="icon"
+                />
               )}
-              <Group gap="xs">
-                <Badge color="violet" variant="light">
-                  {t('library.detail.track')}
-                </Badge>
-              </Group>
             </Stack>
           </Group>
         </Card>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Title order={3} mb="md">
-            {t('library.detail.overview')}
-          </Title>
+        <Card shadow="sm" padding={0} radius="md" bg="transparent">
           <Grid>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.peakPosition')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  #{stats.peak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalWeeks')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalWeeks}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.weeksAtPeak')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.weeksAtPeak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalPlays')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalPlays.toLocaleString()}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.firstAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.firstAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.lastAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.lastAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
+            <StatsBox
+              label={t('library.detail.peakPosition')}
+              value={stats.peak != null ? stats.peak : '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              valueClassName={stats.peak === 1 ? 'peak' : undefined}
+            />
+            <StatsBox
+              label={t('library.detail.totalWeeks')}
+              value={stats.totalWeeks ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.totalPlays')}
+              value={stats.totalPlays ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.points')}
+              value={stats.totalPoints ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.top1')}
+              value={top1Weeks}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.top5')}
+              value={totals.top5 ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.top10')}
+              value={totals.top10 ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
+              value={totals.withinCutoff ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
           </Grid>
         </Card>
 
@@ -256,11 +291,7 @@ export const TrackDetailPage: React.FC = () => {
 
               <Tabs.Panel value="timeline">
                 <Box mt="md">
-                  <ChartRun
-                    run={timelineRun}
-                    chartType="track"
-                    highlightWeek={chartRunLatestWeek}
-                  />
+                  <ChartRun run={timelineRun} chartType="track" />
                 </Box>
               </Tabs.Panel>
               <Tabs.Panel value="line">

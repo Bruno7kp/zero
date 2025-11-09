@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { Box, Text, Tooltip, useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import { Box, Text, Tooltip, useMantineColorScheme, useMantineTheme, rgba } from '@mantine/core';
 import dayjs from 'dayjs';
 import type { EntityChartRunPoint } from './EntityChartRun';
+import { useTranslation } from 'react-i18next';
 
 interface EntityWaffleRunProps {
   data: EntityChartRunPoint[];
@@ -14,6 +15,7 @@ type WaffleCell = {
   key: string;
   point: EntityChartRunPoint;
   color: string;
+  out: boolean;
 };
 
 const hexToRgb = (hex: string) => {
@@ -91,7 +93,16 @@ const EntityWaffleRun: React.FC<EntityWaffleRunProps> = ({
 }) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
+  const { t } = useTranslation();
   const cellSize = 10;
+  const tooltipBg =
+    colorScheme === 'dark'
+      ? rgba(theme.colors.dark?.[7] ?? '#141517', 0.92)
+      : rgba(theme.white ?? '#ffffff', 0.95);
+  const tooltipColor =
+    colorScheme === 'dark'
+      ? theme.colors.gray?.[2] ?? '#e9ecef'
+      : theme.colors.dark?.[7] ?? '#212529';
 
   const cells = useMemo<WaffleCell[]>(() => {
     if (!data?.length) return [];
@@ -112,7 +123,7 @@ const EntityWaffleRun: React.FC<EntityWaffleRunProps> = ({
 
     return ordered.map(point => {
       if (point.position == null) {
-        return { key: point.week, point, color: outsideColor };
+        return { key: point.week, point, color: outsideColor, out: true };
       }
 
       const tileColor = getRankColor(
@@ -120,7 +131,7 @@ const EntityWaffleRun: React.FC<EntityWaffleRunProps> = ({
         safeMaxRank,
         colorScheme === 'dark' ? 'dark' : 'light'
       );
-      return { key: point.week, point, color: tileColor };
+      return { key: point.week, point, color: tileColor, out: false };
     });
   }, [cutoff, data, colorScheme, theme.colors.gray]);
 
@@ -147,18 +158,43 @@ const EntityWaffleRun: React.FC<EntityWaffleRunProps> = ({
       {cells.map(cell => {
         const tooltipLabel = (
           <Box>
-            <Text size="xs" fw={600}>
-              #{cell.point.position ?? '-'}
+            <Text size="xs" fw={600} c={tooltipColor}>
+              {cell.out
+                ? t('library.detail.waffleTooltip.outTitle')
+                : t('library.detail.waffleTooltip.positionTitle', {
+                    position: cell.point.position,
+                  })}
             </Text>
-            <Text size="10px" c="dimmed">
+            <Text size="10px" c={tooltipColor}>
               {dayjs(cell.point.week).format('DD/MM/YYYY')}
             </Text>
-            <Text size="10px">{cell.point.plays.toLocaleString()} plays</Text>
+            {cell.out ? (
+              <Text size="10px" c={tooltipColor}>
+                {t('library.detail.waffleTooltip.outDescription')}
+              </Text>
+            ) : (
+              <Text size="10px" c={tooltipColor}>
+                {t('library.detail.waffleTooltip.plays', {
+                  plays: cell.point.plays.toLocaleString(),
+                })}
+              </Text>
+            )}
           </Box>
         );
 
         return (
-          <Tooltip key={cell.key} label={tooltipLabel} withinPortal withArrow>
+          <Tooltip
+            key={cell.key}
+            label={tooltipLabel}
+            withinPortal
+            withArrow
+            styles={{
+              tooltip: {
+                backgroundColor: tooltipBg,
+                color: tooltipColor,
+              },
+            }}
+          >
             <Box
               style={{
                 width: '100%',

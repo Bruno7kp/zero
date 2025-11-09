@@ -14,7 +14,6 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
   const [openedKey, setOpenedKey] = React.useState<string | null>(null);
   const { t } = useTranslation();
   const autoCloseRef = React.useRef<number | null>(null);
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
 
   // Ordena as semanas
   const sorted = React.useMemo(() => {
@@ -62,20 +61,6 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
     setOpenedKey(prev => (prev === weekKey ? null : weekKey));
   };
 
-  // Auto-scroll to highlighted week or end
-  React.useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    if (highlightWeek) {
-      const target = el.querySelector(`[data-week='${highlightWeek}']`);
-      if (target) {
-        (target as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-    }
-    el.scrollTop = el.scrollHeight;
-  }, [highlightWeek, run]);
-
   // Calcula o peak (menor valor de position no run)
   const peak = React.useMemo(() => {
     if (!run || run.length === 0) return undefined;
@@ -83,10 +68,7 @@ export const ChartRun: React.FC<ChartRunProps> = ({ run, highlightWeek, chartTyp
   }, [run]);
 
   return (
-    <Box
-      ref={containerRef}
-      style={{ width: '100%', maxHeight: 240, overflowY: 'auto', paddingRight: 4 }}
-    >
+    <Box style={{ width: '100%', maxHeight: 240, overflowY: 'auto', paddingRight: 4 }}>
       <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
         {sequence.map((item, idx) => {
           if (item.type === 'out') {

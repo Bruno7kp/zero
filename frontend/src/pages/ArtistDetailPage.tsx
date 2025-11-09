@@ -1,23 +1,22 @@
 import React, { useMemo, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
-  Container,
-  Title,
-  Text,
-  Card,
-  Grid,
-  Stack,
-  Button,
-  Loader,
-  Center,
-  Group,
-  Avatar,
-  Badge,
-  Tabs,
-  Box,
   Anchor,
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Center,
+  Container,
+  Grid,
+  Group,
+  Loader,
+  Stack,
+  Tabs,
   Table,
+  Text,
+  Title,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconArrowLeft, IconMicrophone } from '@tabler/icons-react';
@@ -31,30 +30,36 @@ import EntityWaffleRun from '../components/library/EntityWaffleRun';
 import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { useArtistEntities } from '../hooks/useArtistEntities';
+import { StatsBox } from '../components/StatsBox';
+
+type RootState = {
+  charts: {
+    charts: any[];
+    activeChartId: number | null;
+  };
+};
 
 export const ArtistDetailPage: React.FC = () => {
   const { t } = useTranslation();
   const { artist } = useParams<{ artist: string }>();
   const navigate = useNavigate();
-  const charts = useSelector((state: any) => state.charts.charts);
-  const activeChartId = useSelector((state: any) => state.charts.activeChartId);
+  const charts = useSelector((state: RootState) => state.charts.charts);
+  const activeChartId = useSelector((state: RootState) => state.charts.activeChartId);
+
   const chart = useMemo(
     () => charts.find((c: any) => c.id === activeChartId) || null,
     [charts, activeChartId]
   );
 
-  // Decode the artist name from URL
   const artistName = artist ? decodeLastFmSlug(artist) : '';
   const entityId = `artist-${artistName}-`;
 
-  // Fetch stats
   const { loading, stats, error } = useEntityStats(chart, 'artist', entityId);
   const cutoff = chart?.artist_cutoff || chart?.music_cutoff || 100;
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
 
-  // Fetch Spotify image
   const { imageUrl } = useSpotifyImage({
     entityId,
     name: artistName,
@@ -63,21 +68,23 @@ export const ArtistDetailPage: React.FC = () => {
     clientId: SPOTIFY_TOKEN,
     clientSecret: SPOTIFY_SECRET,
   });
-  const effectiveImageUrl = customImageUrl ?? imageUrl ?? undefined;
 
-  // Prepare chart data for visualization
+  const effectiveImageUrl = customImageUrl ?? imageUrl ?? undefined;
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
-  const chartRunLatestWeek = chartRun.length > 0 ? chartRun[chartRun.length - 1]?.week : undefined;
+
   const timelineRun = useMemo(
     () =>
-      chartRun.map(item => ({
-        week: item.week,
-        position: item.position ?? cutoff + 1,
-        plays: item.plays,
-      })),
-    [chartRun, cutoff]
+      chartRun
+        .filter(item => typeof item.position === 'number')
+        .map(item => ({
+          week: item.week,
+          position: item.position as number,
+          plays: item.plays,
+        })),
+    [chartRun]
   );
+
   const handleBack = () => navigate('/library');
   const headerBackButton = (
     <Button
@@ -92,6 +99,7 @@ export const ArtistDetailPage: React.FC = () => {
 
   const artistDisplayName = stats?.name || artistName;
   const artistSlug = artistDisplayName ? encodeLastFmSlug(artistDisplayName) : '';
+
   const { loading: albumsLoading, entities: topAlbums } = useArtistEntities(
     chart,
     'album',
@@ -136,17 +144,44 @@ export const ArtistDetailPage: React.FC = () => {
             {t('library.detail.backToLibrary')}
           </Button>
           <Center>
-            <Text>{error || t('library.detail.notFound')}</Text>
+            <Text>{error || t('errors.entityNotFound')}</Text>
           </Center>
         </Stack>
       </Container>
     );
   }
 
+  const fallbackTotals = (() => {
+    const summary = { top5: 0, top10: 0, withinCutoff: 0 };
+    chartRun.forEach(entry => {
+      if (typeof entry.position !== 'number') return;
+      const pos = entry.position;
+      if (pos <= 5) summary.top5 += 1;
+      if (pos <= 10) summary.top10 += 1;
+      if (cutoff != null) {
+        if (pos <= cutoff) summary.withinCutoff += 1;
+      } else {
+        summary.withinCutoff += 1;
+      }
+    });
+    return summary;
+  })();
+
+  const chartTotals =
+    ((stats.stats as Record<string, any> | undefined)?.totals as
+      | Record<string, number>
+      | undefined) ?? {};
+  const totals = {
+    top5: chartTotals.top5 ?? fallbackTotals.top5,
+    top10: chartTotals.top10 ?? fallbackTotals.top10,
+    withinCutoff: chartTotals.withinCutoff ?? fallbackTotals.withinCutoff,
+  };
+  const top1Weeks = stats.peak === 1 ? stats.weeksAtPeak ?? 0 : 0;
+
   return (
     <Container className="noPaddingMobile">
       <CreateHeader
-        pageTitle={artistName}
+        pageTitle={t('library.detail.artist')}
         icon={IconMicrophone}
         leftSection={headerBackButton}
         showSettings={false}
@@ -158,87 +193,60 @@ export const ArtistDetailPage: React.FC = () => {
             <Avatar
               src={effectiveImageUrl}
               alt={artistName}
-              size={120}
+              size={170}
               radius="md"
               onClick={() => setImageModalOpen(true)}
               style={{ cursor: 'pointer' }}
             />
             <Stack gap="xs" style={{ flex: 1 }}>
-              <Title order={2}>{stats.name}</Title>
-              <Group gap="xs">
-                <Badge color="blue" variant="light">
-                  {t('library.detail.artist')}
-                </Badge>
-              </Group>
+              <Title order={1}>{stats.name}</Title>
             </Stack>
           </Group>
         </Card>
 
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Title order={3} mb="md">
-            {t('library.detail.overview')}
-          </Title>
+        <Card shadow="sm" padding={0} radius="md" bg="transparent">
           <Grid>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.peakPosition')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  #{stats.peak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalWeeks')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalWeeks}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.weeksAtPeak')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.weeksAtPeak}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.totalPlays')}
-                </Text>
-                <Text size="xl" fw={700}>
-                  {stats.totalPlays.toLocaleString()}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.firstAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.firstAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {t('library.detail.lastAppearance')}
-                </Text>
-                <Text size="lg" fw={600}>
-                  {stats.lastAppearance}
-                </Text>
-              </Stack>
-            </Grid.Col>
+            <StatsBox
+              label={t('library.detail.peakPosition')}
+              value={stats.peak ?? '—'}
+              span={{ base: 12, sm: 6, md: 3 }}
+              valueClassName={stats.peak === 1 ? 'peak' : undefined}
+            />
+            <StatsBox
+              label={t('library.detail.totalWeeks')}
+              value={stats.totalWeeks ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('library.detail.totalPlays')}
+              value={stats.totalPlays ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.points')}
+              value={stats.totalPoints ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.top1')}
+              value={top1Weeks}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.top5')}
+              value={totals.top5 ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={t('charts.stats.top10')}
+              value={totals.top10 ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
+            <StatsBox
+              label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
+              value={totals.withinCutoff ?? 0}
+              span={{ base: 12, sm: 6, md: 3 }}
+            />
           </Grid>
         </Card>
 
@@ -262,11 +270,7 @@ export const ArtistDetailPage: React.FC = () => {
 
               <Tabs.Panel value="timeline">
                 <Box mt="md">
-                  <ChartRun
-                    run={timelineRun}
-                    chartType="artist"
-                    highlightWeek={chartRunLatestWeek}
-                  />
+                  <ChartRun run={timelineRun} chartType="artist" />
                 </Box>
               </Tabs.Panel>
               <Tabs.Panel value="line">
@@ -310,33 +314,51 @@ export const ArtistDetailPage: React.FC = () => {
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>#</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>#</Table.Th>
                   <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPoints')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnWeeks')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPeak')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPlays')}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {topAlbums.map((album, index) => (
+                {topAlbums.map((album: any, index: number) => (
                   <Table.Tr key={album.entityId || `${album.name}-${index}`}>
-                    <Table.Td>{index + 1}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
                     <Table.Td>
                       <Anchor
                         component={Link}
                         to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
                         fw={600}
                         size="sm"
-                        c="white"
                       >
                         {album.name}
                       </Anchor>
                     </Table.Td>
-                    <Table.Td>{album.points.toLocaleString()}</Table.Td>
-                    <Table.Td>{album.weeks.toLocaleString()}</Table.Td>
-                    <Table.Td>#{album.peak}</Table.Td>
-                    <Table.Td>{album.totalPlays.toLocaleString()}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.points.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.weeks.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td
+                      style={{ textAlign: 'center' }}
+                      className={album.peak === 1 ? 'peak' : undefined}
+                    >
+                      {album.peak}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.totalPlays.toLocaleString()}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -371,33 +393,51 @@ export const ArtistDetailPage: React.FC = () => {
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>#</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>#</Table.Th>
                   <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPoints')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnWeeks')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPeak')}
+                  </Table.Th>
+                  <Table.Th style={{ textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPlays')}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {topTracks.map((track, index) => (
+                {topTracks.map((track: any, index: number) => (
                   <Table.Tr key={track.entityId || `${track.name}-${index}`}>
-                    <Table.Td>{index + 1}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
                     <Table.Td>
                       <Anchor
                         component={Link}
                         to={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
                         fw={600}
                         size="sm"
-                        c="white"
                       >
                         {track.name}
                       </Anchor>
                     </Table.Td>
-                    <Table.Td>{track.points.toLocaleString()}</Table.Td>
-                    <Table.Td>{track.weeks.toLocaleString()}</Table.Td>
-                    <Table.Td>#{track.peak}</Table.Td>
-                    <Table.Td>{track.totalPlays.toLocaleString()}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.points.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.weeks.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td
+                      style={{ textAlign: 'center' }}
+                      className={track.peak === 1 ? 'peak' : undefined}
+                    >
+                      {track.peak}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.totalPlays.toLocaleString()}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
