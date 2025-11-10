@@ -585,7 +585,9 @@
           "albumsInCutoff": "Álbuns no Chart",
           "tracksInTopX": "Músicas no Top {{x}}",
           "tracksInCutoff": "Músicas no Chart",
-          "totalWeeks": "Total de Semanas"
+          "totalWeeks": "Total de Semanas",
+          "viewTable": "Tabela",
+          "viewCarousel": "Carrossel"
         },
         "chartRunTabs": {
           "timeline": "Chart Run",

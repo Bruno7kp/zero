@@ -13,6 +13,7 @@ import {
   Grid,
   Group,
   Loader,
+  SegmentedControl,
   Select,
   Stack,
   Tabs,
@@ -22,8 +23,15 @@ import {
   useMantineTheme,
   useComputedColorScheme,
 } from '@mantine/core';
+import { Carousel } from '@mantine/carousel';
 import { useTranslation } from 'react-i18next';
-import { IconArrowLeft, IconMicrophone, IconSortDescending } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconList,
+  IconMicrophone,
+  IconPhoto,
+  IconSortDescending,
+} from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import { useEntityStats } from '../hooks/useEntityStats';
 import { useSpotifyImage } from '../hooks/useSpotifyImage';
@@ -135,6 +143,9 @@ export const ArtistDetailPage: React.FC = () => {
   const [tracksSort, setTracksSort] = useState<'weeks' | 'peak'>(() => {
     return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak';
   });
+  const [albumsView, setAlbumsView] = useState<'table' | 'carousel'>(() => {
+    return storage.get(KEYS.ARTIST_ALBUMS_VIEW, [], 'table') as 'table' | 'carousel';
+  });
 
   // Save sorting preferences to localStorage
   useEffect(() => {
@@ -144,6 +155,10 @@ export const ArtistDetailPage: React.FC = () => {
   useEffect(() => {
     storage.set(KEYS.ARTIST_TRACKS_SORT, tracksSort);
   }, [tracksSort]);
+
+  useEffect(() => {
+    storage.set(KEYS.ARTIST_ALBUMS_VIEW, albumsView);
+  }, [albumsView]);
 
   const { imageUrl } = useSpotifyImage({
     entityId,
@@ -473,6 +488,29 @@ export const ArtistDetailPage: React.FC = () => {
           <Group justify="space-between" align="center" mb="md">
             <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
             <Group gap="sm">
+              <SegmentedControl
+                value={albumsView}
+                onChange={value => setAlbumsView(value as 'table' | 'carousel')}
+                data={[
+                  {
+                    value: 'table',
+                    label: (
+                      <Center>
+                        <IconList size={16} />
+                      </Center>
+                    ),
+                  },
+                  {
+                    value: 'carousel',
+                    label: (
+                      <Center>
+                        <IconPhoto size={16} />
+                      </Center>
+                    ),
+                  },
+                ]}
+                size="xs"
+              />
               <Select
                 leftSection={<IconSortDescending size={16} />}
                 value={albumsSort}
@@ -506,6 +544,72 @@ export const ArtistDetailPage: React.FC = () => {
             <Text size="sm" c="dimmed">
               {t('library.detail.sections.emptyAlbums')}
             </Text>
+          ) : albumsView === 'carousel' ? (
+            <Carousel
+              slideSize={{ base: '50%', xs: '33.333%', sm: '25%', md: '20%', lg: '16.666%' }}
+              slideGap="md"
+              withControls
+              emblaOptions={{ loop: true, dragFree: true, containScroll: 'trimSnaps' }}
+            >
+              {topAlbums.map((album: any, index: number) => {
+                const AlbumSlide: React.FC = () => {
+                  const { imageUrl } = useSpotifyImage({
+                    entityId: album.entityId,
+                    name: album.name,
+                    artist: artistDisplayName,
+                    type: 'album',
+                    clientId: SPOTIFY_TOKEN,
+                    clientSecret: SPOTIFY_SECRET,
+                  });
+
+                  return (
+                    <Box
+                      component={Link}
+                      to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <Stack gap="xs" align="center">
+                        <Avatar
+                          src={imageUrl}
+                          alt={album.name}
+                          size={120}
+                          radius="md"
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <Text
+                          size="sm"
+                          fw={600}
+                          c={anchorColor}
+                          ta="center"
+                          lineClamp={2}
+                          style={{ maxWidth: 120 }}
+                        >
+                          {album.name}
+                        </Text>
+                        {album.peak === 1 && (
+                          <Group gap={4} justify="center" wrap="nowrap">
+                            <Text size="xs" fw={600} c="mediumblue">
+                              #1
+                            </Text>
+                            {album.timesAtPeak && album.timesAtPeak > 0 && (
+                              <Text size="xs" c="dimmed">
+                                ({album.timesAtPeak}x)
+                              </Text>
+                            )}
+                          </Group>
+                        )}
+                      </Stack>
+                    </Box>
+                  );
+                };
+
+                return (
+                  <Carousel.Slide key={album.entityId || `${album.name}-${index}`}>
+                    <AlbumSlide />
+                  </Carousel.Slide>
+                );
+              })}
+            </Carousel>
           ) : (
             <Table highlightOnHover>
               <Table.Thead>
