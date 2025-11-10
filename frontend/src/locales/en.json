@@ -574,7 +574,18 @@
           "columnPeak": "Peak",
           "columnPlays": "Plays",
           "meta": "{{points}} pts • {{weeks}} weeks • {{plays}} plays • peak #{{peak}}",
-          "backToArtist": "Back to artist"
+          "backToArtist": "Back to artist",
+          "sortBy": "Sort by",
+          "sortWeeks": "Weeks",
+          "sortPeak": "Peak",
+          "albumsAtOne": "Albums at #1",
+          "tracksAtOne": "Tracks at #1",
+          "weeksAtOne": "Weeks at #1",
+          "albumsInTopX": "Albums in Top {{x}}",
+          "albumsInCutoff": "Albums in Chart",
+          "tracksInTopX": "Tracks in Top {{x}}",
+          "tracksInCutoff": "Tracks in Chart",
+          "totalWeeks": "Total Weeks"
         },
         "chartRunTabs": {
           "timeline": "Chart Run",

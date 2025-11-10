@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
+  Avatar,
   Container,
   Title,
   Text,
@@ -12,15 +13,81 @@ import {
   Button,
   Table,
   Anchor,
+  Flex,
+  Select,
+  Group,
+  useMantineTheme,
+  useComputedColorScheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconArrowLeft, IconDisc } from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import CreateHeader from '../components/createChart/CreateHeader';
 import { useArtistEntities } from '../hooks/useArtistEntities';
+import { useSpotifyImage } from '../hooks/useSpotifyImage';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../services/SpotifyApi';
+import { ImageEditModal } from '../components/dialogs/ImageEditModal';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import storage from '../utils/storage';
+import KEYS from '../constants/storageKeys';
+import { StatsBox } from '../components/StatsBox';
+import { Grid } from '@mantine/core';
+
+// Helper component for entity cell with image
+const EntityCell: React.FC<{
+  entityId: string;
+  name: string;
+  artistName: string;
+  link: string;
+  anchorColor: string;
+  onImageClick: (imageUrl: string) => void;
+}> = ({ entityId, name, artistName, link, anchorColor, onImageClick }) => {
+  const { imageUrl } = useSpotifyImage({
+    entityId,
+    name,
+    artist: artistName,
+    type: 'album',
+    clientId: SPOTIFY_TOKEN,
+    clientSecret: SPOTIFY_SECRET,
+  });
+
+  return (
+    <Flex gap="sm" wrap="nowrap" align="center">
+      <Avatar
+        src={imageUrl}
+        alt={name}
+        size={40}
+        radius="sm"
+        onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          onImageClick(imageUrl || '');
+        }}
+        style={{ cursor: 'pointer', flexShrink: 0 }}
+      />
+      <Anchor
+        component={Link}
+        to={link}
+        fw={600}
+        size="sm"
+        c={anchorColor}
+        style={{
+          wordBreak: 'break-word',
+          lineHeight: 1.4,
+        }}
+      >
+        {name}
+      </Anchor>
+    </Flex>
+  );
+};
 
 const ArtistAlbumsPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useMantineTheme();
+  const colorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+  const anchorColor = colorScheme === 'dark' ? theme.white : theme.black;
   const { artist } = useParams<{ artist: string }>();
   const navigate = useNavigate();
   const charts = useSelector((state: any) => state.charts.charts);
@@ -32,7 +99,67 @@ const ArtistAlbumsPage: React.FC = () => {
 
   const artistName = artist ? decodeLastFmSlug(artist) : '';
   const artistSlug = artistName ? encodeLastFmSlug(artistName) : '';
-  const { loading, entities } = useArtistEntities(chart, 'album', artistName);
+  const { loading, entities: rawEntities } = useArtistEntities(chart, 'album', artistName);
+
+  // Sorting state with localStorage persistence
+  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak'>(() => {
+    return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak';
+  });
+
+  // Modal state
+  const [entityImageModalOpen, setEntityImageModalOpen] = useState(false);
+  const [selectedEntity, setSelectedEntity] = useState<{
+    id: string;
+    name: string;
+    imageUrl: string;
+  } | null>(null);
+
+  // Save sorting preference to localStorage
+  useEffect(() => {
+    storage.set(KEYS.ARTIST_ALBUMS_SORT, albumsSort);
+  }, [albumsSort]);
+
+  // Sorting function with tiebreakers: peak (asc), timesAtPeak (desc), weeks (desc)
+  const sortByPeak = (a: any, b: any) => {
+    if (a.peak !== b.peak) return a.peak - b.peak;
+    const aTimesAtPeak = a.timesAtPeak || 0;
+    const bTimesAtPeak = b.timesAtPeak || 0;
+    if (aTimesAtPeak !== bTimesAtPeak) return bTimesAtPeak - aTimesAtPeak;
+    return b.weeks - a.weeks;
+  };
+
+  // Sorting function: weeks (desc)
+  const sortByWeeks = (a: any, b: any) => b.weeks - a.weeks;
+
+  // Apply sorting
+  const entities = useMemo(() => {
+    const sorted = [...rawEntities];
+    if (albumsSort === 'peak') {
+      sorted.sort(sortByPeak);
+    } else {
+      sorted.sort(sortByWeeks);
+    }
+    return sorted;
+  }, [rawEntities, albumsSort]);
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const albumsAtOne = entities.filter(e => e.peak === 1).length;
+    const weeksAtOne = entities
+      .filter(e => e.peak === 1)
+      .reduce((sum, e) => sum + (e.timesAtPeak || 0), 0);
+    const cutoff = chart?.album_cutoff || chart?.music_cutoff || 100;
+    const albumsInCutoff = entities.filter(e => e.peak <= cutoff).length;
+    const totalWeeks = entities.reduce((sum, e) => sum + e.weeks, 0);
+
+    return {
+      albumsAtOne,
+      weeksAtOne,
+      albumsInCutoff,
+      totalWeeks,
+      cutoff,
+    };
+  }, [entities, chart]);
 
   const headerBackButton = (
     <Button
@@ -64,9 +191,76 @@ const ArtistAlbumsPage: React.FC = () => {
         showSettings={false}
       />
 
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Card
+        shadow="sm"
+        padding="lg"
+        radius="md"
+        withBorder
+        style={{
+          background: getCardBackgroundByMode(theme, themeMode),
+          paddingTop: 0,
+          paddingBottom: 0,
+        }}
+        mb="md"
+      >
+        <Grid>
+          <StatsBox
+            label={t('library.detail.sections.albumsAtOne')}
+            value={stats.albumsAtOne}
+            span={{ base: 6, sm: 6, md: 3 }}
+            shadow="none"
+            background={getCardBackgroundByMode(theme, themeMode)}
+          />
+          <StatsBox
+            label={t('library.detail.sections.weeksAtOne')}
+            value={stats.weeksAtOne}
+            span={{ base: 6, sm: 6, md: 3 }}
+            shadow="none"
+            background={getCardBackgroundByMode(theme, themeMode)}
+          />
+          <StatsBox
+            label={
+              stats.cutoff
+                ? t('library.detail.sections.albumsInTopX', { x: stats.cutoff })
+                : t('library.detail.sections.albumsInCutoff')
+            }
+            value={stats.albumsInCutoff}
+            span={{ base: 6, sm: 6, md: 3 }}
+            shadow="none"
+            background={getCardBackgroundByMode(theme, themeMode)}
+          />
+          <StatsBox
+            label={t('library.detail.sections.totalWeeks')}
+            value={stats.totalWeeks}
+            span={{ base: 6, sm: 6, md: 3 }}
+            shadow="none"
+            background={getCardBackgroundByMode(theme, themeMode)}
+          />
+        </Grid>
+      </Card>
+
+      <Card
+        shadow="sm"
+        padding="lg"
+        radius="md"
+        withBorder
+        style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+      >
         <Stack gap="md">
-          <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
+          <Group justify="space-between" align="center">
+            <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
+            <Select
+              value={albumsSort}
+              onChange={value => setAlbumsSort((value as 'weeks' | 'peak') || 'weeks')}
+              data={[
+                { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
+                { value: 'peak', label: t('library.detail.sections.sortPeak') },
+              ]}
+              size="xs"
+              w={120}
+              allowDeselect={false}
+            />
+          </Group>
           {loading ? (
             <Center py="lg">
               <Loader size="lg" />
@@ -76,36 +270,75 @@ const ArtistAlbumsPage: React.FC = () => {
               {t('library.detail.sections.emptyAlbums')}
             </Text>
           ) : (
-            <Table striped highlightOnHover>
+            <Table highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>#</Table.Th>
+                  <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
                   <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPoints')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnWeeks')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPeak')}</Table.Th>
-                  <Table.Th>{t('library.detail.sections.columnPlays')}</Table.Th>
+                  <Table.Th style={{ width: 100, textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPlays')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 80, textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPeak')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 100, textAlign: 'center' }}>
+                    {t('library.detail.sections.columnWeeks')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 100, textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPoints')}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {entities.map((album, index) => (
                   <Table.Tr key={album.entityId || `${album.name}-${index}`}>
-                    <Table.Td>{index + 1}</Table.Td>
-                    <Table.Td>
-                      <Anchor
-                        component={Link}
-                        to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
-                        fw={600}
-                        size="sm"
-                        c="white"
-                      >
-                        {album.name}
-                      </Anchor>
+                    <Table.Td style={{ textAlign: 'center' }}>{index + 1}</Table.Td>
+                    <Table.Td style={{ maxWidth: 300 }}>
+                      <EntityCell
+                        entityId={album.entityId}
+                        name={album.name}
+                        artistName={artistName}
+                        link={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
+                        anchorColor={anchorColor}
+                        onImageClick={imageUrl => {
+                          setSelectedEntity({
+                            id: album.entityId,
+                            name: album.name,
+                            imageUrl,
+                          });
+                          setEntityImageModalOpen(true);
+                        }}
+                      />
                     </Table.Td>
-                    <Table.Td>{album.points.toLocaleString()}</Table.Td>
-                    <Table.Td>{album.weeks.toLocaleString()}</Table.Td>
-                    <Table.Td>#{album.peak}</Table.Td>
-                    <Table.Td>{album.totalPlays.toLocaleString()}</Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.totalPlays.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.peak === 1 ? (
+                        <Group gap={4} justify="center" wrap="nowrap">
+                          <Text size="sm" fw={600} c="mediumblue">
+                            1
+                          </Text>
+                          {album.timesAtPeak && album.timesAtPeak > 0 && (
+                            <Text size="xs" c="dimmed">
+                              ({album.timesAtPeak}x)
+                            </Text>
+                          )}
+                        </Group>
+                      ) : album.peak < 999 ? (
+                        <Text size="sm">{album.peak}</Text>
+                      ) : (
+                        <Text size="sm" c="dimmed">
+                          -
+                        </Text>
+                      )}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.weeks.toLocaleString()}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {album.points.toLocaleString()}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -113,6 +346,26 @@ const ArtistAlbumsPage: React.FC = () => {
           )}
         </Stack>
       </Card>
+
+      {selectedEntity && (
+        <ImageEditModal
+          opened={entityImageModalOpen}
+          onClose={() => {
+            setEntityImageModalOpen(false);
+            setSelectedEntity(null);
+          }}
+          entityId={selectedEntity.id}
+          name={selectedEntity.name}
+          artistName={artistName}
+          imageUrl={selectedEntity.imageUrl}
+          type="album"
+          clientId={SPOTIFY_TOKEN}
+          clientSecret={SPOTIFY_SECRET}
+          onImageChange={() => {
+            // Force re-render if needed
+          }}
+        />
+      )}
     </Container>
   );
 };

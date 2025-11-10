@@ -19,6 +19,8 @@ export const KEYS = {
   CHARTS_WEEKS_BADGE_STYLE: 'zc.chartsWeeks.badgeStyle:v1',
   USER_DATA: 'zc.user-data:v1',
   I18NEXT_LANG: 'zc.i18nextLng:v1',
+  ARTIST_ALBUMS_SORT: 'zc.artist.albumsSort:v1',
+  ARTIST_TRACKS_SORT: 'zc.artist.tracksSort:v1',
 };
 
 // Legacy keys used previously in the codebase. Use as fallbacks when migrating.

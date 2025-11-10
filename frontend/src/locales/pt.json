@@ -574,7 +574,18 @@
           "columnPeak": "Pico",
           "columnPlays": "Reproduções",
           "meta": "{{points}} pts • {{weeks}} semanas • {{plays}} reproduções • pico #{{peak}}",
-          "backToArtist": "Voltar para o artista"
+          "backToArtist": "Voltar para o artista",
+          "sortBy": "Ordenar por",
+          "sortWeeks": "Semanas",
+          "sortPeak": "Pico",
+          "albumsAtOne": "Álbuns em #1",
+          "tracksAtOne": "Músicas em #1",
+          "weeksAtOne": "Semanas em #1",
+          "albumsInTopX": "Álbuns no Top {{x}}",
+          "albumsInCutoff": "Álbuns no Chart",
+          "tracksInTopX": "Músicas no Top {{x}}",
+          "tracksInCutoff": "Músicas no Chart",
+          "totalWeeks": "Total de Semanas"
         },
         "chartRunTabs": {
           "timeline": "Chart Run",

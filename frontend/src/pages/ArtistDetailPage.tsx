@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -13,6 +13,7 @@ import {
   Grid,
   Group,
   Loader,
+  Select,
   Stack,
   Tabs,
   Table,
@@ -22,7 +23,7 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { IconArrowLeft, IconMicrophone } from '@tabler/icons-react';
+import { IconArrowLeft, IconMicrophone, IconSortDescending } from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import { useEntityStats } from '../hooks/useEntityStats';
 import { useSpotifyImage } from '../hooks/useSpotifyImage';
@@ -35,6 +36,8 @@ import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { useArtistEntities } from '../hooks/useArtistEntities';
 import { StatsBox } from '../components/StatsBox';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import storage from '../utils/storage';
+import KEYS from '../constants/storageKeys';
 
 type RootState = {
   charts: {
@@ -51,7 +54,7 @@ const EntityCell: React.FC<{
   type: 'album' | 'track';
   link: string;
   anchorColor: string;
-  onImageClick: () => void;
+  onImageClick: (imageUrl: string) => void;
 }> = ({ entityId, name, artistName, type, link, anchorColor, onImageClick }) => {
   const { imageUrl } = useSpotifyImage({
     entityId,
@@ -72,7 +75,7 @@ const EntityCell: React.FC<{
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
-          onImageClick();
+          onImageClick(imageUrl || '');
         }}
         style={{ cursor: 'pointer', flexShrink: 0 }}
       />
@@ -122,7 +125,25 @@ export const ArtistDetailPage: React.FC = () => {
     id: string;
     name: string;
     type: 'album' | 'track';
+    imageUrl: string;
   } | null>(null);
+
+  // Sorting state with localStorage persistence
+  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak'>(() => {
+    return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak';
+  });
+  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak'>(() => {
+    return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak';
+  });
+
+  // Save sorting preferences to localStorage
+  useEffect(() => {
+    storage.set(KEYS.ARTIST_ALBUMS_SORT, albumsSort);
+  }, [albumsSort]);
+
+  useEffect(() => {
+    storage.set(KEYS.ARTIST_TRACKS_SORT, tracksSort);
+  }, [tracksSort]);
 
   const { imageUrl } = useSpotifyImage({
     entityId,
@@ -164,18 +185,52 @@ export const ArtistDetailPage: React.FC = () => {
   const artistDisplayName = stats?.name || artistName;
   const artistSlug = artistDisplayName ? encodeLastFmSlug(artistDisplayName) : '';
 
-  const { loading: albumsLoading, entities: topAlbums } = useArtistEntities(
+  const { loading: albumsLoading, entities: rawAlbums } = useArtistEntities(
     chart,
     'album',
     artistDisplayName,
     { limit: 10 }
   );
-  const { loading: tracksLoading, entities: topTracks } = useArtistEntities(
+  const { loading: tracksLoading, entities: rawTracks } = useArtistEntities(
     chart,
     'track',
     artistDisplayName,
     { limit: 10 }
   );
+
+  // Sorting function with tiebreakers: peak (desc), timesAtPeak (desc), weeks (desc)
+  const sortByPeak = (a: any, b: any) => {
+    if (a.peak !== b.peak) return a.peak - b.peak;
+    const aTimesAtPeak = a.timesAtPeak || 0;
+    const bTimesAtPeak = b.timesAtPeak || 0;
+    if (aTimesAtPeak !== bTimesAtPeak) return bTimesAtPeak - aTimesAtPeak;
+    return b.weeks - a.weeks;
+  };
+
+  // Sorting function: weeks (desc)
+  const sortByWeeks = (a: any, b: any) => b.weeks - a.weeks;
+
+  // Apply sorting to albums
+  const topAlbums = useMemo(() => {
+    const sorted = [...rawAlbums];
+    if (albumsSort === 'peak') {
+      sorted.sort(sortByPeak);
+    } else {
+      sorted.sort(sortByWeeks);
+    }
+    return sorted;
+  }, [rawAlbums, albumsSort]);
+
+  // Apply sorting to tracks
+  const topTracks = useMemo(() => {
+    const sorted = [...rawTracks];
+    if (tracksSort === 'peak') {
+      sorted.sort(sortByPeak);
+    } else {
+      sorted.sort(sortByWeeks);
+    }
+    return sorted;
+  }, [rawTracks, tracksSort]);
 
   if (!chart) {
     return (
@@ -281,7 +336,11 @@ export const ArtistDetailPage: React.FC = () => {
           padding="lg"
           radius="md"
           withBorder
-          style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+          style={{
+            background: getCardBackgroundByMode(theme, themeMode),
+            paddingTop: 0,
+            paddingBottom: 0,
+          }}
         >
           <Grid>
             <StatsBox
@@ -365,7 +424,11 @@ export const ArtistDetailPage: React.FC = () => {
             padding="lg"
             radius="md"
             withBorder
-            style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+            style={{
+              background: getCardBackgroundByMode(theme, themeMode),
+              paddingTop: 0,
+              paddingBottom: 0,
+            }}
           >
             <Grid>
               <StatsBox
@@ -409,17 +472,31 @@ export const ArtistDetailPage: React.FC = () => {
         >
           <Group justify="space-between" align="center" mb="md">
             <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
-            {artistSlug && (
-              <Button
-                component={Link}
-                to={`/library/music/${artistSlug}/+albums`}
-                variant="light"
+            <Group gap="sm">
+              <Select
+                leftSection={<IconSortDescending size={16} />}
+                value={albumsSort}
+                onChange={value => setAlbumsSort((value as 'weeks' | 'peak') || 'weeks')}
+                data={[
+                  { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
+                  { value: 'peak', label: t('library.detail.sections.sortPeak') },
+                ]}
                 size="xs"
-                disabled={!topAlbums.length}
-              >
-                {t('library.detail.sections.viewAllAlbums')}
-              </Button>
-            )}
+                w={120}
+                allowDeselect={false}
+              />
+              {artistSlug && (
+                <Button
+                  component={Link}
+                  to={`/library/music/${artistSlug}/+albums`}
+                  variant="light"
+                  size="xs"
+                  disabled={!topAlbums.length}
+                >
+                  {t('library.detail.sections.viewAllAlbums')}
+                </Button>
+              )}
+            </Group>
           </Group>
           {albumsLoading ? (
             <Center py="lg">
@@ -461,11 +538,12 @@ export const ArtistDetailPage: React.FC = () => {
                         type="album"
                         link={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
                         anchorColor={anchorColor}
-                        onImageClick={() => {
+                        onImageClick={imageUrl => {
                           setSelectedEntity({
                             id: album.entityId,
                             name: album.name,
                             type: 'album',
+                            imageUrl,
                           });
                           setEntityImageModalOpen(true);
                         }}
@@ -516,17 +594,31 @@ export const ArtistDetailPage: React.FC = () => {
         >
           <Group justify="space-between" align="center" mb="md">
             <Title order={3}>{t('library.detail.sections.tracksTitle')}</Title>
-            {artistSlug && (
-              <Button
-                component={Link}
-                to={`/library/music/${artistSlug}/+tracks`}
-                variant="light"
+            <Group gap="sm">
+              <Select
+                leftSection={<IconSortDescending size={16} />}
+                value={tracksSort}
+                onChange={value => setTracksSort((value as 'weeks' | 'peak') || 'weeks')}
+                data={[
+                  { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
+                  { value: 'peak', label: t('library.detail.sections.sortPeak') },
+                ]}
                 size="xs"
-                disabled={!topTracks.length}
-              >
-                {t('library.detail.sections.viewAllTracks')}
-              </Button>
-            )}
+                w={120}
+                allowDeselect={false}
+              />
+              {artistSlug && (
+                <Button
+                  component={Link}
+                  to={`/library/music/${artistSlug}/+tracks`}
+                  variant="light"
+                  size="xs"
+                  disabled={!topTracks.length}
+                >
+                  {t('library.detail.sections.viewAllTracks')}
+                </Button>
+              )}
+            </Group>
           </Group>
           {tracksLoading ? (
             <Center py="lg">
@@ -568,11 +660,12 @@ export const ArtistDetailPage: React.FC = () => {
                         type="track"
                         link={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
                         anchorColor={anchorColor}
-                        onImageClick={() => {
+                        onImageClick={imageUrl => {
                           setSelectedEntity({
                             id: track.entityId,
                             name: track.name,
                             type: 'track',
+                            imageUrl,
                           });
                           setEntityImageModalOpen(true);
                         }}
@@ -638,7 +731,7 @@ export const ArtistDetailPage: React.FC = () => {
           entityId={selectedEntity.id}
           name={selectedEntity.name}
           artistName={artistDisplayName}
-          imageUrl=""
+          imageUrl={selectedEntity.imageUrl}
           type={selectedEntity.type}
           clientId={SPOTIFY_TOKEN}
           clientSecret={SPOTIFY_SECRET}
