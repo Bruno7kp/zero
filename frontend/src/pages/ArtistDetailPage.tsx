@@ -27,6 +27,8 @@ import { Carousel } from '@mantine/carousel';
 import { useTranslation } from 'react-i18next';
 import {
   IconArrowLeft,
+  IconChevronLeft,
+  IconChevronRight,
   IconList,
   IconMicrophone,
   IconPhoto,
@@ -146,6 +148,7 @@ export const ArtistDetailPage: React.FC = () => {
   const [albumsView, setAlbumsView] = useState<'table' | 'carousel'>(() => {
     return storage.get(KEYS.ARTIST_ALBUMS_VIEW, [], 'table') as 'table' | 'carousel';
   });
+  const [embla, setEmbla] = useState<any>(null);
 
   // Save sorting preferences to localStorage
   useEffect(() => {
@@ -488,6 +491,26 @@ export const ArtistDetailPage: React.FC = () => {
           <Group justify="space-between" align="center" mb="md">
             <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
             <Group gap="sm">
+              {albumsView === 'carousel' && (
+                <Group gap={4}>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    onClick={() => embla?.scrollPrev()}
+                    disabled={!embla}
+                  >
+                    <IconChevronLeft size={16} />
+                  </Button>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    onClick={() => embla?.scrollNext()}
+                    disabled={!embla}
+                  >
+                    <IconChevronRight size={16} />
+                  </Button>
+                </Group>
+              )}
               <SegmentedControl
                 value={albumsView}
                 onChange={value => setAlbumsView(value as 'table' | 'carousel')}
@@ -546,10 +569,16 @@ export const ArtistDetailPage: React.FC = () => {
             </Text>
           ) : albumsView === 'carousel' ? (
             <Carousel
-              slideSize={{ base: '50%', xs: '33.333%', sm: '25%', md: '20%', lg: '16.666%' }}
+              slideSize={{ base: '50%', xs: '33.333%', sm: '25%', md: '25%', lg: '25%' }}
               slideGap="md"
-              withControls
-              emblaOptions={{ loop: true, dragFree: true, containScroll: 'trimSnaps' }}
+              withControls={false}
+              getEmblaApi={setEmbla}
+              emblaOptions={{
+                loop: true,
+                dragFree: true,
+                containScroll: 'trimSnaps',
+                align: 'start',
+              }}
             >
               {topAlbums.map((album: any, index: number) => {
                 const AlbumSlide: React.FC = () => {
@@ -563,43 +592,81 @@ export const ArtistDetailPage: React.FC = () => {
                   });
 
                   return (
-                    <Box
-                      component={Link}
-                      to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <Stack gap="xs" align="center">
-                        <Avatar
-                          src={imageUrl}
-                          alt={album.name}
-                          size={120}
-                          radius="md"
-                          style={{ cursor: 'pointer' }}
-                        />
+                    <Card padding="md" radius="md" withBorder>
+                      <Stack gap="sm" align="center">
+                        <Box
+                          component={Link}
+                          to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <Avatar
+                            src={imageUrl}
+                            alt={album.name}
+                            size={160}
+                            radius="md"
+                            style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                            onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                            }}
+                            onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
+                          />
+                        </Box>
                         <Text
+                          component={Link}
+                          to={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
                           size="sm"
                           fw={600}
                           c={anchorColor}
                           ta="center"
                           lineClamp={2}
-                          style={{ maxWidth: 120 }}
+                          style={{
+                            minHeight: '2.5em',
+                            width: '100%',
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                          }}
                         >
                           {album.name}
                         </Text>
-                        {album.peak === 1 && (
-                          <Group gap={4} justify="center" wrap="nowrap">
-                            <Text size="xs" fw={600} c="mediumblue">
-                              #1
+                        <Group gap="lg" justify="center" w="100%">
+                          <Stack gap={2} align="center">
+                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
+                              {t('library.detail.sections.columnPeak')}
                             </Text>
-                            {album.timesAtPeak && album.timesAtPeak > 0 && (
+                            {album.peak === 1 ? (
+                              <Group gap={4} justify="center" wrap="nowrap">
+                                <Text size="xs" fw={700} c="mediumblue">
+                                  #1
+                                </Text>
+                                {album.timesAtPeak && album.timesAtPeak > 0 && (
+                                  <Text size="10px" c="dimmed">
+                                    ({album.timesAtPeak}x)
+                                  </Text>
+                                )}
+                              </Group>
+                            ) : album.peak < 999 ? (
+                              <Text size="xs" fw={600}>
+                                #{album.peak}
+                              </Text>
+                            ) : (
                               <Text size="xs" c="dimmed">
-                                ({album.timesAtPeak}x)
+                                -
                               </Text>
                             )}
-                          </Group>
-                        )}
+                          </Stack>
+                          <Stack gap={2} align="center">
+                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
+                              {t('library.detail.sections.columnWeeks')}
+                            </Text>
+                            <Text size="xs" fw={600}>
+                              {album.weeks}
+                            </Text>
+                          </Stack>
+                        </Group>
                       </Stack>
-                    </Box>
+                    </Card>
                   );
                 };
 
