@@ -118,19 +118,21 @@ const GridItem: React.FC<GridItemProps> = ({
     clientSecret: SPOTIFY_SECRET,
   });
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleNavigate = (e: React.MouseEvent) => {
     // Check if the click is with a modifier key (ctrl, cmd, etc.)
     const isModifiedClick = e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0;
-    
+
     if (isModifiedClick) {
       // Allow browser to handle modified clicks (e.g., open in new tab)
       return;
     }
 
+    e.stopPropagation();
+
     // Navigate to detail page
     const artistSlug = encodeLastFmSlug(item.artistName || item.name);
     const nameSlug = encodeLastFmSlug(item.name);
-    
+
     if (type === 'artist') {
       navigate(`/library/music/${artistSlug}`);
     } else if (type === 'album') {
@@ -138,6 +140,11 @@ const GridItem: React.FC<GridItemProps> = ({
     } else if (type === 'track') {
       navigate(`/library/music/${artistSlug}/_/${nameSlug}`);
     }
+  };
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setModalOpen(true);
   };
 
   // Show badge if item has peaked in the chart and showPeak is enabled
@@ -150,13 +157,11 @@ const GridItem: React.FC<GridItemProps> = ({
       p={0}
       style={{
         background: getCardBackgroundByMode(theme, themeMode),
-        cursor: 'pointer',
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'visible',
       }}
-      onClick={handleClick}
     >
       <Box style={{ position: 'relative', overflow: 'hidden', borderRadius: '0.5rem' }}>
         {showBadge && (
@@ -187,6 +192,7 @@ const GridItem: React.FC<GridItemProps> = ({
           }}
         >
           <Box
+            onClick={handleImageClick}
             style={{
               position: 'absolute',
               inset: 0,
@@ -194,11 +200,13 @@ const GridItem: React.FC<GridItemProps> = ({
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundColor: imageUrl ? 'transparent' : theme.colors.gray[7],
+              cursor: 'pointer',
             }}
           />
           {/* Bottom gradient overlay with centered text */}
           {item?.name && (
             <Box
+              onClick={handleNavigate}
               style={{
                 position: 'absolute',
                 left: 0,
@@ -213,6 +221,7 @@ const GridItem: React.FC<GridItemProps> = ({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                cursor: 'pointer',
               }}
             >
               <Text
@@ -277,7 +286,14 @@ const GridItem: React.FC<GridItemProps> = ({
       )}
 
       {showPlays && item.playcount !== undefined && (
-        <Text size="xs" ta="center" tt="lowercase" p="xs">
+        <Text
+          size="xs"
+          ta="center"
+          tt="lowercase"
+          p="xs"
+          onClick={handleNavigate}
+          style={{ cursor: 'pointer' }}
+        >
           {item.playcount.toLocaleString()} {t('charts.plays')}
         </Text>
       )}

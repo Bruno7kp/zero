@@ -20,6 +20,7 @@ export interface StatsBoxProps {
   span?: GridSpan;
   format?: 'auto' | 'number' | 'plain';
   valueClassName?: string;
+  shadow?: string;
 }
 
 export const StatsBox: React.FC<StatsBoxProps> = ({
@@ -30,6 +31,7 @@ export const StatsBox: React.FC<StatsBoxProps> = ({
   span,
   format = 'auto',
   valueClassName,
+  shadow = 'sm',
 }) => {
   const shouldFormatNumber =
     format === 'number' ||
@@ -40,7 +42,7 @@ export const StatsBox: React.FC<StatsBoxProps> = ({
 
   return (
     <Grid.Col span={span ?? { base: 6, sm: 3, md: 2 }}>
-      <Card p="sm" withBorder style={{ textAlign: 'center' }}>
+      <Card p="sm" withBorder shadow={shadow} style={{ textAlign: 'center' }}>
         <Text fw={600} tt="uppercase" size="xs" ta="center">
           {label}
         </Text>

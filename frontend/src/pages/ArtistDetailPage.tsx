@@ -194,45 +194,49 @@ export const ArtistDetailPage: React.FC = () => {
 
       <Stack gap="md">
         <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Group wrap="nowrap" gap="lg">
-            <Avatar
-              src={effectiveImageUrl}
-              alt={artistName}
-              size={170}
-              radius="md"
-              onClick={() => setImageModalOpen(true)}
-              style={{ cursor: 'pointer' }}
-            />
-            <Stack gap="xs" style={{ flex: 1 }}>
-              <Title order={1}>{stats.name}</Title>
-            </Stack>
-          </Group>
-        </Card>
+          <Stack gap="lg">
+            <Group wrap="nowrap" gap="lg">
+              <Avatar
+                src={effectiveImageUrl}
+                alt={artistName}
+                size={170}
+                radius="md"
+                onClick={() => setImageModalOpen(true)}
+                style={{ cursor: 'pointer' }}
+              />
+              <Stack gap="xs" style={{ flex: 1 }}>
+                <Title order={1}>{stats.name}</Title>
+              </Stack>
+            </Group>
 
-        <Card padding={0} radius="md" bg="transparent">
-          <Grid>
-            <StatsBox
-              label={t('library.detail.peakPosition')}
-              value={stats.peak ?? '—'}
-              span={{ base: 12, sm: 6, md: 3 }}
-              valueClassName={stats.peak === 1 ? 'peak' : undefined}
-            />
-            <StatsBox
-              label={t('library.detail.totalWeeks')}
-              value={stats.totalWeeks ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
-              label={t('library.detail.totalPlays')}
-              value={stats.totalPlays ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
-              label={t('charts.stats.points')}
-              value={stats.totalPoints ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-          </Grid>
+            <Grid>
+              <StatsBox
+                label={t('library.detail.peakPosition')}
+                value={stats.peak ?? '—'}
+                span={{ base: 6, sm: 6, md: 3 }}
+                valueClassName={stats.peak === 1 ? 'peak' : undefined}
+                shadow="none"
+              />
+              <StatsBox
+                label={t('library.detail.totalWeeks')}
+                value={stats.totalWeeks ?? 0}
+                span={{ base: 6, sm: 6, md: 3 }}
+                shadow="none"
+              />
+              <StatsBox
+                label={t('library.detail.totalPlays')}
+                value={stats.totalPlays ?? 0}
+                span={{ base: 6, sm: 6, md: 3 }}
+                shadow="none"
+              />
+              <StatsBox
+                label={t('charts.stats.points')}
+                value={stats.totalPoints ?? 0}
+                span={{ base: 6, sm: 6, md: 3 }}
+                shadow="none"
+              />
+            </Grid>
+          </Stack>
         </Card>
 
         {chartRun.length > 0 && (
@@ -279,21 +283,25 @@ export const ArtistDetailPage: React.FC = () => {
                 label={t('charts.stats.top1')}
                 value={top1Weeks}
                 span={{ base: 12, sm: 6, md: 3 }}
+                shadow="none"
               />
               <StatsBox
                 label={t('charts.stats.top5')}
                 value={totals.top5 ?? 0}
                 span={{ base: 12, sm: 6, md: 3 }}
+                shadow="none"
               />
               <StatsBox
                 label={t('charts.stats.top10')}
                 value={totals.top10 ?? 0}
                 span={{ base: 12, sm: 6, md: 3 }}
+                shadow="none"
               />
               <StatsBox
                 label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
                 value={totals.withinCutoff ?? 0}
                 span={{ base: 12, sm: 6, md: 3 }}
+                shadow="none"
               />
             </Grid>
           </Card>
