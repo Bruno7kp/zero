@@ -29,9 +29,13 @@ import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { StatsBox } from '../components/StatsBox';
 import { CertificationBadge } from '../components/CertificationBadge';
+import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import { useMantineTheme } from '@mantine/core';
 
 export const AlbumDetailPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useMantineTheme();
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   const { artist, album } = useParams<{ artist: string; album: string }>();
   const navigate = useNavigate();
   const charts = useSelector((state: any) => state.charts.charts);
@@ -170,7 +174,13 @@ export const AlbumDetailPage: React.FC = () => {
       />
 
       <Stack gap="md">
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card
+          shadow="sm"
+          padding="lg"
+          radius="md"
+          withBorder
+          style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+        >
           <Stack gap="lg">
             <Group wrap="nowrap" align="stretch" gap="lg">
               <Avatar
@@ -226,7 +236,13 @@ export const AlbumDetailPage: React.FC = () => {
             </Group>
           </Stack>
         </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card
+          shadow="sm"
+          padding="lg"
+          radius="md"
+          withBorder
+          style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+        >
           <Grid>
             <StatsBox
               label={t('library.detail.peakPosition')}
@@ -234,29 +250,39 @@ export const AlbumDetailPage: React.FC = () => {
               span={{ base: 6, sm: 6, md: 3 }}
               valueClassName={stats.peak === 1 ? 'peak' : undefined}
               shadow="none"
+              background={getCardBackgroundByMode(theme, themeMode)}
             />
             <StatsBox
               label={t('library.detail.totalWeeks')}
               value={stats.totalWeeks ?? 0}
               span={{ base: 6, sm: 6, md: 3 }}
               shadow="none"
+              background={getCardBackgroundByMode(theme, themeMode)}
             />
             <StatsBox
               label={t('library.detail.totalPlays')}
               value={stats.totalPlays ?? 0}
               span={{ base: 6, sm: 6, md: 3 }}
               shadow="none"
+              background={getCardBackgroundByMode(theme, themeMode)}
             />
             <StatsBox
               label={t('charts.stats.points')}
               value={stats.totalPoints ?? 0}
               span={{ base: 6, sm: 6, md: 3 }}
               shadow="none"
+              background={getCardBackgroundByMode(theme, themeMode)}
             />
           </Grid>
         </Card>{' '}
         {chartRun.length > 0 && (
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card
+            shadow="sm"
+            padding="lg"
+            radius="md"
+            withBorder
+            style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+          >
             <Title order={3} mb="md">
               {t('library.detail.chartRun')}
             </Title>
@@ -292,31 +318,41 @@ export const AlbumDetailPage: React.FC = () => {
           </Card>
         )}
         {chartRun.length > 0 && (
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card
+            shadow="sm"
+            padding="lg"
+            radius="md"
+            withBorder
+            style={{ background: getCardBackgroundByMode(theme, themeMode) }}
+          >
             <Grid>
               <StatsBox
                 label={t('charts.stats.top1')}
                 value={top1Weeks}
                 span={{ base: 12, sm: 6, md: 3 }}
                 shadow="none"
+                background={getCardBackgroundByMode(theme, themeMode)}
               />
               <StatsBox
                 label={t('charts.stats.top5')}
                 value={totals.top5 ?? 0}
                 span={{ base: 12, sm: 6, md: 3 }}
                 shadow="none"
+                background={getCardBackgroundByMode(theme, themeMode)}
               />
               <StatsBox
                 label={t('charts.stats.top10')}
                 value={totals.top10 ?? 0}
                 span={{ base: 12, sm: 6, md: 3 }}
                 shadow="none"
+                background={getCardBackgroundByMode(theme, themeMode)}
               />
               <StatsBox
                 label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
                 value={totals.withinCutoff ?? 0}
                 span={{ base: 12, sm: 6, md: 3 }}
                 shadow="none"
+                background={getCardBackgroundByMode(theme, themeMode)}
               />
             </Grid>
           </Card>

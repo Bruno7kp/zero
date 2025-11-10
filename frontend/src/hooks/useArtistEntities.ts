@@ -10,6 +10,7 @@ export interface ArtistEntitySummary {
   totalPlays: number;
   peak: number;
   weeks: number;
+  timesAtPeak?: number;
   lastAppearance: string | null;
 }
 
@@ -87,6 +88,7 @@ export function useArtistEntities(
             totalPlays: number;
             peak: number;
             weeks: Set<string>;
+            timesAtPeak: number;
             lastAppearance: string | null;
           }
         >();
@@ -111,6 +113,7 @@ export function useArtistEntities(
               totalPlays: 0,
               peak: row.rank,
               weeks: new Set<string>(),
+              timesAtPeak: 0,
               lastAppearance: null,
             });
           }
@@ -118,6 +121,9 @@ export function useArtistEntities(
           entry.points += Math.max(0, 101 - row.rank);
           entry.totalPlays += row.plays || 0;
           entry.peak = Math.min(entry.peak, row.rank);
+          if (row.rank === 1) {
+            entry.timesAtPeak += 1;
+          }
           entry.weeks.add(row.week);
           entry.lastAppearance = compareDates(entry.lastAppearance, row.week);
         }
@@ -130,6 +136,7 @@ export function useArtistEntities(
           totalPlays: entry.totalPlays,
           peak: entry.peak,
           weeks: entry.weeks.size,
+          timesAtPeak: entry.timesAtPeak,
           lastAppearance: entry.lastAppearance,
         }));
 
