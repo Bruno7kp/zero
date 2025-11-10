@@ -187,7 +187,7 @@ export const AlbumDetailPage: React.FC = () => {
 
             <Stack
               gap="md"
-              justify="space-between"
+              justify="space-around"
               style={{
                 flex: 1,
               }}
