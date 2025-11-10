@@ -11,7 +11,7 @@ import {
   Loader,
 } from '@mantine/core';
 import { IconRefresh } from '@tabler/icons-react';
-import MetalVinylDisc from './MetalVinylDisc';
+import StackedMetalVinylDisc from './StackedMetalVinylDisc';
 import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
 import { formatNumber } from '../utils/format';
@@ -171,7 +171,11 @@ export const CertificationBadge: React.FC<Props> = ({
           onClick={handleManualReload}
           style={{ cursor: online && !loading ? 'pointer' : 'default' }}
         >
-          {loading ? <Loader size="sm" /> : <MetalVinylDisc level="none" size={50} />}
+          {loading ? (
+            <Loader size="sm" />
+          ) : (
+            <StackedMetalVinylDisc level="none" size={50} multiplier={1} />
+          )}
         </ThemeIcon>
       );
 
@@ -254,7 +258,11 @@ export const CertificationBadge: React.FC<Props> = ({
           {loading ? (
             <Loader size="sm" />
           ) : (
-            <MetalVinylDisc level={(level as any) || 'none'} size={50} />
+            <StackedMetalVinylDisc
+              level={(level as any) || 'none'}
+              size={50}
+              multiplier={multiplier}
+            />
           )}
         </ThemeIcon>
       </Tooltip>
@@ -280,7 +288,11 @@ export const CertificationBadge: React.FC<Props> = ({
       <Group wrap="nowrap" align="center" gap="sm">
         <ThemeIcon size={52} radius="xl" variant="transparent">
           {/* Always show a vinyl disc; use neutral black when there's no certification */}
-          <MetalVinylDisc level={(level as any) || 'none'} size={50} />
+          <StackedMetalVinylDisc
+            level={(level as any) || 'none'}
+            size={50}
+            multiplier={multiplier}
+          />
         </ThemeIcon>
         <Stack gap={2} style={{ flex: 1 }}>
           <Text fw={600} size="sm" tt="uppercase">
