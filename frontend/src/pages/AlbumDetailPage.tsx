@@ -225,7 +225,7 @@ export const AlbumDetailPage: React.FC = () => {
           </Group>
         </Card>
 
-        <Card shadow="sm" padding={0} radius="md" bg="transparent">
+        <Card padding={0} radius="md" bg="transparent">
           <Grid>
             <StatsBox
               label={t('library.detail.peakPosition')}
@@ -246,26 +246,6 @@ export const AlbumDetailPage: React.FC = () => {
             <StatsBox
               label={t('charts.stats.points')}
               value={stats.totalPoints ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
-              label={t('charts.stats.top1')}
-              value={top1Weeks}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
-              label={t('charts.stats.top5')}
-              value={totals.top5 ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
-              label={t('charts.stats.top10')}
-              value={totals.top10 ?? 0}
-              span={{ base: 12, sm: 6, md: 3 }}
-            />
-            <StatsBox
-              label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
-              value={totals.withinCutoff ?? 0}
               span={{ base: 12, sm: 6, md: 3 }}
             />
           </Grid>
@@ -305,6 +285,33 @@ export const AlbumDetailPage: React.FC = () => {
                 </Box>
               </Tabs.Panel>
             </Tabs>
+          </Card>
+        )}
+
+        {chartRun.length > 0 && (
+          <Card padding={0} radius="md" bg="transparent">
+            <Grid>
+              <StatsBox
+                label={t('charts.stats.top1')}
+                value={top1Weeks}
+                span={{ base: 12, sm: 6, md: 3 }}
+              />
+              <StatsBox
+                label={t('charts.stats.top5')}
+                value={totals.top5 ?? 0}
+                span={{ base: 12, sm: 6, md: 3 }}
+              />
+              <StatsBox
+                label={t('charts.stats.top10')}
+                value={totals.top10 ?? 0}
+                span={{ base: 12, sm: 6, md: 3 }}
+              />
+              <StatsBox
+                label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
+                value={totals.withinCutoff ?? 0}
+                span={{ base: 12, sm: 6, md: 3 }}
+              />
+            </Grid>
           </Card>
         )}
       </Stack>

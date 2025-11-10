@@ -1,6 +1,6 @@
 import React from 'react';
 import { ThemeIcon, Tooltip } from '@mantine/core';
-import MetalVinylDisc from './MetalVinylDisc';
+import StackedMetalVinylDisc from './StackedMetalVinylDisc';
 import { useTranslation } from 'react-i18next';
 import { computeCertification, type CertificationResult } from '../utils/certification';
 import { db } from '../db/indexedDb';
@@ -170,7 +170,11 @@ const CertificationIconBase: React.FC<CertificationIconProps> = ({
   return (
     <Tooltip label={label} color="dark" withArrow>
       <ThemeIcon size={size} radius="xl" variant="transparent">
-        <MetalVinylDisc level={result.level} size={Math.max(14, size - 6)} />
+        <StackedMetalVinylDisc
+          level={result.level}
+          size={Math.max(14, size - 6)}
+          multiplier={result.multiplier}
+        />
       </ThemeIcon>
     </Tooltip>
   );

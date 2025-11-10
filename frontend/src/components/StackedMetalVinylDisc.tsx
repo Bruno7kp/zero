@@ -45,7 +45,6 @@ export const StackedMetalVinylDisc: React.FC<StackedMetalVinylDiscProps> = ({
         const reverseIndex = stackCount - 1 - index;
         const x = reverseIndex * offset;
         const zIndex = index;
-        const opacity = index === stackCount - 1 ? 1 : 0.6; // Front disc fully opaque, others slightly faded
 
         return (
           <Box
@@ -55,7 +54,6 @@ export const StackedMetalVinylDisc: React.FC<StackedMetalVinylDiscProps> = ({
               left: x,
               top: 0,
               zIndex,
-              opacity,
             }}
           >
             <MetalVinylDisc level={level} size={size} />
