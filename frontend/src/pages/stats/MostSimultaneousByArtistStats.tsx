@@ -29,6 +29,7 @@ import {
   getYearRange,
   getAllWeeks,
 } from '../../utils/statsQueries';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
@@ -292,7 +293,14 @@ const MostSimultaneousByArtistStats: React.FC = () => {
                           <Flex gap="sm" align="center">
                             {preferences.showImages && <ImageCell artistName={record.artistName} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} size={primaryTextSize}>
+                              <Text
+                                fw={600}
+                                lineClamp={1}
+                                size={primaryTextSize}
+                                component={Link}
+                                to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                                className="mantine-Link-root"
+                              >
                                 {record.artistName}
                               </Text>
                             </Box>

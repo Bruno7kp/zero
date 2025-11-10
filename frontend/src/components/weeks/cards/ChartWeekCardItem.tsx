@@ -6,6 +6,7 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../../services/SpotifyApi';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../../db/indexedDb';
+import { encodeLastFmSlug } from '../../../utils/urlEncoding';
 
 interface ChartWeekCardItemProps {
   type: 'artist' | 'album' | 'track';
@@ -117,16 +118,37 @@ export const ChartWeekCardItem: React.FC<ChartWeekCardItemProps> = React.memo(
           />
         </Grid.Col>
         <Grid.Col span="auto">
-          <Box style={{ minWidth: 0 }}>
-            <Text fw={600} size="sm" style={{ lineHeight: 1.3 }}>
+          <Flex direction="column" gap={0} style={{ minWidth: 0 }}>
+            <Text
+              component={Link}
+              to={(() => {
+                const artistSlug = encodeLastFmSlug(artistName || name);
+                const nameSlug = encodeLastFmSlug(name);
+                if (type === 'artist') return `/library/music/${artistSlug}`;
+                if (type === 'album') return `/library/music/${artistSlug}/${nameSlug}`;
+                if (type === 'track') return `/library/music/${artistSlug}/_/${nameSlug}`;
+                return '#';
+              })()}
+              fw={600}
+              size="sm"
+              className="mantine-Link-root"
+              style={{ lineHeight: 1.3, cursor: 'pointer', color: 'inherit' }}
+            >
               {name}
             </Text>
             {artistName && (
-              <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
+              <Text
+                component={Link}
+                to={`/library/music/${encodeLastFmSlug(artistName)}`}
+                size="xs"
+                c="dimmed"
+                className="mantine-Link-root"
+                style={{ lineHeight: 1.3, cursor: 'pointer', color: 'inherit' }}
+              >
                 {artistName}
               </Text>
             )}
-          </Box>
+          </Flex>
         </Grid.Col>
         <Grid.Col span="content">
           <Box style={{ minWidth: 80, textAlign: 'right' }}>

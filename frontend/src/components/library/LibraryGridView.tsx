@@ -118,30 +118,6 @@ const GridItem: React.FC<GridItemProps> = ({
     clientSecret: SPOTIFY_SECRET,
   });
 
-  const handleNavigate = (e: React.MouseEvent) => {
-    // Check if the click is with a modifier key (ctrl, cmd, etc.)
-    const isModifiedClick = e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0;
-
-    if (isModifiedClick) {
-      // Allow browser to handle modified clicks (e.g., open in new tab)
-      return;
-    }
-
-    e.stopPropagation();
-
-    // Navigate to detail page
-    const artistSlug = encodeLastFmSlug(item.artistName || item.name);
-    const nameSlug = encodeLastFmSlug(item.name);
-
-    if (type === 'artist') {
-      navigate(`/library/music/${artistSlug}`);
-    } else if (type === 'album') {
-      navigate(`/library/music/${artistSlug}/${nameSlug}`);
-    } else if (type === 'track') {
-      navigate(`/library/music/${artistSlug}/_/${nameSlug}`);
-    }
-  };
-
   const handleImageClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setModalOpen(true);
@@ -149,6 +125,19 @@ const GridItem: React.FC<GridItemProps> = ({
 
   // Show badge if item has peaked in the chart and showPeak is enabled
   const showBadge = showPeak && item.peak < 999;
+
+  // Generate links
+  const artistSlug = encodeLastFmSlug(item.artistName || item.name);
+  const nameSlug = encodeLastFmSlug(item.name);
+
+  const entityLink =
+    type === 'artist'
+      ? `/library/music/${artistSlug}`
+      : type === 'album'
+      ? `/library/music/${artistSlug}/${nameSlug}`
+      : `/library/music/${artistSlug}/_/${nameSlug}`;
+
+  const artistLink = `/library/music/${artistSlug}`;
 
   return (
     <Card
@@ -206,7 +195,6 @@ const GridItem: React.FC<GridItemProps> = ({
           {/* Bottom gradient overlay with centered text */}
           {item?.name && (
             <Box
-              onClick={handleNavigate}
               style={{
                 position: 'absolute',
                 left: 0,
@@ -221,7 +209,6 @@ const GridItem: React.FC<GridItemProps> = ({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
               }}
             >
               <Text
@@ -229,7 +216,6 @@ const GridItem: React.FC<GridItemProps> = ({
                 fw={600}
                 size="sm"
                 pt="sm"
-                className="entity-name"
                 style={{
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
@@ -237,6 +223,13 @@ const GridItem: React.FC<GridItemProps> = ({
                   maxWidth: '90%',
                   textAlign: 'center',
                 }}
+                component="a"
+                href={entityLink}
+                onClick={(e: React.MouseEvent) => {
+                  e.preventDefault();
+                  navigate(entityLink);
+                }}
+                className="mantine-Link-root"
               >
                 {item.name}
               </Text>
@@ -252,6 +245,13 @@ const GridItem: React.FC<GridItemProps> = ({
                     textAlign: 'center',
                     opacity: 0.8,
                   }}
+                  component="a"
+                  href={artistLink}
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    navigate(artistLink);
+                  }}
+                  className="mantine-Link-root"
                 >
                   {item.artistName}
                 </Text>
@@ -286,14 +286,7 @@ const GridItem: React.FC<GridItemProps> = ({
       )}
 
       {showPlays && item.playcount !== undefined && (
-        <Text
-          size="xs"
-          ta="center"
-          tt="lowercase"
-          p="xs"
-          onClick={handleNavigate}
-          style={{ cursor: 'pointer' }}
-        >
+        <Text size="xs" ta="center" tt="lowercase" p="xs">
           {item.playcount.toLocaleString()} {t('charts.plays')}
         </Text>
       )}

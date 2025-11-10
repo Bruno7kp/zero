@@ -5,7 +5,6 @@ import {
   Button,
   Text,
   Skeleton,
-  Avatar,
   Divider,
   Group,
   ThemeIcon,
@@ -15,6 +14,9 @@ import {
 import { IconArrowRight, IconFlame } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { encodeLastFmSlug } from '../../../utils/urlEncoding';
+import { SpotifyImageWithModal } from '../../SpotifyImageWithModal';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../../services/SpotifyApi';
 
 interface LastPerfectAllKillCardProps {
   loading: boolean;
@@ -71,20 +73,78 @@ export const LastPerfectAllKillCard: React.FC<LastPerfectAllKillCardProps> = ({
         <>
           <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md" verticalSpacing="md">
             <Flex direction="column" align="center" gap={8}>
-              <Avatar src={lastPAK.artistImageUrl} alt={lastPAK.artistName} size={80} radius="md" />
-              <Text fw={600} size="sm" ta="center">
+              <SpotifyImageWithModal
+                entityId={`artist-${lastPAK.artistName}-`}
+                name={lastPAK.artistName}
+                artistName={lastPAK.artistName}
+                type="artist"
+                clientId={SPOTIFY_TOKEN}
+                clientSecret={SPOTIFY_SECRET}
+                width={80}
+                height={80}
+                borderRadius={8}
+                style={{ borderRadius: '8px' }}
+              />
+              <Text
+                fw={600}
+                size="sm"
+                ta="center"
+                component={Link}
+                to={`/library/music/${encodeLastFmSlug(lastPAK.artistName)}`}
+                className="mantine-Link-root"
+              >
                 {lastPAK.artistName}
               </Text>
             </Flex>
             <Flex direction="column" align="center" gap={8}>
-              <Avatar src={lastPAK.albumImageUrl} alt={lastPAK.albumName} size={80} radius="md" />
-              <Text fw={600} size="sm" ta="center">
+              <SpotifyImageWithModal
+                entityId={`album-${lastPAK.albumName}-${lastPAK.artistName}`}
+                name={lastPAK.albumName}
+                artistName={lastPAK.artistName}
+                type="album"
+                clientId={SPOTIFY_TOKEN}
+                clientSecret={SPOTIFY_SECRET}
+                width={80}
+                height={80}
+                borderRadius={8}
+                style={{ borderRadius: '8px' }}
+              />
+              <Text
+                fw={600}
+                size="sm"
+                ta="center"
+                component={Link}
+                to={`/library/music/${encodeLastFmSlug(lastPAK.artistName)}/${encodeLastFmSlug(
+                  lastPAK.albumName
+                )}`}
+                className="mantine-Link-root"
+              >
                 {lastPAK.albumName}
               </Text>
             </Flex>
             <Flex direction="column" align="center" gap={8}>
-              <Avatar src={lastPAK.trackImageUrl} alt={lastPAK.trackName} size={80} radius="md" />
-              <Text fw={600} size="sm" ta="center">
+              <SpotifyImageWithModal
+                entityId={`track-${lastPAK.trackName}-${lastPAK.artistName}`}
+                name={lastPAK.trackName}
+                artistName={lastPAK.artistName}
+                type="track"
+                clientId={SPOTIFY_TOKEN}
+                clientSecret={SPOTIFY_SECRET}
+                width={80}
+                height={80}
+                borderRadius={8}
+                style={{ borderRadius: '8px' }}
+              />
+              <Text
+                fw={600}
+                size="sm"
+                ta="center"
+                component={Link}
+                to={`/library/music/${encodeLastFmSlug(lastPAK.artistName)}/_/${encodeLastFmSlug(
+                  lastPAK.trackName
+                )}`}
+                className="mantine-Link-root"
+              >
                 {lastPAK.trackName}
               </Text>
             </Flex>

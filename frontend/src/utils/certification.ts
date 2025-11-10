@@ -147,7 +147,7 @@ export async function computeCertification(
   const totalFormula = stabilityPoints * pointsWeight + userPlaycount * playsWeight;
 
   let level: CertificationResult['level'] = 'none';
-  let multiplier = 0;
+  let multiplier = 1;
   let nextTarget: number | null = null;
   let remainingToNext: number | null = null;
   let nextType: CertificationResult['nextType'] = undefined;

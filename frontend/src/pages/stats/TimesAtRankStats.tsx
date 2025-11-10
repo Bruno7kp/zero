@@ -1,6 +1,6 @@
 // Times at Rank #N stats - shows who maintained a specific position for most weeks
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Stack,
   Loader,
@@ -24,6 +24,7 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 import { db } from '../../db/indexedDb';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ record: any; type: string }> = ({ record, type }) => {
@@ -320,13 +321,25 @@ const TimesAtRankStats: React.FC = () => {
                               <Text
                                 fw={600}
                                 lineClamp={1}
-                                className="entity-name"
+                                className="entity-name mantine-Link-root"
                                 size={
                                   preferences.fontSize === 'xs'
                                     ? 'sm'
                                     : preferences.fontSize === 'md'
                                     ? 'lg'
                                     : 'md'
+                                }
+                                component={Link}
+                                to={
+                                  type === 'artist'
+                                    ? `/library/music/${encodeLastFmSlug(record.name)}`
+                                    : type === 'album'
+                                    ? `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/${encodeLastFmSlug(record.name)}`
+                                    : `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/_/${encodeLastFmSlug(record.name)}`
                                 }
                               >
                                 {record.name}
@@ -344,6 +357,9 @@ const TimesAtRankStats: React.FC = () => {
                                         : 'sm'
                                     }
                                     lineClamp={1}
+                                    component={Link}
+                                    to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                                    className="mantine-Link-root"
                                   >
                                     {record.artistName}
                                   </Text>
@@ -361,6 +377,9 @@ const TimesAtRankStats: React.FC = () => {
                                   ? 'lg'
                                   : 'md'
                               }
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                              className="mantine-Link-root"
                             >
                               {record.artistName}
                             </Text>

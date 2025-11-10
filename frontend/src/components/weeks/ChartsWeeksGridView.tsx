@@ -20,6 +20,7 @@ import { AllKillBadge } from '../AllKillBadge';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
 import dayjs from 'dayjs';
 import { t } from 'i18next';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 interface WeekTop1Data {
   week: string;
@@ -133,26 +134,41 @@ const GridItem: React.FC<GridItemProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
             }}
+            onClick={e => e.stopPropagation()}
           >
             <Text
+              component={Link}
+              to={(() => {
+                const artistSlug = encodeLastFmSlug(item.artistName || item.name);
+                const nameSlug = encodeLastFmSlug(item.name);
+                if (type === 'artist') return `/library/music/${artistSlug}`;
+                if (type === 'album') return `/library/music/${artistSlug}/${nameSlug}`;
+                if (type === 'track') return `/library/music/${artistSlug}/_/${nameSlug}`;
+                return '#';
+              })()}
               c="#fff"
               fw={600}
               size="sm"
               pt="sm"
+              className="mantine-Link-root"
               style={{
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
                 overflow: 'hidden',
                 maxWidth: '90%',
                 textAlign: 'center',
+                cursor: 'pointer',
               }}
             >
               {item.name}
             </Text>
             {type !== 'artist' && item.artistName && (
               <Text
+                component={Link}
+                to={`/library/music/${encodeLastFmSlug(item.artistName)}`}
                 c="#fff"
                 size="xs"
+                className="mantine-Link-root"
                 style={{
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
@@ -160,6 +176,7 @@ const GridItem: React.FC<GridItemProps> = ({
                   maxWidth: '90%',
                   textAlign: 'center',
                   opacity: 0.8,
+                  cursor: 'pointer',
                 }}
               >
                 {item.artistName}

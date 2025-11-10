@@ -27,6 +27,7 @@ import { getWeeksToFirstNumberOne, getYearRange, getAllWeeks } from '../../utils
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 const WeeksToNumberOneStats: React.FC = () => {
   const { t } = useTranslation();
@@ -287,13 +288,37 @@ const WeeksToNumberOneStats: React.FC = () => {
                               />
                             )}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} size={primaryTextSize}>
+                              <Text
+                                fw={600}
+                                lineClamp={1}
+                                size={primaryTextSize}
+                                component={Link}
+                                to={
+                                  type === 'artist'
+                                    ? `/library/music/${encodeLastFmSlug(record.name)}`
+                                    : type === 'album'
+                                    ? `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/${encodeLastFmSlug(record.name)}`
+                                    : `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/_/${encodeLastFmSlug(record.name)}`
+                                }
+                                className="mantine-Link-root"
+                              >
                                 {record.name}
                               </Text>
                               {type !== 'artist' &&
                                 record.artistName &&
                                 !preferences.showArtistColumn && (
-                                  <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
+                                  <Text
+                                    c="dimmed"
+                                    size={secondaryTextSize}
+                                    lineClamp={1}
+                                    component={Link}
+                                    to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                                    className="mantine-Link-root"
+                                  >
                                     {record.artistName}
                                   </Text>
                                 )}
@@ -302,7 +327,14 @@ const WeeksToNumberOneStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text size={primaryTextSize}>{record.artistName}</Text>
+                            <Text
+                              size={primaryTextSize}
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                              className="mantine-Link-root"
+                            >
+                              {record.artistName}
+                            </Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>

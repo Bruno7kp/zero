@@ -29,6 +29,7 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 import { useStatsPreferences } from '../../hooks/useStatsPreferences';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ record: ChartData; type: string }> = ({ record, type }) => {
@@ -429,15 +430,34 @@ const RankStats: React.FC = () => {
                               <Text
                                 fw={600}
                                 lineClamp={1}
-                                className="entity-name"
+                                className="entity-name mantine-Link-root"
                                 size={primaryTextSize}
+                                component={Link}
+                                to={
+                                  type === 'artist'
+                                    ? `/library/music/${encodeLastFmSlug(record.name)}`
+                                    : type === 'album'
+                                    ? `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/${encodeLastFmSlug(record.name)}`
+                                    : `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/_/${encodeLastFmSlug(record.name)}`
+                                }
                               >
                                 {record.name}
                               </Text>
                               {type !== 'artist' &&
                                 record.artistName &&
                                 !preferences.showArtistColumn && (
-                                  <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
+                                  <Text
+                                    c="dimmed"
+                                    size={secondaryTextSize}
+                                    lineClamp={1}
+                                    component={Link}
+                                    to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                                    className="mantine-Link-root"
+                                  >
                                     {record.artistName}
                                   </Text>
                                 )}
@@ -446,7 +466,14 @@ const RankStats: React.FC = () => {
                         </Table.Td>
                         {preferences.showArtistColumn && type !== 'artist' && (
                           <Table.Td>
-                            <Text size={primaryTextSize}>{record.artistName}</Text>
+                            <Text
+                              size={primaryTextSize}
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                              className="mantine-Link-root"
+                            >
+                              {record.artistName}
+                            </Text>
                           </Table.Td>
                         )}
                         <Table.Td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>

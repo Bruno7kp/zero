@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, Flex, Text, Collapse, ActionIcon, Divider, Box } from '@mantine/core';
+import { Link } from 'react-router-dom';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { selectResolvedBadge } from '../../store/badgeStylesSlice';
 import { useSelector } from 'react-redux';
@@ -8,6 +9,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { ChartItemStatsLoader } from '../stats/ChartItemStatsLoader';
 import { makeScaleSize } from '../../hooks/useFontScale';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 import {
   RankCellList,
   PlaysCellList,
@@ -227,26 +229,42 @@ export const ChartWeekListRow: React.FC<{
                       }}
                     >
                       <Text
+                        component={Link}
+                        to={(() => {
+                          const artistSlug = encodeLastFmSlug(row.artistName || row.name);
+                          const nameSlug = encodeLastFmSlug(row.name);
+                          if (type === 'artist') return `/library/music/${artistSlug}`;
+                          if (type === 'album') return `/library/music/${artistSlug}/${nameSlug}`;
+                          if (type === 'track') return `/library/music/${artistSlug}/_/${nameSlug}`;
+                          return '#';
+                        })()}
                         fw={600}
                         size={effectiveScaleSize('lg')}
-                        className="entity-name"
+                        className="entity-name mantine-Link-root"
                         style={{
                           whiteSpace: 'nowrap',
                           textOverflow: 'ellipsis',
                           overflow: 'hidden',
                           width: '100%',
+                          color: 'inherit',
+                          cursor: 'pointer',
                         }}
                       >
                         {row.name}
                       </Text>
                       {row.artistName && (
                         <Text
+                          component={Link}
+                          to={`/library/music/${encodeLastFmSlug(row.artistName)}`}
                           size={effectiveScaleSize('md')}
+                          className="mantine-Link-root"
                           style={{
                             whiteSpace: 'nowrap',
                             textOverflow: 'ellipsis',
                             overflow: 'hidden',
                             width: '100%',
+                            color: 'inherit',
+                            cursor: 'pointer',
                           }}
                         >
                           {row.artistName}

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Flex, Text } from '@mantine/core';
+import { Link } from 'react-router-dom';
 import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import type { ChartData } from '../../db/indexedDb';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 interface NameCellProps {
   row: ChartData;
@@ -32,6 +34,18 @@ export const NameCell: React.FC<NameCellProps> = ({
   scaleSize,
   imageSize = 40,
 }) => {
+  // Build detail page link
+  const artistSlug = encodeLastFmSlug(row.artistName || row.name);
+  const nameSlug = encodeLastFmSlug(row.name);
+  let detailLink = '';
+  if (type === 'artist') {
+    detailLink = `/library/music/${artistSlug}`;
+  } else if (type === 'album') {
+    detailLink = `/library/music/${artistSlug}/${nameSlug}`;
+  } else if (type === 'track') {
+    detailLink = `/library/music/${artistSlug}/_/${nameSlug}`;
+  }
+
   return (
     <Flex>
       {showImage && (
@@ -61,11 +75,26 @@ export const NameCell: React.FC<NameCellProps> = ({
         </Flex>
       )}
       <Flex direction="column" justify="center" align="flex-start">
-        <Text fw={600} size={scaleSize('md')} className="entity-name">
+        <Text
+          component={Link}
+          to={detailLink}
+          fw={600}
+          size={scaleSize('md')}
+          className="entity-name mantine-Link-root"
+          style={{ color: 'inherit', cursor: 'pointer' }}
+        >
           {row.name}
         </Text>
         {artistMode === 'under' && row.artistName && (
-          <Text size={scaleSize('sm')}>{row.artistName}</Text>
+          <Text
+            component={Link}
+            to={`/library/music/${artistSlug}`}
+            size={scaleSize('sm')}
+            className="mantine-Link-root"
+            style={{ color: 'inherit', cursor: 'pointer' }}
+          >
+            {row.artistName}
+          </Text>
         )}
       </Flex>
     </Flex>

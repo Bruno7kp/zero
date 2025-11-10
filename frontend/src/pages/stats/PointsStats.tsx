@@ -1,6 +1,6 @@
 // Points Accumulators stats
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Stack,
   Text,
@@ -23,6 +23,7 @@ import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ entityId: string; name: string; artistName: string; type: string }> = ({
@@ -290,7 +291,6 @@ const PointsStats: React.FC = () => {
                               <Text
                                 fw={600}
                                 lineClamp={1}
-                                className="entity-name"
                                 size={
                                   preferences.fontSize === 'xs'
                                     ? 'sm'
@@ -298,6 +298,19 @@ const PointsStats: React.FC = () => {
                                     ? 'lg'
                                     : 'md'
                                 }
+                                component={Link}
+                                to={
+                                  type === 'artist'
+                                    ? `/library/music/${encodeLastFmSlug(record.name)}`
+                                    : type === 'album'
+                                    ? `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/${encodeLastFmSlug(record.name)}`
+                                    : `/library/music/${encodeLastFmSlug(
+                                        record.artistName
+                                      )}/_/${encodeLastFmSlug(record.name)}`
+                                }
+                                className="mantine-Link-root"
                               >
                                 {record.name}
                               </Text>
@@ -314,6 +327,9 @@ const PointsStats: React.FC = () => {
                                         : 'sm'
                                     }
                                     lineClamp={1}
+                                    component={Link}
+                                    to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                                    className="mantine-Link-root"
                                   >
                                     {record.artistName}
                                   </Text>
@@ -331,6 +347,9 @@ const PointsStats: React.FC = () => {
                                   ? 'lg'
                                   : 'md'
                               }
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
+                              className="mantine-Link-root"
                             >
                               {record.artistName}
                             </Text>

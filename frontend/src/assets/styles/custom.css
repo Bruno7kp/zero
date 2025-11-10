@@ -303,10 +303,16 @@ h6 {
   font-family: 'Satoshi-Variable';
 }
 
-a:hover,
-a:focus,
-.mantine-Link-root:hover,
-.mantine-Link-root:focus {
+a,
+.mantine-Link-root {
+  text-decoration: none !important;
+}
+
+a:hover:not(.mantine-Button-root):not(.mantine-ActionIcon-root),
+a:focus:not(.mantine-Button-root):not(.mantine-ActionIcon-root),
+.mantine-Link-root:hover:not(.mantine-Button-root):not(.mantine-ActionIcon-root),
+.mantine-Link-root:focus:not(.mantine-Button-root):not(.mantine-ActionIcon-root) {
+  text-decoration: underline !important;
   text-decoration-color: var(--mantine-color-blue-6) !important;
   text-decoration-thickness: 2px !important;
 }

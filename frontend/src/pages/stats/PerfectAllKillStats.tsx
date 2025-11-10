@@ -29,6 +29,7 @@ import type { ChartData } from '../../db/indexedDb';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
@@ -293,7 +294,7 @@ const PerfectAllKillStats: React.FC = () => {
                             <Text
                               fw={600}
                               lineClamp={1}
-                              className="entity-name"
+                              className="entity-name mantine-Link-root"
                               size={
                                 preferences.fontSize === 'xs'
                                   ? 'sm'
@@ -301,6 +302,8 @@ const PerfectAllKillStats: React.FC = () => {
                                   ? 'lg'
                                   : 'md'
                               }
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
                             >
                               {record.artistName}
                             </Text>
@@ -317,6 +320,11 @@ const PerfectAllKillStats: React.FC = () => {
                               ? 'lg'
                               : 'md'
                           }
+                          component={Link}
+                          to={`/library/music/${encodeLastFmSlug(
+                            record.artistName
+                          )}/${encodeLastFmSlug(record.albumName)}`}
+                          className="mantine-Link-root"
                         >
                           {record.albumName}
                         </Text>
@@ -331,6 +339,11 @@ const PerfectAllKillStats: React.FC = () => {
                               ? 'lg'
                               : 'md'
                           }
+                          component={Link}
+                          to={`/library/music/${encodeLastFmSlug(
+                            record.artistName
+                          )}/_/${encodeLastFmSlug(record.trackName)}`}
+                          className="mantine-Link-root"
                         >
                           {record.trackName}
                         </Text>

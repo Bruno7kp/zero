@@ -1,6 +1,6 @@
 // Most Sales (calculated from Last.fm top 100 + stability points)
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   Stack,
   Loader,
@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSpotifyImage } from '../../hooks/useSpotifyImage';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import StatsFilters from '../../components/stats/StatsFilters';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 import { getYearRange, getPointsAccumulators } from '../../utils/statsQueries';
 import {
   getUserTopTracks,
@@ -390,11 +391,35 @@ const MostSalesStats: React.FC = () => {
                           <Flex gap="sm" align="center">
                             {preferences.showImages && <ImageCell record={record} type={type} />}
                             <Box style={{ flex: 1, minWidth: 0 }}>
-                              <Text fw={600} lineClamp={1} size={primaryTextSize}>
+                              <Text
+                                fw={600}
+                                lineClamp={1}
+                                size={primaryTextSize}
+                                component={Link}
+                                to={
+                                  type === 'artist'
+                                    ? `/library/music/${encodeLastFmSlug(record.name)}`
+                                    : type === 'album'
+                                    ? `/library/music/${encodeLastFmSlug(
+                                        record.artist
+                                      )}/${encodeLastFmSlug(record.name)}`
+                                    : `/library/music/${encodeLastFmSlug(
+                                        record.artist
+                                      )}/_/${encodeLastFmSlug(record.name)}`
+                                }
+                                className="mantine-Link-root"
+                              >
                                 {record.name}
                               </Text>
                               {!artistColumnVisible && type !== 'artist' && record.artist && (
-                                <Text c="dimmed" size={secondaryTextSize} lineClamp={1}>
+                                <Text
+                                  c="dimmed"
+                                  size={secondaryTextSize}
+                                  lineClamp={1}
+                                  component={Link}
+                                  to={`/library/music/${encodeLastFmSlug(record.artist)}`}
+                                  className="mantine-Link-root"
+                                >
                                   {record.artist}
                                 </Text>
                               )}
@@ -403,7 +428,13 @@ const MostSalesStats: React.FC = () => {
                         </Table.Td>
                         {artistColumnVisible && (
                           <Table.Td>
-                            <Text lineClamp={1} size={primaryTextSize}>
+                            <Text
+                              lineClamp={1}
+                              size={primaryTextSize}
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artist)}`}
+                              className="mantine-Link-root"
+                            >
                               {record.artist}
                             </Text>
                           </Table.Td>

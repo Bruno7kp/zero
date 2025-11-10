@@ -1,6 +1,6 @@
 // Artists with most debuts at #1 stats
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Stack,
   Text,
@@ -25,6 +25,7 @@ import { useStatsPreferences } from '../../hooks/useStatsPreferences';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { useMantineTheme } from '@mantine/core';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 // Component to render image cell with hooks
 const ImageCell: React.FC<{ artistName: string }> = ({ artistName }) => {
@@ -253,7 +254,7 @@ const DebutsAtOneByArtistStats: React.FC = () => {
                             <Text
                               fw={600}
                               lineClamp={1}
-                              className="entity-name"
+                              className="entity-name mantine-Link-root"
                               size={
                                 preferences.fontSize === 'xs'
                                   ? 'sm'
@@ -261,6 +262,8 @@ const DebutsAtOneByArtistStats: React.FC = () => {
                                   ? 'lg'
                                   : 'md'
                               }
+                              component={Link}
+                              to={`/library/music/${encodeLastFmSlug(record.artistName)}`}
                             >
                               {record.artistName}
                             </Text>

@@ -224,37 +224,37 @@ export const AlbumDetailPage: React.FC = () => {
                 )}
               </Stack>
             </Group>
-
-            <Grid>
-              <StatsBox
-                label={t('library.detail.peakPosition')}
-                value={stats.peak != null ? stats.peak : '—'}
-                span={{ base: 6, sm: 6, md: 3 }}
-                valueClassName={stats.peak === 1 ? 'peak' : undefined}
-                shadow="none"
-              />
-              <StatsBox
-                label={t('library.detail.totalWeeks')}
-                value={stats.totalWeeks ?? 0}
-                span={{ base: 6, sm: 6, md: 3 }}
-                shadow="none"
-              />
-              <StatsBox
-                label={t('library.detail.totalPlays')}
-                value={stats.totalPlays ?? 0}
-                span={{ base: 6, sm: 6, md: 3 }}
-                shadow="none"
-              />
-              <StatsBox
-                label={t('charts.stats.points')}
-                value={stats.totalPoints ?? 0}
-                span={{ base: 6, sm: 6, md: 3 }}
-                shadow="none"
-              />
-            </Grid>
           </Stack>
         </Card>
-
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Grid>
+            <StatsBox
+              label={t('library.detail.peakPosition')}
+              value={stats.peak ?? '—'}
+              span={{ base: 6, sm: 6, md: 3 }}
+              valueClassName={stats.peak === 1 ? 'peak' : undefined}
+              shadow="none"
+            />
+            <StatsBox
+              label={t('library.detail.totalWeeks')}
+              value={stats.totalWeeks ?? 0}
+              span={{ base: 6, sm: 6, md: 3 }}
+              shadow="none"
+            />
+            <StatsBox
+              label={t('library.detail.totalPlays')}
+              value={stats.totalPlays ?? 0}
+              span={{ base: 6, sm: 6, md: 3 }}
+              shadow="none"
+            />
+            <StatsBox
+              label={t('charts.stats.points')}
+              value={stats.totalPoints ?? 0}
+              span={{ base: 6, sm: 6, md: 3 }}
+              shadow="none"
+            />
+          </Grid>
+        </Card>{' '}
         {chartRun.length > 0 && (
           <Card shadow="sm" padding="lg" radius="md" withBorder>
             <Title order={3} mb="md">
@@ -291,9 +291,8 @@ export const AlbumDetailPage: React.FC = () => {
             </Tabs>
           </Card>
         )}
-
         {chartRun.length > 0 && (
-          <Card padding={0} radius="md" bg="transparent">
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
             <Grid>
               <StatsBox
                 label={t('charts.stats.top1')}

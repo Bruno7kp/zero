@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { SpotifyImageWithModal } from '../../SpotifyImageWithModal';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../../services/SpotifyApi';
+import { encodeLastFmSlug } from '../../../utils/urlEncoding';
 
 interface Top1Item {
   type: 'artist' | 'album' | 'track';
@@ -73,6 +74,19 @@ export const MostPointsCard: React.FC<MostPointsCardProps> = ({ loading, cardBg,
               icon = <IconDisc size={18} />;
             }
 
+            const detailLink = (() => {
+              const artistSlug = encodeLastFmSlug(item.artistName);
+              const nameSlug = encodeLastFmSlug(item.name);
+
+              if (item.type === 'artist') {
+                return `/library/music/${nameSlug}`;
+              } else if (item.type === 'album') {
+                return `/library/music/${artistSlug}/${nameSlug}`;
+              } else {
+                return `/library/music/${artistSlug}/_/${nameSlug}`;
+              }
+            })();
+
             return (
               <Grid key={item.type} grow align="center" gutter="xs">
                 <Grid.Col span="auto">
@@ -95,17 +109,33 @@ export const MostPointsCard: React.FC<MostPointsCardProps> = ({ loading, cardBg,
                   />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                  <Text fw={600} size="sm" className="entity-name" style={{ lineHeight: 1.3 }}>
-                    {item.name}
-                  </Text>
-                  {item.artistName && (
-                    <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
-                      {item.artistName}
+                  <Flex direction="column" gap={0}>
+                    <Text
+                      fw={600}
+                      size="sm"
+                      className="entity-name mantine-Link-root"
+                      style={{ lineHeight: 1.3 }}
+                      component={Link}
+                      to={detailLink}
+                    >
+                      {item.name}
                     </Text>
-                  )}
-                  <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
-                    {item.totalPoints} {t('charts.stats.points')}
-                  </Text>
+                    {item.artistName && item.type !== 'artist' && (
+                      <Text
+                        size="xs"
+                        c="dimmed"
+                        style={{ lineHeight: 1.3 }}
+                        component={Link}
+                        to={`/library/music/${encodeLastFmSlug(item.artistName)}`}
+                        className="mantine-Link-root"
+                      >
+                        {item.artistName}
+                      </Text>
+                    )}
+                    <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
+                      {item.totalPoints} {t('charts.stats.points')}
+                    </Text>
+                  </Flex>
                 </Grid.Col>
                 <Grid.Col span="auto">
                   <Flex justify="flex-end">

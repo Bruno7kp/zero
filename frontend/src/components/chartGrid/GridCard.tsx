@@ -10,6 +10,7 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import {
   getCardBackgroundByMode,
   getSecondaryCardBackgroundByMode,
@@ -21,6 +22,7 @@ import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import { formatNumber } from '../../utils/format';
 import { t } from 'i18next';
 import type { BadgeStyleConfig } from '../../store/badgeStylesSlice';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 export interface GridCardProps {
   row: ChartData;
@@ -134,6 +136,18 @@ export const GridCard: React.FC<GridCardProps> = ({
   const rankBadgeColor = row.rank === 1 ? 'lazuli' : deltaColor;
   const opacity = isDropped ? 0 : 1;
 
+  // Build detail page link
+  const artistSlug = encodeLastFmSlug(row.artistName || row.name);
+  const nameSlug = encodeLastFmSlug(row.name);
+  let detailLink = '';
+  if (type === 'artist') {
+    detailLink = `/library/music/${artistSlug}`;
+  } else if (type === 'album') {
+    detailLink = `/library/music/${artistSlug}/${nameSlug}`;
+  } else if (type === 'track') {
+    detailLink = `/library/music/${artistSlug}/_/${nameSlug}`;
+  }
+
   return (
     <Card
       shadow="sm"
@@ -246,20 +260,25 @@ export const GridCard: React.FC<GridCardProps> = ({
         }}
       >
         <Text
+          component={Link}
+          to={detailLink}
           fw={600}
           size={droppedScaleSize('md')}
-          className="entity-name"
+          className="entity-name mantine-Link-root"
           lineClamp={2}
-          style={{ width: '100%', textAlign: 'center' }}
+          style={{ width: '100%', textAlign: 'center', color: 'inherit', cursor: 'pointer' }}
         >
           {row.name}
         </Text>
         {row.artistName && (
           <Text
+            component={Link}
+            to={`/library/music/${artistSlug}`}
             size={droppedScaleSize('sm')}
             c="dimmed"
+            className="mantine-Link-root"
             lineClamp={1}
-            style={{ width: '100%', textAlign: 'center' }}
+            style={{ width: '100%', textAlign: 'center', color: 'inherit', cursor: 'pointer' }}
           >
             {row.artistName}
           </Text>

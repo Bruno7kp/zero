@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 interface ChartWeekTop1SummaryProps {
   chartId: string;
@@ -170,6 +171,18 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({
             icon = <IconDisc size={18} />;
           }
 
+          // Build detail page link
+          const artistSlug = encodeLastFmSlug(item.artistName || item.name);
+          const nameSlug = encodeLastFmSlug(item.name);
+          let detailLink = '';
+          if (item.type === 'artist') {
+            detailLink = `/library/music/${artistSlug}`;
+          } else if (item.type === 'album') {
+            detailLink = `/library/music/${artistSlug}/${nameSlug}`;
+          } else if (item.type === 'track') {
+            detailLink = `/library/music/${artistSlug}/_/${nameSlug}`;
+          }
+
           return (
             <Grid key={item.type} grow align="center" gutter="xs">
               <Grid.Col span="auto">
@@ -192,14 +205,30 @@ export const ChartWeekTop1Summary: React.FC<ChartWeekTop1SummaryProps> = ({
                 />
               </Grid.Col>
               <Grid.Col span={6}>
-                <Text fw={600} size="sm" className="entity-name" style={{ lineHeight: 1.3 }}>
-                  {item.name}
-                </Text>
-                {item.artistName && (
-                  <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
-                    {item.artistName}
+                <Flex direction="column" gap={0}>
+                  <Text
+                    component={Link}
+                    to={detailLink}
+                    fw={600}
+                    size="sm"
+                    className="entity-name mantine-Link-root"
+                    style={{ lineHeight: 1.3, cursor: 'pointer' }}
+                  >
+                    {item.name}
                   </Text>
-                )}
+                  {item.artistName && (
+                    <Text
+                      component={Link}
+                      to={`/library/music/${artistSlug}`}
+                      size="xs"
+                      c="dimmed"
+                      className="mantine-Link-root"
+                      style={{ lineHeight: 1.3, cursor: 'pointer' }}
+                    >
+                      {item.artistName}
+                    </Text>
+                  )}
+                </Flex>
               </Grid.Col>
               <Grid.Col span="auto">
                 <Flex justify="flex-end">

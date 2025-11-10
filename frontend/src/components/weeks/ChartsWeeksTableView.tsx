@@ -23,6 +23,7 @@ import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../services/SpotifyApi';
 import { AllKillBadge } from '../AllKillBadge';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 import { ImageEditModal } from '../dialogs/ImageEditModal';
+import { encodeLastFmSlug } from '../../utils/urlEncoding';
 
 interface WeekTop1Data {
   week: string;
@@ -57,6 +58,17 @@ const EntityCell: React.FC<{
 
   if (!item) return <Text c="dimmed">-</Text>;
 
+  const artistSlug = encodeLastFmSlug(item.artistName || item.name);
+  const nameSlug = encodeLastFmSlug(item.name);
+  let detailLink = '';
+  if (type === 'artist') {
+    detailLink = `/library/music/${artistSlug}`;
+  } else if (type === 'album') {
+    detailLink = `/library/music/${artistSlug}/${nameSlug}`;
+  } else if (type === 'track') {
+    detailLink = `/library/music/${artistSlug}/_/${nameSlug}`;
+  }
+
   return (
     <Group gap="sm" wrap="nowrap" align="center">
       <Avatar
@@ -70,18 +82,32 @@ const EntityCell: React.FC<{
         }}
         onMouseDown={e => e.stopPropagation()}
       />
-      <Box style={{ flex: 1, minWidth: 0 }}>
-        <Text fw={600} size="sm" lineClamp={1}>
+      <Flex direction="column" style={{ flex: 1, minWidth: 0 }}>
+        <Text
+          component={Link}
+          to={detailLink}
+          fw={600}
+          size="sm"
+          lineClamp={1}
+          className="mantine-Link-root"
+          style={{ cursor: 'pointer', color: 'inherit' }}
+        >
           {item.name}
         </Text>
         {type !== 'artist' && item.artistName && (
-          <Group gap={6} align="center" wrap="nowrap">
-            <Text c="dimmed" size="xs" lineClamp={1} style={{ flex: 1, minWidth: 0 }}>
-              {item.artistName}
-            </Text>
-          </Group>
+          <Text
+            component={Link}
+            to={`/library/music/${artistSlug}`}
+            c="dimmed"
+            size="xs"
+            lineClamp={1}
+            className="mantine-Link-root"
+            style={{ cursor: 'pointer', color: 'inherit' }}
+          >
+            {item.artistName}
+          </Text>
         )}
-      </Box>
+      </Flex>
     </Group>
   );
 };
