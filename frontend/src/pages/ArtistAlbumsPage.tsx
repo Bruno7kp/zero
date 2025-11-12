@@ -107,6 +107,12 @@ const ArtistAlbumsPage: React.FC = () => {
   const artistSlug = artistName ? encodeLastFmSlug(artistName) : '';
   const { loading, entities: rawEntities } = useArtistEntities(chart, 'album', artistName);
 
+  // Define if card background should use custom color based on theme
+  const useCustomCardBackground = themeMode !== 'dark';
+  const cardBackground = useCustomCardBackground
+    ? getCardBackgroundByMode(theme, themeMode)
+    : undefined;
+
   // Sorting state with localStorage persistence
   const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak' | 'points'>(() => {
     return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
@@ -215,7 +221,7 @@ const ArtistAlbumsPage: React.FC = () => {
         radius="md"
         withBorder
         style={{
-          background: getCardBackgroundByMode(theme, themeMode),
+          background: cardBackground,
           paddingTop: 0,
           paddingBottom: 0,
         }}
@@ -227,14 +233,14 @@ const ArtistAlbumsPage: React.FC = () => {
             value={stats.albumsAtOne}
             span={{ base: 6, sm: 6, md: 3 }}
             shadow="none"
-            background={getCardBackgroundByMode(theme, themeMode)}
+            background={cardBackground}
           />
           <StatsBox
             label={t('library.detail.sections.weeksAtOne')}
             value={stats.weeksAtOne}
             span={{ base: 6, sm: 6, md: 3 }}
             shadow="none"
-            background={getCardBackgroundByMode(theme, themeMode)}
+            background={cardBackground}
           />
           <StatsBox
             label={
@@ -245,25 +251,19 @@ const ArtistAlbumsPage: React.FC = () => {
             value={stats.albumsInCutoff}
             span={{ base: 6, sm: 6, md: 3 }}
             shadow="none"
-            background={getCardBackgroundByMode(theme, themeMode)}
+            background={cardBackground}
           />
           <StatsBox
             label={t('library.detail.sections.totalWeeks')}
             value={stats.totalWeeks}
             span={{ base: 6, sm: 6, md: 3 }}
             shadow="none"
-            background={getCardBackgroundByMode(theme, themeMode)}
+            background={cardBackground}
           />
         </Grid>
       </Card>
 
-      <Card
-        shadow="sm"
-        padding="lg"
-        radius="md"
-        withBorder
-        style={{ background: getCardBackgroundByMode(theme, themeMode) }}
-      >
+      <Card shadow="sm" padding="lg" radius="md" withBorder style={{ background: cardBackground }}>
         <Stack gap="md">
           <Group justify="space-between" align="center">
             <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
