@@ -503,7 +503,9 @@
       "collapse": "Collapse",
       "artist": "Artist",
       "album": "Album",
-      "track": "Track"
+      "track": "Track",
+      "year": "Year",
+      "allYears": "All Years"
     },
     "chartEdit": {
       "title": "Edit chart week",

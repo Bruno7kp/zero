@@ -23,7 +23,13 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { IconArrowLeft, IconDisc, IconSettings } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconDisc,
+  IconSettings,
+  IconCalendar,
+  IconSortDescending,
+} from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import CreateHeader from '../components/createChart/CreateHeader';
 import { useArtistEntities } from '../hooks/useArtistEntities';
@@ -35,6 +41,7 @@ import storage from '../utils/storage';
 import KEYS from '../constants/storageKeys';
 import { StatsBox } from '../components/StatsBox';
 import { Grid } from '@mantine/core';
+import { db } from '../db/indexedDb';
 
 // Helper component for entity cell with image
 const EntityCell: React.FC<{
@@ -120,6 +127,7 @@ const ArtistAlbumsPage: React.FC = () => {
   const [albumsShowImage, setAlbumsShowImage] = useState<boolean>(() => {
     return storage.getJson<boolean>(KEYS.ARTIST_ALBUMS_SHOW_IMAGE, [], true) ?? true;
   });
+  const [debutYear, setDebutYear] = useState<string>('all');
 
   // Modal state
   const [entityImageModalOpen, setEntityImageModalOpen] = useState(false);
@@ -153,9 +161,67 @@ const ArtistAlbumsPage: React.FC = () => {
   // Sorting function: points (desc)
   const sortByPoints = (a: any, b: any) => b.points - a.points;
 
+  // Get debut year for each entity
+  const [debutYears, setDebutYears] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    if (!chart || rawEntities.length === 0) {
+      return;
+    }
+
+    const chartId = String(chart.id);
+    const fetchDebuts = async () => {
+      try {
+        const rows = await db.charts_data
+          .where('[chartId+chartType]')
+          .equals([chartId, 'album'])
+          .toArray();
+
+        const firstAppearance = new Map<string, string>();
+        rows.forEach(row => {
+          const key = row.entityId;
+          if (!firstAppearance.has(key) || row.week < firstAppearance.get(key)!) {
+            firstAppearance.set(key, row.week);
+          }
+        });
+
+        setDebutYears(firstAppearance);
+      } catch (error) {
+        console.error('Failed to fetch debut years', error);
+      }
+    };
+
+    fetchDebuts();
+  }, [chart, rawEntities.length]);
+
+  // Get available debut years
+  const availableYears = useMemo(() => {
+    const years = new Set<string>();
+    rawEntities.forEach(entity => {
+      const debutWeek = debutYears.get(entity.entityId);
+      if (debutWeek) {
+        const year = debutWeek.substring(0, 4);
+        years.add(year);
+      }
+    });
+    return Array.from(years).sort((a, b) => b.localeCompare(a));
+  }, [rawEntities, debutYears]);
+
+  // Filter by debut year
+  const filteredEntities = useMemo(() => {
+    if (debutYear === 'all') {
+      return rawEntities;
+    }
+    return rawEntities.filter(entity => {
+      const debutWeek = debutYears.get(entity.entityId);
+      if (!debutWeek) return false;
+      return debutWeek.startsWith(debutYear);
+    });
+  }, [rawEntities, debutYear, debutYears]);
+
   // Apply sorting
   const entities = useMemo(() => {
-    const sorted = [...rawEntities];
+    const sorted = [...filteredEntities];
     if (albumsSort === 'peak') {
       sorted.sort(sortByPeak);
     } else if (albumsSort === 'points') {
@@ -164,7 +230,7 @@ const ArtistAlbumsPage: React.FC = () => {
       sorted.sort(sortByWeeks);
     }
     return sorted;
-  }, [rawEntities, albumsSort]);
+  }, [filteredEntities, albumsSort]);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -268,6 +334,34 @@ const ArtistAlbumsPage: React.FC = () => {
           <Group justify="space-between" align="center">
             <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
             <Group gap="sm">
+              <Select
+                value={albumsSort}
+                onChange={value => setAlbumsSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
+                data={[
+                  { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
+                  { value: 'peak', label: t('library.detail.sections.sortPeak') },
+                  { value: 'points', label: t('library.detail.sections.sortPoints') },
+                ]}
+                size="xs"
+                w={120}
+                allowDeselect={false}
+                leftSection={<IconSortDescending size={16} />}
+              />
+              {availableYears.length > 0 && (
+                <Select
+                  value={debutYear}
+                  onChange={value => setDebutYear(value || 'all')}
+                  data={[
+                    { value: 'all', label: t('common.allYears') },
+                    ...availableYears.map(year => ({ value: year, label: year })),
+                  ]}
+                  size="xs"
+                  w={140}
+                  allowDeselect={false}
+                  placeholder={t('common.year')}
+                  leftSection={<IconCalendar size={16} />}
+                />
+              )}
               <Menu shadow="md" width={200}>
                 <Menu.Target>
                   <ActionIcon variant="light" size="lg">
@@ -284,18 +378,6 @@ const ArtistAlbumsPage: React.FC = () => {
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
-              <Select
-                value={albumsSort}
-                onChange={value => setAlbumsSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
-                data={[
-                  { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
-                  { value: 'peak', label: t('library.detail.sections.sortPeak') },
-                  { value: 'points', label: t('library.detail.sections.sortPoints') },
-                ]}
-                size="xs"
-                w={120}
-                allowDeselect={false}
-              />
             </Group>
           </Group>
           {loading ? (
