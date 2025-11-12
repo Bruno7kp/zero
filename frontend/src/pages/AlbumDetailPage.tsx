@@ -31,6 +31,7 @@ import { StatsBox } from '../components/StatsBox';
 import { CertificationBadge } from '../components/CertificationBadge';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import { useMantineTheme } from '@mantine/core';
+import { AlbumAchievements } from '../components/library/AlbumAchievements';
 
 export const AlbumDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -362,6 +363,19 @@ export const AlbumDetailPage: React.FC = () => {
               />
             </Grid>
           </Card>
+        )}
+
+        {chartRun.length > 0 && (
+          <AlbumAchievements
+            stats={{
+              totalWeeks: stats.totalWeeks,
+              peak: stats.peak,
+              totalPoints: stats.totalPoints,
+              totalPlays: stats.totalPlays,
+            }}
+            chartRun={chartRun}
+            background={cardBackground}
+          />
         )}
       </Stack>
 
