@@ -12,6 +12,8 @@ import {
   Tooltip,
   Badge,
   useMantineTheme,
+  ActionIcon,
+  Collapse,
 } from '@mantine/core';
 import { useChartDb } from '../../hooks/useChartDb';
 import {
@@ -25,10 +27,12 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
-import { IconRefresh, IconAlertCircle } from '@tabler/icons-react';
+import { IconRefresh, IconAlertCircle, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useOfflineStatus } from '../../hooks/useOfflineStatus';
 import { useSelector } from 'react-redux';
 import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import storage from '../../utils/storage';
+import KEYS from '../../constants/storageKeys';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -66,10 +70,21 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
   const [partialWeeks, setPartialWeeks] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.CHART_SYNC_COLLAPSED, [], false) ?? false;
+  });
   const { t } = useTranslation();
   const { isOnline } = useOfflineStatus();
   const theme = useMantineTheme();
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+
+  const handleToggleCollapse = useCallback(() => {
+    setCollapsed(prev => {
+      const next = !prev;
+      storage.setJson(KEYS.CHART_SYNC_COLLAPSED, next);
+      return next;
+    });
+  }, []);
 
   // Calcula as semanas a carregar
   useEffect(() => {
@@ -258,7 +273,7 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
 
   return (
     <Card shadow="md" p="md" style={{ background: getCardBackgroundByMode(theme, themeMode) }}>
-      <Group justify="space-between" align="center">
+      <Group justify="space-between" align="center" mb={collapsed ? 0 : 'xs'}>
         <Group>
           <ThemeIcon variant="light" size="md">
             <IconRefresh style={{ width: rem(20), height: rem(20) }} />
@@ -267,113 +282,127 @@ export const ChartSyncProgress: React.FC<ChartSyncProgressProps> = ({ chart, onS
             {t('charts.sync')}
           </Text>
         </Group>
-      </Group>
-      <Divider variant="dashed" size="sm" my="xs" />
-      <Group justify="space-between" align="center" mb="xs">
-        <Group gap="xs">
-          <Text size="md">{t('charts.syncStatus', { loadedWeeks, weeks: weeks.length })}</Text>
-          {weeks.length > 0 && loadedWeeks < weeks.length && (
-            <Tooltip label={t('charts.toSync')}>
-              <Badge variant="light" color="grape" size="sm">
-                {loadedWeeks}/{weeks.length}
-              </Badge>
-            </Tooltip>
-          )}
-        </Group>
-        <Button
-          onClick={handleSync}
-          loading={loading}
-          disabled={!isOnline || loadedWeeks === weeks.length}
-          size="xs"
-          variant={!isOnline ? 'outline' : 'filled'}
+        <ActionIcon
+          variant="subtle"
+          size="lg"
+          onClick={handleToggleCollapse}
+          aria-label={collapsed ? t('common.expand') : t('common.collapse')}
         >
-          {loadedWeeks === weeks.length ? t('charts.synced') : t('charts.toSync')}
-        </Button>
+          {collapsed ? (
+            <IconChevronDown style={{ width: rem(20), height: rem(20) }} />
+          ) : (
+            <IconChevronUp style={{ width: rem(20), height: rem(20) }} />
+          )}
+        </ActionIcon>
       </Group>
-      {/* Segmented progress bar manually composed */}
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: rem(14),
-          borderRadius: 6,
-          overflow: 'hidden',
-          marginBottom: rem(6),
-          background: 'var(--mantine-color-dark-3)',
-        }}
-      >
-        {weeks.length > 0 && (
-          <>
-            {loadedWeeks > 0 && (
-              <div
-                style={{
-                  width: `${(loadedWeeks / weeks.length) * 100}%`,
-                  background: 'var(--mantine-color-green-6)',
-                  transition: 'width 200ms',
-                }}
-              />
+      <Collapse in={!collapsed}>
+        <Divider variant="dashed" size="sm" my="xs" />
+        <Group justify="space-between" align="center" mb="xs">
+          <Group gap="xs">
+            <Text size="md">{t('charts.syncStatus', { loadedWeeks, weeks: weeks.length })}</Text>
+            {weeks.length > 0 && loadedWeeks < weeks.length && (
+              <Tooltip label={t('charts.toSync')}>
+                <Badge variant="light" color="grape" size="sm">
+                  {loadedWeeks}/{weeks.length}
+                </Badge>
+              </Tooltip>
             )}
-            {partialWeeks > 0 && (
-              <div
-                style={{
-                  width: `${(partialWeeks / weeks.length) * 100}%`,
-                  background: 'var(--mantine-color-yellow-6)',
-                  transition: 'width 200ms',
-                }}
-              />
-            )}
-            {weeks.length - loadedWeeks - partialWeeks > 0 && (
-              <div
-                style={{
-                  width: `${((weeks.length - loadedWeeks - partialWeeks) / weeks.length) * 100}%`,
-                  background: 'var(--mantine-color-gray-5)',
-                  transition: 'width 200ms',
-                }}
-              />
-            )}
-          </>
-        )}
-      </div>
-      {(partialWeeks > 0 || loadedWeeks > 0) && (
-        <Group gap="xs" mb="xs">
-          <Badge variant="light" color="green" size="xs">
-            {t('charts.complete')}: {loadedWeeks}
-          </Badge>
-          <Badge variant="light" color="yellow" size="xs">
-            {t('charts.partial')}: {partialWeeks}
-          </Badge>
-          <Badge variant="light" color="gray" size="xs">
-            {t('charts.toSync')}: {Math.max(0, weeks.length - loadedWeeks - partialWeeks)}
-          </Badge>
-        </Group>
-      )}
-      {weeks.length > 0 && loadedWeeks < weeks.length && (
-        <Card withBorder padding="sm" mt="xs">
-          <Group align="flex-start" gap="sm">
-            <ThemeIcon size="sm" radius="xl" variant="light" color="orange">
-              <IconAlertCircle size={14} />
-            </ThemeIcon>
-            <div>
-              <Text size="sm" fw={600}>
-                {t('charts.outdatedWarning')}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {t('charts.outdatedWarningMessage', { missingWeeks: weeks.length - loadedWeeks })}
-              </Text>
-            </div>
           </Group>
-        </Card>
-      )}
-      {!isOnline && (
-        <Alert title={t('errors.warning')} color="yellow" variant="light" mt="xs" radius="sm">
-          {t('settings.needOnline')} - {t('errors.offlineAction')}
-        </Alert>
-      )}
-      {error && (
-        <Text c="red" size="sm">
-          {error}
-        </Text>
-      )}
+          <Button
+            onClick={handleSync}
+            loading={loading}
+            disabled={!isOnline || loadedWeeks === weeks.length}
+            size="xs"
+            variant={!isOnline ? 'outline' : 'filled'}
+          >
+            {loadedWeeks === weeks.length ? t('charts.synced') : t('charts.toSync')}
+          </Button>
+        </Group>
+        {/* Segmented progress bar manually composed */}
+        <div
+          style={{
+            display: 'flex',
+            width: '100%',
+            height: rem(14),
+            borderRadius: 6,
+            overflow: 'hidden',
+            marginBottom: rem(6),
+            background: 'var(--mantine-color-dark-3)',
+          }}
+        >
+          {weeks.length > 0 && (
+            <>
+              {loadedWeeks > 0 && (
+                <div
+                  style={{
+                    width: `${(loadedWeeks / weeks.length) * 100}%`,
+                    background: 'var(--mantine-color-green-6)',
+                    transition: 'width 200ms',
+                  }}
+                />
+              )}
+              {partialWeeks > 0 && (
+                <div
+                  style={{
+                    width: `${(partialWeeks / weeks.length) * 100}%`,
+                    background: 'var(--mantine-color-yellow-6)',
+                    transition: 'width 200ms',
+                  }}
+                />
+              )}
+              {weeks.length - loadedWeeks - partialWeeks > 0 && (
+                <div
+                  style={{
+                    width: `${((weeks.length - loadedWeeks - partialWeeks) / weeks.length) * 100}%`,
+                    background: 'var(--mantine-color-gray-5)',
+                    transition: 'width 200ms',
+                  }}
+                />
+              )}
+            </>
+          )}
+        </div>
+        {(partialWeeks > 0 || loadedWeeks > 0) && (
+          <Group gap="xs" mb="xs">
+            <Badge variant="light" color="green" size="xs">
+              {t('charts.complete')}: {loadedWeeks}
+            </Badge>
+            <Badge variant="light" color="yellow" size="xs">
+              {t('charts.partial')}: {partialWeeks}
+            </Badge>
+            <Badge variant="light" color="gray" size="xs">
+              {t('charts.toSync')}: {Math.max(0, weeks.length - loadedWeeks - partialWeeks)}
+            </Badge>
+          </Group>
+        )}
+        {weeks.length > 0 && loadedWeeks < weeks.length && (
+          <Card withBorder padding="sm" mt="xs">
+            <Group align="flex-start" gap="sm">
+              <ThemeIcon size="sm" radius="xl" variant="light" color="orange">
+                <IconAlertCircle size={14} />
+              </ThemeIcon>
+              <div>
+                <Text size="sm" fw={600}>
+                  {t('charts.outdatedWarning')}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {t('charts.outdatedWarningMessage', { missingWeeks: weeks.length - loadedWeeks })}
+                </Text>
+              </div>
+            </Group>
+          </Card>
+        )}
+        {!isOnline && (
+          <Alert title={t('errors.warning')} color="yellow" variant="light" mt="xs" radius="sm">
+            {t('settings.needOnline')} - {t('errors.offlineAction')}
+          </Alert>
+        )}
+        {error && (
+          <Text c="red" size="sm">
+            {error}
+          </Text>
+        )}
+      </Collapse>
     </Card>
   );
 };

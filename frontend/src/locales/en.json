@@ -498,7 +498,9 @@
       "copied": "Copied!",
       "week": "Week",
       "show": "Show",
-      "hide": "Hide"
+      "hide": "Hide",
+      "expand": "Expand",
+      "collapse": "Collapse"
     },
     "chartEdit": {
       "title": "Edit chart week",

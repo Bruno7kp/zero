@@ -498,7 +498,9 @@
       "copied": "Copiado!",
       "week": "Semana",
       "show": "Mostrar",
-      "hide": "Ocultar"
+      "hide": "Ocultar",
+      "expand": "Expandir",
+      "collapse": "Recolher"
     },
     "chartEdit": {
       "title": "Editar semana do chart",
