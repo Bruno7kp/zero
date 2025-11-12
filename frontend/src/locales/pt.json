@@ -609,6 +609,45 @@
           "outTitle": "Fora do chart",
           "outDescription": "Nesta semana o item ficou fora do chart."
         }
+      },
+      "achievements": {
+        "title": "Conquistas",
+        "firstNumberOne": "Primeiro #1",
+        "firstNumberOneDesc": "Alcançou #1 após {{weeks}} semanas",
+        "firstNumberOneLocked": "Alcance a posição #1",
+        "perfectAllKill": "Perfect All Kill",
+        "perfectAllKillDesc": "Pegou #1 nos três charts na mesma semana",
+        "perfectAllKillLocked": "Pegue #1 nos três charts na mesma semana",
+        "consistencyKing": "Rei da Consistência",
+        "consistencyKingDesc": "{{weeks}} semanas consecutivas (meta: {{target}})",
+        "consistencyKingProgress": "{{current}}/{{target}} semanas consecutivas",
+        "centuryClub": "Clube dos Centenários",
+        "centuryClubDesc": "{{weeks}} semanas totais (meta: {{target}})",
+        "centuryClubProgress": "{{current}}/{{target}} semanas",
+        "tripleThreat": "Ameaça Tripla",
+        "tripleThreatDesc": "Pegou #1 nos três charts",
+        "tripleThreatLocked": "Pegue #1 nos três charts",
+        "chartDominator": "Dominador do Chart",
+        "chartDominatorDesc": "{{weeks}} semanas em #1 (meta: {{target}})",
+        "chartDominatorProgress": "{{current}}/{{target}} semanas em #1",
+        "pointMaster": "Mestre dos Pontos",
+        "pointMasterDesc": "{{points}} pontos totais (meta: {{target}})",
+        "pointMasterProgress": "{{current}}/{{target}} pontos",
+        "risingStar": "Estrela em Ascensão",
+        "risingStarDesc": "Alcançou #{{rank}} (meta: top {{target}})",
+        "risingStarLocked": "Alcance o top {{target}}",
+        "veteran": "Veterano",
+        "veteranDesc": "{{weeks}} semanas no chart (meta: {{target}})",
+        "veteranProgress": "{{current}}/{{target}} semanas",
+        "peakPerformance": "Performance de Pico",
+        "peakPerformanceDesc": "Posição de pico: #{{peak}}",
+        "peakPerformanceLocked": "Alcance o top 5",
+        "rarity": {
+          "common": "Comum",
+          "rare": "Rara",
+          "epic": "Épica",
+          "legendary": "Lendária"
+        }
       }
     },
     "stats": {

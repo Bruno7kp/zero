@@ -52,6 +52,7 @@ import { StatsBox } from '../components/StatsBox';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import storage from '../utils/storage';
 import KEYS from '../constants/storageKeys';
+import { ArtistAchievements } from '../components/library/ArtistAchievements';
 
 type RootState = {
   charts: {
@@ -237,6 +238,9 @@ export const ArtistDetailPage: React.FC = () => {
   const cardBackground = useCustomCardBackground
     ? getCardBackgroundByMode(theme, themeMode)
     : undefined;
+
+  // Card background for carousel items - darker for dark mode, light gray for light mode
+  const carouselCardBg = colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.03)';
 
   const { loading: albumsLoading, entities: rawAlbums } = useArtistEntities(
     chart,
@@ -523,6 +527,16 @@ export const ArtistDetailPage: React.FC = () => {
           </Card>
         )}
 
+        {chartRun.length > 0 && (
+          <ArtistAchievements
+            stats={stats}
+            chartRun={chartRun}
+            albums={rawAlbums}
+            tracks={rawTracks}
+            background={cardBackground}
+          />
+        )}
+
         <Card
           shadow="sm"
           padding="lg"
@@ -653,7 +667,12 @@ export const ArtistDetailPage: React.FC = () => {
                   });
 
                   return (
-                    <Card padding="md" radius="md" withBorder>
+                    <Card
+                      padding="md"
+                      radius="md"
+                      withBorder
+                      style={{ backgroundColor: carouselCardBg }}
+                    >
                       <Stack gap="sm" align="center">
                         <Box
                           component={Link}
@@ -948,7 +967,12 @@ export const ArtistDetailPage: React.FC = () => {
                   });
 
                   return (
-                    <Card padding="md" radius="md" withBorder>
+                    <Card
+                      padding="md"
+                      radius="md"
+                      withBorder
+                      style={{ backgroundColor: carouselCardBg }}
+                    >
                       <Stack gap="sm" align="center">
                         <Box
                           component={Link}

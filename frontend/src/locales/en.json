@@ -609,6 +609,45 @@
           "outTitle": "Out of chart",
           "outDescription": "This week the item was outside the chart."
         }
+      },
+      "achievements": {
+        "title": "Achievements",
+        "firstNumberOne": "First #1",
+        "firstNumberOneDesc": "Reached #1 after {{weeks}} weeks",
+        "firstNumberOneLocked": "Reach #1 position",
+        "perfectAllKill": "Perfect All Kill",
+        "perfectAllKillDesc": "Got #1 on all three charts in the same week",
+        "perfectAllKillLocked": "Get #1 on all three charts in the same week",
+        "consistencyKing": "Consistency King",
+        "consistencyKingDesc": "{{weeks}} consecutive weeks (target: {{target}})",
+        "consistencyKingProgress": "{{current}}/{{target}} consecutive weeks",
+        "centuryClub": "Century Club",
+        "centuryClubDesc": "{{weeks}} total weeks (target: {{target}})",
+        "centuryClubProgress": "{{current}}/{{target}} weeks",
+        "tripleThreat": "Triple Threat",
+        "tripleThreatDesc": "Got #1 on all three charts",
+        "tripleThreatLocked": "Get #1 on all three charts",
+        "chartDominator": "Chart Dominator",
+        "chartDominatorDesc": "{{weeks}} weeks at #1 (target: {{target}})",
+        "chartDominatorProgress": "{{current}}/{{target}} weeks at #1",
+        "pointMaster": "Point Master",
+        "pointMasterDesc": "{{points}} total points (target: {{target}})",
+        "pointMasterProgress": "{{current}}/{{target}} points",
+        "risingStar": "Rising Star",
+        "risingStarDesc": "Reached #{{rank}} (target: top {{target}})",
+        "risingStarLocked": "Reach top {{target}}",
+        "veteran": "Veteran",
+        "veteranDesc": "{{weeks}} weeks on chart (target: {{target}})",
+        "veteranProgress": "{{current}}/{{target}} weeks",
+        "peakPerformance": "Peak Performance",
+        "peakPerformanceDesc": "Peak position: #{{peak}}",
+        "peakPerformanceLocked": "Reach top 5",
+        "rarity": {
+          "common": "Common",
+          "rare": "Rare",
+          "epic": "Epic",
+          "legendary": "Legendary"
+        }
       }
     },
     "stats": {
