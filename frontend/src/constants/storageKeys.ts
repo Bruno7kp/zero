@@ -22,6 +22,9 @@ export const KEYS = {
   ARTIST_ALBUMS_SORT: 'zc.artist.albumsSort:v1',
   ARTIST_TRACKS_SORT: 'zc.artist.tracksSort:v1',
   ARTIST_ALBUMS_VIEW: 'zc.artist.albumsView:v1',
+  ARTIST_TRACKS_VIEW: 'zc.artist.tracksView:v1',
+  ARTIST_ALBUMS_SHOW_IMAGE: 'zc.artist.albumsShowImage:v1',
+  ARTIST_TRACKS_SHOW_IMAGE: 'zc.artist.tracksShowImage:v1',
 };
 
 // Legacy keys used previously in the codebase. Use as fallbacks when migrating.

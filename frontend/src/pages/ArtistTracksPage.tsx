@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
+  ActionIcon,
   Avatar,
+  Checkbox,
   Container,
   Title,
   Text,
@@ -16,11 +18,12 @@ import {
   Flex,
   Select,
   Group,
+  Menu,
   useMantineTheme,
   useComputedColorScheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { IconArrowLeft, IconMusic } from '@tabler/icons-react';
+import { IconArrowLeft, IconMusic, IconSettings } from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import CreateHeader from '../components/createChart/CreateHeader';
 import { useArtistEntities } from '../hooks/useArtistEntities';
@@ -41,7 +44,8 @@ const EntityCell: React.FC<{
   link: string;
   anchorColor: string;
   onImageClick: (imageUrl: string) => void;
-}> = ({ entityId, name, artistName, link, anchorColor, onImageClick }) => {
+  showImage?: boolean;
+}> = ({ entityId, name, artistName, link, anchorColor, onImageClick, showImage = true }) => {
   const { imageUrl } = useSpotifyImage({
     entityId,
     name,
@@ -53,18 +57,20 @@ const EntityCell: React.FC<{
 
   return (
     <Flex gap="sm" wrap="nowrap" align="center">
-      <Avatar
-        src={imageUrl}
-        alt={name}
-        size={40}
-        radius="sm"
-        onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          onImageClick(imageUrl || '');
-        }}
-        style={{ cursor: 'pointer', flexShrink: 0 }}
-      />
+      {showImage && (
+        <Avatar
+          src={imageUrl}
+          alt={name}
+          size={40}
+          radius="sm"
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            onImageClick(imageUrl || '');
+          }}
+          style={{ cursor: 'pointer', flexShrink: 0 }}
+        />
+      )}
       <Anchor
         component={Link}
         to={link}
@@ -102,8 +108,11 @@ const ArtistTracksPage: React.FC = () => {
   const { loading, entities: rawEntities } = useArtistEntities(chart, 'track', artistName);
 
   // Sorting state with localStorage persistence
-  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak'>(() => {
-    return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak';
+  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak' | 'points'>(() => {
+    return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
+  });
+  const [tracksShowImage, setTracksShowImage] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_TRACKS_SHOW_IMAGE, [], true) ?? true;
   });
 
   // Modal state
@@ -119,6 +128,10 @@ const ArtistTracksPage: React.FC = () => {
     storage.set(KEYS.ARTIST_TRACKS_SORT, tracksSort);
   }, [tracksSort]);
 
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_TRACKS_SHOW_IMAGE, tracksShowImage);
+  }, [tracksShowImage]);
+
   // Sorting function with tiebreakers: peak (asc), timesAtPeak (desc), weeks (desc)
   const sortByPeak = (a: any, b: any) => {
     if (a.peak !== b.peak) return a.peak - b.peak;
@@ -131,11 +144,16 @@ const ArtistTracksPage: React.FC = () => {
   // Sorting function: weeks (desc)
   const sortByWeeks = (a: any, b: any) => b.weeks - a.weeks;
 
+  // Sorting function: points (desc)
+  const sortByPoints = (a: any, b: any) => b.points - a.points;
+
   // Apply sorting
   const entities = useMemo(() => {
     const sorted = [...rawEntities];
     if (tracksSort === 'peak') {
       sorted.sort(sortByPeak);
+    } else if (tracksSort === 'points') {
+      sorted.sort(sortByPoints);
     } else {
       sorted.sort(sortByWeeks);
     }
@@ -249,17 +267,36 @@ const ArtistTracksPage: React.FC = () => {
         <Stack gap="md">
           <Group justify="space-between" align="center">
             <Title order={3}>{t('library.detail.sections.tracksTitle')}</Title>
-            <Select
-              value={tracksSort}
-              onChange={value => setTracksSort((value as 'weeks' | 'peak') || 'weeks')}
-              data={[
-                { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
-                { value: 'peak', label: t('library.detail.sections.sortPeak') },
-              ]}
-              size="xs"
-              w={120}
-              allowDeselect={false}
-            />
+            <Group gap="sm">
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon variant="light" size="lg">
+                    <IconSettings size={18} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item closeMenuOnClick={false}>
+                    <Checkbox
+                      label={t('library.detail.sections.showImage')}
+                      checked={tracksShowImage}
+                      onChange={e => setTracksShowImage(e.currentTarget.checked)}
+                    />
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+              <Select
+                value={tracksSort}
+                onChange={value => setTracksSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
+                data={[
+                  { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
+                  { value: 'peak', label: t('library.detail.sections.sortPeak') },
+                  { value: 'points', label: t('library.detail.sections.sortPoints') },
+                ]}
+                size="xs"
+                w={120}
+                allowDeselect={false}
+              />
+            </Group>
           </Group>
           {loading ? (
             <Center py="lg">
@@ -300,6 +337,7 @@ const ArtistTracksPage: React.FC = () => {
                         artistName={artistName}
                         link={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
                         anchorColor={anchorColor}
+                        showImage={tracksShowImage}
                         onImageClick={imageUrl => {
                           setSelectedEntity({
                             id: track.entityId,

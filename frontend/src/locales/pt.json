@@ -578,6 +578,7 @@
           "sortBy": "Ordenar por",
           "sortWeeks": "Semanas",
           "sortPeak": "Pico",
+          "sortPoints": "Pontos",
           "albumsAtOne": "Álbuns em #1",
           "tracksAtOne": "Músicas em #1",
           "weeksAtOne": "Semanas em #1",
@@ -587,7 +588,8 @@
           "tracksInCutoff": "Músicas no Chart",
           "totalWeeks": "Total de Semanas",
           "viewTable": "Tabela",
-          "viewCarousel": "Carrossel"
+          "viewCarousel": "Carrossel",
+          "showImage": "Mostrar imagem"
         },
         "chartRunTabs": {
           "timeline": "Chart Run",

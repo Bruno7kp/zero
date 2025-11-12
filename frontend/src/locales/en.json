@@ -578,6 +578,7 @@
           "sortBy": "Sort by",
           "sortWeeks": "Weeks",
           "sortPeak": "Peak",
+          "sortPoints": "Points",
           "albumsAtOne": "Albums at #1",
           "tracksAtOne": "Tracks at #1",
           "weeksAtOne": "Weeks at #1",
@@ -587,7 +588,8 @@
           "tracksInCutoff": "Tracks in Chart",
           "totalWeeks": "Total Weeks",
           "viewTable": "Table",
-          "viewCarousel": "Carousel"
+          "viewCarousel": "Carousel",
+          "showImage": "Show image"
         },
         "chartRunTabs": {
           "timeline": "Chart Run",

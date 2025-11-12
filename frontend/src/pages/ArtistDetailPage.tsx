@@ -2,17 +2,20 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
+  ActionIcon,
   Anchor,
   Avatar,
   Box,
   Button,
   Card,
   Center,
+  Checkbox,
   Container,
   Flex,
   Grid,
   Group,
   Loader,
+  Menu,
   SegmentedControl,
   Select,
   Stack,
@@ -32,6 +35,7 @@ import {
   IconList,
   IconMicrophone,
   IconPhoto,
+  IconSettings,
   IconSortDescending,
 } from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
@@ -65,7 +69,8 @@ const EntityCell: React.FC<{
   link: string;
   anchorColor: string;
   onImageClick: (imageUrl: string) => void;
-}> = ({ entityId, name, artistName, type, link, anchorColor, onImageClick }) => {
+  showImage?: boolean;
+}> = ({ entityId, name, artistName, type, link, anchorColor, onImageClick, showImage = true }) => {
   const { imageUrl } = useSpotifyImage({
     entityId,
     name,
@@ -77,18 +82,20 @@ const EntityCell: React.FC<{
 
   return (
     <Flex gap="sm" wrap="nowrap" align="center">
-      <Avatar
-        src={imageUrl}
-        alt={name}
-        size={40}
-        radius="sm"
-        onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          onImageClick(imageUrl || '');
-        }}
-        style={{ cursor: 'pointer', flexShrink: 0 }}
-      />
+      {showImage && (
+        <Avatar
+          src={imageUrl}
+          alt={name}
+          size={40}
+          radius="sm"
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            onImageClick(imageUrl || '');
+          }}
+          style={{ cursor: 'pointer', flexShrink: 0 }}
+        />
+      )}
       <Anchor
         component={Link}
         to={link}
@@ -139,16 +146,26 @@ export const ArtistDetailPage: React.FC = () => {
   } | null>(null);
 
   // Sorting state with localStorage persistence
-  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak'>(() => {
-    return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak';
+  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak' | 'points'>(() => {
+    return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
   });
-  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak'>(() => {
-    return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak';
+  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak' | 'points'>(() => {
+    return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
   });
   const [albumsView, setAlbumsView] = useState<'table' | 'carousel'>(() => {
     return storage.get(KEYS.ARTIST_ALBUMS_VIEW, [], 'table') as 'table' | 'carousel';
   });
+  const [tracksView, setTracksView] = useState<'table' | 'carousel'>(() => {
+    return storage.get(KEYS.ARTIST_TRACKS_VIEW, [], 'table') as 'table' | 'carousel';
+  });
   const [embla, setEmbla] = useState<any>(null);
+  const [tracksEmbla, setTracksEmbla] = useState<any>(null);
+  const [albumsShowImage, setAlbumsShowImage] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_ALBUMS_SHOW_IMAGE, [], true) ?? true;
+  });
+  const [tracksShowImage, setTracksShowImage] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_TRACKS_SHOW_IMAGE, [], true) ?? true;
+  });
 
   // Save sorting preferences to localStorage
   useEffect(() => {
@@ -162,6 +179,18 @@ export const ArtistDetailPage: React.FC = () => {
   useEffect(() => {
     storage.set(KEYS.ARTIST_ALBUMS_VIEW, albumsView);
   }, [albumsView]);
+
+  useEffect(() => {
+    storage.set(KEYS.ARTIST_TRACKS_VIEW, tracksView);
+  }, [tracksView]);
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_ALBUMS_SHOW_IMAGE, albumsShowImage);
+  }, [albumsShowImage]);
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_TRACKS_SHOW_IMAGE, tracksShowImage);
+  }, [tracksShowImage]);
 
   const { imageUrl } = useSpotifyImage({
     entityId,
@@ -228,11 +257,16 @@ export const ArtistDetailPage: React.FC = () => {
   // Sorting function: weeks (desc)
   const sortByWeeks = (a: any, b: any) => b.weeks - a.weeks;
 
+  // Sorting function: points (desc)
+  const sortByPoints = (a: any, b: any) => b.points - a.points;
+
   // Apply sorting to albums
   const topAlbums = useMemo(() => {
     const sorted = [...rawAlbums];
     if (albumsSort === 'peak') {
       sorted.sort(sortByPeak);
+    } else if (albumsSort === 'points') {
+      sorted.sort(sortByPoints);
     } else {
       sorted.sort(sortByWeeks);
     }
@@ -244,6 +278,8 @@ export const ArtistDetailPage: React.FC = () => {
     const sorted = [...rawTracks];
     if (tracksSort === 'peak') {
       sorted.sort(sortByPeak);
+    } else if (tracksSort === 'points') {
+      sorted.sort(sortByPoints);
     } else {
       sorted.sort(sortByWeeks);
     }
@@ -491,6 +527,24 @@ export const ArtistDetailPage: React.FC = () => {
           <Group justify="space-between" align="center" mb="md">
             <Title order={3}>{t('library.detail.sections.albumsTitle')}</Title>
             <Group gap="sm">
+              {albumsView === 'table' && (
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <ActionIcon variant="light" size="lg">
+                      <IconSettings size={18} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item closeMenuOnClick={false}>
+                      <Checkbox
+                        label={t('library.detail.sections.showImage')}
+                        checked={albumsShowImage}
+                        onChange={e => setAlbumsShowImage(e.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
               {albumsView === 'carousel' && (
                 <Group gap={4}>
                   <Button
@@ -537,10 +591,11 @@ export const ArtistDetailPage: React.FC = () => {
               <Select
                 leftSection={<IconSortDescending size={16} />}
                 value={albumsSort}
-                onChange={value => setAlbumsSort((value as 'weeks' | 'peak') || 'weeks')}
+                onChange={value => setAlbumsSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
                 data={[
                   { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
                   { value: 'peak', label: t('library.detail.sections.sortPeak') },
+                  { value: 'points', label: t('library.detail.sections.sortPoints') },
                 ]}
                 size="xs"
                 w={120}
@@ -709,6 +764,7 @@ export const ArtistDetailPage: React.FC = () => {
                         type="album"
                         link={`/library/music/${artistSlug}/${encodeLastFmSlug(album.name)}`}
                         anchorColor={anchorColor}
+                        showImage={albumsShowImage}
                         onImageClick={imageUrl => {
                           setSelectedEntity({
                             id: album.entityId,
@@ -766,13 +822,75 @@ export const ArtistDetailPage: React.FC = () => {
           <Group justify="space-between" align="center" mb="md">
             <Title order={3}>{t('library.detail.sections.tracksTitle')}</Title>
             <Group gap="sm">
+              {tracksView === 'table' && (
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <ActionIcon variant="light" size="lg">
+                      <IconSettings size={18} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item closeMenuOnClick={false}>
+                      <Checkbox
+                        label={t('library.detail.sections.showImage')}
+                        checked={tracksShowImage}
+                        onChange={e => setTracksShowImage(e.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
+              {tracksView === 'carousel' && (
+                <Group gap={4}>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    onClick={() => tracksEmbla?.scrollPrev()}
+                    disabled={!tracksEmbla}
+                  >
+                    <IconChevronLeft size={16} />
+                  </Button>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    onClick={() => tracksEmbla?.scrollNext()}
+                    disabled={!tracksEmbla}
+                  >
+                    <IconChevronRight size={16} />
+                  </Button>
+                </Group>
+              )}
+              <SegmentedControl
+                value={tracksView}
+                onChange={value => setTracksView(value as 'table' | 'carousel')}
+                data={[
+                  {
+                    value: 'table',
+                    label: (
+                      <Center>
+                        <IconList size={16} />
+                      </Center>
+                    ),
+                  },
+                  {
+                    value: 'carousel',
+                    label: (
+                      <Center>
+                        <IconPhoto size={16} />
+                      </Center>
+                    ),
+                  },
+                ]}
+                size="xs"
+              />
               <Select
                 leftSection={<IconSortDescending size={16} />}
                 value={tracksSort}
-                onChange={value => setTracksSort((value as 'weeks' | 'peak') || 'weeks')}
+                onChange={value => setTracksSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
                 data={[
                   { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
                   { value: 'peak', label: t('library.detail.sections.sortPeak') },
+                  { value: 'points', label: t('library.detail.sections.sortPoints') },
                 ]}
                 size="xs"
                 w={120}
@@ -799,6 +917,116 @@ export const ArtistDetailPage: React.FC = () => {
             <Text size="sm" c="dimmed">
               {t('library.detail.sections.emptyTracks')}
             </Text>
+          ) : tracksView === 'carousel' ? (
+            <Carousel
+              slideSize={{ base: '50%', xs: '33.333%', sm: '25%', md: '25%', lg: '25%' }}
+              slideGap="md"
+              withControls={false}
+              getEmblaApi={setTracksEmbla}
+              emblaOptions={{
+                loop: true,
+                dragFree: true,
+                containScroll: 'trimSnaps',
+                align: 'start',
+              }}
+            >
+              {topTracks.map((track: any, index: number) => {
+                const TrackSlide: React.FC = () => {
+                  const { imageUrl } = useSpotifyImage({
+                    entityId: track.entityId,
+                    name: track.name,
+                    artist: artistDisplayName,
+                    type: 'track',
+                    clientId: SPOTIFY_TOKEN,
+                    clientSecret: SPOTIFY_SECRET,
+                  });
+
+                  return (
+                    <Card padding="md" radius="md" withBorder>
+                      <Stack gap="sm" align="center">
+                        <Box
+                          component={Link}
+                          to={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <Avatar
+                            src={imageUrl}
+                            alt={track.name}
+                            size={160}
+                            radius="md"
+                            style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                            onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                            }}
+                            onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
+                          />
+                        </Box>
+                        <Text
+                          component={Link}
+                          to={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
+                          size="sm"
+                          fw={600}
+                          c={anchorColor}
+                          ta="center"
+                          lineClamp={2}
+                          style={{
+                            minHeight: '2.5em',
+                            width: '100%',
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {track.name}
+                        </Text>
+                        <Group gap="lg" justify="center" w="100%">
+                          <Stack gap={2} align="center">
+                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
+                              {t('library.detail.sections.columnPeak')}
+                            </Text>
+                            {track.peak === 1 ? (
+                              <Group gap={4} justify="center" wrap="nowrap">
+                                <Text size="xs" fw={700} c="mediumblue">
+                                  #1
+                                </Text>
+                                {track.timesAtPeak && track.timesAtPeak > 0 && (
+                                  <Text size="10px" c="dimmed">
+                                    ({track.timesAtPeak}x)
+                                  </Text>
+                                )}
+                              </Group>
+                            ) : track.peak < 999 ? (
+                              <Text size="xs" fw={600}>
+                                #{track.peak}
+                              </Text>
+                            ) : (
+                              <Text size="xs" c="dimmed">
+                                -
+                              </Text>
+                            )}
+                          </Stack>
+                          <Stack gap={2} align="center">
+                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
+                              {t('library.detail.sections.columnWeeks')}
+                            </Text>
+                            <Text size="xs" fw={600}>
+                              {track.weeks}
+                            </Text>
+                          </Stack>
+                        </Group>
+                      </Stack>
+                    </Card>
+                  );
+                };
+
+                return (
+                  <Carousel.Slide key={track.entityId || `${track.name}-${index}`}>
+                    <TrackSlide />
+                  </Carousel.Slide>
+                );
+              })}
+            </Carousel>
           ) : (
             <Table highlightOnHover>
               <Table.Thead>
@@ -831,6 +1059,7 @@ export const ArtistDetailPage: React.FC = () => {
                         type="track"
                         link={`/library/music/${artistSlug}/_/${encodeLastFmSlug(track.name)}`}
                         anchorColor={anchorColor}
+                        showImage={tracksShowImage}
                         onImageClick={imageUrl => {
                           setSelectedEntity({
                             id: track.entityId,
