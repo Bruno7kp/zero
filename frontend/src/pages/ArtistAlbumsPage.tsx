@@ -161,8 +161,10 @@ const ArtistAlbumsPage: React.FC = () => {
   // Sorting function: points (desc)
   const sortByPoints = (a: any, b: any) => b.points - a.points;
 
-  // Get debut year for each entity
-  const [debutYears, setDebutYears] = useState<Map<string, string>>(new Map());
+  // Get all chart data for recalculating stats by year
+  const [chartData, setChartData] = useState<
+    Array<{ entityId: string; week: string; rank: number; plays: number }>
+  >([]);
 
   useEffect(() => {
     if (!chart || rawEntities.length === 0) {
@@ -170,54 +172,102 @@ const ArtistAlbumsPage: React.FC = () => {
     }
 
     const chartId = String(chart.id);
-    const fetchDebuts = async () => {
+    const fetchChartData = async () => {
       try {
         const rows = await db.charts_data
           .where('[chartId+chartType]')
           .equals([chartId, 'album'])
           .toArray();
 
-        const firstAppearance = new Map<string, string>();
-        rows.forEach(row => {
-          const key = row.entityId;
-          if (!firstAppearance.has(key) || row.week < firstAppearance.get(key)!) {
-            firstAppearance.set(key, row.week);
-          }
-        });
-
-        setDebutYears(firstAppearance);
+        setChartData(
+          rows.map(row => ({
+            entityId: row.entityId,
+            week: row.week,
+            rank: row.rank,
+            plays: row.plays || 0,
+          }))
+        );
       } catch (error) {
-        console.error('Failed to fetch debut years', error);
+        console.error('Failed to fetch chart data', error);
       }
     };
 
-    fetchDebuts();
+    fetchChartData();
   }, [chart, rawEntities.length]);
 
-  // Get available debut years
+  // Get available years (years where entities appeared)
   const availableYears = useMemo(() => {
     const years = new Set<string>();
-    rawEntities.forEach(entity => {
-      const debutWeek = debutYears.get(entity.entityId);
-      if (debutWeek) {
-        const year = debutWeek.substring(0, 4);
-        years.add(year);
-      }
+    chartData.forEach(row => {
+      const year = row.week.substring(0, 4);
+      years.add(year);
     });
     return Array.from(years).sort((a, b) => b.localeCompare(a));
-  }, [rawEntities, debutYears]);
+  }, [chartData]);
 
-  // Filter by debut year
+  // Filter and recalculate stats by year
   const filteredEntities = useMemo(() => {
     if (debutYear === 'all') {
       return rawEntities;
     }
-    return rawEntities.filter(entity => {
-      const debutWeek = debutYears.get(entity.entityId);
-      if (!debutWeek) return false;
-      return debutWeek.startsWith(debutYear);
+
+    // Filter chart data by year
+    const yearData = chartData.filter(row => row.week.startsWith(debutYear));
+
+    // Group by entityId and calculate stats
+    const entityStats = new Map<
+      string,
+      {
+        weeks: number;
+        peak: number;
+        timesAtPeak: number;
+        points: number;
+        totalPlays: number;
+      }
+    >();
+
+    yearData.forEach(row => {
+      const existing = entityStats.get(row.entityId);
+      const points = Math.max(0, 101 - row.rank);
+
+      if (!existing) {
+        entityStats.set(row.entityId, {
+          weeks: 1,
+          peak: row.rank,
+          timesAtPeak: row.rank === 1 ? 1 : 0,
+          points: points,
+          totalPlays: row.plays,
+        });
+      } else {
+        existing.weeks++;
+        if (row.rank < existing.peak) {
+          existing.peak = row.rank;
+          existing.timesAtPeak = row.rank === 1 ? 1 : 0;
+        } else if (row.rank === existing.peak && row.rank === 1) {
+          existing.timesAtPeak++;
+        }
+        existing.points += points;
+        existing.totalPlays += row.plays;
+      }
     });
-  }, [rawEntities, debutYear, debutYears]);
+
+    // Map back to entities with recalculated stats
+    return rawEntities
+      .map(entity => {
+        const stats = entityStats.get(entity.entityId);
+        if (!stats) return null;
+
+        return {
+          ...entity,
+          weeks: stats.weeks,
+          peak: stats.peak,
+          timesAtPeak: stats.timesAtPeak,
+          points: stats.points,
+          totalPlays: stats.totalPlays,
+        };
+      })
+      .filter((e): e is NonNullable<typeof e> => e !== null);
+  }, [rawEntities, debutYear, chartData]);
 
   // Apply sorting
   const entities = useMemo(() => {
