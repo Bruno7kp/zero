@@ -37,9 +37,15 @@ interface MostPointsCardProps {
   loading: boolean;
   cardBg: string;
   topArtists: Top1Item[];
+  year?: number;
 }
 
-export const MostPointsCard: React.FC<MostPointsCardProps> = ({ loading, cardBg, topArtists }) => {
+export const MostPointsCard: React.FC<MostPointsCardProps> = ({
+  loading,
+  cardBg,
+  topArtists,
+  year,
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -50,7 +56,9 @@ export const MostPointsCard: React.FC<MostPointsCardProps> = ({ loading, cardBg,
             <IconCoins style={{ width: rem(20), height: rem(20) }} />
           </ThemeIcon>
           <Text fw={600} size="lg">
-            {t('stats.visualizations.overview.mostPoints')}
+            {year
+              ? t('stats.visualizations.overview.mostPointsWithYear', { year })
+              : t('stats.visualizations.overview.mostPoints')}
           </Text>
         </Group>
       </Group>

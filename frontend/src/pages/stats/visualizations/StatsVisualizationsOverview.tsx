@@ -89,8 +89,6 @@ const SortableCard: React.FC<{ id: CardId; children: React.ReactNode }> = ({ id,
 };
 
 const LATEST_NUMBER_ONE_COUNT = 8;
-const TOP_DEBUTS_COUNT = 8;
-const TOP_PLAYS_COUNT = 8;
 const CHART_TYPES: Array<'artist' | 'album' | 'track'> = ['artist', 'album', 'track'];
 interface RankLeaderPreview {
   id: string;
@@ -134,6 +132,9 @@ const StatsVisualizationsOverview: React.FC = () => {
     }>
   >([]);
   const [rankLeaders, setRankLeaders] = React.useState<RankLeaderPreview[]>([]);
+  const [leadersChartType, setLeadersChartType] = React.useState<'artist' | 'album' | 'track'>(
+    'track'
+  );
   const [lastPAK, setLastPAK] = React.useState<{
     artistName: string;
     albumName: string;
@@ -155,26 +156,26 @@ const StatsVisualizationsOverview: React.FC = () => {
   >([]);
   const [biggestDebuts, setBiggestDebuts] = React.useState<
     Array<{
+      type: SpotifyEntityType;
       name: string;
-      artistName?: string;
+      artistName: string;
       plays: number;
       entityId: string;
+      week: string;
       imageUrl?: string;
     }>
   >([]);
-  const [debutsChartType, setDebutsChartType] = React.useState<'artist' | 'album' | 'track'>(
-    'track'
-  );
   const [highestPlays, setHighestPlays] = React.useState<
     Array<{
+      type: SpotifyEntityType;
       name: string;
-      artistName?: string;
+      artistName: string;
       plays: number;
       entityId: string;
+      week: string;
       imageUrl?: string;
     }>
   >([]);
-  const [playsChartType, setPlaysChartType] = React.useState<'artist' | 'album' | 'track'>('track');
   React.useEffect(() => {
     setCardOrder(prev => {
       const normalized = normalizeCardOrder(prev);
@@ -232,11 +233,15 @@ const StatsVisualizationsOverview: React.FC = () => {
           }))
         );
 
-        // Rank Leaders
+        // Rank Leaders - random type, filtered by current year
+        const randomLeaderType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
+        const currentYear = new Date().getFullYear();
+
         const leaders = await getTimesAtRank({
           chartId,
-          chartType: 'track',
+          chartType: randomLeaderType,
           rank: 1,
+          year: String(currentYear),
         });
 
         const topLeaders = leaders.slice(0, 8);
@@ -245,7 +250,7 @@ const StatsVisualizationsOverview: React.FC = () => {
             entityId: entity.entityId,
             name: entity.name,
             artistName: entity.artistName,
-            type: 'track',
+            type: randomLeaderType,
           }))
         );
 
@@ -289,19 +294,22 @@ const StatsVisualizationsOverview: React.FC = () => {
           pakImages = await fetchSpotifyImagesBatch(imageRequests);
         }
 
-        // Most Points - top artist, album, and track
+        // Most Points - top artist, album, and track (filtered by current year)
         const [artistPoints, albumPoints, trackPoints] = await Promise.all([
           getPointsAccumulators({
             chartId,
             chartType: 'artist',
+            year: String(currentYear),
           }),
           getPointsAccumulators({
             chartId,
             chartType: 'album',
+            year: String(currentYear),
           }),
           getPointsAccumulators({
             chartId,
             chartType: 'track',
+            year: String(currentYear),
           }),
         ]);
 
@@ -352,38 +360,150 @@ const StatsVisualizationsOverview: React.FC = () => {
           }))
         );
 
-        // Biggest Debuts - random type
-        const randomDebutType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
-        const debuts = await getBestDebuts({
-          chartId,
-          chartType: randomDebutType,
-        });
-        const topDebuts = debuts.slice(0, TOP_DEBUTS_COUNT);
-        const debutsImages = topDebuts.length
+        // Biggest Debuts of current year - one of each type
+        const [artistDebuts, albumDebuts, trackDebuts] = await Promise.all([
+          getBestDebuts({
+            chartId,
+            chartType: 'artist',
+            year: String(currentYear),
+          }),
+          getBestDebuts({
+            chartId,
+            chartType: 'album',
+            year: String(currentYear),
+          }),
+          getBestDebuts({
+            chartId,
+            chartType: 'track',
+            year: String(currentYear),
+          }),
+        ]);
+
+        const latestDebuts: Array<{
+          type: SpotifyEntityType;
+          name: string;
+          artistName: string;
+          entityId: string;
+          plays: number;
+          week: string;
+        }> = [];
+
+        if (artistDebuts[0]) {
+          latestDebuts.push({
+            type: 'artist',
+            name: artistDebuts[0].name,
+            artistName: artistDebuts[0].artistName,
+            entityId: artistDebuts[0].entityId,
+            plays: artistDebuts[0].plays,
+            week: artistDebuts[0].week,
+          });
+        }
+
+        if (albumDebuts[0]) {
+          latestDebuts.push({
+            type: 'album',
+            name: albumDebuts[0].name,
+            artistName: albumDebuts[0].artistName,
+            entityId: albumDebuts[0].entityId,
+            plays: albumDebuts[0].plays,
+            week: albumDebuts[0].week,
+          });
+        }
+
+        if (trackDebuts[0]) {
+          latestDebuts.push({
+            type: 'track',
+            name: trackDebuts[0].name,
+            artistName: trackDebuts[0].artistName,
+            entityId: trackDebuts[0].entityId,
+            plays: trackDebuts[0].plays,
+            week: trackDebuts[0].week,
+          });
+        }
+
+        // No need to sort - getBestDebuts already returns sorted by plays (highest first)
+
+        const debutsImages = latestDebuts.length
           ? await fetchSpotifyImagesBatch(
-              topDebuts.map(item => ({
+              latestDebuts.map(item => ({
                 entityId: item.entityId,
                 name: item.name,
                 artistName: item.artistName,
-                type: randomDebutType,
+                type: item.type,
               }))
             )
           : {};
 
-        // Highest Plays - random type
-        const randomPlaysType = CHART_TYPES[Math.floor(Math.random() * CHART_TYPES.length)];
-        const playsData = await getHighestPlays({
-          chartId,
-          chartType: randomPlaysType,
-        });
-        const topPlaysData = playsData.slice(0, TOP_PLAYS_COUNT);
+        // Highest Plays in a Week of current year - one of each type
+        const [artistPlays, albumPlays, trackPlays] = await Promise.all([
+          getHighestPlays({
+            chartId,
+            chartType: 'artist',
+            year: String(currentYear),
+          }),
+          getHighestPlays({
+            chartId,
+            chartType: 'album',
+            year: String(currentYear),
+          }),
+          getHighestPlays({
+            chartId,
+            chartType: 'track',
+            year: String(currentYear),
+          }),
+        ]);
+
+        const topPlaysData: Array<{
+          type: SpotifyEntityType;
+          name: string;
+          artistName: string;
+          entityId: string;
+          plays: number;
+          week: string;
+        }> = [];
+
+        if (artistPlays[0]) {
+          topPlaysData.push({
+            type: 'artist',
+            name: artistPlays[0].name,
+            artistName: artistPlays[0].artistName,
+            entityId: artistPlays[0].entityId,
+            plays: artistPlays[0].plays,
+            week: artistPlays[0].week,
+          });
+        }
+
+        if (albumPlays[0]) {
+          topPlaysData.push({
+            type: 'album',
+            name: albumPlays[0].name,
+            artistName: albumPlays[0].artistName,
+            entityId: albumPlays[0].entityId,
+            plays: albumPlays[0].plays,
+            week: albumPlays[0].week,
+          });
+        }
+
+        if (trackPlays[0]) {
+          topPlaysData.push({
+            type: 'track',
+            name: trackPlays[0].name,
+            artistName: trackPlays[0].artistName,
+            entityId: trackPlays[0].entityId,
+            plays: trackPlays[0].plays,
+            week: trackPlays[0].week,
+          });
+        }
+
+        // No need to sort - getHighestPlays already returns sorted by plays (highest first)
+
         const playsImages = topPlaysData.length
           ? await fetchSpotifyImagesBatch(
               topPlaysData.map(item => ({
                 entityId: item.entityId,
                 name: item.name,
                 artistName: item.artistName,
-                type: randomPlaysType,
+                type: item.type,
               }))
             )
           : {};
@@ -409,6 +529,7 @@ const StatsVisualizationsOverview: React.FC = () => {
             imageUrl: images[entity.entityId],
           }))
         );
+        setLeadersChartType(randomLeaderType);
 
         setLastPAK(
           latestPAK
@@ -436,26 +557,28 @@ const StatsVisualizationsOverview: React.FC = () => {
         );
 
         setBiggestDebuts(
-          topDebuts.map(item => ({
+          latestDebuts.map(item => ({
+            type: item.type,
             name: item.name,
             artistName: item.artistName,
             plays: item.plays,
             entityId: item.entityId,
+            week: item.week,
             imageUrl: debutsImages[item.entityId],
           }))
         );
-        setDebutsChartType(randomDebutType);
 
         setHighestPlays(
           topPlaysData.map(item => ({
+            type: item.type,
             name: item.name,
             artistName: item.artistName,
             plays: item.plays,
             entityId: item.entityId,
+            week: item.week,
             imageUrl: playsImages[item.entityId],
           }))
         );
-        setPlaysChartType(randomPlaysType);
       } catch (error) {
         console.error('[visualizations] Failed to load overview data', error);
         if (mounted) {
@@ -520,6 +643,8 @@ const StatsVisualizationsOverview: React.FC = () => {
         loading={loading}
         cardBg={cardBg}
         rankLeaders={rankLeaders}
+        chartType={leadersChartType}
+        year={new Date().getFullYear()}
       />
     ),
     'last-pak': (
@@ -538,6 +663,7 @@ const StatsVisualizationsOverview: React.FC = () => {
           totalPoints: item.totalPoints,
           imageUrl: item.imageUrl,
         }))}
+        year={new Date().getFullYear()}
       />
     ),
     'biggest-debuts': (
@@ -546,7 +672,6 @@ const StatsVisualizationsOverview: React.FC = () => {
         loading={loading}
         cardBg={cardBg}
         debuts={biggestDebuts}
-        chartType={debutsChartType}
       />
     ),
     'highest-plays': (
@@ -555,7 +680,6 @@ const StatsVisualizationsOverview: React.FC = () => {
         loading={loading}
         cardBg={cardBg}
         highestPlays={highestPlays}
-        chartType={playsChartType}
       />
     ),
   };

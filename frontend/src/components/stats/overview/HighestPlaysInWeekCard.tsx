@@ -1,30 +1,55 @@
 import React from 'react';
-import { Card, Flex, Text, Skeleton, Group, ThemeIcon, rem, Divider, Button } from '@mantine/core';
-import { IconHeadphones } from '@tabler/icons-react';
+import {
+  Card,
+  Flex,
+  Text,
+  Skeleton,
+  Group,
+  ThemeIcon,
+  rem,
+  Divider,
+  Button,
+  Grid,
+} from '@mantine/core';
+import {
+  IconHeadphones,
+  IconChevronRight,
+  IconDisc,
+  IconMicrophone,
+  IconMusic,
+} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import MiniVerticalBarChart from '../../visualizations/MiniVerticalBarChart';
 import { Link } from 'react-router-dom';
+import { SpotifyImageWithModal } from '../../SpotifyImageWithModal';
+import { SPOTIFY_TOKEN, SPOTIFY_SECRET } from '../../../services/SpotifyApi';
+import { encodeLastFmSlug } from '../../../utils/urlEncoding';
+
+interface HighestPlaysItem {
+  type: 'artist' | 'album' | 'track';
+  name: string;
+  artistName: string;
+  plays: number;
+  entityId: string;
+  week: string;
+  imageUrl?: string;
+}
 
 interface HighestPlaysInWeekCardProps {
   loading: boolean;
   cardBg: string;
-  highestPlays: Array<{
-    name: string;
-    artistName?: string;
-    plays: number;
-    entityId: string;
-    imageUrl?: string;
-  }>;
-  chartType: 'artist' | 'album' | 'track';
+  highestPlays: HighestPlaysItem[];
 }
 
 export const HighestPlaysInWeekCard: React.FC<HighestPlaysInWeekCardProps> = ({
   loading,
   cardBg,
   highestPlays,
-  chartType,
 }) => {
   const { t } = useTranslation();
+
+  const formatDate = (week: string) => {
+    return week.replace(/-/g, '.');
+  };
 
   return (
     <Card shadow="md" p="md" style={{ background: cardBg }}>
@@ -34,48 +59,113 @@ export const HighestPlaysInWeekCard: React.FC<HighestPlaysInWeekCardProps> = ({
             <IconHeadphones style={{ width: rem(20), height: rem(20) }} />
           </ThemeIcon>
           <Text fw={600} size="lg">
-            {t('stats.visualizations.overview.highestPlaysInWeek')}
+            {t('stats.visualizations.overview.highestPlaysInWeekOfYear', {
+              year: highestPlays[0]?.week.substring(0, 4) || new Date().getFullYear(),
+            })}
           </Text>
         </Group>
       </Group>
       <Divider variant="dashed" size="sm" my="xs" />
       {loading ? (
-        <Skeleton height={200} radius="md" />
+        <Skeleton height={140} radius="md" />
       ) : highestPlays.length === 0 ? (
-        <Flex justify="center" align="center" style={{ height: 200 }}>
+        <Flex justify="center" align="center" style={{ height: 140 }}>
           <Text c="dimmed" size="sm">
             {t('stats.noData')}
           </Text>
         </Flex>
       ) : (
-        <MiniVerticalBarChart
-          items={highestPlays.map((item, index) => ({
-            id: `${item.entityId ?? item.name}-${index}`,
-            label: item.name,
-            value: item.plays,
-            subtitle: item.artistName,
-            colorKey: item.artistName || item.name,
-            imageUrl: item.imageUrl,
-          }))}
-          height={240}
-          layout="horizontal"
-          showImages
-          showAxisLabels={false}
-        />
+        <Flex direction="column" gap="md">
+          {highestPlays.map(item => {
+            let icon = <IconMusic size={18} />;
+            if (item.type === 'artist') {
+              icon = <IconMicrophone size={18} />;
+            }
+            if (item.type === 'album') {
+              icon = <IconDisc size={18} />;
+            }
+
+            const detailLink = (() => {
+              const artistSlug = encodeLastFmSlug(item.artistName);
+              const nameSlug = encodeLastFmSlug(item.name);
+
+              if (item.type === 'artist') {
+                return `/library/music/${nameSlug}`;
+              } else if (item.type === 'album') {
+                return `/library/music/${artistSlug}/${nameSlug}`;
+              } else {
+                return `/library/music/${artistSlug}/_/${nameSlug}`;
+              }
+            })();
+
+            return (
+              <Grid key={item.type} grow align="center" gutter="xs">
+                <Grid.Col span="auto">
+                  <Flex align="center" justify="center">
+                    {icon}
+                  </Flex>
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <SpotifyImageWithModal
+                    entityId={item.entityId}
+                    name={item.name}
+                    artistName={item.artistName}
+                    type={item.type}
+                    clientId={SPOTIFY_TOKEN}
+                    clientSecret={SPOTIFY_SECRET}
+                    width={40}
+                    height={40}
+                    borderRadius={4}
+                    style={{ borderRadius: '4px' }}
+                  />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <Flex direction="column" gap={0}>
+                    <Text
+                      fw={600}
+                      size="sm"
+                      className="entity-name mantine-Link-root"
+                      style={{ lineHeight: 1.3 }}
+                      component={Link}
+                      to={detailLink}
+                    >
+                      {item.name}
+                    </Text>
+                    {item.artistName && item.type !== 'artist' && (
+                      <Text
+                        size="xs"
+                        c="dimmed"
+                        style={{ lineHeight: 1.3 }}
+                        component={Link}
+                        to={`/library/music/${encodeLastFmSlug(item.artistName)}`}
+                        className="mantine-Link-root"
+                      >
+                        {item.artistName}
+                      </Text>
+                    )}
+                    <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
+                      {item.plays} {t('charts.stats.plays')} • {formatDate(item.week)}
+                    </Text>
+                  </Flex>
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <Flex justify="flex-end">
+                    <Button
+                      component={Link}
+                      to={`/stats/plays/all/${item.type}`}
+                      size="xs"
+                      variant="light"
+                      aria-label={t('charts.view')}
+                    >
+                      <IconChevronRight size={18} />
+                    </Button>
+                  </Flex>
+                </Grid.Col>
+              </Grid>
+            );
+          })}
+        </Flex>
       )}
-      <Divider variant="dashed" size="sm" my="xs" />
-      <Group justify="center" align="center">
-        <Button
-          component={Link}
-          to={`/stats/plays/all/${chartType}`}
-          size="sm"
-          fullWidth
-          variant="light"
-          aria-label={t('stats.visualizations.actions.viewDetail')}
-        >
-          {t('stats.visualizations.actions.viewDetail')}
-        </Button>
-      </Group>
     </Card>
   );
 };

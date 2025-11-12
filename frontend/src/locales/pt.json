@@ -500,7 +500,10 @@
       "show": "Mostrar",
       "hide": "Ocultar",
       "expand": "Expandir",
-      "collapse": "Recolher"
+      "collapse": "Recolher",
+      "artist": "Artista",
+      "album": "Álbum",
+      "track": "Música"
     },
     "chartEdit": {
       "title": "Editar semana do chart",
@@ -645,10 +648,12 @@
           "latestNumberOnePlaysDescription": "Mostrando quem liderou nas últimas semanas",
           "latestNumberOneTooltip": "Semanas recentes em #1",
           "rankDominance": "Líderes no #1",
+          "rankDominanceWithYear": "Líderes no #1 em {{year}}",
           "rankDominanceDescription": "Quem passou mais semanas no topo",
           "lastPerfectAllKill": "Último Perfect All Kill",
           "lastPerfectAllKillDescription": "Último artista a alcançar PAK",
           "mostPoints": "Mais Pontos",
+          "mostPointsWithYear": "Mais Pontos em {{year}}",
           "mostPointsDescription": "Top artistas por total de pontos",
           "mostPointsLabels": {
             "artist": "Artista com mais pontos",
@@ -657,7 +662,10 @@
           },
           "biggestDebuts": "Maiores Estreias",
           "biggestDebutsDescription": "Top 5 melhores primeiras aparições",
+          "biggestDebutsOfYear": "Maiores Estreias em {{year}}",
+          "latestNumberOneDebuts": "Últimas Estreias em #1",
           "highestPlaysInWeek": "Maiores Reproduções em uma Semana",
+          "highestPlaysInWeekOfYear": "Maiores Reproduções em uma Semana em {{year}}",
           "highestPlaysInWeekDescription": "Top 5 maiores contagens de reprodução",
           "numberOneHistory": "Histórico de #1",
           "numberOneHistoryDescription": "Últimas 15 semanas em #1",

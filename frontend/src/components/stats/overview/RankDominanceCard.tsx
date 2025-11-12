@@ -17,12 +17,16 @@ interface RankDominanceCardProps {
   loading: boolean;
   cardBg: string;
   rankLeaders: RankLeaderPreview[];
+  chartType?: 'artist' | 'album' | 'track';
+  year?: number;
 }
 
 export const RankDominanceCard: React.FC<RankDominanceCardProps> = ({
   loading,
   cardBg,
   rankLeaders,
+  chartType = 'track',
+  year,
 }) => {
   const { t } = useTranslation();
 
@@ -34,7 +38,12 @@ export const RankDominanceCard: React.FC<RankDominanceCardProps> = ({
             <IconCrown style={{ width: rem(20), height: rem(20) }} />
           </ThemeIcon>
           <Text fw={600} size="lg">
-            {t('stats.visualizations.overview.rankDominance')}
+            {year
+              ? t('stats.visualizations.overview.rankDominanceWithYear', {
+                  type: t(`common.${chartType}`),
+                  year,
+                })
+              : t('stats.visualizations.overview.rankDominance')}
           </Text>
         </Group>
         <Button

@@ -500,7 +500,10 @@
       "show": "Show",
       "hide": "Hide",
       "expand": "Expand",
-      "collapse": "Collapse"
+      "collapse": "Collapse",
+      "artist": "Artist",
+      "album": "Album",
+      "track": "Track"
     },
     "chartEdit": {
       "title": "Edit chart week",
@@ -645,10 +648,12 @@
           "latestNumberOnePlaysDescription": "Showing who led in the last weeks",
           "latestNumberOneTooltip": "Last weeks at #1",
           "rankDominance": "Leaders at #1",
+          "rankDominanceWithYear": "Leaders at #1 in {{year}}",
           "rankDominanceDescription": "Who spent the most weeks at #1",
           "lastPerfectAllKill": "Last Perfect All Kill",
           "lastPerfectAllKillDescription": "Latest artist to achieve PAK",
           "mostPoints": "Most Points",
+          "mostPointsWithYear": "Most Points in {{year}}",
           "mostPointsDescription": "Top artists by total points",
           "mostPointsLabels": {
             "artist": "Top artist by points",
@@ -657,7 +662,10 @@
           },
           "biggestDebuts": "Biggest Debuts",
           "biggestDebutsDescription": "Top 5 best first appearances",
+          "biggestDebutsOfYear": "Biggest Debuts in {{year}}",
+          "latestNumberOneDebuts": "Latest #1 Debuts",
           "highestPlaysInWeek": "Highest Plays in a Week",
+          "highestPlaysInWeekOfYear": "Highest Plays in a Week in {{year}}",
           "highestPlaysInWeekDescription": "Top 5 highest play counts",
           "numberOneHistory": "#1 History",
           "numberOneHistoryDescription": "Last 15 weeks at #1",
