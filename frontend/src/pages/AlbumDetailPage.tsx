@@ -364,7 +364,6 @@ export const AlbumDetailPage: React.FC = () => {
             </Grid>
           </Card>
         )}
-
         {chartRun.length > 0 && (
           <AlbumAchievements
             stats={{
