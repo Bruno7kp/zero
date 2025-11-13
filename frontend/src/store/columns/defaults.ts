@@ -1,7 +1,13 @@
 import type { ColumnConfig, ViewSettings } from './types';
 
 export const defaultColumns: ColumnConfig[] = [
-  { key: 'rank', label: 'Rank', labelComplete: 'charts.rankLabel', visible: true, isColumn: true },
+  {
+    key: 'rank',
+    label: 'charts.rankLabel',
+    labelComplete: 'charts.rankLabel',
+    visible: true,
+    isColumn: true,
+  },
   { key: 'deltaRankBadge', label: 'charts.deltaRankLabel', visible: true, isColumn: false },
   { key: 'altVariation', label: 'charts.altVariationLabel', visible: false, isColumn: true },
   { key: 'image', label: 'charts.imageLabel', visible: true, isColumn: false },
@@ -22,7 +28,7 @@ export const defaultColumns: ColumnConfig[] = [
   { key: 'cert', label: 'Cert', labelComplete: 'charts.certLabel', visible: false, isColumn: true },
   {
     key: 'plays',
-    label: 'Plays',
+    label: 'charts.playsLabel',
     labelComplete: 'charts.playsLabel',
     visible: true,
     isColumn: true,

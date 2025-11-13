@@ -42,6 +42,7 @@ import storage from '../utils/storage';
 import KEYS from '../constants/storageKeys';
 import { StatsBox } from '../components/StatsBox';
 import { Grid } from '@mantine/core';
+import { CertificationIcon } from '../components/CertificationIcon';
 
 // Helper component for entity cell with image
 const EntityCell: React.FC<{
@@ -127,6 +128,12 @@ const ArtistTracksPage: React.FC = () => {
   const [debutYear, setDebutYear] = useState<string>(() => {
     return storage.get(KEYS.ARTIST_TRACKS_YEAR_FILTER, [], 'all') as string;
   });
+  const [showSales, setShowSales] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_TRACKS_SHOW_SALES, [], false) ?? false;
+  });
+  const [showCert, setShowCert] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_TRACKS_SHOW_CERT, [], false) ?? false;
+  });
 
   // Modal state
   const [entityImageModalOpen, setEntityImageModalOpen] = useState(false);
@@ -148,6 +155,20 @@ const ArtistTracksPage: React.FC = () => {
   useEffect(() => {
     storage.set(KEYS.ARTIST_TRACKS_YEAR_FILTER, debutYear);
   }, [debutYear]);
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_TRACKS_SHOW_SALES, showSales);
+  }, [showSales]);
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_TRACKS_SHOW_CERT, showCert);
+  }, [showCert]);
+
+  // Feature availability
+  const pointsWeight = chart?.music_points_weight || 0;
+  const playsWeight = chart?.music_plays_weight || 0;
+  const hasSalesFormula = pointsWeight > 0 || playsWeight > 0;
+  const hasCertification = (chart?.music_platinum_value ?? 0) > 0;
 
   // Sorting function with tiebreakers: peak (asc), timesAtPeak (desc), weeks (desc)
   const sortByPeak = (a: any, b: any) => {
@@ -429,6 +450,25 @@ const ArtistTracksPage: React.FC = () => {
                       onChange={e => setTracksShowImage(e.currentTarget.checked)}
                     />
                   </Menu.Item>
+                  {hasSalesFormula && (
+                    <Menu.Item closeMenuOnClick={false}>
+                      <Checkbox
+                        label={chart?.formula_name || t('charts.sales')}
+                        tt="capitalize"
+                        checked={showSales}
+                        onChange={e => setShowSales(e.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  )}
+                  {hasCertification && (
+                    <Menu.Item closeMenuOnClick={false}>
+                      <Checkbox
+                        label="Cert."
+                        checked={showCert}
+                        onChange={e => setShowCert(e.currentTarget.checked)}
+                      />
+                    </Menu.Item>
+                  )}
                 </Menu.Dropdown>
               </Menu>
             </Group>
@@ -459,6 +499,14 @@ const ArtistTracksPage: React.FC = () => {
                   <Table.Th style={{ width: 100, textAlign: 'center' }}>
                     {t('library.detail.sections.columnPoints')}
                   </Table.Th>
+                  {hasSalesFormula && showSales && (
+                    <Table.Th style={{ width: 100, textAlign: 'center' }} tt="capitalize">
+                      {chart?.formula_name || t('charts.sales')}
+                    </Table.Th>
+                  )}
+                  {hasCertification && showCert && (
+                    <Table.Th style={{ width: 80, textAlign: 'center' }}>Cert.</Table.Th>
+                  )}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -512,6 +560,33 @@ const ArtistTracksPage: React.FC = () => {
                     <Table.Td style={{ textAlign: 'center' }}>
                       {track.points.toLocaleString()}
                     </Table.Td>
+                    {hasSalesFormula && showSales && (
+                      <Table.Td style={{ textAlign: 'center' }}>
+                        {Math.floor(
+                          track.points * pointsWeight + track.totalPlays * playsWeight
+                        ).toLocaleString()}
+                      </Table.Td>
+                    )}
+                    {hasCertification && showCert && (
+                      <Table.Td style={{ textAlign: 'center' }}>
+                        {track.entityId ? (
+                          <CertificationIcon
+                            chart={chart}
+                            chartType="track"
+                            totals={{
+                              totalPoints: track.points,
+                              totalPlays: track.totalPlays,
+                            }}
+                            entity={{
+                              name: track.name,
+                              artistName: artistName,
+                            }}
+                            entityId={track.entityId}
+                            username={chart?.lastfm_username}
+                          />
+                        ) : null}
+                      </Table.Td>
+                    )}
                   </Table.Tr>
                 ))}
               </Table.Tbody>

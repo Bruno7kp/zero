@@ -42,6 +42,7 @@ import KEYS from '../constants/storageKeys';
 import { StatsBox } from '../components/StatsBox';
 import { Grid } from '@mantine/core';
 import { db } from '../db/indexedDb';
+import { CertificationIcon } from '../components/CertificationIcon';
 
 // Helper component for entity cell with image
 const EntityCell: React.FC<{
@@ -127,6 +128,12 @@ const ArtistAlbumsPage: React.FC = () => {
   const [debutYear, setDebutYear] = useState<string>(() => {
     return storage.get(KEYS.ARTIST_ALBUMS_YEAR_FILTER, [], 'all') as string;
   });
+  const [showSales, setShowSales] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_ALBUMS_SHOW_SALES, [], false) ?? false;
+  });
+  const [showCert, setShowCert] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_ALBUMS_SHOW_CERT, [], false) ?? false;
+  });
 
   // Modal state
   const [entityImageModalOpen, setEntityImageModalOpen] = useState(false);
@@ -148,6 +155,14 @@ const ArtistAlbumsPage: React.FC = () => {
   useEffect(() => {
     storage.set(KEYS.ARTIST_ALBUMS_YEAR_FILTER, debutYear);
   }, [debutYear]);
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_ALBUMS_SHOW_SALES, showSales);
+  }, [showSales]);
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_ALBUMS_SHOW_CERT, showCert);
+  }, [showCert]);
 
   // Sorting function with tiebreakers: peak (asc), timesAtPeak (desc), weeks (desc)
   const sortByPeak = (a: any, b: any) => {
@@ -284,6 +299,12 @@ const ArtistAlbumsPage: React.FC = () => {
     }
     return sorted;
   }, [filteredEntities, albumsSort]);
+
+  // Calculate if sales and cert features should be available
+  const pointsWeight = chart?.album_points_weight || 0;
+  const playsWeight = chart?.album_plays_weight || 0;
+  const hasSalesFormula = pointsWeight > 0 || playsWeight > 0;
+  const hasCertification = chart?.album_platinum_value > 0;
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -429,6 +450,21 @@ const ArtistAlbumsPage: React.FC = () => {
                       onChange={e => setAlbumsShowImage(e.currentTarget.checked)}
                     />
                   </Menu.Item>
+                  <Menu.Item closeMenuOnClick={false}>
+                    <Checkbox
+                      label={chart?.formula_name || t('charts.sales')}
+                      tt="capitalize"
+                      checked={showSales}
+                      onChange={e => setShowSales(e.currentTarget.checked)}
+                    />
+                  </Menu.Item>
+                  <Menu.Item closeMenuOnClick={false}>
+                    <Checkbox
+                      label="Cert."
+                      checked={showCert}
+                      onChange={e => setShowCert(e.currentTarget.checked)}
+                    />
+                  </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
             </Group>
@@ -459,6 +495,14 @@ const ArtistAlbumsPage: React.FC = () => {
                   <Table.Th style={{ width: 100, textAlign: 'center' }}>
                     {t('library.detail.sections.columnPoints')}
                   </Table.Th>
+                  {hasSalesFormula && showSales && (
+                    <Table.Th style={{ width: 100, textAlign: 'center' }} tt="capitalize">
+                      {chart?.formula_name || t('charts.sales')}
+                    </Table.Th>
+                  )}
+                  {hasCertification && showCert && (
+                    <Table.Th style={{ width: 80, textAlign: 'center' }}>Cert.</Table.Th>
+                  )}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -512,6 +556,33 @@ const ArtistAlbumsPage: React.FC = () => {
                     <Table.Td style={{ textAlign: 'center' }}>
                       {album.points.toLocaleString()}
                     </Table.Td>
+                    {hasSalesFormula && showSales && (
+                      <Table.Td style={{ textAlign: 'center' }}>
+                        {Math.floor(
+                          album.points * pointsWeight + album.totalPlays * playsWeight
+                        ).toLocaleString()}
+                      </Table.Td>
+                    )}
+                    {hasCertification && showCert && (
+                      <Table.Td style={{ textAlign: 'center' }}>
+                        {album.entityId ? (
+                          <CertificationIcon
+                            chart={chart}
+                            chartType="album"
+                            totals={{
+                              totalPoints: album.points,
+                              totalPlays: album.totalPlays,
+                            }}
+                            entity={{
+                              name: album.name,
+                              artistName: artistName,
+                            }}
+                            entityId={album.entityId}
+                            username={chart?.lastfm_username}
+                          />
+                        ) : null}
+                      </Table.Td>
+                    )}
                   </Table.Tr>
                 ))}
               </Table.Tbody>

@@ -338,7 +338,7 @@ export const GridCard: React.FC<GridCardProps> = ({
           {showPlays && (
             <Box style={{ textAlign: 'center', flex: 1 }}>
               <Text size={droppedScaleSize('xs')} tt="capitalize" c="dimmed">
-                {showFormulaInsteadOfPlays && formulaName ? formulaName : 'Plays'}
+                {showFormulaInsteadOfPlays && formulaName ? formulaName : t('charts.playsLabel')}
               </Text>
               <Text fw={600} size={droppedScaleSize('sm')}>
                 {formatNumber(

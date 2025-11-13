@@ -86,7 +86,8 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
   const artistMode: 'under' | 'column' = (viewSettings || {}).artistDisplayMode || 'under';
 
   let built = filteredColumns.map((col: any): DataTableColumn<ChartData> => {
-    const resolvedTitle =
+    // Use short label for plays column in table view
+    let resolvedTitle =
       col.label != null
         ? typeof col.label === 'string'
           ? col.label.startsWith('charts.')
@@ -96,6 +97,12 @@ export function buildTableColumns(args: BuildTableColumnsArgs): DataTableColumn<
         : col.labelComplete
         ? t(col.labelComplete)
         : col.key;
+
+    // Override with short version for plays column
+    if (col.key === 'plays' && col.label === 'charts.playsLabel') {
+      resolvedTitle = t('charts.playsLabelShort');
+    }
+
     const base: Partial<DataTableColumn<ChartData>> = {
       accessor: col.key,
       title: resolvedTitle as any,

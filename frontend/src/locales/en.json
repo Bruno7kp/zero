@@ -51,6 +51,7 @@
       "titleLabel": "Title",
       "artistLabel": "Artist",
       "playsLabel": "Plays",
+      "playsLabelShort": "Plays",
       "playLabel": "Play",
       "showFormulaInsteadOfPlays": "Show formula value instead of plays",
       "deltaPlaysLabel": "Plays change",
@@ -401,7 +402,7 @@
       "noActiveChart": "Click here to select a chart",
       "dataError": "An error occurred while loading data. Try again later.",
       "noTop1Data": "No data found. Sync the weeks to view last week's #1s.",
-      "entityNotFound": "Page not found.",
+      "entityNotFound": "Artist/album/track not found. This page doesn't exist or hasn't entered the chart yet.",
       "noData": {
         "title": "No data",
         "description": "No chart data available for the current week."

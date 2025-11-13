@@ -72,9 +72,11 @@ export const LibraryTableView: React.FC<LibraryTableViewProps> = ({
           <Table highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th style={{ width: 60, textAlign: 'center' }}>Rank</Table.Th>
+                <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
                 <Table.Th>{t('charts.titleLabel')}</Table.Th>
-                <Table.Th style={{ width: 80, textAlign: 'center' }}>Plays</Table.Th>
+                <Table.Th style={{ width: 80, textAlign: 'center' }}>
+                  {t('charts.playsLabel')}
+                </Table.Th>
                 {visibleColumns.peak && (
                   <Table.Th style={{ width: 80, textAlign: 'center' }}>{t('charts.peak')}</Table.Th>
                 )}

@@ -44,13 +44,14 @@
       "view": "Ver chart",
       "viewAll": "Ver todos os charts",
       "viewLive": "Ver prévia da semana atual",
-      "rankLabel": "Rank: Posição",
+      "rankLabel": "Posição",
       "deltaRankLabel": "Variação da rank (badge)",
       "altVariationLabel": "Variação de rank (coluna)",
       "imageLabel": "Imagem",
       "titleLabel": "Título",
       "artistLabel": "Artista",
-      "playsLabel": "Plays: Reproduções",
+      "playsLabel": "Reproduções",
+      "playsLabelShort": "Reprod.",
       "playLabel": "Reprodução",
       "showFormulaInsteadOfPlays": "Mostrar valor da fórmula no lugar das reproduções",
       "deltaPlaysLabel": "Variação de reproduções",
@@ -401,7 +402,7 @@
       "noActiveChart": "Clique aqui para selecionar um chart",
       "dataError": "Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.",
       "noTop1Data": "Nenhum dado encontrado. Sincronize as semanas para visualizar os #1s da última semana.",
-      "entityNotFound": "Página não encontrada.",
+      "entityNotFound": "Artista/álbum/música não encontrado. Esta página não existe ou ainda não entrou no chart.",
       "noData": {
         "title": "Sem dados",
         "description": "Nenhum dado de chart disponível para a semana atual."
@@ -776,7 +777,7 @@
         "timeline": {
           "windowLabel": "Janela: últimas {{weeks}} semanas",
           "axisBottom": "Semana",
-          "axisLeft": "Plays",
+          "axisLeft": "Reproduções",
           "tooltipPlays": "{{value}} reproduções"
         },
         "rankLeaders": {
