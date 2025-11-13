@@ -185,9 +185,38 @@ export const AlbumDetailPage: React.FC = () => {
           padding="lg"
           radius="md"
           withBorder
-          style={{ background: cardBackground }}
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+          }}
         >
-          <Stack gap="lg">
+          {effectiveImageUrl && (
+            <>
+              <Box
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: `url(${effectiveImageUrl})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  filter: 'none',
+                  zIndex: 0,
+                }}
+              />
+              <Box
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.05) 100%)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  zIndex: 1,
+                }}
+              />
+            </>
+          )}
+          <Stack gap="lg" style={{ position: 'relative', zIndex: 2 }}>
             <Group wrap="nowrap" align="stretch" gap="lg">
               <Avatar
                 src={effectiveImageUrl}
