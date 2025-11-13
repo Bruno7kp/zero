@@ -137,6 +137,17 @@ h6 {
   }
 }
 
+/* Responsive visibility utilities */
+.visibleFrom-sm {
+  display: none !important;
+}
+
+@media (min-width: 48em) {
+  .visibleFrom-sm {
+    display: inline !important;
+  }
+}
+
 /* Override Mantine dark theme default text color to pure white */
 :root[data-mantine-color-scheme='dark'] {
   --mantine-color-text: #ffffff;

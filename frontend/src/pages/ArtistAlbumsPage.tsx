@@ -124,7 +124,9 @@ const ArtistAlbumsPage: React.FC = () => {
   const [albumsShowImage, setAlbumsShowImage] = useState<boolean>(() => {
     return storage.getJson<boolean>(KEYS.ARTIST_ALBUMS_SHOW_IMAGE, [], true) ?? true;
   });
-  const [debutYear, setDebutYear] = useState<string>('all');
+  const [debutYear, setDebutYear] = useState<string>(() => {
+    return storage.get(KEYS.ARTIST_ALBUMS_YEAR_FILTER, [], 'all') as string;
+  });
 
   // Modal state
   const [entityImageModalOpen, setEntityImageModalOpen] = useState(false);
@@ -142,6 +144,10 @@ const ArtistAlbumsPage: React.FC = () => {
   useEffect(() => {
     storage.setJson(KEYS.ARTIST_ALBUMS_SHOW_IMAGE, albumsShowImage);
   }, [albumsShowImage]);
+
+  useEffect(() => {
+    storage.set(KEYS.ARTIST_ALBUMS_YEAR_FILTER, debutYear);
+  }, [debutYear]);
 
   // Sorting function with tiebreakers: peak (asc), timesAtPeak (desc), weeks (desc)
   const sortByPeak = (a: any, b: any) => {
@@ -305,7 +311,9 @@ const ArtistAlbumsPage: React.FC = () => {
       size="xs"
       onClick={() => navigate(`/library/music/${artistSlug}`)}
     >
-      {t('library.detail.sections.backToArtist')}
+      <span style={{ display: 'none' }} className="visibleFrom-sm">
+        {t('library.detail.sections.backToArtist')}
+      </span>
     </Button>
   );
 
@@ -330,13 +338,11 @@ const ArtistAlbumsPage: React.FC = () => {
 
       <Card
         shadow="sm"
-        padding="lg"
+        padding="sm"
         radius="md"
         withBorder
         style={{
           background: cardBackground,
-          paddingTop: 0,
-          paddingBottom: 0,
         }}
         mb="md"
       >

@@ -95,7 +95,9 @@ export const AlbumDetailPage: React.FC = () => {
       size="xs"
       onClick={handleBack}
     >
-      {t('library.detail.backToLibrary')}
+      <span style={{ display: 'none' }} className="visibleFrom-sm">
+        {t('library.detail.backToLibrary')}
+      </span>
     </Button>
   );
 
@@ -242,7 +244,7 @@ export const AlbumDetailPage: React.FC = () => {
         </Card>
         <Card
           shadow="sm"
-          padding="lg"
+          padding="sm"
           radius="md"
           withBorder
           style={{ background: cardBackground }}
@@ -324,7 +326,7 @@ export const AlbumDetailPage: React.FC = () => {
         {chartRun.length > 0 && (
           <Card
             shadow="sm"
-            padding="lg"
+            padding="sm"
             radius="md"
             withBorder
             style={{ background: cardBackground }}

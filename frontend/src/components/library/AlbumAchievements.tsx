@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
+  ActionIcon,
   Badge,
   Card,
+  Collapse,
   Divider,
   Grid,
   Group,
@@ -22,9 +24,13 @@ import {
   IconRocket,
   IconMedal,
   IconLock,
+  IconChevronDown,
+  IconChevronUp,
 } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import storage from '../../utils/storage';
+import KEYS from '../../constants/storageKeys';
 
 interface AlbumAchievementsProps {
   stats: {
@@ -57,6 +63,15 @@ export const AlbumAchievements: React.FC<AlbumAchievementsProps> = ({
   const { t } = useTranslation();
   const theme = useMantineTheme();
   const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
+
+  // Collapse state with localStorage persistence
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ALBUM_ACHIEVEMENTS_COLLAPSED, [], false) ?? false;
+  });
+
+  useEffect(() => {
+    storage.setJson(KEYS.ALBUM_ACHIEVEMENTS_COLLAPSED, collapsed);
+  }, [collapsed]);
 
   const achievements = useMemo<Achievement[]>(() => {
     const result: Achievement[] = [];
@@ -180,11 +195,11 @@ export const AlbumAchievements: React.FC<AlbumAchievementsProps> = ({
       description: hasPointMaster
         ? t('library.achievements.album.pointMasterDesc', {
             points: totalPoints.toLocaleString(),
-            target: '1,000',
+            target: (1000).toLocaleString(),
           })
         : t('library.achievements.album.pointMasterProgress', {
             current: totalPoints.toLocaleString(),
-            target: '1,000',
+            target: (1000).toLocaleString(),
           }),
       unlocked: hasPointMaster,
       progress: Math.min(totalPoints, 1000),
@@ -218,76 +233,83 @@ export const AlbumAchievements: React.FC<AlbumAchievementsProps> = ({
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder style={{ background }}>
       <Stack gap="md">
-        <Group justify="space-between" align="center" mb="md">
+        <Group justify="space-between" align="center" mb={collapsed ? 0 : 'md'}>
           <Title order={3}>{t('library.achievements.title')}</Title>
-          <Badge size="lg" variant="gradient" gradient={{ from: 'yellow', to: 'orange' }}>
-            {unlockedCount}/{totalCount}
-          </Badge>
+          <Group gap="sm">
+            <Badge size="lg" variant="gradient" gradient={{ from: 'yellow', to: 'orange' }}>
+              {unlockedCount}/{totalCount}
+            </Badge>
+            <ActionIcon variant="subtle" onClick={() => setCollapsed(!collapsed)} size="lg">
+              {collapsed ? <IconChevronDown size={20} /> : <IconChevronUp size={20} />}
+            </ActionIcon>
+          </Group>
         </Group>
 
-        <Grid>
-          {achievements.map(achievement => (
-            <Grid.Col key={achievement.id} span={{ base: 12, sm: 6, md: 6 }}>
-              <Card
-                padding="md"
-                radius="md"
-                withBorder
-                style={{
-                  opacity: achievement.unlocked ? 1 : 0.6,
-                  position: 'relative',
-                  backgroundColor: cardBg,
-                }}
-              >
-                <Stack gap={0}>
-                  {/* Top section: Icon and Title */}
-                  <Group gap="sm" wrap="nowrap" align="center" mb="xs">
-                    <ThemeIcon
-                      size="lg"
-                      radius="md"
-                      variant={achievement.unlocked ? 'gradient' : 'light'}
-                      gradient={{ from: achievement.color, to: achievement.color, deg: 45 }}
-                      color={achievement.color}
-                      style={{ flexShrink: 0 }}
-                    >
-                      {achievement.unlocked ? achievement.icon : <IconLock size={24} />}
-                    </ThemeIcon>
-                    <Text size="sm" fw={700} style={{ flex: 1 }}>
-                      {achievement.title}
-                    </Text>
-                  </Group>
-
-                  <Divider variant="dashed" size="sm" mb="xs" />
-
-                  {/* Bottom section: Rarity badge and description */}
-                  <Stack gap="xs">
-                    {achievement.rarity && (
-                      <Badge size="xs" variant="light" color={getRarityColor(achievement.rarity)}>
-                        {t(`library.achievements.rarity.${achievement.rarity}`)}
-                      </Badge>
-                    )}
-                    <Text size="xs" c="dimmed" style={{ lineHeight: 1.4 }}>
-                      {achievement.description}
-                    </Text>
-
-                    {!achievement.unlocked && achievement.progress !== undefined && (
-                      <Tooltip
-                        label={`${achievement.progress} / ${achievement.total}`}
-                        position="bottom"
+        <Collapse in={!collapsed}>
+          <Grid>
+            {achievements.map(achievement => (
+              <Grid.Col key={achievement.id} span={{ base: 12, sm: 6, md: 6 }}>
+                <Card
+                  padding="md"
+                  radius="md"
+                  withBorder
+                  style={{
+                    opacity: achievement.unlocked ? 1 : 0.6,
+                    position: 'relative',
+                    backgroundColor: cardBg,
+                  }}
+                >
+                  <Stack gap={0}>
+                    {/* Top section: Icon and Title */}
+                    <Group gap="sm" wrap="nowrap" align="center" mb="xs">
+                      <ThemeIcon
+                        size="lg"
+                        radius="md"
+                        variant={achievement.unlocked ? 'gradient' : 'light'}
+                        gradient={{ from: achievement.color, to: achievement.color, deg: 45 }}
+                        color={achievement.color}
+                        style={{ flexShrink: 0 }}
                       >
-                        <Progress
-                          value={(achievement.progress / (achievement.total || 1)) * 100}
-                          size="sm"
-                          radius="xl"
-                          color={achievement.color}
-                        />
-                      </Tooltip>
-                    )}
+                        {achievement.unlocked ? achievement.icon : <IconLock size={24} />}
+                      </ThemeIcon>
+                      <Text size="sm" fw={700} style={{ flex: 1 }}>
+                        {achievement.title}
+                      </Text>
+                    </Group>
+
+                    <Divider variant="dashed" size="sm" mb="xs" />
+
+                    {/* Bottom section: Rarity badge and description */}
+                    <Stack gap="xs">
+                      {achievement.rarity && (
+                        <Badge size="xs" variant="light" color={getRarityColor(achievement.rarity)}>
+                          {t(`library.achievements.rarity.${achievement.rarity}`)}
+                        </Badge>
+                      )}
+                      <Text size="xs" c="dimmed" style={{ lineHeight: 1.4 }}>
+                        {achievement.description}
+                      </Text>
+
+                      {!achievement.unlocked && achievement.progress !== undefined && (
+                        <Tooltip
+                          label={`${achievement.progress} / ${achievement.total}`}
+                          position="bottom"
+                        >
+                          <Progress
+                            value={(achievement.progress / (achievement.total || 1)) * 100}
+                            size="sm"
+                            radius="xl"
+                            color={achievement.color}
+                          />
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Card>
-            </Grid.Col>
-          ))}
-        </Grid>
+                </Card>
+              </Grid.Col>
+            ))}
+          </Grid>
+        </Collapse>
       </Stack>
     </Card>
   );

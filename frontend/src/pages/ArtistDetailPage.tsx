@@ -230,7 +230,9 @@ export const ArtistDetailPage: React.FC = () => {
       size="xs"
       onClick={handleBack}
     >
-      {t('library.detail.backToLibrary')}
+      <span style={{ display: 'none' }} className="visibleFrom-sm">
+        {t('library.detail.backToLibrary')}
+      </span>
     </Button>
   );
 

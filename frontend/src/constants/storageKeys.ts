@@ -25,7 +25,12 @@ export const KEYS = {
   ARTIST_TRACKS_VIEW: 'zc.artist.tracksView:v1',
   ARTIST_ALBUMS_SHOW_IMAGE: 'zc.artist.albumsShowImage:v1',
   ARTIST_TRACKS_SHOW_IMAGE: 'zc.artist.tracksShowImage:v1',
+  ARTIST_ALBUMS_YEAR_FILTER: 'zc.artist.albumsYearFilter:v1',
+  ARTIST_TRACKS_YEAR_FILTER: 'zc.artist.tracksYearFilter:v1',
   CHART_SYNC_COLLAPSED: 'zc.chartSync.collapsed:v1',
+  ARTIST_ACHIEVEMENTS_COLLAPSED: 'zc.achievements.artist.collapsed:v1',
+  ALBUM_ACHIEVEMENTS_COLLAPSED: 'zc.achievements.album.collapsed:v1',
+  TRACK_ACHIEVEMENTS_COLLAPSED: 'zc.achievements.track.collapsed:v1',
 };
 
 // Legacy keys used previously in the codebase. Use as fallbacks when migrating.

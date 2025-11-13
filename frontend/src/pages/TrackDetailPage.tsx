@@ -95,7 +95,9 @@ export const TrackDetailPage: React.FC = () => {
       size="xs"
       onClick={handleBack}
     >
-      {t('library.detail.backToLibrary')}
+      <span style={{ display: 'none' }} className="visibleFrom-sm">
+        {t('library.detail.backToLibrary')}
+      </span>
     </Button>
   );
 
@@ -243,7 +245,7 @@ export const TrackDetailPage: React.FC = () => {
 
         <Card
           shadow="sm"
-          padding="lg"
+          padding="sm"
           radius="md"
           withBorder
           style={{ background: cardBackground }}
@@ -327,7 +329,7 @@ export const TrackDetailPage: React.FC = () => {
         {chartRun.length > 0 && (
           <Card
             shadow="sm"
-            padding="lg"
+            padding="sm"
             radius="md"
             withBorder
             style={{ background: cardBackground }}
