@@ -580,7 +580,7 @@ export const ArtistDetailPage: React.FC = () => {
               {albumsView === 'table' && (
                 <Menu shadow="md" width={200}>
                   <Menu.Target>
-                    <ActionIcon variant="light" size="lg">
+                    <ActionIcon variant="subtle" size="lg">
                       <IconSettings size={18} />
                     </ActionIcon>
                   </Menu.Target>

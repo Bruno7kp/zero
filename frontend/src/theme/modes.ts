@@ -26,7 +26,7 @@ export function appShellDarkIndex(mode: ThemeMode): number {
       return 9;
     case 'dark':
     default:
-      return 8;
+      return 7;
   }
 }
 
@@ -38,7 +38,7 @@ export function appShellHeaderDarkIndex(mode: ThemeMode): number {
       return 7;
     case 'dark':
     default:
-      return 7;
+      return 8;
   }
 }
 
@@ -72,7 +72,7 @@ export function getCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): s
       return (theme as any).colors?.dark?.[7] ?? '#1A1B1E';
     case 'dark':
     default:
-      return '#292929';
+      return (theme as any).colors?.dark?.[6] ?? '#292929';
   }
 }
 

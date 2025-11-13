@@ -239,7 +239,7 @@ export const AlbumAchievements: React.FC<AlbumAchievementsProps> = ({
             <Badge size="lg" variant="gradient" gradient={{ from: 'yellow', to: 'orange' }}>
               {unlockedCount}/{totalCount}
             </Badge>
-            <ActionIcon variant="subtle" onClick={() => setCollapsed(!collapsed)} size="lg">
+            <ActionIcon variant="gradient" onClick={() => setCollapsed(!collapsed)} size="md">
               {collapsed ? <IconChevronDown size={20} /> : <IconChevronUp size={20} />}
             </ActionIcon>
           </Group>
