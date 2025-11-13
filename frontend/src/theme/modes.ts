@@ -72,7 +72,7 @@ export function getCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): s
       return (theme as any).colors?.dark?.[7] ?? '#1A1B1E';
     case 'dark':
     default:
-      return (theme as any).colors?.dark?.[7] ?? '#1A1B1E';
+      return '#292929';
   }
 }
 
