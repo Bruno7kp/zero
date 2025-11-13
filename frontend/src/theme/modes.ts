@@ -72,7 +72,7 @@ export function getCardBackgroundByMode(theme: MantineTheme, mode: ThemeMode): s
       return (theme as any).colors?.dark?.[7] ?? '#1A1B1E';
     case 'dark':
     default:
-      return (theme as any).colors?.dark?.[8] ?? '#1A1B1E';
+      return (theme as any).colors?.dark?.[6] ?? '#1A1B1E';
   }
 }
 
@@ -86,6 +86,6 @@ export function getSecondaryCardBackgroundByMode(theme: MantineTheme, mode: Them
       return (theme as any).colors?.dark?.[6] ?? '#1A1B1E';
     case 'dark':
     default:
-      return (theme as any).colors?.dark?.[6] ?? '#1A1B1E';
+      return (theme as any).colors?.dark?.[8] ?? '#1A1B1E';
   }
 }

@@ -69,11 +69,8 @@ export const TrackDetailPage: React.FC = () => {
   });
   const effectiveImageUrl = customImageUrl ?? imageUrl ?? undefined;
 
-  // Define if card background should use custom color based on theme
-  const useCustomCardBackground = themeMode !== 'dark';
-  const cardBackground = useCustomCardBackground
-    ? getCardBackgroundByMode(theme, themeMode)
-    : undefined;
+  // Define card background based on theme
+  const cardBackground = getCardBackgroundByMode(theme, themeMode);
 
   // Prepare chart data for visualization
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);

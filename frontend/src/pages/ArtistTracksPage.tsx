@@ -114,11 +114,8 @@ const ArtistTracksPage: React.FC = () => {
   const artistSlug = artistName ? encodeLastFmSlug(artistName) : '';
   const { loading, entities: rawEntities } = useArtistEntities(chart, 'track', artistName);
 
-  // Define if card background should use custom color based on theme
-  const useCustomCardBackground = themeMode !== 'dark';
-  const cardBackground = useCustomCardBackground
-    ? getCardBackgroundByMode(theme, themeMode)
-    : undefined;
+  // Define card background based on theme
+  const cardBackground = getCardBackgroundByMode(theme, themeMode);
 
   // Sorting state with localStorage persistence
   const [tracksSort, setTracksSort] = useState<'weeks' | 'peak' | 'points'>(() => {

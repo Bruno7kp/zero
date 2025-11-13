@@ -49,7 +49,11 @@ import { ChartRun } from '../components/ChartRun';
 import { ImageEditModal } from '../components/dialogs/ImageEditModal';
 import { useArtistEntities } from '../hooks/useArtistEntities';
 import { StatsBox } from '../components/StatsBox';
-import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
+import {
+  getCardBackgroundByMode,
+  getSecondaryCardBackgroundByMode,
+  type ThemeMode,
+} from '../theme/modes';
 import storage from '../utils/storage';
 import KEYS from '../constants/storageKeys';
 import { ArtistAchievements } from '../components/library/ArtistAchievements';
@@ -233,14 +237,11 @@ export const ArtistDetailPage: React.FC = () => {
   const artistDisplayName = stats?.name || artistName;
   const artistSlug = artistDisplayName ? encodeLastFmSlug(artistDisplayName) : '';
 
-  // Define if card background should use custom color based on theme
-  const useCustomCardBackground = themeMode !== 'dark';
-  const cardBackground = useCustomCardBackground
-    ? getCardBackgroundByMode(theme, themeMode)
-    : undefined;
+  // Define card backgrounds based on theme
+  const cardBackground = getCardBackgroundByMode(theme, themeMode);
 
-  // Card background for carousel items - darker for dark mode, light gray for light mode
-  const carouselCardBg = colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.03)';
+  // Card background for carousel items - secondary background
+  const carouselCardBg = getSecondaryCardBackgroundByMode(theme, themeMode);
 
   const { loading: albumsLoading, entities: rawAlbums } = useArtistEntities(
     chart,
@@ -397,13 +398,11 @@ export const ArtistDetailPage: React.FC = () => {
 
         <Card
           shadow="sm"
-          padding="lg"
+          padding="sm"
           radius="md"
           withBorder
           style={{
             background: cardBackground,
-            paddingTop: 0,
-            paddingBottom: 0,
           }}
         >
           <Grid>
@@ -485,13 +484,11 @@ export const ArtistDetailPage: React.FC = () => {
         {chartRun.length > 0 && (
           <Card
             shadow="sm"
-            padding="lg"
+            padding="sm"
             radius="md"
             withBorder
             style={{
               background: cardBackground,
-              paddingTop: 0,
-              paddingBottom: 0,
             }}
           >
             <Grid>

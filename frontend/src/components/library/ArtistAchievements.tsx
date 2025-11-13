@@ -11,7 +11,7 @@ import {
   ThemeIcon,
   Title,
   Tooltip,
-  useComputedColorScheme,
+  useMantineTheme,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import {
@@ -26,6 +26,8 @@ import {
   IconCalendar,
   IconLock,
 } from '@tabler/icons-react';
+import { useSelector } from 'react-redux';
+import { getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 interface ArtistAchievementsProps {
   stats: {
@@ -60,7 +62,8 @@ export const ArtistAchievements: React.FC<ArtistAchievementsProps> = ({
   background,
 }) => {
   const { t } = useTranslation();
-  const colorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: true });
+  const theme = useMantineTheme();
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
 
   const achievements = useMemo<Achievement[]>(() => {
     const result: Achievement[] = [];
@@ -271,8 +274,8 @@ export const ArtistAchievements: React.FC<ArtistAchievementsProps> = ({
     }
   };
 
-  // Card background color - darker for dark mode, light gray for light mode
-  const cardBg = colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.03)';
+  // Card background color using secondary background
+  const cardBg = getSecondaryCardBackgroundByMode(theme, themeMode);
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder style={{ background }}>
