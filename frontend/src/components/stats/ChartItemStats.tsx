@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Grid, Text, Group, ThemeIcon, rem } from '@mantine/core';
+import { Paper, Grid, Text, Group, ThemeIcon, rem, useMantineTheme } from '@mantine/core';
 import { CertificationBadge } from '../CertificationBadge';
 import { useOfflineStatus } from '../../hooks/useOfflineStatus';
 import { getUserPlaycountCached } from '../../utils/certification';
@@ -14,6 +14,7 @@ import {
   IconTimeline,
 } from '@tabler/icons-react';
 import { StatsBox } from '../StatsBox';
+import { getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
 
 export interface ChartItemStatsProps {
   stats: any;
@@ -35,6 +36,8 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
   full = false,
 }) => {
   const { t } = useTranslation();
+  const theme = useMantineTheme();
+  const themeMode = useSelector((s: any) => (s.theme?.value as ThemeMode) || 'dark');
   const charts = useSelector((s: RootState) => s.charts.charts);
   const chart = charts.find((c: any) => String(c.id) === String(chartId));
   // Defensive: handle both old and new stats shape
@@ -49,6 +52,8 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
     else if (chartType === 'album') cutoff = chart.album_cutoff;
     else if (chartType === 'track') cutoff = chart.music_cutoff;
   }
+  // Define card background based on theme
+  const cardBackground = getSecondaryCardBackgroundByMode(theme, themeMode);
   return (
     <Paper p="md" radius={0} style={{ backgroundColor: 'transparent' }}>
       <Grid justify="center" mb="md">
@@ -87,6 +92,7 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
                 ? entityName || stats.name || stats.entityName || ''
                 : entityArtistName || stats.artistName || stats.artist || ''
             }
+            background={cardBackground}
           />
         )}
         <StatsBox
@@ -94,6 +100,7 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
           value={totals.totalPoints ?? 0}
           color="blue"
           span={{ base: 4, sm: 2 }}
+          background={cardBackground}
         />
         {['album', 'track'].includes(chartType) &&
           (() => {
@@ -141,24 +148,28 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
           value={peak.position && parseInt(peak.position) === 1 ? peak.weeksAtPeak : 0}
           color="blue"
           span={{ base: 4, sm: 2 }}
+          background={cardBackground}
         />
         <StatsBox
           label={t('charts.stats.top5')}
           value={totals.top5 ?? 0}
           color="blue"
           span={{ base: 4, sm: 2 }}
+          background={cardBackground}
         />
         <StatsBox
           label={t('charts.stats.top10')}
           value={totals.top10 ?? 0}
           color="blue"
           span={{ base: 4, sm: 2 }}
+          background={cardBackground}
         />
         <StatsBox
           label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
           value={totals.withinCutoff ?? 0}
           color="blue"
           span={{ base: 4, sm: 2 }}
+          background={cardBackground}
         />
       </Grid>
       {full && (
@@ -178,24 +189,28 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
             value={sequences.rank1 ?? 0}
             color="blue"
             span={{ base: 4, sm: 2 }}
+            background={cardBackground}
           />
           <StatsBox
             label={t('charts.stats.top5')}
             value={sequences.top5 ?? 0}
             color="blue"
             span={{ base: 4, sm: 2 }}
+            background={cardBackground}
           />
           <StatsBox
             label={t('charts.stats.top10')}
             value={sequences.top10 ?? 0}
             color="blue"
             span={{ base: 4, sm: 2 }}
+            background={cardBackground}
           />
           <StatsBox
             label={cutoff ? t('charts.stats.topX', { x: cutoff }) : t('charts.stats.topCutoff')}
             value={sequences.withinCutoff ?? 0}
             color="blue"
             span={{ base: 4, sm: 2 }}
+            background={cardBackground}
           />
         </Grid>
       )}
@@ -209,11 +224,15 @@ function LastfmPlaysBox({
   chartType,
   artistName,
   entityName,
+  shadow = 'sm',
+  background,
 }: {
   chart: any;
   chartType: 'artist' | 'album' | 'track';
   artistName: string;
   entityName: string;
+  shadow?: string;
+  background: string;
 }) {
   const { isOnline } = useOfflineStatus();
   const [plays, setPlays] = React.useState<number | null>(null);
@@ -250,6 +269,8 @@ function LastfmPlaysBox({
       sub={plays == null ? '…' : undefined}
       color="blue"
       span={{ base: 4, sm: 2 }}
+      shadow={shadow}
+      background={background}
     />
   );
 }
