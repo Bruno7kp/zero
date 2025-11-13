@@ -151,12 +151,26 @@ export const ArtistDetailPage: React.FC = () => {
   } | null>(null);
 
   // Sorting state with localStorage persistence
-  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak' | 'points'>(() => {
-    return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
-  });
-  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak' | 'points'>(() => {
-    return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
-  });
+  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak' | 'points' | 'plays' | 'sales'>(
+    () => {
+      return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as
+        | 'weeks'
+        | 'peak'
+        | 'points'
+        | 'plays'
+        | 'sales';
+    }
+  );
+  const [tracksSort, setTracksSort] = useState<'weeks' | 'peak' | 'points' | 'plays' | 'sales'>(
+    () => {
+      return storage.get(KEYS.ARTIST_TRACKS_SORT, [], 'weeks') as
+        | 'weeks'
+        | 'peak'
+        | 'points'
+        | 'plays'
+        | 'sales';
+    }
+  );
   const [albumsView, setAlbumsView] = useState<'table' | 'carousel'>(() => {
     return storage.get(KEYS.ARTIST_ALBUMS_VIEW, [], 'table') as 'table' | 'carousel';
   });
@@ -273,6 +287,23 @@ export const ArtistDetailPage: React.FC = () => {
   // Sorting function: points (desc)
   const sortByPoints = (a: any, b: any) => b.points - a.points;
 
+  // Sorting function: plays (desc)
+  const sortByPlays = (a: any, b: any) => b.totalPlays - a.totalPlays;
+
+  // Sorting function: sales (desc)
+  const sortBySales = React.useCallback(
+    (a: any, b: any, isAlbum: boolean) => {
+      const pointsWeight = isAlbum
+        ? chart?.album_points_weight || 0
+        : chart?.music_points_weight || 0;
+      const playsWeight = isAlbum ? chart?.album_plays_weight || 0 : chart?.music_plays_weight || 0;
+      const aSales = a.points * pointsWeight + a.totalPlays * playsWeight;
+      const bSales = b.points * pointsWeight + b.totalPlays * playsWeight;
+      return bSales - aSales;
+    },
+    [chart]
+  );
+
   // Apply sorting to albums
   const topAlbums = useMemo(() => {
     const sorted = [...rawAlbums];
@@ -280,11 +311,15 @@ export const ArtistDetailPage: React.FC = () => {
       sorted.sort(sortByPeak);
     } else if (albumsSort === 'points') {
       sorted.sort(sortByPoints);
+    } else if (albumsSort === 'plays') {
+      sorted.sort(sortByPlays);
+    } else if (albumsSort === 'sales') {
+      sorted.sort((a, b) => sortBySales(a, b, true));
     } else {
       sorted.sort(sortByWeeks);
     }
     return sorted;
-  }, [rawAlbums, albumsSort]);
+  }, [rawAlbums, albumsSort, sortBySales]);
 
   // Apply sorting to tracks
   const topTracks = useMemo(() => {
@@ -293,11 +328,15 @@ export const ArtistDetailPage: React.FC = () => {
       sorted.sort(sortByPeak);
     } else if (tracksSort === 'points') {
       sorted.sort(sortByPoints);
+    } else if (tracksSort === 'plays') {
+      sorted.sort(sortByPlays);
+    } else if (tracksSort === 'sales') {
+      sorted.sort((a, b) => sortBySales(a, b, false));
     } else {
       sorted.sort(sortByWeeks);
     }
     return sorted;
-  }, [rawTracks, tracksSort]);
+  }, [rawTracks, tracksSort, sortBySales]);
 
   if (!chart) {
     return (
@@ -641,11 +680,20 @@ export const ArtistDetailPage: React.FC = () => {
               <Select
                 leftSection={<IconSortDescending size={16} />}
                 value={albumsSort}
-                onChange={value => setAlbumsSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
+                onChange={value =>
+                  setAlbumsSort(
+                    (value as 'weeks' | 'peak' | 'points' | 'plays' | 'sales') || 'weeks'
+                  )
+                }
                 data={[
                   { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
                   { value: 'peak', label: t('library.detail.sections.sortPeak') },
                   { value: 'points', label: t('library.detail.sections.sortPoints') },
+                  { value: 'plays', label: t('library.detail.sections.columnPlays') },
+                  {
+                    value: 'sales',
+                    label: chart?.formula_name || t('library.detail.sections.columnSales'),
+                  },
                 ]}
                 size="xs"
                 w={120}
@@ -740,12 +788,17 @@ export const ArtistDetailPage: React.FC = () => {
                         >
                           {album.name}
                         </Text>
-                        <Group gap="lg" justify="center" w="100%">
-                          <Stack gap={2} align="center">
-                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
-                              {t('library.detail.sections.columnPeak')}
-                            </Text>
-                            {album.peak === 1 ? (
+                        <Stack gap={2} align="center" w="100%">
+                          <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
+                            {albumsSort === 'peak' && t('library.detail.sections.columnPeak')}
+                            {albumsSort === 'weeks' && t('library.detail.sections.columnWeeks')}
+                            {albumsSort === 'points' && t('library.detail.sections.columnPoints')}
+                            {albumsSort === 'plays' && t('library.detail.sections.columnPlays')}
+                            {albumsSort === 'sales' &&
+                              (chart?.formula_name || t('library.detail.sections.columnSales'))}
+                          </Text>
+                          {albumsSort === 'peak' ? (
+                            album.peak === 1 ? (
                               <Group gap={4} justify="center" wrap="nowrap">
                                 <Text size="xs" fw={700} c="mediumblue">
                                   #1
@@ -764,17 +817,31 @@ export const ArtistDetailPage: React.FC = () => {
                               <Text size="xs" c="dimmed">
                                 -
                               </Text>
-                            )}
-                          </Stack>
-                          <Stack gap={2} align="center">
-                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
-                              {t('library.detail.sections.columnWeeks')}
-                            </Text>
+                            )
+                          ) : albumsSort === 'weeks' ? (
                             <Text size="xs" fw={600}>
                               {album.weeks}
                             </Text>
-                          </Stack>
-                        </Group>
+                          ) : albumsSort === 'points' ? (
+                            <Text size="xs" fw={600}>
+                              {album.points}
+                            </Text>
+                          ) : albumsSort === 'plays' ? (
+                            <Text size="xs" fw={600}>
+                              {album.totalPlays?.toLocaleString()}
+                            </Text>
+                          ) : (
+                            <Text size="xs" fw={600}>
+                              {(() => {
+                                const pointsWeight = chart?.album_points_weight || 0;
+                                const playsWeight = chart?.album_plays_weight || 0;
+                                const sales =
+                                  album.points * pointsWeight + album.totalPlays * playsWeight;
+                                return Math.round(sales).toLocaleString();
+                              })()}
+                            </Text>
+                          )}
+                        </Stack>
                       </Stack>
                     </Card>
                   );
@@ -941,11 +1008,20 @@ export const ArtistDetailPage: React.FC = () => {
               <Select
                 leftSection={<IconSortDescending size={16} />}
                 value={tracksSort}
-                onChange={value => setTracksSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
+                onChange={value =>
+                  setTracksSort(
+                    (value as 'weeks' | 'peak' | 'points' | 'plays' | 'sales') || 'weeks'
+                  )
+                }
                 data={[
                   { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
                   { value: 'peak', label: t('library.detail.sections.sortPeak') },
                   { value: 'points', label: t('library.detail.sections.sortPoints') },
+                  { value: 'plays', label: t('library.detail.sections.columnPlays') },
+                  {
+                    value: 'sales',
+                    label: chart?.formula_name || t('library.detail.sections.columnSales'),
+                  },
                 ]}
                 size="xs"
                 w={120}
@@ -1040,12 +1116,17 @@ export const ArtistDetailPage: React.FC = () => {
                         >
                           {track.name}
                         </Text>
-                        <Group gap="lg" justify="center" w="100%">
-                          <Stack gap={2} align="center">
-                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
-                              {t('library.detail.sections.columnPeak')}
-                            </Text>
-                            {track.peak === 1 ? (
+                        <Stack gap={2} align="center" w="100%">
+                          <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
+                            {tracksSort === 'peak' && t('library.detail.sections.columnPeak')}
+                            {tracksSort === 'weeks' && t('library.detail.sections.columnWeeks')}
+                            {tracksSort === 'points' && t('library.detail.sections.columnPoints')}
+                            {tracksSort === 'plays' && t('library.detail.sections.columnPlays')}
+                            {tracksSort === 'sales' &&
+                              (chart?.formula_name || t('library.detail.sections.columnSales'))}
+                          </Text>
+                          {tracksSort === 'peak' ? (
+                            track.peak === 1 ? (
                               <Group gap={4} justify="center" wrap="nowrap">
                                 <Text size="xs" fw={700} c="mediumblue">
                                   #1
@@ -1064,17 +1145,31 @@ export const ArtistDetailPage: React.FC = () => {
                               <Text size="xs" c="dimmed">
                                 -
                               </Text>
-                            )}
-                          </Stack>
-                          <Stack gap={2} align="center">
-                            <Text size="10px" c="dimmed" tt="uppercase" fw={600}>
-                              {t('library.detail.sections.columnWeeks')}
-                            </Text>
+                            )
+                          ) : tracksSort === 'weeks' ? (
                             <Text size="xs" fw={600}>
                               {track.weeks}
                             </Text>
-                          </Stack>
-                        </Group>
+                          ) : tracksSort === 'points' ? (
+                            <Text size="xs" fw={600}>
+                              {track.points}
+                            </Text>
+                          ) : tracksSort === 'plays' ? (
+                            <Text size="xs" fw={600}>
+                              {track.totalPlays?.toLocaleString()}
+                            </Text>
+                          ) : (
+                            <Text size="xs" fw={600}>
+                              {(() => {
+                                const pointsWeight = chart?.music_points_weight || 0;
+                                const playsWeight = chart?.music_plays_weight || 0;
+                                const sales =
+                                  track.points * pointsWeight + track.totalPlays * playsWeight;
+                                return Math.round(sales).toLocaleString();
+                              })()}
+                            </Text>
+                          )}
+                        </Stack>
                       </Stack>
                     </Card>
                   );

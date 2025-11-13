@@ -581,6 +581,7 @@
           "columnWeeks": "Semanas",
           "columnPeak": "Pico",
           "columnPlays": "Reproduções",
+          "columnSales": "Vendas",
           "meta": "{{points}} pts • {{weeks}} semanas • {{plays}} reproduções • pico #{{peak}}",
           "backToArtist": "Voltar para o artista",
           "sortBy": "Ordenar por",

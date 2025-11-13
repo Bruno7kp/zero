@@ -119,9 +119,16 @@ const ArtistAlbumsPage: React.FC = () => {
   const cardBackground = getCardBackgroundByMode(theme, themeMode);
 
   // Sorting state with localStorage persistence
-  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak' | 'points'>(() => {
-    return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as 'weeks' | 'peak' | 'points';
-  });
+  const [albumsSort, setAlbumsSort] = useState<'weeks' | 'peak' | 'points' | 'plays' | 'sales'>(
+    () => {
+      return storage.get(KEYS.ARTIST_ALBUMS_SORT, [], 'weeks') as
+        | 'weeks'
+        | 'peak'
+        | 'points'
+        | 'plays'
+        | 'sales';
+    }
+  );
   const [albumsShowImage, setAlbumsShowImage] = useState<boolean>(() => {
     return storage.getJson<boolean>(KEYS.ARTIST_ALBUMS_SHOW_IMAGE, [], true) ?? true;
   });
@@ -178,6 +185,21 @@ const ArtistAlbumsPage: React.FC = () => {
 
   // Sorting function: points (desc)
   const sortByPoints = (a: any, b: any) => b.points - a.points;
+
+  // Sorting function: plays (desc)
+  const sortByPlays = (a: any, b: any) => b.totalPlays - a.totalPlays;
+
+  // Sorting function: sales (desc)
+  const sortBySales = React.useCallback(
+    (a: any, b: any) => {
+      const pointsWeight = chart?.album_points_weight || 0;
+      const playsWeight = chart?.album_plays_weight || 0;
+      const aSales = a.points * pointsWeight + a.totalPlays * playsWeight;
+      const bSales = b.points * pointsWeight + b.totalPlays * playsWeight;
+      return bSales - aSales;
+    },
+    [chart]
+  );
 
   // Get all chart data for recalculating stats by year
   const [chartData, setChartData] = useState<
@@ -294,11 +316,15 @@ const ArtistAlbumsPage: React.FC = () => {
       sorted.sort(sortByPeak);
     } else if (albumsSort === 'points') {
       sorted.sort(sortByPoints);
+    } else if (albumsSort === 'plays') {
+      sorted.sort(sortByPlays);
+    } else if (albumsSort === 'sales') {
+      sorted.sort(sortBySales);
     } else {
       sorted.sort(sortByWeeks);
     }
     return sorted;
-  }, [filteredEntities, albumsSort]);
+  }, [filteredEntities, albumsSort, sortBySales]);
 
   // Calculate if sales and cert features should be available
   const pointsWeight = chart?.album_points_weight || 0;
@@ -410,11 +436,20 @@ const ArtistAlbumsPage: React.FC = () => {
             <Group gap="sm">
               <Select
                 value={albumsSort}
-                onChange={value => setAlbumsSort((value as 'weeks' | 'peak' | 'points') || 'weeks')}
+                onChange={value =>
+                  setAlbumsSort(
+                    (value as 'weeks' | 'peak' | 'points' | 'plays' | 'sales') || 'weeks'
+                  )
+                }
                 data={[
                   { value: 'weeks', label: t('library.detail.sections.sortWeeks') },
                   { value: 'peak', label: t('library.detail.sections.sortPeak') },
                   { value: 'points', label: t('library.detail.sections.sortPoints') },
+                  { value: 'plays', label: t('library.detail.sections.columnPlays') },
+                  {
+                    value: 'sales',
+                    label: chart?.formula_name || t('library.detail.sections.columnSales'),
+                  },
                 ]}
                 size="xs"
                 w={120}
@@ -438,7 +473,7 @@ const ArtistAlbumsPage: React.FC = () => {
               )}
               <Menu shadow="md" width={200}>
                 <Menu.Target>
-                  <ActionIcon variant="light" size="lg">
+                  <ActionIcon variant="subtle" size="lg">
                     <IconSettings size={18} />
                   </ActionIcon>
                 </Menu.Target>

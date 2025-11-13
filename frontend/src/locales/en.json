@@ -581,6 +581,7 @@
           "columnWeeks": "Weeks",
           "columnPeak": "Peak",
           "columnPlays": "Plays",
+          "columnSales": "Sales",
           "meta": "{{points}} pts • {{weeks}} weeks • {{plays}} plays • peak #{{peak}}",
           "backToArtist": "Back to artist",
           "sortBy": "Sort by",
