@@ -277,7 +277,7 @@ export const CertificationBadge: React.FC<Props> = ({
           <Text fw={600} size="sm" c={textColor}>
             {levelLabel}
           </Text>
-          <Text size="xs" c={textColor ? textColor : "dimmed"}>
+          <Text size="xs" c={textColor ? textColor : 'dimmed'}>
             {valueLabel}
           </Text>
         </Stack>

@@ -421,7 +421,7 @@ export const ArtistDetailPage: React.FC = () => {
                 style={{ cursor: 'pointer' }}
               />
               <Stack gap="xs" style={{ flex: 1 }}>
-                <Title order={1} c={effectiveImageUrl ? "#fff" : undefined}>
+                <Title order={1} c={effectiveImageUrl ? '#fff' : undefined}>
                   {stats.name}
                 </Title>
               </Stack>
