@@ -239,11 +239,13 @@ export const TrackDetailPage: React.FC = () => {
                 }}
               >
                 <Stack gap={4}>
-                  <Title order={1}>{stats.name}</Title>
+                  <Title order={1} c={effectiveImageUrl ? "#fff" : undefined}>
+                    {stats.name}
+                  </Title>
                   {stats.artistName && (
                     <Text
                       size="lg"
-                      c="dimmed"
+                      c={effectiveImageUrl ? "#e0e0e0" : "dimmed"}
                       component={Link}
                       to={`/library/music/${encodeLastFmSlug(stats.artistName)}`}
                       style={{ textDecoration: 'none' }}
@@ -265,6 +267,7 @@ export const TrackDetailPage: React.FC = () => {
                     username={chart?.lastfm_username}
                     dayOfWeek={chart?.day_of_week}
                     variant="icon"
+                    textColor={effectiveImageUrl ? "#fff" : undefined}
                   />
                 )}
               </Stack>

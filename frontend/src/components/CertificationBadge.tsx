@@ -25,6 +25,7 @@ interface Props {
   username?: string;
   dayOfWeek?: number; // next calculation day (chart.day_of_week?)
   variant?: 'full' | 'icon';
+  textColor?: string; // Override text color for light backgrounds
 }
 
 export const CertificationBadge: React.FC<Props> = ({
@@ -35,6 +36,7 @@ export const CertificationBadge: React.FC<Props> = ({
   username,
   dayOfWeek,
   variant = 'full',
+  textColor,
 }) => {
   const { t } = useTranslation();
   const { isOnline: online } = useOfflineStatus();
@@ -272,10 +274,10 @@ export const CertificationBadge: React.FC<Props> = ({
       <Group wrap="nowrap" align="center" gap="sm">
         {iconElement}
         <Stack gap={0} justify="center" style={{ flex: 'unset' }}>
-          <Text fw={600} size="sm">
+          <Text fw={600} size="sm" c={textColor}>
             {levelLabel}
           </Text>
-          <Text size="xs" c="dimmed">
+          <Text size="xs" c={textColor ? textColor : "dimmed"}>
             {valueLabel}
           </Text>
         </Stack>
