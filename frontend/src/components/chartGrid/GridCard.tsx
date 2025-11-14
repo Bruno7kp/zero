@@ -121,6 +121,10 @@ export const GridCard: React.FC<GridCardProps> = ({
   };
 
   const cardBackground = isDropped
+    ? themeMode === 'dark'
+      ? getCardBackgroundByMode(theme, themeMode)
+      : getSecondaryCardBackgroundByMode(theme, themeMode)
+    : themeMode === 'dark'
     ? getSecondaryCardBackgroundByMode(theme, themeMode)
     : getCardBackgroundByMode(theme, themeMode);
   const rankBadgeSize = isDropped ? 'lg' : 'xl';

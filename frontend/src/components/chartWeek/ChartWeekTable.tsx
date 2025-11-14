@@ -26,7 +26,11 @@ import RowExpansionStats from '../chartTable/RowExpansionStats';
 import { useStableDisplayedData } from '../chartTable/hooks/useStableDisplayedData';
 import { useDeferredStats } from '../chartTable/hooks/useDeferredStats';
 import { useStatsEmptyFallback } from '../chartTable/hooks/useStatsEmptyFallback';
-import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import {
+  getCardBackgroundByMode,
+  getSecondaryCardBackgroundByMode,
+  type ThemeMode,
+} from '../../theme/modes';
 
 interface ChartWeekTableProps {
   chart: any;
@@ -325,7 +329,15 @@ export const ChartWeekTable: React.FC<ChartWeekTableProps> = ({
           bg: 'transparent' as const,
           style: { background: 'transparent' },
         }
-      : { shadow: 'xs' as const, style: { background: getCardBackgroundByMode(theme, themeMode) } };
+      : {
+          shadow: 'xs' as const,
+          style: {
+            background:
+              themeMode === 'dark'
+                ? getSecondaryCardBackgroundByMode(theme, themeMode)
+                : getCardBackgroundByMode(theme, themeMode),
+          },
+        };
 
   return (
     <>

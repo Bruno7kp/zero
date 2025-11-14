@@ -14,7 +14,11 @@ import {
   IconTimeline,
 } from '@tabler/icons-react';
 import { StatsBox } from '../StatsBox';
-import { getSecondaryCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import {
+  getCardBackgroundByMode,
+  getSecondaryCardBackgroundByMode,
+  type ThemeMode,
+} from '../../theme/modes';
 
 export interface ChartItemStatsProps {
   stats: any;
@@ -53,7 +57,10 @@ export const ChartItemStats: React.FC<ChartItemStatsProps> = ({
     else if (chartType === 'track') cutoff = chart.music_cutoff;
   }
   // Define card background based on theme
-  const cardBackground = getSecondaryCardBackgroundByMode(theme, themeMode);
+  const cardBackground =
+    themeMode !== 'dark'
+      ? getSecondaryCardBackgroundByMode(theme, themeMode)
+      : getCardBackgroundByMode(theme, themeMode);
   return (
     <Paper p="md" radius={0} style={{ backgroundColor: 'transparent' }}>
       <Grid justify="center" mb="md">

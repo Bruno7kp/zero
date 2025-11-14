@@ -8,7 +8,11 @@ import { SpotifyImageWithModal } from '../SpotifyImageWithModal';
 import type { ChartData } from '../../db/indexedDb';
 import { ChartItemStatsLoader } from '../stats/ChartItemStatsLoader';
 import { makeScaleSize } from '../../hooks/useFontScale';
-import { getCardBackgroundByMode, type ThemeMode } from '../../theme/modes';
+import {
+  getCardBackgroundByMode,
+  getSecondaryCardBackgroundByMode,
+  type ThemeMode,
+} from '../../theme/modes';
 import { encodeLastFmSlug } from '../../utils/urlEncoding';
 import {
   RankCellList,
@@ -146,7 +150,11 @@ export const ChartWeekListRow: React.FC<{
         p={0}
         radius="md"
         style={{
-          background: isTransparent ? 'transparent' : getCardBackgroundByMode(theme, themeMode),
+          background: isTransparent
+            ? 'transparent'
+            : themeMode === 'dark'
+            ? getSecondaryCardBackgroundByMode(theme, themeMode)
+            : getCardBackgroundByMode(theme, themeMode),
         }}
       >
         <Flex
