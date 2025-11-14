@@ -88,7 +88,7 @@ const fetchLastFmApi = async (
     if (useUsernameParam) base.username = user;
     else base.user = user;
   }
-  
+
   // Se useLastFmEncoding for true, usar encodeLastFmSlug para parâmetros específicos
   let queryString: string;
   if (useLastFmEncoding) {
@@ -107,7 +107,7 @@ const fetchLastFmApi = async (
     const params = new URLSearchParams(base);
     queryString = params.toString();
   }
-  
+
   const lurl = `${LASTFM_API_URL}?${queryString}`;
   const response = await fetch(lurl);
   if (!response.ok) {
@@ -196,7 +196,7 @@ export const getTrackInfo = async (user: string, artist: string, track: string) 
     undefined,
     { artist, track, autocorrect: '0' },
     true,
-    true  // useLastFmEncoding = true
+    true // useLastFmEncoding = true
   );
   if (!data?.track?.userplaycount) {
     try {
@@ -207,7 +207,7 @@ export const getTrackInfo = async (user: string, artist: string, track: string) 
         undefined,
         { artist, track, autocorrect: '1' },
         true,
-        true  // useLastFmEncoding = true
+        true // useLastFmEncoding = true
       );
     } catch {
       /* ignore fallback error */
@@ -224,7 +224,7 @@ export const getAlbumInfo = async (user: string, artist: string, album: string) 
     undefined,
     { artist, album },
     true,
-    true  // useLastFmEncoding = true
+    true // useLastFmEncoding = true
   );
   if (!data?.album?.userplaycount) {
     try {
@@ -235,7 +235,7 @@ export const getAlbumInfo = async (user: string, artist: string, album: string) 
         undefined,
         { artist, album, autocorrect: '1' },
         true,
-        true  // useLastFmEncoding = true
+        true // useLastFmEncoding = true
       );
     } catch {
       /* ignore */
@@ -253,7 +253,7 @@ export const getArtistInfo = async (user: string, artist: string) => {
     undefined,
     { artist, autocorrect: '0' },
     true,
-    true  // useLastFmEncoding = true
+    true // useLastFmEncoding = true
   );
   if (!data?.artist?.stats?.userplaycount) {
     try {
@@ -264,7 +264,7 @@ export const getArtistInfo = async (user: string, artist: string) => {
         undefined,
         { artist, autocorrect: '1' },
         true,
-        true  // useLastFmEncoding = true
+        true // useLastFmEncoding = true
       );
     } catch {
       /* ignore */
