@@ -1,5 +1,7 @@
 // src/services/lastfm.ts
 
+import { encodeLastFmSlug } from '../utils/urlEncoding';
+
 const LASTFM_API_KEY = 'e35699481c9c3134d856e99792a2b6de';
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 
@@ -71,7 +73,8 @@ const fetchLastFmApi = async (
   from?: string,
   to?: string,
   extra: Record<string, string> = {},
-  useUsernameParam: boolean = false
+  useUsernameParam: boolean = false,
+  useLastFmEncoding: boolean = false
 ): Promise<LastFmResponse> => {
   const base: Record<string, string> = {
     method,
@@ -85,8 +88,27 @@ const fetchLastFmApi = async (
     if (useUsernameParam) base.username = user;
     else base.user = user;
   }
-  const params = new URLSearchParams(base);
-  const lurl = `${LASTFM_API_URL}?${params.toString()}`;
+  
+  // Se useLastFmEncoding for true, usar encodeLastFmSlug para parâmetros específicos
+  let queryString: string;
+  if (useLastFmEncoding) {
+    const params: string[] = [];
+    for (const [key, value] of Object.entries(base)) {
+      if (key === 'artist' || key === 'track' || key === 'album') {
+        // Usar encoding específico do Last.fm para nomes de artistas/tracks/albums
+        params.push(`${key}=${encodeLastFmSlug(value)}`);
+      } else {
+        // Usar encoding padrão para outros parâmetros
+        params.push(`${key}=${encodeURIComponent(value)}`);
+      }
+    }
+    queryString = params.join('&');
+  } else {
+    const params = new URLSearchParams(base);
+    queryString = params.toString();
+  }
+  
+  const lurl = `${LASTFM_API_URL}?${queryString}`;
   const response = await fetch(lurl);
   if (!response.ok) {
     throw new LastFmApiError(`[LASTFM][HTTP:${response.status}] ${response.statusText}`, {
@@ -173,7 +195,8 @@ export const getTrackInfo = async (user: string, artist: string, track: string) 
     undefined,
     undefined,
     { artist, track, autocorrect: '0' },
-    true
+    true,
+    true  // useLastFmEncoding = true
   );
   if (!data?.track?.userplaycount) {
     try {
@@ -183,7 +206,8 @@ export const getTrackInfo = async (user: string, artist: string, track: string) 
         undefined,
         undefined,
         { artist, track, autocorrect: '1' },
-        true
+        true,
+        true  // useLastFmEncoding = true
       );
     } catch {
       /* ignore fallback error */
@@ -199,7 +223,8 @@ export const getAlbumInfo = async (user: string, artist: string, album: string) 
     undefined,
     undefined,
     { artist, album },
-    true
+    true,
+    true  // useLastFmEncoding = true
   );
   if (!data?.album?.userplaycount) {
     try {
@@ -209,7 +234,8 @@ export const getAlbumInfo = async (user: string, artist: string, album: string) 
         undefined,
         undefined,
         { artist, album, autocorrect: '1' },
-        true
+        true,
+        true  // useLastFmEncoding = true
       );
     } catch {
       /* ignore */
@@ -226,7 +252,8 @@ export const getArtistInfo = async (user: string, artist: string) => {
     undefined,
     undefined,
     { artist, autocorrect: '0' },
-    true
+    true,
+    true  // useLastFmEncoding = true
   );
   if (!data?.artist?.stats?.userplaycount) {
     try {
@@ -236,7 +263,8 @@ export const getArtistInfo = async (user: string, artist: string) => {
         undefined,
         undefined,
         { artist, autocorrect: '1' },
-        true
+        true,
+        true  // useLastFmEncoding = true
       );
     } catch {
       /* ignore */
