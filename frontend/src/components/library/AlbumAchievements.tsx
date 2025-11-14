@@ -236,10 +236,10 @@ export const AlbumAchievements: React.FC<AlbumAchievementsProps> = ({
         <Group justify="space-between" align="center" mb={collapsed ? 0 : 'md'}>
           <Title order={3}>{t('library.achievements.title')}</Title>
           <Group gap="sm">
-            <Badge size="lg" variant="gradient" gradient={{ from: 'yellow', to: 'orange' }}>
+            <Badge size="lg" variant="gradient" gradient={{ from: 'teal', to: 'blue' }}>
               {unlockedCount}/{totalCount}
             </Badge>
-            <ActionIcon variant="gradient" onClick={() => setCollapsed(!collapsed)} size="md">
+            <ActionIcon variant="subtle" onClick={() => setCollapsed(!collapsed)} size="md">
               {collapsed ? <IconChevronDown size={20} /> : <IconChevronUp size={20} />}
             </ActionIcon>
           </Group>
