@@ -522,11 +522,11 @@ const ArtistTracksPage: React.FC = () => {
                 <Table.Tr>
                   <Table.Th style={{ width: 60, textAlign: 'center' }}>#</Table.Th>
                   <Table.Th>{t('library.detail.sections.columnEntity')}</Table.Th>
-                  <Table.Th style={{ width: 100, textAlign: 'center' }}>
-                    {t('library.detail.sections.columnPlays')}
-                  </Table.Th>
                   <Table.Th style={{ width: 80, textAlign: 'center' }}>
                     {t('library.detail.sections.columnPeak')}
+                  </Table.Th>
+                  <Table.Th style={{ width: 100, textAlign: 'center' }}>
+                    {t('library.detail.sections.columnPlays')}
                   </Table.Th>
                   <Table.Th style={{ width: 100, textAlign: 'center' }}>
                     {t('library.detail.sections.columnWeeks')}
@@ -567,9 +567,6 @@ const ArtistTracksPage: React.FC = () => {
                       />
                     </Table.Td>
                     <Table.Td style={{ textAlign: 'center' }}>
-                      {track.totalPlays.toLocaleString()}
-                    </Table.Td>
-                    <Table.Td style={{ textAlign: 'center' }}>
                       {track.peak === 1 ? (
                         <Group gap={4} justify="center" wrap="nowrap">
                           <Text size="sm" fw={600} c="mediumblue">
@@ -588,6 +585,9 @@ const ArtistTracksPage: React.FC = () => {
                           -
                         </Text>
                       )}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: 'center' }}>
+                      {track.totalPlays.toLocaleString()}
                     </Table.Td>
                     <Table.Td style={{ textAlign: 'center' }}>
                       {track.weeks.toLocaleString()}

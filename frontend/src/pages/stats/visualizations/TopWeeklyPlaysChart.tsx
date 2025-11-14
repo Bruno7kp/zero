@@ -15,6 +15,7 @@ import { ResponsiveBar } from '@nivo/bar';
 import type { BarDatum } from '@nivo/bar';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
 import VisualizationFilters from '../../../components/stats/VisualizationFilters';
 import { useVisualizationPreferences } from '../../../hooks/useVisualizationPreferences';
 import { getHighestPlays, getAllWeeks, getYearRange } from '../../../utils/statsQueries';
@@ -41,6 +42,8 @@ const TopWeeklyPlaysChart: React.FC = () => {
   const computedColorScheme = useComputedColorScheme('dark');
   const isDark = computedColorScheme === 'dark';
   const { preferences, updatePreference } = useVisualizationPreferences();
+  const { type: typeParam } = useParams<{ type: string }>();
+  const navigate = useNavigate();
 
   const charts = useSelector((state: any) => state.charts.charts);
   const activeChartId = useSelector((state: any) => state.charts.activeChartId);
@@ -52,7 +55,17 @@ const TopWeeklyPlaysChart: React.FC = () => {
   const [yearRange, setYearRange] = React.useState<{ minYear: number; maxYear: number } | null>(
     null
   );
-  const [type, setType] = React.useState<'track' | 'album' | 'artist'>('track');
+  const type =
+    typeParam === 'album' || typeParam === 'artist' || typeParam === 'track'
+      ? (typeParam as 'track' | 'album' | 'artist')
+      : 'track';
+
+  const handleTypeChange = React.useCallback(
+    (newType: 'track' | 'album' | 'artist') => {
+      navigate(`/stats/visualizations/top-weekly-plays/${newType}`);
+    },
+    [navigate]
+  );
   const [loading, setLoading] = React.useState<boolean>(false);
   const [data, setData] = React.useState<WeeklyPlaysDatum[]>([]);
   const [allWeeks, setAllWeeks] = React.useState<string[]>([]);
@@ -416,7 +429,7 @@ const TopWeeklyPlaysChart: React.FC = () => {
         year={year}
         onYearChange={setYear}
         type={type}
-        onTypeChange={setType}
+        onTypeChange={handleTypeChange}
         containerSize={preferences.containerSize}
         onContainerSizeChange={value => updatePreference('containerSize', value)}
         yearRange={yearRange || undefined}

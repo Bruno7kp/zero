@@ -13,6 +13,7 @@ import { ResponsiveBar } from '@nivo/bar';
 import type { BarTooltipProps } from '@nivo/bar';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
 import VisualizationFilters from '../../../components/stats/VisualizationFilters';
 import { db } from '../../../db/indexedDb';
 import { getYearRange } from '../../../utils/statsQueries';
@@ -46,6 +47,8 @@ const NumberOneTimelineChart: React.FC = () => {
   const themeMode = useSelector((state: any) => state.theme?.value || 'dark') as ThemeMode;
   const cardBg = getCardBackgroundByMode(theme, themeMode);
   const { preferences, updatePreference } = useVisualizationPreferences();
+  const { type: typeParam } = useParams<{ type: string }>();
+  const navigate = useNavigate();
 
   const [year, setYear] = React.useState<string>('all');
   const [yearRange, setYearRange] = React.useState<{ minYear: number; maxYear: number } | null>(
@@ -54,8 +57,16 @@ const NumberOneTimelineChart: React.FC = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [data, setData] = React.useState<NumberOneBarDatum[]>([]);
   const [defaultYearApplied, setDefaultYearApplied] = React.useState<boolean>(false);
-  const [chartType, setChartType] = React.useState<'track' | 'album' | 'artist'>(
-    DEFAULT_CHART_TYPE
+  const chartType =
+    typeParam === 'album' || typeParam === 'artist' || typeParam === 'track'
+      ? (typeParam as 'track' | 'album' | 'artist')
+      : DEFAULT_CHART_TYPE;
+
+  const handleTypeChange = React.useCallback(
+    (newType: 'track' | 'album' | 'artist') => {
+      navigate(`/stats/visualizations/number-one-timeline/${newType}`);
+    },
+    [navigate]
   );
   const chartRef = React.useRef<HTMLDivElement>(null);
 
@@ -259,7 +270,7 @@ const NumberOneTimelineChart: React.FC = () => {
         onYearChange={setYear}
         yearRange={yearRange || undefined}
         type={chartType}
-        onTypeChange={value => setChartType(value)}
+        onTypeChange={handleTypeChange}
         containerSize={preferences.containerSize}
         onContainerSizeChange={value => updatePreference('containerSize', value)}
       />

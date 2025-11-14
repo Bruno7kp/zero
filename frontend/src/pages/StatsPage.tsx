@@ -59,6 +59,21 @@ const StatsPage: React.FC = () => {
   // Get chart cutoff for track type
   const trackCutoff = chart?.music_cutoff || 100;
 
+  // Extract current type from URL (track, album, or artist)
+  const getCurrentType = (): 'track' | 'album' | 'artist' => {
+    const pathParts = location.pathname.split('/');
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart === 'album' || lastPart === 'artist' || lastPart === 'track') {
+      return lastPart as 'track' | 'album' | 'artist';
+    }
+    return 'track'; // default
+  };
+
+  const currentType = getCurrentType();
+
+  // Some stats don't support artist type, so we fall back to track
+  const typeForArtistStats = currentType === 'artist' ? 'track' : currentType;
+
   // Navigation items
   const navItems: NavItem[] = [
     {
@@ -70,69 +85,69 @@ const StatsPage: React.FC = () => {
     {
       icon: IconGraph,
       label: t('stats.sidebar.viewVisualizations'),
-      path: '/stats/visualizations',
-      exact: true,
+      path: `/stats/visualizations`,
+      exact: false,
     },
     { divider: true },
     {
       icon: IconCrown,
       label: t('stats.timesAtTopByArtist.title', { n: 1 }),
-      path: '/stats/times_at_top_by_artist/1/track',
+      path: `/stats/times_at_top_by_artist/1/${typeForArtistStats}`,
       group: 'times_at_top_by_artist',
     },
     {
       icon: IconTrophy,
       label: t('stats.rank.title', { n: 1 }),
-      path: '/stats/rank/1/track',
+      path: `/stats/rank/1/${currentType}`,
       group: 'rank',
     },
     {
       icon: IconStar,
       label: t('stats.timesAtRank.title', { n: 1 }),
-      path: '/stats/times_at_rank/1/track',
+      path: `/stats/times_at_rank/1/${currentType}`,
       group: 'times_at_rank',
     },
     {
       icon: IconCalendarUp,
       label: t('stats.timesAtTop.title', { n: trackCutoff }),
-      path: `/stats/times_at_top/${trackCutoff}/track`,
+      path: `/stats/times_at_top/${trackCutoff}/${currentType}`,
       group: 'times_at_top',
     },
     {
       icon: IconBoxMultiple1,
       label: t('stats.longestConsecutiveAtOne.title'),
-      path: '/stats/longest_consecutive_at_one/track',
+      path: `/stats/longest_consecutive_at_one/${currentType}`,
       group: 'longest_consecutive_at_one',
     },
     { divider: true },
     {
       icon: IconRocket,
       label: t('stats.debuts.title'),
-      path: '/stats/debuts/all/track',
+      path: `/stats/debuts/all/${currentType}`,
       group: 'debuts',
     },
     {
       icon: IconSparkles,
       label: t('stats.debutsAtOneByArtist.title', { n: 1 }),
-      path: '/stats/debuts_at_one_by_artist/track',
+      path: `/stats/debuts_at_one_by_artist/${typeForArtistStats}`,
       group: 'debuts_at_one_by_artist',
     },
     {
       icon: IconMusicPlus,
       label: t('stats.mostSimultaneousByArtist.title'),
-      path: '/stats/most_simultaneous_by_artist/track',
+      path: `/stats/most_simultaneous_by_artist/${typeForArtistStats}`,
       group: 'most_simultaneous_by_artist',
     },
     {
       icon: IconHeadphones,
       label: t('stats.plays.title'),
-      path: '/stats/plays/all/track',
+      path: `/stats/plays/all/${currentType}`,
       group: 'plays',
     },
     {
       icon: IconStairsUp,
       label: t('stats.weeksToNumberOne.title'),
-      path: '/stats/weeks_to_number_one/track',
+      path: `/stats/weeks_to_number_one/${currentType}`,
       group: 'weeks_to_number_one',
     },
     { divider: true },
@@ -145,13 +160,13 @@ const StatsPage: React.FC = () => {
     {
       icon: IconCoins,
       label: t('stats.points.title'),
-      path: '/stats/points/track',
+      path: `/stats/points/${currentType}`,
       group: 'points',
     },
     {
       icon: IconCoin,
       label: t('stats.mostSales.title'),
-      path: '/stats/most_sales/track',
+      path: `/stats/most_sales/${currentType}`,
       group: 'most_sales',
     },
   ];

@@ -33,11 +33,29 @@ const StatsVisualizationsPage: React.FC = () => {
   const isMobile = useIsMobile();
   const [drawerOpened, setDrawerOpened] = React.useState(false);
 
+  // Extract current type from URL (track, album, or artist)
+  const getCurrentType = (): 'track' | 'album' | 'artist' => {
+    const pathParts = location.pathname.split('/');
+    // Check if the last part is a type
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart === 'album' || lastPart === 'artist' || lastPart === 'track') {
+      return lastPart as 'track' | 'album' | 'artist';
+    }
+    // Check if the part before last is a type (when in a subpage)
+    const secondLast = pathParts[pathParts.length - 2];
+    if (secondLast === 'album' || secondLast === 'artist' || secondLast === 'track') {
+      return secondLast as 'track' | 'album' | 'artist';
+    }
+    return 'track'; // default
+  };
+
+  const currentType = getCurrentType();
+
   const navItems: NavItem[] = [
     {
       icon: IconGraph,
       label: t('stats.visualizations.sidebar.overview'),
-      path: '/stats/visualizations',
+      path: `/stats/visualizations`,
       exact: true,
     },
     {
@@ -50,31 +68,31 @@ const StatsVisualizationsPage: React.FC = () => {
     {
       icon: IconTimeline,
       label: t('stats.visualizations.sidebar.timeline'),
-      path: '/stats/visualizations/number-one-timeline',
+      path: `/stats/visualizations/number-one-timeline/${currentType}`,
       group: 'number-one-timeline',
     },
     {
       icon: IconCrown,
       label: t('stats.visualizations.sidebar.rankDominance'),
-      path: '/stats/visualizations/top-rank-leaders',
+      path: `/stats/visualizations/top-rank-leaders/${currentType}`,
       group: 'top-rank-leaders',
     },
     {
       icon: IconCoins,
       label: t('stats.visualizations.sidebar.pointsDominance'),
-      path: '/stats/visualizations/top-points-leaders',
+      path: `/stats/visualizations/top-points-leaders/${currentType}`,
       group: 'top-points-leaders',
     },
     {
       icon: IconHeadphones,
       label: t('stats.visualizations.sidebar.weeklyPlays'),
-      path: '/stats/visualizations/top-weekly-plays',
+      path: `/stats/visualizations/top-weekly-plays/${currentType}`,
       group: 'top-weekly-plays',
     },
     {
       icon: IconRocket,
       label: t('stats.visualizations.sidebar.weeklyDebuts'),
-      path: '/stats/visualizations/top-weekly-debuts',
+      path: `/stats/visualizations/top-weekly-debuts/${currentType}`,
       group: 'top-weekly-debuts',
     },
   ];
@@ -131,11 +149,11 @@ const StatsVisualizationsPage: React.FC = () => {
           >
             <Routes>
               <Route index element={<StatsVisualizationsOverview />} />
-              <Route path="number-one-timeline" element={<NumberOneTimelineChart />} />
-              <Route path="top-rank-leaders" element={<TopRankLeadersChart />} />
-              <Route path="top-points-leaders" element={<TopPointsLeadersChart />} />
-              <Route path="top-weekly-plays" element={<TopWeeklyPlaysChart />} />
-              <Route path="top-weekly-debuts" element={<TopWeeklyDebutsChart />} />
+              <Route path="number-one-timeline/:type" element={<NumberOneTimelineChart />} />
+              <Route path="top-rank-leaders/:type" element={<TopRankLeadersChart />} />
+              <Route path="top-points-leaders/:type" element={<TopPointsLeadersChart />} />
+              <Route path="top-weekly-plays/:type" element={<TopWeeklyPlaysChart />} />
+              <Route path="top-weekly-debuts/:type" element={<TopWeeklyDebutsChart />} />
               <Route path="*" element={<StatsVisualizationsOverview />} />
             </Routes>
           </Suspense>
