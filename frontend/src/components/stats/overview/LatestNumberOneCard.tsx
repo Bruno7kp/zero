@@ -15,12 +15,14 @@ interface LatestNumberOneCardProps {
     artistName?: string;
     imageUrl?: string;
   }>;
+  chartType?: 'artist' | 'album' | 'track';
 }
 
 export const LatestNumberOneCard: React.FC<LatestNumberOneCardProps> = ({
   loading,
   cardBg,
   numberOneTrend,
+  chartType = 'track',
 }) => {
   const { t } = useTranslation();
 
@@ -39,7 +41,7 @@ export const LatestNumberOneCard: React.FC<LatestNumberOneCardProps> = ({
           variant="light"
           size="xs"
           component={Link}
-          to="/stats/visualizations/number-one-timeline"
+          to={`/stats/visualizations/number-one-timeline/${chartType}`}
           rightSection={<IconArrowRight size={14} />}
         >
           {t('stats.visualizations.actions.viewDetail')}

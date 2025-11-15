@@ -635,6 +635,7 @@ const StatsVisualizationsOverview: React.FC = () => {
         loading={loading}
         cardBg={cardBg}
         numberOneTrend={numberOneTrend}
+        chartType={'track'}
       />
     ),
     'rank-dominance': (

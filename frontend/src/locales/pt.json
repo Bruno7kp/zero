@@ -766,7 +766,7 @@
           "biggestDebutsOfYear": "Maiores Estreias em {{year}}",
           "latestNumberOneDebuts": "Últimas Estreias em #1",
           "highestPlaysInWeek": "Maiores Reproduções em uma Semana",
-          "highestPlaysInWeekOfYear": "Maiores Reproduções em uma Semana em {{year}}",
+          "highestPlaysInWeekOfYear": "Maiores Reproduções Semanais de {{year}}",
           "highestPlaysInWeekDescription": "Top 5 maiores contagens de reprodução",
           "numberOneHistory": "Histórico de #1",
           "numberOneHistoryDescription": "Últimas 15 semanas em #1",

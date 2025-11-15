@@ -50,7 +50,7 @@ export const RankDominanceCard: React.FC<RankDominanceCardProps> = ({
           variant="light"
           size="xs"
           component={Link}
-          to="/stats/visualizations/top-rank-leaders"
+          to={`/stats/visualizations/top-rank-leaders/${chartType}`}
           rightSection={<IconArrowRight size={14} />}
         >
           {t('stats.visualizations.actions.viewDetail')}
