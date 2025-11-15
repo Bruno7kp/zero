@@ -16,6 +16,7 @@ import ChartsWeekPage from './pages/ChartsWeekPage';
 import ChartsWeeksListPage from './pages/ChartsWeeksListPage.tsx';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
+import ScrobblePage from './pages/ScrobblePage';
 import RouteErrorBoundary from './components/RouteErrorBoundary';
 import MainLayout from './layouts/MainLayout';
 import { useSelector } from 'react-redux';
@@ -235,6 +236,14 @@ function App() {
           element={
             <ProtectedRoute>
               <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="scrobble"
+          element={
+            <ProtectedRoute>
+              <ScrobblePage />
             </ProtectedRoute>
           }
         />

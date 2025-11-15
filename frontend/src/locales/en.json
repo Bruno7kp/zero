@@ -11,7 +11,48 @@
       "friends": "Friends",
       "terms": "Terms of Use",
       "privacy": "Privacy Policy",
-      "rights": "All rights reserved"
+      "rights": "All rights reserved",
+      "scrobble": "Manual Scrobble"
+    },
+    "scrobble": {
+      "title": "Manual Scrobble",
+      "description": "Manually scrobble a track to Last.fm",
+      "form": {
+        "track": "Track Name",
+        "trackPlaceholder": "Enter track name",
+        "trackRequired": "Track name is required",
+        "artist": "Artist Name",
+        "artistPlaceholder": "Enter artist name",
+        "artistRequired": "Artist name is required",
+        "album": "Album Name (optional)",
+        "albumPlaceholder": "Enter album name",
+        "albumArtist": "Album Artist (optional)",
+        "albumArtistPlaceholder": "Enter album artist",
+        "duration": "Duration (seconds, optional)",
+        "durationPlaceholder": "Enter duration in seconds",
+        "timestamp": "Scrobble Date/Time",
+        "timestampDescription": "Last.fm allows scrobbles up to 2 weeks in the past",
+        "apiKey": "Last.fm API Key",
+        "apiKeyPlaceholder": "Enter your Last.fm API key",
+        "apiKeyRequired": "API key is required",
+        "apiSecret": "Last.fm API Secret",
+        "apiSecretPlaceholder": "Enter your Last.fm API secret",
+        "apiSecretRequired": "API secret is required",
+        "sessionKey": "Last.fm Session Key",
+        "sessionKeyPlaceholder": "Enter your Last.fm session key",
+        "sessionKeyRequired": "Session key is required",
+        "submit": "Scrobble",
+        "submitting": "Scrobbling..."
+      },
+      "success": "Track scrobbled successfully!",
+      "error": "Failed to scrobble track",
+      "errorDetails": "Error: {{message}}",
+      "help": {
+        "title": "How to get your Last.fm credentials",
+        "apiKey": "1. Go to https://www.last.fm/api/account/create to create an API account",
+        "sessionKey": "2. To get your session key, you need to authenticate your application",
+        "sessionKeyLink": "Learn more at Last.fm Authentication docs"
+      }
     },
     "charts": {
       "live_chart_period": "{{from}} - now",

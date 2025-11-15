@@ -28,6 +28,7 @@ import {
   IconDroplet,
   IconMoon,
   IconBell,
+  IconMusic,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Link } from 'react-router-dom';
@@ -187,6 +188,14 @@ export const Header: React.FC = () => {
               {t('user.friends')}
             </Menu.Item>
             <Menu.Divider />
+            <Menu.Item
+              component={NavLink}
+              to="/scrobble"
+              leftSection={<IconMusic style={{ width: rem(14), height: rem(14) }} />}
+              onClick={() => closeUserMenu()}
+            >
+              {t('user.scrobble')}
+            </Menu.Item>
             <Menu.Item
               component={NavLink}
               to="/notifications"

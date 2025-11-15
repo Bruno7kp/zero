@@ -2,6 +2,7 @@
 
 // routes/api.php (clean restored)
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\LastFmController;
 use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -21,6 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/charts', [ChartController::class, 'store']);
     Route::put('/charts/{chart}', [ChartController::class, 'update']);
     Route::delete('/charts/{chart}', [ChartController::class, 'destroy']);
+
+    // Last.fm scrobble endpoint
+    Route::post('/lastfm/scrobble', [LastFmController::class, 'scrobble']);
 });
 
 Route::get('/health', function () {
