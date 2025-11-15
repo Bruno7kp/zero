@@ -9,7 +9,7 @@ class LastFmController extends Controller
 {
     /**
      * Scrobble a track to Last.fm
-     * 
+     *
      * This endpoint proxies scrobble requests to Last.fm API.
      * Requires user's Last.fm session key and API credentials.
      */
@@ -38,13 +38,13 @@ class LastFmController extends Controller
         ];
 
         // Add optional parameters
-        if (!empty($validatedData['album'])) {
+        if (! empty($validatedData['album'])) {
             $params['album'] = $validatedData['album'];
         }
-        if (!empty($validatedData['albumArtist'])) {
+        if (! empty($validatedData['albumArtist'])) {
             $params['albumArtist'] = $validatedData['albumArtist'];
         }
-        if (!empty($validatedData['duration'])) {
+        if (! empty($validatedData['duration'])) {
             $params['duration'] = $validatedData['duration'];
         }
 
@@ -55,7 +55,7 @@ class LastFmController extends Controller
         try {
             // Make request to Last.fm API
             $response = Http::asForm()->post('https://ws.audioscrobbler.com/2.0/', $params);
-            
+
             $data = $response->json();
 
             if (isset($data['error'])) {
@@ -81,26 +81,22 @@ class LastFmController extends Controller
 
     /**
      * Generate API signature for Last.fm
-     * 
-     * @param array $params
-     * @param string $secret
-     * @return string
      */
     private function generateSignature(array $params, string $secret): string
     {
         // Remove format parameter if exists
         unset($params['format']);
-        
+
         // Sort parameters alphabetically
         ksort($params);
-        
+
         // Build signature string
         $sig = '';
         foreach ($params as $key => $value) {
-            $sig .= $key . $value;
+            $sig .= $key.$value;
         }
         $sig .= $secret;
-        
+
         // Return MD5 hash
         return md5($sig);
     }
