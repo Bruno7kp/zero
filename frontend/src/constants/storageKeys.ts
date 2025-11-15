@@ -35,6 +35,10 @@ export const KEYS = {
   ARTIST_ACHIEVEMENTS_COLLAPSED: 'zc.achievements.artist.collapsed:v1',
   ALBUM_ACHIEVEMENTS_COLLAPSED: 'zc.achievements.album.collapsed:v1',
   TRACK_ACHIEVEMENTS_COLLAPSED: 'zc.achievements.track.collapsed:v1',
+  // Persisted collapsible state for Chart Run card on entity detail pages
+  ARTIST_CHART_RUN_COLLAPSED: 'zc.chartrun.artist.collapsed:v1',
+  ALBUM_CHART_RUN_COLLAPSED: 'zc.chartrun.album.collapsed:v1',
+  TRACK_CHART_RUN_COLLAPSED: 'zc.chartrun.track.collapsed:v1',
 };
 
 // Legacy keys used previously in the codebase. Use as fallbacks when migrating.

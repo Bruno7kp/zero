@@ -20,6 +20,7 @@ import {
   Select,
   Stack,
   Tabs,
+  Collapse,
   Table,
   Text,
   Title,
@@ -37,6 +38,8 @@ import {
   IconPhoto,
   IconSettings,
   IconSortDescending,
+  IconChevronDown,
+  IconChevronUp,
 } from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import { useEntityStats } from '../hooks/useEntityStats';
@@ -222,6 +225,14 @@ export const ArtistDetailPage: React.FC = () => {
 
   const effectiveImageUrl = customImageUrl ?? imageUrl ?? undefined;
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
+  // Collapsible state for the chart run card (persisted)
+  const [chartRunCollapsed, setChartRunCollapsed] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ARTIST_CHART_RUN_COLLAPSED, [], false) ?? false;
+  });
+
+  useEffect(() => {
+    storage.setJson(KEYS.ARTIST_CHART_RUN_COLLAPSED, chartRunCollapsed);
+  }, [chartRunCollapsed]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
 
   const timelineRun = useMemo(
@@ -518,38 +529,47 @@ export const ArtistDetailPage: React.FC = () => {
             withBorder
             style={{ background: cardBackground }}
           >
-            <Title order={3} mb="md">
-              {t('library.detail.chartRun')}
-            </Title>
-            <Tabs
-              value={chartView}
-              onChange={value =>
-                setChartView((value as 'timeline' | 'line' | 'waffle') || 'timeline')
-              }
-              keepMounted={false}
-            >
-              <Tabs.List>
-                <Tabs.Tab value="timeline">{t('library.detail.chartRunTabs.timeline')}</Tabs.Tab>
-                <Tabs.Tab value="line">{t('library.detail.chartRunTabs.line')}</Tabs.Tab>
-                <Tabs.Tab value="waffle">{t('library.detail.chartRunTabs.waffle')}</Tabs.Tab>
-              </Tabs.List>
+            <Group justify="space-between" align="center" mb={chartRunCollapsed ? 0 : 'md'}>
+              <Title order={3}>{t('library.detail.chartRun')}</Title>
+              <ActionIcon
+                variant="subtle"
+                onClick={() => setChartRunCollapsed(!chartRunCollapsed)}
+                size="md"
+              >
+                {chartRunCollapsed ? <IconChevronDown size={20} /> : <IconChevronUp size={20} />}
+              </ActionIcon>
+            </Group>
+            <Collapse in={!chartRunCollapsed}>
+              <Tabs
+                value={chartView}
+                onChange={value =>
+                  setChartView((value as 'timeline' | 'line' | 'waffle') || 'timeline')
+                }
+                keepMounted={false}
+              >
+                <Tabs.List>
+                  <Tabs.Tab value="timeline">{t('library.detail.chartRunTabs.timeline')}</Tabs.Tab>
+                  <Tabs.Tab value="line">{t('library.detail.chartRunTabs.line')}</Tabs.Tab>
+                  <Tabs.Tab value="waffle">{t('library.detail.chartRunTabs.waffle')}</Tabs.Tab>
+                </Tabs.List>
 
-              <Tabs.Panel value="timeline">
-                <Box mt="md">
-                  <ChartRun run={timelineRun} chartType="artist" />
-                </Box>
-              </Tabs.Panel>
-              <Tabs.Panel value="line">
-                <Box mt="md">
-                  <EntityChartRun data={chartRun} cutoff={cutoff} colorKey={entityId} />
-                </Box>
-              </Tabs.Panel>
-              <Tabs.Panel value="waffle">
-                <Box mt="md">
-                  <EntityWaffleRun data={chartRun} cutoff={cutoff} />
-                </Box>
-              </Tabs.Panel>
-            </Tabs>
+                <Tabs.Panel value="timeline">
+                  <Box mt="md">
+                    <ChartRun run={timelineRun} chartType="artist" />
+                  </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="line">
+                  <Box mt="md">
+                    <EntityChartRun data={chartRun} cutoff={cutoff} colorKey={entityId} />
+                  </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="waffle">
+                  <Box mt="md">
+                    <EntityWaffleRun data={chartRun} cutoff={cutoff} />
+                  </Box>
+                </Tabs.Panel>
+              </Tabs>
+            </Collapse>
           </Card>
         )}
 

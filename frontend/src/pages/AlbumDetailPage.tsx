@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -15,9 +15,11 @@ import {
   Avatar,
   Tabs,
   Box,
+  Collapse,
+  ActionIcon,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { IconArrowLeft, IconDisc } from '@tabler/icons-react';
+import { IconArrowLeft, IconDisc, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { decodeLastFmSlug, encodeLastFmSlug } from '../utils/urlEncoding';
 import { useEntityStats } from '../hooks/useEntityStats';
 import { useSpotifyImage } from '../hooks/useSpotifyImage';
@@ -32,6 +34,8 @@ import { CertificationBadge } from '../components/CertificationBadge';
 import { getCardBackgroundByMode, type ThemeMode } from '../theme/modes';
 import { useMantineTheme } from '@mantine/core';
 import { AlbumAchievements } from '../components/library/AlbumAchievements';
+import storage from '../utils/storage';
+import KEYS from '../constants/storageKeys';
 
 export const AlbumDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -75,6 +79,15 @@ export const AlbumDetailPage: React.FC = () => {
   // Prepare chart data for visualization
   const chartRun = useMemo(() => stats?.chartRun ?? [], [stats]);
   const [chartView, setChartView] = useState<'timeline' | 'line' | 'waffle'>('timeline');
+
+  // Collapsible state for the chart run card (persisted)
+  const [chartRunCollapsed, setChartRunCollapsed] = useState<boolean>(() => {
+    return storage.getJson<boolean>(KEYS.ALBUM_CHART_RUN_COLLAPSED, [], false) ?? false;
+  });
+
+  useEffect(() => {
+    storage.setJson(KEYS.ALBUM_CHART_RUN_COLLAPSED, chartRunCollapsed);
+  }, [chartRunCollapsed]);
 
   const timelineRun = useMemo(
     () =>
@@ -321,38 +334,47 @@ export const AlbumDetailPage: React.FC = () => {
             withBorder
             style={{ background: cardBackground }}
           >
-            <Title order={3} mb="md">
-              {t('library.detail.chartRun')}
-            </Title>
-            <Tabs
-              value={chartView}
-              onChange={value =>
-                setChartView((value as 'timeline' | 'line' | 'waffle') || 'timeline')
-              }
-              keepMounted={false}
-            >
-              <Tabs.List>
-                <Tabs.Tab value="timeline">{t('library.detail.chartRunTabs.timeline')}</Tabs.Tab>
-                <Tabs.Tab value="line">{t('library.detail.chartRunTabs.line')}</Tabs.Tab>
-                <Tabs.Tab value="waffle">{t('library.detail.chartRunTabs.waffle')}</Tabs.Tab>
-              </Tabs.List>
+            <Group justify="space-between" align="center" mb={chartRunCollapsed ? 0 : 'md'}>
+              <Title order={3}>{t('library.detail.chartRun')}</Title>
+              <ActionIcon
+                variant="subtle"
+                onClick={() => setChartRunCollapsed(!chartRunCollapsed)}
+                size="md"
+              >
+                {chartRunCollapsed ? <IconChevronDown size={20} /> : <IconChevronUp size={20} />}
+              </ActionIcon>
+            </Group>
+            <Collapse in={!chartRunCollapsed}>
+              <Tabs
+                value={chartView}
+                onChange={value =>
+                  setChartView((value as 'timeline' | 'line' | 'waffle') || 'timeline')
+                }
+                keepMounted={false}
+              >
+                <Tabs.List>
+                  <Tabs.Tab value="timeline">{t('library.detail.chartRunTabs.timeline')}</Tabs.Tab>
+                  <Tabs.Tab value="line">{t('library.detail.chartRunTabs.line')}</Tabs.Tab>
+                  <Tabs.Tab value="waffle">{t('library.detail.chartRunTabs.waffle')}</Tabs.Tab>
+                </Tabs.List>
 
-              <Tabs.Panel value="timeline">
-                <Box mt="md">
-                  <ChartRun run={timelineRun} chartType="album" />
-                </Box>
-              </Tabs.Panel>
-              <Tabs.Panel value="line">
-                <Box mt="md">
-                  <EntityChartRun data={chartRun} cutoff={cutoff} colorKey={entityId} />
-                </Box>
-              </Tabs.Panel>
-              <Tabs.Panel value="waffle">
-                <Box mt="md">
-                  <EntityWaffleRun data={chartRun} cutoff={cutoff} />
-                </Box>
-              </Tabs.Panel>
-            </Tabs>
+                <Tabs.Panel value="timeline">
+                  <Box mt="md">
+                    <ChartRun run={timelineRun} chartType="album" />
+                  </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="line">
+                  <Box mt="md">
+                    <EntityChartRun data={chartRun} cutoff={cutoff} colorKey={entityId} />
+                  </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="waffle">
+                  <Box mt="md">
+                    <EntityWaffleRun data={chartRun} cutoff={cutoff} />
+                  </Box>
+                </Tabs.Panel>
+              </Tabs>
+            </Collapse>
           </Card>
         )}
         {chartRun.length > 0 && (
