@@ -4,3 +4,6 @@ export { LastPerfectAllKillCard } from './LastPerfectAllKillCard';
 export { MostPointsCard } from './MostPointsCard';
 export { BiggestDebutsCard } from './BiggestDebutsCard';
 export { HighestPlaysInWeekCard } from './HighestPlaysInWeekCard';
+export { MiniMostPointsCard } from './MiniMostPointsCard';
+export { MiniBiggestDebutsCard } from './MiniBiggestDebutsCard';
+export { MiniHighestPlaysInWeekCard } from './MiniHighestPlaysInWeekCard';

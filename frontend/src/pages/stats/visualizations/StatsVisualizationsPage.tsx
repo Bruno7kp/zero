@@ -18,7 +18,7 @@ import { useIsMobile } from '../../../hooks/useIsMobile';
 import StatsSidebar, { type NavItem } from '../../../components/stats/StatsSidebar';
 import { MobileSidebar } from '../../../components/stats/MobileSidebar';
 
-const StatsVisualizationsOverview = lazy(() => import('./StatsVisualizationsOverview'));
+const StatsVisualizationsOverview = lazy(() => import('./StatsVisualizationsOverviewPage'));
 const NumberOneTimelineChart = lazy(() => import('./NumberOneTimelineChart'));
 const TopRankLeadersChart = lazy(() => import('./TopRankLeadersChart'));
 const TopPointsLeadersChart = lazy(() => import('./TopPointsLeadersChart'));

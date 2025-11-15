@@ -10,6 +10,8 @@ export const KEYS = {
   LIBRARY_SHOW_GRID_PEAK: 'zc.library.showGridPeak:v1',
   LIBRARY_SHOW_GRID_POSITION: 'zc.library.showGridPosition:v1',
   STATS_OVERVIEW_CARD_ORDER: 'zc.stats.overviewCardOrder:v1',
+  // Separate card order for the visualizations page to keep persisted layout independent
+  STATS_VISUALIZATIONS_OVERVIEW_CARD_ORDER: 'zc.stats.visualizations.overviewCardOrder:v1',
   USER_TOKEN: 'zc.user-token:v1',
   CHARTS_WEEKS_VIEW_MODE: 'zc.chartsWeeks.viewMode:v1',
   CHARTS_WEEKS_TYPE_FILTER: 'zc.chartsWeeks.typeFilter:v1',
