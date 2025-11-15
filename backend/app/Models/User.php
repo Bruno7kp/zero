@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'google_id',
         'avatar',
+        'lastfm_session_key',
+        'lastfm_username',
     ];
 
     /**
@@ -35,6 +37,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'lastfm_session_key',
     ];
 
     /**

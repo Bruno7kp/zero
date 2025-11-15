@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Title,
@@ -10,15 +10,22 @@ import {
   Text,
   Alert,
   NumberInput,
-  Accordion,
-  Anchor,
   rem,
   ThemeIcon,
+  Loader,
+  Badge,
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconX, IconMusic, IconInfoCircle } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconX,
+  IconMusic,
+  IconInfoCircle,
+  IconUnlink,
+  IconPlugConnected,
+} from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { apiUrl } from '../config';
 import { useSelector } from 'react-redux';
@@ -30,9 +37,11 @@ interface ScrobbleFormValues {
   albumArtist: string;
   duration: number | string;
   timestamp: Date;
-  apiKey: string;
-  apiSecret: string;
-  sessionKey: string;
+}
+
+interface LastFmStatus {
+  connected: boolean;
+  username: string | null;
 }
 
 const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
@@ -40,6 +49,12 @@ const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
 function ScrobblePage() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [lastfmStatus, setLastfmStatus] = useState<LastFmStatus>({
+    connected: false,
+    username: null,
+  });
+  const [disconnecting, setDisconnecting] = useState(false);
   const token = useSelector((state: any) => state.auth.token);
 
   const form = useForm<ScrobbleFormValues>({
@@ -50,16 +65,10 @@ function ScrobblePage() {
       albumArtist: '',
       duration: '',
       timestamp: new Date(),
-      apiKey: '',
-      apiSecret: '',
-      sessionKey: '',
     },
     validate: {
       track: value => (!value ? t('scrobble.form.trackRequired') : null),
       artist: value => (!value ? t('scrobble.form.artistRequired') : null),
-      apiKey: value => (!value ? t('scrobble.form.apiKeyRequired') : null),
-      apiSecret: value => (!value ? t('scrobble.form.apiSecretRequired') : null),
-      sessionKey: value => (!value ? t('scrobble.form.sessionKeyRequired') : null),
       timestamp: value => {
         if (!value) return 'Date is required';
         const now = Date.now();
@@ -75,7 +84,122 @@ function ScrobblePage() {
     },
   });
 
+  // Check Last.fm connection status on mount
+  useEffect(() => {
+    checkLastFmStatus();
+  }, []);
+
+  const checkLastFmStatus = async () => {
+    setStatusLoading(true);
+    try {
+      const response = await fetch(apiUrl('/lastfm/status'), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLastfmStatus(data);
+      }
+    } catch (error) {
+      console.error('Failed to check Last.fm status:', error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  const handleConnectLastFm = async () => {
+    try {
+      const response = await fetch(apiUrl('/lastfm/authorize'), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Open Last.fm authorization in popup
+        const width = 600;
+        const height = 700;
+        const left = window.screen.width / 2 - width / 2;
+        const top = window.screen.height / 2 - height / 2;
+
+        const authWindow = window.open(
+          data.auth_url,
+          'lastfm_auth',
+          `width=${width},height=${height},left=${left},top=${top}`
+        );
+
+        // Poll for callback completion
+        const pollInterval = setInterval(async () => {
+          if (authWindow?.closed) {
+            clearInterval(pollInterval);
+            // Check status after window closes
+            await checkLastFmStatus();
+            if (lastfmStatus.connected) {
+              notifications.show({
+                title: t('scrobble.success'),
+                message: t('scrobble.connectedSuccess'),
+                color: 'green',
+                icon: <IconCheck />,
+              });
+            }
+          }
+        }, 1000);
+      }
+    } catch (error: any) {
+      notifications.show({
+        title: t('scrobble.error'),
+        message: t('scrobble.errorDetails', { message: error.message }),
+        color: 'red',
+        icon: <IconX />,
+      });
+    }
+  };
+
+  const handleDisconnectLastFm = async () => {
+    setDisconnecting(true);
+    try {
+      const response = await fetch(apiUrl('/lastfm/disconnect'), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setLastfmStatus({ connected: false, username: null });
+        notifications.show({
+          title: t('scrobble.success'),
+          message: t('scrobble.disconnectedSuccess'),
+          color: 'green',
+          icon: <IconCheck />,
+        });
+      }
+    } catch (error: any) {
+      notifications.show({
+        title: t('scrobble.error'),
+        message: t('scrobble.errorDetails', { message: error.message }),
+        color: 'red',
+        icon: <IconX />,
+      });
+    } finally {
+      setDisconnecting(false);
+    }
+  };
+
   const handleSubmit = async (values: ScrobbleFormValues) => {
+    if (!lastfmStatus.connected) {
+      notifications.show({
+        title: t('scrobble.error'),
+        message: t('scrobble.notConnected'),
+        color: 'red',
+        icon: <IconX />,
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -83,9 +207,6 @@ function ScrobblePage() {
       const timestampUTC = Math.floor(values.timestamp.getTime() / 1000);
 
       const payload = {
-        api_key: values.apiKey,
-        api_secret: values.apiSecret,
-        session_key: values.sessionKey,
         artist: values.artist,
         track: values.track,
         timestamp: timestampUTC,
@@ -133,6 +254,17 @@ function ScrobblePage() {
     }
   };
 
+  if (statusLoading) {
+    return (
+      <Container size="sm" py="xl">
+        <Stack align="center" gap="md">
+          <Loader size="lg" />
+          <Text>{t('scrobble.checkingConnection')}</Text>
+        </Stack>
+      </Container>
+    );
+  }
+
   return (
     <Container size="sm" py="xl">
       <Stack gap="lg">
@@ -147,6 +279,60 @@ function ScrobblePage() {
           {t('scrobble.description')}
         </Text>
 
+        {/* Last.fm Connection Status */}
+        <Alert
+          icon={
+            lastfmStatus.connected ? (
+              <IconPlugConnected size={16} />
+            ) : (
+              <IconInfoCircle size={16} />
+            )
+          }
+          title={
+            lastfmStatus.connected
+              ? t('scrobble.connection.connected')
+              : t('scrobble.connection.notConnected')
+          }
+          color={lastfmStatus.connected ? 'green' : 'blue'}
+          variant="light"
+        >
+          <Stack gap="sm">
+            {lastfmStatus.connected ? (
+              <>
+                <Group gap="xs">
+                  <Text size="sm">
+                    {t('scrobble.connection.connectedAs')}{' '}
+                    <Badge size="sm" variant="light">
+                      {lastfmStatus.username}
+                    </Badge>
+                  </Text>
+                </Group>
+                <Button
+                  size="xs"
+                  variant="light"
+                  color="red"
+                  leftSection={<IconUnlink size={16} />}
+                  onClick={handleDisconnectLastFm}
+                  loading={disconnecting}
+                >
+                  {t('scrobble.connection.disconnect')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Text size="sm">{t('scrobble.connection.connectDescription')}</Text>
+                <Button
+                  size="sm"
+                  leftSection={<IconPlugConnected size={16} />}
+                  onClick={handleConnectLastFm}
+                >
+                  {t('scrobble.connection.connect')}
+                </Button>
+              </>
+            )}
+          </Stack>
+        </Alert>
+
         <Paper shadow="sm" p="xl" withBorder>
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="md">
@@ -154,6 +340,7 @@ function ScrobblePage() {
                 label={t('scrobble.form.track')}
                 placeholder={t('scrobble.form.trackPlaceholder')}
                 required
+                disabled={!lastfmStatus.connected}
                 {...form.getInputProps('track')}
               />
 
@@ -161,18 +348,21 @@ function ScrobblePage() {
                 label={t('scrobble.form.artist')}
                 placeholder={t('scrobble.form.artistPlaceholder')}
                 required
+                disabled={!lastfmStatus.connected}
                 {...form.getInputProps('artist')}
               />
 
               <TextInput
                 label={t('scrobble.form.album')}
                 placeholder={t('scrobble.form.albumPlaceholder')}
+                disabled={!lastfmStatus.connected}
                 {...form.getInputProps('album')}
               />
 
               <TextInput
                 label={t('scrobble.form.albumArtist')}
                 placeholder={t('scrobble.form.albumArtistPlaceholder')}
+                disabled={!lastfmStatus.connected}
                 {...form.getInputProps('albumArtist')}
               />
 
@@ -180,6 +370,7 @@ function ScrobblePage() {
                 label={t('scrobble.form.duration')}
                 placeholder={t('scrobble.form.durationPlaceholder')}
                 min={0}
+                disabled={!lastfmStatus.connected}
                 {...form.getInputProps('duration')}
               />
 
@@ -189,71 +380,22 @@ function ScrobblePage() {
                 placeholder="Pick date and time"
                 valueFormat="DD/MM/YYYY HH:mm"
                 required
+                disabled={!lastfmStatus.connected}
                 {...form.getInputProps('timestamp')}
               />
 
-              <Alert
-                icon={<IconInfoCircle size={16} />}
-                title="Last.fm API Credentials Required"
-                color="blue"
-                variant="light"
+              <Button
+                type="submit"
+                loading={loading}
+                fullWidth
+                size="md"
+                disabled={!lastfmStatus.connected}
               >
-                <Text size="sm">
-                  You need your Last.fm API credentials to scrobble tracks. These are stored
-                  locally and only sent to Last.fm.
-                </Text>
-              </Alert>
-
-              <TextInput
-                label={t('scrobble.form.apiKey')}
-                placeholder={t('scrobble.form.apiKeyPlaceholder')}
-                required
-                {...form.getInputProps('apiKey')}
-              />
-
-              <TextInput
-                label={t('scrobble.form.apiSecret')}
-                placeholder={t('scrobble.form.apiSecretPlaceholder')}
-                type="password"
-                required
-                {...form.getInputProps('apiSecret')}
-              />
-
-              <TextInput
-                label={t('scrobble.form.sessionKey')}
-                placeholder={t('scrobble.form.sessionKeyPlaceholder')}
-                type="password"
-                required
-                {...form.getInputProps('sessionKey')}
-              />
-
-              <Button type="submit" loading={loading} fullWidth size="md">
                 {loading ? t('scrobble.form.submitting') : t('scrobble.form.submit')}
               </Button>
             </Stack>
           </form>
         </Paper>
-
-        <Accordion variant="contained">
-          <Accordion.Item value="help">
-            <Accordion.Control icon={<IconInfoCircle size={20} />}>
-              {t('scrobble.help.title')}
-            </Accordion.Control>
-            <Accordion.Panel>
-              <Stack gap="sm">
-                <Text size="sm">{t('scrobble.help.apiKey')}</Text>
-                <Text size="sm">{t('scrobble.help.sessionKey')}</Text>
-                <Anchor
-                  href="https://www.last.fm/api/authentication"
-                  target="_blank"
-                  size="sm"
-                >
-                  {t('scrobble.help.sessionKeyLink')}
-                </Anchor>
-              </Stack>
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
       </Stack>
     </Container>
   );

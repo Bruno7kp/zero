@@ -25,16 +25,15 @@ class LastFmScrobbleTest extends TestCase
      */
     public function test_scrobble_validates_required_fields(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'lastfm_session_key' => 'test_session_key',
+        ]);
 
         $response = $this->actingAs($user)
             ->postJson('/api/lastfm/scrobble', []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
-                'api_key',
-                'api_secret',
-                'session_key',
                 'artist',
                 'track',
                 'timestamp',
@@ -42,37 +41,26 @@ class LastFmScrobbleTest extends TestCase
     }
 
     /**
-     * Test that scrobble endpoint accepts valid data.
+     * Test that scrobble requires Last.fm connection.
      */
-    public function test_scrobble_accepts_valid_data(): void
+    public function test_scrobble_requires_lastfm_connection(): void
     {
         $user = User::factory()->create();
 
         $data = [
-            'api_key' => 'test_api_key',
-            'api_secret' => 'test_api_secret',
-            'session_key' => 'test_session_key',
             'artist' => 'Test Artist',
             'track' => 'Test Track',
             'timestamp' => time(),
-            'album' => 'Test Album',
-            'albumArtist' => 'Test Album Artist',
-            'duration' => 240,
         ];
 
-        // Note: This will fail with Last.fm API unless valid credentials are provided
-        // This test validates the endpoint accepts the correct structure and makes the request
         $response = $this->actingAs($user)
             ->postJson('/api/lastfm/scrobble', $data);
 
-        // We expect either success (200), Last.fm API error (400), or server error (500)
-        // Server error is expected with fake credentials as Last.fm will reject them
-        $this->assertContains($response->status(), [200, 400, 500]);
-
-        // If it's a 400 or 500, ensure we get a proper error response
-        if ($response->status() !== 200) {
-            $response->assertJsonStructure(['success', 'error']);
-        }
+        $response->assertStatus(400)
+            ->assertJson([
+                'success' => false,
+                'error' => 'Last.fm account not connected. Please connect your Last.fm account first.',
+            ]);
     }
 
     /**
@@ -80,12 +68,11 @@ class LastFmScrobbleTest extends TestCase
      */
     public function test_scrobble_works_without_optional_fields(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'lastfm_session_key' => 'test_session_key',
+        ]);
 
         $data = [
-            'api_key' => 'test_api_key',
-            'api_secret' => 'test_api_secret',
-            'session_key' => 'test_session_key',
             'artist' => 'Test Artist',
             'track' => 'Test Track',
             'timestamp' => time(),
@@ -96,5 +83,45 @@ class LastFmScrobbleTest extends TestCase
 
         // We expect either success or Last.fm API error, but not validation error
         $this->assertNotEquals(422, $response->status());
+    }
+
+    /**
+     * Test Last.fm connection status endpoint.
+     */
+    public function test_lastfm_status_returns_connection_state(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/lastfm/status');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'connected',
+                'username',
+            ]);
+    }
+
+    /**
+     * Test Last.fm disconnect endpoint.
+     */
+    public function test_lastfm_disconnect_clears_session_key(): void
+    {
+        $user = User::factory()->create([
+            'lastfm_session_key' => 'test_session_key',
+            'lastfm_username' => 'test_user',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/lastfm/disconnect');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        $user->refresh();
+        $this->assertNull($user->lastfm_session_key);
+        $this->assertNull($user->lastfm_username);
     }
 }

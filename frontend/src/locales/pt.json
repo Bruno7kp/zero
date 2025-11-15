@@ -17,6 +17,8 @@
     "scrobble": {
       "title": "Scrobble Manual",
       "description": "Envie manualmente uma música para o Last.fm",
+      "checkingConnection": "Verificando conexão com Last.fm...",
+      "notConnected": "Por favor, conecte sua conta Last.fm primeiro",
       "form": {
         "track": "Nome da Música",
         "trackPlaceholder": "Digite o nome da música",
@@ -32,27 +34,22 @@
         "durationPlaceholder": "Digite a duração em segundos",
         "timestamp": "Data/Hora do Scrobble",
         "timestampDescription": "O Last.fm permite scrobbles até 2 semanas no passado",
-        "apiKey": "Chave de API do Last.fm",
-        "apiKeyPlaceholder": "Digite sua chave de API do Last.fm",
-        "apiKeyRequired": "Chave de API é obrigatória",
-        "apiSecret": "Segredo de API do Last.fm",
-        "apiSecretPlaceholder": "Digite seu segredo de API do Last.fm",
-        "apiSecretRequired": "Segredo de API é obrigatório",
-        "sessionKey": "Chave de Sessão do Last.fm",
-        "sessionKeyPlaceholder": "Digite sua chave de sessão do Last.fm",
-        "sessionKeyRequired": "Chave de sessão é obrigatória",
         "submit": "Enviar Scrobble",
         "submitting": "Enviando..."
       },
-      "success": "Música enviada com sucesso!",
-      "error": "Falha ao enviar música",
-      "errorDetails": "Erro: {{message}}",
-      "help": {
-        "title": "Como obter suas credenciais do Last.fm",
-        "apiKey": "1. Acesse https://www.last.fm/api/account/create para criar uma conta de API",
-        "sessionKey": "2. Para obter sua chave de sessão, você precisa autenticar seu aplicativo",
-        "sessionKeyLink": "Saiba mais na documentação de autenticação do Last.fm"
-      }
+      "connection": {
+        "connected": "Last.fm Conectado",
+        "notConnected": "Conecte Sua Conta Last.fm",
+        "connectedAs": "Conectado como",
+        "connect": "Conectar Last.fm",
+        "disconnect": "Desconectar",
+        "connectDescription": "Conecte sua conta Last.fm para começar a enviar scrobbles"
+      },
+      "success": "Sucesso!",
+      "connectedSuccess": "Conta Last.fm conectada com sucesso",
+      "disconnectedSuccess": "Conta Last.fm desconectada",
+      "error": "Erro",
+      "errorDetails": "Erro: {{message}}"
     },
     "charts": {
       "live_chart_period": "{{from}} - agora",

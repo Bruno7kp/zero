@@ -23,7 +23,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/charts/{chart}', [ChartController::class, 'update']);
     Route::delete('/charts/{chart}', [ChartController::class, 'destroy']);
 
-    // Last.fm scrobble endpoint
+    // Last.fm authentication and scrobble endpoints
+    Route::get('/lastfm/authorize', [LastFmController::class, 'authorize']);
+    Route::get('/lastfm/callback', [LastFmController::class, 'callback']);
+    Route::post('/lastfm/disconnect', [LastFmController::class, 'disconnect']);
+    Route::get('/lastfm/status', [LastFmController::class, 'status']);
     Route::post('/lastfm/scrobble', [LastFmController::class, 'scrobble']);
 });
 

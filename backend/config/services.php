@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_CALLBACK_URL'),
     ],
 
+    'lastfm' => [
+        'api_key' => env('LASTFM_API_KEY'),
+        'api_secret' => env('LASTFM_API_SECRET'),
+        'callback_url' => env('LASTFM_CALLBACK_URL'),
+    ],
+
 ];
