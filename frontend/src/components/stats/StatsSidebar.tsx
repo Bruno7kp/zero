@@ -284,7 +284,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({
         size="350px"
         title={drawerTitle}
         styles={{
-          header: { justifyContent: 'center', position: 'relative' },
+          header: { justifyContent: 'center', position: 'relative', backgroundColor: bgColor },
           title: { width: '100%', display: 'flex', justifyContent: 'center' },
           close: { position: 'absolute', right: 'var(--mantine-spacing-sm)' },
           body: { padding: 'md', height: '100%', display: 'flex', flexDirection: 'column' },

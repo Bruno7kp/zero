@@ -23,7 +23,7 @@ export function appShellDarkIndex(mode: ThemeMode): number {
     case 'blue':
       return 8;
     case 'black':
-      return 9;
+      return 5;
     case 'dark':
     default:
       return 7;

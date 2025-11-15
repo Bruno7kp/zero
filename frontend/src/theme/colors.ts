@@ -161,7 +161,7 @@ export const blackdark: MantineColorsTuple = [
   '#7a7a7a', // 2
   '#5c5c5c', // 3
   '#404040', // 4
-  '#2c2c2c', // 5
+  '#191919', // 5
   '#1f1f1f', // 6
   '#141414', // 7
   '#0a0a0a', // 8
