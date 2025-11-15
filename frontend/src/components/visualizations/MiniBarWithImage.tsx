@@ -54,7 +54,8 @@ const MiniBarWithImage: React.FC<MiniBarWithImageProps> = ({
     }));
   }, [items, color, isHorizontal]);
 
-  const IMAGE_SIZE = 32;
+  // Increase image size to 36 per design request
+  const IMAGE_SIZE = 36;
 
   const effectiveHeight = React.useMemo(() => {
     if (isHorizontal) {
@@ -98,8 +99,11 @@ const MiniBarWithImage: React.FC<MiniBarWithImageProps> = ({
     [isHorizontal, showImages]
   );
 
+  // For horizontal layouts we need more right margin for the image; however 160px
+  // was making the chart area much smaller. Use a smaller right margin so bars
+  // can occupy more width while still showing the image to the right.
   const margin = isHorizontal
-    ? { top: 12, right: IMAGE_SIZE + 160, bottom: 12, left: 12 }
+    ? { top: 12, right: IMAGE_SIZE + 56, bottom: 12, left: 12 }
     : { top: 48, right: 12, bottom: 24, left: 12 };
 
   return (
